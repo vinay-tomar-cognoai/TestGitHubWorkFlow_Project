@@ -1,0 +1,557 @@
+{% extends 'LiveChatApp/manager_console.html' %}
+{% block consolecontent %}
+{% load static %}
+<head>
+
+    <link href="{% static 'LiveChatApp/css/calender.css' %}" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="{% static 'LiveChatApp/css/bootstrap_datepicker.css' %}" />
+
+    <style type="text/css">
+        .add-holiday-btn {
+            background: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+        }
+        
+        .work-timing-btn {
+            border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }} !important;
+            color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+        }
+        #calendar-work-timing-modal .cam input:checked~.checkmark{
+             background-color: {{admin_config.get_livechat_theme_lighten_one}};
+        }
+        .datepicker table tr td.active, .datepicker table tr td.active.disabled, .datepicker table tr td.active.disabled:hover, .datepicker table tr td.active:hover{
+            background-image: none !important;
+            background-color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+        }
+    </style>
+</head>
+<div class="col-xl-10 col-lg-10 col-md-12 col-sm-12 col-12 py-2 overflow-hidden-desktop" id="live-chat-admin-setting-content-calendar" style="height: calc(100vh - 4.375rem); background: #FAFAFA; overflow-y: auto; overflow-x: hidden; max-width: 83%; z-index: 10;;">
+
+        <div class="live-chat-setting-calender-heading mb-0">
+            <div class="row">
+                <img src="{% static 'LiveChatApp/img/mobile-back.svg' %}" class="back-arrow-div" id="live-chat-active-customers-opener-setting" onclick="myFunctionArrow()">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" id="livechat-calender-icon">
+                <path d="M11.4722 0C12.8683 0 14 1.13172 14 2.52778V11.4722C14 12.8683 12.8683 14 11.4722 14H2.52778C1.13172 14 0 12.8683 0 11.4722V2.52778C0 1.13172 1.13172 0 2.52778 0H11.4722ZM11.4722 1.16667H2.52778C1.77606 1.16667 1.16667 1.77606 1.16667 2.52778V11.4722C1.16667 12.2239 1.77606 12.8333 2.52778 12.8333H11.4722C12.2239 12.8333 12.8333 12.2239 12.8333 11.4722V2.52778C12.8333 1.77606 12.2239 1.16667 11.4722 1.16667ZM3.69444 8.16667C4.23139 8.16667 4.66667 8.60195 4.66667 9.13889C4.66667 9.67583 4.23139 10.1111 3.69444 10.1111C3.1575 10.1111 2.72222 9.67583 2.72222 9.13889C2.72222 8.60195 3.1575 8.16667 3.69444 8.16667ZM7 8.16667C7.53694 8.16667 7.97222 8.60195 7.97222 9.13889C7.97222 9.67583 7.53694 10.1111 7 10.1111C6.46306 10.1111 6.02778 9.67583 6.02778 9.13889C6.02778 8.60195 6.46306 8.16667 7 8.16667ZM3.69444 4.27778C4.23139 4.27778 4.66667 4.71306 4.66667 5.25C4.66667 5.78694 4.23139 6.22222 3.69444 6.22222C3.1575 6.22222 2.72222 5.78694 2.72222 5.25C2.72222 4.71306 3.1575 4.27778 3.69444 4.27778ZM7 4.27778C7.53694 4.27778 7.97222 4.71306 7.97222 5.25C7.97222 5.78694 7.53694 6.22222 7 6.22222C6.46306 6.22222 6.02778 5.78694 6.02778 5.25C6.02778 4.71306 6.46306 4.27778 7 4.27778ZM10.3056 4.27778C10.8425 4.27778 11.2778 4.71306 11.2778 5.25C11.2778 5.78694 10.8425 6.22222 10.3056 6.22222C9.76861 6.22222 9.33333 5.78694 9.33333 5.25C9.33333 4.71306 9.76861 4.27778 10.3056 4.27778Z" fill="#4d4d4d"/>
+            </svg>
+
+                <span>Calendar</span>
+            </div>
+            <div class="row">
+                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-calender-date">
+                    <div class="filter-month-name-div">
+                        <button class="filter-btn" id="live-chat-calendar-filter-btn" data-toggle="modal" data-target="#calendar-filter-modal">
+                            <span>Filter</span>
+                            <svg width="16" height="9" viewBox="0 0 16 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5.33333 8.35714C5.33333 8.18665 5.40357 8.02313 5.5286 7.90257C5.65362 7.78201 5.82319 7.71429 6 7.71429H10C10.1768 7.71429 10.3464 7.78201 10.4714 7.90257C10.5964 8.02313 10.6667 8.18665 10.6667 8.35714C10.6667 8.52764 10.5964 8.69115 10.4714 8.81171C10.3464 8.93227 10.1768 9 10 9H6C5.82319 9 5.65362 8.93227 5.5286 8.81171C5.40357 8.69115 5.33333 8.52764 5.33333 8.35714ZM2.66667 4.5C2.66667 4.3295 2.7369 4.16599 2.86193 4.04543C2.98695 3.92487 3.15652 3.85714 3.33333 3.85714H12.6667C12.8435 3.85714 13.013 3.92487 13.1381 4.04543C13.2631 4.16599 13.3333 4.3295 13.3333 4.5C13.3333 4.6705 13.2631 4.83401 13.1381 4.95457C13.013 5.07513 12.8435 5.14286 12.6667 5.14286H3.33333C3.15652 5.14286 2.98695 5.07513 2.86193 4.95457C2.7369 4.83401 2.66667 4.6705 2.66667 4.5ZM0 0.642857C0 0.472361 0.070238 0.308848 0.195262 0.188289C0.320287 0.0677295 0.489856 0 0.666667 0H15.3333C15.5101 0 15.6797 0.0677295 15.8047 0.188289C15.9298 0.308848 16 0.472361 16 0.642857C16 0.813353 15.9298 0.976867 15.8047 1.09743C15.6797 1.21798 15.5101 1.28571 15.3333 1.28571H0.666667C0.489856 1.28571 0.320287 1.21798 0.195262 1.09743C0.070238 0.976867 0 0.813353 0 0.642857Z" fill="#868686"/>
+                            </svg>
+                        </button>
+    
+                        <div class="month-arrow-name-div">
+                            <div class="navigate-month-arrow">
+                                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" class="prev-month" id="prev-month-id">
+                                    <path d="M4.37695 7.26101C4.37664 7.00581 4.48625 6.76283 4.67778 6.59418L8.97887 2.81029C9.27529 2.56155 9.71608 2.59495 9.97164 2.88551C10.2272 3.17607 10.2041 3.61752 9.91953 3.87977L6.1584 7.18851C6.13751 7.20681 6.12554 7.23324 6.12554 7.26101C6.12554 7.28879 6.13751 7.31521 6.1584 7.33352L9.91953 10.6423C10.1175 10.8084 10.21 11.0687 10.1612 11.3225C10.1123 11.5763 9.92989 11.7837 9.6844 11.8646C9.43891 11.9454 9.16891 11.8869 8.97887 11.7117L4.67933 7.92901C4.48733 7.76006 4.3772 7.51676 4.37695 7.26101Z" fill="#2D2D2D"/>
+                                </svg>                                    
+                                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" class="next-month" id="next-month-id">
+                                    <path d="M10.7812 7.45383C10.7815 7.71967 10.6674 7.97277 10.4679 8.14845L5.98756 12.09C5.67878 12.3491 5.21963 12.3143 4.95341 12.0116C4.6872 11.709 4.7113 11.2491 5.00769 10.976L8.92554 7.52936C8.9473 7.51029 8.95977 7.48276 8.95977 7.45383C8.95977 7.4249 8.9473 7.39737 8.92554 7.3783L5.00769 3.93171C4.7113 3.65852 4.6872 3.19869 4.95341 2.89602C5.21963 2.59335 5.67878 2.55856 5.98756 2.81766L10.4662 6.758C10.6662 6.93399 10.781 7.18743 10.7812 7.45383Z" fill="#2D2D2D"/>
+                                </svg>                                  
+                            </div>
+                            <div class="month-name-year" id="month-name-year-div-id">
+                                <p>{{selected_month_name}} {{selected_year}}</p>
+                            </div>
+                        </div>
+                    </div>
+                   
+                </div>
+            </div>
+
+        </div>
+        <div class="row m-0">
+            <div class="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12 live-chat-calender-area live-chat-table-parent-div livechat-new-calendar">
+                <div class="created-on-date">
+                    {% with calendar_objs|first as first_calendar_obj %}
+                    Created on : {{ first_calendar_obj.created_at | date:"j M" }}
+                    {% endwith %}
+                </div>
+            
+                
+                <table class="calendar-table table table-bordered calendar-month-area">
+                    <thead>
+                        <tr>
+                            <th class="weekday">Sun</th>
+                            <th class="weekday working">Mon</th>
+                            <th class="weekday working">Tue</th>
+                            <th class="weekday working">Wed</th>
+                            <th class="weekday working">Thu</th>
+                            <th class="weekday working">Fri</th>
+                            <th class="weekday working">Sat</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% now "M d, Y" as today %}
+                        <!-- row loop -->
+                        
+                        {% for new_calender_objs in calender_list %}
+                        <tr>
+                            <!-- column loop -->
+                            {% for calendar_obj in new_calender_objs %}
+                              
+                              {% is_numeric calendar_obj as numeric %}
+
+
+                              {% if not numeric %}  
+                                {% if calendar_obj.event_date|date:"M d, Y" == today %}
+                                <td class="weekday-number present">
+                                {% elif calendar_obj.event_type == "1" %}  
+                                <td class="weekday-number working">
+                                {% elif calendar_obj.event_type == "2" %}     
+                                <td class="weekday-number holiday">
+                                {% endif %}    
+                                    <div class="month-day-detail">
+                                        <p class="month-date">
+                                            {{calendar_obj.event_date | date:"j"}}
+                                        </p>
+                                        {% if calendar_obj.event_type == "1" %}
+                                        <p class="working-hours" >
+                                            <span class="working-hrs-color"></span>
+                                            <span class="working-hrs-time">{{ calendar_obj.start_time | time:'H:i' }} - {{ calendar_obj.end_time | time:'H:i' }}</span>
+                                        </p>
+                                        {% else %}
+                                        <p class="working-hours" style="display: none;">
+                                            <span class="working-hrs-color"></span>
+                                            <span class="working-hrs-time">{{ calendar_obj.start_time | time:'H:i' }} - {{ calendar_obj.end_time | time:'H:i' }}</span>
+                                        </p>
+                                        {% endif %}
+                                    </div>
+                                    <div class="edit-icon" data-toggle="modal" data-target="#modal-edit-calender-event-{{calendar_obj.pk}}">
+                                        <img src="{% static 'LiveChatApp/img/Edit.svg' %}" alt="">
+                                    </div>
+
+                                    <!-- edit model -->
+                                    <div class="modal fade backdrop modal-edit-calendar" id="modal-edit-calender-event-{{calendar_obj.pk}}" tabindex="-1" role="dialog" aria-labelledby="calendar_edit_modal_label" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <div class="calendar-filter-header">
+                                                        <h6>{{ calendar_obj.event_date | date:"d-M-Y" }}</h6>
+                                                        <p class="modified-date-time-para">
+                                                            Modified: {{ calendar_obj.modified_date|date:"d M" }} <br>
+                                                            {{time_zone}}:  {{ calendar_obj.modified_date|date:"h:i A" }} 
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="row">
+                                                        <div class="col-12 mb-4 edit-day-type-field">
+                                                            <label>Day</label>
+                                                            <input type="checkbox" name="calendar-edit-day-type-input" {% if calendar_obj.event_type == "1" %} checked {% endif %} id="calendar-edit-day-type-input-{{ calendar_obj.pk }}">
+                                                            <label for="calendar-edit-day-type-input-{{ calendar_obj.pk }}" class="days-type-toggle">
+                                                                <span class="day-type-working" id="day-type-working-id-{{ calendar_obj.pk }}" {% if calendar_obj.event_type == "1" %} style="display: block;" {% else %} style="display: none;" {% endif %}>Working</span>
+                                                                <span class="day-type-holiday" id="day-type-holiday-id-{{ calendar_obj.pk }}" {% if calendar_obj.event_type == "2" %} style="display: block;" {% else %} style="display: none;" {% endif %}>Holiday</span>      
+                                                            </label>
+                                                        </div>
+                                                        {% if calendar_obj.event_type == "1" %}
+                                                        <div class="col-6 mb-4 working-time text-left" id="edit-start-working-time-div-{{calendar_obj.pk}}">
+                                                            <label>Start Time</label>
+                                                            <input class="form-control " type="time" id="edit-start-working-time-{{ calendar_obj.pk }}" value="{{ calendar_obj.start_time | time:'H:i' }}">
+                                                        </div>
+                                                        <div class="col-6 mb-4 working-time text-left" id="edit-end-working-time-div-{{calendar_obj.pk}}">
+                                                            <label>End Time</label>
+                                                            <input class="form-control" type="time" id="edit-end-working-time-{{ calendar_obj.pk }}" value="{{ calendar_obj.end_time | time:'H:i' }}">
+                                                        </div>
+                                                        {% else %}
+                                                        <div class="col-6 mb-4 working-time text-left" id="edit-start-working-time-div-{{calendar_obj.pk}}" style="display: none;">
+                                                            <label>Start Time</label>
+                                                            <input class="form-control " type="time" id="edit-start-working-time-{{ calendar_obj.pk }}" value="{{ calendar_obj.start_time | time:'H:i' }}">
+                                                        </div>
+                                                        <div class="col-6 mb-4 working-time text-left" id="edit-end-working-time-div-{{calendar_obj.pk}}" style="display: none;">
+                                                            <label>End Time</label>
+                                                            <input class="form-control" type="time" id="edit-end-working-time-{{ calendar_obj.pk }}" value="{{ calendar_obj.end_time | time:'H:i' }}">
+                                                        </div>
+                                                        {% endif %}
+                                                        {% if calendar_obj.event_type == "2" %}
+                                                        <div class="col-12 mb-4 holidays-content text-left" id="edit-holiday-calender-event-description-{{ calendar_obj.pk }}">
+                                                            <label>Description</label>
+                                                            <input class="form-control show-char-count" type="text " maxlength="{{ char_limit_medium_text }}" id="modal-holiday-description-{{ calendar_obj.pk }}" value="{{calendar_obj.description}}" placeholder="Type Here">
+                                                            <div class="livechat-char-count">
+                                                                <p id="modal-holiday-description-{{ calendar_obj.pk }}-char-count">{{ calendar_obj.description|length }}</p>
+                                                                <p>/{{ char_limit_medium_text }}</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-12 mb-4 holidays-content text-left" id="edit-holiday-calender-event-autoreponse-{{ calendar_obj.pk }}">
+                                                            <label>Auto Response</label>
+                                                            <input class="form-control show-char-count" type="text " maxlength="{{ char_limit_large_text }}" id="modal-holiday-autoreponse-{{ calendar_obj.pk }}" value="{{calendar_obj.auto_response}}" placeholder="Type Here">
+                                                            <div class="livechat-char-count">
+                                                                <p id="modal-holiday-autoreponse-{{ calendar_obj.pk }}-char-count">{{ calendar_obj.auto_response|length }}</p>
+                                                                <p>/{{ char_limit_large_text }}</p>
+                                                            </div>
+                                                        </div>
+                                                        {% else %}
+                                                        <div class="col-12 mb-4 holidays-content text-left" id="edit-holiday-calender-event-description-{{ calendar_obj.pk }}" style="display: none;">
+                                                            <label>Description</label>
+                                                            <input class="form-control show-char-count" type="text " maxlength="{{ char_limit_medium_text }}" id="modal-holiday-description-{{ calendar_obj.pk }}" value="" placeholder="Type Here">
+                                                            <div class="livechat-char-count">
+                                                                <p id="modal-holiday-description-{{ calendar_obj.pk }}-char-count">{{ calendar_obj.description|length }}</p>
+                                                                <p>/{{ char_limit_medium_text }}</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-12 mb-4 holidays-content text-left" id="edit-holiday-calender-event-autoreponse-{{ calendar_obj.pk }}" style="display: none;">
+                                                            <label>Auto Response</label>
+                                                            <input class="form-control show-char-count" type="text " maxlength="{{ char_limit_large_text }}"  id="modal-holiday-autoreponse-{{ calendar_obj.pk }}" value="" placeholder="Type Here">
+                                                            <div class="livechat-char-count">
+                                                                <p id="modal-holiday-autoreponse-{{ calendar_obj.pk }}-char-count">{{ calendar_obj.auto_response|length }}</p>
+                                                                <p>/{{ char_limit_large_text }}</p>
+                                                            </div>
+                                                        </div>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer ">
+                                                    <div style="float: right; ">
+                                                        <button class="btn-close " type="button " data-dismiss="modal">Cancel</button>
+                                                        <button class="btn-primary " type="button" onclick="edit_calender_event('{{calendar_obj.pk}}')">Save Changes</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                              {% else %}
+                               <td class="weekday-number next-month-date">
+                                   {{calendar_obj}}
+                                </td>
+                              {% endif %} 
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}    
+
+                    </tbody>
+                </table>
+
+            <div class="calendar-color-code-detail">
+                <div class="working-color-code color-code-div">
+                    <span class="working-color"></span>
+                    <p>Working </p>
+                </div>
+                <div class="working-color-code color-code-div">
+                    <span class="present-color"></span>
+                    <p>Present day </p>
+                </div>
+                <div class="holiday-color-code color-code-div">
+                    <span class="holiday-color"></span>
+                    <p>Holidays</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-3 livechat-new-calendar">
+            <div class="holiday-work-timing-button-div">
+                <button class="add-holiday-btn" id="live-chat-calendar-add-holiday-btn" data-toggle="modal" data-target="#calendar-add-holiday-modal">Add Holidays</button>
+                <button class="work-timing-btn" id="live-chat-calendar-work-timing-btn" data-toggle="modal" data-target="#calendar-work-timing-modal">Work Timing</button>
+            </div>
+        </div> 
+        </div>   
+    </div>
+    <div class="modal fade backdrop" id="calendar-work-timing-modal" tabindex="-1" role="dialog" aria-labelledby="calendar_work_timing_modal_label" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="calendar-filter-header">
+                        <h6>Add Work Timing</h6>
+                        <p class="modified-date-time-para">
+                            Modified: {{latest_modified_calendar_obj.modified_date|date:"d M"}} <br>
+                            {{time_zone}}: {{latest_modified_calendar_obj.modified_date|date:"h:i A"}}  
+                        </p>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12 mb-4">
+                            <label>Periodicity</label>
+                            <select name="day" class="form-control select-dropdown-icon selectpicker create-user-select-field" id="select-work-mode" onchange="select_filter()">
+                                <option value="">Choose from the following</option>
+                                <option value="1">Monthly</option>
+                                <option value="3">Quarterly</option>
+                                <option value="2">Yearly</option>
+                            </select>
+                        </div>
+
+
+                        <div class="col-12 mb-4" id="div-working-month" style="display: none;">
+                            <select id="select-working-month" class="form-control select-dropdown-icon selectpicker create-user-select-field">
+                                {% for month in calender_month %}
+                                    {% if month.key != "0" %}
+                                        <option value="{{month.key}}">{{month.value}}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12 mb-4" id="div-working-year" style="display: none;">
+                            <select id="select-working-year" class="form-control select-dropdown-icon selectpicker create-user-select-field">
+                                {% for year in calender_year %}
+                                    {% if year.key == selected_year %}
+                                        <option value="{{year.key}}" selected>{{year.value}}</option>
+                                    {% else %}
+                                        <option value="{{year.key}}">{{year.value}}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+
+
+
+                        <div class="col-6 mb-4">
+                            <label>Start Time</label>
+                            <input class="form-control" type="time" placeholder="Type Here" id="start-working-time">
+                        </div>
+                        <div class="col-6 mb-4" >
+                            <label>End Time</label>
+                            <input class="form-control" type="time" placeholder="Type Here" id="end-working-time">
+                        </div>
+                        <div class="col-12">
+                            <label>Select Working Days</label>
+                            <div class="row">
+                                <div class="col-3">
+                                    <label class="cam">
+                                        <input id="indeterminate-checkbox-0" type="checkbox" />
+                                        <span class="checkmark"></span>
+                                        <span>Sunday</span>
+                                    </label>
+                                </div>
+                                <div class="col-3">
+                                    <label class="cam">
+                                        <input id="indeterminate-checkbox-1" type="checkbox" />
+                                        <span class="checkmark"></span>
+                                        <span>Monday</span>
+                                    </label>
+                                </div>
+                                <div class="col-3">
+                                    <label class="cam">
+                                        <input id="indeterminate-checkbox-2" type="checkbox" />
+                                        <span class="checkmark"></span>
+                                        <span>Tuesday</span>
+                                    </label>
+                                </div>
+                                <div class="col-3">
+                                    <label class="cam">
+                                        <input id="indeterminate-checkbox-3" type="checkbox" />
+                                        <span class="checkmark"></span>
+                                        <span>Wednesday</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-3">
+                                    <label class="cam">
+                                        <input id="indeterminate-checkbox-4" type="checkbox" />
+                                        <span class="checkmark"></span>
+                                        <span>Thursday</span>
+                                    </label>
+                                </div>
+                                <div class="col-3">
+                                    <label class="cam">
+                                        <input id="indeterminate-checkbox-5" type="checkbox" />
+                                        <span class="checkmark"></span>
+                                        <span>Friday</span>
+                                    </label>
+                                </div>
+                                <div class="col-3">
+                                    <label class="cam">
+                                        <input id="indeterminate-checkbox-6" type="checkbox" />
+                                        <span class="checkmark"></span>
+                                        <span>Saturday</span>
+                                    </label>
+                                </div>
+                                <div class="col-3">
+                                    <label class="cam">
+                                        <input id="indeterminate-checkbox-all" type="checkbox" />
+                                        <span class="checkmark"></span>
+                                        <span>All</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div style="float: right;">
+                        <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                        <button class="btn-primary" type="button" onclick="add_working_hours(this)">Add</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade backdrop" id="calendar-add-holiday-modal" tabindex="-1" role="dialog" aria-labelledby="calendar_work_timing_modal_label" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="calendar-filter-header">
+                        <h6>Add Holidays</h6>
+                        <p class="modified-date-time-para">
+                            Modified: {{latest_modified_calendar_obj.modified_date|date:"d M"}} <br>
+                            {{time_zone}}: : {{latest_modified_calendar_obj.modified_date|date:"h:i A"}}
+                        </p>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12 mb-4">
+                            <label>Holiday(s)</label>
+                            <input class="form-control" id="modal-holiday-date" placeholder="DD-MM-YYYY">
+                            <!-- <input class="form-control" type="text" placeholder="Select Date"> -->
+                        </div>
+                        <div class="col-12 mb-4" >
+                            <label>Description</label>
+                            <input class="form-control show-char-count" maxlength="{{ char_limit_medium_text }}" type="text" placeholder="Type Here" id="modal-holiday-description">
+                            <div class="livechat-char-count">
+                                <p id="modal-holiday-description-char-count">0</p>
+                                <p>/{{ char_limit_medium_text }}</p>
+                            </div>
+                        </div>
+                        <div class="col-12 mb-4">
+                            <label>Auto Response</label>
+                            <input class="form-control show-char-count" maxlength="{{ char_limit_large_text }}" type="text" placeholder="Type Here" id="modal-holiday-autoreponse">
+                            <div class="livechat-char-count">
+                                <p id="modal-holiday-autoreponse-char-count">0</p>
+                                <p>/{{ char_limit_large_text }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div style="float: right;">
+                        <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                        <button class="btn-primary" type="button" onclick="add_holiday_calender()">Add</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade backdrop" id="calendar-filter-modal" tabindex="-1" role="dialog" aria-labelledby="calendar_work_timing_modal_label" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="calendar-filter-header">
+                        <h6>Filter</h6>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12 mb-4">
+                            <label>Month</label>
+                            <select name="month" class="form-control select-dropdown-icon selectpicker create-user-select-field" id="select-calender-month">
+                                <option>Select</option>
+                                {% for month in calender_month %}
+                                    {% if month.key == selected_month %}
+                                        <option value="{{month.key}}" selected>{{month.value}}</option>
+                                    {% else %}
+                                        <option value="{{month.key}}">{{month.value}}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12 mb-4" >
+                            <label>Year</label>
+                            <select name="year" class="form-control select-dropdown-icon selectpicker create-user-select-field" id="select-calender-year">
+                                <option>Select</option>
+                                {% for year in calender_year %}
+                                    {% if year.key == selected_year %}
+                                <option value="{{year.key}}" selected>{{year.value}}</option>
+                                    {% else %}
+                                <option value="{{year.key}}">{{year.value}}</option>
+                                    {% endif %}
+                                {% endfor %}
+                           </select> 
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div style="float: right;">
+                        <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                        <button class="btn-primary" type="button" onclick="apply_calender_filter()">Apply</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- {% if user_obj.status == "1" %} -->
+                        <button class="add-holiday-btn" id="live-chat-calendar-add-holiday-btn" data-toggle="modal" data-target="#calendar-add-holiday-modal">Add Holidays</button>
+                        <button class="work-timing-btn" id="live-chat-calendar-work-timing-btn" data-toggle="modal" data-target="#calendar-work-timing-modal">Work Timing</button>
+                        <!-- {% elif user_obj.status == "2" %}
+                            <button class="add-holiday-btn" id="live-chat-calendar-add-holiday-btn" data-toggle="modal" data-target="#calendar-add-holiday-modal">Add Holidays</button> -->
+                    <!-- {% endif %} -->
+
+<script type="text/javascript">
+    function select_filter(){
+        value = document.getElementById("select-work-mode").value;
+        if(value == "1"){
+            document.getElementById("div-working-month").style.display = "block";
+             document.getElementById("div-working-year").style.display = "block";
+        }else if(value == "2"){
+            document.getElementById("div-working-month").style.display = "none";
+             document.getElementById("div-working-year").style.display = "block";
+        }else if(value == "3") {
+            document.getElementById("div-working-month").style.display = "block";
+             document.getElementById("div-working-year").style.display = "block";
+        }
+    }
+    function display_calender_event(pk){
+
+        value = document.getElementById("select-edit-calender-type-" + pk).value
+        if(value == "1"){
+
+            $("#edit-start-working-time-div-"+pk).show()
+            $("#edit-end-working-time-div-"+pk).show()
+            $("#edit-holiday-calender-event-description-"+pk).hide()
+            $("#edit-holiday-calender-event-autoreponse-"+pk).hide()
+        }else{
+
+            $("#edit-start-working-time-div-"+pk).hide()
+            $("#edit-end-working-time-div-"+pk).hide()
+            $("#edit-holiday-calender-event-description-"+pk).show()
+            $("#edit-holiday-calender-event-autoreponse-"+pk).show()
+        }
+    }
+    $(document).ready(function() {
+      $('#table-calender-details').DataTable({
+          "language": {
+            "info": "Showing _START_ to _END_ entries out of {{ total_calender_objs }}",
+            "infoEmpty": "No records available",
+            "infoFiltered": "(filtered from _MAX_ total records)",
+          },
+          "bPaginate": false,
+          "ordering": false,
+          "infoCallback": function( settings, start, end, max, total, pre ) {
+              if (settings.oPreviousSearch["sSearch"] != ""){
+                  return pre;
+              }
+              end = ({{ start_point }} - 1) + end;
+              start = ({{ start_point }} - 1) + start;
+              return "Showing " + start + " to " + end + " entries out of {{ total_calender_objs }}" ;
+            }
+      });
+
+      var table = $('#table-calender-details').DataTable();
+
+        $('#table-calender-details-search').keyup(function() {
+            let value = this.value;
+            table.search(value).draw();
+        })
+
+      var date = new Date();
+      var current_month = date.getMonth() + 1;
+      var current_year = date.getFullYear();
+
+      if ( {{total_calender_objs}}  == 0) {
+        load_calendar_for_other_months({{selected_month}}, {{selected_year}});
+      }
+      
+    });
+    window.CURRENT_STATUS = '{{user_obj.current_status}}'
+    window.SELECTED_MONTH = '{{selected_month}}'
+    window.SELECTED_YEAR = '{{selected_year}}'
+</script>
+<script src="{% static 'LiveChatApp/js/bootstrap_datepicker.js' %}"></script>
+{% endblock %}

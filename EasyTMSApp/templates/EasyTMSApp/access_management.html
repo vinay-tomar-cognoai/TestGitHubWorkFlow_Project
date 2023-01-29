@@ -1,0 +1,1317 @@
+{% extends 'EasyTMSApp/console.html' %}
+
+{% block content %}
+{% load static %}
+
+<style>
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+</style>
+
+<!-- Begin Page Content -->
+<style type="text/css">
+    #tms-bot-select-div .dropdown {
+        width: 100%;
+    }
+
+    #tms-ticket-category-select-div .dropdown {
+        width: 100%;
+    }
+
+    .modal .modal-body .row{
+        display: block;
+    }
+    
+    .modal .dropdown{
+        width: inherit !important;
+    }
+
+    .dropdown-menu.show{
+        width: inherit !important;
+    }
+
+    .bootstrap-select.show-tick .dropdown-menu li a span.text{
+        width: 95% !important;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .bootstrap-select button {
+        border-radius: 5px!important;
+        border: 1px solid #E6E6E6 !important;
+        box-shadow: none !important;
+        text-align: left;
+        font-size: 1rem!important;
+        width: 100%!important;
+        transform: none!important;
+        outline: none!important;
+        transition: none!important;
+    }
+
+    .bootstrap-select .filter-option {
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    .bootstrap-select .dropdown-item {
+        color: #6e707e!important;
+        font-size: 1rem;
+        padding-left: 0.8em;
+        background-color: transparent;
+    }
+
+    .bootstrap-select .dropdown-item:hover {
+        background-color: #F8F9F9;
+    }
+    button:focus {
+        outline:none !important; ;
+        box-shadow: none !important; ;
+    }
+
+    #selected-supervisor-div {
+        padding-top: unset!important;
+    }
+
+    #tms-bot-select-div {
+        padding-top: unset!important;
+    }
+
+    .dataTable-class {
+        border-collapse: separate !important;
+        border-spacing: 0 1em !important;
+        font-size: 15px;
+    }
+
+    .dataTable-class  tbody tr:hover {
+        box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.25);
+    }
+
+    .dataTable-class tbody tr:hover  td .edit-delete-btn-class {
+        visibility: visible !important;
+    }
+
+    @media only screen and (min-width: 768px) {
+        .dataTable-class td,th {
+            padding: 0.57rem !important;
+        }
+
+        .dataTable-class tr {
+            width: 95% !important;
+        }
+    }
+
+    .dataTable-class tbody td .edit-delete-btn-class svg:hover {
+        transform: scale(1.2);
+    }
+
+    #button-activate-account {
+        display: block;
+        cursor: pointer;
+        text-align: center;
+        border: 1px solid #00DB3D;
+        border-radius: 30px;
+        height: unset;
+        padding: 5px!important;
+        color: #00DB3D;
+        width: 100px;
+        margin-right: 10px;
+        text-decoration: none;
+    }
+
+    #button-deactivate-account {
+        display: block;
+        cursor: pointer;
+        text-align: center;
+        border: 1px solid #E53E3E;
+        border-radius: 30px;
+        height: unset;
+        padding: 5px!important;
+        color: #E53E3E;
+        width: 100px;
+        margin-right: 10px;
+        text-decoration: none;
+    }
+
+    #button-present-account {
+        display: block;
+        cursor: pointer;
+        text-align: center;
+        border: 1px solid #00DB3D;
+        border-radius: 30px;
+        height: unset;
+        padding: 5px!important;
+        color: #00DB3D;
+        width: 100px;
+        margin-right: 10px;
+        text-decoration: none;
+    }
+
+    #button-absent-account {
+        display: block;
+        cursor: pointer;
+        text-align: center;
+        border: 1px solid #E53E3E;
+        border-radius: 30px;
+        height: unset;
+        padding: 5px!important;
+        color: #E53E3E;
+        width: 100px;
+        margin-right: 10px;
+        text-decoration: none;
+    }
+
+    @media only screen and (max-width: 769px) {
+
+        #user_details_upload_modal .modal-footer {
+            flex-direction: column!important;
+        }
+
+        .d-width-sm-100 {
+            display: flex;
+            flex-direction: column-reverse;
+            width: 100%!important;
+        }
+
+        .d-width-sm-100 button {
+            margin-left: 0!important;
+        }
+
+        #button-activate-account {
+            width: 100%!important;
+            margin: 15px 6px 15px 0px!important;
+        }        
+
+        #button-deactivate-account {
+            width: 100%!important;
+            margin: 15px 0 15px 6px!important;
+        }
+
+        #button-present-account {
+            width: 100%!important;
+            margin: 15px 6px 15px 0px!important;
+        }        
+
+        #button-absent-account {
+            width: 100%!important;
+            margin: 15px 0 15px 6px!important;
+        }
+
+        .flex-column-sm {
+            flex-direction: column!important;
+        }
+
+        .dropdown.no-arrow.modal-arrow {
+            text-align: right;
+        }
+
+        .access-management-pills {
+            justify-content: unset !important;
+        }
+    }
+
+    #create-user-via-excel-btn {
+        width: 233px;
+        background: #fff!important;
+        color: #0254D7;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 13px;
+        align-items: center;
+        display: flex;
+        justify-content: center;
+    }
+
+    #add-new-agent-btn {
+        width: 120px;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 13px;
+    }
+
+    #refresh-btn {
+        width: 43px;
+        background: #FFFFFF!important;
+        border: 1px solid #0254D7;
+        box-sizing: border-box;
+        border-radius: 8px!important;
+        margin-left: 9px;
+    }
+
+    *[id^='resend-password-btn-'] {
+        font-style: normal;
+        font-weight: 500;
+        font-size: 14px;
+        color: #0254D7;
+    }
+
+    *[id^="view-agent-btn-"] {
+        font-family: Silka;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 14px;
+        color: #0254D7;
+    }
+
+    #export-agent-btn, #export-supervisor-btn {
+        width: 120px;
+    }
+
+
+    #user_details_upload_modal .modal-title {
+      font-family: Silka;
+      font-style: normal;
+      font-weight: 500;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      color: #2D2D2D;
+    }
+
+    #user_details_upload_modal .modal-header {
+      padding: 1em 1.5em!important;
+    }
+
+    #user_details_upload_modal .modal-body {
+      padding: 1.5em!important;
+    }
+
+    #user_details_upload_modal .btn-primary {
+      min-width: 120px!important;
+      height: 39.13px!important;
+      font-weight: 500!important;
+    }
+
+    .agent-management-status-tile {
+        height: 37px;
+        width: max-content;
+        display: flex;
+        align-items: center;
+        background: white;
+        border-radius: 50px;
+    }
+
+    .agent-management-status-tile span {
+        padding-left: 4px;
+        padding-top: 1px;
+    }
+
+    .agent-management-status-tile div {
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .agent-management-status-tile .total-tile,
+    .agent-management-status-tile .present-tile,
+    .agent-management-status-tile .absent-tile,
+    .agent-management-status-tile .active-tile,
+    .agent-management-status-tile .inactive-tile {
+        height: 37px;
+        border: 2px solid #E5E8FC;
+        border-right: none;
+        background: white;
+        display: flex;
+        align-items: center;
+        padding: 0px 8px;
+        font-weight: 500;
+    }
+
+    .agent-management-status-tile > div:first-child{
+        border-radius: 22px 0px 0px 22px;
+        border-left: 2px solid #E5E8FC;
+        padding-left: 15px;
+    }
+
+    .agent-management-status-tile > div:last-child{
+        border-radius: 0px 22px 22px 0px;
+        border-right: 2px solid #E5E8FC;
+        padding-right: 15px;
+    }
+
+    .agent-management-status-tile > div.active{
+        background-color: #E6EAFF;
+    }
+
+    .agent-management-status-tile .total-tile {
+        color: #2655CB;
+    }
+
+    .agent-management-status-tile .present-tile {
+        color: #38B27F;
+    }
+
+    .agent-management-status-tile .absent-tile {
+        color: #858796;
+    }
+
+    .agent-management-status-tile .active-tile {
+        color: #38B27F;
+    }
+
+    .agent-management-status-tile .inactive-tile {
+        color: #F56565;
+        border-right: none;
+    }
+
+    .access-management-pills {
+        overflow-x: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        scrollbar-width: none;
+    }
+
+    .access-management-pills::-webkit-scrollbar {
+        display: none;
+    }
+
+    #add-new-agent {
+        height: 31px;
+        vertical-align: middle;
+        padding: 0 2em!important;
+    }
+</style>
+<div class="container-fluid">
+    <div class="row">
+    <div class="col-md-12 mb">
+        <div class="row">
+            <div class="col-md-12 mb-3 access-management-pills">
+                <div class="agent-management-status-tile">
+                    <div class="total-tile{% if filter_is_absent == None and filter_is_account_active == None %} active{% endif %}"
+                        onclick="show_agent_details('all')">Total:<span>{{ total_agent_count }}</span></div>
+                    <div class="present-tile{% if filter_is_absent == False %} active{% endif %}" 
+                        onclick="show_agent_details('present')">Present<span>{{ present_agent_count }}</span></div>
+                    <div class="absent-tile{% if filter_is_absent == True %} active{% endif %}" 
+                        onclick="show_agent_details('absent')">Absent<span>{{ absent_agent_count }}</span></div>
+                    <div class="active-tile{% if filter_is_account_active == True %} active{% endif %}" 
+                        onclick="show_agent_details('active')" >Active:<span>{{ active_agent_account_count }}</span></div>
+                    <div class="inactive-tile{% if filter_is_account_active == False %} active{% endif %}" 
+                        onclick="show_agent_details('inactive')">Inactive:<span>{{ inactive_agent_account_count }}</span></div>
+                </div>
+            </div>
+            <div class="col-md-12 mt-4 mb-2 remove-margin-mobile">
+                <div class="row">
+                     <div class="col-md-6 col-sm-12" style="display: flex; flex-wrap: wrap;">
+                        {% if not is_requested_data %}
+                            {% if active_agent.role == "admin" %}
+                                <button class="btn btn-primary mb-2 mr-sm-2 add-user-btn" id="add-new-agent-btn" data-toggle="modal" data-target="#add_new_agent_modal" onclick="populate_new_agent_modal()">Add User</button>
+                            {% else %}
+                                <button class="btn btn-primary mb-2 mr-sm-2 add-user-btn" id="add-new-agent-btn" data-toggle="modal" data-target="#add_new_agent_modal">Add Agent</button>
+                            {% endif %}
+                            {% if active_agent.role == "admin" %}
+                                <button class="btn btn-outline-primary mb-2 add-user-btn" id="create-user-via-excel-btn" data-toggle="modal" data-target="#user_details_upload_modal">Create User via Excel</button>
+                            {% endif %}
+                                <button class="btn btn-outline-primary mb-2 mr-sm-2" id="refresh-btn" onclick="refresh_page();" data-toggle="tooltip" title="Refresh" data-placement="bottom">
+                                    <svg width="18" height="23" viewBox="0 0 18 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M4.94823 4.5285C5.28315 4.96765 5.19865 5.59515 4.7595 5.93007C3.03254 7.24714 2 9.28703 2 11.5C2 14.9973 4.56475 17.8956 7.916 18.4166L7.20711 17.7071C6.81658 17.3166 6.81658 16.6834 7.20711 16.2929C7.59763 15.9024 8.2308 15.9024 8.62132 16.2929L11.1213 18.7929C11.5118 19.1834 11.5118 19.8166 11.1213 20.2071L8.62132 22.7071C8.2308 23.0976 7.59763 23.0976 7.20711 22.7071C6.81658 22.3166 6.81658 21.6834 7.20711 21.2929L8.05028 20.4505C3.52615 19.976 0 16.1498 0 11.5C0 8.65644 1.32882 6.03122 3.54667 4.33978C3.98581 4.00486 4.61331 4.08936 4.94823 4.5285ZM6.87868 2.79289L9.37868 0.292893C9.7692 -0.0976311 10.4024 -0.0976311 10.7929 0.292893C11.1534 0.653377 11.1811 1.22061 10.8761 1.6129L10.7929 1.70711L9.94972 2.54951C14.4739 3.02399 18 6.85021 18 11.5C18 14.2198 16.7849 16.7432 14.7284 18.4419C14.3026 18.7936 13.6723 18.7335 13.3206 18.3077C12.9688 17.8819 13.0289 17.2516 13.4547 16.8999C15.056 15.5772 16 13.6168 16 11.5C16 8.00269 13.4352 5.10441 10.084 4.58343L10.7929 5.29289C11.1834 5.68342 11.1834 6.31658 10.7929 6.70711C10.4324 7.06759 9.86518 7.09532 9.47289 6.7903L9.37868 6.70711L6.87868 4.20711C6.5182 3.84662 6.49047 3.27939 6.79549 2.8871L6.87868 2.79289L9.37868 0.292893L6.87868 2.79289Z" fill="#0254D7"/>
+                                    </svg>
+                                </button>
+                        {% endif %}
+                    </div>
+                    <div class="col-sm-6 col-md-6" style="display: flex; justify-content: flex-end; align-items: center;">
+                        <a href="javascript:void(0)" style="display:none; cursor:pointer;" onclick="change_agent_absent_status(this, 'false')" id="button-present-account">
+                            Present
+                        </a>
+                        <a href="javascript:void(0)" style="display:none; cursor:pointer;" onclick="change_agent_absent_status(this, 'true')" id="button-absent-account">
+                            Absent
+                        </a>
+                        <a href="javascript:void(0)" style="display:none; cursor:pointer;" onclick="activate_user(this)" id="button-activate-account">
+                            Activate
+                        </a>
+                        <a href="javascript:void(0)" style="display:none; cursor:pointer;" onclick="deactivate_user(this)" id="button-deactivate-account">
+                            Deactivate
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <!-- DataTales Example -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        {% if not is_requested_data %}
+                        <div class="row">
+                            <div class="col-md-8 col-sm-12">
+                                <h6 class="m-0 font-weight-bold text-primary heading-text-primary">
+                                    {% if filter_is_absent == None and filter_is_account_active == None %}
+                                        Agents
+                                    {% elif filter_is_absent == False %}
+                                        Present Agents
+                                    {% elif filter_is_absent == True %}
+                                        Absent Agents
+                                    {% elif filter_is_account_active == True %}
+                                        Active Agents
+                                    {% elif filter_is_account_active == False %}
+                                        Inactive Agents
+                                    {% endif %}
+                                </h6>
+                            </div>
+                            <div class="col-md-4 col-sm-12" style="text-align: right;">
+                                <button class="btn btn-primary" id="export-agent-btn" onclick="export_user_excel_details(this)">Export</button>
+                            </div>
+                        </div>
+                        {% else %}
+                                <a href="/tms/access-management/" style="padding-right: 11px;display: inline; text-decoration: none;">
+                                    <svg width="14" height="12" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M6.60694 11.7482C6.52734 11.828 6.43277 11.8914 6.32866 11.9346C6.22455 11.9778 6.11294 12 6.00022 12C5.8875 12 5.77589 11.9778 5.67177 11.9346C5.56766 11.8914 5.47309 11.828 5.39349 11.7482L0.251754 6.6065C0.171949 6.5269 0.108633 6.43233 0.0654311 6.32822C0.0222292 6.22411 -8.62093e-06 6.1125 -8.63079e-06 5.99978C-8.64064e-06 5.88706 0.0222291 5.77545 0.065431 5.67133C0.108632 5.56722 0.171949 5.47265 0.251754 5.39305L5.39349 0.251314C5.5544 0.0904008 5.77265 1.04862e-06 6.00021 1.02873e-06C6.22778 1.00883e-06 6.44603 0.0904007 6.60694 0.251314C6.76785 0.412228 6.85825 0.630473 6.85825 0.858039C6.85825 1.0856 6.76785 1.30385 6.60694 1.46476L2.07021 5.99978L6.60694 10.5348C6.68675 10.6144 6.75006 10.709 6.79326 10.8131C6.83647 10.9172 6.8587 11.0288 6.8587 11.1415C6.8587 11.2542 6.83647 11.3658 6.79326 11.47C6.75006 11.5741 6.68675 11.6686 6.60694 11.7482Z" fill="#4D4D4D"/>
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M13.7128 5.99979C13.7128 6.22707 13.6225 6.44504 13.4618 6.60575C13.3011 6.76646 13.0832 6.85675 12.8559 6.85675L1.71544 6.85675C1.48816 6.85675 1.27019 6.76647 1.10948 6.60575C0.948773 6.44504 0.858488 6.22707 0.858488 5.9998C0.858488 5.77252 0.948773 5.55455 1.10948 5.39384C1.27019 5.23312 1.48816 5.14284 1.71544 5.14284L12.8559 5.14284C13.0832 5.14284 13.3011 5.23312 13.4618 5.39383C13.6225 5.55454 13.7128 5.77252 13.7128 5.99979Z" fill="#4D4D4D"/>
+                                    </svg>
+                                </a>
+                                <h6 class="m-0 font-weight-bold text-primary heading-text-primary" style="display: inline;">
+                                    {% if filter_is_absent == None and filter_is_account_active == None %}
+                                        Agents under {{requested_supervisor.user.username}}
+                                    {% elif filter_is_absent == False %}
+                                        Present Agents under {{requested_supervisor.user.username}}
+                                    {% elif filter_is_absent == True %}
+                                        Absent Agents under {{requested_supervisor.user.username}}
+                                    {% elif filter_is_account_active == True %}
+                                        Active Agents under {{requested_supervisor.user.username}}
+                                    {% elif filter_is_account_active == False %}
+                                        Inactive Agents under {{requested_supervisor.user.username}}
+                                    {% endif %}
+                                </h6>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        {% if agents %}
+                        <div class="table-responsive admin-agent-management-table-area">
+                            <table role="row" class="table table-bordered admin-agent-management-table dataTable-class" id="dataTable-agent" aria-describedby="Agent Table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col"></th>
+                                        <th scope="col">Name</th>
+                                        <th style="white-space: nowrap;" scope="col">Email ID</th>
+                                        <th scope="col">Mobile</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Account Status</th>
+                                        <th scope="col"></th>
+                                        <th scope="col"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for agent in agents %}
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ agent.pk }}">
+                                            <input type="hidden" value="{{ agent.is_account_active }}" >
+                                            <input type="hidden" value="{{ agent.is_absent }}" >
+                                        </td>
+                                        <td style="white-space: nowrap;">
+                                            {% if agent.user.first_name != "" %}
+                                                {{ agent.user.first_name }}
+                                            {% else %}
+                                                {{ agent.user.username }}
+                                            {% endif %}
+                                            <div style="float: right;">
+                                                <a onclick="save_cobrowsing_agent('{{agent.pk}}')" style="margin-top: -2rem;display: inline-block;margin-right: 0.5em;">
+                                                    <svg class="svg-hide-on-desktop" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M17.0604 0.939564C18.3132 2.19232 18.3132 4.22343 17.0604 5.47618L6.33146 16.2052C6.08325 16.4534 5.77457 16.6325 5.43593 16.7249L0.849981 17.9756C0.348084 18.1124 -0.112448 17.6519 0.0244331 17.15L1.27515 12.5641C1.3675 12.2254 1.54664 11.9167 1.79484 11.6685L12.5238 0.939564C13.7766 -0.313188 15.8077 -0.313188 17.0604 0.939564ZM11.6547 3.7104L2.74567 12.6194C2.66293 12.7021 2.60322 12.805 2.57244 12.9179L1.6313 16.3687L5.08212 15.4276C5.195 15.3968 5.2979 15.3371 5.38063 15.2543L14.2894 6.34506L11.6547 3.7104ZM13.4746 1.89039L12.6049 2.75927L15.2396 5.39482L16.1096 4.52535C16.8372 3.79773 16.8372 2.61802 16.1096 1.89039C15.382 1.16277 14.2023 1.16277 13.4746 1.89039Z" fill="#0254D7"/>
+                                                    </svg>
+                                                </a>
+                                                <a onclick="remove_cobrowsing_agent('{{agent.pk}}', 'agent')" style="margin: -2rem 2rem 0px 0px; display: inline-block;margin-right: 0.5em">
+                                                    <svg class="svg-hide-on-desktop"  width="16" height="18" viewBox="0 0 16 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M8 0C9.60341 0 10.913 1.19168 10.9958 2.69116L11 2.84211H15.4C15.7314 2.84211 16 3.0966 16 3.41053C16 3.6983 15.7743 3.93612 15.4814 3.97376L15.4 3.97895H14.5528L13.5769 15.3876C13.4506 16.8633 12.1496 18 10.5867 18H5.41328C3.85044 18 2.5494 16.8633 2.42309 15.3876L1.4464 3.97895H0.6C0.296243 3.97895 0.0452071 3.7651 0.00547714 3.48766L0 3.41053C0 3.12276 0.225723 2.88493 0.518584 2.84729L0.6 2.84211H5C5 1.27245 6.34315 0 8 0ZM13.3494 3.97895H2.65062L3.61917 15.2957C3.69495 16.1812 4.47557 16.8632 5.41328 16.8632H10.5867C11.5244 16.8632 12.305 16.1812 12.3808 15.2957L13.3494 3.97895ZM6.2 6.82105C6.50376 6.82105 6.75479 7.0349 6.79452 7.31234L6.8 7.38947V13.4526C6.8 13.7666 6.53137 14.0211 6.2 14.0211C5.89624 14.0211 5.64521 13.8072 5.60548 13.5298L5.6 13.4526V7.38947C5.6 7.07554 5.86863 6.82105 6.2 6.82105ZM9.8 6.82105C10.1038 6.82105 10.3548 7.0349 10.3945 7.31234L10.4 7.38947V13.4526C10.4 13.7666 10.1314 14.0211 9.8 14.0211C9.49624 14.0211 9.24521 13.8072 9.20548 13.5298L9.2 13.4526V7.38947C9.2 7.07554 9.46863 6.82105 9.8 6.82105ZM8 1.13684C7.04731 1.13684 6.26748 1.83802 6.20415 2.72535L6.2 2.84211H9.8L9.79585 2.72535C9.73252 1.83802 8.95269 1.13684 8 1.13684Z" fill="#EE2525"/>
+                                                    </svg>
+                                                </a>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if agent.user.email != "" %}
+                                                {{ agent.user.email }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if agent.phone_number != "" and agent.phone_number != None %}
+                                                {{ agent.phone_number }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if agent.is_absent == False %}
+                                            <p style="color:#38B27F; font-weight: 500;">Present</p>
+                                            {% else %}
+                                            <p style="color:#858796; font-weight: 500;">Absent</p>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if agent.is_account_active %}
+                                            <p style="color:#38B27F; font-weight: 500;">Active</p>
+                                            {% else %}
+                                            <p style="color:#F56565; font-weight: 500;">Inactive</p>
+                                            {% endif %}
+                                        </td>
+                                        <td class="admin-view-agent-btn">
+                                            <a style="white-space: nowrap;" class="" href="javascript:void(0)" data-toggle="modal" data-target="#resend-password-modal" onclick="resend_password_agent('{{agent.pk}}')" id="resend-password-btn-{{ agent.pk }}">Resend Password</a>
+                                        </td>
+                                        <td class="td-hide-on-small-device">
+                                            <div class="edit-delete-btn-class" style="visibility: hidden;display: flex;">
+                                                <a data-toggle="tooltip" data-placement="bottom" title="Edit" style="cursor: pointer; margin-right: 1em;" onclick="save_cobrowsing_agent('{{agent.pk}}')">
+                                                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M13.2692 0.730772C14.2436 1.70513 14.2436 3.28489 13.2692 4.25925L4.92447 12.604C4.73142 12.7971 4.49134 12.9364 4.22794 13.0082L0.661097 13.981C0.270732 14.0875 -0.0874597 13.7293 0.0190035 13.3389L0.99178 9.77206C1.06361 9.50867 1.20294 9.26858 1.39599 9.07553L9.74075 0.730772C10.7151 -0.243591 12.2949 -0.243591 13.2692 0.730772ZM9.06478 2.88586L2.13552 9.81506C2.07117 9.87941 2.02473 9.95944 2.00078 10.0472L1.26879 12.7312L3.95276 11.9992C4.04056 11.9753 4.12059 11.9288 4.18494 11.8645L11.114 4.93504L9.06478 2.88586ZM10.4803 1.4703L9.80385 2.1461L11.853 4.19597L12.5297 3.51972C13.0956 2.95379 13.0956 2.03623 12.5297 1.4703C11.9638 0.904373 11.0462 0.904373 10.4803 1.4703Z" fill="#0254D7"/>
+                                                    </svg>                                                    
+                                                </a>
+                                                <a data-toggle="tooltip" data-placement="bottom" title="Delete" style="cursor: pointer; margin-right: 1em;" onclick="remove_cobrowsing_agent('{{agent.pk}}', 'agent')">
+                                                    <svg width="14" height="16" viewBox="0 0 14 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M7 0C8.40298 0 9.54889 1.05927 9.62136 2.39215L9.625 2.52632H13.475C13.7649 2.52632 14 2.75253 14 3.03158C14 3.28737 13.8025 3.49877 13.5462 3.53223L13.475 3.53684H12.7337L11.8798 13.6779C11.7693 14.9896 10.6309 16 9.26338 16H4.73662C3.36913 16 2.23072 14.9896 2.12021 13.6779L1.2656 3.53684H0.525C0.259213 3.53684 0.0395562 3.34676 0.0047925 3.10014L0 3.03158C0 2.77578 0.197508 2.56438 0.453761 2.53093L0.525 2.52632H4.375C4.375 1.13107 5.55025 0 7 0ZM11.6807 3.53684H2.31929L3.16677 13.5962C3.23308 14.3832 3.91613 14.9895 4.73662 14.9895H9.26338C10.0839 14.9895 10.7669 14.3832 10.8332 13.5962L11.6807 3.53684ZM5.425 6.06316C5.69079 6.06316 5.91044 6.25324 5.94521 6.49986L5.95 6.56842V11.9579C5.95 12.2369 5.71495 12.4632 5.425 12.4632C5.15921 12.4632 4.93956 12.2731 4.90479 12.0265L4.9 11.9579V6.56842C4.9 6.28937 5.13505 6.06316 5.425 6.06316ZM8.575 6.06316C8.84079 6.06316 9.06044 6.25324 9.09521 6.49986L9.1 6.56842V11.9579C9.1 12.2369 8.86495 12.4632 8.575 12.4632C8.30921 12.4632 8.08956 12.2731 8.05479 12.0265L8.05 11.9579V6.56842C8.05 6.28937 8.28505 6.06316 8.575 6.06316ZM7 1.01053C6.1664 1.01053 5.48405 1.63379 5.42863 2.42254L5.425 2.52632H8.575L8.57137 2.42254C8.51595 1.63379 7.8336 1.01053 7 1.01053Z" fill="#EE2525"/>
+                                                    </svg>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="table-responsive">
+                            Agents not available
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% if supervisors or active_agent.role == "admin" %}
+                {% if not is_requested_data %}
+                <div class="col-md-12">
+                    <!-- DataTales Example -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <div class="row">
+                                <div class="col-md-8 col-sm-12">
+                                    <h6 class="m-0 font-weight-bold text-primary heading-text-primary">Admin/Supervisors</h6>
+                                </div>
+                                <div class="col-md-4 col-sm-12" style="text-align: right;">
+                                    <button class="btn btn-primary" id="export-supervisor-btn" onclick="export_supervisor_excel_details(this)">Export</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive admin-agent-management-table-area">
+                                <table class="table table-bordered admin-agent-management-table dataTable-class" id="dataTable-supervisor" aria-describedby="Agent/Supervisor Table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col"></th>
+                                            <th scope="col">Name</th>
+                                            <th scope="col">Email ID</th>
+                                            <th scope="col">Mobile</th>
+                                            <th scope="col">Account Status</th>
+                                            <th scope="col"></th>
+                                            <th scope="col"></th>
+                                            <th scope="col"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for supervisor in supervisors %}
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ supervisor.pk }}">
+                                                <input type="hidden" value="{{ supervisor.is_account_active }}" >
+                                                <input type="hidden" value="{{ supervisor.is_absent }}" >
+                                            </td>
+                                            <td>
+                                                {% if supervisor.user.first_name != "" %}
+                                                    {{ supervisor.user.first_name }}
+                                                {% else %}
+                                                    {{ supervisor.user.username }}
+                                                {% endif %}
+                                                <div style="float: right;">
+                                                    <a onclick="save_cobrowsing_supervisor('{{supervisor.pk}}')" style="margin-top: -2rem;display: inline-block;margin-right: 0.5em;">
+                                                        <svg class="svg-hide-on-desktop" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M17.0604 0.939564C18.3132 2.19232 18.3132 4.22343 17.0604 5.47618L6.33146 16.2052C6.08325 16.4534 5.77457 16.6325 5.43593 16.7249L0.849981 17.9756C0.348084 18.1124 -0.112448 17.6519 0.0244331 17.15L1.27515 12.5641C1.3675 12.2254 1.54664 11.9167 1.79484 11.6685L12.5238 0.939564C13.7766 -0.313188 15.8077 -0.313188 17.0604 0.939564ZM11.6547 3.7104L2.74567 12.6194C2.66293 12.7021 2.60322 12.805 2.57244 12.9179L1.6313 16.3687L5.08212 15.4276C5.195 15.3968 5.2979 15.3371 5.38063 15.2543L14.2894 6.34506L11.6547 3.7104ZM13.4746 1.89039L12.6049 2.75927L15.2396 5.39482L16.1096 4.52535C16.8372 3.79773 16.8372 2.61802 16.1096 1.89039C15.382 1.16277 14.2023 1.16277 13.4746 1.89039Z" fill="#0254D7"/>
+                                                        </svg>
+                                                    </a>
+                                                    <a onclick="remove_cobrowsing_agent('{{supervisor.pk}}', 'supervisor')" style="margin: -2rem 2rem 0px 0px; display: inline-block;margin-right: 0.5em">
+                                                        <svg class="svg-hide-on-desktop"  width="16" height="18" viewBox="0 0 16 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M8 0C9.60341 0 10.913 1.19168 10.9958 2.69116L11 2.84211H15.4C15.7314 2.84211 16 3.0966 16 3.41053C16 3.6983 15.7743 3.93612 15.4814 3.97376L15.4 3.97895H14.5528L13.5769 15.3876C13.4506 16.8633 12.1496 18 10.5867 18H5.41328C3.85044 18 2.5494 16.8633 2.42309 15.3876L1.4464 3.97895H0.6C0.296243 3.97895 0.0452071 3.7651 0.00547714 3.48766L0 3.41053C0 3.12276 0.225723 2.88493 0.518584 2.84729L0.6 2.84211H5C5 1.27245 6.34315 0 8 0ZM13.3494 3.97895H2.65062L3.61917 15.2957C3.69495 16.1812 4.47557 16.8632 5.41328 16.8632H10.5867C11.5244 16.8632 12.305 16.1812 12.3808 15.2957L13.3494 3.97895ZM6.2 6.82105C6.50376 6.82105 6.75479 7.0349 6.79452 7.31234L6.8 7.38947V13.4526C6.8 13.7666 6.53137 14.0211 6.2 14.0211C5.89624 14.0211 5.64521 13.8072 5.60548 13.5298L5.6 13.4526V7.38947C5.6 7.07554 5.86863 6.82105 6.2 6.82105ZM9.8 6.82105C10.1038 6.82105 10.3548 7.0349 10.3945 7.31234L10.4 7.38947V13.4526C10.4 13.7666 10.1314 14.0211 9.8 14.0211C9.49624 14.0211 9.24521 13.8072 9.20548 13.5298L9.2 13.4526V7.38947C9.2 7.07554 9.46863 6.82105 9.8 6.82105ZM8 1.13684C7.04731 1.13684 6.26748 1.83802 6.20415 2.72535L6.2 2.84211H9.8L9.79585 2.72535C9.73252 1.83802 8.95269 1.13684 8 1.13684Z" fill="#EE2525"/>
+                                                        </svg>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                            <td>
+                                            {% if supervisor.user.email != "" and supervisor.user.email != None %}
+                                                {{supervisor.user.email}}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if supervisor.phone_number != "" and supervisor.phone_number != None %}
+                                                    {{ supervisor.phone_number }}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if supervisor.is_account_active %}
+                                                <p style="color:#38B27F; font-weight: 500;">Active</p>
+                                                {% else %}
+                                                <p style="color:#F56565; font-weight: 500;">Inactive</p>
+                                                {% endif %}
+                                            </td>
+                                            <td class="admin-view-agent-btn">
+                                                <a class="" href="/tms/access-management/?pk={{supervisor.pk}}" id="view-agent-btn-{{ supervisor.pk }}">View Agents</a>
+                                            </td>
+                                            <td class="admin-view-agent-btn">
+                                                <a  style="white-space: nowrap;" href="javascript:void(0)" data-toggle="modal" data-target="#resend-password-modal" onclick="resend_password_agent('{{supervisor.pk}}')" id="resend-password-btn-{{ supervisor.pk }}">Resend Password</a>
+                                            </td>
+                                            <td class="td-hide-on-small-device">
+                                                <div class="edit-delete-btn-class" style="visibility: hidden;">
+                                                    <a data-toggle="tooltip" title="Edit" style="cursor: pointer; margin-right: 1em;" onclick="save_cobrowsing_supervisor('{{supervisor.pk}}')">
+                                                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M13.2692 0.730772C14.2436 1.70513 14.2436 3.28489 13.2692 4.25925L4.92447 12.604C4.73142 12.7971 4.49134 12.9364 4.22794 13.0082L0.661097 13.981C0.270732 14.0875 -0.0874597 13.7293 0.0190035 13.3389L0.99178 9.77206C1.06361 9.50867 1.20294 9.26858 1.39599 9.07553L9.74075 0.730772C10.7151 -0.243591 12.2949 -0.243591 13.2692 0.730772ZM9.06478 2.88586L2.13552 9.81506C2.07117 9.87941 2.02473 9.95944 2.00078 10.0472L1.26879 12.7312L3.95276 11.9992C4.04056 11.9753 4.12059 11.9288 4.18494 11.8645L11.114 4.93504L9.06478 2.88586ZM10.4803 1.4703L9.80385 2.1461L11.853 4.19597L12.5297 3.51972C13.0956 2.95379 13.0956 2.03623 12.5297 1.4703C11.9638 0.904373 11.0462 0.904373 10.4803 1.4703Z" fill="#0254D7"/>
+                                                        </svg>                                                    
+                                                    </a>
+                                                    <a data-toggle="tooltip" title="Delete" style="cursor: pointer; margin-right: 1em;"  onclick="remove_cobrowsing_agent('{{supervisor.pk}}', 'supervisor')">
+                                                        <svg width="14" height="16" viewBox="0 0 14 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M7 0C8.40298 0 9.54889 1.05927 9.62136 2.39215L9.625 2.52632H13.475C13.7649 2.52632 14 2.75253 14 3.03158C14 3.28737 13.8025 3.49877 13.5462 3.53223L13.475 3.53684H12.7337L11.8798 13.6779C11.7693 14.9896 10.6309 16 9.26338 16H4.73662C3.36913 16 2.23072 14.9896 2.12021 13.6779L1.2656 3.53684H0.525C0.259213 3.53684 0.0395562 3.34676 0.0047925 3.10014L0 3.03158C0 2.77578 0.197508 2.56438 0.453761 2.53093L0.525 2.52632H4.375C4.375 1.13107 5.55025 0 7 0ZM11.6807 3.53684H2.31929L3.16677 13.5962C3.23308 14.3832 3.91613 14.9895 4.73662 14.9895H9.26338C10.0839 14.9895 10.7669 14.3832 10.8332 13.5962L11.6807 3.53684ZM5.425 6.06316C5.69079 6.06316 5.91044 6.25324 5.94521 6.49986L5.95 6.56842V11.9579C5.95 12.2369 5.71495 12.4632 5.425 12.4632C5.15921 12.4632 4.93956 12.2731 4.90479 12.0265L4.9 11.9579V6.56842C4.9 6.28937 5.13505 6.06316 5.425 6.06316ZM8.575 6.06316C8.84079 6.06316 9.06044 6.25324 9.09521 6.49986L9.1 6.56842V11.9579C9.1 12.2369 8.86495 12.4632 8.575 12.4632C8.30921 12.4632 8.08956 12.2731 8.05479 12.0265L8.05 11.9579V6.56842C8.05 6.28937 8.28505 6.06316 8.575 6.06316ZM7 1.01053C6.1664 1.01053 5.48405 1.63379 5.42863 2.42254L5.425 2.52632H8.575L8.57137 2.42254C8.51595 1.63379 7.8336 1.01053 7 1.01053Z" fill="#EE2525"/>
+                                                        </svg>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                        <tr>
+                                            <td></td>
+                                            <td>
+                                                {% if active_agent.user.first_name != "" %}
+                                                    {{ active_agent.user.first_name }}
+                                                {% else %}
+                                                    {{ active_agent.user.username }}
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                            {% if active_agent.user.email != "" and active_agent.user.email != None %}
+                                                {{active_agent.user.email}}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if active_agent.phone_number != "" and active_agent.phone_number != None %}
+                                                    {{ active_agent.phone_number }}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if active_agent.is_account_active %}
+                                                <p style="color:#38B27F; font-weight: 500;">Active</p>
+                                                {% else %}
+                                                <p style="color:#F56565; font-weight: 500;">Inactive</p>
+                                                {% endif %}
+                                            </td>
+                                            <td class="admin-view-agent-btn">
+                                                <a class="" href="/tms/access-management/?pk={{active_agent.pk}}" id="view-agent-btn-{{ active_agent.pk }}">View Agents</a>
+                                            </td>
+                                            <td class="admin-view-agent-btn">
+                                                <a  style="white-space: nowrap;" href="javascript:void(0)" data-toggle="modal" data-target="#resend-password-modal" onclick="resend_password_agent('{{active_agent.pk}}')" id="resend-password-btn-{{ active_agent.pk }}">Resend Password</a>
+                                            </td>
+                                            <td class="td-hide-on-small-device">
+                                                <div class="edit-delete-btn-class" style="visibility: hidden !important;">
+                                                    <a data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="save_cobrowsing_supervisor('{{supervisor.pk}}')">
+                                                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M13.2692 0.730772C14.2436 1.70513 14.2436 3.28489 13.2692 4.25925L4.92447 12.604C4.73142 12.7971 4.49134 12.9364 4.22794 13.0082L0.661097 13.981C0.270732 14.0875 -0.0874597 13.7293 0.0190035 13.3389L0.99178 9.77206C1.06361 9.50867 1.20294 9.26858 1.39599 9.07553L9.74075 0.730772C10.7151 -0.243591 12.2949 -0.243591 13.2692 0.730772ZM9.06478 2.88586L2.13552 9.81506C2.07117 9.87941 2.02473 9.95944 2.00078 10.0472L1.26879 12.7312L3.95276 11.9992C4.04056 11.9753 4.12059 11.9288 4.18494 11.8645L11.114 4.93504L9.06478 2.88586ZM10.4803 1.4703L9.80385 2.1461L11.853 4.19597L12.5297 3.51972C13.0956 2.95379 13.0956 2.03623 12.5297 1.4703C11.9638 0.904373 11.0462 0.904373 10.4803 1.4703Z" fill="#0254D7"/>
+                                                        </svg>                                                    
+                                                    </a>
+                                                    <a data-toggle="tooltip" title="Delete" style="cursor: pointer; margin-right: 1em;" onclick="remove_cobrowsing_agent('{{supervisor.pk}}', 'supervisor')">
+                                                        <svg width="14" height="16" viewBox="0 0 14 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M7 0C8.40298 0 9.54889 1.05927 9.62136 2.39215L9.625 2.52632H13.475C13.7649 2.52632 14 2.75253 14 3.03158C14 3.28737 13.8025 3.49877 13.5462 3.53223L13.475 3.53684H12.7337L11.8798 13.6779C11.7693 14.9896 10.6309 16 9.26338 16H4.73662C3.36913 16 2.23072 14.9896 2.12021 13.6779L1.2656 3.53684H0.525C0.259213 3.53684 0.0395562 3.34676 0.0047925 3.10014L0 3.03158C0 2.77578 0.197508 2.56438 0.453761 2.53093L0.525 2.52632H4.375C4.375 1.13107 5.55025 0 7 0ZM11.6807 3.53684H2.31929L3.16677 13.5962C3.23308 14.3832 3.91613 14.9895 4.73662 14.9895H9.26338C10.0839 14.9895 10.7669 14.3832 10.8332 13.5962L11.6807 3.53684ZM5.425 6.06316C5.69079 6.06316 5.91044 6.25324 5.94521 6.49986L5.95 6.56842V11.9579C5.95 12.2369 5.71495 12.4632 5.425 12.4632C5.15921 12.4632 4.93956 12.2731 4.90479 12.0265L4.9 11.9579V6.56842C4.9 6.28937 5.13505 6.06316 5.425 6.06316ZM8.575 6.06316C8.84079 6.06316 9.06044 6.25324 9.09521 6.49986L9.1 6.56842V11.9579C9.1 12.2369 8.86495 12.4632 8.575 12.4632C8.30921 12.4632 8.08956 12.2731 8.05479 12.0265L8.05 11.9579V6.56842C8.05 6.28937 8.28505 6.06316 8.575 6.06316ZM7 1.01053C6.1664 1.01053 5.48405 1.63379 5.42863 2.42254L5.425 2.52632H8.575L8.57137 2.42254C8.51595 1.63379 7.8336 1.01053 7 1.01053Z" fill="#EE2525"/>
+                                                        </svg>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+    </div>
+</div>
+<div class="modal fade add_or_update_modal" id="add_new_agent_modal" tabindex="-1" role="dialog" aria-labelledby="add_new_agent_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                {% if active_agent.role == "admin" %}
+                <h5 class="modal-title" id="add_new_agent_modal_modal_label">Add User</h5>
+                {% else %}
+                <h5 class="modal-title" id="add_new_agent_modal_modal_label">Add Agent</h5>
+                {% endif %}
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                        <form class="form-inline" action="javascript:void(0)">
+                            {% if active_agent.role == "admin" %}
+                                <div class="col-sm-6 mb-2">
+                                    <select class="custom-select" id="inline-form-input-user-type" onchange="check_selected_user_status(this)" style="width: 100%;">
+                                        <option value="agent" selected>Agent</option>
+                                        <option value="supervisor">Supervisor</option>
+                                    </select>
+                                </div>
+                            {% endif %}
+                            <div class="col-sm-6 mb-2">
+                                <label class="sr-only" for="inline-form-input-agent-name">User Name</label>
+                                <input type="text" style="width: 100%;" class="form-control" id="inline-form-input-agent-name" placeholder="Agent Name">
+                            </div>
+                            <div class="col-sm-6 mb-2">
+                                <label class="sr-only" for="inline-form-input-agent-email">User Email</label>
+                                <input type="text" style="width: 100%;" class="form-control" id="inline-form-input-agent-email" placeholder="Agent Email">
+                            </div>
+                            <div class="col-sm-6 mb-2">
+                                <label class="sr-only" for="inline-form-input-agent-mobile">User Mobile No. (optional)</label>
+                                <input type="text" style="width: 100%;" class="form-control" id="inline-form-input-agent-mobile" placeholder="Agent Mobile No. (optional)">
+                            </div>
+                            <div class="col-sm-6 mb-2" id="tms-bot-select-div">
+                                <select class="selectpicker bot_select" multiple data-live-search="true" title="Select Bot" id="tms-bot-select-element" onchange="bot_select_change()">
+                                    {% for bot in bots %}
+                                        <option value="{{ bot.pk }}" selected>{{ bot.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-sm-6 mb-2" id="tms-ticket-category-select-div">
+                                <select class="selectpicker ticket_categoty_select" multiple data-live-search="true" title="Select Ticket Category" id="tms-ticket-category-select">
+                                    {% for ticket_category in ticket_categories %}
+                                        <option value="{{ ticket_category.bot.pk }}-{{ ticket_category.pk }}" selected>{{ ticket_category.bot.name }} - {{ ticket_category.ticket_category }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% if active_agent.role == "admin" %}
+                                <div class="col-sm-6 mb-2" id="selected-supervisor-div">
+                                    <select class="selectpicker" title="Choose Supervisor" multiple id="inline-form-input-supervisor-pk" style="width: 100%;">
+                                        <option value="{{ active_agent.pk }}">{{ active_agent.user.username }}(Self)</option>
+                                        {% for supervisor in supervisors %}
+                                            <option value="{{ supervisor.pk }}">{{ supervisor.user.username }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            {% else %}
+                                <div class="col-sm-6 mb-2" id="selected-supervisor-div" style="display:none;width: 100%;">
+                                    <select class="selectpicker" title="Choose Supervisor" multiple id="inline-form-input-supervisor-pk">
+                                        <option value="{{ active_agent.pk }}">{{ active_agent.user.username }}(Self)</option>
+                                    </select>
+                                </div>
+                            {% endif %}
+                        </form>
+                        <p id="add-new-agent-error"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-success" id = "add-new-agent" onclick="add_new_agent(this)">Add</button>
+                <button class="btn btn-success" id="save-agent-details" onclick="add_new_agent(this)" style="display: none;">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% for agent in agents %}
+<div class="modal fade add_or_update_modal" id="save-agent-modal-{{agent.pk}}" tabindex="-1" role="dialog" aria-labelledby="edit_agent_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                {% if active_agent.role == "admin" %}
+                    <h5 class="modal-title" id="edit_agent_modal_modal_label">&nbsp;Edit User</h5>
+                {% else %}
+                    <h5 class="modal-title" id="edit_agent_modal_modal_label">&nbsp;Edit Agent</h5>
+                {% endif %}
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                        <form class="form-inline" action="javascript:void(0)">
+                            {% if active_agent.role == "admin" %}
+                            <div class="col-sm-6 mb-2">
+                                <select class="custom-select" id="inline-form-input-user-type-{{agent.pk}}" onchange="check_selected_user_status(this,'{{agent.pk}}')" style="width: 100%;">
+                                    <option value="agent" selected>Agent</option>
+                                    <option value="supervisor">Supervisor</option>
+                                </select>
+                            </div>
+                            {% endif %}
+                            <div class="col-sm-6 mb-2">
+                                <label class="sr-only" for="inline-form-input-agent-name-{{agent.pk}}">User Name</label>
+                                <input type="text" style="width: 100%;" class="form-control" id="inline-form-input-agent-name-{{agent.pk}}" value="{{agent.user.first_name}}" placeholder="User Name">
+                            </div>
+                            <div class="col-sm-6 mb-2">
+                                <label class="sr-only" for="inline-form-input-agent-email-{{agent.pk}}">User Email</label>
+                                <input type="text" style="width: 100%;" class="form-control" id="inline-form-input-agent-email-{{agent.pk}}" value="{{agent.user.email}}" placeholder="User Email">
+                            </div>
+                            <div class="col-sm-6 mb-2">
+                                <label class="sr-only" for="inline-form-input-agent-mobile-{{agent.pk}}">User Mobile No. (optional)</label>
+                                {% if agent.phone_number != None %}
+                                    <input type="text" style="width: 100%;" class="form-control" id="inline-form-input-agent-mobile-{{agent.pk}}" value="{{agent.phone_number}}" placeholder="User Mobile No. (optional)">
+                                {% else %}
+                                    <input type="text" style="width: 100%;" class="form-control" id="inline-form-input-agent-mobile-{{agent.pk}}" placeholder="User Mobile No. (optional)">
+                                {% endif %}
+                            </div>
+                            <div class="col-sm-6 mb-2" id="tms-bot-select-div-{{agent.pk}}">
+                                <select class="selectpicker bot_select" multiple data-live-search="true" title="Select Bot" id="tms-bot-select-element-{{agent.pk}}" onchange="bot_select_change()">
+                                    {% for bot in bots %}
+                                        {% if bot in agent.bots.all %}
+                                            <option value="{{ bot.pk }}" selected>{{ bot.name }}</option>
+                                        {% else %}
+                                            <option value="{{ bot.pk }}">{{ bot.name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-sm-6 mb-2" id="tms-ticket-category-select-div-{{agent.pk}}">
+                                <select class="selectpicker ticket_categoty_select" multiple data-live-search="true" title="Select Ticket Category" id="tms-ticket-category-select-{{agent.pk}}">
+                                    {% for ticket_category in ticket_categories %}
+                                        {% if ticket_category in agent.ticket_categories.all %}
+                                            <option value="{{ ticket_category.bot.pk }}-{{ ticket_category.pk }}" selected>{{ ticket_category.bot.name }} - {{ ticket_category.ticket_category }}</option>
+                                        {% else %}
+                                            <option value="{{ ticket_category.bot.pk }}-{{ ticket_category.pk }}">{{ ticket_category.bot.name }} - {{ ticket_category.ticket_category }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% if active_agent.role == "admin" %}
+                            <div class="col-sm-6 mb-2" id="selected-supervisor-div-{{agent.pk}}" style="display:inline;">
+                                <select class="selectpicker" multiple title="Choose Supervisor" id="inline-form-input-supervisor-pk-{{agent.pk}}">
+                                    {% if agent in active_agent.agents.all %}
+                                        <option value="{{ active_agent.pk }}" selected>{{ active_agent.user.username }}(Self)</option>
+                                    {% else %}
+                                        <option value="{{ active_agent.pk }}">{{ active_agent.user.username }}(Self)</option>
+                                    {% endif %}
+                                    {% for supervisor in supervisors %}
+                                        {% if agent in supervisor.agents.all %}
+                                            <option value="{{ supervisor.pk }}" selected>{{ supervisor.user.username }}</option>
+                                        {% else %}
+                                            <option value="{{ supervisor.pk }}">{{ supervisor.user.username }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% else %}
+                            <div class="col-sm-6 mb-2" id="selected-supervisor-div-{{agent.pk}}" style="display:none;">
+                                <select class="selectpicker" multiple title="Choose Supervisor" id="inline-form-input-supervisor-pk-{{agent.pk}}">
+                                    {% if agent in active_agent.agents.all %}
+                                        <option value="{{ active_agent.pk }}" selected>{{ active_agent.user.username }}(Self)</option>
+                                    {% else %}
+                                        <option value="{{ active_agent.pk }}">{{ active_agent.user.username }}(Self)</option>
+                                    {% endif %}
+                                    {% for supervisor in supervisors %}
+                                        {% if agent in supervisor.agents.all %}
+                                            <option value="{{ supervisor.pk }}" selected>{{ supervisor.user.username }}</option>
+                                        {% else %}
+                                            <option value="{{ supervisor.pk }}">{{ supervisor.user.username }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% endif %}
+                        </form>
+                        <p id="save-agent-details-error-{{agent.pk}}"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-success" id="save-agent-details" onclick="update_agent_details(this,'{{agent.pk}}')">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% for supervisor in supervisors %}
+<div class="modal fade add_or_update_modal" id="save-supervisor-modal-{{supervisor.pk}}" tabindex="-1" role="dialog" aria-labelledby="edit_supervisor_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                {% if active_agent.role == "admin" %}
+                    <h5 class="modal-title" id="edit_supervisor_modal_modal_label">Edit User</h5>
+                {% else %}
+                    <h5 class="modal-title" id="edit_supervisor_modal_modal_label">Edit Agent</h5>
+                {% endif %}
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <form class="form-inline" action="javascript:void(0)">
+                            <div class="col-sm-6">
+                                <label class="sr-only" for="inline-form-input-agent-name-{{supervisor.pk}}">User Name</label>
+                                <input type="text" style="width: 100%;" class="form-control mb-2" id="inline-form-input-agent-name-{{supervisor.pk}}" value="{{supervisor.user.first_name}}" placeholder="User Name">
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="sr-only" for="inline-form-input-agent-email-{{supervisor.pk}}">User Email</label>
+                                <input type="text" style="width: 100%;" class="form-control mb-2" id="inline-form-input-agent-email-{{supervisor.pk}}" value="{{supervisor.user.email}}" placeholder="User Email">
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="sr-only" for="inline-form-input-agent-mobile-{{supervisor.pk}}">User Mobile No. (optional)</label>
+                                {% if supervisor.phone_number != None %}
+                                    <input type="text" style="width: 100%;" class="form-control mb-2" id="inline-form-input-agent-mobile-{{supervisor.pk}}" value="{{supervisor.phone_number}}" placeholder="User Mobile No. (optional)">
+                                {% else %}
+                                    <input type="text" style="width: 100%;" class="form-control mb-2" id="inline-form-input-agent-mobile-{{supervisor.pk}}" placeholder="User Mobile No. (optional)">
+                                {% endif %}
+                            </div>
+                            {% if active_agent.role == "admin" %}
+                                <div class="col-sm-6">
+                                    <select class="custom-select" id="inline-form-input-user-type-{{supervisor.pk}}" onchange="check_selected_user_status(this,'{{supervisor.pk}}')" style="width: 100%;margin-bottom: .5rem;">
+                                        <option value="agent">Agent</option>
+                                        <option value="supervisor" selected>Supervisor</option>
+                                    </select>
+                                </div>
+                            {% endif %}
+                            <div class="col-sm-6" id="tms-bot-select-div-{{supervisor.pk}}">
+                                <select class="selectpicker bot_select" multiple data-live-search="true" title="Select Bot" id="tms-bot-select-element-{{supervisor.pk}}" onchange="bot_select_change()">
+                                    {% for bot in bots %}
+                                        {% if bot in supervisor.bots.all %}
+                                            <option value="{{ bot.pk }}" selected>{{ bot.name }}</option>
+                                        {% else %}
+                                            <option value="{{ bot.pk }}">{{ bot.name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-sm-6" id="tms-ticket-category-select-div-{{supervisor.pk}}">
+                                <select class="selectpicker ticket_categoty_select" multiple data-live-search="true" title="Select Ticket Category" id="tms-ticket-category-select-{{supervisor.pk}}">
+                                    {% for ticket_category in ticket_categories %}
+                                        {% if ticket_category in supervisor.ticket_categories.all %}
+                                            <option value="{{ ticket_category.bot.pk }}-{{ ticket_category.pk }}" selected>{{ ticket_category.bot.name }} - {{ ticket_category.ticket_category }}</option>
+                                        {% else %}
+                                            <option value="{{ ticket_category.bot.pk }}-{{ ticket_category.pk }}">{{ ticket_category.bot.name }} - {{ ticket_category.ticket_category }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-sm-6" id="selected-supervisor-div-{{supervisor.pk}}" style="display: none;padding-top: 5px;">
+                                <select class="selectpicker" multiple title="Select Supervisor" id="inline-form-input-supervisor-pk-{{supervisor.pk}}">
+                                    <option value="{{ active_agent.pk }}">{{ active_agent.user.username }}(Self)</option>
+                                    {% for supervise in supervisors %}
+                                        {% if supervise != supervisor %}
+                                            <option value="{{ supervise.pk }}">{{ supervise.user.username }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </form>
+                        <p id="save-agent-details-error-{{supervisor.pk}}"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-success" id="save-agent-details" onclick="update_agent_details(this,'{{supervisor.pk}}')">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+<div class="modal fade" id="remove-agent-modal" tabindex="-1" role="dialog" aria-labelledby="remove_agent_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="remove_agent_modal_modal_label">Delete Agent</h5>
+            </div>
+            <div class="modal-body">
+                Do you really want to delete this Agent?
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-danger" onclick="remove_cobrowsing_agent()">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="remove-supervisor-modal" tabindex="-1" role="dialog" aria-labelledby="remove_supervisor_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="remove_supervisor_modal_modal_label">Delete Supervisor</h5>
+            </div>
+            <div class="modal-body">
+                Do you really want to delete this Supervisor?
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-danger" onclick="remove_cobrowsing_agent()">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="resend-password-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Resend Password?</h5>
+        </div>
+        <div class="modal-body">Click Resend below if you want to resend password.</div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+          <button class="btn btn-primary" onclick="resend_password_agent()">Resend</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+<div class="modal fade upload_file_modal" id="user_details_upload_modal" tabindex="-1" role="dialog" aria-labelledby="document_upload_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="document_upload_modal_modal_label">Add Users Via Excel</h5>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                  <div class="col-sm-12">
+                    <label for="user_details_upload_input" class="custom-file-upload">
+                        Choose File
+                    </label>
+                    <input type="file" id="user_details_upload_input" class="form-control" name="" style="display: none !important;" accept=".xls, .xlsx">
+                  </div>
+                  <div class="col-sm-11">
+                      <div class="col-md-12 col-sm-12 modal-upload-file mt-4" style="display: none;">
+                        <div class="col-md-1 col-sm-1 width-auto-sm pd-mg">
+                          <svg width="24" height="32" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M14 0V8.50667C14 9.33333 14.6667 10 15.4933 10H24V30.5067C24 31.3333 23.3333 32 22.5067 32H1.49333C0.666665 32 0 31.3333 0 30.5067V1.49333C0 0.666667 0.666665 0 1.49333 0H14ZM17.4404 0.426667L23.5471 6.56C23.8404 6.85333 24.0004 7.22667 24.0004 7.62667V8H16.0004V0H16.3737C16.7737 0 17.147 0.16 17.4404 0.426667Z" fill="url(#paint0_linear)"/>
+                            <defs>
+                              <linearGradient id="paint0_linear" x1="2.39111" y1="3" x2="23.3908" y2="32.0002" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#E08F8D"/>
+                                <stop offset="1" stop-color="#FE736F"/>
+                              </linearGradient>
+                            </defs>
+                          </svg>
+                        </div>
+                        <div class="col-md-10 col-sm-10 file-name-container">
+                          <div class="file-name-div">
+                          </div>
+                          <div class="progress">
+                            <div class="indeterminate"></div>
+                          </div>
+                        </div>
+                        <div class="col-md-1 col-sm-1 width-auto-sm pr-sm-0">
+                          <button class="upload-file-cross-btn" type="button" onclick="remove_uploaded_file();">
+                            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6.48438 4.98438L9.85938 1.64062C10.0469 1.45312 10.0469 1.10938 9.85938 0.921875L9.07812 0.140625C8.89062 -0.046875 8.54688 -0.046875 8.35938 0.140625L5.01562 3.51562L1.64062 0.140625C1.45312 -0.046875 1.10938 -0.046875 0.921875 0.140625L0.140625 0.921875C-0.046875 1.10938 -0.046875 1.45312 0.140625 1.64062L3.51562 4.98438L0.140625 8.35938C-0.046875 8.54688 -0.046875 8.89062 0.140625 9.07812L0.921875 9.85938C1.10938 10.0469 1.45312 10.0469 1.64062 9.85938L5.01562 6.48438L8.35938 9.85938C8.54688 10.0469 8.89062 10.0469 9.07812 9.85938L9.85938 9.07812C10.0469 8.89062 10.0469 8.54688 9.85938 8.35938L6.48438 4.98438Z" fill="#E08F8D"/>
+                              </svg>
+                          </button>
+                        </div>
+                      </div>
+                  </div>
+                  <div class="col-sm-12">
+                    <p style="padding-top: 1em;" id="user_details_upload_input_error"></p>
+                </div>
+              </div>
+          </div>
+            <div class="modal-footer" style="display: flex; align-items: center; justify-content: space-between;">
+                <button class="btn btn-outline-primary" onclick="download_user_details_excel_template(this)" id="user-details-download-template-button">Download template</button>
+                <div class="d-width-sm-100">
+                    <button class="btn btn-text-only" type="button" data-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary" onclick="upload_user_excel_details(this)">Upload</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var remove_agent_pk = null;
+    var resend_password_agent_pk = null;
+    $(document).ready(function(){
+        setTimeout(function(){
+            $('.bootstrap-select button').removeClass();
+            $('.bootstrap-select button').addClass('custom-select');
+        }, 1000);
+
+        {% if agents|length %}
+            $("#dataTable-agent").DataTable({
+                "ordering": false,
+                "paging": true,
+                "pagingType": "simple_numbers"
+            });
+        {% else %}
+            $("#dataTable-agent").DataTable({
+                "ordering": false,
+                "searching": false,
+                "paging": false
+            });
+        {% endif %}
+
+        {% if supervisors|length %}
+            $("#dataTable-supervisor").DataTable({
+                "ordering": false,
+                "paging": true,
+                "pagingType": "simple_numbers"
+            });
+        {% else %}
+            $("#dataTable-supervisor").DataTable({
+                "ordering": false,
+                "searching": false,
+                "paging": false
+            });
+        {% endif %}
+
+        try {
+            var agent_table = document.getElementById("dataTable-agent");
+            var supervisor_table = document.getElementById("dataTable-supervisor");
+            var tms_base_obj = new TMSBase();
+            tms_base_obj.update_table_attribute([agent_table, supervisor_table]);
+        } catch(err) {
+            console.log(err);
+        }
+    });
+
+    function check_selected_user_status(element,pk=""){
+        var selected_supervisor_div = "selected-supervisor-div";
+        if(pk !== "")
+            selected_supervisor_div += '-' + pk;
+        if(element.value=="agent"){
+            document.getElementById(selected_supervisor_div).style.display="block";
+            document.getElementById("inline-form-input-agent-name").placeholder = "Agent Name";
+            document.getElementById("inline-form-input-agent-email").placeholder = "Agent Email";
+            document.getElementById("inline-form-input-agent-mobile").placeholder = "Agent Mobile No. (optional)";
+        }else{
+            document.getElementById(selected_supervisor_div).style.display="none";
+            document.getElementById("inline-form-input-agent-name").placeholder = "Supervisor Name";
+            document.getElementById("inline-form-input-agent-email").placeholder = "Supervisor Email";
+            document.getElementById("inline-form-input-agent-mobile").placeholder = "Supervisor Mobile No. (optional)";
+        }
+    }
+
+    function populate_new_agent_modal(){
+        document.getElementById('selected-supervisor-div').style.display="block";
+    }
+
+    function remove_cobrowsing_agent(pk=null, agent=null){
+        if(pk == null || pk == undefined){
+            delete_cobrowsing_agent(remove_agent_pk);
+        }else{
+            remove_agent_pk = pk;
+            if(agent == "agent")
+                $("#remove-agent-modal").modal('show');
+            else
+                $("#remove-supervisor-modal").modal('show');
+        }
+            
+    }
+
+    function save_cobrowsing_supervisor(supervisor_pk){
+        $("#save-supervisor-modal-"+supervisor_pk).modal('show');
+    }
+
+    function save_cobrowsing_agent(agent_pk){
+        $("#save-agent-modal-"+agent_pk).modal('show');
+    }
+
+    function resend_password_agent(pk=null) {
+        if(pk == null) {
+            resend_password(resend_password_agent_pk);
+            $("#resend-password-modal").modal('hide');
+        } else {
+            resend_password_agent_pk = pk;
+        }
+    }
+
+    function refresh_page() {
+        window.location.reload();
+    }
+
+    var selected_bot_pk_list = [];
+    var modal_opened_add_or_update_agent = null;
+
+    function update_ticket_category_select(){
+        var modal_element = modal_opened_add_or_update_agent;
+        var bot_select = modal_element.querySelector("select.bot_select");
+        var bot_all = [];
+        var selected_bot = $(bot_select).val();
+        for(var index=0; index<bot_select.length; index++){
+            bot_all.push(bot_select[index].value);
+        }
+
+        var ticket_category_select_element = modal_element.querySelector("select.ticket_categoty_select");
+
+        for(var index=0; index<bot_all.length; index++){
+            var target_options = ticket_category_select_element.querySelectorAll("option[value^='" + bot_all[index] + "-']");
+            if(selected_bot.indexOf(bot_all[index]) == -1){
+                $(target_options).hide();
+                // target_options.forEach((item)=>{item.selected=false;});
+            } else {
+                $(target_options).show();
+                // target_options.forEach((item)=>{item.selected=true;});
+            }
+        }
+        $(ticket_category_select_element).selectpicker('refresh');
+    }
+
+    function bot_select_change(){
+        var ticket_category_select_element = modal_opened_add_or_update_agent.querySelector("select.ticket_categoty_select");
+        var bot_select_element = modal_opened_add_or_update_agent.querySelector("select.bot_select");
+
+        var updated_bot_pk_list = $(bot_select_element).val()
+
+        if(selected_bot_pk_list.length > updated_bot_pk_list.length){
+            // element de-selected
+            var deselected_bot_pk = selected_bot_pk_list.filter((item)=>{ return updated_bot_pk_list.indexOf(item) == -1 })[0];
+            selected_bot_pk_list = updated_bot_pk_list;
+
+            var options = ticket_category_select_element.querySelectorAll("option");
+            var target_options = ticket_category_select_element.querySelectorAll("option[value^='" + deselected_bot_pk + "-']");
+            target_options.forEach((item)=>{item.selected=false;});
+        } else if(selected_bot_pk_list.length < updated_bot_pk_list.length) {
+            // element selected
+            var selected_bot_pk = updated_bot_pk_list.filter((item)=>{ return selected_bot_pk_list.indexOf(item) == -1 })[0];
+            selected_bot_pk_list = updated_bot_pk_list;
+
+            var options = ticket_category_select_element.querySelectorAll("option");
+            var target_options = ticket_category_select_element.querySelectorAll("option[value^='" + selected_bot_pk + "-']");
+            target_options.forEach((item)=>{item.selected=true;});
+        }
+
+        $(ticket_category_select_element).selectpicker('refresh');
+        update_ticket_category_select();
+    }
+
+    $(".add_or_update_modal").on('shown.bs.modal', function (event) {
+        var currentElement = event.currentTarget;
+        var tms_bot_select_div = currentElement.querySelector("select.bot_select");
+        selected_bot_pk_list = $(tms_bot_select_div).val();
+        modal_opened_add_or_update_agent = currentElement;
+        update_ticket_category_select();
+    });
+
+    var user_details_upload_input_file_global = undefined;
+    document.getElementById("user_details_upload_input").addEventListener('change', function(event) {
+        var file = document.getElementById("user_details_upload_input").files[0];
+        if(file) {
+            user_details_upload_input_file_global = ($("#user_details_upload_input"))[0].files[0];
+            $('#user_details_upload_modal .file-name-div').html(file.name);
+            $('#user_details_upload_modal .modal-upload-file').show();
+            $('#user_details_upload_modal .progress').show();
+
+            var progress_div = $('#user_details_upload_modal .progress')[0].children[0];
+            progress_div.classList.remove('determinate');
+            progress_div.classList.add('indeterminate');
+
+            setTimeout(function() {
+                progress_div.classList.remove('indeterminate');
+                progress_div.classList.add('determinate');
+            }, 300);
+
+            var error_element = document.getElementById("user_details_upload_input_error");
+            error_element.innerHTML = "";
+            try {
+                error_element.nextElementSibling.remove();
+            } catch(err) {}
+        } else {
+            if(user_details_upload_input_file_global == undefined){
+                $('#user_details_upload_modal .file-name-div').html("No file selected");
+                $('#user_details_upload_modal .progress').hide();
+            }
+        }
+        document.getElementById("user_details_upload_input").value = "";
+    });
+
+    function remove_uploaded_file() {
+        $('#user_details_upload_modal .file-name-div').html("");
+        $('#user_details_upload_modal .modal-upload-file').hide();
+        document.getElementById("user_details_upload_input").value = "";
+        user_details_upload_input_file_global = undefined
+    }
+
+</script>
+{% endblock %}

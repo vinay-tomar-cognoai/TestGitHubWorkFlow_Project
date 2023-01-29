@@ -1,0 +1,316 @@
+<!-- v6.1 dev input changes -->
+<style>
+    {% if bot_channel_obj.is_textfield_input_enabled %}
+    .show-if-no-input {
+            display: none !important;
+        }
+
+    {% endif %}
+
+    .bot-menus-button-footer {
+        background-color: #{{ svg_icon_color }} !important;
+    }
+
+    .bot-home-button-footer {
+        background-color: #{{ svg_icon_color }} !important;
+        
+    }
+
+    .bot-menus-button-footer, .bot-lang-button-footer {
+        background-color: #{{ svg_icon_color }} ;
+    }
+
+    .bot-menus-button-footer:hover svg {
+
+        fill: #{{ svg_icon_color }} !important;
+    }
+
+    .bot-menus-button-footer:hover{
+        background-color: #ffffff !important;
+
+    }
+
+    .bot-home-button-footer.bot-action-btns-item:hover {
+        background-color: #ffffff !important;
+    }
+
+    .bot-home-button-footer.bot-action-btns-item:hover svg{
+        fill: #{{ svg_icon_color }} !important;
+        
+    }
+
+    .bot-lang-button-footer:hover svg{
+        fill: #{{ svg_icon_color }} !important;
+        
+    }
+
+    .bot-lang-button-footer:hover svg path{
+        stroke: #{{ svg_icon_color }} !important;
+    }
+
+    #bot_action_opner_btn svg path{
+        fill: #{{ svg_icon_color }} !important;
+    }
+
+
+</style>
+
+
+{% if bot_channel_obj.is_textfield_input_enabled %}
+    <div id="bot_menu_option_items_wrapper">
+{% else %}
+    {% if bot_obj.show_brand_name and not easychat_config_obj.disable_show_brand_name %}
+        <div id="bot_menu_option_items_wrapper"  class="footer-with-button-only">
+    {% else %}
+        <div id="bot_menu_option_items_wrapper" class="footer-with-button-only brand-name-not-enabled">
+    {% endif %}
+{% endif %}
+
+    <div id="hide-if-no-input" class="hide-if-no-input">
+        <div class="easychat-bot-sticky-menu-wrapper" id="easychat-sticky-theme4">
+            <div class="bot-sticky-menu-content-wrapper">
+                <div class="easychat-bot-sticky-menu-header-container">
+                    <div id="sticky-menu-header-text" class="sticky-menu-header-text">{{language_template_obj.meny_text}}</div>
+
+                </div>
+                <div class="easychat-sticky-menu-items" id="easychat_sticky_menu_items">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Elements when text input field is switched off -->
+    <div id="dont-hide-if-no-input" class="dont-hide-if-no-input">
+    
+            {% if bot_channel_obj.sticky_button_display_format == "Button" %}
+                <div id="easychat-restart-div-no-input" class="show-if-no-input" style="margin-bottom: 3px;">
+            {% else %}
+                <div id="easychat-restart-div-no-input" style="display: none !important;" class="show-if-no-input">
+            {% endif %}
+                    <button class="bot-home-button-footer tooltip-custom" onclick="restart_chatbot(this)">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12.7966 3.32939C12.5853 3.11848 12.2988 3 12 3C11.7012 3 11.4147 3.11848 11.2034 3.32939L3.31629 11.2045C3.11104 11.4167 2.99748 11.7009 3.00004 11.9958C3.00261 12.2908 3.12111 12.573 3.33001 12.7816C3.53892 12.9901 3.82151 13.1085 4.11694 13.111C4.41236 13.1136 4.69698 13.0002 4.90948 12.7953L5.23962 12.4656V19.875C5.23962 20.1734 5.35832 20.4595 5.56963 20.6705C5.78093 20.8815 6.06752 21 6.36635 21H8.61981C8.91863 21 9.20522 20.8815 9.41653 20.6705C9.62783 20.4595 9.74654 20.1734 9.74654 19.875V17.625C9.74654 17.3266 9.86525 17.0404 10.0765 16.8294C10.2879 16.6185 10.5744 16.4999 10.8733 16.4999H13.1267C13.4256 16.4999 13.7121 16.6185 13.9234 16.8294C14.1348 17.0404 14.2535 17.3266 14.2535 17.625V19.875C14.2535 20.1734 14.3722 20.4595 14.5835 20.6705C14.7948 20.8815 15.0814 21 15.3802 21H17.6337C17.9325 21 18.2191 20.8815 18.4304 20.6705C18.6417 20.4595 18.7604 20.1734 18.7604 19.875V12.4656L19.0905 12.7953C19.303 13.0002 19.5876 13.1136 19.8831 13.111C20.1785 13.1085 20.4611 12.9901 20.67 12.7816C20.8789 12.573 20.9974 12.2908 21 11.9958C21.0025 11.7009 20.889 11.4167 20.6837 11.2045L12.7966 3.32939Z" fill="white"/>
+                            </svg>
+                            <span class="tooltiptext-custom tooltip-top-custom" id="tooltip-home-text">Home</span>
+                    </button>
+
+                </div>
+
+                {% if bot_channel_obj.sticky_button_display_format == "Menu" %}
+                <div id="bot_menu_option_items_wrapper_div" class="easychat-button-only-sticky-menu-option-wrapper show-if-no-input" style="display: none;">
+
+
+                    <div class="easychat-bot-sticky-menu-wrapper-no-input" id="easychat_bot_sticky_menu_wrapper">
+                        <div class="bot-sticky-menu-content-wrapper">
+
+                            <div class="easychat-sticky-menu-items-no-input" id="easychat_sticky_menu_items_no_input">
+
+                            </div>
+                        </div>
+                        <div class="bot-sticky-menu-close-btn-wrapper">
+                            <div class="bot-sticky-menu-header-wrapper">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3.23865 17.9385H15.3053C15.7052 17.9385 16.0293 18.2627 16.0293 18.6625C16.0293 19.0291 15.7569 19.332 15.4036 19.3799L15.3053 19.3865H3.23865C2.83879 19.3865 2.51465 19.0624 2.51465 18.6625C2.51465 18.296 2.78702 17.9931 3.14041 17.9452L3.23865 17.9385H15.3053H3.23865ZM3.23865 11.6639H21.0973C21.4972 11.6639 21.8213 11.988 21.8213 12.3879C21.8213 12.7544 21.5489 13.0573 21.1956 13.1053L21.0973 13.1119H3.23865C2.83879 13.1119 2.51465 12.7877 2.51465 12.3879C2.51465 12.0213 2.78702 11.7184 3.14041 11.6705L3.23865 11.6639H21.0973H3.23865ZM3.23865 5.39233H18.2013C18.6012 5.39233 18.9253 5.71648 18.9253 6.11633C18.9253 6.48287 18.6529 6.78578 18.2996 6.83372L18.2013 6.84033H3.23865C2.83879 6.84033 2.51465 6.51619 2.51465 6.11633C2.51465 5.7498 2.78702 5.44688 3.14041 5.39894L3.23865 5.39233H18.2013H3.23865Z" fill="#212121"/>
+                                </svg>
+                                <div class="bot-sticky-menu-heading-text">
+                                    {{language_template_obj.menu_text}}
+                                </div>
+                            </div>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9.01479 13.8542C9.29753 14.1518 9.75594 14.1518 10.0387 13.8542L12.6641 11.0906L15.2895 13.8542C15.5722 14.1518 16.0306 14.1518 16.3133 13.8542C16.5961 13.5566 16.5961 13.074 16.3133 12.7764L13.176 9.47394C12.8933 9.17632 12.4349 9.17632 12.1521 9.47394L9.01479 12.7764C8.73205 13.074 8.73205 13.5566 9.01479 13.8542Z" fill="#334155"/>
+                                </svg>
+
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="bot-button-only-footer-menu-wrapper show-if-no-input">
+                    <div class="bot-action-btns-menu-options-div" id="bot_action_btn_items" style="display: none;">
+                        
+                            <button class="bot-menus-button-footer bot-action-btns-item tooltip" id="sticky_menu_opner_btn">
+                                <svg width="20" height="20" viewBox="0 0 16 14" fill="white" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M-0.222219 12.3332H10.8889C11.2571 12.3332 11.5556 12.6317 11.5556 12.9999C11.5556 13.3374 11.3048 13.6163 10.9794 13.6604L10.8889 13.6665H-0.222219C-0.590409 13.6665 -0.888885 13.3681 -0.888885 12.9999C-0.888885 12.6624 -0.638082 12.3834 -0.312682 12.3393L-0.222219 12.3332H10.8889H-0.222219ZM-0.222219 6.55542H16.2222C16.5904 6.55542 16.8889 6.85389 16.8889 7.22208C16.8889 7.55959 16.6381 7.83852 16.3127 7.88266L16.2222 7.88875H-0.222219C-0.590409 7.88875 -0.888885 7.59027 -0.888885 7.22208C-0.888885 6.88458 -0.638082 6.60565 -0.312682 6.5615L-0.222219 6.55542H16.2222H-0.222219ZM-0.222219 0.780518H13.5556C13.9237 0.780518 14.2222 1.07899 14.2222 1.44718C14.2222 1.78469 13.9714 2.06362 13.646 2.10777L13.5556 2.11385H-0.222219C-0.590409 2.11385 -0.888885 1.81537 -0.888885 1.44718C-0.888885 1.10968 -0.638082 0.830748 -0.312682 0.786603L-0.222219 0.780518H13.5556H-0.222219Z" />
+                                    </svg>
+                                    <span class="tooltiptextright" id="tooltiptext-menu-btn">{{language_template_obj.menu_text}}</span>
+                                    
+                                                            
+                            </button>
+                        
+                        <button class="bot-home-button-footer bot-action-btns-item tooltip" onclick="$('#bot_action_opner_btn').click(); restart_chatbot(this)">
+                            <svg width="20" height="20" viewBox="0 0 16 16" fill="white" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8.53106 2.21959C8.3902 2.07899 8.19918 2 8 2C7.80082 2 7.6098 2.07899 7.46893 2.21959L2.21086 7.46966C2.07403 7.61112 1.99832 7.80057 2.00003 7.99722C2.00174 8.19387 2.08074 8.38198 2.22001 8.52104C2.35928 8.6601 2.54768 8.73898 2.74463 8.74068C2.94158 8.74239 3.13132 8.6668 3.27299 8.53018L3.49308 8.31042V13.25C3.49308 13.4489 3.57222 13.6397 3.71309 13.7803C3.85395 13.921 4.04501 14 4.24423 14H5.74654C5.94576 14 6.13682 13.921 6.27768 13.7803C6.41855 13.6397 6.49769 13.4489 6.49769 13.25V11.75C6.49769 11.5511 6.57683 11.3603 6.7177 11.2196C6.85857 11.079 7.04963 11 7.24885 11H8.75115C8.95037 11 9.14143 11.079 9.2823 11.2196C9.42317 11.3603 9.50231 11.5511 9.50231 11.75V13.25C9.50231 13.4489 9.58145 13.6397 9.72231 13.7803C9.86318 13.921 10.0542 14 10.2535 14H11.7558C11.955 14 12.146 13.921 12.2869 13.7803C12.4278 13.6397 12.5069 13.4489 12.5069 13.25V8.31042L12.727 8.53018C12.8687 8.6668 13.0584 8.74239 13.2554 8.74068C13.4523 8.73898 13.6407 8.6601 13.78 8.52104C13.9193 8.38198 13.9983 8.19387 14 7.99722C14.0017 7.80057 13.926 7.61112 13.7891 7.46966L8.53106 2.21959Z" />
+                                </svg>
+                                
+                                <span class="tooltiptextright" id="tooltiptext-home-btn">{{language_template_obj.home_button_tooltip}}</span>
+                                
+                        </button>
+
+                    </div>
+                    <button class="bot-action-btns-menu-opner-btn" id="bot_action_opner_btn">
+                       
+                            <svg style="margin-top: 3px;" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M17.9999 13H12.9999V18C12.9999 18.55 12.5499 19 11.9999 19C11.4499 19 10.9999 18.55 10.9999 18V13H5.99994C5.44994 13 4.99994 12.55 4.99994 12C4.99994 11.45 5.44994 11 5.99994 11H10.9999V6.00002C10.9999 5.45002 11.4499 5.00002 11.9999 5.00002C12.5499 5.00002 12.9999 5.45002 12.9999 6.00002V11H17.9999C18.5499 11 18.9999 11.45 18.9999 12C18.9999 12.55 18.5499 13 17.9999 13Z" fill="#3884FD"/>
+                                </svg>                 
+
+                    </button>
+
+                </div>
+
+                {% else %}
+                <div class="easychat-bot-sticky-intent-wrapper show-if-no-input" id="easychat-sticky-btn-theme3-4" style="display: none">
+                    <button class="sticky-intent-arrow-button-left" onclick="sticky_scroll_right_theme4_no_input()">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="16" height="16" fill="none"></rect>
+                            <path d="M10.2603 3.20041C10.5639 3.48226 10.5814 3.95681 10.2996 4.26034L6.77348 8L10.2996 11.7397C10.5814 12.0432 10.5639 12.5177 10.2603 12.7996C9.9568 13.0815 9.48226 13.0639 9.2004 12.7603L5.2004 8.51034C4.9332 8.22258 4.9332 7.77743 5.2004 7.48966L9.20041 3.23966C9.48226 2.93613 9.95681 2.91856 10.2603 3.20041Z" fill="#52555E"></path>
+                            </svg>
+                            
+                    </button>
+                    <div class="easychat-bot-sticky-intent-items-div" id="easychat-bot-sticky-intent-items-div-no-input">
+
+
+                    </div>
+
+
+                    <button class="sticky-intent-arrow-button-right" onclick="sticky_scroll_left_theme4_no_input()">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="16" height="16" transform="matrix(-1 0 0 1 16 0)" fill="none"></rect>
+                            <path d="M5.73966 3.20041C5.43613 3.48226 5.41855 3.95681 5.70041 4.26034L9.22652 8L5.70041 11.7397C5.41855 12.0432 5.43613 12.5177 5.73966 12.7996C6.0432 13.0815 6.51774 13.0639 6.7996 12.7603L10.7996 8.51034C11.0668 8.22258 11.0668 7.77743 10.7996 7.48966L6.79959 3.23966C6.51774 2.93613 6.04319 2.91856 5.73966 3.20041Z" fill="#52555E"></path>
+                            </svg>
+                            
+                </button>
+                </div>
+                {% endif %}
+    </div>
+    <!-- Elements when text input field is switched off end -->
+</div>
+
+<div id="hide-if-no-input" class="hide-if-no-input">
+<div class="easychat-bot-sticky-intent-wrapper" id="easychat-bot-sticky-intent-wrapper">
+    <button class="sticky-intent-arrow-button-left" onclick="sticky_scroll_right()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="16" height="16" fill="none" />
+            <path
+                d="M10.2603 3.20041C10.5639 3.48226 10.5814 3.95681 10.2996 4.26034L6.77348 8L10.2996 11.7397C10.5814 12.0432 10.5639 12.5177 10.2603 12.7996C9.9568 13.0815 9.48226 13.0639 9.2004 12.7603L5.2004 8.51034C4.9332 8.22258 4.9332 7.77743 5.2004 7.48966L9.20041 3.23966C9.48226 2.93613 9.95681 2.91856 10.2603 3.20041Z"
+                fill="#52555E" />
+        </svg>
+
+    </button>
+    <div class="easychat-bot-sticky-intent-items-div" id="easychat-bot-sticky-intent-items-div">
+    </div>
+    <button class="sticky-intent-arrow-button-right" onclick="sticky_scroll_left()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="16" height="16" transform="matrix(-1 0 0 1 16 0)" fill="none" />
+            <path
+                d="M5.73966 3.20041C5.43613 3.48226 5.41855 3.95681 5.70041 4.26034L9.22652 8L5.70041 11.7397C5.41855 12.0432 5.43613 12.5177 5.73966 12.7996C6.0432 13.0815 6.51774 13.0639 6.7996 12.7603L10.7996 8.51034C11.0668 8.22258 11.0668 7.77743 10.7996 7.48966L6.79959 3.23966C6.51774 2.93613 6.04319 2.91856 5.73966 3.20041Z"
+                fill="#52555E" />
+        </svg>
+
+    </button>
+</div>
+<div class="easychat-bot-footer-input-wrapper">
+    <!-- <div class="user-input-autocomplete-list">
+        <div class="user-input-autocomplete-list-wrapper">
+        </div>
+    </div> -->
+    <div class="easychat-bot-footer-input-container" id="easychat-restart-div">
+        <div class="easychat-bot-restart-div">
+            <div class="tooltip-custom">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" onclick="restart_chatbot(this)">
+                    <path
+                        d="M19.8766 12.3611C19.779 12.3619 19.6852 12.3251 19.6146 12.2587L19.2903 11.9349L18.0104 10.6569V12.4656V19.875C18.0104 19.9741 17.971 20.0693 17.9004 20.1398C17.8299 20.2102 17.7339 20.25 17.6337 20.25H15.3802C15.2799 20.25 15.184 20.2102 15.1134 20.1398C15.0429 20.0693 15.0035 19.9741 15.0035 19.875V17.625C15.0035 17.1273 14.8055 16.6503 14.4534 16.2987C14.1013 15.9472 13.6241 15.7499 13.1267 15.7499H10.8733C10.3759 15.7499 9.89867 15.9472 9.54662 16.2987C9.19454 16.6503 8.99654 17.1273 8.99654 17.625V19.875C8.99654 19.9741 8.95712 20.0693 8.8866 20.1398C8.81604 20.2102 8.72009 20.25 8.61981 20.25H6.36635C6.26606 20.25 6.17012 20.2102 6.09955 20.1398C6.02903 20.0693 5.98962 19.9741 5.98962 19.875V12.4656V10.6569L4.70969 11.9349L4.38539 12.2587C4.31479 12.3251 4.22098 12.3619 4.12345 12.3611C4.02431 12.3602 3.9297 12.3205 3.85994 12.2508C3.79021 12.1812 3.75087 12.0873 3.75001 11.9893C3.74918 11.8929 3.78565 11.7998 3.85205 11.7294L11.7332 3.8602C11.7333 3.86018 11.7333 3.86015 11.7333 3.86012C11.8039 3.78974 11.8998 3.75 12 3.75C12.1002 3.75 12.1961 3.78974 12.2667 3.86012C12.2667 3.86015 12.2667 3.86018 12.2668 3.8602L20.1479 11.7294C20.2143 11.7998 20.2508 11.8929 20.25 11.9893C20.2491 12.0873 20.2098 12.1812 20.1401 12.2508C20.0703 12.3205 19.9757 12.3602 19.8766 12.3611Z"
+                        stroke="#{{ bot_obj.bot_theme_color}}" stroke-width="1.5" />
+                </svg>
+                <span class="tooltiptext-custom tooltip-top-custom" id="tooltip-home-text">{{language_template_obj.home_button_tooltip}}</span>
+            </div>
+        </div>
+        <div class="easychat-bot-user-input-div">
+            <div class="input-area-wrapper">
+                <div class="placeholder-text" id="user_input_placeholder_text">{{language_template_obj.placeholder}}</div>
+                <div role="textbox" id="user_input" tabindex= "1" class="input-area" contenteditable="true" data-tab="9" dir="ltr" spellcheck="true"></div>
+            </div>
+        </div>
+        {% if bot_obj.is_livechat_enabled %}
+        {% if bot_obj.is_image_upload_allowed_in_livechat %}
+            <div class="tooltip-custom easychat-bot-attachment-div" id ="easychat-img-div">
+                <a onclick="open_file_upload_modal()">
+                    <svg id="img-div" width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11.9002 0C14.7168 0 17 2.14903 17 4.8C17 6.02984 16.5052 7.18747 15.6367 8.06683L15.4753 8.22274L8.05763 15.2043L8.01247 15.2438L7.96511 15.2797C7.3963 15.7407 6.66958 16 5.90203 16C4.15526 16 2.73923 14.6672 2.73923 13.0231C2.73923 12.302 3.01379 11.6199 3.50042 11.0859L3.62646 10.9556L3.63928 10.9461L9.83636 5.10304C10.168 4.79034 10.7062 4.7899 11.0384 5.10204C11.3706 5.41419 11.3711 5.92072 11.0394 6.23341L4.84236 12.0765L4.83307 12.0831C4.58123 12.3366 4.43915 12.6684 4.43915 13.0231C4.43915 13.7835 5.09411 14.4 5.90203 14.4C6.22412 14.4 6.52836 14.3025 6.77853 14.1257L6.88233 14.0451L6.88299 14.0464L14.2797 7.08566L14.4145 6.95414C14.9798 6.37039 15.3001 5.61 15.3001 4.8C15.3001 3.03269 13.7779 1.6 11.9002 1.6C10.9979 1.6 10.1539 1.93168 9.52449 2.51087L9.39296 2.63874L9.37725 2.64911L1.45111 10.1122C1.11925 10.4247 0.581087 10.4248 0.249083 10.1125C-0.0829225 9.80012 -0.0830429 9.29359 0.248814 8.9811L8.16107 1.5306L8.20069 1.49617C9.15597 0.548616 10.4823 0 11.9002 0Z" fill="#7B7A7B"/>
+                    </svg>
+                    <input onchange="change_span_name_to_file_name_livechat(this)" id="easychat-livechat-uploadfile" type="file" style="display: none;">
+                </a>
+                <span class="tooltiptext-custom tooltip-top-custom">{% get_utils_data language_template_obj.attachment_tooltip_text 0 %}</span>
+            </div>
+            <div class="tooltip-custom easychat-bot-attachment-div" id="easychat-img-div-previous">
+                <a>
+                    <svg id="img-div" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15.9999 2C19.3136 2 21.9999 4.68629 21.9999 8C21.9999 9.5373 21.4178 10.9843 20.396 12.0835L20.2061 12.2784L11.479 21.0053L11.4259 21.0548L11.3702 21.0997C10.7009 21.6759 9.84594 22 8.9429 22C6.88779 22 5.22179 20.334 5.22179 18.2789C5.22179 17.3775 5.54481 16.5248 6.11735 15.8574L6.26564 15.6945L6.28072 15.6826L13.5717 8.37879C13.9619 7.98793 14.5951 7.98737 14.986 8.37755C15.3768 8.76774 15.3774 9.4009 14.9872 9.79177L7.69618 17.0956L7.68524 17.1039C7.38894 17.4208 7.22179 17.8354 7.22179 18.2789C7.22179 19.2294 7.99236 20 8.9429 20C9.32185 20 9.67979 19.8781 9.97412 19.6571L10.0962 19.5564L10.097 19.558L18.7994 10.8571L18.958 10.6927C19.6231 9.96299 19.9999 9.0125 19.9999 8C19.9999 5.79086 18.2091 4 15.9999 4C14.9383 4 13.9453 4.4146 13.2048 5.13858L13.0501 5.29842L13.0316 5.31139L3.70629 14.6403C3.31585 15.0309 2.68269 15.031 2.29207 14.6406C1.90146 14.2501 1.90132 13.617 2.29176 13.2264L11.6007 3.91324L11.6473 3.87021C12.7712 2.68577 14.3316 2 15.9999 2Z" fill="#64748B"/>
+                    </svg>
+                </a>
+                <span class="tooltiptext-custom tooltip-top-custom">{% get_utils_data language_template_obj.attachment_tooltip_text 0 %}</span>
+            </div>
+        {% endif %}
+    {% endif %}
+        <div class="easychat-bot-footer-query-input-div tooltip-custom" id="easychat-query-mic-send-icon-wrapper" style="pointer-events: auto;">
+            <button class="easychat-query-send-icon rotate-in-rtl" id="easychat-query-send-icon" onclick="if(window.outerWidth > 450)send_message()">
+                <svg class="easychat-query-send-icon-unactive" width="24" height="24" viewBox="0 0 24 24"
+                    fill="#{{ bot_obj.bot_theme_color }}" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M6.18197 12L3.04914 3.94538C2.8311 3.38478 3.37781 2.84867 3.91864 3.03923L4.00387 3.07546L20.6173 11.3809C21.0957 11.6201 21.1256 12.2748 20.707 12.5659L20.6173 12.6191L4.00387 20.9245C3.4658 21.1935 2.88128 20.6989 3.02096 20.1428L3.04914 20.0546L6.18197 12ZM4.98993 5.11605L7.39795 11.3073L13.515 11.3079C13.8655 11.3079 14.1551 11.5683 14.2009 11.9061L14.2072 12C14.2072 12.3504 13.9468 12.64 13.6089 12.6858L13.515 12.6921L7.39795 12.6916L4.98993 18.8839L18.7599 12L4.98993 5.11605Z" />
+                </svg>
+                <svg class="easychat-query-send-icon-active" width="24" height="24" viewBox="0 0 24 24"
+                    fill="#{{ bot_obj.bot_theme_color }}" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M12.7545 12.1821L5.80338 13.3404C5.64058 13.3675 5.50466 13.4795 5.44692 13.6341L3.04914 20.0546C2.81962 20.6447 3.43748 21.2077 4.00387 20.9245L20.6173 12.6191C21.1276 12.364 21.1276 11.636 20.6173 11.3809L4.00387 3.07546C3.43748 2.79231 2.81962 3.35528 3.04914 3.94538L5.44692 10.3659C5.50466 10.5205 5.64058 10.6325 5.80338 10.6596L12.7545 11.8179C12.855 11.8347 12.923 11.9298 12.9062 12.0303C12.8932 12.1081 12.8323 12.1691 12.7545 12.1821Z" />
+                </svg>
+            </button>
+
+            <div class="easychat-mic-icon" id="easychat-mic-icon" style="display: flex;" onclick="check_mic_access()">
+                <svg id="easychat-mic-svg_theme_4" width="18" height="18" viewBox="0 0 18 18" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M9 0.75C8.40326 0.75 7.83097 0.987053 7.40901 1.40901C6.98705 1.83097 6.75 2.40326 6.75 3V9C6.75 9.59674 6.98705 10.169 7.40901 10.591C7.83097 11.0129 8.40326 11.25 9 11.25C9.59674 11.25 10.169 11.0129 10.591 10.591C11.0129 10.169 11.25 9.59674 11.25 9V3C11.25 2.40326 11.0129 1.83097 10.591 1.40901C10.169 0.987053 9.59674 0.75 9 0.75V0.75Z"
+                        stroke="#{{ bot_obj.bot_theme_color }}" stroke-linecap="round" stroke-linejoin="round" />
+                    <path
+                        d="M14.25 7.5V9C14.25 10.3924 13.6969 11.7277 12.7123 12.7123C11.7277 13.6969 10.3924 14.25 9 14.25C7.60761 14.25 6.27226 13.6969 5.28769 12.7123C4.30312 11.7277 3.75 10.3924 3.75 9V7.5"
+                        stroke="#{{ bot_obj.bot_theme_color }}" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M9 14.25V17.25" stroke="#{{ bot_obj.bot_theme_color }}" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                    <path d="M6 17.25H12" stroke="#{{ bot_obj.bot_theme_color }}" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </div>
+            <div id="mic-speak-animation-div" onclick="deactivate_mic()" style="display: none;" class="easychat-mic-speak-animation-wrapper">
+                <div class="mic-speak-animation-item"></div>
+                <div class="mic-speak-animation-item"></div>
+                <div class="mic-speak-animation-item"></div>
+            </div>
+            <div class="easychat-mic-icon-active" id="easychat-mic-icon-active" onclick="deactivate_mic()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M14.9211 11C14.9211 12.66 13.5811 14 11.9211 14C10.2611 14 8.92105 12.66 8.92105 11V5C8.92105 3.34 10.2611 2 11.9211 2C13.5811 2 14.9211 3.34 14.9211 5V11ZM16.8509 11.85C16.9309 11.36 17.3409 11 17.8309 11C18.4409 11 18.9309 11.54 18.8309 12.14C18.3409 15.14 15.9409 17.49 12.9209 17.92V20C12.9209 20.55 12.4709 21 11.9209 21C11.3709 21 10.9209 20.55 10.9209 20V17.92C7.90089 17.49 5.50088 15.14 5.01088 12.14C4.92088 11.54 5.40088 11 6.01089 11C6.50089 11 6.91088 11.36 6.99088 11.85C7.40088 14.2 9.45089 16 11.9209 16C14.3909 16 16.4409 14.2 16.8509 11.85Z"
+                        fill="#{{ bot_obj.bot_theme_color }}" />
+                </svg>
+            </div>
+
+
+            <span class="tooltiptext-custom tooltip-top-custom" id="tooltip-mic-send-text">{{language_template_obj.mic_button_tooltip}}</span>
+
+        </div>
+    </div>
+    <div class="easychat-bot-footer-menus-opner-div tooltip-custom " id="bot_menu_option_opner_div">
+        <svg class="footer-menu-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2.75 18H15.25C15.6642 18 16 18.3358 16 18.75C16 19.1297 15.7178 19.4435 15.3518 19.4931L15.25 19.5H2.75C2.33579 19.5 2 19.1642 2 18.75C2 18.3703 2.28215 18.0565 2.64823 18.0068L2.75 18H15.25H2.75ZM2.75 11.5H21.25C21.6642 11.5 22 11.8358 22 12.25C22 12.6297 21.7178 12.9435 21.3518 12.9931L21.25 13H2.75C2.33579 13 2 12.6642 2 12.25C2 11.8703 2.28215 11.5565 2.64823 11.5068L2.75 11.5H21.25H2.75ZM2.75 5.00323H18.25C18.6642 5.00323 19 5.33902 19 5.75323C19 6.13293 18.7178 6.44673 18.3518 6.49639L18.25 6.50323H2.75C2.33579 6.50323 2 6.16745 2 5.75323C2 5.37354 2.28215 5.05974 2.64823 5.01008L2.75 5.00323H18.25H2.75Z" fill="#{{ bot_obj.bot_theme_color }}"/>
+        </svg>
+        <svg class="footer-menu-cross-icon" width="20" height="20" viewBox="0 0 20 20" fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <path d="M3.58923 3.33331L16.4113 16.6666" stroke="white" stroke-width="2.22222"
+                stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M16.411 3.33331L3.58898 16.6666" stroke="white" stroke-width="2.22222"
+                stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <span class="tooltiptext-custom tooltip-top-custom" id="tooltip-menu-text">Menu</span>
+    </div>
+
+</div>
+</div>

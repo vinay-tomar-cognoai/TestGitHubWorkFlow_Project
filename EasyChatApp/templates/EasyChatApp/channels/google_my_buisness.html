@@ -1,0 +1,252 @@
+{% extends 'EasyChatApp/console.html' %}
+{% block consolecontent %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/changes_placement.css' %}?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/common_integrated_channel.css' %}?v={% random_int 1 100 %}">
+
+    <div style="padding: 1em;">
+
+      <div class="row">
+        {% include "EasyChatApp/channels/channel_components/channel_integration_document_button.html" with channel_doc_download_link="https://drive.google.com/uc?export=download&id=1Om3lOv29PIAG5hVpKpmrLozl-LdogcH8" channel_name="Google Business Messages" %}
+      </div>
+      
+      {% include "EasyChatApp/channels/channel_components/language_dropdown_go_back.html" %}
+
+      <div class="row">
+        {% include "EasyChatApp/channels/channel_components/custom_message.html" with area="google-mb-textarea" %}
+
+        <div class="col s12">
+
+          <div class="row">
+            {% if selected_language == "en" %}
+            {% include "EasyChatApp/channels/channel_components/language_specific.html" %}
+            <ul class="collapsible">
+              <li>
+                <div class="collapsible-header">Initial Questions</div>
+                <div class="collapsible-body">
+                  <div class="row" id="channel-initial-messages">
+                    *Search and select from existing Intent List
+
+                    <div class="input-field col s12">
+                      <select multiple id="multiple-select-google-buisness-messages-initial-message-list">
+                        {% for intent_name in intent_name_list %}
+                            {% if intent_name.is_selected %}
+                              <option value="{{ intent_name.intent_pk }}" selected>{{ intent_name.intent_name }}</option>
+                            {% else %}
+                              <option value="{{ intent_name.intent_pk }}">{{ intent_name.intent_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+            <ul class="collapsible">
+              <li>
+                <div class="collapsible-header">Failure Recommendations</div>
+                <div class="collapsible-body">
+                  <div class="row" id="channel-initial-messages">
+                    *Search and select from existing Intent List
+
+                    <div class="input-field col s12">
+                      <select multiple id="multiple-select-google-buisness-messages-failure-message-list">
+                        {% for intent_name in intent_name_list_failure %}
+                            {% if intent_name.is_selected %}
+                              <option value="{{ intent_name.intent_pk }}" selected>{{ intent_name.intent_name }}</option>
+                            {% else %}
+                              <option value="{{ intent_name.intent_pk }}">{{ intent_name.intent_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+            <ul class="collapsible">
+                <li>
+                  <div class="collapsible-header">Webhook Set-Up</div>
+                  <div class="collapsible-body">
+                    <div class="row" id="gmb-webhook-setup">
+                      <div class="input-field col s12">
+                        <input type="text" value='{{gmb_url}}' id="gmb-webhook-url" readonly style="width:96%;border: 0.1em solid black;padding:1em;font-family: Consolas, monaco, monospace;word-wrap: break-word;background-color:white;">
+                        <button onclick="copyToClipboard('gmb-webhook-url', this)">Copy Script</button>
+                      </div>
+                        
+                        <div class="input-field col s12">
+                            <p>Client Token<sup><i style="font-size: 17px;" class="material-icons tooltipped" data-tooltip="Add the Client token created in the Google Business communication developer console to verify">help</i></sup></p>
+                            <input type="text" id="gbm-client-access-token" value="{{client_access_token}}">
+                        </div>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+          <!-- </div>
+          
+        </div> -->        
+<ul class="collapsible">
+    <li>
+      <div class="collapsible-header">GBM Credentials</div>
+      <div class="collapsible-body">
+        <div class="row" id="gbm-credentials">
+            <p class="gbm-credentials-heading">Bot Display Name <sup style="color: red;">*</sup></p>
+            <input class="gbm-credentials-input" id="gmb-bot-display-name" type="text" class="validate" placeholder="Allincall Agent" 
+            value="{{ gmb_obj.bot_display_name }}" >
+            <p class="gbm-credentials-heading">Bot display picture(max 50kb)<sup style="color: red;">*</sup></p>
+            <div class="row">
+              <div class="gbm-upload-picture-div">
+                  <div class="input-field col s8">
+                     <img id ="gmb-display-image-preview" style="width: 150px; height: 100px;" src="{{ gmb_obj.bot_display_image_url }}">
+                                       <input disabled style="width:80% !important;" id="gmb_display_picture_url" type="text" class="validate" placeholder="copy image url here*" value="{{ gmb_obj.bot_display_image_url }}">
+                  </div>
+             
+             
+              <div class="col s4 gbm-upload-image-div" >
+                  
+                  <a style="width:95% !important; height: 40px !important;" class=" modal-trigger easychat-button gbm-upload-image-btn" href="#modal-upload-gmb-display-image"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 6L19 6C19.5523 6 20 5.55228 20 5C20 4.44772 19.5523 4 19 4L5 4C4.44771 4 4 4.44772 4 5C4 5.55228 4.44771 6 5 6Z" fill="white"/>
+                          <path d="M20 7V5C20 4.44772 19.5523 4 19 4C18.4477 4 18 4.44772 18 5V7C18 7.55228 18.4477 8 19 8C19.5523 8 20 7.55228 20 7Z" fill="white"/>
+                          <path d="M6 7V5C6 4.44772 5.55228 4 5 4C4.44772 4 4 4.44772 4 5V7C4 7.55228 4.44772 8 5 8C5.55228 8 6 7.55228 6 7Z" fill="white"/>
+                              <path d="M8 14C7.84476 14 7.69164 13.9639 7.55279 13.8944C7.41393 13.825 7.29315 13.7242 7.2 13.6C7.12121 13.495 7.06388 13.3754 7.03129 13.2482C6.99869 13.121 6.99148 12.9886 7.01005 12.8586C7.02862 12.7286 7.07262 12.6035 7.13953 12.4905C7.20643 12.3775 7.29494 12.2788 7.4 12.2L11.4 9.20001C11.5713 9.07486 11.7779 9.00742 11.99 9.00742C12.2021 9.00742 12.4087 9.07486 12.58 9.20001L16.58 12.02C16.7956 12.1729 16.9419 12.405 16.9868 12.6655C17.0318 12.926 16.9718 13.1936 16.82 13.41C16.7442 13.5182 16.6478 13.6102 16.5362 13.6809C16.4246 13.7516 16.3002 13.7995 16.17 13.8218C16.0399 13.8441 15.9066 13.8404 15.7778 13.8109C15.6491 13.7814 15.5275 13.7267 15.42 13.65L12 11.24L8.6 13.8C8.4269 13.9298 8.21637 14 8 14Z" fill="white"/>
+                               <path d="M12 21C11.7348 21 11.4804 20.8946 11.2929 20.7071C11.1054 20.5196 11 20.2652 11 20V12C11 11.7348 11.1054 11.4804 11.2929 11.2929C11.4804 11.1054 11.7348 11 12 11C12.2652 11 12.5196 11.1054 12.7071 11.2929C12.8946 11.4804 13 11.7348 13 12V20C13 20.2652 12.8946 20.5196 12.7071 20.7071C12.5196 20.8946 12.2652 21 12 21Z" fill="white"/>
+                              </svg> &nbsp;Upload From Device </a>
+              </div>
+            </div>
+             </div>
+                      
+            {% if gmb_obj.gmb_agent_id != "" %}
+            <p class="gbm-credentials-heading" id="agent-token-guideline">Agent Id already added.</p>
+              <input  class="gbm-credentials-input" type="text" value='{{gmb_obj.gmb_agent_id}}' id="gmb-agent-id"  style="width:96%;padding:1em;font-family: Consolas, monaco, monospace;word-wrap: break-word;background-color:white;">
+              
+            {% else %}
+            <p class="gbm-credentials-heading" id="agent-token-guideline">Paste your Agent Id here and add.<sup style="color: red;">*</sup></p>
+              <input  class="gbm-credentials-input" type="text" id="gmb-agent-id" style="width:96%;padding:1em;font-family: Consolas, monaco, monospace;word-wrap: break-word;background-color:white;">
+              
+            {% endif %}
+            {% if gmb_obj.gmb_brand_id != "" %}
+              <p class="gbm-credentials-heading" id="brand-token-guideline">Brand Id already added.</p>
+              <input  class="gbm-credentials-input" type="text" value='{{gmb_obj.gmb_brand_id}}' id="gmb-brand-id"  style="width:96%;padding:1em;font-family: Consolas, monaco, monospace;word-wrap: break-word;background-color:white;">
+              
+            {% else %}
+              <p class="gbm-credentials-heading" id="brand-token-guideline">Paste your Brand Id here and add.<sup style="color: red;">*</sup></p>
+              <input  class="gbm-credentials-input" type="text" id="gmb-brand-id" style="width:96%;padding:1em;font-family: Consolas, monaco, monospace;word-wrap: break-word;background-color:white;">
+              
+            {% endif %}
+            <p class="gbm-credentials-heading" >Privacy policy url<sup style="color: red;">*</sup></p>
+            <input  class="gbm-credentials-input"  id="gmb-client-privacy-policy-url" type="text" class="validate" placeholder="Privacy Policy Url*" value="{{ gmb_obj.gmb_privacy_policy_url }}">
+
+            <p class="gbm-credentials-heading"> GBM API Credentials File <sup style="color: red;">*</sup></p> 
+            <div class="input-field col s8" style="padding-left: 0px;">
+                              
+              <input  class="gbm-credentials-input"  id="gmb_api_credential_file_path" readonly type="text" class="validate" placeholder="Credentials File Path*" value="{{ gmb_credentials_file_name }}">
+            </div>
+
+            <div class="col s3" style="margin-top:1em;">
+                <a style=" height: 40px !important;" class=" modal-trigger easychat-button gbm-upload-file-btn" href="#modal-upload-gmb-credential-file">  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 6L19 6C19.5523 6 20 5.55228 20 5C20 4.44772 19.5523 4 19 4L5 4C4.44771 4 4 4.44772 4 5C4 5.55228 4.44771 6 5 6Z" fill="white"/>
+                          <path d="M20 7V5C20 4.44772 19.5523 4 19 4C18.4477 4 18 4.44772 18 5V7C18 7.55228 18.4477 8 19 8C19.5523 8 20 7.55228 20 7Z" fill="white"/>
+                          <path d="M6 7V5C6 4.44772 5.55228 4 5 4C4.44772 4 4 4.44772 4 5V7C4 7.55228 4.44772 8 5 8C5.55228 8 6 7.55228 6 7Z" fill="white"/>
+                              <path d="M8 14C7.84476 14 7.69164 13.9639 7.55279 13.8944C7.41393 13.825 7.29315 13.7242 7.2 13.6C7.12121 13.495 7.06388 13.3754 7.03129 13.2482C6.99869 13.121 6.99148 12.9886 7.01005 12.8586C7.02862 12.7286 7.07262 12.6035 7.13953 12.4905C7.20643 12.3775 7.29494 12.2788 7.4 12.2L11.4 9.20001C11.5713 9.07486 11.7779 9.00742 11.99 9.00742C12.2021 9.00742 12.4087 9.07486 12.58 9.20001L16.58 12.02C16.7956 12.1729 16.9419 12.405 16.9868 12.6655C17.0318 12.926 16.9718 13.1936 16.82 13.41C16.7442 13.5182 16.6478 13.6102 16.5362 13.6809C16.4246 13.7516 16.3002 13.7995 16.17 13.8218C16.0399 13.8441 15.9066 13.8404 15.7778 13.8109C15.6491 13.7814 15.5275 13.7267 15.42 13.65L12 11.24L8.6 13.8C8.4269 13.9298 8.21637 14 8 14Z" fill="white"/>
+                               <path d="M12 21C11.7348 21 11.4804 20.8946 11.2929 20.7071C11.1054 20.5196 11 20.2652 11 20V12C11 11.7348 11.1054 11.4804 11.2929 11.2929C11.4804 11.1054 11.7348 11 12 11C12.2652 11 12.5196 11.1054 12.7071 11.2929C12.8946 11.4804 13 11.7348 13 12V20C13 20.2652 12.8946 20.5196 12.7071 20.7071C12.5196 20.8946 12.2652 21 12 21Z" fill="white"/>
+                              </svg>
+                                        &nbsp;Upload File </a>
+            </div>
+            
+        </div>
+
+                     
+        </div>
+      <div class="progress" id="easychat_telegram_channel_preloader" style="display: none;">
+            <div class="indeterminate"></div>
+      </div>
+      <div class="row">
+      </div>
+      </div>
+</li>
+</ul>
+{% endif %}
+<div class="progress" id="easychat_google_my_buisness_channel_preloader" style="display: none;">
+            <div class="indeterminate"></div>
+</div>
+{% if selected_language == "en" %}
+<a class="btn green lighten-2" style="background-color: #82C784; margin-left: 0.2em;"id="save-google-buisness-messages-channel">Save</a>
+{% else %}
+<a class="btn green lighten-2" style="background-color: #82C784; margin-left: 0.2em;" id="save-google-buisness-messages-channel-for-non-primary-language">Save</a>
+{% endif %}
+</div>
+</div>
+</div>
+<div id="modal-upload-gmb-credential-file" class="modal">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <div class="row">  
+                   <p>Upload Service Account Api Credentials File .</p>
+                       
+                  <p></p>
+                  <div class="file-field input-field">
+                    <div class="col s3 waves-effect waves-light btn easychat-button">
+                      <span>Select File<sup>*</sup></span>
+                      <input id="input-upload-gmb-credentials-file" type = "file" accept=".json," />
+                    </div>
+
+                    <div class="col s9 file-path-wrapper">
+                      <input class="file-path validate" type="text" 
+                      placeholder="Upload file" />
+                    </div>
+
+                    
+                  </div>
+                </div>
+                <div class="row">
+                  <a class="col s2 btn waves-effect waves-light right easychat-button" id="upload-resume" onclick="upload_gmb_credentials_file()">Upload</a>
+                </div>
+            </div>            
+        </div>
+    </div>
+</div>
+<div id="modal-upload-gmb-display-image" class="modal">
+            <div class="modal-content">
+                <h5>Choose Image</h5>
+                <div class="file-field input-field col s10">
+                    <div class="btn-small easychat-button">
+                        <span>Choose image</span>
+                        <input id="input_upload_gmb-display-image" type="file" accept='image/*'>
+                    </div>
+                    <div class="file-path-wrapper">
+                        <input id="input_upload_gmb-display-image2" class="file-path validate" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a class="modal-close btn easychat-button" id="upload-gmb-display-image">Upload</a>
+            </div>
+</div>
+
+
+
+
+
+<script type="text/javascript">
+
+  $(".google-mb-textarea").trumbowyg({
+                    tagsToKeep: [],
+                    allowTagsFromPaste: {
+                        allowedTags: ['h4', 'p', 'br']
+                    },
+                    minimalLinks: true,
+                    btns: [
+                        // ['viewHTML'],
+                        ['strong', 'em'], 
+                        ['emoji'],
+                        ['link'],
+                        ['unorderedList', 'orderedList'],
+                        ['underline'],
+                        ['justifyLeft'], ['justifyCenter'], ['justifyRight'], ['justifyFull'],
+                    ],
+  })
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,1331 @@
+{% extends 'EasyAssistApp/console.html' %}
+{% block content %}
+{% load static %}
+{% load easyassist_custom_filters %}
+
+<style type="text/css">
+
+/*
+    Chat style
+*/
+
+.easychat-bot-message-div {
+    margin-top: 0em;
+    width: 100%;
+    display: inline-block;
+}
+
+.message-time-user {
+    font-size: 11px;
+    float: right;
+    text-align: right;
+    margin-left: 20px;
+    color: white;
+    padding: 0.5em 0em 0em 0.5em;
+}
+/* thead {
+    display:block;
+}
+tbody {
+    height:20em;
+    overflow-y:scroll;
+    display:block;
+} */
+
+.message-time-bot {
+    font-size: 11px;
+    text-align: right;
+    width: 100%;
+    float: right;
+    padding: 0.5em 0em 0em 0.5em;
+}
+
+.easychat-bot-message {
+    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
+    float: left;
+    width: fit-content;
+    height: auto;
+    font-size: 14px;
+    color: #262626;
+    border-radius: 0px 10px 10px 10px;
+    background-color: #ffffff;
+    padding-bottom: 10px;
+    word-wrap: break-word;
+    display: inline-block;
+}
+
+@media screen and (min-width: 425px) {
+    .easychat-bot-message {
+        width: fit-content;
+        max-width: 80%;
+    }
+}
+
+.easychat-bot-message-line {
+    line-height: 20px;
+    padding: 0.8em 0.5em 0.8em 0.5em;
+}
+
+.easychat-user-message-div {
+    margin: 0em 0em 0em 0em;
+    width: 100%;
+    display: inline-block;
+}
+
+.easychat-user-message {
+    box-shadow: -1px 1px 5px rgba(0, 0, 0, 0.2);
+    float: right;
+    height: auto;
+    max-width: 80%;
+    font-size: 14px;
+    color: white;
+    border-radius: 10px 0px 10px 10px;
+    word-wrap: break-word;
+    display: inline-block;
+    margin-right: 0.3em;
+}
+
+.easychat-user-message-line {
+    line-height: 16px;
+    padding: 0.8em 0.7em 0.8em 0.8em !important;
+}
+
+.easychat-livechat-customer-attachment {
+    width: auto;
+    max-width: 80%;
+    float: left;
+    background-color: #ffffff;
+    margin: 1em 0px 3px 0px;
+    padding: 4px 4px 1px 4px;
+    border-radius: 0em 1em 1em 1em;
+    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
+}
+
+.easychat-livechat-message {
+    height: fit-content;
+    padding: 6px;
+    word-wrap: break-word;
+}
+
+/*  Chat Style End */
+.cobrowse-msg {
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: 10px;
+}
+
+.cobrowse-msg-img {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+    background: #ddd;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    border-radius: 50%;
+}
+
+.cobrowse-msg-bubble {
+    max-width: 450px;
+    padding: 15px;
+    border-radius: 15px;
+    background: aliceblue;
+    max-width: 50%;
+}
+
+.cobrowse-msg-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.cobrowse-msg-info-name {
+    margin-right: 10px;
+}
+
+.cobrowse-msg-info-time {
+    font-size: 0.85em;
+}
+
+.right-cobrowse-msg {
+    flex-direction: row-reverse;
+}
+
+.right-cobrowse-msg .cobrowse-msg-bubble {
+    border-bottom-right-radius: 0;
+}
+
+.left-cobrowse-msg .cobrowse-msg-bubble {
+    border-bottom-left-radius: 0;
+}
+
+@media only screen and (max-width: 769px) {
+    .d-block-sm {
+        display: block!important;
+    }
+}
+
+#modal-mis-filter label {
+    font-size: 13px;
+}
+</style>
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <!-- DataTales Example -->
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <div class="row align-items-center">
+                <div class="col-sm-4">
+                    <h6 class="m-0 font-weight-bold text-primary">Meeting Support History</h6>
+                </div>
+                {% if is_cobrowse_video_empty == False %}
+                <div class="col-sm-8 d-flex justify-content-end card-header-left-div">
+                    <div class="form-group has-search d-flex mb-0 mr-2">
+                        <span class="fa fa-search form-control-feedback"></span>
+                        <input type="text" id="custom-agent-table-search" class="custom-table-search form-control" placeholder="Search" aria-controls="support-history-table">
+                    </div>
+                    {% if cobrowse_agent.role == "admin" or cobrowse_agent.role == "supervisor" or cobrowse_agent.role == "admin_ally"  %}
+                        {% if audit_trail_objs %}
+                        <button class="btn btn-info btn-width-100" style="width: 120px;" data-toggle="modal" data-target="#modal-mis-filter">Export</button>
+                        {% endif %}
+                    {% endif %}
+                    <button class="btn btn-white-border btn-width-100" data-toggle="modal" data-target="#apply_filter_modal">Filter</button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card-body">
+        	<div class="row filter-result-div" id="applied-filter-div" style="display: none;">
+                <div class="filter-items-container" id="applied-filter-result-container">
+                </div>
+                <div class="filtered-result-text-heading">
+                    Filtered Results
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th scope="col">Customer Details</th>
+                            <th scope="col">Meeting Date</th>
+                            {% if cobrowse_agent.role != "agent" %}
+                            <th scope="col">Agent</th>
+                            {% endif %}
+                            {% if cobrowse_agent.role == "admin_ally" %}  
+                            <th scope="col">Supervisors</th>
+                            {% endif %}
+                            <th scope="col">Total Duration</th>
+                            {% if access_token_obj.enable_meeting_recording %}
+                                <th scope="col">Meeting Recording</th>
+                            {% endif %}
+                            <th scope="col">Meeting Status</th>
+                            <th scope="col">Meeting Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for audit_trail_obj in audit_trail_objs %}
+                        <tr>
+                            <td>
+                                Name: 
+                                {% if audit_trail_obj.cobrowse_video.full_name|length %}
+                                    {{ audit_trail_obj.cobrowse_video.full_name }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                                <br> Mobile Number: 
+                                    {% if audit_trail_obj.cobrowse_video.mobile_number|length %}
+                                        {{ audit_trail_obj.cobrowse_video.mobile_number|mask_data }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                <br>Initiated:             
+                                        {{ audit_trail_obj.get_lead_initiated_by }}
+                            </td>
+                            <td>
+                                {{ audit_trail_obj.cobrowse_video.meeting_start_date | date:"d-M-Y" }}
+                            </td>
+                            {% if cobrowse_agent.role != "agent" %}
+                            <td>
+                                {{ audit_trail_obj.cobrowse_video.agent.name }}
+                            </td>
+                            {% endif %}
+                            {% if cobrowse_agent.role == "admin_ally" %}
+                            <td>
+                            <div data-toggle="tooltip" title="{{ audit_trail_obj.cobrowse_video.agent.get_supervisors }}" data-placement="bottom" class="easyassist-supervisor-list-ellips">
+                                        {% if audit_trail_obj.cobrowse_video.agent.get_supervisors %}
+                                            {{ audit_trail_obj.cobrowse_video.agent.get_supervisors}}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </div>
+                            </td>
+                            {% endif %}
+                            <td>
+                                {{ audit_trail_obj.get_readable_meeting_duration }}
+                            </td>
+                            {% if access_token_obj.enable_meeting_recording %}
+                                <td>
+                                    <a class="btn btn-info" href="javascript:void(0)" onclick="download_meeting_recording('{{ audit_trail_obj.cobrowse_video.pk }}')">Download</a>
+                                </td>
+                            {% endif %}
+                            <td>
+                                {% if audit_trail_obj.cobrowse_video.is_expired %}
+                                Completed
+                                {% else %}
+                                Scheduled
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button type="button" onclick="show_right_sidenav('{{ audit_trail_obj.pk }}')" class="right-sidenav-session-btn btn btn-info btn-icon-split request-cobrowsing-btn-md">
+                                    <span class="icon text-white-50">
+                                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M9 0C4.02991 0 0 4.02991 0 9C0 13.9701 4.02991 18 9 18C13.9701 18 18 13.9701 18 9C18 4.02991 13.9701 0 9 0ZM9.64286 13.3393C9.64286 13.4277 9.57054 13.5 9.48214 13.5H8.51786C8.42946 13.5 8.35714 13.4277 8.35714 13.3393V7.875C8.35714 7.78661 8.42946 7.71429 8.51786 7.71429H9.48214C9.57054 7.71429 9.64286 7.78661 9.64286 7.875V13.3393ZM9 6.42857C8.74766 6.42342 8.5074 6.31956 8.33076 6.13929C8.15413 5.95901 8.0552 5.71667 8.0552 5.46429C8.0552 5.2119 8.15413 4.96956 8.33076 4.78929C8.5074 4.60901 8.74766 4.50515 9 4.5C9.25234 4.50515 9.4926 4.60901 9.66924 4.78929C9.84587 4.96956 9.9448 5.2119 9.9448 5.46429C9.9448 5.71667 9.84587 5.95901 9.66924 6.13929C9.4926 6.31956 9.25234 6.42342 9 6.42857Z" fill="rgba(255,255,255,.5)"></path>
+                                        </svg>
+                                    </span>
+                                    <span class="text">Meeting Details</span>
+                                </button>
+                                <button type="button" onclick="show_right_sidenav('{{ audit_trail_obj.pk }}')" class="right-sidenav-session-btn btn btn-info request-cobrowsing-btn">
+                                    <div class="sessiondetail-icon">
+                                        <svg style="    margin-top: 12px;" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M9 0C4.02991 0 0 4.02991 0 9C0 13.9701 4.02991 18 9 18C13.9701 18 18 13.9701 18 9C18 4.02991 13.9701 0 9 0ZM9.64286 13.3393C9.64286 13.4277 9.57054 13.5 9.48214 13.5H8.51786C8.42946 13.5 8.35714 13.4277 8.35714 13.3393V7.875C8.35714 7.78661 8.42946 7.71429 8.51786 7.71429H9.48214C9.57054 7.71429 9.64286 7.78661 9.64286 7.875V13.3393ZM9 6.42857C8.74766 6.42342 8.5074 6.31956 8.33076 6.13929C8.15413 5.95901 8.0552 5.71667 8.0552 5.46429C8.0552 5.2119 8.15413 4.96956 8.33076 4.78929C8.5074 4.60901 8.74766 4.50515 9 4.5C9.25234 4.50515 9.4926 4.60901 9.66924 4.78929C9.84587 4.96956 9.9448 5.2119 9.9448 5.46429C9.9448 5.71667 9.84587 5.95901 9.66924 6.13929C9.4926 6.31956 9.25234 6.42342 9 6.42857Z" fill="white"></path>
+                                        </svg>
+                                    </div>
+                                    <span class="text">Meeting Details</span>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if total_audit_trail_objs > 0 %}
+            <div class="row mt-3">
+                <div class="col-md-6 col-sm-12 show-pagination-entry-container" filter_default_text="Showing {{start_point}} to {{end_point}} of {{total_audit_trail_objs}} entries" start_point="{{start_point}}" end_point="{{end_point}}">
+                    Showing {{start_point}} to {{end_point}} of {{total_audit_trail_objs}} entries
+                </div>
+                <div class="col-md-6 col-sm-12">
+                    <div class="d-flex justify-content-end">
+                        <nav aria-label="Page navigation example">
+                          <ul class="pagination">
+
+                            {% if audit_trail_objs.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" onclick="load_more_page('{{ audit_trail_objs.previous_page_number }}');" href="javascript:void(0)" aria-label="Previous">
+                                        <span aria-hidden="true">Previous</span>
+                                        <span class="sr-only">Previous</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="disabled page-item"><span>
+                                    <a class="page-link" href="javascript:void(0)" aria-label="Previous">
+                                        <span aria-hidden="true">Previous</span>
+                                        <span class="sr-only">Previous</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            {% if audit_trail_objs.number|add:'-4' > 1 %}
+                                <li class="page-item">
+                                    <a class="page-link" onclick="load_more_page('{{ audit_trail_objs.number|add:'-5' }}');" href="javascript:void(0)">&hellip;</a>
+                                </li>
+                            {% endif %}
+
+                            {% for i in audit_trail_objs.paginator.page_range %}
+                                {% if audit_trail_objs.number == i %}
+                                    <li class="active purple darken-3 page-item">
+                                        <a onclick="load_more_page('{{ i }}');" href="javascript:void(0)" class="page-link">{{ i }}</a>
+                                    </li>
+                                {% elif i > audit_trail_objs.number|add:'-5' and i < audit_trail_objs.number|add:'5' %}
+                                    <li class="page-item">
+                                        <a href="javascript:void(0)" onclick="load_more_page('{{ i }}');" class="page-link">{{ i }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if audit_trail_objs.paginator.num_pages > audit_trail_objs.number|add:'4' %}
+                                <li class="page-item">
+                                    <a href="javascript:void(0)" onclick="load_more_page('{{ audit_trail_objs.number|add:'5' }}');" class="page-link">&hellip;</a>
+                                </li>
+                            {% endif %}
+
+                            {% if audit_trail_objs.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="javascript:void(0)" onclick="load_more_page('{{ audit_trail_objs.next_page_number }}');" aria-label="Next">
+                                        <span aria-hidden="true">Next</span>
+                                        <span class="sr-only">Next</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="disabled page-item">
+                                    <a class="page-link" href="javascript:void(0)" aria-label="Next">
+                                        <span aria-hidden="true">Next</span>
+                                        <span class="sr-only">Next</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                          </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% for audit_trail_obj in audit_trail_objs %}
+<div class="navbar-nav bg-gradient-light sidebar sidebar-dark accordion product-session-details" id="accordionSidebar-{{ audit_trail_obj.pk }}" style="overflow-y: scroll;max-height: 100vh;display: none;">
+    <a class="sidebar-brand" href="javascript:void(0)">
+        <div class="text-dark mx-3">Meeting Details<i class="fas fa-window-close text-dark" style="float:right;" onclick="hide_right_sidenav(this)"></i></div>
+    </a>
+    <div style="padding:0.5em 0.5em 1em 0.5em;">
+        <strong>Meeting Id:</strong>
+        <br>
+        <a href="/easy-assist/sales-ai/meeting-audit-trail/?meeting_id={{ audit_trail_obj.cobrowse_video.meeting_id }}">{{ audit_trail_obj.cobrowse_video.meeting_id }}</a>
+        <hr>
+        <div><strong>Customer Details</strong>
+        </div>
+        <br>
+        <p><b>Name:</b> 
+        {% if audit_trail_obj.cobrowse_video.full_name|length %}
+            {{ audit_trail_obj.cobrowse_video.full_name }}
+        {% else %}
+            -
+        {% endif %}
+        </p>
+        <p><b>Mobile Number:</b>
+        {% if audit_trail_obj.cobrowse_video.mobile_number|length %}
+            {{ audit_trail_obj.cobrowse_video.mobile_number|mask_data }}
+        {% else %}
+            -
+        {% endif %}
+        </p>
+        {% if audit_trail_obj.cobrowse_video.email_id != None and audit_trail_obj.cobrowse_video.email_id != "" %}
+            <p><b>Email Id:</b> {{ audit_trail_obj.cobrowse_video.email_id|mask_data }}</p>
+        {% endif %}
+
+        {% if access_token_obj.enable_location == True %}
+        {% if audit_trail_obj.get_client_location_details|length %}
+        <p><b>Location Details:</b> <a class="btn btn-info" href="#" data-toggle="modal" data-target="#client_location_details" onclick="show_client_location_details('{{ audit_trail_obj.pk }}');hide_right_sidenav_by_id('{{ audit_trail_obj.pk }}');">
+            Location Details</a>
+            <input type="hidden" value="{{ audit_trail_obj.client_location_details }}" id="client-location-details-data-{{ audit_trail_obj.pk }}">
+        </p>
+        {% else %}
+        <p><b>Location Details:</b> No details</p>
+        {% endif %}
+        <p><b>Session Initiated By:</b> 
+            {{ audit_trail_obj.get_lead_initiated_by }}
+
+        </p>
+        {% endif %}
+
+        <hr>
+        <div>
+            <strong>Meeting Details</strong>
+        </div>
+        <br>
+        <p><b>Agent:</b> 
+            {% if audit_trail_obj.get_meeting_main_primary_agent %}
+                {{ audit_trail_obj.get_meeting_main_primary_agent }}
+            {% else %}
+                {{ audit_trail_obj.cobrowse_video.agent }}
+            {% endif %}
+        </p>
+        
+        {% if access_token_obj.enable_request_in_queue %}
+            <p><b>Self assign time: </b> {{ audit_trail_obj.get_self_assign_time }} </p>
+        {% endif %}
+        
+        {% if access_token_obj.enable_auto_assign_unattended_lead %}
+            <p><b>Auto-assigned Agent:</b> 
+                {{ audit_trail_obj.get_meeting_auto_assigned_agents }}
+            </p>
+        {% endif %}
+
+        {% if access_token_obj.enable_invite_agent_in_meeting or access_token_obj.enable_invite_agent_in_cobrowsing %}
+            <p><b>Support Agents:</b>
+                {% if audit_trail_obj.get_meeting_invited_agents %}
+                {% for agent in audit_trail_obj.get_meeting_invited_agents %}
+                {% if not forloop.last %}
+                {{ agent }},
+                {% else %}
+                {{ agent }}
+                {% endif %}
+                {% endfor %}
+                {% else %}
+                -
+                {% endif %}
+            </p>
+            
+            <p><b>Support Agents Connected:</b>
+                {% if audit_trail_obj.get_meeting_agents %}
+                {% for agent in audit_trail_obj.get_meeting_agents %}
+                {% if not forloop.last %}
+                {{ agent }},
+                {% else %}
+                {{ agent }}
+                {% endif %}
+                {% endfor %}
+                {% else %}
+                -
+                {% endif %}
+            </p>
+        {% endif %}
+        {% if access_token_obj.enable_auto_assign_unattended_lead %}
+            <p><b>Assigned Agents: </b>
+                {% if audit_trail_obj.get_meeting_assigned_agents_list %}
+                    {{ audit_trail_obj.get_meeting_assigned_agents_list | length }} &nbsp;
+                    <button class="btn btn-info" data-toggle="modal" onclick="open_agent_audit_trail_modal({{audit_trail_obj.get_meeting_assigned_agents_list | safe}}); hide_right_sidenav_by_id('{{ audit_trail_obj.pk }}');">View Details</button>
+                {% else %}
+                    -
+                {% endif %}
+            </p>
+        {% endif %}
+        <p><b>Meeting Description:</b> {{ audit_trail_obj.cobrowse_video.meeting_description }}</p>
+        <p><b>Date:</b> {{ audit_trail_obj.cobrowse_video.meeting_start_date | date:"d-M-Y"}}</p>
+        <p><b>Initiated by:</b> {{ audit_trail_obj.get_meeting_initiated_by }}</p>
+        <p><b>Start Time:</b> {{ audit_trail_obj.cobrowse_video.meeting_start_time | date:"h:i A" }}</p>
+        {% if audit_trail_obj.cobrowse_video.meeting_end_time != None and audit_trail_obj.cobrowse_video.meeting_end_time != "" %}
+        <p><b>End Time:</b> {{ audit_trail_obj.cobrowse_video.meeting_end_time | date:"h:i A" }}</p>
+        {% elif audit_trail_obj.agent_end_time != None and audit_trail_obj.agent_end_time != "" %}
+        <p><b>End Time:</b> {{audit_trail_obj.agent_end_time | date:"h:i A" }} </p>
+        {% else %}
+        <p><b>End Time:</b> -</p>
+        {% endif %}
+        <p><b>Agent Joined:</b> {{ audit_trail_obj.agent_joined | date:"d-M-Y, h:i A"}}</p>
+        <p> <b>Total Time Spent (in HH:MM:SS): </b> {{ audit_trail_obj.get_meeting_duration }}</p>
+        {% if audit_trail_obj.agent_notes %}
+        <b>Agent Notes:</b>
+        <p style="overflow: auto;max-height: 150px;"> {{ audit_trail_obj.agent_notes|mask_data }}  {{audit_trail_obj.agent_notes.length}}  </p>
+        {% else %}
+        <p> <b>Agent Notes:</b> No Notes</p>
+        {% endif %}
+        <p><b>Status: </b>
+            {% if audit_trail_obj.is_meeting_ended %}
+            Completed
+            {% else %}
+            Scheduled
+            {% endif %}
+        </p>
+        {% if audit_trail_obj.cobrowse_video.feedback_rating %}
+            <p><b>NPS:</b> {{ audit_trail_obj.cobrowse_video.feedback_rating }}</p>
+        {% else %}
+            <p><b>NPS:</b> Not provided</p>
+        {% endif %}
+
+        {% if audit_trail_obj.cobrowse_video.feedback_comment %}
+            <p><b>Comment:</b> {{ audit_trail_obj.cobrowse_video.feedback_comment }}</p>
+        {% else %}
+            <p><b>Comment:</b> Not provided</p>
+        {% endif %}
+        {% if audit_trail_obj.cobrowse_video.agent_comments %}
+            <p><b>Agent Comment:</b> {{ audit_trail_obj.cobrowse_video.agent_comments }}</p>
+        {% endif %}
+        <hr>
+        <div>
+            <strong>Meeting Data</strong>
+        </div>
+        <br>
+
+        {% if audit_trail_obj.message_history %}
+        <p><b>Chat:</b> <a class="btn btn-info" href="#" data-toggle="modal" data-target="#agent_chat_history" onclick="get_client_agent_chats('{{ audit_trail_obj.cobrowse_video.meeting_id }}');hide_right_sidenav_by_id('{{ audit_trail_obj.pk }}');">Show Chat</a></p>
+        {% else %}
+        <p><b>Chat:</b> No chat found</p>
+        {% endif %}
+
+        {% if audit_trail_obj.get_meeting_screenshot|length %}
+        <p><b>Screenshot:</b> <button class="btn btn-info" data-toggle="modal" data-target="#see_captured_screenshot" onclick="show_captured_screenshots('{{ audit_trail_obj.pk }}'); hide_right_sidenav_by_id('{{ audit_trail_obj.pk }}')">Captured Screenshot</button></p>
+        <input type="hidden" id="meeting-screencapture-{{ audit_trail_obj.pk }}" value="{{ audit_trail_obj.meeting_screenshot }}">
+        {% else %}
+        <p><b>Screenshot:</b> No screenshot captured</p>
+        {% endif %}
+
+        {% if access_token_obj.enable_video_conferencing_form == True %}
+            {% if audit_trail_obj.get_meeting_forms|length %}
+                <p><b>Forms:</b> <a class="btn btn-info" href="#" onclick="show_cobrowse_form_modal('{{ audit_trail_obj.pk }}');hide_right_sidenav_by_id('{{ audit_trail_obj.pk }}');">
+                Forms</a></p>
+            {% else %}
+                <p><b>Forms:</b> No forms</p>
+            {% endif %}
+        {% endif %}
+
+    </div>
+</div>
+{% endfor %}
+
+<div class="modal fade" id="agent_chat_history" tabindex="-1" role="dialog" aria-labelledby="agent_chat_history_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="agent_chat_history_modal_label">Chat history</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12" id="client-agent-chat-history" style="max-height: 400px;overflow-y: auto;"></div>
+                </div>
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade client-location-details" id="client-location-details" tabindex="-1" role="dialog" aria-labelledby="client_location_details_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="client_location_details_label">Client's Location Details</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
+<div class="modal fade meeting-screencapture-details" id="meeting-screencapture-details" tabindex="-1" role="dialog" aria-labelledby="meeting_screencapture_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="meeting_screencapture_label">Captured Screenshots</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="table-responsive" style="max-height: 400px">
+                        <table class="table table-borderless" style="max-height: 305px;overflow-y: scroll;">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Screenshot</th>
+                                    <th scope="col">Download</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-captured-screenshot-details"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="apply_filter_modal" tabindex="-1" role="dialog" aria-labelledby="apply_filter_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="apply_filter_modal_modal_label">Apply custom filter</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row filter-header-row">
+                    <div class="col-md-4 col-sm-12 filter-mb-sm-4">
+                        <select class="form-control" onchange="show_filter_options(this)" id="selected-filter-parameter" style="width: 100%!important;">
+                            <option value="None">Select Filter</option>
+                            {% if cobrowse_agent.role != "agent" %}
+                            <option value="agent">Agent</option>
+                            {% endif %}
+                            {% if cobrowse_agent.role == "admin_ally" %}
+                            <option value="supervisor">Supervisor</option>
+                            {% endif %}
+                            <option value="startdate">Start Date</option>
+                            <option value="enddate">End Date</option>
+                            <option value="status">Status</option>
+                        </select>
+                    </div>
+                    <div class="col-md-5 col-sm-12 filter-mb-sm-4 easyassist-multiselect-dropdown-container" id="selected-filter-container">
+                        <select class="form-control" style="display:none;" id="selected-agent-filter" multiple>
+                            {% for agent in agents %}
+                            <option value="{{ agent.user.username }}">{{ agent.user.username }}</option>
+                            {% endfor %}
+                        </select>
+                        {% if cobrowse_agent.role == "admin_ally" %}
+                        <select class="form-control" style="display:none;" id="selected-supervisor-filter" multiple>
+                            {% for supervisor in supervisors %}
+                            <option value="{{ supervisor.user.username }}">{{ supervisor.user.username }}</option>
+                            {% endfor %}
+                        </select>
+                        {% endif %}
+                        <input id="filter-start-date" placeholder="Start Date" style="display:none;" class="filter-parameter form-control datepicker" autocomplete="off" data-date-format="dd-mm-yyyy">
+                        <input id="filter-end-date" placeholder="End Date" style="display:none;" class="filter-parameter form-control datepicker" autocomplete="off" data-date-format="dd-mm-yyyy">
+                        <select class="form-control filter-parameter" style="display:none;" id="selected-status-filter">
+                            <option value="all">All</option>
+                            <option value="completed">Completed</option>
+                            <option value="scheduled">Scheduled</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 col-sm-12" style="align-items: center; display: flex;">
+                        <button class="btn btn-success btn-icon-split" type="button" id="add-filter-btn" onclick="add_new_filter_parameter(this)" style="width: 100%;justify-content: start;" disabled>
+                            <span class="icon text-white-50">
+                                <svg width="19" height="14" viewBox="0 0 19 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M6.03809 11.0455L1.53383 6.69202L0 8.16406L6.03809 14L19 1.47204L17.477 0L6.03809 11.0455Z" fill="white"/>
+                                </svg>
+                            </span>
+                            <span class="text" style="width: 100%;">Add</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="row" id="tbody-filter-parameters">
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <button id="reset_filter" class="btn btn-white-border" style="display: none;" disabled onclick="reset_support_history_filter(this)">Reset</button>
+                <button id="apply_filter_confirm" class="btn btn-primary" disabled onclick="apply_support_history_filter(this)">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% for audit_trail_obj in audit_trail_objs %}
+<div class="modal fade" id="cobrowse-form-{{ audit_trail_obj.pk }}" tabindex="-1" role="dialog" aria-labelledby="cobrowse_form_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cobrowse_form_label">Form Details</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="table-responsive">
+                        <table class="table table-borderless" style="max-height: 305px;">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="text-center">Form Name</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cobrowse_form in audit_trail_obj.get_meeting_forms %}
+                                <tr>
+                                    <td class="text-center">
+                                        <a href="/easy-assist/cobrowse-data-collect/show/{{ audit_trail_obj.cobrowse_video.meeting_id }}/{{ cobrowse_form.pk }}/" target="_blank">{{ cobrowse_form.form_name }}</a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td class="text-center">
+                                        No Forms
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<!-- ********************************* Export data -->
+<div class="modal fade client-location-details" id="modal-mis-filter" tabindex="-1" role="dialog" aria-labelledby="client_location_details_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="export_mis_lable">Export Meeting Support History</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h6 style="color: #3e95cd">Select date range</h6>
+                        <select id="select-date-range" class="form-control" onchange="check_select_date_range(this)">
+                            <option value="0" selected="selected">Choose date range</option>
+                            <option value="1">Last day</option>
+                            <option value="2">Last 7 days</option>
+                            <option value="3">Last 1 month</option>
+                            <option value="4">Custom Range</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-6 mt-4" id="from-date-div" style="display: none;">
+                        <h6 style="color: #3e95cd">From Date</h6>
+                        <input id="startdate" placeholder="From Date" class="filter-parameter form-control datepicker" autocomplete="off" data-date-format="dd-mm-yyyy">
+                    </div>
+                    <div class="col-sm-6 mt-4" id="to-date-div" style="display: none;">
+                        <h6 style="color: #3e95cd">To Date</h6>
+                        <input id="enddate" placeholder="To Date" class="filter-parameter form-control datepicker" autocomplete="off" data-date-format="dd-mm-yyyy">
+                    </div>
+                    <div class="col-sm-12" id="email-id-div" style="display:none; padding-top: 25px;">
+                        <h6 style="color: #3e95cd">Email ID*</h6>
+                        <textarea class="form-control" id="filter-data-email" style="height:10em;">{{ request.user.email }}</textarea>
+                        <span><br><b>Note: You will receive the meeting history data dump on the above email ID within 24 hours.</b></span>
+                    </div>
+                    <div class="col-sm-12 mt-3" id="general-error-message">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-info" type="button" onclick="export_meeting_support_history(this)">Export</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Agent auto assign audit trail modal -->
+<div class="modal fade auto-assign-transfer-audit-trail" id="auto_assign_audit_trail" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+       <div class="modal-content" style="margin: auto !important;">
+          <div class="modal-header">
+             <h5 class="modal-title" id="auto_assign_audit_trail_modal_label">Auto Assign Audit Trail
+             </h5>
+             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                   <path d="M3.34525 3L20.655 21" stroke="#2D2D2D" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/>
+                   <path d="M20.6548 3L3.34502 21" stroke="#2D2D2D" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+             </button>
+          </div>
+          <div class="modal-body">
+             <div class="table-responsive" id="auto_assign_transfer_audit_trail_table_div">
+                <table id="auto_assign_transfer_audit_trail_table" class="table table-bordered" style="width: 100%;">
+                   <thead>
+                      <tr>
+                         <th scope="col">SL No.</th>
+                         <th scope="col">Date Time</th>
+                         <th scope="col">Auto Assigned Agent</th>
+                      </tr>
+                   </thead>
+                   <tbody>
+                   </tbody>
+                </table>
+             </div>
+          </div>
+       </div>
+    </div>
+ </div>
+
+
+<script type="text/javascript">
+window.is_filter_applied = false;
+window.custom_session_filter_dropdown = null;
+window.custom_filter_option_dropdown = null;
+window.applied_filter_key_value_map = {};
+
+function right_sidenav_close_event(event){
+    var parent_element = $(event.target).closest("#report_problem_icon,#report_problem_modal");
+    if(parent_element.length) {
+        return;
+    }
+
+    let bt_session=event.target.closest('.right-sidenav-session-btn');
+    if(!bt_session){
+        let container=$('.product-session-details:visible');
+        if(container && container[0]!=event.target.closest('.product-session-details')){
+            $('.product-session-details:visible').find('.sidebar-brand i').trigger('click');
+        }
+    }
+}
+
+function hide_right_sidenav(element) {
+    element.parentElement.parentElement.parentElement.style.display = "none";
+    document.removeEventListener('click',right_sidenav_close_event);
+    document.removeEventListener('keydown', function (event) {
+            var key = event.key || event.keyCode;
+            if (key === 'Escape' || key === 'Esc' || key === 27) {
+                $('.product-session-details:visible').find('.sidebar-brand i').trigger('click');
+            }
+    });
+}
+
+function show_right_sidenav(element_id) {
+    var right_sidenav = document.getElementsByClassName("product-session-details");
+    for (var index = 0; index < right_sidenav.length; index++) {
+        right_sidenav[index].style.display = "none";
+    }
+    document.getElementById("accordionSidebar-" + element_id).style.display = "block";
+    document.addEventListener('click',right_sidenav_close_event);
+    document.addEventListener('keydown', function (event) {
+            var key = event.key || event.keyCode;
+            if (key === 'Escape' || key === 'Esc' || key === 27) {
+                $('.product-session-details:visible').find('.sidebar-brand i').trigger('click');
+            }
+    });
+}
+
+function hide_right_sidenav_by_id(element_id) {
+    document.getElementById("accordionSidebar-" + element_id).style.display = "none";
+}
+
+function show_client_location_details(element_id) {
+
+    hide_all_active_modal();
+    let client_details_data = $('#client-location-details-data-' + element_id).val();
+    client_details_data = JSON.parse(client_details_data)['items'];
+
+    let promises = [];
+    for(var idx = 0; idx < client_details_data.length; idx ++) {
+        var locations = getCurrentLocation(client_details_data[idx]['latitude'], client_details_data[idx]["longitude"]);
+        promises.push(locations);
+    }
+    Promise.all(promises)
+    .then(function(results) {
+        var html = "";
+        if(results.length) {
+            for(var idx = 0; idx < results.length; idx ++) {
+                html += "<tr>";
+                html += "<td>" + client_details_data[idx]['client_name'] + "</td>";
+                html += "<td>" + results[idx] + "</td>";
+                html += "</tr>";
+            }
+        } else {
+            html += "<tr>";
+            html += "<td colspan=\"2\" class=\"text-center\">No details found</td>";
+            html += "</tr>";
+        }
+        html = "<table class=\"table table-bordered\" width=\"100%\" cellspacing=\"0\">\
+                <thead>\
+                    <tr>\
+                       <th>Name</th>\
+                        <th>Location</th>\
+                    </tr>\
+                </thead>\
+                <tbody>" + html + "</tbody>\
+             </table>";
+        $('#client-location-details .table-responsive').html(html);
+        update_table_attribute();
+        $('#client-location-details').modal('show');
+    });
+}
+
+function getCurrentLocation(latitude, longitude) {
+    if(latitude == "None" || longitude == "None") {
+        return new Promise(function(resolve, reject) {
+            resolve("Location not shared");
+        });
+    }
+    var geocoder = new google.maps.Geocoder();
+    var latlng = new google.maps.LatLng(latitude, longitude);
+    return new Promise(function(resolve, reject) {
+        geocoder.geocode({'latLng': latlng}, function(results, status) {
+            if(status == google.maps.GeocoderStatus.OK) {
+                if(results[2]) {
+                    var address = results[2].formatted_address;
+                    resolve(address);
+                } else {
+                    resolve("Location not shared");
+                }
+            } else {
+                resolve("Location not shared");
+            }
+        });
+    });
+}
+
+function show_captured_screenshots(element_id) {
+
+    hide_all_active_modal();
+    let screenshots = $('#meeting-screencapture-' + element_id).val();
+    screenshots = JSON.parse(screenshots)["items"];
+
+    if (screenshots.length == 0) {
+        var html = [
+            '<td colspan="2" class="text-center">',
+            'No captured screenshot',
+            '</td>'
+        ].join('');
+        document.getElementById("tbody-captured-screenshot-details").innerHTML = html;
+        update_table_attribute();
+        $('#meeting-screencapture-details').modal('show');
+        return;
+    }
+
+    var tbody_html = "";
+    for (var index = 0; index < screenshots.length; index++) {
+        tbody_html += [
+            '<tr>',
+            '<td><span>Screenshot</span></td>',
+            '<td><a href="/easy-assist/download-file/' + screenshots[index]['screenshot'] + '" download><i class="fas fa-fw fa-file-download"></i></a></td>',
+            '</tr>'
+        ].join('');
+    }
+    document.getElementById("tbody-captured-screenshot-details").innerHTML = tbody_html;
+    update_table_attribute();
+    $('#meeting-screencapture-details').modal('show');
+}
+
+function show_filter_options(element) {
+    $("#selected-agent-filter").next().hide();
+    if(document.querySelector("#selected-supervisor-filter")){
+        $("#selected-supervisor-filter").next().hide();
+    }
+    custom_session_filter_dropdown.hide_custom_dropdown();
+    document.getElementById("filter-start-date").style.display = "none";
+    document.getElementById("filter-end-date").style.display = "none";
+
+    if (element.value == "None") {
+        document.getElementById("add-filter-btn").disabled = true;
+    } else {
+
+        document.getElementById("selected-filter-container").style.display = "block";        
+
+        filter_parameters = document.getElementsByClassName("filter-parameter");
+        for (var index = 0; index < filter_parameters.length; index++) {
+            filter_parameters[index].style.display = "none";
+        }
+        if (element.value == "title") {
+            custom_title_filter_dropdown.show_custom_dropdown();
+        } else if (element.value == "agent") {
+            $("#selected-agent-filter").next().show();
+        } else if (element.value == "supervisor") {
+            $("#selected-supervisor-filter").next().show();
+        } else if (element.value == "startdate") {
+            document.getElementById("filter-start-date").style.display = "block";
+        } else if (element.value == "enddate") {
+            document.getElementById("filter-end-date").style.display = "block";
+        } else if (element.value == "status") {
+            custom_session_filter_dropdown.show_custom_dropdown();
+        } else {
+            show_easyassist_toast("Please select valid filter");
+        }
+        
+        document.getElementById("reset_filter").removeAttribute("disabled");
+        document.getElementById("reset_filter").style.display = "block";
+        document.getElementById("add-filter-btn").disabled = false;
+    }
+}
+
+function add_new_filter_parameter() {
+    var filter_key = null;
+    var filter_value = null;
+    element = document.getElementById("selected-filter-parameter");
+    if (element.value == "None") {
+        show_easyassist_toast("Please select valid filter parameter");
+    } else {
+        var value = "None";
+        var key = element.value;
+        if (element.value == "agent") {
+            value = $("#selected-agent-filter").val();
+            if (value.length == 0) {
+                show_easyassist_toast(NO_AGENT_SELECTED_TOAST);
+                return;
+            }
+            filter_key = "Agent"
+            filter_value = value;
+        } else if (element.value == "supervisor") {
+            value = $("#selected-supervisor-filter").val();
+            if (value.length == 0) {
+                show_easyassist_toast(NO_SUPERVISOR_SELECTED_TOAST);
+                return;
+            }
+            filter_key = "Supervisor"
+            filter_value = value;
+        } else if (element.value == "startdate") {
+            value = document.getElementById("filter-start-date").value;
+
+            if (value == "") {
+                show_easyassist_toast(EMPTY_START_DATE_ERROR_TOAST);
+                return;
+            }
+
+            var formatted_start_date = get_iso_formatted_date(value);
+            if (applied_filter_key_value_map['enddate'] != null) {
+                var formatted_end_date = get_iso_formatted_date(applied_filter_key_value_map['enddate'][0]);
+                if (formatted_end_date < formatted_start_date) {
+                    show_easyassist_toast(INVALID_START_DATE_ERROR_TOAST);
+                    return;
+                }
+            }
+
+            var today = get_today_date();
+            if (formatted_start_date > today || formatted_start_date.length > 10) {
+                show_easyassist_toast("Please select valid date");
+                return;
+            }
+
+            filter_key = "Start Date"
+            filter_value = [value];
+        } else if (element.value == "enddate") {
+            value = document.getElementById("filter-end-date").value;
+            if (value == "") {
+                show_easyassist_toast(EMPTY_END_DATE_ERROR_TOAST);
+                return;
+            }
+
+            var formatted_end_date = get_iso_formatted_date(value);
+            if (applied_filter_key_value_map['startdate'] != null) {
+                var formatted_start_date = get_iso_formatted_date(applied_filter_key_value_map['startdate'][0]);
+                if (formatted_start_date > formatted_end_date) {
+                    show_easyassist_toast(INVALID_START_DATE_ERROR_TOAST);
+                    return;
+                }
+            }
+
+            var today = get_today_date();
+            if (formatted_end_date > today || formatted_end_date.length > 10) {
+                show_easyassist_toast("Please select valid date");
+                return;
+            }
+            
+            filter_key = "End Date";
+            filter_value = [value];
+        } else if (element.value == "status") {
+            value = document.getElementById("selected-status-filter").value;
+
+            filter_key = "Status"
+            if(value == "completed") {
+                filter_value = "Completed";
+            } else if(value == "scheduled") {
+                filter_value = "Scheduled";
+            } else {
+                filter_value = "All";
+            }
+            filter_value = [filter_value];
+        } else {
+            show_easyassist_toast("Please select valid filter parameter");
+        }
+
+        if(check_filter_already_applied(applied_filter_key_value_map[key], filter_value)) {
+            show_easyassist_toast(filter_key + " filter already applied");
+        }
+
+        if (applied_filter_key_value_map[key] != null) {
+            applied_filter_key_value_map[key] = filter_value;
+            update_applied_filter_by_key(key, filter_value);
+            return;
+        }
+        applied_filter_key_value_map[key] = filter_value;
+
+        var filter_chip_html = "";
+        filter_chip_html = generate_filter_chips(filter_key, filter_value);
+        
+        var html_filter = [
+            '<div class="col-md-12 filter-parameter-column" filter-key="' + key + '" filter-data=\'' + JSON.stringify(filter_value) + '\' style="padding: 1em;border-bottom: 1px solid #E6E6E6;">',
+                '<div class="row filter-custom-row">',
+                    '<div class="col-md-2 filter-mb-sm-2 filter-flex-column">',
+                        '<span class="filter-text">' + filter_key + '</span>',
+                        '<button type="button" class="btn remove-filter-row-btn filter-show-on-mobile" onclick="remove_selected_filter_parameter(this)">',
+                            '<svg width="16" height="18" viewBox="0 0 16 18" fill="none" xmlns="http://www.w3.org/2000/svg">',
+                                '<path d="M8 0C9.49884 0 10.7237 1.20574 10.8064 2.72496L10.8108 2.88889H15.3514C15.7096 2.88889 16 3.18737 16 3.55556C16 3.89306 15.756 4.17199 15.4394 4.21614L15.3514 4.22222H14.6629L13.5558 15.7948C13.441 16.994 12.4959 17.92 11.3406 17.9951L11.1888 18H4.81118C3.63878 18 2.64965 17.124 2.46385 15.9497L2.44423 15.7948L1.33622 4.22222H0.648649C0.320263 4.22222 0.0488727 3.97142 0.00592144 3.64602L0 3.55556C0 3.21805 0.244025 2.93912 0.560631 2.89497L0.648649 2.88889H5.18919C5.18919 1.2934 6.44763 0 8 0ZM13.3596 4.22222H2.63957L3.73529 15.6643C3.7861 16.1952 4.19488 16.6083 4.70127 16.661L4.81118 16.6667H11.1888C11.7078 16.6667 12.1478 16.289 12.2484 15.7762L12.2647 15.6643L13.3596 4.22222ZM9.51351 6.66667C9.8419 6.66667 10.1133 6.91747 10.1562 7.24287L10.1622 7.33333V13.5556C10.1622 13.9237 9.87175 14.2222 9.51351 14.2222C9.18513 14.2222 8.91374 13.9714 8.87079 13.646L8.86487 13.5556V7.33333C8.86487 6.96514 9.15528 6.66667 9.51351 6.66667ZM6.48649 6.66667C6.81487 6.66667 7.08626 6.91747 7.12921 7.24287L7.13514 7.33333V13.5556C7.13514 13.9237 6.84473 14.2222 6.48649 14.2222C6.1581 14.2222 5.88671 13.9714 5.84376 13.646L5.83784 13.5556V7.33333C5.83784 6.96514 6.12825 6.66667 6.48649 6.66667ZM8 1.33333C7.2059 1.33333 6.55464 1.96188 6.4915 2.76131L6.48649 2.88889H9.51351C9.51351 2.02978 8.83589 1.33333 8 1.33333Z" fill="#757575"/>',
+                            '</svg>',
+                        '</button>',
+                    '</div>',
+                    '<div class="col-md-8 filter-chip-column">',
+                        filter_chip_html,
+                    '</div>',
+                    '<div class="col-md-2 filter-hide-on-mobile">',
+                        '<button type="button" class="btn remove-filter-row-btn" onclick="remove_selected_filter_parameter(this)">',
+                            '<svg width="16" height="18" viewBox="0 0 16 18" fill="none" xmlns="http://www.w3.org/2000/svg">',
+                                '<path d="M8 0C9.49884 0 10.7237 1.20574 10.8064 2.72496L10.8108 2.88889H15.3514C15.7096 2.88889 16 3.18737 16 3.55556C16 3.89306 15.756 4.17199 15.4394 4.21614L15.3514 4.22222H14.6629L13.5558 15.7948C13.441 16.994 12.4959 17.92 11.3406 17.9951L11.1888 18H4.81118C3.63878 18 2.64965 17.124 2.46385 15.9497L2.44423 15.7948L1.33622 4.22222H0.648649C0.320263 4.22222 0.0488727 3.97142 0.00592144 3.64602L0 3.55556C0 3.21805 0.244025 2.93912 0.560631 2.89497L0.648649 2.88889H5.18919C5.18919 1.2934 6.44763 0 8 0ZM13.3596 4.22222H2.63957L3.73529 15.6643C3.7861 16.1952 4.19488 16.6083 4.70127 16.661L4.81118 16.6667H11.1888C11.7078 16.6667 12.1478 16.289 12.2484 15.7762L12.2647 15.6643L13.3596 4.22222ZM9.51351 6.66667C9.8419 6.66667 10.1133 6.91747 10.1562 7.24287L10.1622 7.33333V13.5556C10.1622 13.9237 9.87175 14.2222 9.51351 14.2222C9.18513 14.2222 8.91374 13.9714 8.87079 13.646L8.86487 13.5556V7.33333C8.86487 6.96514 9.15528 6.66667 9.51351 6.66667ZM6.48649 6.66667C6.81487 6.66667 7.08626 6.91747 7.12921 7.24287L7.13514 7.33333V13.5556C7.13514 13.9237 6.84473 14.2222 6.48649 14.2222C6.1581 14.2222 5.88671 13.9714 5.84376 13.646L5.83784 13.5556V7.33333C5.83784 6.96514 6.12825 6.66667 6.48649 6.66667ZM8 1.33333C7.2059 1.33333 6.55464 1.96188 6.4915 2.76131L6.48649 2.88889H9.51351C9.51351 2.02978 8.83589 1.33333 8 1.33333Z" fill="#EE2525"/>',
+                            '</svg>',
+                        '</button>',
+                    '</div>',
+                '</div>',
+            '</div>',
+        ].join('');
+
+        document.getElementById("tbody-filter-parameters").innerHTML += html_filter;
+        document.getElementById("apply_filter_confirm").removeAttribute("disabled");
+        document.getElementById("reset_filter").removeAttribute("disabled");
+        document.getElementById("reset_filter").style.display = "block";
+        scrollToBottom();
+    }
+}
+
+function remove_selected_filter_parameter(element){
+    remove_element = $(element).closest('.filter-parameter-column')[0];
+    var filter_element = $(remove_element).attr("filter-key");
+    applied_filter_key_value_map[filter_element] = null;
+
+    remove_element.parentElement.removeChild(remove_element);
+    if(document.getElementsByClassName("tr-filter-parameters").length <= 0){
+        document.getElementById("apply_filter_confirm").setAttribute("disabled", "disabled");
+        if(!is_filter_applied) {
+            document.getElementById("reset_filter").setAttribute("disabled", "disabled");
+        }
+    }
+}
+
+function apply_support_history_filter(element) {
+    selected_filter_parameters = document.getElementsByClassName("filter-parameter-column");
+    var key_value = '';
+    
+    for(var idx = 0; idx < selected_filter_parameters.length; idx ++) {
+	    var filter_key = selected_filter_parameters[idx].getAttribute('filter-key');
+	    var filter_data = selected_filter_parameters[idx].getAttribute('filter-data');
+
+	    filter_data = JSON.parse(filter_data);
+
+	    for(var index = 0; index < filter_data.length; index ++) {
+	    	key_value += filter_key + "=" + filter_data[index] + "&";
+	    }
+    }
+
+    window.location = window.location.protocol + "//" + window.location.host + window.location.pathname + "?" + key_value;
+}
+
+function reset_support_history_filter() {
+    document.getElementById("tbody-filter-parameters").innerHTML = "";
+    document.getElementById("reset_filter").setAttribute("disabled", "disabled");
+    document.getElementById("apply_filter_confirm").setAttribute("disabled", "disabled");
+    custom_filter_option_dropdown.update_value("None");
+    custom_session_filter_dropdown.update_value("all");
+    $("#selected-agent-filter").val("").multiselect('refresh');
+    if(document.querySelector("#selected-supervisor-filter")){
+        $("#selected-supervisor-filter").val("").multiselect('refresh');
+    }
+
+    $('#filter-start-date').val("").datepicker("update");
+    $('#filter-end-date').val("").datepicker("update");
+    initialize_custom_filter_map();
+}
+
+function hide_all_active_modal() {
+    $('.modal').modal('hide');
+}
+
+function show_cobrowse_form_modal(audit_trail_pk){
+    hide_all_active_modal();
+    $('#cobrowse-form-' + audit_trail_pk).modal('show');
+}
+
+$(document).ready(function() {
+    btn_tabs = document.getElementsByClassName("btn-tab");
+
+    for(var index=0; index< btn_tabs.length; index++){
+        btn_tabs[index].classList.remove("btn-tab-active");
+    }
+
+    for(var index=0; index< btn_tabs.length; index++){
+        if(btn_tabs[index].pathname==window.location.pathname){
+            btn_tabs[index].classList.add("btn-tab-active");
+        }
+    }
+    $("#auto_assign_audit_trail").on('hide.bs.modal', function(){
+        $("#auto_assign_audit_trail .modal-body").scrollTop(0);
+    });
+});
+
+function load_map_script() {
+
+    var params = JSON.stringify({});
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "/easy-assist/map-script/", true);
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.setRequestHeader('X-CSRFToken', get_csrfmiddlewaretoken());
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            response = JSON.parse(this.responseText);
+            response = easyassist_custom_decrypt(response.Response);
+            response = JSON.parse(response);
+            if (response["status"] == 200) {
+                var src = response['src'];
+                var script = document.createElement('script');
+                script.type = 'text/javascript';
+                script.defer = true;
+                script.src = src
+                document.body.appendChild(script);          
+            }
+        }
+    }
+    xhttp.send(params);
+}
+
+$(document).ready(function() {
+    initialize_custom_filter_map();
+    load_map_script();
+    initialize_custom_dropdown();
+    update_applied_filter();
+
+    {% if audit_trail_objs|length %}
+        let meeting_audit_trail = $("#dataTable").DataTable({
+        "ordering": false,
+        "bPaginate": false,
+        "bInfo": false,
+        });
+    {% else %}
+        $("#dataTable").DataTable({
+        "ordering": false,
+        "bPaginate": false,
+        "bInfo": false,
+        "searching": false,
+        });
+    {% endif %}
+
+    $("#custom-agent-table-search").keyup(function() {
+        meeting_audit_trail.search($(this).val()).draw() ;
+    })
+
+    $('#selected-agent-filter').multiselect({
+        nonSelectedText: 'Select Agent',
+        enableFiltering: true,
+        enableCaseInsensitiveFiltering: true,
+        includeSelectAllOption: true
+    });
+    $("#selected-agent-filter").next().hide();
+    if(document.querySelector("#selected-supervisor-filter")){
+        $('#selected-supervisor-filter').multiselect({
+            nonSelectedText: 'Select Supervisor',
+            enableFiltering: true,
+            enableCaseInsensitiveFiltering: true,
+            includeSelectAllOption: true
+        });
+        $("#selected-supervisor-filter").next().hide();
+    }
+});
+
+function check_select_date_range(element){
+    general_error_message = document.getElementById("general-error-message");
+    general_error_message.innerHTML = "";
+
+    if(element.value == "0") {
+        general_error_message.innerHTML = "Please select valid date range filter";
+    } else {
+        general_error_message.innerHTML = "";
+    }
+
+    if(element.value=="4"){
+        document.getElementById("from-date-div").style.display="block";
+        document.getElementById("to-date-div").style.display="block";
+        document.getElementById("email-id-div").style.display="block";
+    }else{
+        document.getElementById("from-date-div").style.display="none";
+        document.getElementById("to-date-div").style.display="none";
+        document.getElementById("email-id-div").style.display="none";
+    }
+}
+
+function initialize_custom_dropdown() {
+    var console_theme_color = getComputedStyle(document.body).getPropertyValue('--color_rgb');
+    $("#selected-agent-filter")[0].selectedIndex = -1;
+    if(document.querySelector("#selected-supervisor-filter")){
+        $("#selected-supervisor-filter")[0].selectedIndex = -1;
+    }
+
+    custom_filter_option_dropdown = new EasyassistCustomSelect("#selected-filter-parameter", "Select One", console_theme_color);
+    custom_session_filter_dropdown = new EasyassistCustomSelect("#selected-status-filter", "Select One", console_theme_color);
+}
+
+function initialize_custom_filter_map() {
+    applied_filter_key_value_map = {
+        'agent': null,
+        'startdate': null,
+        'enddate': null,
+        'status': null,
+    }
+}
+</script>
+{% endblock %}

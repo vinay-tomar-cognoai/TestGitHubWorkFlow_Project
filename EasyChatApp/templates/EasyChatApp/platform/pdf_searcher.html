@@ -1,0 +1,702 @@
+{% extends 'EasyChatApp/console.html' %}
+{% block consolecontent %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/changes_placement.css' %}?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/mailer_analytics.css' %}?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/filter_modal.css' %}?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/bootstrap_datatable_min.css' %}?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/pdf_searcher.css' %}?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="{% static 'CampaignApp/css/easyassist-custom-select.css' %}">
+{% csrf_token %}
+
+<div id="pdf-searcher-table">
+    <div class="container-fluid">
+        <div class="disclaimer-message" id="pdf_search_disclaimer_message" style="display: none;">
+            <span>For the bot to incorporate the updates, you need to index yours pdfs again.</span>
+            <button class="disclaimer-hide-btn" onclick="hide_disclaimer_message();">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="16" height="16" fill="white"/>
+                    <path d="M2.39705 2.55379L2.46967 2.46967C2.73594 2.2034 3.1526 2.1792 3.44621 2.39705L3.53033 2.46967L8 6.939L12.4697 2.46967C12.7626 2.17678 13.2374 2.17678 13.5303 2.46967C13.8232 2.76256 13.8232 3.23744 13.5303 3.53033L9.061 8L13.5303 12.4697C13.7966 12.7359 13.8208 13.1526 13.6029 13.4462L13.5303 13.5303C13.2641 13.7966 12.8474 13.8208 12.5538 13.6029L12.4697 13.5303L8 9.061L3.53033 13.5303C3.23744 13.8232 2.76256 13.8232 2.46967 13.5303C2.17678 13.2374 2.17678 12.7626 2.46967 12.4697L6.939 8L2.46967 3.53033C2.2034 3.26406 2.1792 2.8474 2.39705 2.55379L2.46967 2.46967L2.39705 2.55379Z" fill="#4D4D4D"/>
+                </svg>
+            </button>
+        </div>
+        <div class="card shadow mb-4">
+            <div class="card-header py-3" style="min-height: 60px;">
+                <div class="row" style="margin-top: 0;">
+                    <div class="col-sm-6">
+                        <h6 class="m-0 font-weight-bold text-primary heading-text-primary">PDF Searcher</h6>
+                    </div>
+                    <div class="col-sm-6" id="edit_icon">
+                        <a title="Edit" style="cursor: pointer;" class="modal-trigger" href="#pdf_search_meta_data_table" data-toggle="modal">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" class="svg-theme-color">
+                                <path d="M13.2692 0.730772C14.2436 1.70513 14.2436 3.28489 13.2692 4.25925L4.92447 12.604C4.73142 12.7971 4.49134 12.9364 4.22794 13.0082L0.661097 13.981C0.270732 14.0875 -0.0874597 13.7293 0.0190035 13.3389L0.99178 9.77206C1.06361 9.50867 1.20294 9.26858 1.39599 9.07553L9.74075 0.730772C10.7151 -0.243591 12.2949 -0.243591 13.2692 0.730772ZM9.06478 2.88586L2.13552 9.81506C2.07117 9.87941 2.02473 9.95944 2.00078 10.0472L1.26879 12.7312L3.95276 11.9992C4.04056 11.9753 4.12059 11.9288 4.18494 11.8645L11.114 4.93504L9.06478 2.88586ZM10.4803 1.4703L9.80385 2.1461L11.853 4.19597L12.5297 3.51972C13.0956 2.95379 13.0956 2.03623 12.5297 1.4703C11.9638 0.904373 11.0462 0.904373 10.4803 1.4703Z" fill="#0254D7"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="custom-btn-row">
+                    <div class="custom-filter-container" style="height: 34px;">
+                        <input type="text" class="pdf_search_bar" id="pdf-search-bar" placeholder="&nbsp; &nbsp; &nbsp; Search">
+                    </div>
+                    <div>
+                        <button class="btn right custom_filter_btn modal-trigger" data-target="pdf-search-filter-modal" data-toggle="modal">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5.79381 5.20714C5.79381 5.0196 5.71676 4.83973 5.57963 4.70712C5.44249 4.5745 5.25649 4.5 5.06255 4.5C4.86861 4.5 4.68261 4.5745 4.54547 4.70712C4.40833 4.83973 4.33129 5.0196 4.33129 5.20714V10.3467C4.10898 10.4708 3.92437 10.6493 3.79602 10.8643C3.66767 11.0793 3.6001 11.3232 3.6001 11.5714C3.6001 11.8197 3.66767 12.0635 3.79602 12.2785C3.92437 12.4935 4.10898 12.6721 4.33129 12.7962V13.6929C4.33129 13.8804 4.40833 14.0603 4.54547 14.1929C4.68261 14.3255 4.86861 14.4 5.06255 14.4C5.25649 14.4 5.44249 14.3255 5.57963 14.1929C5.71676 14.0603 5.79381 13.8804 5.79381 13.6929V12.7962C6.01612 12.6721 6.20073 12.4935 6.32908 12.2785C6.45743 12.0635 6.525 11.8197 6.525 11.5714C6.525 11.3232 6.45743 11.0793 6.32908 10.8643C6.20073 10.6493 6.01612 10.4708 5.79381 10.3467V5.20714ZM10.1814 5.20714C10.1814 5.0196 10.1043 4.83973 9.96718 4.70712C9.83004 4.5745 9.64404 4.5 9.4501 4.5C9.25616 4.5 9.07016 4.5745 8.93302 4.70712C8.79588 4.83973 8.71884 5.0196 8.71884 5.20714V6.1038C8.49653 6.22793 8.31192 6.40647 8.18357 6.62146C8.05522 6.83645 7.98765 7.08032 7.98765 7.32857C7.98765 7.57682 8.05522 7.82069 8.18357 8.03568C8.31192 8.25067 8.49653 8.42921 8.71884 8.55334V13.6929C8.71884 13.8804 8.79588 14.0603 8.93302 14.1929C9.07016 14.3255 9.25616 14.4 9.4501 14.4C9.64404 14.4 9.83004 14.3255 9.96718 14.1929C10.1043 14.0603 10.1814 13.8804 10.1814 13.6929V8.55334C10.4037 8.42921 10.5883 8.25067 10.7166 8.03568C10.845 7.82069 10.9125 7.57682 10.9125 7.32857C10.9125 7.08032 10.845 6.83645 10.7166 6.62146C10.5883 6.40647 10.4037 6.22793 10.1814 6.1038V5.20714ZM13.8376 4.5C14.0316 4.5 14.2176 4.5745 14.3547 4.70712C14.4919 4.83973 14.5689 5.0196 14.5689 5.20714V10.3467C14.7912 10.4708 14.9758 10.6493 15.1042 10.8643C15.2325 11.0793 15.3001 11.3232 15.3001 11.5714C15.3001 11.8197 15.2325 12.0635 15.1042 12.2785C14.9758 12.4935 14.7912 12.6721 14.5689 12.7962V13.6929C14.5689 13.8804 14.4919 14.0603 14.3547 14.1929C14.2176 14.3255 14.0316 14.4 13.8376 14.4C13.6437 14.4 13.4577 14.3255 13.3206 14.1929C13.1834 14.0603 13.1064 13.8804 13.1064 13.6929V12.7962C12.8841 12.6721 12.6995 12.4935 12.5711 12.2785C12.4428 12.0635 12.3752 11.8197 12.3752 11.5714C12.3752 11.3232 12.4428 11.0793 12.5711 10.8643C12.6995 10.6493 12.8841 10.4708 13.1064 10.3467V5.20714C13.1064 5.0196 13.1834 4.83973 13.3206 4.70712C13.4577 4.5745 13.6437 4.5 13.8376 4.5Z" fill="#FFFFFF"/>
+                            </svg>
+                            Filter                      
+                        </button>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary custom_export_btn modal-trigger" data-toggle="modal" data-target="export-pdf-search-modal">
+                            <svg width="16" height="11" viewBox="0 0 16 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 9.58965H2.25V3.24309H4.19625C4.19625 3.24309 4.713 2.61126 5.82375 1.83275H1.5C1.30109 1.83275 1.11032 1.90704 0.96967 2.03929C0.829018 2.17153 0.75 2.3509 0.75 2.53792L0.75 10.2948C0.75 10.4819 0.829018 10.6612 0.96967 10.7935C1.11032 10.9257 1.30109 11 1.5 11H12.75C12.9489 11 13.1397 10.9257 13.2803 10.7935C13.421 10.6612 13.5 10.4819 13.5 10.2948V7.65325L12 8.81326V9.58965ZM10.7708 4.6887V7.19277L15.75 3.52516L10.7708 0V2.2079C4.725 2.2079 4.725 7.82672 4.725 7.82672C6.4365 5.18373 7.4895 4.6887 10.7708 4.6887Z" fill="white"></path>
+                            </svg>
+                            <span style="line-height: 1;">Export</span>
+                        </button>
+                    </div>
+                    {% if is_indexing_in_progress %}
+                    <div id="upload_btn_div" class="disabled">
+                        <button class="btn btn-primary custom_upload_btn modal-trigger" data-toggle="modal" data-target="pdf-upload-modal">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M7.89823 3.00685L8 3C8.3797 3 8.69349 3.28215 8.74315 3.64823L8.75 3.75V7.25H12.25C12.6297 7.25 12.9435 7.53215 12.9932 7.89823L13 8C13 8.3797 12.7178 8.69349 12.3518 8.74315L12.25 8.75H8.75V12.25C8.75 12.6297 8.46785 12.9435 8.10177 12.9932L8 13C7.6203 13 7.30651 12.7178 7.25685 12.3518L7.25 12.25V8.75H3.75C3.3703 8.75 3.05651 8.46785 3.00685 8.10177L3 8C3 7.6203 3.28215 7.30651 3.64823 7.25685L3.75 7.25H7.25V3.75C7.25 3.3703 7.53215 3.05651 7.89823 3.00685L8 3L7.89823 3.00685Z" fill="white"/>
+                            </svg>
+                            <span style="line-height: 1;">Upload PDF</span>
+                        </button>
+                    </div>
+                    {% else %}
+                    <div id="upload_btn_div">
+                        <button class="btn btn-primary custom_upload_btn modal-trigger" data-toggle="modal" data-target="pdf-upload-modal">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M7.89823 3.00685L8 3C8.3797 3 8.69349 3.28215 8.74315 3.64823L8.75 3.75V7.25H12.25C12.6297 7.25 12.9435 7.53215 12.9932 7.89823L13 8C13 8.3797 12.7178 8.69349 12.3518 8.74315L12.25 8.75H8.75V12.25C8.75 12.6297 8.46785 12.9435 8.10177 12.9932L8 13C7.6203 13 7.30651 12.7178 7.25685 12.3518L7.25 12.25V8.75H3.75C3.3703 8.75 3.05651 8.46785 3.00685 8.10177L3 8C3 7.6203 3.28215 7.30651 3.64823 7.25685L3.75 7.25H7.25V3.75C7.25 3.3703 7.53215 3.05651 7.89823 3.00685L8 3L7.89823 3.00685Z" fill="white"/>
+                            </svg>
+                            <span style="line-height: 1;">Upload PDF</span>
+                        </button>
+                    </div>
+                    {% endif%}
+
+                    {% if is_indexing_in_progress %}
+                    <div id="start_indexing_btn_div" class="disabled">
+                        <a class="btn btn-primary start_indexing_btn modal-trigger indexing-active" data-toggle="modal" data-target="pdf-start-indexing-modal">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M10.9138 3.84331L8.81327 5.94388C8.41879 6.33836 8.41879 6.96952 8.81327 7.34427L10.9138 9.39553C11.5351 10.007 12.5904 9.57304 12.5904 8.69534V7.18648C15.3911 7.65985 17.5213 10.0859 17.5213 13.0148C17.5213 15.7071 15.7264 17.9753 13.261 18.6854C12.8566 18.8037 12.5904 19.1883 12.5904 19.6124V19.642C12.5904 20.2732 13.1919 20.7662 13.8034 20.5887C17.0972 19.6321 19.4937 16.6045 19.4937 13.0148C19.4937 8.9912 16.4759 5.67761 12.5904 5.19438V4.5435C12.5904 3.6658 11.5253 3.23187 10.9138 3.84331ZM4.69115 9.2375C4.41502 9.74046 4.19806 10.2631 4.04027 10.8055C3.85289 11.417 4.34599 12.0284 4.98701 12.0284H5.00673C5.43079 12.0284 5.8154 11.7523 5.93374 11.3381C6.05209 10.9436 6.20988 10.559 6.40711 10.1941C6.61421 9.81935 6.54518 9.35584 6.23946 9.05013L6.2296 9.04027C5.77596 8.58662 4.99687 8.67538 4.69115 9.2375ZM10.6182 19.6023V19.6221C10.6182 20.2631 10.0068 20.7463 9.39532 20.5688C8.85292 20.411 8.33025 20.194 7.82729 19.9179C7.26517 19.6122 7.17641 18.8331 7.63005 18.3795L7.64978 18.3597C7.95549 18.054 8.419 17.985 8.79375 18.1921C9.15864 18.3992 9.54325 18.557 9.93773 18.6753C10.3421 18.7937 10.6182 19.1783 10.6182 19.6023ZM4.70094 16.7917C5.00665 17.3539 5.78574 17.4426 6.23939 16.989C6.53524 16.6931 6.61414 16.2197 6.40704 15.845C6.2098 15.4702 6.05201 15.0856 5.93367 14.6912C5.81533 14.277 5.44058 14.0008 5.00665 14.0008H4.98693C4.34591 14.0008 3.86268 14.6123 4.04019 15.2237C4.20785 15.7661 4.42481 16.2888 4.70094 16.7917Z" fill="white"/>
+                            </svg>
+                            <span style="line-height: 1;">Start Indexing</span>
+                        </a>
+                    </div>
+                    {% elif is_indexing_required %}
+                    <div id="start_indexing_btn_div" >
+                        <a class="btn btn-primary start_indexing_btn modal-trigger" data-toggle="modal" data-target="pdf-start-indexing-modal">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M10.9138 3.84331L8.81327 5.94388C8.41879 6.33836 8.41879 6.96952 8.81327 7.34427L10.9138 9.39553C11.5351 10.007 12.5904 9.57304 12.5904 8.69534V7.18648C15.3911 7.65985 17.5213 10.0859 17.5213 13.0148C17.5213 15.7071 15.7264 17.9753 13.261 18.6854C12.8566 18.8037 12.5904 19.1883 12.5904 19.6124V19.642C12.5904 20.2732 13.1919 20.7662 13.8034 20.5887C17.0972 19.6321 19.4937 16.6045 19.4937 13.0148C19.4937 8.9912 16.4759 5.67761 12.5904 5.19438V4.5435C12.5904 3.6658 11.5253 3.23187 10.9138 3.84331ZM4.69115 9.2375C4.41502 9.74046 4.19806 10.2631 4.04027 10.8055C3.85289 11.417 4.34599 12.0284 4.98701 12.0284H5.00673C5.43079 12.0284 5.8154 11.7523 5.93374 11.3381C6.05209 10.9436 6.20988 10.559 6.40711 10.1941C6.61421 9.81935 6.54518 9.35584 6.23946 9.05013L6.2296 9.04027C5.77596 8.58662 4.99687 8.67538 4.69115 9.2375ZM10.6182 19.6023V19.6221C10.6182 20.2631 10.0068 20.7463 9.39532 20.5688C8.85292 20.411 8.33025 20.194 7.82729 19.9179C7.26517 19.6122 7.17641 18.8331 7.63005 18.3795L7.64978 18.3597C7.95549 18.054 8.419 17.985 8.79375 18.1921C9.15864 18.3992 9.54325 18.557 9.93773 18.6753C10.3421 18.7937 10.6182 19.1783 10.6182 19.6023ZM4.70094 16.7917C5.00665 17.3539 5.78574 17.4426 6.23939 16.989C6.53524 16.6931 6.61414 16.2197 6.40704 15.845C6.2098 15.4702 6.05201 15.0856 5.93367 14.6912C5.81533 14.277 5.44058 14.0008 5.00665 14.0008H4.98693C4.34591 14.0008 3.86268 14.6123 4.04019 15.2237C4.20785 15.7661 4.42481 16.2888 4.70094 16.7917Z" fill="white"/>
+                            </svg>
+                            <span style="line-height: 1;">Start Indexing</span>
+                        </a>
+                    </div>
+                    {% else %}
+                    <div id="start_indexing_btn_div" style="display: none;">
+                        <a class="btn btn-primary start_indexing_btn modal-trigger" data-toggle="modal" data-target="pdf-start-indexing-modal">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M10.9138 3.84331L8.81327 5.94388C8.41879 6.33836 8.41879 6.96952 8.81327 7.34427L10.9138 9.39553C11.5351 10.007 12.5904 9.57304 12.5904 8.69534V7.18648C15.3911 7.65985 17.5213 10.0859 17.5213 13.0148C17.5213 15.7071 15.7264 17.9753 13.261 18.6854C12.8566 18.8037 12.5904 19.1883 12.5904 19.6124V19.642C12.5904 20.2732 13.1919 20.7662 13.8034 20.5887C17.0972 19.6321 19.4937 16.6045 19.4937 13.0148C19.4937 8.9912 16.4759 5.67761 12.5904 5.19438V4.5435C12.5904 3.6658 11.5253 3.23187 10.9138 3.84331ZM4.69115 9.2375C4.41502 9.74046 4.19806 10.2631 4.04027 10.8055C3.85289 11.417 4.34599 12.0284 4.98701 12.0284H5.00673C5.43079 12.0284 5.8154 11.7523 5.93374 11.3381C6.05209 10.9436 6.20988 10.559 6.40711 10.1941C6.61421 9.81935 6.54518 9.35584 6.23946 9.05013L6.2296 9.04027C5.77596 8.58662 4.99687 8.67538 4.69115 9.2375ZM10.6182 19.6023V19.6221C10.6182 20.2631 10.0068 20.7463 9.39532 20.5688C8.85292 20.411 8.33025 20.194 7.82729 19.9179C7.26517 19.6122 7.17641 18.8331 7.63005 18.3795L7.64978 18.3597C7.95549 18.054 8.419 17.985 8.79375 18.1921C9.15864 18.3992 9.54325 18.557 9.93773 18.6753C10.3421 18.7937 10.6182 19.1783 10.6182 19.6023ZM4.70094 16.7917C5.00665 17.3539 5.78574 17.4426 6.23939 16.989C6.53524 16.6931 6.61414 16.2197 6.40704 15.845C6.2098 15.4702 6.05201 15.0856 5.93367 14.6912C5.81533 14.277 5.44058 14.0008 5.00665 14.0008H4.98693C4.34591 14.0008 3.86268 14.6123 4.04019 15.2237C4.20785 15.7661 4.42481 16.2888 4.70094 16.7917Z" fill="white"/>
+                            </svg>
+                            <span style="line-height: 1;">Start Indexing</span>
+                        </a>
+                    </div>
+                    {% endif %}
+
+                </div>
+                <!-- /*************** Filter result HTML ***************************/ -->
+                <div class="easychat-filter-chip-wrapper" id="applied-filter-div" style="display: none;">
+                    <div class="filter-items-container" id="applied-filter-result-container">
+                    </div>
+                    <div class="filtered-result-text-heading">
+                        Filtered Results
+                    </div>
+                </div>
+                <!-- /*************** Filter result HTML ***************************/ -->
+
+                <div class="table-responsive avtive-customer-table" id="pdf_dashboard_table">
+                    <div id="pdf_table_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
+                        <div class="row">
+                            <div class="col-sm-12" style="width: 100%;">
+                                <table class="dataTable responsive-table highlight" id="pdf_search_table" width="100%" cellspacing="0" role="grid" style="width: 100%;"></table>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-md-5">
+
+                            </div>
+                            <div class="col-sm-12 col-md-7">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3" id="pdf_table_pagination_div"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Edit-table-modal -->
+<div id="pdf_search_meta_data_table" class="modal">
+    <div class="modal-content">
+        <div class="row" style="margin-bottom: 12px !important;">
+            <div class="modal-header">
+                <h6>Table Meta Data</h6>
+                <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                    <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z" fill="black" fill-opacity="0.54"></path>
+                    </svg>
+                </a>
+            </div>
+            <div class="modal-overflow-content-div">
+                <div class="col s12" style="margin-top: 9px;">
+                    <div class="pdf-search-noselect" id="lead_dala_table_meta_div">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="modal-close btn filter-modal-footer-btn-cancel">Clear</a>
+        <a class="btn filter-modal-footer-btn modal-close" onclick="save_lead_data_table_metadata()">Save</a>
+    </div>
+</div>
+<!-- Filter modal -->
+<div id="pdf-search-filter-modal" class="modal">
+    <div class="modal-content">
+        <div class="row" style="margin-bottom: 12px !important;">
+            <div class="modal-header">
+                <h6>Apply filter</h6>
+                <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                    <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z" fill="black" fill-opacity="0.54"></path>
+                    </svg>
+                </a>
+            </div>
+            <div style="padding: 1em 0em;">
+                <div class="col s12 date-range-filter-select-area">
+                    <div class="filter-heading">
+                        Select Date range
+                    </div>
+                    <label onclick="show_custom_date();">
+                        <input type="radio" name="date-range-filter-btn" id="pdf_search_overview_week" checked="true" value="1" filter_key="selected_date_filter" display_name="Last 7 days">
+                        <div class=" filter-box">
+                            <span>Last 7 days</span>
+                        </div>
+                    </label>
+                    <label onclick="show_custom_date();">
+                        <input type="radio" name="date-range-filter-btn" id="pdf_search_overview_month" value="2" filter_key="selected_date_filter" display_name="Last 30 days">
+                        <div class=" filter-box">
+                            <span>Last 30 days</span>
+                        </div>
+                    </label>
+                    <label onclick="show_custom_date();">
+                        <input type="radio" name="date-range-filter-btn" id="pdf_search_overview_three_month" value="3" filter_key="selected_date_filter" display_name="Last 90 days">
+                        <div class=" filter-box">
+                            <span>Last 90 days</span>
+                        </div>
+                    </label>
+                    <label onclick="show_custom_date();">
+                        <input type="radio" name="date-range-filter-btn" id="pdf_search_overview_custom_date_btn" value="4" filter_key="selected_date_filter" display_name="Custom Date">
+                        <div class=" filter-box">
+                            <span>Custom Dates</span>
+                        </div>
+                    </label>
+                    <label onclick="show_custom_date();">
+                        <input type="radio" name="date-range-filter-btn" id="pdf_search_overview_beg" value="5" filter_key="selected_date_filter" display_name="From Beginning">
+                        <div class=" filter-box">
+                            <span>From beginning</span>
+                        </div>
+                    </label>
+                </div>
+                <div class="col s10 analytics-custom-date-select-area" id="analytics-custom-date-select-area" style="display: none;margin-top: 10px;margin-left: 4px;">
+                    <div class="col s6" style="padding-left: 0px; font-weight: 500;color: #4d4d4d; font-size: 14px;">
+                        Start Date
+                        <input type="date" class="message-default-start-date" id="filter_custom_start_date" value='{{default_start_date|date:"Y-m-d"}}'>
+                    </div>
+                    <div class="col s6" style="font-weight: 500; padding-right: 0px !important;color: #4d4d4d; font-size: 14px;">
+                        End Date
+                        <input type="date" class="message-default-end-date" id="filter_custom_end_date" value='{{default_end_date|date:"Y-m-d"}}'>
+                    </div>
+                </div>
+                <div class="col s12 analytics-status-select-area">
+                    <div class="filter-heading">
+                        Select Status
+                    </div>
+                    <label>
+                        <input type="checkbox" id="status_1" value="active" name="filter_pdf_search_status">
+                        <div class="status-box">
+                            <span>Active</span>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="checkbox" id="status_2" value="inactive" name="filter_pdf_search_status">
+                        <div class="status-box">
+                            <span>Inactive</span>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="checkbox" id="status_3" value="indexing" name="filter_pdf_search_status">
+                        <div class="status-box">
+                            <span>Indexing</span>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="checkbox" id="status_4" value="not_indexed" name="filter_pdf_search_status">
+                        <div class="status-box">
+                            <span>Not indexed</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0)" class="modal-close btn filter-modal-footer-btn-cancel" onclick="clear_filter();">Clear filter</a>
+        <a class="btn filter-modal-footer-btn modal-close" onclick="apply_pdf_search_filter();">Apply filter</a>
+    </div>
+</div>
+<!-- Pdf update modal -->
+<div id="pdf-update-modal" class="modal">
+    <div class="modal-header">
+        <span>Update</span>
+        <input type="hidden" name="update_pdf_key" />
+        <svg class="modal-close" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3.89705 15.9462L3.96967 16.0303C4.23594 16.2966 4.6526 16.3208 4.94621 16.1029L5.03033 16.0303L10 11.061L14.9697 16.0303C15.2359 16.2966 15.6526 16.3208 15.9462 16.1029L16.0303 16.0303C16.2966 15.7641 16.3208 15.3474 16.1029 15.0538L16.0303 14.9697L11.061 10L16.0303 5.03033C16.2966 4.76406 16.3208 4.3474 16.1029 4.05379L16.0303 3.96967C15.7641 3.7034 15.3474 3.6792 15.0538 3.89705L14.9697 3.96967L10 8.939L5.03033 3.96967C4.76406 3.7034 4.3474 3.6792 4.05379 3.89705L3.96967 3.96967C3.7034 4.23594 3.6792 4.6526 3.89705 4.94621L3.96967 5.03033L8.939 10L3.96967 14.9697C3.7034 15.2359 3.6792 15.6526 3.89705 15.9462L3.96967 16.0303L3.89705 15.9462Z" fill="#4D4D4D"/>
+        </svg>
+    </div>
+    <div class="modal-body">
+        <table class="responsive-table" style="table-layout: fixed;word-wrap: break-word;">
+            <tr>
+                <td width="200px">Name
+                    <span style="color: #FF0000;">*</span>
+                </td>
+                <td><input placeholder="Chatbot" type="text" id="update_pdf_name" autocomplete="off"></td>
+            </tr>
+            <tr>
+                <td>Important Pages
+                    <sup><i class="material-icons tiny tooltipped" style="color: #7B7A7B;" data-position="top" data-tooltip="Important part of the doc for Indexing">help</i></sup>
+                </td>
+                <td><input type="text" autocomplete="off" style="background: #F8F8F8;" placeholder="e.g. 1-5, 8, 11-14" id="update_imp_pages"></td>
+            </tr>
+            <tr>
+                <td>Pages to skip
+                    <sup><i class="material-icons tiny tooltipped" style="color: #7B7A7B;" data-position="top" data-tooltip="Part of the doc which can be dropped from Indexing">help</i></sup>
+                </td>
+                <td><input type="text" autocomplete="off" style="background: #F8F8F8;" placeholder="e.g. 1-5, 8, 11-14" id="update_skipped_pages"></td>
+            </tr>
+            <tr>
+                <td>Status <span style="color: #FF0000;">*</span></td>
+                <td>
+                    <label style="cursor: pointer;">
+                        <input id="active" name="status" type="radio">
+                        <div style="display: inline-block;margin: 0 26px 0 14px;color: #000000;padding-bottom: 15px;">
+                            Active
+                        </div>
+                        </input>
+                    </label>
+                    <label style="cursor: pointer;">
+                        <input id="inactive" name="status" type="radio">
+                        <div style="display: inline-block;margin: 0 26px 0 14px;color: #000000;padding-bottom: 15px;">
+                            Inactive
+                        </div>
+                        </input>
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <td style="vertical-align: top;">Attachment</td>
+                <td>
+                    <div class="drag-drop-container" style="
+                        text-align: center;
+                        background: #fff;
+                        border: 0.7px dashed #CFD6DF;
+                        border-radius: 3px;
+                        padding: 15px;
+                        height: 100%;
+                        position: relative;">
+                        <span class="drag-drop-message" style="color: rgb(15, 82, 161); flex-direction: column; display: flex;align-items: center;justify-content: center;">
+                            <img src="{% static 'EasyChatApp/img/upload_file_icon.svg' %}">
+                            <p style="width:90%;margin-bottom: 0;color: #A8A8A8;font-size: 12px;font-weight: 500;">
+                                Drop your file here<br>
+                                or<br>
+                                <a style="color: #2754F3;">Click here</a> to upload your file
+                            </p>
+                        </span>
+                        <div id="file-selected-filename"></div>
+                        <div class="drag-drop-input-field-wrapper">
+                            <input onchange="handle_file_update_input_change()" id="drag-drop-input-box" style="border-bottom: none !important;border: 1px solid black;height: 100% !important;opacity: 0;cursor: pointer;" type="file" accept=".pdf">
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="modal-footer">
+        <a class="btn update-btn" id="update_btn" onclick="update_pdf(this)">Update</a>
+    </div>
+</div>
+<!-- Pdf upload modal -->
+<div id="pdf-upload-modal" class="modal">
+    <div class="modal-header">
+        <span>Upload pdf</span>
+        <svg class="modal-close" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3.89705 15.9462L3.96967 16.0303C4.23594 16.2966 4.6526 16.3208 4.94621 16.1029L5.03033 16.0303L10 11.061L14.9697 16.0303C15.2359 16.2966 15.6526 16.3208 15.9462 16.1029L16.0303 16.0303C16.2966 15.7641 16.3208 15.3474 16.1029 15.0538L16.0303 14.9697L11.061 10L16.0303 5.03033C16.2966 4.76406 16.3208 4.3474 16.1029 4.05379L16.0303 3.96967C15.7641 3.7034 15.3474 3.6792 15.0538 3.89705L14.9697 3.96967L10 8.939L5.03033 3.96967C4.76406 3.7034 4.3474 3.6792 4.05379 3.89705L3.96967 3.96967C3.7034 4.23594 3.6792 4.6526 3.89705 4.94621L3.96967 5.03033L8.939 10L3.96967 14.9697C3.7034 15.2359 3.6792 15.6526 3.89705 15.9462L3.96967 16.0303L3.89705 15.9462Z" fill="#4D4D4D"/>
+        </svg>
+    </div>
+    <div class="modal-body">
+        <table class="" style="table-layout: fixed;word-wrap: break-word;">
+            <tr>
+                <td width="200px">Name
+                    <span style="color: #FF0000;">*</span>
+                </td>
+                <td><input placeholder="Chatbot" autocomplete="off" id="pdf_name" type="text"></td>
+            </tr>
+            <tr>
+                <td>Important Pages
+                    <sup><i class="material-icons tiny tooltipped" style="color: #7B7A7B;" data-position="top" data-tooltip="Important part of the doc for Indexing">help</i></sup>
+                </td>
+                <td><input autocomplete="off" type="text" id="imp_pages" style="background: #F8F8F8;" placeholder="e.g. 1-5, 8, 11-14"></td>
+            </tr>
+            <tr>
+                <td>Pages to skip
+                    <sup><i class="material-icons tiny tooltipped" style="color: #7B7A7B;" data-position="top" data-tooltip="Part of the doc which can be dropped from Indexing">help</i></sup>
+                </td>
+                <td><input autocomplete="off" type="text" id="skipped_pages" style="background: #F8F8F8;" placeholder="e.g. 1-5, 8, 11-14"></td>
+            </tr>
+            <tr>
+                <td style="vertical-align: top;">Attachment <span style="color: #FF0000;">*</span></td>
+                <td>
+                    <div class="drag-drop-container" style="
+                        text-align: center;
+                        background: #fff;
+                        border: 0.7px dashed #CFD6DF;
+                        border-radius: 3px;
+                        padding: 15px;
+                        height: 100%;
+                        position: relative;">
+                        <span class="drag-drop-message" style="color: rgb(15, 82, 161); flex-direction: column; display: flex;align-items: center;justify-content: center;">
+                            <img src="{% static 'EasyChatApp/img/upload_file_icon.svg' %}">
+                            <p style="width:90%;margin-bottom: 0;color: #A8A8A8;font-size: 12px;font-weight: 500;">
+                                Drop your file here<br>
+                                or<br>
+                                <a style="color: #2754F3;">Click here</a> to upload your file
+                            </p>
+                        </span>
+                        <div id="file-selected-filename"></div>
+                        <div class="drag-drop-input-field-wrapper">
+                            <input onchange="handle_file_upload_input_change()" id="drag-drop-input-box" style="border-bottom: none !important;border: 1px solid black;height: 100% !important;opacity: 0;cursor: pointer;" type="file" accept=".pdf">
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="modal-footer">
+        <a class="btn upload-btn" id="upload_btn" onclick="upload_pdf(this)">Upload</a>
+    </div>
+</div>
+<!-- Delete confirmation modal -->
+<div id="delete-confirmation-modal" class="modal">
+    <div class="termination-confirmation-modal">
+        <div class="termination-confirmation-modal-container">
+            <div class="termination-icon">
+                <svg width="83" height="82" viewBox="0 0 83 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M41.3395 6.83336C22.5888 6.83336 7.33337 22.1605 7.33337 41C7.33337 59.8395 22.6605 75.1667 41.5 75.1667C60.3395 75.1667 75.6667 59.8395 75.6667 41C75.6667 22.1605 60.2678 6.83336 41.3395 6.83336ZM44.9167 58.0834H38.0834V51.25H44.9167V58.0834ZM44.9167 44.4167H38.0834V23.9167H44.9167V44.4167Z" fill="#DB2A2A"/>
+                </svg>
+            </div>
+            <div class="termination-confirmation-text">
+                Are you sure you want to delete this document ?
+
+                <input type="hidden" name="delete_pdf_key" />
+            </div>
+            <div class="termination-buttons" >
+                <button class="btn termination-no-btn modal-close">Cancel</button>
+                <button class="btn termination-yes-btn" onclick="delete_pdf(this);">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="pdf-start-indexing-modal" class="modal">
+    <div class="termination-confirmation-modal">
+        <div class="termination-confirmation-modal-container">
+            <div class="termination-icon">
+                <svg width="83" height="82" viewBox="0 0 83 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M41.3395 6.83336C22.5888 6.83336 7.33337 22.1605 7.33337 41C7.33337 59.8395 22.6605 75.1667 41.5 75.1667C60.3395 75.1667 75.6667 59.8395 75.6667 41C75.6667 22.1605 60.2678 6.83336 41.3395 6.83336ZM44.9167 58.0834H38.0834V51.25H44.9167V58.0834ZM44.9167 44.4167H38.0834V23.9167H44.9167V44.4167Z" fill="#DB2A2A"/>
+                </svg>
+            </div>
+            <div class="termination-confirmation-text">
+                After initiating the indexing process, next indexing process can not be started before 1 hour. Do you want to continue this operation?
+            </div>
+            <div class="termination-buttons" >
+                <button class="btn termination-no-btn modal-close">Cancel</button>
+                <button class="btn termination-yes-btn" onclick="start_indexing(this);">Start</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Export modal -->
+<div id="export-pdf-search-modal" class="modal">
+    <div class="modal-content">
+        <div class="row" style="margin-bottom: 0px !important;">
+            <div class="modal-header">
+                <h6>Export PDF Search</h6>
+                <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                    <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z" fill="black" fill-opacity="0.54"></path>
+                    </svg>
+                </a>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col s12" id="export-data-dropdown">
+                        <div class="filter-heading">
+                            Select Date range
+                        </div>
+                        <div>
+                            <select onchange="handle_export_filter(this)" data-select="false" id="export-select-date-range">
+                                <option value="1">Last 7 days</option>
+                                <option value="2">Last 30 days</option>
+                                <option value="3">Last 90 days</option>
+                                <option value="4">Custom Dates</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col s12" style="margin-top: 20px;display: none;" id="custom-dates-div">
+                        <div class="col s6" style="padding-left: 0px; font-weight: 500;color: #2d2d2d;font-size: 16px;">
+                            From Date
+                            <input type="date" class="message-default-start-date" id="export_custom_start_date" autocomplete="off" data-date-format="dd-mm-yyyy">
+                        </div>
+                        <div class="col s6" style="font-weight: 500; padding-right: 0px !important;color: #2d2d2d;font-size: 16px;">
+                            To Date
+                            <input type="date" class="message-default-end-date" id="export_custom_end_date" autocomplete="off" data-date-format="dd-mm-yyyy">
+                        </div>
+                    </div>
+                    <div class="col s12" style="margin-top: 20px;display: none;" id="email-id-div">
+                        <div class="filter-heading">
+                            Email ID*
+                        </div>
+                        <input id="export-email-id" style="margin-top: 0 !important;width: calc(96% - 0.16rem) !important;" type="text" autocomplete="off">
+                        <p style="color: #4d4d4d;font-size: 14px;font-weight: 500;">Note: You will receive the campaign report data dump on the above email ID within 24 hours.</p>
+                    </div>
+                    <div class="col s12" id="general-error-message" style="color: red; margin-top: 1em;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a class="btn filter-modal-footer-btn" onclick="export_pdf_search_request(this)">Export</a>
+    </div>
+</div>
+
+<script type="text/javascript" src="{% static 'CampaignApp/js/easyassist-custom-select.js' %}"></script>
+<script type="text/javascript" src="{% static 'CampaignApp/js/col-resizable.js' %}"></script>
+<script type="text/javascript" src="{% static 'EasyChatApp/js/pdf_search.js' %}"></script>
+<script type="text/javascript">
+
+    window.API_FAIL_EMAIL_CONFIGURED = '{{api_fail_email_configured}}'
+    bot_id = get_url_vars()['bot_pk'];
+    SERVER_URL= window.location.origin;
+    BOT_ID=bot_id
+    BOT_NAME='uat';
+    BOT_THEME='null';
+    BOT_POSITION='bottom-right';
+    bot_click_image = 'true';
+    is_form_assist='false';
+    is_easyassist_enabled='false';
+    is_lead_generation='false';
+    lead_generation_intent_id='';
+
+    window.selected_bot_obj_pk = '{{selected_bot_obj.pk}}'
+    window.selected_category = '{{selected_category}}'
+    window.intent_type = '{{intent_type}}'
+    window.NEED_TO_BUILD = "{{ selected_bot_obj.need_to_build }}";
+    window.SELECTED_LANGUAGE = "{{selected_language}}";
+    window.selected_category_index = '{{selected_category_index}}';
+    window.DEFAULT_START_DATE = '{{default_start_date|date:"Y-m-d"}}';
+    window.DEFAULT_END_DATE = '{{default_end_date|date:"Y-m-d"}}';
+    window.IS_INDEXING_IN_PROGRESS = '{{is_indexing_in_progress}}';
+
+    if(window.IS_INDEXING_IN_PROGRESS == "True") {
+        window.IS_INDEXING_IN_PROGRESS = true;
+    } else {
+        window.IS_INDEXING_IN_PROGRESS = false;
+    }
+</script>
+
+{% if selected_bot_obj.default_theme.name == "theme_1" %}
+<script src="{% static 'EasyChatApp/js/theme1_embed.js' %}?v={% random_int 1 100 %}"></script>
+{% elif selected_bot_obj.default_theme.name == "theme_2" %}
+<script src="{% static 'EasyChatApp/js/theme2_embed.js' %}?v={% random_int 1 100 %}"></script>
+{% endif %}
+
+<script type="text/javascript">
+$(document).ready(function() {
+    $('.pdf-delete-icon').click(function() {
+        $('#delete-confirmation-modal').modal('open');
+    });
+    $('.pdf-update-icon').click(function() {
+        $('#pdf-update-modal').modal('open');
+    });
+    
+    $('#pdf-upload-modal #imp_pages').focusout(function(){
+        var imp_pages = get_pages_in_list_format($('#pdf-upload-modal #imp_pages').val());
+        $('#pdf-upload-modal #imp_pages').val(imp_pages);
+    });
+    $('#pdf-upload-modal #skipped_pages').focusout(function(){
+        var skip_pages = get_pages_in_list_format($('#pdf-upload-modal #skipped_pages').val());
+        $('#pdf-upload-modal #skipped_pages').val(skip_pages);
+    })
+    $('#pdf-update-modal #update_imp_pages').focusout(function(){
+        var imp_pages = get_pages_in_list_format($('#pdf-update-modal #update_imp_pages').val());
+        $('#pdf-update-modal #update_imp_pages').val(imp_pages);
+    });
+    $('#pdf-update-modal #update_skipped_pages').focusout(function(){
+        var skip_pages = get_pages_in_list_format($('#pdf-update-modal #update_skipped_pages').val());
+        $('#pdf-update-modal #update_skipped_pages').val(skip_pages);
+    }) 
+
+    var pdf_name_input_element = document.getElementById("pdf_name")
+    pdf_name_input_element.addEventListener('keypress', function(e) {
+        let val = pdf_name_input_element.value.trim().replace( /(<([^>]+)>)/ig, '');
+        if(val.length > 25) {
+            show_pdf_search_toast("PDF name should not be more than 25 characters");
+        } 
+    });
+
+    var update_pdf_name_input_element = document.getElementById("update_pdf_name")
+    update_pdf_name_input_element.addEventListener('keypress', function(e) {
+        let val = update_pdf_name_input_element.value.trim().replace( /(<([^>]+)>)/ig, '');
+        if(val.length > 25) {
+            show_pdf_search_toast("PDF name should not be more than 25 characters");
+        } 
+    });
+
+    var export_date_range_dropdown = document.getElementById("export-select-date-range");
+    export_date_range_dropdown.selectedIndex = -1;
+    new EasyassistCustomSelect(export_date_range_dropdown, "Choose Date Range", null);
+});
+</script>
+
+<script>
+var pdf_input_file_global = undefined;
+var pdf_update_input_file_global = undefined;
+
+function handle_file_upload_input_change() {
+    var file_name = $('#pdf-upload-modal #drag-drop-input-box').val();
+    file_name = file_name.replace(/.*[\/\\]/, '');
+    pdf_input_file_global = ($("#pdf-upload-modal #drag-drop-input-box"))[0].files[0];
+
+    if (file_name) {
+        $('#pdf-upload-modal .drag-drop-message').hide();
+        $('#pdf-upload-modal #file-selected-filename').html(`
+            <div class="bot-excel-selected-dismiss-btn" style="display: flex;justify-content: flex-end;">
+                <svg width="16" onclick="handle_file_upload_cross_btn()" style="z-index: 1000;cursor: pointer;" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2.39705 2.55379L2.46967 2.46967C2.73594 2.2034 3.1526 2.1792 3.44621 2.39705L3.53033 2.46967L8 6.939L12.4697 2.46967C12.7626 2.17678 13.2374 2.17678 13.5303 2.46967C13.8232 2.76256 13.8232 3.23744 13.5303 3.53033L9.061 8L13.5303 12.4697C13.7966 12.7359 13.8208 13.1526 13.6029 13.4462L13.5303 13.5303C13.2641 13.7966 12.8474 13.8208 12.5538 13.6029L12.4697 13.5303L8 9.061L3.53033 13.5303C3.23744 13.8232 2.76256 13.8232 2.46967 13.5303C2.17678 13.2374 2.17678 12.7626 2.46967 12.4697L6.939 8L2.46967 3.53033C2.2034 3.26406 2.1792 2.8474 2.39705 2.55379L2.46967 2.46967L2.39705 2.55379Z" fill="#A8A8A8"></path>
+                </svg>
+            </div>
+            <div class="">
+                <svg width="47" height="50" viewBox="0 0 67 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17.5 62V22.6398L38.9465 18.0205L44.8023 23.5511L46.1256 24.8744L48.1256 26.8744L48.6602 27.409L43.3964 62H17.5Z" stroke="#BED8FB" stroke-width="35" stroke-linejoin="round"></path>
+                    <path d="M44.3446 35.3108C46.417 36.3471 48.688 36.9199 51 36.9922V56.5H24V16H30.5705C30.6222 16.5494 30.7024 17.0961 30.8107 17.6379L31.3107 20.1379C31.7206 22.1872 32.5279 24.1363 33.6872 25.8752L34.6872 27.3752C35.2716 28.2519 35.9413 29.0687 36.6863 29.8137L38.1863 31.3137C39.4023 32.5297 40.8064 33.5418 42.3446 34.3108L44.3446 35.3108Z" stroke="#DDEAFB" stroke-width="32" stroke-linejoin="round"></path>
+                </svg>
+            </div>
+            <p>
+                ${file_name}
+            </p>`
+        );
+    }
+}
+
+function handle_file_upload_cross_btn() {
+    $("#pdf-upload-modal .drag-drop-message").show();
+    $("#pdf-upload-modal #file-selected-filename").html("");
+    $("#pdf-upload-modal #drag-drop-input-box").val("");
+}
+
+function handle_file_update_input_change() {
+    var file_name = $('#pdf-update-modal #drag-drop-input-box').val();
+    file_name = file_name.replace(/.*[\/\\]/, '');
+    pdf_update_input_file_global = ($("#pdf-update-modal #drag-drop-input-box"))[0].files[0];
+    if (file_name) {
+        $('#pdf-update-modal .drag-drop-message').hide();
+        $('#pdf-update-modal #file-selected-filename').html(`
+            <div class="bot-excel-selected-dismiss-btn" style="display: flex;justify-content: flex-end;">
+                <svg width="16" onclick="handle_file_update_cross_btn()" style="z-index: 1000;cursor: pointer;" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2.39705 2.55379L2.46967 2.46967C2.73594 2.2034 3.1526 2.1792 3.44621 2.39705L3.53033 2.46967L8 6.939L12.4697 2.46967C12.7626 2.17678 13.2374 2.17678 13.5303 2.46967C13.8232 2.76256 13.8232 3.23744 13.5303 3.53033L9.061 8L13.5303 12.4697C13.7966 12.7359 13.8208 13.1526 13.6029 13.4462L13.5303 13.5303C13.2641 13.7966 12.8474 13.8208 12.5538 13.6029L12.4697 13.5303L8 9.061L3.53033 13.5303C3.23744 13.8232 2.76256 13.8232 2.46967 13.5303C2.17678 13.2374 2.17678 12.7626 2.46967 12.4697L6.939 8L2.46967 3.53033C2.2034 3.26406 2.1792 2.8474 2.39705 2.55379L2.46967 2.46967L2.39705 2.55379Z" fill="#A8A8A8"></path>
+                </svg>
+            </div>
+            <div class="">
+                <svg width="47" height="50" viewBox="0 0 67 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17.5 62V22.6398L38.9465 18.0205L44.8023 23.5511L46.1256 24.8744L48.1256 26.8744L48.6602 27.409L43.3964 62H17.5Z" stroke="#BED8FB" stroke-width="35" stroke-linejoin="round"></path>
+                    <path d="M44.3446 35.3108C46.417 36.3471 48.688 36.9199 51 36.9922V56.5H24V16H30.5705C30.6222 16.5494 30.7024 17.0961 30.8107 17.6379L31.3107 20.1379C31.7206 22.1872 32.5279 24.1363 33.6872 25.8752L34.6872 27.3752C35.2716 28.2519 35.9413 29.0687 36.6863 29.8137L38.1863 31.3137C39.4023 32.5297 40.8064 33.5418 42.3446 34.3108L44.3446 35.3108Z" stroke="#DDEAFB" stroke-width="32" stroke-linejoin="round"></path>
+                </svg>
+            </div>
+            <p>
+                ${file_name}
+            </p>`
+        );
+    }
+}
+
+function handle_file_update_cross_btn() {
+    $("#pdf-update-modal .drag-drop-message").show();
+    $("#pdf-update-modal #file-selected-filename").html("");
+    $("#pdf-update-modal #drag-drop-input-box").val("");
+}
+
+function handle_export_filter(element){
+
+    $('#email-id-div').show();
+
+    if(element.value==="4") {
+        $('#custom-dates-div').show();
+    } else {
+        $('#custom-dates-div').hide();
+    }
+
+    document.getElementById("general-error-message").innerHTML = "";
+}
+
+function hide_disclaimer_message() {
+    document.getElementById("pdf_search_disclaimer_message").style.display = "none";
+}
+
+function show_disclaimer_message() {
+    document.getElementById("pdf_search_disclaimer_message").style.display = "";
+}
+
+function show_start_indexing_btn() {
+    document.getElementById("start_indexing_btn_div").style.display = "";
+}
+
+function hide_start_indexing_btn() {
+    document.getElementById("start_indexing_btn_div").style.display = "none";
+}
+
+function disable_start_indexing_btn() {
+    document.getElementById("start_indexing_btn_div").classList.add("disabled");
+}
+
+function enable_start_indexing_btn() {
+    document.getElementById("start_indexing_btn_div").classList.remove("disabled");
+
+    var btn_element = document.getElementById("start_indexing_btn_div").children[0];
+    btn_element.classList.remove("indexing-active");
+}
+
+function disable_upload_pdf_btn() {
+    document.getElementById("upload_btn_div").classList.add("disabled");
+}
+
+function enable_upload_pdf_btn() {
+    document.getElementById("upload_btn_div").classList.remove("disabled");
+}
+</script>
+{% endblock %}

@@ -1,0 +1,843 @@
+{% extends 'LiveChatApp/report_console.html' %}
+{% block consolecontent %}
+{% load static %}
+<style type="text/css">
+.dataTables_filter {
+  display: none;
+}
+#hourly-interaction-report-table_info {
+  font-size: 13px;
+      margin-top: 60px;
+      color: #4D4D4D;
+      width: 50%;
+      padding-left: 10px;
+      display: inline-block;
+      position: absolute;
+      bottom: 2px;
+}
+.ui-state-default{
+  background: #f6f6f6 !important;
+  color: #454545 !important;
+  border: 1px solid #c5c5c5 !important;
+}
+.ui-state-highlight{
+    background: #ffffff !important;
+    color: {{admin_config.get_livechat_theme_lighten_one}} !important;
+}
+.ui-state-active{
+  background: {{admin_config.get_livechat_theme_lighten_one}} !important;
+  color: #ffffff !important;
+  border: 1px solid {{admin_config.get_livechat_theme_lighten_one}} !important;
+}
+</style>
+<div class="col-xl-10 col-lg-10 col-md-12 col-sm-12 col-12 py-2" id="live-chat-reports-content-hourly-interaction" style="height: calc(100vh - 4.375rem); background: #FAFAFA; overflow-y: auto; overflow-x: hidden; max-width: 83%;">
+
+  <div class="live-chat-report-d-interaction-heading ">
+  <div class="row">
+          <!-- <img src="./img/mobile-back.svg" class="back-arrow-div" id="live-chat-active-customers-opener-setting" onclick="myFunctionArrow()"> -->
+          <svg width="15" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="15" height="15" fill="#E5E5E5"/>
+              <g clip-path="url(#clip0)">
+              <rect width="1440" height="760" transform="translate(-98 -211)" fill="white"/>
+              <rect x="-21" y="-155" width="1363" height="704" fill="#FAFAFA"/>
+              <rect x="-21" y="-155" width="180" height="704" fill="white"/>
+              <path d="M13.44 0H0.56C0.25025 0 0 0.268125 0 0.6V14.4C0 14.7319 0.25025 15 0.56 15H13.44C13.7498 15 14 14.7319 14 14.4V0.6C14 0.268125 13.7498 0 13.44 0ZM12.74 13.65H1.26V1.35H12.74V13.65ZM3.374 7.725H4.26125C4.326 7.725 4.38025 7.66875 4.38025 7.5975V6.11812C4.38025 5.74875 4.6585 5.45063 5.0015 5.45063H8.60125V6.45188C8.60125 6.55875 8.715 6.61688 8.792 6.55125L10.7013 4.94438C10.7625 4.89375 10.7625 4.79438 10.7013 4.74375L8.792 3.13687C8.715 3.07125 8.60125 3.13125 8.60125 3.23625V4.2375H4.99975C4.0355 4.2375 3.255 5.0775 3.255 6.11438V7.59375C3.255 7.66875 3.3075 7.725 3.374 7.725ZM3.3005 10.2544L5.20975 11.8612C5.28675 11.9269 5.4005 11.8669 5.4005 11.7619V10.7606H9.00025C9.9645 10.7606 10.745 9.92062 10.745 8.88375V7.40438C10.745 7.335 10.6925 7.27688 10.626 7.27688H9.73875C9.674 7.27688 9.61975 7.33313 9.61975 7.40438V8.88375C9.61975 9.25313 9.3415 9.55125 8.9985 9.55125H5.4005V8.55C5.4005 8.44313 5.28675 8.385 5.20975 8.45063L3.3005 10.0575C3.23925 10.1044 3.23925 10.2038 3.3005 10.2544Z" fill="#4D4D4D"/>
+              <circle cx="14" cy="13" r="5" fill="#4D4D4D"/>
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M16.5 13C16.5 13.663 16.2366 14.2989 15.7678 14.7678C15.2989 15.2366 14.663 15.5 14 15.5C13.337 15.5 12.7011 15.2366 12.2322 14.7678C11.7634 14.2989 11.5 13.663 11.5 13C11.5 12.337 11.7634 11.7011 12.2322 11.2322C12.7011 10.7634 13.337 10.5 14 10.5C14.663 10.5 15.2989 10.7634 15.7678 11.2322C16.2366 11.7011 16.5 12.337 16.5 13ZM14 11.5938C14 11.5523 13.9835 11.5126 13.9542 11.4833C13.9249 11.454 13.8852 11.4375 13.8438 11.4375C13.8023 11.4375 13.7626 11.454 13.7333 11.4833C13.704 11.5126 13.6875 11.5523 13.6875 11.5938V13.3125C13.6875 13.34 13.6948 13.3671 13.7086 13.3909C13.7225 13.4147 13.7423 13.4345 13.7662 13.4481L14.86 14.0731C14.8959 14.0925 14.938 14.0971 14.9772 14.0859C15.0164 14.0747 15.0497 14.0486 15.07 14.0132C15.0902 13.9778 15.0958 13.9358 15.0855 13.8963C15.0752 13.8569 15.0499 13.8229 15.015 13.8019L14 13.2219V11.5938Z" fill="white"/>
+              </g>
+              <defs>
+              <clipPath id="clip0">
+              <rect width="1440" height="760" fill="white" transform="translate(-98 -211)"/>
+              </clipPath>
+              </defs>
+          </svg>
+          <span>Hourly Interaction</span>
+      </div>
+      <div class="row">
+          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-report-button-section">
+
+              <button class="filter-button" id="filterBtn-h-interaction" data-toggle="modal" data-target="#apply-filter-interaction-report">Filters
+                    <svg width="16" height="9" viewBox="0 0 16 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="16" height="9" fill="#E5E5E5"/>
+                        <g clip-path="url(#clip0)">
+                        <rect width="1440" height="660" transform="translate(-174 -97)" fill="white"/>
+                        <rect x="-97" y="-41" width="1363" height="604" fill="#FAFAFA"/>
+                        <rect x="-88" y="-30" width="1345" height="68" fill="white"/>
+                        <rect x="-72.5" y="-13.5" width="103" height="34" rx="4.5" fill="white" stroke="#E6E6E6"/>
+                        <path d="M5.33333 8.35714C5.33333 8.18665 5.40357 8.02313 5.5286 7.90257C5.65362 7.78201 5.82319 7.71429 6 7.71429H10C10.1768 7.71429 10.3464 7.78201 10.4714 7.90257C10.5964 8.02313 10.6667 8.18665 10.6667 8.35714C10.6667 8.52764 10.5964 8.69115 10.4714 8.81171C10.3464 8.93227 10.1768 9 10 9H6C5.82319 9 5.65362 8.93227 5.5286 8.81171C5.40357 8.69115 5.33333 8.52764 5.33333 8.35714ZM2.66667 4.5C2.66667 4.3295 2.7369 4.16599 2.86193 4.04543C2.98695 3.92487 3.15652 3.85714 3.33333 3.85714H12.6667C12.8435 3.85714 13.013 3.92487 13.1381 4.04543C13.2631 4.16599 13.3333 4.3295 13.3333 4.5C13.3333 4.6705 13.2631 4.83401 13.1381 4.95457C13.013 5.07513 12.8435 5.14286 12.6667 5.14286H3.33333C3.15652 5.14286 2.98695 5.07513 2.86193 4.95457C2.7369 4.83401 2.66667 4.6705 2.66667 4.5ZM0 0.642857C0 0.472361 0.070238 0.308848 0.195262 0.188289C0.320287 0.0677295 0.489856 0 0.666667 0H15.3333C15.5101 0 15.6797 0.0677295 15.8047 0.188289C15.9298 0.308848 16 0.472361 16 0.642857C16 0.813353 15.9298 0.976867 15.8047 1.09743C15.6797 1.21798 15.5101 1.28571 15.3333 1.28571H0.666667C0.489856 1.28571 0.320287 1.21798 0.195262 1.09743C0.070238 0.976867 0 0.813353 0 0.642857Z" fill="#868686"/>
+                        </g>
+                        <defs>
+                        <clipPath id="clip0">
+                        <rect width="1440" height="660" fill="white" transform="translate(-174 -97)"/>
+                        </clipPath>
+                        </defs>
+                    </svg>
+              </button>
+              <button class="export-button" id="exportBtn-h-interaction" data-toggle="modal" data-target="#modal-report-filter">Export
+                <svg width="15" height="11" viewBox="0 0 15 11" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-left: 12px; margin-top: -3px;">
+                  <rect width="15" height="11" fill="#E5E5E5"/>
+                  <g clip-path="url(#clip0)">
+                  <rect width="1440" height="660" transform="translate(-290 -95)" fill="white"/>
+                  <rect x="-213" y="-39" width="1363" height="604" fill="#FAFAFA"/>
+                  <rect x="-204" y="-28" width="1345" height="68" fill="white"/>
+                  <rect x="-65" y="-12" width="95" height="35" rx="5" fill="{{ admin_config.get_livechat_theme_lighten_one }}"/>
+                  <path d="M11.25 9.58965H1.5V3.24309H3.44625C3.44625 3.24309 3.963 2.61126 5.07375 1.83275H0.75C0.551088 1.83275 0.360322 1.90704 0.21967 2.03929C0.0790176 2.17153 0 2.3509 0 2.53792L0 10.2948C0 10.4819 0.0790176 10.6612 0.21967 10.7935C0.360322 10.9257 0.551088 11 0.75 11H12C12.1989 11 12.3897 10.9257 12.5303 10.7935C12.671 10.6612 12.75 10.4819 12.75 10.2948V7.65325L11.25 8.81326V9.58965ZM10.0208 4.6887V7.19277L15 3.52516L10.0208 0V2.2079C3.975 2.2079 3.975 7.82672 3.975 7.82672C5.6865 5.18373 6.7395 4.6887 10.0208 4.6887Z" fill="white"/>
+                  </g>
+                  <defs>
+                  <clipPath id="clip0">
+                  <rect width="1440" height="660" fill="white" transform="translate(-290 -95)"/>
+                  </clipPath>
+                  </defs>
+              </svg>
+              </button>
+
+              <div class="search-container">
+                  
+                      <button type="submit">
+                          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="13" height="13" fill="#E5E5E5"/>
+                                <g clip-path="url(#clip0)">
+                                <rect width="1440" height="660" transform="translate(-1209 -141)" fill="white"/>
+                                <rect x="-962" y="-85" width="1193" height="604" fill="#FAFAFA"/>
+                                <rect x="-952" y="-74" width="1174" height="114" fill="white"/>
+                                <g filter="url(#filter0_d)">
+                                <rect x="-14" y="-10" width="219" height="33" rx="5" fill="white"/>
+                                </g>
+                                <path d="M5.55942 11.1182C6.79289 11.118 7.99083 10.7051 8.96247 9.94526L12.0174 13L13 12.0174L9.9451 8.96269C10.7054 7.991 11.1185 6.79285 11.1188 5.55912C11.1188 2.49396 8.62474 0 5.55942 0C2.49409 0 0 2.49396 0 5.55912C0 8.62428 2.49409 11.1182 5.55942 11.1182ZM5.55942 1.38978C7.85893 1.38978 9.72898 3.25973 9.72898 5.55912C9.72898 7.85851 7.85893 9.72846 5.55942 9.72846C3.2599 9.72846 1.38985 7.85851 1.38985 5.55912C1.38985 3.25973 3.2599 1.38978 5.55942 1.38978Z" fill="#757575"/>
+                                </g>
+                                <defs>
+                                <filter id="filter0_d" x="-22" y="-18" width="235" height="49" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                                <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                                <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
+                                <feOffset/>
+                                <feGaussianBlur stdDeviation="4"/>
+                                <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.08 0"/>
+                                <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+                                <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+                                </filter>
+                                <clipPath id="clip0">
+                                <rect width="1440" height="660" fill="white" transform="translate(-1209 -141)"/>
+                                </clipPath>
+                                </defs>
+                          </svg>  
+                      </button>
+                      <input type="text" placeholder="Search" name="search" id="hourly-interaction-report-table-search">
+
+              </div>
+
+
+          </div>
+      </div>
+    </div>
+    <!-- peak hour chart start  -->
+
+    <div class="peak-hours-analytics-div">
+        <div class="peak-hours-analytics-header">
+            <div class="peak-hours-title-date-div">
+            <div class="peak-hours-analytics-title">
+                <h5 class="analytics-title-h">
+                    Cumulative Peak Hours Analytics
+                </h5>
+            </div>
+            <div class="peak-hour-analytic-date-input-div cumulative-peak-analytic-date-range-div">
+                <input type="text" id="cumulative-peak-hours-analytic-start-date" class="analytic-date-input" value="30/06/2022">
+                <span class="hyphen-between-date-span"></span>
+                <input type="text" id="cumulative-peak-hours-analytic-end-date" class="analytic-date-input" value="30/06/2022">
+            </div>
+            </div>
+        
+        </div>
+
+        <div class="peak-hour-analytics-graph-div">
+        <canvas id="cumulative-peak-hours-analytics-graph" width="500" height="250"></canvas>
+        
+        </div>
+        <div class="cumulative-peak-hour-analytic-note-div">
+            Note: Above graph is calculated on the basis of average for the selected date range
+        </div>
+    </div>
+
+    <div class="peak-hours-analytics-div">
+        <div class="peak-hours-analytics-header">
+            <div class="peak-hours-title-date-div">
+                <div class="peak-hours-analytics-title">
+                    <h5 class="analytics-title-h">
+                        Daily Peak Hours Analytics
+                    </h5>
+                </div>
+                <div class="peak-hour-analytic-date-input-div">
+                    <input type="text" id="peak-hours-analytic-date-input" class="analytic-date-input" value="30/06/2022">
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="peak-hour-analytics-graph-div">
+            <canvas id="peak-hours-analytics-graph" width="500" height="250"></canvas>
+        </div>
+    </div>
+    {% if interaction_objects %}
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-report-d-interaction-table-area live-chat-table-parent-div hourly-interaction-report-table-no-maxheight">
+      <table role="table" id="hourly-interaction-report-table" class="display">
+          <thead role="rowgroup">
+              <tr role="row">
+                  <th role="columnheader">Date </th>
+                  <th role="columnheader">Start time </th>
+                  <th role="columnheader">End time </th>
+                  <th role="columnheader">Bot name</th>
+                  <th role="columnheader">
+                      <div class="interaction-count-column-header reorder">
+                        Interaction Count
+                        <span class="default-sort-icon" id="sorter">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M4.39197 4.60897L6.48447 2.51647C6.62697 2.37397 6.86697 2.37397 7.00947 2.51647L9.10197 4.60897C9.34197 4.84147 9.17697 5.24647 8.83947 5.24647H7.49697V9.75397C7.49697 10.1665 7.15947 10.504 6.74697 10.504C6.33447 10.504 5.99697 10.1665 5.99697 9.75397V5.24647H4.65447C4.31697 5.24647 4.15197 4.84147 4.39197 4.60897ZM11.997 8.25347V12.761H13.347C13.677 12.761 13.8495 13.166 13.6095 13.3985L11.517 15.4835C11.367 15.626 11.1345 15.626 10.9845 15.4835L8.892 13.3985C8.652 13.166 8.817 12.761 9.1545 12.761H10.497V8.25347C10.497 7.84097 10.8345 7.50347 11.247 7.50347C11.6595 7.50347 11.997 7.84097 11.997 8.25347Z" fill="#4D4D4D"/>
+                            </svg> 
+                        </span>
+                        <span class="sort-desc-icon" >
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_2_6475)">
+                                <path d="M4.91842 10.7958V4.7551C4.91842 4.2023 4.55997 3.75 4.12187 3.75C3.68377 3.75 3.32532 4.2023 3.32532 4.7551V10.7958H1.8995C1.54105 10.7958 1.36581 11.3385 1.6207 11.6501L3.84308 14.4443C4.00239 14.6352 4.24932 14.6352 4.40863 14.4443L6.631 11.6501C6.8859 11.3385 6.70269 10.7958 6.35221 10.7958H4.91842Z" fill="#4D4D4D"/>
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M8.25 6C7.975 6 7.5 5.6625 7.5 5.25C7.5 4.8375 7.975 4.5 8.25 4.5H15.75C16.025 4.5 16.5 4.8375 16.5 5.25C16.5 5.6625 16.025 6 15.75 6H8.25ZM8.25 9.75H12.75C12.9333 9.75 13.5 9.4125 13.5 9C13.5 8.5875 12.9333 8.25 12.75 8.25H8.25C8.06667 8.25 7.5 8.5875 7.5 9C7.5 9.4125 8.06667 9.75 8.25 9.75ZM8.25 13.5H10.5C10.6146 13.5 11.25 13.1625 11.25 12.75C11.25 12.3375 10.6146 12 10.5 12H8.25C8.13542 12 7.5 12.3375 7.5 12.75C7.5 13.1625 8.13542 13.5 8.25 13.5Z" fill="#4D4D4D"/>
+                                </g>
+                                <defs>
+                                <clipPath id="clip0_2_6475">
+                                <rect width="18" height="18" fill="white"/>
+                                </clipPath>
+                                </defs>
+                            </svg>
+                        </span>
+                        <span class="sort-asc-icon">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_2_6550)">
+                                <path d="M3.33832 7.53842L3.3131 13.579C3.31079 14.1318 3.66735 14.5856 4.10545 14.5874C4.54355 14.5893 4.90388 14.1385 4.90619 13.5857L4.9314 7.54507L6.35721 7.55103C6.71566 7.55252 6.89316 7.0105 6.63957 6.69786L4.42888 3.89443C4.27037 3.7028 4.02344 3.70177 3.86334 3.89207L1.62932 6.67695C1.37312 6.98746 1.55406 7.53097 1.90454 7.53244L3.33832 7.53842Z" fill="#4D4D4D"/>
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M15.7349 12.0189C16.0099 12.0203 16.4832 12.3602 16.4811 12.7727C16.479 13.1852 16.0023 13.5203 15.7273 13.5189L8.2274 13.481C7.9524 13.4797 7.47911 13.1398 7.4812 12.7273C7.48328 12.3148 7.95998 11.9797 8.23498 11.9811L15.7349 12.0189ZM12.7576 8.2766L8.25764 8.25387C8.07431 8.25294 7.50595 8.58758 7.50386 9.00007C7.50178 9.41257 8.06673 9.75292 8.25007 9.75385L12.75 9.77658C12.9333 9.7775 13.5017 9.44287 13.5038 9.03037C13.5059 8.61788 12.9409 8.27752 12.7576 8.2766ZM10.5039 4.87128L8.25392 4.85992C8.13933 4.85934 7.50222 5.19363 7.50014 5.60612C7.49806 6.01862 8.13176 6.35932 8.24634 6.3599L10.4963 6.37126C10.6109 6.37184 11.248 6.03756 11.2501 5.62506C11.2522 5.21257 10.6185 4.87186 10.5039 4.87128Z" fill="#4D4D4D"/>
+                                </g>
+                                <defs>
+                                <clipPath id="clip0_2_6550">
+                                <rect width="18" height="18" fill="white"/>
+                                </clipPath>
+                                </defs>
+                            </svg>
+                        </span>
+                      </div>
+                   </th>
+              </tr>
+          </thead>
+          <tbody role="rowgroup">
+            {% for object in interaction_objects %}
+                    <tr role="row">
+                      <td role="cell">
+                        {{ object.date }}
+                      </td>
+                      <td role="cell">
+                        {{ object.start_time}}
+                      </td>
+                      <td role="cell">
+                        {{ object.end_time }}
+                      </td>
+                      <td role="cell">
+                        {{ object.bot_name}}
+                      </td>
+                      <td role="cell">
+                        {{ object.frequency}}
+                      </td>
+                    </tr>
+                {% endfor %}       
+          </tbody>
+      </table>
+  </div>
+  {% endif %}
+</div>
+    <!-- Modal content -->
+     <div class="modal fade" id="apply-filter-interaction-report" tabindex="-1" role="dialog" aria-labelledby="Admin_report_performance_filter_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h6>Filter</h6>
+              <svg width="16" height="9" viewBox="0 0 16 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M5.33333 8.35714C5.33333 8.18665 5.40357 8.02313 5.5286 7.90257C5.65362 7.78201 5.82319 7.71429 6 7.71429H10C10.1768 7.71429 10.3464 7.78201 10.4714 7.90257C10.5964 8.02313 10.6667 8.18665 10.6667 8.35714C10.6667 8.52764 10.5964 8.69115 10.4714 8.81171C10.3464 8.93227 10.1768 9 10 9H6C5.82319 9 5.65362 8.93227 5.5286 8.81171C5.40357 8.69115 5.33333 8.52764 5.33333 8.35714ZM2.66667 4.5C2.66667 4.3295 2.7369 4.16599 2.86193 4.04543C2.98695 3.92487 3.15652 3.85714 3.33333 3.85714H12.6667C12.8435 3.85714 13.013 3.92487 13.1381 4.04543C13.2631 4.16599 13.3333 4.3295 13.3333 4.5C13.3333 4.6705 13.2631 4.83401 13.1381 4.95457C13.013 5.07513 12.8435 5.14286 12.6667 5.14286H3.33333C3.15652 5.14286 2.98695 5.07513 2.86193 4.95457C2.7369 4.83401 2.66667 4.6705 2.66667 4.5ZM0 0.642857C0 0.472361 0.070238 0.308848 0.195262 0.188289C0.320287 0.0677295 0.489856 0 0.666667 0H15.3333C15.5101 0 15.6797 0.0677295 15.8047 0.188289C15.9298 0.308848 16 0.472361 16 0.642857C16 0.813353 15.9298 0.976867 15.8047 1.09743C15.6797 1.21798 15.5101 1.28571 15.3333 1.28571H0.666667C0.489856 1.28571 0.320287 1.21798 0.195262 1.09743C0.070238 0.976867 0 0.813353 0 0.642857Z" fill="#2D2D2D"></path>
+              </svg>
+          </div>
+          <div class="modal-body">
+              <div class="row">
+                  <div class="col-12 mb-2">
+                      <label>Bot name</label>
+                      <select name="day" class="form-control select-dropdown-icon" id="select-bot-name">
+                        <option value="0">All</option>
+                      {% for bot in bot_list %}
+                          {% if bot.pk == selected_bot_pk %}
+                              <option value="{{ bot.pk }}" selected>{{ bot.name }}</option>
+                          {% else %}
+                              <option value="{{ bot.pk }}">{{ bot.name }}</option>
+                          {% endif %}
+                      {% endfor %}
+                      </select>
+                  </div>
+                  <div class="col-12 mb-2">
+                    <label>Channel</label>
+                    <div class="livechat-multiselect-dropdown livechat-multiselect-filter-dropdown">
+                        <select name="channel" class="form-control select-dropdown-icon" id="select-channel" multiple>
+                            <!-- <option value="All">All</option> -->
+                            <option value="Web">Web</option>
+                            <option value="GoogleHome">GoogleHome</option>
+                            <option value="Alexa">Alexa</option>
+                      </select>
+                     </div>
+                    
+                </div>
+                <div class="col-12 mb-2">
+                    <label>Category</label>
+                    <div class="livechat-multiselect-dropdown livechat-multiselect-filter-dropdown">
+                        <select name="" class="form-control select-dropdown-icon " id="select-category" multiple>
+                            <!-- <option value="All">All</option> -->
+                            <option value="Web">Loans</option>
+                            <option value="GoogleHome">Others</option>
+                      </select>
+                    </div>
+                    
+                </div>
+                <div class="col-12 mb-2">
+                    <label>Sources</label>
+                    <div class="livechat-multiselect-dropdown livechat-multiselect-filter-dropdown">
+                        <select name="" class="form-control select-dropdown-icon create-user-select-field" id="select-sources" multiple>
+                            <!-- <option value="All">All</option> -->
+                            <option value="Desktop">Desktop</option>
+                            <option value="Web">Web</option>
+                      </select>
+                    </div>
+                   
+                </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+              <div style="float: right;">
+                  <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                  <button class="btn-primary" type="button" id="submit-filter" onclick="submit_hourly_interaction_report_filter()">Apply</button>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+    <!-- Export Modal -->
+
+    <div class="modal fade" id="modal-report-filter" tabindex="-1" role="dialog" aria-labelledby="Admin_report_export_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h6>Select Date Range</h6>
+          </div>
+          <div class="modal-body">
+              <div class="row">
+                  <div class="col-12 mb-2">
+                      <label>Range</label>
+                      <select name="day" class="form-control select-dropdown-icon" id="select-date-range-export" onchange="check_select_date_range(this)">
+                        <option value="0" selected="selected">Choose date range</option>
+                        <option value="1">Last day</option>
+                        <option value="2">Last 7 days</option>
+                        <option value="3">Last 1 month</option>
+                        <option value="4">Custom Range</option>
+                      </select>
+                  </div>
+              </div>
+              <div class="row" id="custom-range-filter-export" style="display: none;">
+                <div class="col-12">
+                    <label>Filter by date range</label><br>
+                    <input type="text" class="form-control" id="export-default-start-date" placeholder="Start Date" value="{{ start_date|date:" d-m-Y " }}">
+                    <input type="text" class="form-control" id="export-default-end-date" placeholder="End Date" value="{{ end_date|date:" d-m-Y " }}">
+                </div>
+                <div class="col-12" style="margin-top: 18px;">
+                    <label>Email ID*</label>
+                    <input class="form-control" type="text" placeholder="Enter your email id" id="filter-data-email-export" value="{{ request.user.email }}">
+                </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+              <div style="float: right;">
+                  <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                  <button class="btn-primary" type="button"  id="hourly-interaction-report-filter" onclick="hourly_interaction_report_filter()">Export</button>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+  <script type="text/javascript">
+
+    $(document).ready(function() {
+        $('#hourly-interaction-report-table').DataTable({
+            // for sorting 
+            columnDefs: [{ 
+                orderable: true, 
+                className: 'reorder',
+                targets: 4 
+            },
+            { 
+                orderable: false, 
+                targets: '_all' 
+            }],
+            "language": {
+              searchPlaceholder: 'Search',
+              search: "",
+              "info": "Showing _START_ to _END_ entries out of 724",
+              "info": "Showing _START_ to _END_ entries out of {{ total_interaction_objects }}",
+              "infoEmpty": "No records available",
+              "infoFiltered": "(filtered from _MAX_ total records)",
+            },
+            "bPaginate": false,
+            // "infoCallback": function( settings, start, end, max, total, pre ) {
+            //     if (settings.oPreviousSearch["sSearch"] != ""){
+            //         return pre;
+            //     }
+            //     end = (1 - 1) + end;
+            //     start = (1- 1) + start;
+            //     return "Showing " + start + " to " + end + " entries out of {{ total_interaction_objects }}" ;
+            //   }
+        });
+        var table = $('#hourly-interaction-report-table').DataTable();
+
+        $('#hourly-interaction-report-table-search').keyup(function() {
+          let value = this.value;
+          table.search(value).draw();
+        })
+
+        try {
+          document.getElementsByClassName('dataTables_empty')[0].innerHTML = 'No record found';
+        } catch (err) {}
+        var start_date = " 27-07-2022 ";
+        var end_date = " 03-08-2022 ";
+        $('#interaction-report-start-date').datepicker({ dateFormat: 'dd-mm-yy', prevText: "Previous" }).val(start_date.trim());
+        $('#livechat-interaction-report-end-date').datepicker({ dateFormat: 'dd-mm-yy', prevText: "Previous" }).val(end_date.trim());
+        $('#export-default-start-date').datepicker({ dateFormat: 'dd-mm-yy', prevText: "Previous" }).val(start_date.trim());
+        $('#export-default-end-date').datepicker({ dateFormat: 'dd-mm-yy', prevText: "Previous" }).val(end_date.trim());
+    });
+    function check_select_date_range(element){
+        if(element.value=="4"){
+            document.getElementById("custom-range-filter-export").style.display="block";
+            document.getElementById("custom-range-filter-email").style.display="block";
+        }else if(element.value=="5"){
+            document.getElementById("custom-range-filter-export").style.display = "none";
+            document.getElementById("custom-range-filter-email").style.display="block";
+        }
+        else{
+            document.getElementById("custom-range-filter-export").style.display="none";
+            document.getElementById("custom-range-filter-email").style.display="none";
+        }
+    }
+  </script>
+  <!-- peak hours script start   -->
+
+    <script type="text/javascript" src="{% static 'LiveChatApp/js/chartjs-adapter-date-fns.bundle.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'LiveChatApp/js/chartjs-plugin-datalabels.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'LiveChatApp/js/bootstrap-multiselect.js' %}"></script>
+
+    <script>
+    $('#peak-hours-analytic-date-input').datepicker({ dateFormat: 'dd-mm-yy', prevText: "Previous" })
+    $('#cumulative-peak-hours-analytic-start-date').datepicker({ dateFormat: 'dd-mm-yy', prevText: "Previous" })
+    $('#cumulative-peak-hours-analytic-end-date').datepicker({ dateFormat: 'dd-mm-yy', prevText: "Previous" })
+
+    var ctx = document.getElementById("peak-hours-analytics-graph").getContext('2d');
+    
+    var chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ["2022-06-30 00:00","2022-06-30 01:00","2022-06-30 02:00","2022-06-30 03:00","2022-06-30 04:00","2022-06-30 05:00","2022-06-30 06:00","2022-06-30 07:00","2022-06-30 08:00","2022-06-30 09:00","2022-06-30 10:00","2022-06-30 11:00","2022-06-30 12:00","2022-06-30 13:00","2022-06-30 14:00","2022-06-30 15:00","2022-06-30 16:00","2022-06-30 17:00","2022-06-30 18:00","2022-06-30 19:00","2022-06-30 20:00","2022-06-30 21:00","2022-06-30 22:00","2022-06-30 23:00","2022-06-30 24:00"],
+            datasets: [{
+                label: "Total number of interaction count",
+                data: [
+                        {
+                            "x": "2022-06-30 00:00",
+                            "y": 0
+                        },
+                        {
+                            "x": "2022-06-30 03:00",
+                            "y": 30
+                        },
+                        {
+                            "x": "2022-06-30 08:00",
+                            "y": 10
+                        },
+                        {
+                            "x": "2022-06-30 10:45",
+                            "y": 50
+                        },
+                        {
+                            "x": "2022-06-30 12:00",
+                            "y": 60
+                        },
+                        {
+                            "x": "2022-06-30 18:00",
+                            "y": 10
+                        },
+                        {
+                            "x": "2022-06-30 24:00",
+                            "y": 60
+                        },
+                        
+                        
+                    
+                    ],
+                borderColor: '#10B981',
+                borderWidth: 1,
+                pointHoverBackgroundColor: "#10B981",
+                pointRadius: 0,
+                pointHoverRadius: 5,
+                pointBorderColor: '#10B981',
+                pointBackgroundColor: '#10B981',
+                pointBorderWidth: 1
+            }]
+        },
+
+        options: {
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            tension: 0.5,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context){
+                            console.log(context)
+                            return "Count" + ": " + context.formattedValue
+                        }
+                    },
+                    backgroundColor: '#FFF',
+                    titleFont: {
+                        size: 12,
+                    },
+                    titleColor: '#000',
+                        bodyColor: '#000',
+                    bodyFont: {
+                        size: 12,
+                    },
+                    displayColors: true,
+                    borderColor: '#000',
+                        borderWidth: 0.1,
+                },
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        align: 'start',
+                        usePointStyle: true,
+                        fontColor: '#333',
+                        padding: 20,
+                        align: 'start',
+                        boxWidth: 9,
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    min: 0,
+                    max: 60,
+                    ticks: {
+                        size: 10,
+                        color: '#7B7A7B',
+                        fontFamily: "'DM Sans', sans-serif",
+                        lineHeight: 13,
+                        // stepSize: 10
+                    },
+                    title: {
+                        display: true,
+                        text: 'Interaction Count',
+                        color: '#7B7A7B',
+                        font: {
+                        family: "'DM Sans', sans-serif",
+                        size: 9,
+                        lineHeight: 1.2
+                        },
+                        padding: 10,
+                    },
+                    grid: {
+                        display: true,
+                        color: "#EBEBEB "
+
+                    }
+                },
+                x: {
+                    type: "time",
+                
+                    time: {
+                        minUnit: 'hour',
+                        displayFormats: {
+                            // hour: 'H' ,      // for 24hr format
+                            hour: 'h a',        // for 12hr format
+                        },
+                        tooltipFormat: 'hh:mm a - hh:mm a',
+                    },
+                    ticks: {
+                        source: 'labels',
+                        size: 10,
+                        color: '#7B7A7B',
+                        fontFamily: "'DM Sans', sans-serif",
+                        lineHeight: 13
+                    },
+                
+                    grid: {
+                        display: true,
+                        color: "#EBEBEB "
+                    }
+                },
+                xAxis2: {
+                    labels: ["30/06/2022","30/06/2022"],
+                    
+                    grid: {
+                        drawOnChartArea: false, // only want the grid lines for one axis to show up
+                        drawBorder: false,
+                        display: false,
+                    },
+                    ticks: {
+                        size: 10,
+                        color: ' #000000',
+                        fontFamily: "'DM Sans', sans-serif",
+                    },
+                    title: {
+                        display: true,
+                        text: 'Time (24hr)',
+                        color: '#7B7A7B',
+                        font: {
+                        family: "'DM Sans', sans-serif",
+                        size: 9,
+                        lineHeight: 1.2
+                        },
+                        padding: 10,
+                    },
+
+                }
+
+            },
+
+            responsive: true, 
+            maintainAspectRatio: false,
+        }
+    });
+
+    var ctxbubble = document.getElementById("cumulative-peak-hours-analytics-graph").getContext('2d');
+    var bubblechart = new Chart(ctxbubble, {
+        type: 'bubble',
+        data: {
+            labels: ["2022-06-30 00:00","2022-06-30 01:00","2022-06-30 02:00","2022-06-30 03:00","2022-06-30 04:00","2022-06-30 05:00","2022-06-30 06:00","2022-06-30 07:00","2022-06-30 08:00","2022-06-30 09:00","2022-06-30 10:00","2022-06-30 11:00","2022-06-30 12:00"],
+            datasets: [{
+                label: 'Top 7 peak hours',
+                data: [{
+                    x: "2022-06-30 00:00",
+                    y: 100
+                }, 
+                {
+                    x: "2022-06-30 03:00",
+                    y: 103
+                },
+                {
+                    x: "2022-06-30 06:00",
+                    y: 40
+                },
+                {
+                    x: "2022-06-30 05:00",
+                    y: 150
+                },
+                {
+                    x: "2022-06-30 04:00",
+                    y: 85
+                },
+                {
+                    x: "2022-06-30 02:00",
+                    y: 90
+                },
+                {
+                    x: "2022-06-30 01:00",
+                    y: 50
+                },
+            ],
+                backgroundColor: '#0098FF',
+                hoverRadius: 2,
+                clip: false,
+                radius: 30
+            },
+            {
+                label: 'Mid 9 peak hours',
+                data: [{
+                    x: "2022-06-30 07:00",
+                    y: 100
+                }, 
+                {
+                    x: "2022-06-30 08:00",
+                    y: 103
+                },
+                {
+                    x: "2022-06-30 09:00",
+                    y: 40
+                },
+                {
+                    x: "2022-06-30 10:00",
+                    y: 150
+                },
+                {
+                    x: "2022-06-30 10:15",
+                    y: 85
+                },
+                {
+                    x: "2022-06-30 09:15",
+                    y: 90
+                },
+                {
+                    x: "2022-06-30 08:15",
+                    y: 50
+                },
+                {
+                    x: "2022-06-30 07:15",
+                    y: 60
+                }, 
+                {
+                    x: "2022-06-30 07:30",
+                    y: 90
+                }, 
+            ],
+                backgroundColor: '#00D586',
+                hoverRadius: 2,
+                clip: false,
+                radius: 20
+            
+            },
+            {
+                label: 'Least 8 peak hours',
+                data: [{
+                    x: "2022-06-30 10:30",
+                    y: 10
+                }, 
+                {
+                    x: "2022-06-30 11:00",
+                    y: 9
+                },
+                {
+                    x: "2022-06-30 12:00",
+                    y: 0
+                },
+                {
+                    x: "2022-06-30 11:15",
+                    y: 30
+                },
+            ],
+                backgroundColor: '#F9600A',
+                hoverRadius: 2,
+                clip: false,
+                radius: 10
+            
+            },
+        ]
+        },
+        // plugins: [ChartDataLabels],
+        options: {
+            plugins: {
+                // datalables: {
+                //     anchor: 'end',
+                //     align: 'end',
+                //     formatter: function(value, ctxbubble) {
+                //         
+                //     },
+                //     labels: {
+                //         value: {
+                //             color: 'white'
+                //         }
+                //     }
+                // },
+                tooltip: {
+                    callbacks: {
+                        label: function(context){
+                            console.log(context)
+                            return "Count" + ": " + context.raw.y + ", " + context.raw.x
+                        }
+                    },
+                    backgroundColor: '#FFF',
+                    titleFont: {
+                        size: 12,
+                    },
+                    titleColor: '#000',
+                        bodyColor: '#000',
+                    bodyFont: {
+                        size: 12,
+                    },
+                    displayColors: true,
+                    borderColor: '#000',
+                        borderWidth: 0.1,
+                },
+                legend: {
+                    display: true,
+                    align: 'start',
+                    position: 'bottom',
+                    labels: {
+                        align: 'center',
+                        usePointStyle: true,
+                        fontColor: '#333',
+                        padding: 20,
+                        boxWidth: 9,
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    display: false,
+                    min: 0,
+                    ticks: {
+                        fontSize: 10,
+                        fontColor: '#7B7A7B',
+                        fontFamily: "'DM Sans', sans-serif",
+                        lineHeight: 13,
+                        // stepSize: 10
+                    },
+                },
+                x: {
+                    display: false,
+                    type: "time",
+                
+                    time: {
+                        minUnit: 'hour',
+                        tooltipFormat: 'h:mm - h:mm',
+                    },
+                    ticks: {
+                        source: 'labels',
+                        fontSize: 10,
+                        fontColor: '#7B7A7B',
+                        fontFamily: "'DM Sans', sans-serif",
+                        lineHeight: 13
+                    },
+                }
+
+            },
+
+            responsive: true, 
+            maintainAspectRatio: false,
+        },
+    
+    });
+
+        $("#select-sources").multiselect({
+            nonSelectedText: 'Select source',
+            enableFiltering: false,
+            includeSelectAllOption: true,
+            enableCaseInsensitiveFiltering: false
+        });
+        $("#select-sources").multiselect('selectAll', false);
+        $("#select-sources").multiselect('updateButtonText');
+
+        $("#select-channel").multiselect({
+            nonSelectedText: 'Select channel',
+            enableFiltering: false,
+            includeSelectAllOption: true,
+            enableCaseInsensitiveFiltering: false
+        });
+        $("#select-channel").multiselect('selectAll', false);
+        $("#select-channel").multiselect('updateButtonText');
+
+        $("#select-category").multiselect({
+            nonSelectedText: 'Select category',
+            enableFiltering: false,
+            includeSelectAllOption: true,
+            enableCaseInsensitiveFiltering: false
+        });
+        $("#select-category").multiselect('selectAll', false);
+        $("#select-category").multiselect('updateButtonText');
+
+        $(".livechat-multiselect-dropdown.livechat-multiselect-filter-dropdown .multiselect-container>li>a>label").addClass("custom-checkbox-input");
+        $(".livechat-multiselect-dropdown.livechat-multiselect-filter-dropdown .multiselect-container>li").find(".custom-checkbox-input").append("<span class='checkmark'></span>");
+    </script>
+{% endblock %}

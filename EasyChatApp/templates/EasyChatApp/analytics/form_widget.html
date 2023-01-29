@@ -1,0 +1,118 @@
+{% extends 'EasyChatApp/console.html' %}
+{% block consolecontent %}
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="/static/EasyChatApp/css/form_widget.css?v={% random_int 1 100 %}">
+
+<div class="row" style="margin-top:1%;">
+
+<!--     <div class="col s12">
+        {% if manage_intents_permission %}
+        <a class="btn white transparent-btn black-text left"  href="/chat/intent/?bot_pk={{ selected_bot_obj.pk }}&selected_language=en" style="margin-right:0.5em;"><i class="material-icons inline-icon">arrow_back</i> Back</a>
+        {% else %}
+        <a class="btn white transparent-btn black-text left"  href="/chat/landing-page/?bot_pk={{ selected_bot_obj.pk }}" style="margin-right:0.5em;"><i class="material-icons inline-icon">arrow_back</i> Back</a>
+        {% endif %}
+
+    </div> -->
+
+  <div class="col s12" id="main-console-container">
+    {% if form_data_list %}
+    <table class="striped highlight white" style="margin-top:2%; table-layout: fixed; word-wrap:break-word;">
+        <thead>
+            <tr>
+                <th scope="col">Form Name</th>
+                <th scope="col">Report</th>
+                <th scope="col">Intent</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for form_data in form_data_list %}
+            
+            	<tr class="orange-text text-darken-3">
+                    <td>{{form_data.form_name}}</td>
+<td><button class="btn download-report-btn" onclick="download_consolidated_form_date('{{form_data.pk}}','{{bot_id}}')">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="
+    margin-right: 10px;
+"> <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4C9.11 4 6.6 5.64 5.35 8.04C2.34 8.36 0 10.91 0 14C0 17.31 2.69 20 6 20H19C21.76 20 24 17.76 24 15C24 12.36 21.95 10.22 19.35 10.04ZM17 13L12 18L7 13H10V9H14V13H17Z" fill="white"></path> </svg>
+Download</button></td>
+                    <td>{{form_data.intent_name}}
+        {% endfor %}
+                </tr>
+        
+        </tbody>
+    </table>
+    {% else %}
+            <p class="green lighten-1 black-text center" style="padding:1em;">No Data Found</p>
+    {% endif %}
+
+  </div>
+
+    <div class="fixed-action-btn"> 
+        <a class="btn-floating btn-large purple darken-3 modal-trigger" onclick="show_select('{{selected_bot_obj.pk}}')" id="revised-message-history-action" style="margin-right: 1em;display:none;"><i class="large material-icons">mode_edit</i></a>   
+    </div>
+
+	<div class="col s12 right-align" id="pagination_form_data">
+	    {% if form_data_list.has_other_pages %}
+	      <ul class="pagination">
+
+            {% if form_data_list.has_previous %}
+                <li><a href="?page={{ form_data_list.previous_page_number }}&bot_id={{bot_id}}"><i class="material-icons">chevron_left</i></a></li>
+            {% else %}
+                <li class="disabled"><span><i class="material-icons">chevron_left</i></span></li>
+            {% endif %}
+
+            {% if form_data_list.number|add:'-4' > 1 %}
+                <li><a href="?page={{ form_data_list.number|add:'-5' }}&bot_id={{bot_id}}">&hellip;</a></li>
+            {% endif %}
+
+            {% for i in form_data_list.paginator.page_range %}
+                {% if form_data_list.number == i %}
+                    <li class="active purple darken-3"><a href="?page={{ i }}&bot_id={{bot_id}}">{{ i }}</a></li>
+                {% elif i > form_data_list.number|add:'-5' and i < form_data_list.number|add:'5' %}
+                    <li><a href="?page={{ i }}&bot_id={{bot_id}}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if form_data_list.paginator.num_pages > form_data_list.number|add:'4' %}
+                <li><a href="?page={{ form_data_list.number|add:'5' }}&bot_id={{bot_id}}">&hellip;</a></li>
+            {% endif %}
+
+            {% if form_data_list.has_next %}
+                <li><a href="?page={{ form_data_list.next_page_number }}&bot_id={{bot_id}}"><i class="material-icons">chevron_right</i></a></li>
+            {% else %}
+                <li class="disabled"><span><i class="material-icons">chevron_right</i></span></li>
+            {% endif %}
+	      </ul>
+	    {% endif %}
+	</div>
+</div>
+
+<script type="text/javascript">
+    window.NEED_TO_BUILD = "{{ selected_bot_obj.need_to_build }}";
+    
+    function download_consolidated_form_date(form_widget_pk, bot_id){
+        var xhttp = new XMLHttpRequest();
+        var params = '';
+        xhttp.open("GET", "/chat/download-consolidated-form-data/?bot_id="+bot_id+"&form_widget_pk="+form_widget_pk, true);
+        xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            response = JSON.parse(this.responseText);
+            response = custom_decrypt(response)
+            response = JSON.parse(response);
+            if(response["status"]==200){
+                M.toast({
+                    "html":"Data will be received on the registered email address."
+                });
+            }else{
+                M.toast({
+                    "html":"Please report this error."
+                });
+            }
+        }
+    }
+    xhttp.send(params);    
+    }
+</script>
+{% endblock %}
+

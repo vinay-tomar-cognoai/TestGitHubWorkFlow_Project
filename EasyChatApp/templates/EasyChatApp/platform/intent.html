@@ -1,0 +1,464 @@
+{% extends 'EasyChatApp/console.html' %}
+{% block consolecontent %}
+{% load static %}
+
+<link href="{% static 'EasyChatApp/css/intent.css' %}?v={% random_int 1 100 %}" type="text/css" rel="stylesheet"/>
+
+<div class="row" style="margin-bottom: 140px;">
+    <div class="col s12">
+
+      <div class="input-field col s3">
+          <a class="waves-effect btn manage-intent-apply-filter-btn modal-trigger" target="_blank" href="#manage-intent-filter-modal"> 
+            {% if is_filter_applied %}
+            <svg width="94" height="26" viewBox="0 0 94 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6.96299 17.3929C6.96299 17.1987 7.04298 17.0125 7.18537 16.8752C7.32776 16.7379 7.52088 16.6607 7.72225 16.6607H12.2778C12.4792 16.6607 12.6723 16.7379 12.8147 16.8752C12.9571 17.0125 13.0371 17.1987 13.0371 17.3929C13.0371 17.587 12.9571 17.7733 12.8147 17.9106C12.6723 18.0479 12.4792 18.125 12.2778 18.125H7.72225C7.52088 18.125 7.32776 18.0479 7.18537 17.9106C7.04298 17.7733 6.96299 17.587 6.96299 17.3929ZM3.92595 13C3.92595 12.8058 4.00595 12.6196 4.14833 12.4823C4.29072 12.345 4.48384 12.2679 4.68521 12.2679H15.3148C15.5162 12.2679 15.7093 12.345 15.8517 12.4823C15.9941 12.6196 16.0741 12.8058 16.0741 13C16.0741 13.1942 15.9941 13.3804 15.8517 13.5177C15.7093 13.655 15.5162 13.7321 15.3148 13.7321H4.68521C4.48384 13.7321 4.29072 13.655 4.14833 13.5177C4.00595 13.3804 3.92595 13.1942 3.92595 13ZM0.888916 8.60714C0.888916 8.41297 0.968909 8.22674 1.1113 8.08944C1.25369 7.95214 1.44681 7.875 1.64818 7.875H18.3519C18.5532 7.875 18.7464 7.95214 18.8888 8.08944C19.0311 8.22674 19.1111 8.41297 19.1111 8.60714C19.1111 8.80132 19.0311 8.98754 18.8888 9.12485C18.7464 9.26215 18.5532 9.33929 18.3519 9.33929H1.64818C1.44681 9.33929 1.25369 9.26215 1.1113 9.12485C0.968909 8.98754 0.888916 8.80132 0.888916 8.60714Z" fill="#5F6AA8"/>
+            <path d="M28.3552 17.5V7.69727H34.1658V9.03027H29.866V11.874H33.5505V13.1865H29.866V16.1807H34.3093V17.5H28.3552ZM36.572 16.625C35.9158 15.9186 35.5876 14.998 35.5876 13.8633C35.5876 12.7285 35.9135 11.8011 36.5652 11.0811C37.2169 10.3564 38.0531 9.99414 39.074 9.99414C39.4021 9.99414 39.7097 10.0397 39.9968 10.1309C40.2839 10.222 40.5232 10.3405 40.7146 10.4863C40.9106 10.6322 41.0655 10.7666 41.1794 10.8896C41.2934 11.0081 41.3891 11.1266 41.4666 11.2451H41.5691V7H43.0388V17.5H41.5964V16.4609H41.5076C40.9288 17.2767 40.1404 17.6846 39.1423 17.6846C38.0896 17.6846 37.2328 17.3314 36.572 16.625ZM37.0847 13.8428C37.0847 14.5993 37.2921 15.2077 37.7068 15.668C38.1261 16.1237 38.6752 16.3516 39.3542 16.3516C40.0378 16.3516 40.5847 16.1123 40.9949 15.6338C41.405 15.1553 41.6101 14.5583 41.6101 13.8428C41.6101 13.0726 41.3959 12.4642 40.9675 12.0176C40.5437 11.5664 40.0014 11.3408 39.3406 11.3408C38.6752 11.3408 38.1329 11.5755 37.7136 12.0449C37.2944 12.5098 37.0847 13.109 37.0847 13.8428ZM44.9324 8.09375C44.9324 7.82487 45.0235 7.60384 45.2058 7.43066C45.3881 7.25749 45.6182 7.1709 45.8962 7.1709C46.1833 7.1709 46.4181 7.25749 46.6003 7.43066C46.7872 7.60384 46.8806 7.82487 46.8806 8.09375C46.8806 8.37174 46.7872 8.59733 46.6003 8.77051C46.4181 8.94368 46.1833 9.03027 45.8962 9.03027C45.6137 9.03027 45.3813 8.94368 45.199 8.77051C45.0212 8.59733 44.9324 8.37174 44.9324 8.09375ZM45.158 17.5V10.1787H46.6277V17.5H45.158ZM48.1384 11.3818V10.1924H49.1023C49.2299 10.1924 49.3347 10.1491 49.4167 10.0625C49.4988 9.97591 49.5398 9.8597 49.5398 9.71387V8.10742H50.9207V10.1787H53.0535V11.3818H50.9207V15.1348C50.9207 15.8822 51.2761 16.2559 51.9871 16.2559H52.9783V17.5H51.7615C51.0323 17.5 50.4649 17.3018 50.0593 16.9053C49.6537 16.5042 49.4509 15.9277 49.4509 15.1758V11.3818H48.1384ZM58.7068 17.5V7.69727H64.5173V9.03027H60.2175V12.0107H64.1824V13.3301H60.2175V17.5H58.7068ZM66.0828 8.09375C66.0828 7.82487 66.1739 7.60384 66.3562 7.43066C66.5385 7.25749 66.7686 7.1709 67.0466 7.1709C67.3337 7.1709 67.5684 7.25749 67.7507 7.43066C67.9376 7.60384 68.031 7.82487 68.031 8.09375C68.031 8.37174 67.9376 8.59733 67.7507 8.77051C67.5684 8.94368 67.3337 9.03027 67.0466 9.03027C66.7641 9.03027 66.5317 8.94368 66.3494 8.77051C66.1716 8.59733 66.0828 8.37174 66.0828 8.09375ZM66.3083 17.5V10.1787H67.7781V17.5H66.3083ZM69.8904 15.6816V7H71.3601V15.5928C71.3601 15.7887 71.408 15.9391 71.5037 16.0439C71.5994 16.1488 71.7384 16.2012 71.9207 16.2012H72.2283V17.5H71.6267C71.0753 17.5 70.6469 17.3405 70.3416 17.0215C70.0408 16.7025 69.8904 16.2559 69.8904 15.6816ZM73.158 11.3818V10.1924H74.1218C74.2494 10.1924 74.3542 10.1491 74.4363 10.0625C74.5183 9.97591 74.5593 9.8597 74.5593 9.71387V8.10742H75.9402V10.1787H78.073V11.3818H75.9402V15.1348C75.9402 15.8822 76.2957 16.2559 77.0066 16.2559H77.9978V17.5H76.781C76.0518 17.5 75.4845 17.3018 75.0789 16.9053C74.6733 16.5042 74.4705 15.9277 74.4705 15.1758V11.3818H73.158ZM79.2966 13.8633C79.2966 13.1022 79.4561 12.4277 79.7751 11.8398C80.0942 11.2474 80.5294 10.7917 81.0808 10.4727C81.6368 10.1536 82.2611 9.99414 82.9539 9.99414C83.5098 9.99414 84.0157 10.0921 84.4714 10.2881C84.9272 10.484 85.3031 10.7529 85.5994 11.0947C85.9001 11.4365 86.1303 11.8353 86.2898 12.291C86.4539 12.7467 86.5359 13.2367 86.5359 13.7607V14.3076H80.7664C80.7937 14.9502 81.0102 15.4674 81.4158 15.8594C81.8214 16.2513 82.3569 16.4473 83.0222 16.4473C83.4871 16.4473 83.9018 16.3424 84.2664 16.1328C84.6355 15.9232 84.893 15.6406 85.0388 15.2852H86.4675C86.2761 16.0052 85.8682 16.5863 85.2439 17.0283C84.6241 17.4658 83.8699 17.6846 82.9812 17.6846C81.892 17.6846 81.0056 17.3268 80.322 16.6113C79.6384 15.8913 79.2966 14.9753 79.2966 13.8633ZM80.7937 13.1729H85.0798C85.0343 12.5713 84.8132 12.0973 84.4167 11.751C84.0203 11.4001 83.5326 11.2246 82.9539 11.2246C82.3888 11.2246 81.9011 11.4069 81.491 11.7715C81.0808 12.1361 80.8484 12.6032 80.7937 13.1729ZM88.3201 17.5V10.1787H89.7351V11.4502H89.8308C89.9584 11.113 90.1977 10.8145 90.5486 10.5547C90.8995 10.2949 91.3142 10.165 91.7927 10.165H92.4353V11.5938H91.7517C91.141 11.5938 90.6602 11.8034 90.3093 12.2227C89.963 12.6419 89.7898 13.1979 89.7898 13.8906V17.5H88.3201Z" fill="#5F6AA8"/>
+            </svg>
+            {% else %}
+            <svg width="104" height="26" viewBox="0 0 104 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6.46299 17.3929C6.46299 17.1987 6.54298 17.0125 6.68537 16.8752C6.82776 16.7379 7.02088 16.6607 7.22225 16.6607H11.7778C11.9792 16.6607 12.1723 16.7379 12.3147 16.8752C12.4571 17.0125 12.5371 17.1987 12.5371 17.3929C12.5371 17.587 12.4571 17.7733 12.3147 17.9106C12.1723 18.0479 11.9792 18.125 11.7778 18.125H7.22225C7.02088 18.125 6.82776 18.0479 6.68537 17.9106C6.54298 17.7733 6.46299 17.587 6.46299 17.3929ZM3.42595 13C3.42595 12.8058 3.50595 12.6196 3.64833 12.4823C3.79072 12.345 3.98384 12.2679 4.18521 12.2679H14.8148C15.0162 12.2679 15.2093 12.345 15.3517 12.4823C15.4941 12.6196 15.5741 12.8058 15.5741 13C15.5741 13.1942 15.4941 13.3804 15.3517 13.5177C15.2093 13.655 15.0162 13.7321 14.8148 13.7321H4.18521C3.98384 13.7321 3.79072 13.655 3.64833 13.5177C3.50595 13.3804 3.42595 13.1942 3.42595 13ZM0.388916 8.60714C0.388916 8.41297 0.468909 8.22674 0.611298 8.08944C0.753687 7.95214 0.946807 7.875 1.14818 7.875H17.8519C18.0532 7.875 18.2464 7.95214 18.3888 8.08944C18.5311 8.22674 18.6111 8.41297 18.6111 8.60714C18.6111 8.80132 18.5311 8.98754 18.3888 9.12485C18.2464 9.26215 18.0532 9.33929 17.8519 9.33929H1.14818C0.946807 9.33929 0.753687 9.26215 0.611298 9.12485C0.468909 8.98754 0.388916 8.80132 0.388916 8.60714Z" fill="#5F6AA8"></path>
+              <path d="M28.5898 17.5L29.5245 14.8054H33.5018L34.4315 17.5H36.0621L32.3981 7.31818H30.6232L26.9592 17.5H28.5898ZM29.9719 13.5128L31.4734 9.16761H31.5529L33.0543 13.5128H29.9719ZM37.4132 20.3636H38.8997V16.3118H38.9892C39.2576 16.799 39.8045 17.6491 41.1966 17.6491C43.046 17.6491 44.3883 16.1676 44.3883 13.6967C44.3883 11.2209 43.0261 9.7642 41.1816 9.7642C39.7647 9.7642 39.2527 10.6293 38.9892 11.1016H38.8649V9.86364H37.4132V20.3636ZM38.8698 13.6818C38.8698 12.0859 39.5659 11.027 40.8635 11.027C42.2108 11.027 42.8869 12.1655 42.8869 13.6818C42.8869 15.2131 42.1909 16.3814 40.8635 16.3814C39.5858 16.3814 38.8698 15.2876 38.8698 13.6818ZM46.0538 20.3636H47.5403V16.3118H47.6298C47.8983 16.799 48.4451 17.6491 49.8372 17.6491C51.6866 17.6491 53.0289 16.1676 53.0289 13.6967C53.0289 11.2209 51.6667 9.7642 49.8223 9.7642C48.4054 9.7642 47.8933 10.6293 47.6298 11.1016H47.5055V9.86364H46.0538V20.3636ZM47.5105 13.6818C47.5105 12.0859 48.2065 11.027 49.5041 11.027C50.8514 11.027 51.5275 12.1655 51.5275 13.6818C51.5275 15.2131 50.8315 16.3814 49.5041 16.3814C48.2264 16.3814 47.5105 15.2876 47.5105 13.6818ZM56.1809 7.31818H54.6944V17.5H56.1809V7.31818ZM59.1204 20.3636C60.3484 20.3636 61.1239 19.7223 61.5664 18.5192L64.7234 9.87855L63.1175 9.86364L61.1836 15.7898H61.104L59.1701 9.86364H57.5792L60.3732 17.5994L60.1893 18.1065C59.8114 19.1207 59.2795 19.2053 58.4641 18.9815L58.1062 20.1996C58.2852 20.2791 58.6729 20.3636 59.1204 20.3636ZM69.9485 17.5H71.4847V13.0604H75.81V11.7429H71.4847V8.64062H76.2624V7.31818H69.9485V17.5ZM78.0323 17.5H79.5188V9.86364H78.0323V17.5ZM78.783 8.68537C79.2951 8.68537 79.7227 8.28764 79.7227 7.80043C79.7227 7.31321 79.2951 6.91051 78.783 6.91051C78.266 6.91051 77.8434 7.31321 77.8434 7.80043C77.8434 8.28764 78.266 8.68537 78.783 8.68537ZM83.0051 7.31818H81.5186V17.5H83.0051V7.31818ZM88.5696 9.86364H87.0035V8.03409H85.517V9.86364H84.3984V11.0568H85.517V15.5661C85.5121 16.9531 86.571 17.6243 87.7443 17.5994C88.2166 17.5945 88.5348 17.505 88.7088 17.4403L88.4403 16.2124C88.3409 16.2322 88.157 16.277 87.9183 16.277C87.4361 16.277 87.0035 16.1179 87.0035 15.2578V11.0568H88.5696V9.86364ZM93.4231 17.6541C95.0886 17.6541 96.2669 16.8338 96.6049 15.5909L95.198 15.3374C94.9295 16.0582 94.2832 16.4261 93.438 16.4261C92.1653 16.4261 91.3102 15.6009 91.2704 14.1293H96.6994V13.6023C96.6994 10.843 95.0488 9.7642 93.3187 9.7642C91.1909 9.7642 89.7889 11.3849 89.7889 13.7315C89.7889 16.103 91.171 17.6541 93.4231 17.6541ZM91.2754 13.0156C91.335 11.9318 92.1206 10.9922 93.3287 10.9922C94.4821 10.9922 95.2377 11.8473 95.2427 13.0156H91.2754ZM98.3487 17.5H99.8352V12.8366C99.8352 11.8374 100.606 11.1165 101.66 11.1165C101.968 11.1165 102.316 11.1712 102.435 11.206V9.78409C102.286 9.7642 101.993 9.74929 101.804 9.74929C100.909 9.74929 100.143 10.2564 99.8651 11.0767H99.7855V9.86364H98.3487V17.5Z" fill="#5F6AA8"></path>
+              </svg>
+              {% endif %}
+          </a>
+
+      </div>
+
+      <div class="input-field col s6 right">
+        <div class="col s12 right" style="padding-right: 0px;">
+          {% if selected_language == "en"%}
+            <a class="waves-effect btn red darken-3 right" id="modify-intent-delete-selected" style="display: none; margin-left: 1rem"><i class="inline-icon material-icons">delete</i> Delete</a>
+          {% endif %}
+          {% if is_small_talk_disable %}
+            <a class="waves-effect btn green lighten-2 tooltipped right black-text" data-position="bottom" data-tooltip="Enable all the small talk intents" onclick="enable_small_talk('{{ selected_bot_obj.pk }}')" style="margin-left:1em; margin-bottom: 1em;">Enable Small Talk</a>
+          {% else %}
+            <a class="waves-effect btn red darken-3 tooltipped right" data-position="bottom" data-tooltip="Disable all the small talk intents" onclick="disable_small_talk('{{ selected_bot_obj.pk }}')" style="margin-left:1em; margin-bottom: 1em;">Disable Small Talk</a>
+          {% endif %}
+
+          {% if selected_bot_obj %}
+            <a class="waves-effect btn easychat-button right" target="_blank"  href="/chat/create-intent/?bot_pk={{ selected_bot_obj.pk }}"><i class="inline-icon material-icons">add</i> Create Intent</a>
+          {% else %}
+            <a class="waves-effect btn purple darken-3 right" target="_blank" href="/chat/create-intent/"><i class="inline-icon material-icons">add</i> Create Intent</a>
+          {% endif %}
+          
+        </div>
+      </div>
+    </div>
+    <div class="col s12">
+        {% if is_filter_applied %}
+        <div class="manage-intent-filter-chip-div">
+            {% if intent_type != "" %}
+            <div class="manage-intent-filter-chip-wrapper">
+                <div class="manage-intent-filter-name">Intent Type :</div>
+                <div class="manage-intent-filter-chip">
+                    {{ intent_type_name }} <svg onclick="clear_intent_filter('intent_type')" width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12.2 4.30667C12.0754 4.18183 11.9063 4.11168 11.73 4.11168C11.5536 4.11168 11.3845 4.18183 11.26 4.30667L7.99998 7.56L4.73998 4.3C4.61543 4.17517 4.44633 4.10501 4.26998 4.10501C4.09364 4.10501 3.92453 4.17517 3.79998 4.3C3.53998 4.56 3.53998 4.98 3.79998 5.24L7.05998 8.5L3.79998 11.76C3.53998 12.02 3.53998 12.44 3.79998 12.7C4.05998 12.96 4.47998 12.96 4.73998 12.7L7.99998 9.44L11.26 12.7C11.52 12.96 11.94 12.96 12.2 12.7C12.46 12.44 12.46 12.02 12.2 11.76L8.93998 8.5L12.2 5.24C12.4533 4.98667 12.4533 4.56 12.2 4.30667Z" fill="#254A9C"></path>
+                        </svg>
+
+                </div>
+
+            </div>
+            {% endif %}
+            {% if filtered_category_obj %}
+            <div class="manage-intent-filter-chip-wrapper">
+                <div class="manage-intent-filter-name">Category :</div>
+                <div class="manage-intent-filter-chip">
+                    {{filtered_category_obj.name}} <svg onclick="clear_intent_filter('category_id')" width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12.2 4.30667C12.0754 4.18183 11.9063 4.11168 11.73 4.11168C11.5536 4.11168 11.3845 4.18183 11.26 4.30667L7.99998 7.56L4.73998 4.3C4.61543 4.17517 4.44633 4.10501 4.26998 4.10501C4.09364 4.10501 3.92453 4.17517 3.79998 4.3C3.53998 4.56 3.53998 4.98 3.79998 5.24L7.05998 8.5L3.79998 11.76C3.53998 12.02 3.53998 12.44 3.79998 12.7C4.05998 12.96 4.47998 12.96 4.73998 12.7L7.99998 9.44L11.26 12.7C11.52 12.96 11.94 12.96 12.2 12.7C12.46 12.44 12.46 12.02 12.2 11.76L8.93998 8.5L12.2 5.24C12.4533 4.98667 12.4533 4.56 12.2 4.30667Z" fill="#254A9C"></path>
+                        </svg>
+
+                </div>
+
+            </div>
+            {% endif %}
+            {% if channel_name != "" %}
+            <div class="manage-intent-filter-chip-wrapper">
+                <div class="manage-intent-filter-name">Channel :</div>
+                <div class="manage-intent-filter-chip">
+                    {{ channel_name }} <svg onclick="clear_intent_filter('channel_name')" width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12.2 4.30667C12.0754 4.18183 11.9063 4.11168 11.73 4.11168C11.5536 4.11168 11.3845 4.18183 11.26 4.30667L7.99998 7.56L4.73998 4.3C4.61543 4.17517 4.44633 4.10501 4.26998 4.10501C4.09364 4.10501 3.92453 4.17517 3.79998 4.3C3.53998 4.56 3.53998 4.98 3.79998 5.24L7.05998 8.5L3.79998 11.76C3.53998 12.02 3.53998 12.44 3.79998 12.7C4.05998 12.96 4.47998 12.96 4.73998 12.7L7.99998 9.44L11.26 12.7C11.52 12.96 11.94 12.96 12.2 12.7C12.46 12.44 12.46 12.02 12.2 11.76L8.93998 8.5L12.2 5.24C12.4533 4.98667 12.4533 4.56 12.2 4.30667Z" fill="#254A9C"></path>
+                        </svg>
+
+                </div>
+
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    <div class="col s12" >
+       
+        {% if intent_objs %}
+        <div class="row">
+          <div class="col s8"></div>
+          <div class="col s4">
+          </div>
+        </div>
+
+        <div class="row">
+
+          <div class="col s2"></div>
+          {% if selected_language == "en" %}
+       <div class="col s4"> 
+        <label class="right">Search:</label>
+        </div>
+        {% endif %}
+      </div>
+      
+      {% if selected_language == "en" %}
+          <div class="col s6">
+          <!-- <input id="search_intent_word" list="Intents">  -->
+          <select id="Intents" class="custom-search">
+          </select>
+        </div>
+        <div class="col s2">
+          <button id="go-to-intent"  style="opacity:1;margin-top: 0px;padding: 0px 16px !important;" class="btn green lighten-2 black-text" onclick="go_to_intent({{ selected_bot_obj.pk }})">Go<i class="inline-icon material-icons">arrow_forward</i></button>
+        </div>
+        {% endif %}
+        {% if supported_language|length != 1 %}
+          <div class="row">
+            <div class="col s8">
+                <div id="edit-intent-custom-drp-down" class="easychat-console-custom-dropdown">
+                    <div class="easychat-console-select-drop" style="display: none;">
+                      {% for language in supported_language %}
+                        <span data-value="{{language.lang}}">{{language.name_in_english}}</span>
+                      {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col s4">
+                <span class="right">Showings {{ selected_intents }} from {{ total_intents }} intents</span>
+            </div>
+          </div>
+        {% else %}
+          <div class="col s4" style="margin-top: 2em;">
+            <span class="right">Showings {{ selected_intents }} from {{ total_intents }} intents</span>
+          </div>
+          <div class="row"></div>
+        {% endif %}
+      </div>
+
+      <div class="col s12" style="padding:1em;">
+          <table id="intent_info_table" style="table-layout: fixed;word-wrap: break-word;">
+            <thead>
+              <tr>
+                <th style="width:10%;" class="center">
+                  <strong>
+                    <div>
+                        <label>
+                            <input class="modify-intent-checkbox filled-in" type="checkbox" id="modify-intent-select-all-checkbox"/>
+                            <span></span>
+                        </label>
+                    </div>
+                  </strong>
+                </th>
+                <th>Intent Name</th>
+                <th>Bot Response</th>
+                <th>Features</th>
+                <th>Category</th>
+              </tr>
+            </thead>
+            <tbody >
+              {% for intent_tunning_obj in intent_tunning_objs %}
+                <tr>
+                  <td style="width:10%;" class="center">
+                    <strong>
+                      <div>
+                          <label>
+                              <input class="modify-intent-checkbox filled-in" type="checkbox" id="modify-intent-checkbox-{{intent_tunning_obj.intent.pk}}-{{ selected_bot_obj.pk }}"/>
+                              <span></span>
+                          </label>
+                      </div>
+                    </strong>
+                  </td>
+                  <td>
+                    <a target="_blank" href="/chat/edit-intent/?intent_pk={{ intent_tunning_obj.intent.pk }}&selected_language={{selected_language}}">{{ intent_tunning_obj.multilingual_name }}</a>
+                    {% if intent_tunning_obj.intent.get_no_of_variations != None %}
+                      <div class="chip tooltipped black-text right" data-tooltip="Number of variations">
+                        {{ intent_tunning_obj.intent.get_no_of_variations }}
+                      </div>
+                  {% endif %}
+                  </td>
+                  <td><p class="tooltipped" data-position="bottom" data-tooltip="{{ intent_tunning_obj.tree.get_response_without_html }}">{{ intent_tunning_obj.tree.get_response_without_html|slice:"50" }}...</p></td>
+                  <td>
+                    {% if intent_tunning_obj.intent.image_exist %}
+                      <i class="material-icons green-text darken-3 tooltipped" data-position="bottom" data-tooltip="Image exist in the bot response">image</i>
+                    {% endif %}
+
+                    {% if intent_tunning_obj.intent.video_exist %}
+                      <i class="material-icons green-text darken-3 tooltipped"  data-position="bottom" data-tooltip="Video exist in the bot response">videocam</i>
+                    {% endif %}
+
+                    {% if intent_tunning_obj.intent.card_exist %}
+                      <i class="material-icons green-text darken-3 tooltipped" data-position="bottom" data-tooltip="Card exist in the bot response">link</i>
+
+                    {% endif %}
+
+                    {% if intent_tunning_obj.intent.recommendation_exist %}
+                      <i class="material-icons green-text darken-3 tooltipped" data-position="bottom" data-tooltip="Recommendation exist in the bot response">playlist_add_check</i>
+                    {% endif %}
+
+
+                  </td>
+                  <td>
+                    {{intent_tunning_obj.intent.category}}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+          <div class="col s12 right-align">
+            {% if intent_objs.has_other_pages %}
+              <ul class="pagination">
+                {% if intent_objs.has_previous %}
+                  <li><a href="?page={{ intent_objs.previous_page_number }}" style="padding: 0px;"><i class="material-icons">chevron_left</i></a></li>
+                {% else %}
+                  <li class="disabled"><span><i class="material-icons">chevron_left</i></span></li>
+                {% endif %}
+                {% if intent_objs.number|add:'-4' > 1 %}
+                  <li><a href="?page={{ intent_objs.number|add:'-5' }}">&hellip;</a></li>
+                {% endif %}
+                {% for i in intent_objs.paginator.page_range %}
+                  {% if intent_objs.number == i %}
+                      <li class="active purple darken-3"><a href="?page={{ i }}">{{ i }}</a></li>
+                  {% elif i > intent_objs.number|add:'-5' and i < intent_objs.number|add:'5' %}
+                      <li><a href="?page={{ i }}">{{ i }}</a></li>
+                  {% endif %}
+                {% endfor %}
+                {% if intent_objs.paginator.num_pages > intent_objs.number|add:'4' %}
+                  <li><a href="?page={{ intent_objs.number|add:'5' }}">&hellip;</a></li>
+                {% endif %}
+                {% if intent_objs.has_next %}
+                  <li><a href="?page={{ intent_objs.next_page_number }}" style="padding: 0px;"><i class="material-icons">chevron_right</i></a></li>
+                {% else %}
+                  <li class="disabled"><span><i class="material-icons">chevron_right</i></span></li>
+                {% endif %}
+              </ul>
+            {% endif %}
+        </div>
+
+        {% else %}
+
+          <p class="green lighten-1 center" style="padding:1em;" id="no-intent-message">No intents found for the filter applied</p>
+
+        {% endif %}
+    </div>
+
+</div>
+
+<div id="div-intent-list-modal-container">
+
+	<div id="manage-intent-filter-modal" class="modal">
+
+        <div class="modal-content">
+            <div class="row" style="margin-bottom: 4px !important;">
+                <div class="modal-header">
+                    <h6 style="font-weight: 600 !important;font-size: 16px; color: #000000;">Intent Filter</h6>
+                    <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                        <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z" fill="black" fill-opacity="0.54"/>
+                        </svg>
+                    </a>
+                </div>
+
+                <div class="easychat-manage-intent-modal-scrollable-content">
+                    <div class="col s12 analytics-filter-select-area">
+                        <div class="filter-heading">
+                            Filter by Intent Type
+                        </div>
+                        <label>
+                    		{% if intent_type == "is_form_assist_intent" %}
+                    			<input type="radio" id="intent_type_one" name="analytics-card-filter-btn" checked>
+                    		{% else %}
+                    			<input type="radio" id="intent_type_one" name="analytics-card-filter-btn">
+                    		{% endif %}
+                    		<div class=" filter-box">
+                      			<span>Form Assist Intents</span>
+                    		</div>
+                  		</label>
+                        <label>
+                    		{% if intent_type == "is_attachment_required" %}
+                    			<input type="radio" id="intent_type_two" name="analytics-card-filter-btn" checked>
+                    		{% else %}
+                    			<input type="radio" id="intent_type_two" name="analytics-card-filter-btn">
+                    		{% endif %}
+		                    <div class=" filter-box">
+		                      <span>Has Attachment(s)</span>
+		                    </div>
+                  		</label>
+                        <label>
+		                    {% if intent_type == "is_small_talk" %}
+		                    	<input type="radio" id="intent_type_three" name="analytics-card-filter-btn" checked>
+		                    {% else %}
+		                    	<input type="radio" id="intent_type_three" name="analytics-card-filter-btn">
+		                    {% endif %}
+		                    <div class=" filter-box">
+		                      <span>Small Talk</span>
+		                    </div>
+	                  	</label>
+                    </div>
+
+                    <div class="col s12 manage-intent-filter-category-select-area">
+                        <div class="filter-heading">
+                            Filter by Category
+                        </div>
+                      	<div id="easychat-filter-intent-category-select-div">
+	                        <div class="easychat-console-custom-dropdown">
+	                          <div class="easychat-console-select-drop" style="display: none;">
+	                            <span data-value="0">All Categories</span>
+	                            {% for category in categories %}
+	                              <span data-value="{{ category.pk }}">{{ category.name }}</span>
+	                            {% endfor %}
+	                          </div>
+	                        </div>
+                      	</div>
+                    </div>
+                    <div class="col s12 analytics-channel-select-area analytics-filter-select-area">
+                        <div class="filter-heading">
+                            Filter by Channel
+                        </div>
+                        {% for channel in channel_list %}
+	                		<div class=" channel-box">
+	                			<label>
+			                		{% if channel_name == channel.name %}
+			                			<input type="radio" id="{{ channel.name }}" onclick="select_single_channel_for_filter(this)" name="manage-intent-filter-channel" checked>
+			                		{% else %}
+			                			<input type="radio" id="{{ channel.name }}" onclick="select_single_channel_for_filter(this)" name="manage-intent-filter-channel">
+			                		{% endif %}
+			                		<div class="filter-box">
+			                			{{ channel.icon|safe }}
+			                      		<span>{{ channel.name }}</span>
+			                		</div>
+		                  		</label>
+	                    	</div>
+	                    {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+      <div class="modal-footer">
+
+          <a href="?bot_pk={{ selected_bot_obj.pk }}&selected_language=en" class="modal-close btn filter-modal-footer-btn-cancel">Clear filter</a>
+          <a onclick="apply_intent_filter()" class="modal-close btn filter-modal-footer-btn">Apply filter</a>
+      </div>
+  </div>    
+</div>
+<script type="text/javascript">
+function get_url_vars() {
+    var vars = {};
+    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
+        vars[key] = value;
+    });
+    return vars;
+}
+
+    window.API_FAIL_EMAIL_CONFIGURED = '{{api_fail_email_configured}}'
+    bot_id = get_url_vars()['bot_pk'];
+    SERVER_URL= window.location.origin;
+    BOT_ID=bot_id
+    BOT_NAME='uat';
+    BOT_THEME='null';
+    BOT_POSITION='bottom-right';
+    bot_click_image = 'true';
+    is_form_assist='false';
+    is_easyassist_enabled='false';
+    is_lead_generation='false';
+    lead_generation_intent_id='';
+</script>
+{% if selected_bot_obj.default_theme.name == "theme_1" %}
+<script src="{% static 'EasyChatApp/js/theme1_embed.js' %}?v={% random_int 1 100 %}"></script>
+{% elif selected_bot_obj.default_theme.name == "theme_2" %}
+<script src="{% static 'EasyChatApp/js/theme2_embed.js' %}?v={% random_int 1 100 %}"></script>
+{% elif selected_bot_obj.default_theme.name == "theme_3" %}
+<script src="{% static 'EasyChatApp/js/theme3_embed.js' %}?v={% random_int 1 100 %}"></script>
+{% elif selected_bot_obj.default_theme.name == "theme_4" %}
+<script src="{% static 'EasyChatApp/js/theme4_embed.js' %}?v={% random_int 1 100 %}"></script>
+{% endif %}
+
+
+{% if request.user.enable_s3_bucket %}
+
+<script src="/static/EasyChatApp/js/easychat-crypto.js"></script>
+
+{% else %}
+  
+<script src="{% static 'EasyChatApp/js/easychat-crypto.js' %} "></script>
+
+{% endif %}
+
+<script type="text/javascript">
+  window.selected_bot_obj_pk = '{{selected_bot_obj.pk}}'
+  window.selected_category = '{{selected_category}}'
+  window.intent_type = '{{intent_type}}'
+  window.NEED_TO_BUILD = "{{ selected_bot_obj.need_to_build }}";
+  window.SELECTED_LANGUAGE = "{{selected_language}}";
+  window.selected_category_index = '{{selected_category_index}}';
+</script>
+<script type="text/javascript">
+  is_no_intent_message = document.getElementById('no-intent-message');
+  if(is_no_intent_message!=undefined){
+    botName = document.getElementById('multiple-select-intent-filter-bot-list');
+    filter_name = document.getElementById('multiple-select-intent-type-filter-intent-list');
+    is_no_intent_message.innerText = "*"+botName.children[botName.selectedIndex].innerText + " does not have any intent that falls under " + filter_name.children[filter_name.selectedIndex].innerText;
+  }
+</script>
+<script>
+      $(document).ready(function () {
+        // This is being done to convert entities like &lt; to their symbol like < safely.
+        $("p.tooltipped").each(function(index) {
+            $(this).text(reverse_sanitize_html($(this).text()))
+        });
+      });
+      try{
+        chevrons = document.getElementsByClassName('pagination')
+        num_of_chevs = chevrons[0].getElementsByTagName('a').length;
+        chev_collection = chevrons[0].getElementsByTagName('a');
+        for(i=0;i<num_of_chevs;i++){
+            chevron = chev_collection[i];
+            chevron.addEventListener("click", redirect_with_filters);
+        }
+        function redirect_with_filters(e){
+            e.preventDefault();
+            filter_path = window.location.href.split("?")[1];
+            if(filter_path!= undefined && filter_path!=""){
+                filter_with_page = filter_path.replace("page=","^");
+                index= filter_with_page.indexOf("^");
+                //checking if url has pagenumber
+                if(index!=-1){
+                     filter_with_page = filter_with_page.slice(index+1);
+                     //taking arguments other than page number
+                     if(isNaN(filter_with_page)){
+                         index= filter_with_page.indexOf("&");
+                         filter_path = filter_with_page.slice(index+1);
+                         href = this.getAttribute('href')+"&";
+                         href+= filter_path;
+                        }
+                     else{
+                        href = this.getAttribute('href')
+                        }
+                     this.setAttribute('href', href);
+                     window.location = href;
+                }
+                else{
+                    href = this.getAttribute('href') + "&";
+                    href+= filter_path;
+                    console.log(href);
+                    window.location = href;
+                }
+            }
+            else{
+                    href = this.getAttribute('href')
+                    console.log(href);
+                    window.location = href;
+                 }
+        }
+    }
+    catch{
+    }
+</script>
+
+
+{% endblock %}

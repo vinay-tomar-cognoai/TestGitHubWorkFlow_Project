@@ -1,0 +1,1421 @@
+{% extends 'EasyChatApp/console.html' %}
+{% block consolecontent %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/changes_placement.css' %}?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/android_channel.css' %}?v={% random_int 1 100 %}">
+<link id="font-link" rel="stylesheet" href="https://fonts.googleapis.com/css?family={{selected_bot_obj.font}}">
+
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/web_channel.css' %}?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/initial_questions_css.css' %}">
+<link rel="stylesheet" href="/static/EasyChatApp/font-awesome-4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="/static/EasyChatApp/css/slick.min.css">
+<div style="padding: 0em 1em 0em 1em;">
+    <div class="row">
+        {% include "EasyChatApp/channels/channel_components/channel_integration_document_button.html" with channel_doc_download_link="https://drive.google.com/uc?export=download&id=1HkPjJ1ib6koSLpNzMhCLuP-pWFtA08-U" channel_name="Android" %}
+    </div>
+    <div class="row">
+        <div class="col s8" style="display: flex;">
+         <a class="btn white transparent-btn black-text" id="channel-back-btn" href="/chat/channels/edit/{{ bot_id }}/"><i class="material-icons inline-icon">arrow_back</i> Back</a>
+            {% if bot_channel_obj.languages_supported.count != 1%}
+                <div class="easychat-console-custom-dropdown">
+                    <div class="easychat-console-select-drop" style="display: none;">
+                        {% for lan_obj in bot_channel_obj.languages_supported.all %}
+                            {% if  lan_obj.lang == selected_language %}
+                                <span  data-value="{{ lan_obj.lang }}" >{{ lan_obj.name_in_english }}</span>
+                            {% else %}
+                                <span  data-value="{{ lan_obj.lang }}">{{ lan_obj.name_in_english }}</span>
+                            {% endif %}
+                        {% endfor %}
+
+                    </div>
+                </div>
+            {% endif %}
+    </div>
+    {% if need_to_show_auto_fix_pop_up %}
+    <div class="progress" id="easychat_channel_language_update_preloader" style="display: none;">
+        <div class="indeterminate"></div>
+    </div>
+        <div class="row language-autofix-popup-warning-container" id="channel-language-auto-fix-pop-up-div">
+            <div class="col s12">
+                <div class="language-autofix-popup-warning-div">
+                    <p>A language change has been detected on your channel settings, Would you like to auto-fix your non-primary languages for this channel?</p>
+                    <div class="language-autofix-popup-warning-div-buttons">
+                        <a class="popup-warning-ignore-btn" href="javascript:void(0)" id="ignore-changes-in-non-primary-language" >Ignore</a>
+                        <a class="popup-warning-autofix-btn" href="javascript:void(0)"id="auto-fix-changes-in-non-primary-language" >Auto-Fix</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    </div>
+
+    <div class="row">
+        <div class="input-field col s4">
+            <h6>Welcome Message</h6>
+            <div class="divider"></div>
+            <textarea id="welcome-message" class="materialize-textarea android-textarea">
+              {{ language_tuned_object.welcome_message }}
+            </textarea>
+        </div>
+        <div class="input-field col s4">
+            <h6>Failure Message</h6>
+            <div class="divider"></div>
+            <textarea id="failure-message" class="materialize-textarea android-textarea">
+              {{ language_tuned_object.failure_message }}
+            </textarea>
+        </div>
+        <div class="input-field col s4">
+            <h6>Authentication Message</h6>
+            <div class="divider"></div>
+            <textarea id="authentication-message" class="materialize-textarea android-textarea">
+              {{ language_tuned_object.authentication_message }}
+            </textarea>
+        </div>
+        <div class="col s12">
+            <div class="row">
+                {% if selected_language == "en" %}
+                <ul class="collapsible">
+                    <li>
+                        <div class="collapsible-header">Add Language to your Channel&nbsp;&nbsp;&nbsp;
+                            <svg width="60" height="23" viewBox="0 0 60 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="60" height="23" rx="6" fill="#2755CB" />
+                                <rect width="60" height="23" rx="6" stroke="#2755CB" />
+                                <path d="M14.959 17V7.89746H17.2378L20.7227 13.623H20.7988V7.89746H22.7856V17H20.5005L17.0283 11.2808H16.9521V17H14.959ZM24.582 17V7.89746H30.3457V9.65576H26.6387V11.541H29.7998V13.293H26.6387V15.229H30.4854V17H24.582ZM31.1582 7.89746H33.4053L34.7319 13.8135H34.8335L36.1855 7.89746H38.7246L40.0894 13.8135H40.1909L41.5176 7.89746H43.7646L41.397 17H38.9658L37.5122 10.8491H37.4106L35.938 17H33.5195L31.1582 7.89746Z" fill="white" />
+                                <circle cx="46" cy="6" r="2" fill="white" />
+                            </svg>
+                        </div>
+                        <div class="collapsible-body" id="add-language-colapsible-body">
+                            <span style="color: #6C7A93;">*English language is supported by default</span>
+                            <hr class="dashed-line" />
+                            <div class="row" id="select-channel-language-supported-container">
+                              <div class="input-field col s12" style="display: grid;grid-template-columns: 1fr 5fr;margin-left: 50px !important;margin-bottom: 20px;">
+                                <div class="choose-language">
+                                    <span style="position: absolute; top: 10px;"> Choose Language </span>               
+                                </div>
+                                <div class="container">
+                                    <div class="select-box">
+                                        <div id="language-box-options-container" class="options-container">
+                                            {% for lan_obj in master_languages %}
+                                                {% if lan_obj in bot_channel_obj.languages_supported.all %}
+        
+                                                    <label for="{{lan_obj.name_in_english|lower}}-{{ lan_obj.lang }}">
+                                                        <div class="option">
+                                                            <input type="radio" class="radio" id="{{lan_obj.name_in_english|lower}}" name="category" />
+                                                            <label for="{{lan_obj.name_in_english}}" >{{lan_obj.name_in_english}}</label>
+                                                            {% if lan_obj.lang == "en" %}
+                                                                <input type="checkbox" style="width: 10% !important;height: 0.8rem !important " disabled checked class="item-checkbox"  value="{{ lan_obj.lang }}" id="{{lan_obj.name_in_english|lower}}-{{ lan_obj.lang }}" name="{{lan_obj.name_in_english}}">
+                                                            {% elif lan_obj.lang in phonetic_typing_enabled_languages %}
+                                                            <input type="checkbox"  onclick="check_phonetic_typing_toogle()" checked style="width: 10% !important;height: 0.8rem !important "  class="item-checkbox"  value="{{ lan_obj.lang }}" id="{{lan_obj.name_in_english|lower}}-{{ lan_obj.lang }}" name="{{lan_obj.name_in_english}}">
+                                                            
+                                                            {% else %}
+                                                            <input type="checkbox" style="width: 10% !important;height: 0.8rem !important " checked class="item-checkbox"  value="{{ lan_obj.lang }}" id="{{lan_obj.name_in_english|lower}}-{{ lan_obj.lang }}" name="{{lan_obj.name_in_english}}">
+                                                            {% endif %}
+                                                             
+                                                        </div>
+                                                    </label>
+                                                {% else %}
+                                                    <label for="{{lan_obj.name_in_english|lower}}-{{ lan_obj.lang }}">
+                                                        <div class="option">
+                                                            <input type="radio" class="radio" id="{{lan_obj.name_in_english}}" name="category" />
+                                                            <label for="{{lan_obj.name_in_english}}"  >{{lan_obj.name_in_english}}</label>
+                                                            {% if lan_obj.lang in phonetic_typing_enabled_languages %}
+                                                                <input type="checkbox" onclick="check_phonetic_typing_toogle()" style="width: 10% !important;height: 0.8rem !important " class="item-checkbox" value="{{ lan_obj.lang }}" id="{{lan_obj.name_in_english|lower}}-{{ lan_obj.lang }}" name="{{lan_obj.name_in_english}}">
+                                                            {% else %}
+                                                                 <input type="checkbox" style="width: 10% !important;height: 0.8rem !important " class="item-checkbox" value="{{ lan_obj.lang }}" id="{{lan_obj.name_in_english|lower}}-{{ lan_obj.lang }}" name="{{lan_obj.name_in_english}}">
+                                                            {% endif %}
+                                                            
+                                                        </div>
+                                                    </label>
+                                                {% endif %}
+
+                                            {% endfor %} 
+                                            
+                                            <div class='no-elem'>No such Language found</div>
+                                        </div>
+                                        <div id="selected-language-chips-wrapper" class="wrapper-box">
+                                        <div class="box">
+
+                                            <div class="selected" style="max-height: 74px;overflow: auto; border: none;" >                                        
+                                              
+                                                {% for lan_obj in first_three_selected_languages %}  
+                                                <span class="tag">
+                                                <span class="language-chip-display-name"> {{lan_obj.name_in_english}}</span>
+                                                    <svg class="selected-language-cross-btn" onclick="remove_selected_language(event,this,'{{lan_obj.name_in_english|lower}}-{{ lan_obj.lang }}')"  width="12" height="12" viewBox="0 0 7 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M6.65011 0.854978C6.55669 0.761352 6.42987 0.708735 6.29761 0.708735C6.16535 0.708735 6.03852 0.761352 5.94511 0.854978L3.50011 3.29498L1.05511 0.849978C0.961692 0.756352 0.834866 0.703735 0.702607 0.703735C0.570349 0.703735 0.443523 0.756352 0.350107 0.849978C0.155107 1.04498 0.155107 1.35998 0.350107 1.55498L2.79511 3.99998L0.350107 6.44498C0.155107 6.63998 0.155107 6.95498 0.350107 7.14998C0.545107 7.34498 0.860107 7.34498 1.05511 7.14998L3.50011 4.70498L5.94511 7.14998C6.14011 7.34498 6.45511 7.34498 6.65011 7.14998C6.84511 6.95498 6.84511 6.63998 6.65011 6.44498L4.20511 3.99998L6.65011 1.55498C6.84011 1.36498 6.84011 1.04498 6.65011 0.854978Z" fill="#2755CB"/>
+                                                    </svg>
+                                                </span>
+                                            {% endfor %} 
+
+                                            {% if count_of_overhead_languages > 0 %}
+                                                <button id="languages-extend-button" >+{{count_of_overhead_languages}}</button>
+                                            {% endif %}
+                                             
+                                            
+                                            </div>
+                                            
+                                        </div>
+                                        <div id="language-dropdown-arrow" class="arrow">
+                                            <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M0.200408 0.739665C0.48226 0.436132 0.956809 0.418556 1.26034 0.700408L5 4.22652L8.73967 0.700408C9.0432 0.418556 9.51775 0.436132 9.7996 0.739665C10.0815 1.0432 10.0639 1.51775 9.76034 1.7996L5.51034 5.7996C5.22258 6.0668 4.77743 6.0668 4.48967 5.7996L0.239665 1.7996C-0.0638681 1.51775 -0.081444 1.0432 0.200408 0.739665Z" fill="#909090"/>
+                                            </svg>
+                                        </div>
+                                        </div>
+                                    
+                                        <div id="language-options-search-box" class="search-box" style="display:none;">
+                                            <input type="text" style="width: 250px !important;border: 1px solid #e1e1e1 !important;" placeholder="&nbsp; &nbsp; &nbsp; Search Language">
+                                            </input>
+                                        </div>
+                                        
+                                    </div>
+                                    
+                                </div>
+                                  
+                              </div>
+
+                              {% if bot_channel_obj.languages_supported.count != 1%}
+                                <div class="col s12" style="display: grid;grid-template-columns: 2fr 5fr; align-items: center; justify-content: space-between; margin-bottom: 20px; margin-left: 50px;" id="bot_language_auto_detection_div">
+                              {% else %}
+                                <div class="col s12" style="display: none;grid-template-columns: 2fr 5fr; align-items: center; justify-content: space-between; margin-bottom: 20px; margin-left: 50px;" id="bot_language_auto_detection_div">
+                              {% endif %}
+                                <div class="row-title">
+                                Enable bot language auto detection.<br/><span style="color: #4D4D4D;"></span>
+                                </div>
+
+                                <div class="row-content"  style="padding-left: 10px; margin-top: 5px;">
+                                    {% if bot_channel_obj.languages_supported.count != 1%}
+                                        {% if bot_channel_obj.is_language_auto_detection_enabled %}
+                                            <input type="checkbox" name="" id="is_language_auto_detection_enabled" style="position:relative;opacity:1;width: unset !important;margin-top: 0 !important;height: 1.4rem !important;pointer-events: auto;cursor: pointer;" checked>
+                                        {% else %}
+                                            <input type="checkbox" name="" id="is_language_auto_detection_enabled" style="position:relative;opacity:1;width: unset !important;margin-top: 0 !important;height: 1.4rem !important;pointer-events: auto;cursor: pointer;">
+                                        {% endif %}
+                                    {% else %}
+                                        <input type="checkbox" name="" id="is_language_auto_detection_enabled" style="position:relative;opacity:1;width: unset !important;margin-top: 0 !important;height: 1.4rem !important;pointer-events: auto;cursor: pointer;" disabled="true">
+                                    {% endif %}
+                                </div>
+                              </div>
+                                    {% if is_phonetic_language_supported %}
+                                    <div class="col s12" id="enable-phonetic-typing" style="display: grid;grid-template-columns: 2fr 5fr;margin-left: 50px !important;margin-bottom: 20px;">
+                                        <div class="row-title">
+                                        Enable phonetic typing in Chatbot <sup><i class="material-icons inline-icon tooltipped" data-position="top" data-tooltip="Enabling this will help the users transliterate in their preferred choice of language while entering their query in the bot">help</i></sup><br/><span style="color: #4D4D4D;"></span>
+                                        </div>
+                                        <div class="row-content"  style="padding-left: 10px;">
+
+                                            {% if bot_channel_obj.is_web_bot_phonetic_typing_enabled %}
+                                                <input type="checkbox" onchange="handle_phonetic_typing_checkbox(this)" style="position:relative;opacity:1;width: unset !important;margin-top: 0 !important;height: 1.4rem !important;pointer-events: auto;cursor: pointer;" name="" id="is_web_bot_phonetic_typing_enabled" checked>
+                                            {% else %}
+                                                <input type="checkbox" onchange="handle_phonetic_typing_checkbox(this)" style="position:relative;opacity:1;width: unset !important;margin-top: 0 !important;height: 1.4rem !important;pointer-events: auto;cursor: pointer;" name="" id="is_web_bot_phonetic_typing_enabled">
+                                            {% endif %}
+
+                                                
+                                        </div>
+                                    </div>
+                                {% else %}
+                                 <div class="col s12" id="enable-phonetic-typing" style="display: none;grid-template-columns: 2fr 5fr;margin-left: 50px !important;margin-bottom: 20px;">
+                                        <div class="row-title">
+                                        Enable phonetic typing in Chatbot <sup><i class="material-icons inline-icon tooltipped" data-position="top" data-tooltip="Enabling this will help the users transliterate in their preferred choice of language while entering their query in the bot">help</i></sup><br/><span style="color: #4D4D4D;"></span>
+                                        </div>
+                                        <div class="row-content"  style="padding-left: 10px;">
+
+                                            {% if bot_channel_obj.is_web_bot_phonetic_typing_enabled %}
+                                                <input type="checkbox" onchange="handle_phonetic_typing_checkbox(this)" style="position:relative;opacity:1;width: unset !important;margin-top: 0 !important;height: 1.4rem !important;pointer-events: auto;cursor: pointer;" name="" id="is_web_bot_phonetic_typing_enabled" checked>
+                                            {% else %}
+                                                <input type="checkbox" onchange="handle_phonetic_typing_checkbox(this)" style="position:relative;opacity:1;width: unset !important;margin-top: 0 !important;height: 1.4rem !important;pointer-events: auto;cursor: pointer;" name="" id="is_web_bot_phonetic_typing_enabled">
+                                            {% endif %}
+
+                                            
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            
+                               {% if bot_channel_obj.is_web_bot_phonetic_typing_enabled  %}
+                                    <div class="col s12" id="language-disclaimer-text-row" style="display: grid; grid-template-columns: 2fr 5fr; margin-bottom: 20px; margin-left: 50px !important;">
+                                        <div class="row-title" style="display: flex;align-items:center;">
+                                            Disclaimer text<sup><i class="material-icons inline-icon tooltipped" data-position="top" data-tooltip="This text will be displayed when an end consumer switches the language">help</i></sup>
+                                        </div>
+                                        <div class="row-content" style="padding-left: 10px;width: 46%;">
+                                            <textarea id="language-disclaimer-text" class="materialize-textarea android-textarea" style="visibility: hidden; height: 51px;"> {{ bot_channel_obj.phonetic_typing_disclaimer_text}}  
+                                            </textarea>
+                                            
+                                        </div>
+                                    
+                                    </div>
+                                {% else %}
+                                    <div class="col s12" id="language-disclaimer-text-row" style="display: none; grid-template-columns: 2fr 5fr; margin-bottom: 20px; margin-left: 50px !important;">
+                                        <div class="row-title" style="display: flex;align-items:center;">
+                                            Disclaimer text<sup><i class="material-icons inline-icon tooltipped" data-position="top" data-tooltip="This text will be displayed when an end consumer switches the language">help</i></sup>
+                                        </div>
+                                        <div class="row-content" style="padding-left: 10px;width: 46%;">
+                                            <textarea id="language-disclaimer-text" class="materialize-textarea android-textarea"> {{ bot_channel_obj.phonetic_typing_disclaimer_text}}  
+                                            </textarea>
+                                           
+                                        </div>
+                                    
+                                    </div>
+                                {% endif %}                     
+                               
+                        </div>
+                    </li>
+                </ul>
+                <ul class="collapsible">
+                    <li>
+                        <div class="collapsible-header">Initial Questions</div>
+                        <div class="collapsible-body">
+                            <div class="row" id="channel-initial-messages">
+                                *Search and select from existing Intent List
+                                <div class="input-field col s12">
+                                    <select multiple id="multiple-select-initial-message-list">
+                                        {% for intent_name in intent_name_list %}
+                                        {% if intent_name.is_selected %}
+                                        <option value="{{ intent_name.intent_pk }}" selected>{{ intent_name.intent_name }}</option>
+                                        {% else %}
+                                        <option value="{{ intent_name.intent_pk }}">{{ intent_name.intent_name }}</option>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <ul class="collapsible">
+                    <li>
+                        <div class="collapsible-header">Failure Recommendations</div>
+                        <div class="collapsible-body">
+                            <div class="row" id="channel-initial-messages">
+                                *Search and select from existing Intent List
+                                <div class="input-field col s12">
+                                    <select multiple id="multiple-select-failure-message-list">
+                                        {% for intent_name in intent_name_list_failure %}
+                                        {% if intent_name.is_selected %}
+                                        <option value="{{ intent_name.intent_pk }}" selected>{{ intent_name.intent_name }}</option>
+                                        {% else %}
+                                        <option value="{{ intent_name.intent_pk }}">{{ intent_name.intent_name }}</option>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                {% endif %}
+                {% if selected_language == "en" %}                               
+                <ul class="collapsible">
+                    <li>
+                        <div class="collapsible-header">Welcome Banner</div>
+                        <div class="collapsible-body welcome-banner-collapsible-body-wrapper">
+                            <div class="row">
+                                <a onclick="open_add_banner_modal()" class="btn modal-trigger add-welcome-banner-btn">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 7C11.45 7 11 7.45 11 8V11H8C7.45 11 7 11.45 7 12C7 12.55 7.45 13 8 13H11V16C11 16.55 11.45 17 12 17C12.55 17 13 16.55 13 16V13H16C16.55 13 17 12.55 17 12C17 11.45 16.55 11 16 11H13V8C13 7.45 12.55 7 12 7ZM4 12C4 16.41 7.59 20 12 20C16.41 20 20 16.41 20 12C20 7.59 16.41 4 12 4C7.59 4 4 7.59 4 12Z" fill="white"/>
+                                    </svg>
+                                    <span>
+                                        Add Welcome Banner
+                                    </span>                                        
+                                </a>
+                            </div>
+                            <div class="row">
+                                <div class="col s4">
+                                    <h6>Set automatic scrolling</h6>
+                                </div>
+                                <div class="col s2" style="display: flex; justify-content: center;">
+                                    <div class="switch">
+                                        <label>
+                                            {% if bot_channel_obj.is_automatic_carousel_enabled %}
+
+                                            <div class="switch-custom">
+                                                <label>
+                                                    <input type="checkbox" checked id="carousel_switch"style="background-color: #3c47c2 !important">
+                                                    <span class="lever-custom"  id="carousel_switch_lever" style="margin-top: 0.5em"></span>
+                                                </label>
+                                            </div>
+                                            {% else %}
+                                            <div class="switch-custom">
+                                                <label>
+                                                    <input type="checkbox" id="carousel_switch"style="background-color: #3c47c2 !important">
+                                                    <span class="lever-custom"  id="carousel_switch_lever" style="margin-top: 0.5em"></span>
+                                                </label>
+                                            </div>
+                                            {% endif %}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if bot_channel_obj.is_automatic_carousel_enabled %}
+                            <div class="row" id="carousel_time_row">
+                                <div class="col s4">
+                                    <h6>Set time interval (in seconds)</h6>
+                                </div>
+                                <div class="col s2">
+                                    <div class="switch">
+                                        <label>
+                                                <input type="number" id="carousel_time" value="{{ bot_channel_obj.carousel_time }}">
+                                            </label>
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="row" id="carousel_time_row" style="display: none;">
+                                <div class="col s4">
+                                    <h6>Set time interval (in seconds)</h6>
+                                </div>
+                                <div class="col s2">
+                                    <div class="switch">
+                                        <label>
+                                                <input type="number" id="carousel_time" value="5">
+                                            </label>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            <div class="row">
+                                <div class="col s12 easychat-welcome-banner-item-container">
+                                    <table>
+                                        <thead>
+                                            <th>Image </th>
+                                            <th>Redirection URL</th>
+                                            <th>Trigger Intent</th>
+                                            <th> </th>
+                                        </thead>
+                                        <tbody id="easychat-welcome-banner-draggable-item">
+                                            {% for welcome_banner_obj in welcome_banner_objs %}
+                                            <tr id="wb-card-{{welcome_banner_obj.pk}}">
+                                                <td>
+                                                    <div class="easychat-welcome-banner-list-image-name-wrapper">
+                                                        <div class="image-div">
+                                                            <img src="{{ welcome_banner_obj.image_url }}">
+                                                        </div>
+                                                        <div class="image-name-div">
+                                                            {{ welcome_banner_obj.get_image_name }}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    {% if welcome_banner_obj.get_redirection_url == "-" %}
+                                                        {{ welcome_banner_obj.get_redirection_url }}
+                                                    {% else %}
+                                                        <a target="_blank" href="{{ welcome_banner_obj.redirection_url }}">{{ welcome_banner_obj.get_redirection_url }}</a>
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ welcome_banner_obj.get_intent_name }}</td>
+                                                <td class="icons-div">
+                                                    <button class="banner-eye-icon tooltip" onclick="image_modal_open('{{ welcome_banner_obj.image_url }}','/')"><img src="{% static 'EasyChatApp/img/wc-eye-icon.svg' %}">
+                                                        <span class="tooltiptext">View Banner</span>
+                                                    </button>
+                                                    <button type="button" class="banner-edit-icon tooltip" data-target="edit-welcome-banner-redirecturl-modal" id="wb-edit-btn-{{welcome_banner_obj.pk}}" onclick="edit_welcome_banner_modal('{{welcome_banner_obj.action_type}}', '{{welcome_banner_obj.get_redirection_url}}', '{{welcome_banner_obj.get_intent_pk}}', '{{welcome_banner_obj.pk}}')"><img src="{% static 'EasyChatApp/img/wc-edit-icon.svg' %}">
+                                                    <span class="tooltiptext">Edit URL</span>
+                                                    </button>
+                                                    <button class="banner-cross-icon delete-button-image-redirection-url tooltip" data-target="delete-welcome-banner-redirecturl-modal" onclick="delete_welcome_banner_modal({{welcome_banner_obj.pk}})"><img src="{% static 'EasyChatApp/img/wc-cross-icon.svg' %}">
+                                                        <span class="tooltiptext remove-banner-tooltip">Remove Banner</span>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                            
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <button type="button" id="preview-banner" onclick="preview_banner()" style="opacity: 1; cursor: pointer;">Preview Banner</button>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+
+                <ul class="collapsible">
+                    <li>
+                        <div class="collapsible-header">Deploy</div>
+                          <div class="collapsible-body">
+                            <div class="row">
+                              <div class="input-field col s12">
+                                <span>Web Platform</span>
+                                <input type="text" value='{{ deployment_url }}' id="android-deployment-url" readonly style="width:96%;border: 0.1em solid black;padding:1em;font-family: Consolas, monaco, monospace;word-wrap: break-word;background-color:white;">
+                                <button onclick="copyToClipboard('android-deployment-url', this)">Copy url</button>
+                            </div>
+
+                            <div class="input-field col s12">
+                                <span>Android Native Platform</span>
+                                <input type="text" value='{{ deployment_dependency }}' id="android-deployment-dependency" readonly style="width:96%;border: 0.1em solid black;padding:1em;font-family: Consolas, monaco, monospace;word-wrap: break-word;background-color:white;">
+                              <button onclick="copyToClipboard('android-deployment-dependency', this)">Copy dependency</button>
+                            </div>
+
+                            <div class="input-field col s12">
+                                <span>Flutter Platform</span>
+                              <input type="text" value='{{ deployment_dependency_flutter }}' id="android-deployment-dependency-flutter" readonly style="width:96%;border: 0.1em solid black;padding:1em;font-family: Consolas, monaco, monospace;word-wrap: break-word;background-color:white;">
+                              <button onclick="copyToClipboard('android-deployment-dependency-flutter', this)">Copy dependency</button>
+                            </div>
+                          </div>
+                    </li>
+                </ul>
+                <ul class="collapsible">
+                    <li>
+                        <div style="display: flex; flex-direction: column;" >
+                        <div class="collapsible-header" id="easychat-sticky-intents-collapsible-header">Sticky Buttons&nbsp;
+                        </div> 
+                    </div>
+                        <div class="collapsible-body" id="easychat-sticky-intents-collapsible-body">
+                            <div style="padding-bottom: 1em; color: #6C7A93"; font-weight: 400;> 
+                           Intents shown to the user at the bottom of chat window
+                       </div>
+                            <div class="row sticky-intent-display-format-div" style=" border-bottom: 1px dashed #9AAAEB;
+                            margin: 0px 0px 36px 0px;
+                            padding-bottom: 16px; ">
+    
+                                <div class="col s12" style="display: flex;">
+                                    <div  class="easychat-web-radio-btn" style="display: flex; align-items: center;">
+                                            <input type="radio" class="sticky-button-display-format" name="sticky button display format" id="button-format"
+                                            style="height: 1.5rem !important; width: 21px !important" 
+                                            value="Button" onchange="sticky_button_display_handler(this)" {% if bot_channel_obj.sticky_button_display_format == "Button" %}checked{% endif %} />
+                                            <p style=" margin-left: 12px !important;">Button</p>
+                                    </div>
+                                    <div class="easychat-web-radio-btn" style="display: flex; align-items: center;">
+                                        
+                                            <input type="radio" class="sticky-button-display-format" name="sticky button display format" id="menu-format"
+                                            style="height: 1.5rem !important;     margin-left: 12px !important; width: 21px !important;"
+                                            value="Menu" onchange="sticky_button_display_handler(this)" 
+                                            {% if bot_channel_obj.sticky_button_display_format == "Menu" %}checked{% endif %}/>
+                                            <p style=" margin-left: 16px !important; margin-right: 0px !important;">Menu</p>
+                                        </div>
+                                </div>
+                            </div>
+                            {% if bot_channel_obj.sticky_button_display_format == "Button" %}
+                                <div class="row" id="channel-sticky-intents">
+                                    *Search and select from existing Intent List
+                                    <div class="input-field col s12">
+                                        <select multiple id="multiple-select-sticky-intent-list">
+                                            {% for intent_name in intent_name_list_sticky %}
+                                            {% if intent_name.is_selected %}
+                                            <option value="{{ intent_name.intent_pk }}" selected>{{ intent_name.intent_name }}</option>
+                                            {% else %}
+                                            <option value="{{ intent_name.intent_pk }}">{{ intent_name.intent_name }}</option>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            
+                                <div class="row" id="channel-sticky-intents-menu" style="display: none;">
+                                    <div class="col s12" id="channel-sticky-intents-menu-list" style="display: flex; flex-direction: row; flex-wrap: wrap;">
+                                        {% for sticky_intent in intent_name_menu_sticky %}
+                                            {% if sticky_intent.is_selected %}
+                                                <div class="sticky-intent-menu-item-div" id="menu-item_{{ forloop.counter }}" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                                                    <div class="sticky-intent-menu-delete-div" onclick="remove_sticky_menu_item(this)">
+                                                        <img src="{% static 'EasyChatApp/img/close_btn_sticky.svg' %}">
+                                                    </div>
+                                                    <div>
+                                                        <a href="#modal-select-sticky-intent" class="modal-trigger" onclick="edit_selected_sticky_intent(this)">
+                                                            <i class="fa {{ sticky_intent.intent_icon }}" aria-hidden="true" style = "font-size: 1.5em"></i>
+                                                        </a>
+                                                    </div>
+                                                    <div style="text-align: center;" class="sticky-intent-menu-text-div"><p class="sticky-intent-menu-text" style="margin: 0; font-size: 100%;"> {{ sticky_intent.intent_name }} </p></div>
+                                                    <input type="hidden" value = "{{ sticky_intent.intent_pk}}_{{ sticky_intent.intent_icon}}_{{ sticky_intent.intent_name }}">
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                        <div class="sticky-intent-menu-item-div" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                                            <div>
+                                                <a href="#modal-select-sticky-intent" class="modal-trigger" onclick="edit_selected_sticky_intent(this)">
+                                                    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M11 0C8.09351 0.035066 5.31595 1.20525 3.2606 3.2606C1.20525 5.31595 0.035066 8.09351 0 11C0.035066 13.9065 1.20525 16.6841 3.2606 18.7394C5.31595 20.7948 8.09351 21.9649 11 22C13.9065 21.9649 16.6841 20.7948 18.7394 18.7394C20.7948 16.6841 21.9649 13.9065 22 11C21.9649 8.09351 20.7948 5.31595 18.7394 3.2606C16.6841 1.20525 13.9065 0.035066 11 0ZM17.2857 11.7857H11.7857V17.2857H10.2143V11.7857H4.71429V10.2143H10.2143V4.71429H11.7857V10.2143H17.2857V11.7857Z" fill="#4D4D4D"/>
+                                                    </svg>    
+                                                </a>                                                
+                                            </div>
+                                            <div>
+                                                Add New
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="row" id="channel-sticky-intents" style="display: none;">
+                                    *Search and select from existing Intent List
+                                    <div class="input-field col s12">
+                                        <select multiple id="multiple-select-sticky-intent-list">
+                                            {% for intent_name in intent_name_list_sticky %}
+                                            {% if intent_name.is_selected %}
+                                            <option value="{{ intent_name.intent_pk }}" selected>{{ intent_name.intent_name }}</option>
+                                            {% else %}
+                                            <option value="{{ intent_name.intent_pk }}">{{ intent_name.intent_name }}</option>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            
+                                <div class="row" id="channel-sticky-intents-menu">
+                                    <div class="col s12" id="channel-sticky-intents-menu-list" style="display: flex; flex-direction: row; flex-wrap: wrap;">
+                                        {% for sticky_intent in intent_name_menu_sticky %}
+                                            {% if sticky_intent.is_selected %}
+                                                <div class="sticky-intent-menu-item-div" id="menu-item_{{ forloop.counter }}" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                                                    <div class="sticky-intent-menu-delete-div" onclick="remove_sticky_menu_item(this)">
+                                                        <img src="{% static 'EasyChatApp/img/close_btn_sticky.svg' %}">
+                                                    </div>
+                                                    <div>
+                                                        <a href="#modal-select-sticky-intent" class="modal-trigger" onclick="edit_selected_sticky_intent(this)">
+                                                            <i class="fa {{ sticky_intent.intent_icon }}" aria-hidden="true" style = "font-size: 1.5em"></i>
+                                                        </a>
+                                                    </div>
+                                                    <div style="text-align: center;" class="sticky-intent-menu-text-div"><p class="sticky-intent-menu-text" style="margin: 0; font-size: 100%;"> {{ sticky_intent.intent_name }} </p></div>
+                                                    <input type="hidden" value = "{{ sticky_intent.intent_pk}}_{{ sticky_intent.intent_icon}}_{{ sticky_intent.intent_name }}">
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                        <div class="sticky-intent-menu-item-div" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                                            <div>
+                                                <a href="#modal-select-sticky-intent" class="modal-trigger" onclick="edit_selected_sticky_intent(this)">
+                                                    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M11 0C8.09351 0.035066 5.31595 1.20525 3.2606 3.2606C1.20525 5.31595 0.035066 8.09351 0 11C0.035066 13.9065 1.20525 16.6841 3.2606 18.7394C5.31595 20.7948 8.09351 21.9649 11 22C13.9065 21.9649 16.6841 20.7948 18.7394 18.7394C20.7948 16.6841 21.9649 13.9065 22 11C21.9649 8.09351 20.7948 5.31595 18.7394 3.2606C16.6841 1.20525 13.9065 0.035066 11 0ZM17.2857 11.7857H11.7857V17.2857H10.2143V11.7857H4.71429V10.2143H10.2143V4.71429H11.7857V10.2143H17.2857V11.7857Z" fill="#4D4D4D"/>
+                                                    </svg>    
+                                                </a>                                                
+                                            </div>
+                                            <div>
+                                                Add New
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </li>
+                </ul>
+                {%endif%}
+                
+               {% if selected_language == "en" %}
+                <ul class="collapsible">
+                    <li>
+                        <div style="display: flex; flex-direction: column;" >
+                        <div class="collapsible-header">Other Settings</div>
+                    </div>
+                        <div class="collapsible-body">
+                            <div style="padding-bottom: 1em; color: #6C7A93"; font-weight: 400;> 
+                           Customise the look and feel of your bot.
+                       </div>
+                            <div class="row sticky-intent-display-format-div" style=" border-bottom: 1px dashed #9AAAEB;
+    margin: 0px 0px 36px 0px;
+    padding-bottom: 16px; ">
+</div>
+                            <div class="row" id="channel-sticky-intents">
+                                <div class="col s10">
+                                    <table id="easychat-web-channel-table" style="box-shadow: none !important;">
+                                        <tbody style="box-shadow: none !important;">
+                                            <tr>
+                                                <td>Enable Input TextField</td>
+                                                <td>
+            
+                                                    <label>
+                                                        {% if bot_channel_obj.is_textfield_input_enabled %}
+                                                            <input type="checkbox" id="is-input-textfield" checked/>
+                                                        {% else %}
+                                                            <input type="checkbox" id="is-input-textfield" />
+                                                        {% endif %}
+                                                        <span></span>
+                                                    </label>
+            
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>
+                                                    <p>Add image in welcome response</p>
+                                                    <img src="" id="uploaded-bot-welcome-image" style="max-height:10em;">
+                                                    <a id="remove-bot-welcome-image" style="display: none;"><i class="material-icons red-text text-darken-3">delete</i></a>
+                                                </td>
+                                                <td>
+                                                    <a class=" gy-btn-outline gy-flex modal-trigger" href="#modal-upload-image">
+                                                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M3.9375 15.375H14.0608C14.3714 15.375 14.6233 15.6268 14.6233 15.9375C14.6233 16.2223 14.4116 16.4576 14.1371 16.4949L14.0608 16.5H3.9375C3.62684 16.5 3.375 16.2482 3.375 15.9375C3.375 15.6527 3.58662 15.4174 3.86117 15.3801L3.9375 15.375H14.0608H3.9375ZM4.71972 5.46708L8.46796 1.71962C8.7382 1.44943 9.16334 1.42853 9.45754 1.657L9.5282 1.71931L13.2808 5.46677C13.5739 5.75946 13.5742 6.23433 13.2815 6.52743C13.0113 6.79798 12.5859 6.81906 12.2915 6.5905L12.2209 6.52815L9.74925 4.05975L9.74913 13.5001C9.7491 13.8847 9.45954 14.2016 9.08653 14.245L8.99907 14.25C8.61444 14.25 8.29746 13.9604 8.25417 13.5874L8.24913 13.4999L8.25 4.05825L5.78028 6.52784C5.50988 6.79818 5.08446 6.81893 4.79026 6.59013L4.71961 6.52774C4.44928 6.25734 4.42853 5.83192 4.65733 5.53772L4.71972 5.46708L8.46796 1.71962L4.71972 5.46708Z" fill="#2743cb" />
+                                                        </svg>
+                                                        &nbsp;
+                                                        Upload From
+                                                        Device</a>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <p>Add video in welcome response
+                                                        <sup>
+                                                            <i class="material-icons inline-icon tooltipped" data-position="top" data-tooltip=" URL/Links added must consist of HTTP/HTTPS, Eg. https://www.google.com">help</i>
+                                                        </sup> 
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <input type="text" name="upload-bot-welcome-video-url" id="upload-bot-welcome-video-url" placeholder="Copy video url here" class="white">
+                                                </td>
+                                            </tr>
+                                            <tr style="height:66px;">
+                                                <td>Enable Intent Icon<sup>
+                                                    <i class="material-icons inline-icon tooltipped" data-position="top" data-tooltip=" Enabling this setting would change the intent suggestion layouts inside the bot to icon layouts and the icon customization can be done inside individual intents. If the toggle is enabled for the Web channel then it will be enabled for Android and IOS as well and vice a versa">help</i>
+                                                </sup></td>
+                                               
+                                                <td>
+                                                    <div style="display: flex; align-items:center; ">
+                                                    <label>
+                                                        {% if bot_info_obj.enable_intent_icon %}
+                                                        <input type="checkbox" onchange="toggle_enable_intent_icon(this)" id="enable-intent-icon" checked />
+                                                        {% else %}
+                                                        <input type="checkbox" onchange="toggle_enable_intent_icon(this)" id="enable-intent-icon" />
+                                                        {% endif %}
+                                                        <span></span>
+                                                    </label>
+                                                    <div class="intent-icon-choices-wrapper" id="intent-icon-choices-wrapper" {% if not bot_info_obj.enable_intent_icon %} style="display: none;" {% endif %}>
+                                                        <select name="" multiple id="intent-icon-choices-multiple-select" class="non-select2">
+                                                            {% for intent_icon_choice_info in intent_icon_choices_info %}
+                                                            <option title="{{ intent_icon_choice_info.name }}" {% if intent_icon_choice_info.value in intent_icon_channel_choices_info.android %} selected {% endif %} value="{{ intent_icon_choice_info.value }}">{{ intent_icon_choice_info.name }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <p>Choose your Bot Theme Color</p>
+                                                    <input class="jscolor" id="bot_theme_color" value="{{selected_bot_obj.bot_theme_color}}" style="text-align: center;">
+                                                </td>
+                                                <td>
+                                                    <a class="gy-flex gy-btn-outline modal-trigger" href="#modal-change-theme">
+                                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M9.01838 6.00129L7.52668 7.50373L4.25 7.50462C3.83579 7.50462 3.5 7.84041 3.5 8.25462V19.7502C3.5 20.1644 3.83579 20.5002 4.25 20.5002H15.75C16.1642 20.5002 16.5 20.1644 16.5 19.7502L16.4976 16.4719L18 14.9802V19.7502C18 20.9929 16.9926 22.0002 15.75 22.0002H4.25C3.00736 22.0002 2 20.9929 2 19.7502V8.25462C2 7.01198 3.00736 6.00462 4.25 6.00462L9.01838 6.00129ZM5.2199 12.2197L7.219 10.2223C7.48524 9.95629 7.90164 9.93213 8.19516 10.1498L8.27926 10.2224L13.7802 15.7197C14.0466 15.986 14.0709 16.4027 13.853 16.6964L13.7803 16.7806L11.7803 18.7806C11.5141 19.0468 11.0974 19.071 10.8038 18.8532L10.7197 18.7806L5.21967 13.2806C4.95332 13.0142 4.92919 12.5974 5.14722 12.3038L5.2199 12.2197L7.219 10.2223L5.2199 12.2197ZM21.2797 2.71856C21.4615 2.90018 21.6151 3.10797 21.7355 3.33504C22.3753 4.54242 21.9593 6.02831 20.8122 6.73496L20.6651 6.81915L19.497 7.43736L20.013 7.95255C21.2353 9.17487 21.2804 11.1285 20.1484 12.4042L20.0126 12.5483L18.7803 13.7806C18.5141 14.0468 18.0974 14.071 17.8038 13.8532L17.7197 13.7806L17.25 13.3112L15.7803 14.7806C15.5141 15.0468 15.0974 15.071 14.8038 14.8532L14.7197 14.7806L9.21967 9.28056C8.95332 9.01422 8.92919 8.5974 9.14722 8.30379L9.2199 8.21967L10.689 6.75015L10.2197 6.28056C9.95335 6.01424 9.92919 5.59748 10.1472 5.30387L10.2198 5.21975L11.4511 3.98913C12.674 2.76928 14.6259 2.72415 15.9032 3.85416L16.0475 3.98976L16.561 4.50336L17.1789 3.33651C17.269 3.16636 17.3777 3.00702 17.5029 2.86137L17.6336 2.7204C18.64 1.71306 20.2724 1.71224 21.2797 2.71856ZM11.749 7.81312L10.8109 8.75046L15.25 13.1896L16.1892 12.2504L11.749 7.81312ZM18.6948 3.78052C18.6443 3.83115 18.5989 3.88662 18.5594 3.94609L18.5047 4.03817L17.672 5.61154L18.3885 6.32804L19.9627 5.49377C20.4884 5.21517 20.6887 4.56314 20.4101 4.03744C20.3598 3.94253 20.2956 3.85567 20.2196 3.77976C19.7983 3.35892 19.1157 3.35927 18.6948 3.78052Z" fill="#2755CB" />
+                                                        </svg>&nbsp;
+                                                        Change
+                                                        Theme Version</a>
+                                                    <br>
+                                                </td>
+                                            </tr>
+                                        
+                                             <tr>
+                                                <td>
+                                                    <p>Choose Bot Font</p>
+                                                </td>
+                                                <td>
+                                                    <input id="bot-font-data" style="text-align:left; border-radius:30px; border: 0px solid black !important; color:black ; height:40px !important; display: inline-block; font-family: '{{selected_bot_obj.font}}' " value="{{ selected_bot_obj.font }}" disabled>
+                                                    <a class="gy-btn-outline gy-flex modal-trigger" href="javascript:void(0)" onclick="font_family_list('{{ selected_bot_obj.font }}','{{ selected_bot_obj.font }}')">
+                                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M2.50001 15.8333L9.31178 15.834C9.4537 16.4345 9.69556 16.9963 10.0188 17.501L2.50001 17.5C2.03977 17.5 1.66667 17.1269 1.66667 16.6667C1.66667 16.2393 1.98837 15.8871 2.40282 15.8389L2.50001 15.8333ZM13.3341 2.5C13.8159 2.5 14.1901 2.90486 14.1666 3.37337L14.1565 3.46782L13.9521 4.71782C13.8778 5.17203 13.4494 5.48002 12.9952 5.40574C12.5734 5.33677 12.2778 4.96244 12.2971 4.54566L12.3073 4.44884L12.3534 4.16667H9.52667L8.06001 13.3333H8.33334C8.7607 13.3333 9.11293 13.655 9.16107 14.0695L9.16667 14.1667C9.16667 14.594 8.84497 14.9463 8.43052 14.9944L8.33334 15H5.83334C5.3731 15 5.00001 14.6269 5.00001 14.1667C5.00001 13.7393 5.32171 13.3871 5.73615 13.3389L5.83334 13.3333H6.37251L7.83917 4.16667H4.87185L4.77926 4.72069C4.7034 5.17463 4.27391 5.48113 3.81997 5.40527C3.39845 5.33483 3.10407 4.95947 3.12491 4.54275L3.1354 4.44597L3.34429 3.19597C3.40582 2.82779 3.70302 2.5498 4.06579 2.50602L4.16623 2.5H13.3341Z" fill="#2743CB" />
+                                                            <path d="M13.8194 10.8333C15.9289 10.8333 17.6389 12.5434 17.6389 14.6528C17.6389 16.7622 15.9289 18.4722 13.8194 18.4722C11.71 18.4722 10 16.7622 10 14.6528C10 12.5434 11.71 10.8333 13.8194 10.8333ZM13.8194 12.2217L13.757 12.2273C13.6153 12.253 13.5035 12.3648 13.4778 12.5065L13.4722 12.5689L13.472 14.305L11.7345 14.3056L11.6721 14.3112C11.5303 14.3369 11.4186 14.4486 11.3929 14.5904L11.3873 14.6528L11.3929 14.7152C11.4186 14.8569 11.5303 14.9687 11.6721 14.9944L11.7345 15L13.4727 14.9995L13.473 16.7385L13.4786 16.8009C13.5043 16.9427 13.6161 17.0544 13.7578 17.0802L13.8202 17.0858L13.8826 17.0802C14.0244 17.0544 14.1361 16.9427 14.1618 16.8009L14.1674 16.7385L14.1671 14.9995L15.906 15L15.9684 14.9944C16.1101 14.9687 16.2219 14.8569 16.2476 14.7152L16.2532 14.6528L16.2476 14.5904C16.2219 14.4486 16.1101 14.3369 15.9684 14.3112L15.906 14.3056L14.1664 14.305L14.1667 12.5689L14.1611 12.5065C14.1317 12.3445 13.9899 12.2217 13.8194 12.2217Z" fill="#2743CB" />
+                                                        </svg>
+                                                        &nbsp;
+                                                        Set Font</a>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>
+                                                    <p>Bot Access Token</p>
+                                                </td>
+                                                <td>
+                                                    <input id="bot-access-token" style="text-align:left; border-radius:30px; border: 0px solid black !important; color:black ; height:40px !important; display: inline-block;" value="{{ bot_channel_obj.api_key }}" disabled>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                {% endif %}
+                
+                {% if selected_language == "en" %}
+                    <a class="btn green lighten-2" style="background-color: #82C784; margin-left: 0.2em;" id="save-android-channel">Save</a>
+                {% else %}
+                    <a class="btn green lighten-2" style="background-color: #82C784; margin-left: 0.2em;" id="save-android-channel-for-non-primary-language">Save</a>
+                {% endif %}
+                
+            </div>
+            <div class="progress" id="easychat_android_channel_preloader" style="display: none;">
+                <div class="indeterminate"></div>
+            </div>
+        </div>
+        <!-- Modal Structure -->
+        <div id="modal-upload-bot-image" class="modal">
+            <div class="modal-content">
+                <h5>Choose Image</h5>
+                <div class="file-field input-field col s10">
+                    <div class="btn white-text purple lighten-4">
+                        <span>Choose image</span>
+                        <input id="input_upload_bot_image" type="file" onchange="check_file_size(this)">
+                    </div>
+                    <div class="file-path-wrapper">
+                        <input id="input_upload_bot_image2" class="file-path validate" type="text">
+                    </div>
+                </div>
+                <div class="col s12">
+                    <p style="color: red;" id="file-size-warning"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a class="modal-close btn easychat-button" id="upload-bot-image">Upload</a>
+            </div>
+        </div>
+        <!-- Modal Structure -->
+         <div id="modal-upload-bot-logo" class="modal">
+            <div class="modal-content">
+                <h5>Choose Image</h5>
+                <div class="file-field input-field col s10">
+                    <div class="btn white-text purple lighten-4">
+                        <span>Choose image</span>
+                        <input id="input_upload_bot_logo" type="file" accept="image/png, image/gif, image/jpeg" onchange="check_bot_logo_file_size(this)">
+                    </div>
+                    <div class="file-path-wrapper">
+                        <input id="input_upload_bot_logo2" class="file-path validate" type="text">
+                    </div>
+                </div>
+                <div class="col s12">
+                    <p style="color: red;" id="bot-logo-file-size-warning"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn easychat-button" id="upload-bot-logo">Upload</button>
+            </div>
+        </div>
+        <!-- Modal Set Bot Font -->
+        <div id="modal-set-bot-font" class="modal">
+            <div class="modal-content">
+                <div class="row">
+                    <h5>Choose Font</h5>
+                    <div class="col s12">
+                        <div class="col s12">
+                            <div class="col s6">
+                                <p> Choose Font: </p>
+                            </div>
+                            <div id="select-font-dropdown" class="col s6">
+                                <select id="bot-font-list" onchange="set_test_font('Roboto','14px')"></select>
+                            </div>
+                        </div>
+                        <div class="col s12" style="display: none">
+                            <div class="col s6">
+                                <p c> Choose Font Size: </p>
+                            </div>
+                            <div class="col s6">
+                                <select id="bot-font-size-list" onchange="set_test_font('Roboto','14px')">
+                                    <option value="" selected> Choose One </option>
+                                    <option value="xx-small"> xx-small </option>
+                                    <option value="x-small"> x-small </option>
+                                    <option value="small"> small </option>
+                                    <option value="medium"> medium </option>
+                                    <option value="large"> large </option>
+                                    <option value="x-large"> x-large </option>
+                                    <option value="xx-large"> xx-large </option>
+                                    <option value="custom"> Custom </option>
+                                </select>
+                                <br>
+                                <br>
+                                <div id="bot-custom-font-size-div" style="display: none; width: 200px;">
+                                    <select id="bot-custom-font-size" onchange="set_test_font('Roboto','14px')"> </select>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <br>
+                        <br>
+                        <br>
+                        <div class="col s12" style="margin-top: 5%">
+                            <p>Test Here:</p>
+                            <textarea id="bot-font-test" style="resize:none; height:50px; background-color:white; font-family: '{{selected_bot_obj.font}}'; font-size: 14px" placeholder="Test it here"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="position: absolute !important; bottom: 0 !important;">
+                <a class="modal-close right green lighten-2 btn" onclick="save_bot_font('Roboto','14px')" style="margin-right: 4%" id="save-bot-font">Save</a>
+                &nbsp; &nbsp; &nbsp;
+                <a class="modal-close right transparent-btn btn white black-text" style="margin-right: 2%">Close</a>
+            </div>
+        </div>
+        <!-- Modal upload image -->
+        <div id="modal-upload-image" class="modal">
+            <div class="modal-content">
+                <h5>Choose Image</h5>
+                <div class="file-field input-field col s10">
+                    <div class="btn white-text purple lighten-4">
+                        <span>Choose image</span>
+                        <input id="input_upload_image_bot_welcome_message" accept='image/*' type="file">
+                    </div>
+                    <div class="file-path-wrapper">
+                        <input id="input_upload_image_bot_welcome_message2" class="file-path validate" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a class="modal-close btn easychat-button" id="upload-bot-welcome-image">Upload</a>
+            </div>
+        </div>
+        <!-- Modal Structure -->
+         <!-- Modal Structure -->
+        <div id="modal-change-theme" class="modal modal-fixed-footer">
+            <div class="modal-header">
+                <h5>Select Theme</h5>
+            </div>
+            <div class="modal-content modal-content-scroll" style="overflow-x: hidden; position: relative;">
+                <div class="easychat-theme-selector">
+                    {% for theme in easychat_themes %}
+                        <div style="display: inline-block;margin-right: 12px">
+                            <p>{{ theme.get_theme_display_name }}</p>
+                            {% if theme_selected == theme.name %}
+                            <input checked id="{{theme.name}}" type="radio" style="width: fit-content !important" name="easychat-theme" value="{{theme.name}}" onclick="handle_theme_selection(this)"/>
+                            {% else %}
+                            <input id="{{theme.name}}" type="radio" style="width: fit-content !important" name="easychat-theme" value="{{theme.name}}" onclick="handle_theme_selection(this)"/>
+                            {% endif %}
+                            <label class="easychat-theme-wrapper" for="{{theme.name}}">
+                                <div class="slider easychat-theme-slider" style="height: 500px !important;">
+                                    <ul class="slides" style="height: 94% !important;">
+                                        <li>
+                                            <img src="{{ theme.get_first_image_src }}">
+                                        </li>
+                                        <li>
+                                            <img src="{{theme.get_second_image_src}}">
+                                        </li>
+                                    </ul>
+                                </div>
+                            </label>
+                        </div>
+
+                    {% endfor %}
+                
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a class="modal-close btn transparent-btn white black-text modal-close-btn" style="margin-right: 10px; border: none;">Cancel</a>
+                <a class="btn green lighten-2 modal-close modal-submit-btn" onclick="save_android_theme_settings(this)" style="margin-right: 10px;">Save</a>
+            </div>
+        </div>
+        
+        <!-- Modal upload quick menu image -->
+        <div id="modal-upload-quick-menu-image" class="modal">
+            <div class="modal-content">
+                <h5>Choose Image</h5>
+                <div class="file-field input-field col s10">
+                    <div class="btn-small easychat-button">
+                        <span>Choose image</span>
+                        <input id="input_upload_quick_menu_image" type="file" accept='image/*'>
+                    </div>
+                    <div class="file-path-wrapper">
+                        <input id="input_upload_quick_menu_image2" class="file-path validate" type="text" readonly="true" style="box-shadow: none !important; border-bottom: 1px solid black !important;">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a class="modal-close btn easychat-button" id="upload_quick_menu_image">Upload</a>
+            </div>
+        </div>
+
+
+        <!-- Modal Structure -->
+        <div id="modal-upload-message-image" class="modal">
+            <div class="modal-content">
+                <h5>Choose Image</h5>
+                <div class="file-field input-field col s10">
+                    <div class="btn white-text purple lighten-4">
+                        <span>Choose image</span>
+                        <input id="input_upload_bot_message_image" type="file">
+                    </div>
+                    <div class="file-path-wrapper">
+                        <input id="input_upload_bot_message_image2" class="file-path validate" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a class="modal-close btn easychat-button" id="upload-bot-message-image">Upload</a>
+            </div>
+        </div>
+        <!-- Modal Structure end-->
+
+        <!-- Modal Structure -->
+        <div id="add-banner-modal" class="modal">
+            <div class="modal-content">
+                <div class="row" style="margin-bottom: 12px !important;">
+                    <div class="modal-header">
+                        <h6>Add Welcome Banner</h6>
+                        <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                            <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z" fill="black" fill-opacity="0.54"></path>
+                        </svg>
+        
+                        </a>
+                    </div>
+        
+                    <div class="modal-overflow-content-div" style="margin: 0;">
+                        <div id='select-action-type' class="row">
+                            <div class="sub-heading">
+                                Select action type
+                            </div>
+                            <select name="action-type" id="action-type" onchange="handle_action_type_change(this)">
+                                <option value="1">Redirection URL</option>
+                                <option value="2">Trigger Intent</option>
+                                <option value="3">Redirection URL with Trigger Intent</option>
+                            </select>
+                            <div id="action-type-container"></div>
+                        </div>
+                        <div class="row" id="upload-image-section">
+                            <div class="sub-heading">
+                                Upload Image
+                                <span style="color: #FF0000;">*</span>
+                                <sup>
+                                    <i class="material-icons inline-icon tooltipped" data-position="top" data-tooltip=" URL/Links added must consist of HTTP/HTTPS,<br>Eg. https://www.google.com">help</i>
+                                </sup> 
+                            </div>
+                            <p style="color: #FF0000;font-size: 14px; display: none;" id="error-message">
+                                Please select the correct file type(.jpg, .png, .pdf)
+                            </p>
+                            <p id="max-size-limit">
+                                (Maximum 2MB and Preferred image dimension 305 * 145) 
+                            </p>
+                            <div class="drag-drop-container" style="text-align: center;background: #fff;border: 0.7px dashed #CBD5E1;border-radius: 3px;padding: 20px;height: 100%;position: relative;">        
+                                <span class="drag-drop-message" style="color: rgb(15, 82, 161); flex-direction: column; display: flex;align-items: center;justify-content: center;">
+                                    <svg width="47" height="50" viewBox="0 0 47 50" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                        <rect x="0.5" width="46" height="50" fill="url(#pattern0)"/>
+                                        <defs>
+                                        <pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">
+                                        <use xlink:href="#image0" transform="translate(-0.0434783) scale(0.00212296 0.00195312)"/>
+                                        </pattern>
+                                        <image id="image0" width="512" height="512" xlink:href="data:image/png;base64,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"/>
+                                        </defs>
+                                    </svg>                                             
+                                        
+                                    <p style="width:90%;margin-bottom: 0;color: #A8A8A8;font-size: 12px;font-weight: 500;">
+                                        Drop your file here<br>
+                                        or<br>
+                                        <a style="color: #2754F3;">Click here</a> to upload your file
+                                    </p>
+                                </span>
+                                <div class="drag-drop-input-field-wrapper">
+                                    <input onchange="handle_image_upload_input_change(this)" id="drag-drop-input-box" style="border-bottom: none !important;border: 1px solid black;height: 100% !important;opacity: 0;cursor: pointer;" type="file" accept=".jpg,.png,.svg">
+                                </div>  
+                            </div>
+                            <div id="image-selected-container">   
+                            </div>
+                            <div id="image-url-input-field">
+                                <div style="text-align: center;font-size: 14px;line-height: 17px;color: #2D2D2D;margin: 16px 0;">OR</div>
+                                <input  type="text" id="wb-image-url" placeholder="Image URL">
+                            </div>
+                        
+                        </div>
+                        <div class="row" id="redirection-url">
+                            <div class="sub-heading">
+                                Redierction URL
+                                <span style="color: #FF0000;">*</span>
+                                <sup>
+                                    <i class="material-icons inline-icon tooltipped" data-position="top" data-tooltip=" URL/Links added must consist of HTTP/HTTPS,<br>Eg. https://www.google.com">help</i>
+                                </sup> 
+                            </div>
+                            <input type="text" id="wb-redirection-url" placeholder="Redierction URL">
+                        </div>
+                        <div class="row" id="select-intent" style="display: none;">
+                            <div class="sub-heading">
+                                Select Intent
+                                <span style="color: #FF0000;">*</span>
+                            </div>
+                            <select name="intent-type" id="intent-type">
+                                <option value="none" selected disabled hidden>
+                                    Select any one
+                                </option>
+                                {% for welcome_banner_intent_obj in welcome_banner_intent_objs %}
+                                    <option value="{{ welcome_banner_intent_obj.pk }}">{{ welcome_banner_intent_obj.name }}</option>
+                                {% endfor %}
+                                </select>
+                            <div id="intent-type-container"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a onclick="save_welcome_banner()" class="btn filter-modal-footer-btn">Save</a>
+            </div>
+        </div>
+
+        <!-- Edit modal -->
+        <div id ="edit-welcome-banner-redirecturl-modal" class="modal">
+            <div class="modal-content">
+                <div class="row" style="margin-bottom: 12px !important;">
+                    <div class="modal-header">
+                        <h6>Edit Welcome Banner</h6>
+                        <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                            <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z" fill="black" fill-opacity="0.54"></path>
+                        </svg>
+        
+                        </a>
+                    </div>
+        
+                    <div class="modal-overflow-content-div" style="margin: 0;">
+                        <div id='edit-select-action-type' class="row disable-active-state">
+                            <div class="sub-heading">
+                                Select action type
+                            </div>
+                            <select name="edit-action-type" id="edit-action-type" onchange="handle_action_type_change(this)">
+                                <option value="1">Redirection URL</option>
+                                <option value="2">Trigger Intent</option>
+                                <option value="3">Redirection URL with Trigger Intent</option>
+                            </select>
+                        </div>
+                        <div class="row" id="edit-redirection-url">
+                            <div class="sub-heading">
+                                Redierction URL
+                                <span style="color: #FF0000;">*</span>
+                            </div>
+                            <input type="text" id="wb-edit-redirection-url" placeholder="Redierction URL" value="https://www.getcogno.ai/">
+                        </div>
+                        <div class="row" id="edit-select-intent">
+                            <div class="sub-heading">
+                                Select Intent
+                                <span style="color: #FF0000;">*</span>
+                            </div>
+                            <select name="edit-intent-type" id="edit-intent-type">
+                                <option value="none" disabled hidden>
+                                    Select any one
+                                </option>
+                                {% for welcome_banner_intent_obj in welcome_banner_intent_objs %}
+                                    <option value="{{ welcome_banner_intent_obj.pk }}">{{ welcome_banner_intent_obj.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div id="edit-intent-type-container"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a class="btn filter-modal-footer-btn" onclick="edit_banner_details(this)">Save</a>
+            </div>
+        </div>
+
+        <div id="delete-welcome-banner-redirecturl-modal"
+            class="modal easychat-custom-modals-wrapper easychat-custom-delete-modal " tabindex="0">
+            <div class="modal-content">
+                <div style="margin-bottom: 0px !important;">
+                    <div class="modal-overflow-content-div">
+                        <div class="termination-confirmation-modal-container">
+                            <div class="termination-icon">
+                                <svg width="83" height="82" viewBox="0 0 83 82" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M41.3395 6.83336C22.5888 6.83336 7.33337 22.1605 7.33337 41C7.33337 59.8395 22.6605 75.1667 41.5 75.1667C60.3395 75.1667 75.6667 59.8395 75.6667 41C75.6667 22.1605 60.2678 6.83336 41.3395 6.83336ZM44.9167 58.0834H38.0834V51.25H44.9167V58.0834ZM44.9167 44.4167H38.0834V23.9167H44.9167V44.4167Z"
+                                        fill="#FF281A"></path>
+                                </svg>
+                            </div>
+                            <div class="delete-heading">
+                                Delete
+                            </div>
+                            <div class="delete-confirmation-heading-text">
+                                Are you sure you want to delete 
+                                        this Banner?
+                            </div>
+                            <div class="termination-buttons">
+                                <a class="termination-no-btn modal-close">Cancel</a>
+                                <a class="termination-yes-btn delete-button" onclick="delete_banner_details(this)">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="welcome-preview-banner-modal" class="modal" style="background-color: rgba(0,0,0,0);">
+            
+            <div class="modal-content">
+                <ul class="slides" id="preview-banner-image-list">
+                </ul>
+                <div class="close-image-view modal-close" id="slider-modal-close">
+                    <svg width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5.43433 5.48001L21.2054 21.88" stroke="white" stroke-width="2.84728" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M21.2057 5.48001L5.43459 21.88" stroke="white" stroke-width="2.84728" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    
+        <div id="welcome-banner-image-view-modal" class="modal" style="background-color: rgba(0,0,0,0);">
+            
+                <div class="modal-content">
+                    <a id ="welcome-banner-list-image-rdurl" target="_blank"> <img  id="welcome-banner-image-view"></a>
+                    <div class="close-image-view modal-close">
+                        <svg width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5.43433 5.48001L21.2054 21.88" stroke="white" stroke-width="2.84728" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M21.2057 5.48001L5.43459 21.88" stroke="white" stroke-width="2.84728" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </div>
+                
+        </div>
+
+        <!-- Modal Structure -->
+        <div id="modal-to-show-intents" class="modal" style="background-color: white !important; padding:unset !important;">
+          <div class="modal-content" style="background-color: white !important; padding: unset !important;">
+            <table>
+            <tr>
+                <td style="color:#2755CB;">Enable Initial Bot Messages</td>
+                <td></td>
+            </tr>
+           
+                <tr>
+                    <td>Show Welcome Banner</td>
+                    <td>                     
+                    <label>
+                        {% if is_welcome_banner_present %}
+                        <input type="checkbox" id="show-welcome-banner" checked>
+                        {% else %}
+                        <input type="checkbox" id="show-welcome-banner">
+                        {% endif %}
+                        <span></span>
+                    </label>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Show Welcome Message</td>
+                    <td>                     
+                    <label>
+                        {% if is_welcome_message_present %}
+                        <input type="checkbox" id="show-welcome-message" checked>
+                        {% else %}
+                        <input type="checkbox" id="show-welcome-message">
+                        {% endif %}
+                        <span></span>
+                    </label>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Show video in welcome response</td>
+                    <td>                     
+                    <label>
+                        {% if initial_videos_present %}
+                        <input type="checkbox" id="show-welcome-video" checked>
+                        {% else %}
+                        <input type="checkbox" id="show-welcome-video">
+                        {% endif %}
+                        <span></span>
+                    </label>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Show image in welcome response</td>
+                    <td>                     
+                    <label>
+                        {% if initial_image_present %}
+                        <input type="checkbox" id="show-welcome-image" checked>
+                        {% else %}
+                        <input type="checkbox" id="show-welcome-image">
+                        {% endif %}
+                        <span></span>
+                    </label>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Show Initial Questions</td>
+                    <td>                     
+                    <label>
+                        {% if initial_intent_present %}
+                        <input type="checkbox" id="show-initial-intent" checked>
+                        {% else %}
+                        <input type="checkbox" id="show-initial-intent">
+                        {% endif %}
+                        <span></span>
+                    </label>
+                    </td>
+                </tr>
+            </table>
+          <div class="modal-footer" style="background-color: white !important;width: 95% !important;">
+            <a href="javascript:void(0)" class="modal-close btn transparent-btn">Cancel</a>&nbsp;&nbsp;&nbsp;
+            <a onclick="add_web_landing_url_initial_messages()" class="modal-close btn lighten-2 black-text">Save</a>
+          </div>
+        </div>
+        </div>
+        <!-- Modal End -->
+
+        <div id="modal-select-sticky-intent" class="modal" style="width: 410px;">
+            <div class="modal-header" id="sticky-menu-modal-header" style="padding: 10px 20px 20px 10px; border-bottom: 1px solid #e6e6e6;">
+                Add New Option
+            </div>
+            <div class="modal-content" style="padding: 0; width: 95%;">
+                <div class="row" style="margin-left: -8px;">
+                <p style="padding-left:26px ; margin-bottom: 0;">Select Intent</p>
+                    <div class="input-field col s12">
+                        <select id="select-sticky-intent-list">
+                            <option></option>
+                            {% for intent_name in intent_name_list_sticky %}
+                                <option value="{{ intent_name.intent_name }}-{{ intent_name.intent_pk }}">{{ intent_name.intent_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <p style="padding-left:30px ; margin-bottom: 0;">Select Icon</p>
+                    <input type="text" id="sticky-intent-icon-name" placeholder="Enter icon name" style="margin-left: 12px; width: 88%;" />
+                    <p style="padding-left:30px ; margin-bottom: 0;">Get your icon name <a rel="noopener noreferrer" target="_blank" href="https://fontawesome.com/v4.7.0/icons/" style="color: #1a46e4;">here</a></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a class="modal-close btn transparent-btn white black-text" style="margin-right: 10px; border: none;">Cancel</a>
+                <a class="btn green lighten-2 modal-close" id="add-sticky-menu-intent" onclick="add_sticky_menu_intent()" style="margin-right: 10px;">Save</a>
+                <a class="btn green lighten-2 modal-close" id="edit-sticky-menu-intent" onclick="edit_sticky_menu_intent(this)" style="margin-right: 10px; display: none;">Save</a>
+            </div>
+        </div>
+
+                <style type="text/css">
+                #image-crop-modal {
+                    max-height: 85% !important;
+                }
+                #easychat-web-channel-table td {
+                    border: none !important;
+                }
+                </style>
+                <script type="text/javascript">
+                function easychat_get_url_vars() {
+                    var vars = {};
+                    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
+                        vars[key] = value;
+                    });
+                    return vars;
+                }
+                bot_id =  easychat_get_url_vars()['id']
+                SERVER_URL = window.location.origin;
+                BOT_ID = bot_id
+                BOT_NAME = 'uat';
+                BOT_THEME = 'null';
+                BOT_POSITION = 'bottom-right';
+                bot_click_image = 'true';
+                is_form_assist = 'false';
+                is_easyassist_enabled = 'false';
+                is_lead_generation = 'false';
+                THEME_SELECTED = '{{theme_selected}}'
+                </script>
+                {% if selected_bot_obj.default_theme.name == "theme_1" %}
+                <script src="{% static 'EasyChatApp/js/theme1_embed.js' %}?v={% random_int 1 100 %}"></script>
+                {% elif selected_bot_obj.default_theme.name == "theme_2" %}
+                <script src="{% static 'EasyChatApp/js/theme2_embed.js' %}?v={% random_int 1 100 %}"></script>
+                {% elif selected_bot_obj.default_theme.name == "theme_3" %}
+                <script src="{% static 'EasyChatApp/js/theme3_embed.js' %}?v={% random_int 1 100 %}"></script>
+                {% elif selected_bot_obj.default_theme.name == "theme_4" %}
+                <script src="{% static 'EasyChatApp/js/theme4_embed.js' %}?v={% random_int 1 100 %}"></script>
+                {% endif %}
+                <script src="{% static 'EasyChatApp/js/multiselect-dropdown.js' %}"></script>
+                <script src="{% static 'EasyChatApp/js/slick.min.js' %}"></script>
+                <script type="text/javascript">
+                
+                $(".android-textarea").trumbowyg({
+                    tagsToKeep: [],
+                    allowTagsFromPaste: {
+                        allowedTags: ['h4', 'p', 'br']
+                    },
+                    minimalLinks: true,
+                    btns: [
+                        // ['viewHTML'],
+                        ['strong', 'em'], 
+                        ['emoji'],
+                        ['link'],
+                        ['unorderedList', 'orderedList'],
+                        ['underline'],
+                        ['justifyLeft'], ['justifyCenter'], ['justifyRight'], ['justifyFull'],
+                    ],
+                })
+                </script>
+        <!--         <script type="text/javascript">
+                    $('#domain_name').chips();
+                    elem = document.getElementById("domain_name");
+                    var instance = M.Chips.getInstance(elem);
+                    var domains = [];
+                    var domain;
+                    for (domain of domains) {
+                        instance.addChip({
+                            tag: domain
+                        });
+                    }
+                </script> -->
+                <script type="text/javascript">
+                try{
+                $(document).on('change', carousel_switch, function() {
+                    var status = document.getElementById('carousel_switch').checked;
+                    if (status) {
+                        document.getElementById('carousel_switch').style.backgroundColor = '#3c47c2 !important';
+                        document.getElementById('carousel_switch_lever').style.backgroundColor = '#3c47c2 !important';
+                        document.getElementById('carousel_time_row').style.display = 'block'
+                    } else {
+                        document.getElementById('carousel_switch').style.backgroundColor = '#84c7c1';
+                        document.getElementById('carousel_switch_lever').style.backgroundColor = '#fff !important';
+                        document.getElementById('carousel_time_row').style.display = 'none'
+                    }
+                })}catch(err){
+                    console.log(err)
+                }
+
+                function show_web_landing_button(id) {
+                    document.getElementById("edit-web-landing-button-" + id).style.display = "block"
+                    document.getElementById("delete-web-landing-button-" + id).style.display = "block"
+                    document.getElementById("")
+                    document.getElementById("web_landing_row_" + id).style.boxShadow = '0px 2px 15px rgba(0, 0, 0, 0.1)';
+                }
+
+                function hide_web_landing_button(id) {
+                    //document.getElementById("web_landing_buttons_" + id).style.display = "none"
+                    document.getElementById("edit-web-landing-button-" + id).style.display = "none"
+                    document.getElementById("delete-web-landing-button-" + id).style.display = "none"
+                    document.getElementById("web_landing_row_" + id).style.boxShadow = '';
+                }
+
+                function show_prompt_details(){
+                    if(document.getElementById("show_prompt_details").checked){
+                        document.getElementById("prompt_message_data").style.display = "inline-block"
+                    }else{
+                        document.getElementById("prompt_message_data").style.display = "none"
+                    }
+                }
+
+                function edit_web_landing_prompt_data(id){
+                 if(document.getElementById("edit_checkbox_"+id).checked){
+                        document.getElementById("prompt_message_data_"+id).style.display = "inline-block"
+                    }else{
+                    document.getElementById("prompt_message_data_"+id).style.display = "none"
+                    }
+
+
+                }
+
+
+                function sticky_button_display_handler(elem) {
+                    if (elem.value == "Menu") {
+                        document.getElementById('channel-sticky-intents').style.display = 'none';
+                        document.getElementById('channel-sticky-intents-menu').style.display = 'block';
+                    } else {
+                        document.getElementById('channel-sticky-intents').style.display = 'block';
+                        document.getElementById('channel-sticky-intents-menu').style.display = 'none';
+                    }
+                }
+
+                function edit_selected_sticky_intent(elem) {
+                    let requiredValue = elem.parentElement.parentElement.lastChild.previousSibling.value;
+
+                    if(requiredValue == undefined) {
+                        requiredValue = elem.parentElement.parentElement.lastChild.value;
+                    }
+                    let selected_intent_value;
+                    if(requiredValue == undefined) {
+                        requiredValue = '-1';
+                        selected_intent_value = requiredValue;
+                        $('#sticky-intent-icon-name').val("");
+                        $('#sticky-menu-modal-header').html('Add new option');
+                        document.getElementById('add-sticky-menu-intent').style.display = 'inline-block';
+                        document.getElementById('edit-sticky-menu-intent').style.display = 'none';
+                    } else {
+                        requiredValue = requiredValue.split('_');
+                        selected_intent_value = requiredValue[2] + '-' + requiredValue[0];
+                        $('#sticky-intent-icon-name').val(requiredValue[1]);
+                        $('#sticky-menu-modal-header').html('Edit option');
+                        document.getElementById('add-sticky-menu-intent').style.display = 'none';
+                        document.getElementById('edit-sticky-menu-intent').style.display = 'inline-block';
+                        document.getElementById('edit-sticky-menu-intent').dataset.elementEdited = requiredValue[0];
+                    }
+                    
+                    $('#select-sticky-intent-list').val(selected_intent_value);
+                    $('#select-sticky-intent-list').trigger('change');
+                }  
+                
+                </script>
+                <script>
+                    if (document.referrer.match("/chat/bots/$")) {
+                        $("#channel-back-btn")[0].href = document.referrer
+                    }
+                </script>
+                {% endblock %}

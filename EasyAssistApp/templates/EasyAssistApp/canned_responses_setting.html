@@ -1,0 +1,764 @@
+{% extends 'EasyAssistApp/console.html' %}
+{% block content %}
+{% load static %}
+
+{% if request.user.enable_s3_bucket %}
+    <script src="https://static.allincall.in/static/EasyAssistApp/js/ace.js" type="text/javascript"
+        charset="utf-8"></script>
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/jscolor.min.js"></script>
+{% else %}
+    <script src="{% static 'EasyAssistApp/js/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" src="{% static 'EasyAssistApp/js/jscolor.min.js' %}"></script>
+{% endif %}
+
+<link href="{% static 'EasyAssistApp/css/settings.css' %}" rel="stylesheet" type="text/css">
+<link href="{% static 'EasyAssistApp/css/canned_response.css' %}" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/canned_response.js' %}"></script>
+
+<style>
+    {% if access_token_obj.cobrowsing_console_theme_color %}
+
+    :root {
+      --color_rgba_3: rgba({{ access_token_obj.get_cobrowsing_console_theme_color.red }}, {{ access_token_obj.get_cobrowsing_console_theme_color.green }}, {{ access_token_obj.get_cobrowsing_console_theme_color.blue }}, 0.03);
+
+      --color_rgba_5: rgba({{ access_token_obj.get_cobrowsing_console_theme_color.red }}, {{ access_token_obj.get_cobrowsing_console_theme_color.green }}, {{ access_token_obj.get_cobrowsing_console_theme_color.blue }}, 0.05);
+
+      --color_rgba_8: rgba({{ access_token_obj.get_cobrowsing_console_theme_color.red }}, {{ access_token_obj.get_cobrowsing_console_theme_color.green }}, {{ access_token_obj.get_cobrowsing_console_theme_color.blue }}, 0.08);
+
+      --color_rgba_10: rgba({{ access_token_obj.get_cobrowsing_console_theme_color.red }}, {{ access_token_obj.get_cobrowsing_console_theme_color.green }}, {{ access_token_obj.get_cobrowsing_console_theme_color.blue }}, 0.1);
+
+      --color_rgba_80: rgba({{ access_token_obj.get_cobrowsing_console_theme_color.red }}, {{ access_token_obj.get_cobrowsing_console_theme_color.green }}, {{ access_token_obj.get_cobrowsing_console_theme_color.blue }}, 0.8);
+
+      --color_rgba_90: rgba({{ access_token_obj.get_cobrowsing_console_theme_color.red }}, {{ access_token_obj.get_cobrowsing_console_theme_color.green }}, {{ access_token_obj.get_cobrowsing_console_theme_color.blue }}, 0.9);
+
+      --color_rgba_60: rgba({{ access_token_obj.get_cobrowsing_console_theme_color.red }}, {{ access_token_obj.get_cobrowsing_console_theme_color.green }}, {{ access_token_obj.get_cobrowsing_console_theme_color.blue }}, 0.6);
+
+      --color_rgb: {{ access_token_obj.get_cobrowsing_console_theme_color.rgb }};
+
+      --dark_color: {{ access_token_obj.get_dark_theme_color }};
+
+      --color_text: #4A4A4A;
+    }
+
+    .custom-modal .modal-title {
+        color: var(--color_text)!important;
+    }
+
+    .active-search {
+        background: var(--color_rgb) !important;
+        color: #ffffff !important;
+    }
+
+    .canned-response-checkbox input:checked ~ .checkmark {
+        background-color: var(--color_rgb)!important;
+    }
+
+    #multiselect-option input:checked {
+        background-color: var(--color_rgb)!important;
+    }
+
+    .custom-checkbox-input input:checked~.custom-checkmark {
+        background-color: var(--color_rgb)!important;
+        border: 1px solid var(--color_rgb)!important;
+    }
+
+    #feedback-sheet-download-button{
+        background-color: var(--color_rgb)!important;
+    }
+
+    input:checked + .easyassist-switch-slider {
+      background: var(--color_rgb) !important;
+    }
+
+    .custom-checkbox-input .custom-checkmark {
+        border: 1px solid var(--color_rgb)!important;
+    }
+
+    #modal-filter-canned-response .modal-body input[type=radio]:checked+.filter-box{
+        border: 1px solid var(--color_rgb)!important;
+    }
+
+    #modal-filter-canned-response .modal-body input[type=radio]:checked+.filter-box span{
+        color: var(--color_rgb)!important;
+    }
+
+
+    .checkmark {
+        border: 1px solid var(--color_rgb)!important;
+    }
+
+    .custom-file-upload {
+        border: 1px solid var(--color_rgb)!important;
+        color: var(--color_rgb)!important;
+    }
+
+    .modal .btn-primary:hover {
+      background: var(--color_rgb) !important;
+    }
+
+    {% endif %}
+</style>
+
+<div class="container-fluid">
+    <div>
+        <div>
+            <div class="page-header">
+                <div class="nav nav-pills navbar-right">
+                    <a class="anchor-reset back-btn" href="/easy-assist/sales-ai/settings">
+                        <span class="mr-3 mb-auto" style="cursor: pointer;">
+                            <svg class="back-arrow-svg" width="44" height="44" viewBox="0 0 44 44" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <rect width="44" height="44" rx="22" transform="matrix(1 0 0 -1 0 44)" fill="white" />
+                                
+                                {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None%}
+                                <path
+                                    d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                                    fill="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" />
+                                {% else %}
+                                <path
+                                    d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                                    fill="#0254D7" />
+
+                                {% endif %}
+                          
+                              
+                            </svg>
+                        </span>
+                    </a>
+                    <h5 class="nav_btn mr-2 mt-2"> <a class="anchor-reset" href="/easy-assist/sales-ai/settings">Settings</a></h5>
+                    <div class=" mr-2 pt-2">
+                        <svg class="mini-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                                fill="#475569" />
+                        </svg>
+                    </div>
+                    <h5 class="nav_btn active1 mt-2">Canned Responses</h5>
+                </div>
+            </div>
+            <div class="card shadow mt-4 mb-4">
+                <div class="card-header py-3" style="min-height: 60px;">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h6 class="canned-response-heading-text-primary">Canned Responses</h6>
+                            <div class="canned-response-table-header-subheading-text mt-1">
+                              Add predefined chat responses for frequently asked customer queries
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="custom-btn-row">
+                        <div class="custom-filter-container flex-grow-1">
+                            <div class="form-group has-search d-flex mb-0">
+                              <span class="fa fa-search form-control-feedback"></span>
+                              <input type="text" id="custom-table-search" class="form-control" class="canned_search_bar" placeholder="Search keywords" aria-controls="canned_responses_table">
+                              <button class="search-bar-button" onclick="set_canned_response_local_storage_obj(); get_all_canned_response()">Search</button>
+                            </div>
+                            <!-- <input type="search" id="custom-table-search" class="canned_search_bar" placeholder="Search" aria-controls="canned_responses_table"> -->
+                          </div>
+                        <div>
+                          <button class="btn btn-primary custom-button d-flex align-items-center" data-toggle="modal" data-target="#modal-filter-canned-response">
+                            <svg width="20" height="13" viewBox="0 0 20 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <g clip-path="url(#clip0_194_14392)">
+                              <path d="M1 2L19.5 2" stroke="white" stroke-width="2.06253"/>
+                              <path d="M3.3125 6.12512L17.1875 6.12512" stroke="white" stroke-width="2.06253"/>
+                              <path d="M6.78125 10.2501L13.7187 10.2501" stroke="white" stroke-width="2.06253"/>
+                              </g>
+                              <defs>
+                              <clipPath id="clip0_194_14392">
+                              <rect width="20" height="12.5" fill="white" transform="translate(0 0.335327)"/>
+                              </clipPath>
+                              </defs>
+                              </svg>
+                              <span id="filter-button-text"> Filter </span>
+                          </button>
+                      </div>
+                        {% if cobrowse_agent.role != "agent" %}
+                            <div>
+                                <button class="btn btn-primary custom-button d-flex align-items-center" data-toggle="modal" data-target="#modal-add-canned-response">
+                                    <svg width="14" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M13 8.58533H8V13.5853C8 14.1353 7.55 14.5853 7 14.5853C6.45 14.5853 6 14.1353 6 13.5853V8.58533H1C0.45 8.58533 0 8.13533 0 7.58533C0 7.03533 0.45 6.58533 1 6.58533H6V1.58533C6 1.03533 6.45 0.585327 7 0.585327C7.55 0.585327 8 1.03533 8 1.58533V6.58533H13C13.55 6.58533 14 7.03533 14 7.58533C14 8.13533 13.55 8.58533 13 8.58533Z" fill="white"/>
+                                        </svg>
+                                        
+                                    <span>Add Canned Response</span>
+            
+                                </button>
+                            </div>
+                            <div>
+                                <button class="btn btn-primary custom-button d-flex align-items-center" data-toggle="modal" data-target="#modal-add-canned-response-excel">
+                                    <svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M11.7881 8.44422C11.7881 8.08252 12.0813 7.78931 12.443 7.78931H17.0274C17.3891 7.78931 17.6823 8.08252 17.6823 8.44422C17.6823 8.80591 17.3891 9.09913 17.0274 9.09913H12.443C12.0813 9.09913 11.7881 8.80591 11.7881 8.44422Z" fill="white"/>
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M11.7881 13.6836C11.7881 13.3219 12.0813 13.0287 12.443 13.0287H17.0274C17.3891 13.0287 17.6823 13.3219 17.6823 13.6836C17.6823 14.0453 17.3891 14.3385 17.0274 14.3385H12.443C12.0813 14.3385 11.7881 14.0453 11.7881 13.6836Z" fill="white"/>
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M4.96762 2.93369C5.21326 2.68805 5.54642 2.55005 5.89381 2.55005H16.3724C16.7198 2.55005 17.0529 2.68805 17.2986 2.93369C17.5442 3.17933 17.6822 3.51249 17.6822 3.85987V18.2679C17.6822 18.6153 17.5442 18.9485 17.2986 19.1941C17.0529 19.4397 16.7198 19.5777 16.3724 19.5777H5.89381C5.54642 19.5777 5.21326 19.4397 4.96762 19.1941C4.72198 18.9485 4.58398 18.6153 4.58398 18.2679V15.6483C4.58398 15.2866 4.8772 14.9934 5.2389 14.9934C5.60059 14.9934 5.89381 15.2866 5.89381 15.6483V18.2679H16.3724V3.85987L5.89381 3.85987L5.89381 6.47951C5.89381 6.84121 5.60059 7.13442 5.2389 7.13442C4.8772 7.13442 4.58398 6.84121 4.58398 6.47951V3.85987C4.58398 3.51248 4.72198 3.17933 4.96762 2.93369Z" fill="white"/>
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M11.1334 14.9934C11.4951 14.9934 11.7883 15.2866 11.7883 15.6483V18.9229C11.7883 19.2846 11.4951 19.5778 11.1334 19.5778C10.7717 19.5778 10.4785 19.2846 10.4785 18.9229V15.6483C10.4785 15.2866 10.7717 14.9934 11.1334 14.9934Z" fill="white"/>
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M11.1334 2.55005C11.4951 2.55005 11.7883 2.84326 11.7883 3.20496V6.47951C11.7883 6.84121 11.4951 7.13442 11.1334 7.13442C10.7717 7.13442 10.4785 6.84121 10.4785 6.47951V3.20496C10.4785 2.84326 10.7717 2.55005 11.1334 2.55005Z" fill="white"/>
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M1.96484 7.13441C1.96484 6.41101 2.55127 5.82458 3.27467 5.82458H11.7885C12.5119 5.82458 13.0983 6.41101 13.0983 7.13441V14.9933C13.0983 15.7167 12.5119 16.3032 11.7885 16.3032H3.27467C2.55127 16.3032 1.96484 15.7167 1.96484 14.9933V7.13441ZM11.7885 7.13441H3.27467V14.9933H11.7885V7.13441Z" fill="white"/>
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M5.66532 8.57523C5.95468 8.35822 6.36518 8.41686 6.5822 8.70622L9.52929 12.6357C9.74631 12.925 9.68767 13.3355 9.39831 13.5526C9.10895 13.7696 8.69845 13.7109 8.48144 13.4216L5.53434 9.49211C5.31732 9.20275 5.37597 8.79225 5.66532 8.57523Z" fill="white"/>
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M9.39831 8.57523C9.68767 8.79225 9.74631 9.20275 9.52929 9.49211L6.5822 13.4216C6.36518 13.7109 5.95468 13.7696 5.66532 13.5526C5.37597 13.3355 5.31732 12.925 5.53434 12.6357L8.48144 8.70622C8.69845 8.41686 9.10895 8.35822 9.39831 8.57523Z" fill="white"/>
+                                        </svg>
+                                    <span>Upload Excel</span>
+                                </button>
+                            </div>
+                            <div>
+                                <button class="btn btn-primary custom-button d-flex align-items-center" id="export-canned-responses" onclick="export_canned_responses(this)">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M13.25 10.5216V14.1237C13.25 14.3788 13.171 14.6233 13.0303 14.8037C12.8897 14.984 12.6989 15.0853 12.5 15.0853H1.25C1.05109 15.0853 0.860322 14.984 0.71967 14.8037C0.579018 14.6233 0.5 14.3788 0.5 14.1237V3.54613C0.5 3.29109 0.579018 3.04651 0.71967 2.86617C0.860322 2.68584 1.05109 2.58453 1.25 2.58453H5.57375C5.07459 3.0616 4.69539 3.49828 4.42914 3.83453C4.10292 4.24651 3.94625 4.50773 3.94625 4.50773H2V13.1621H11.75V12.1034L13.25 10.5216ZM9.27075 6.52445C9.64934 6.49212 10.0634 6.47901 10.5208 6.47901V9.89365L15.5 4.89237L10.5208 0.0853271V3.0961C7.32655 3.0961 5.81997 5.23488 5.10937 7.25245C4.475 9.05359 4.475 10.7581 4.475 10.7581C5.09575 9.45096 5.62987 8.52909 6.2151 7.88499C7.01854 7.00072 7.9183 6.63996 9.27075 6.52445ZM7.45778 5.60927C8.3719 5.30189 9.3861 5.22901 10.5208 5.22901H11.7708V6.86644L13.7186 4.91001L11.7708 3.02956V4.3461H10.5208C9.29868 4.3461 8.45235 4.72422 7.83228 5.24812C7.70008 5.35981 7.57537 5.48059 7.45778 5.60927Z" fill="white"/>
+                                        </svg>
+                                        
+                                    <span id="export-canned-response">Export</span>
+                                </button>
+                            </div>
+                            <div class="d-none" id="delete-all-btn-div">
+                                <button class="btn d-flex align-items-center delete_canned_btn" id="canned-delete-all-btn" data-toggle="modal" data-target="#multi-delete-canned-response">
+                                <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9.66634 6.91866L9.41634 12.752M6.58301 12.752L6.33301 6.91866M2.99967 3.58533L3.70854 14.2184C3.77858 15.269 4.65119 16.0853 5.70411 16.0853H10.2952C11.3482 16.0853 12.2208 15.269 12.2908 14.2184L12.9997 3.58533M2.99967 3.58533H5.49967M2.99967 3.58533H1.33301M12.9997 3.58533H14.6663M12.9997 3.58533H10.4997M10.4997 3.58533V3.08533C10.4997 1.98076 9.60424 1.08533 8.49967 1.08533H7.49967C6.3951 1.08533 5.49967 1.98076 5.49967 3.08533V3.58533M10.4997 3.58533H5.49967" stroke="#FF0000" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>                                
+                                    <span>Delete</span>
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="table-responsive" id="canned_responses_table_wrapper">
+                        <table class="table table-bordered" id="canned-responses-table">
+                            <thead>
+                                {% if cobrowse_agent.role != "agent" %}
+                                    <th class="sorting_disabled" style="width: 7%; max-width: 15px;"> 
+                                    <label class="canned-response-checkbox p-0 mb-0" id="checkbox-label">
+                                        <input type="checkbox" id="select-all-canned"/>
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    </th>
+                                {% endif %}
+                                <th style="width: 15%; max-width: 150px;">Keyword</th>
+                                <th style="width:40%; max-width: 300px;">Canned Response</th>
+                                <th style="width: 20%; max-width: 100px;">Added By</th>
+                                <th style="width: 20%; max-width: 100px;">Visibility</th>
+                                {% if cobrowse_agent.role != "agent"%}
+                                    <th style="width: 6%; max-width: 60px;"></th>
+                                {% endif %}
+                            </thead>
+                                <tbody id="canned-responses-table-body">
+                                </tbody>
+                        </table>
+                    </div>   
+                    <div id="canned-table-pagination-div"></div>       
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade custom-modal" id="modal-edit-canned-response" tabindex="-1" role="dialog" aria-labelledby="client_location_details_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="export_mis_lable">Edit Canned Response</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                <div class="col-sm-12">
+                    <h6>Keyword</h6>
+                    <input type="text" class="canned-keyword-input" maxlength="25" id="edit-canned-keyword" placeholder="Enter keyword" maxlength="25">
+                    <p class="mb-0 mt-2 text-right input-length">
+                    <span class="current-value" id="count"></span> 
+                    <span class="max-value">/ 25</span>
+                    </p>
+                </div>
+                <div class="col-sm-12 mt-2">
+                    <h6>Response</h6>
+                    <textarea class="canned-response-input" maxlength="500" id="edit-canned-response" placeholder="Enter Response" maxlength="500"></textarea>
+                    <p class="mb-0 text-right input-length">
+                    <span class="current-value" id="response-count" ></span> 
+                    <span class="max-value">/ 500</span>
+                    </p>
+                </div>
+                <div class="col-sm-12 mt-3 error-message-div d-none" id="error-message-edit">
+                </div>
+                 <div class="col-sm-12 mt-3 d-flex align-items-center visibility-status" id="canned-visibility">
+                
+                </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary cancel-button" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary" id="canned-response-edit-save-button">Save</button> 
+            </div>
+        </div>
+    </div>
+</div>
+    
+<div class="modal fade custom-modal" id="modal-delete-canned-response" tabindex="-1" role="dialog" aria-labelledby="client_location_details_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="export_mis_lable">Delete Canned Response</h5>
+            </div>
+            <div class="modal-body">
+                <input id="delete-canned-response" hidden>
+                <h6 class="mb-0">Are you sure you want to delete this canned response?</h6>
+            </div>
+            <div class="col-sm-12 mt-3 error-message-div d-none" id="error-message-delete">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary cancel-button" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-danger" id="delete-canned-response-button">Delete</button> 
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade custom-modal" id="modal-add-canned-response" tabindex="-1" role="dialog" aria-labelledby="client_location_details_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="export_mis_lable">Add Canned Response</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h6>Keyword</h6>
+                        <input type="text" class="add-canned-response-input"  id="add-canned-keyword" placeholder="Enter keyword" maxlength="25">
+                        <p class="mb-0 mt-2 text-right input-length">
+                        0
+                        <span class="max-value">/ 25</span>
+                        </p>
+                    </div>
+                    <div class="col-sm-12 mt-2">
+                        <h6>Response</h6>
+                        <textarea class="add-canned-response-input" id="add-canned-response"  placeholder="Enter response" maxlength="500"></textarea>
+                        <p class="mb-0 text-right input-length">
+                        0
+                        <span class="max-value">/ 500</span>
+                        </p>
+                    </div>
+                    <div class="col-sm-12 mt-3 error-message-div d-none" id="error-message">
+                    </div>
+                    <div class="col-sm-12 mt-3 d-flex align-items-center visibility-status">
+                        
+                        {% if cobrowse_agent.role != "admin" %}
+                            <svg class="mr-1" width="12" height="13" viewBox="0 0 12 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                    d="M4.25016 1.08008C2.99686 1.08008 1.98828 2.09352 1.98828 3.34195C1.98828 4.55932 2.94129 5.54748 4.14374 5.59749C4.21202 5.59244 4.28454 5.59223 4.35168 5.59745C5.55323 5.54698 6.50659 4.55931 6.51203 3.34129C6.51167 2.09364 5.49788 1.08008 4.25016 1.08008ZM1.33203 3.34195C1.33203 1.73205 2.63346 0.423828 4.25016 0.423828C5.86054 0.423828 7.16828 1.73157 7.16828 3.34195L7.16828 3.34332C7.16171 4.91849 5.92037 6.20143 4.35451 6.25406C4.33994 6.25455 4.32535 6.25407 4.31084 6.25262C4.27516 6.24905 4.22613 6.24877 4.1807 6.2529C4.16716 6.25413 4.15355 6.25452 4.13997 6.25406C2.57435 6.20143 1.33203 4.91843 1.33203 3.34195Z"
+                                    fill="#4D4D4D" />
+                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                    d="M8.24481 1.91858C8.24481 1.73736 8.39171 1.59045 8.57293 1.59045C9.88643 1.59045 10.9427 2.65381 10.9427 3.96025C10.9427 5.24013 9.92725 6.28241 8.66104 6.32981C8.64335 6.33047 8.62563 6.3297 8.60807 6.3275C8.58984 6.32523 8.56334 6.3247 8.53333 6.32803C8.35322 6.34804 8.19099 6.21826 8.17098 6.03815C8.15097 5.85804 8.28075 5.69581 8.46086 5.67579C8.52568 5.66859 8.59312 5.66722 8.65872 5.67304C9.56381 5.62751 10.2865 4.87786 10.2865 3.96025C10.2865 3.01502 9.52277 2.2467 8.57293 2.2467C8.39171 2.2467 8.24481 2.0998 8.24481 1.91858Z"
+                                    fill="#4D4D4D" />
+                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                    d="M4.35087 6.94983C5.45915 6.94983 6.58372 7.22826 7.44832 7.80572C8.22235 8.32085 8.65296 9.03334 8.65296 9.78847C8.65296 10.5436 8.22241 11.2574 7.44861 11.7754L7.44855 11.7755C6.58118 12.3558 5.45516 12.6359 4.3465 12.6359C3.23798 12.6359 2.1121 12.3559 1.24478 11.7757C0.470684 11.2605 0.0400391 10.548 0.0400391 9.79285C0.0400391 9.03777 0.470587 8.32391 1.24438 7.80591L1.24559 7.8051L1.24559 7.80511C2.11553 7.2283 3.24249 6.94983 4.35087 6.94983ZM1.60883 8.35166C0.971399 8.77859 0.696289 9.30704 0.696289 9.79285C0.696289 10.2786 0.971333 10.8055 1.60866 11.2296L1.60938 11.23C2.34618 11.723 3.33766 11.9796 4.3465 11.9796C5.35534 11.9796 6.34681 11.723 7.08361 11.23C7.72144 10.803 7.99671 10.2744 7.99671 9.78847C7.99671 9.30273 7.72166 8.77578 7.08433 8.35177L7.08384 8.35144C6.35011 7.8614 5.3601 7.60608 4.35087 7.60608C3.34202 7.60608 2.34883 7.86122 1.60883 8.35166Z"
+                                    fill="#4D4D4D" />
+                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                    d="M9.39571 7.67977C9.43555 7.50298 9.61116 7.39197 9.78794 7.4318C10.2369 7.53297 10.6735 7.71264 11.0397 7.99193C11.5651 8.38649 11.8523 8.93052 11.8523 9.49899C11.8523 10.0673 11.5652 10.6112 11.04 11.0058C10.669 11.2903 10.2256 11.4772 9.76523 11.5731C9.58782 11.6101 9.41404 11.4962 9.37708 11.3188C9.34012 11.1414 9.45398 10.9676 9.63139 10.9307C10.0104 10.8517 10.3598 10.7007 10.6418 10.4841L10.6448 10.4819L10.6448 10.4819C11.0286 10.194 11.196 9.83427 11.196 9.49899C11.196 9.1637 11.0286 8.80394 10.6448 8.51607L10.6425 8.51436L10.6425 8.51435C10.3672 8.30413 10.0226 8.1574 9.64367 8.072C9.46689 8.03216 9.35587 7.85655 9.39571 7.67977Z"
+                                    fill="#4D4D4D" />
+                            </svg>
+                            <p class="ml-2 mb-0">Team Only</p>
+                        {% else %}
+                            <svg class="mr-1" width="14" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_77_6595)">
+                                    <path fill-rule="evenodd" clip-rule="evenodd"
+                                        d="M7.25218 1.38718C3.93132 1.38718 1.23923 4.07926 1.23923 7.40013C1.23923 10.721 3.93132 13.4131 7.25218 13.4131C10.573 13.4131 13.2651 10.721 13.2651 7.40013C13.2651 4.07926 10.573 1.38718 7.25218 1.38718ZM0.4375 7.40013C0.4375 3.63648 3.48853 0.585449 7.25218 0.585449C11.0158 0.585449 14.0669 3.63648 14.0669 7.40013C14.0669 11.1638 11.0158 14.2148 7.25218 14.2148C3.48853 14.2148 0.4375 11.1638 0.4375 7.40013Z"
+                                        fill="#4D4D4D" />
+                                    <path fill-rule="evenodd" clip-rule="evenodd"
+                                        d="M7.70162 7.3238L9.22615 7.53018C9.35792 7.54564 9.4845 7.59063 9.59647 7.6618L13.2214 9.89149C13.41 10.0075 13.4688 10.2544 13.3528 10.4429C13.2368 10.6315 12.9899 10.6904 12.8013 10.5744L9.17353 8.3429C9.17125 8.3415 9.16899 8.34008 9.16674 8.33863C9.15633 8.33194 9.14452 8.32775 9.13223 8.32638C9.12903 8.32603 9.12584 8.32564 9.12266 8.32521L7.5927 8.11809L7.5895 8.11765C7.56315 8.11386 7.5363 8.11893 7.51314 8.13204C7.48999 8.14515 7.47183 8.16557 7.46153 8.19011C7.46039 8.19283 7.45922 8.19553 7.45801 8.19822L6.54271 10.2493L6.54206 10.2508C6.5313 10.2746 6.52778 10.3011 6.53194 10.3269C6.53607 10.3526 6.54758 10.3764 6.56505 10.3956C6.56518 10.3958 6.56531 10.3959 6.56544 10.3961L7.82033 11.7511L7.82271 11.7537C7.92104 11.8617 7.99308 11.991 8.03321 12.1315C8.07335 12.272 8.0805 12.4198 8.0541 12.5635C8.05393 12.5645 8.05376 12.5654 8.05358 12.5664C8.05343 12.5671 8.05329 12.5679 8.05314 12.5686L7.79258 13.8914C7.7498 14.1087 7.53902 14.2501 7.32181 14.2073C7.10459 14.1645 6.96318 13.9537 7.00597 13.7365L7.26588 12.417C7.2696 12.3953 7.26839 12.373 7.26233 12.3518C7.25622 12.3304 7.24535 12.3107 7.23053 12.2941L5.97607 10.9396L5.97491 10.9383C5.85104 10.8034 5.76949 10.6351 5.7404 10.4543C5.71135 10.2738 5.73584 10.0887 5.81085 9.92197C5.81098 9.92169 5.8111 9.92141 5.81123 9.92113L6.72433 7.87497C6.80368 7.68893 6.94202 7.5341 7.11809 7.4344C7.2951 7.33417 7.50026 7.29529 7.70162 7.3238Z"
+                                        fill="#4D4D4D" />
+                                    <path fill-rule="evenodd" clip-rule="evenodd"
+                                        d="M3.19989 2.19409C3.40368 2.2806 3.49875 2.51594 3.41224 2.71972L2.81165 4.13443C2.7989 4.16566 2.79841 4.20056 2.81033 4.23214L2.81051 4.23262L3.57883 6.27702C3.5798 6.27961 3.58075 6.28221 3.58167 6.28482C3.58889 6.30531 3.60125 6.32361 3.61757 6.33796C3.63389 6.35231 3.65362 6.36223 3.67487 6.36677L3.67534 6.36687L5.10305 6.67376C5.24242 6.70239 5.37329 6.76289 5.4854 6.85054C5.59796 6.93854 5.68852 7.05149 5.74995 7.18048C5.75011 7.18081 5.75026 7.18114 5.75042 7.18147L6.00117 7.70275C6.01327 7.72564 6.03122 7.74495 6.05321 7.75869C6.0754 7.77256 6.10088 7.78025 6.12702 7.78098H7.02515C7.24654 7.78098 7.42602 7.96045 7.42602 8.18184C7.42602 8.40323 7.24654 8.58271 7.02515 8.58271H6.12321C6.1221 8.58271 6.12099 8.5827 6.11988 8.58269C6.11907 8.58268 6.11825 8.58268 6.11743 8.58266C5.94429 8.58017 5.77513 8.53033 5.6283 8.43856C5.48146 8.34678 5.36253 8.21657 5.28442 8.06203C5.28323 8.05968 5.28207 8.05733 5.28093 8.05496L5.02705 7.52716L5.02617 7.52531C5.01816 7.50843 5.00632 7.49365 4.9916 7.48215C4.97688 7.47064 4.95969 7.46272 4.94137 7.45901C4.93978 7.45869 4.93819 7.45836 4.9366 7.45802L3.50732 7.15079C3.50724 7.15077 3.50717 7.15076 3.50709 7.15074C3.35172 7.1175 3.20748 7.04495 3.08816 6.94003C2.96997 6.8361 2.88015 6.70386 2.8271 6.55573L2.06021 4.51515C2.06018 4.51504 2.06014 4.51494 2.0601 4.51484C1.97607 4.29189 1.98029 4.04528 2.07191 3.82533L2.07296 3.82281L2.67426 2.40643C2.76077 2.20264 2.99611 2.10757 3.19989 2.19409Z"
+                                        fill="#4D4D4D" />
+                                    <path fill-rule="evenodd" clip-rule="evenodd"
+                                        d="M8.69588 0.842705C8.88957 0.735482 9.13351 0.80558 9.24074 0.999273L9.86207 2.12169L9.86355 2.12437C9.96341 2.30806 9.99932 2.51975 9.96563 2.7261C9.93194 2.93245 9.83056 3.12172 9.67747 3.26411C9.67605 3.26543 9.67462 3.26674 9.67318 3.26804L7.87947 4.88838C7.82559 4.93909 7.76553 4.98282 7.70072 5.01854C7.7006 5.01861 7.70048 5.01867 7.70036 5.01874L6.87923 5.4727C6.87721 5.47381 6.87519 5.47491 6.87316 5.47598C6.74017 5.54655 6.59265 5.58537 6.44215 5.58941C6.43857 5.5895 6.43498 5.58955 6.4314 5.58955H5.00301C4.97594 5.58982 4.94952 5.59791 4.92694 5.61286C4.90445 5.62776 4.88673 5.64881 4.87591 5.67351L4.32214 6.98787C4.23618 7.19189 4.00111 7.2876 3.79708 7.20164C3.59306 7.11568 3.49735 6.88061 3.58331 6.67659L4.13784 5.36042L4.139 5.3577C4.21143 5.18927 4.33144 5.04563 4.48431 4.9444C4.63718 4.84317 4.81627 4.78876 4.99961 4.78783L5.00165 4.78782H6.42445C6.44911 4.78662 6.47324 4.78017 6.49522 4.7689L7.31373 4.31639C7.31981 4.31305 7.32542 4.30893 7.33044 4.30415C7.33311 4.3016 7.33581 4.29908 7.33855 4.29661L9.13289 2.6757C9.1549 2.65465 9.16947 2.627 9.17438 2.59692C9.17934 2.56652 9.17417 2.53535 9.15967 2.50821L8.53931 1.38756C8.43209 1.19387 8.50219 0.949928 8.69588 0.842705Z"
+                                        fill="#4D4D4D" />
+                                </g>
+                                <defs>
+                                    <clipPath id="clip0_77_6595">
+                                        <rect width="14" height="14" fill="white" transform="translate(0 0.585449)" />
+                                    </clipPath>
+                                </defs>
+                            </svg>
+                            <p class="ml-2 mb-0">Everyone</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary cancel-button" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary" id="add-canned-response-button" onclick="create_canned_response()">Add</button> 
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade custom-modal" id="modal-add-canned-response-excel" tabindex="-1" role="dialog" aria-labelledby="client_location_details_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="export_mis_lable">Add Canned Response Via Excel</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                    <div class="d-flex align-items-center">
+                        <label for="canned-response-batch-file-upload" class="custom-file-upload mb-0">
+                        Choose File
+                        </label>
+                        <p class="mb-0 ml-3 file-name">No file chosen</p>
+                    </div>
+                    <input type="file" id="canned-response-batch-file-upload" class="form-control" name="" style="display: none !important;" accept=".xls, .xlsx">
+    
+                    <p class="supported-file-note mb-0 mt-3">Supported file format: .xls, .xlsx</p>
+                    </div>
+                </div>
+                <div class="col-sm-12 p-0 mt-3" id="uploaded_file_errors">
+                </div>
+                <div class="mt-3" id="feedback-sheet-download-button-div">
+                    
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-text-only download-template-btn" id="download_canned_response_template" onclick="download_create_canned_response_template()" type="button">
+                {% if access_token_obj.cobrowsing_console_theme_color != None %}
+                    <svg width="13" height="16" viewBox="0 0 13 16" fill="{{access_token_obj.get_cobrowsing_console_theme_color.hex}}" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0.861111 14.2778H11.1944C11.67 14.2778 12.0556 14.6633 12.0556 15.1389C12.0556 15.5748 11.7316 15.9351 11.3113 15.9921L11.1944 16H0.861111C0.385533 16 0 15.6145 0 15.1389C0 14.7029 0.323954 14.3427 0.744263 14.2856L0.861111 14.2778H11.1944H0.861111ZM5.91093 0.507861L6.02778 0.5C6.46373 0.5 6.82401 0.823955 6.88103 1.24426L6.88889 1.36111V10.1881L9.4782 7.6003C9.78391 7.29459 10.2623 7.2668 10.5994 7.51693L10.696 7.6003C11.0017 7.90602 11.0295 8.38441 10.7794 8.72152L10.696 8.8181L6.63667 12.8774C6.33096 13.1831 5.85257 13.2109 5.51546 12.9608L5.41888 12.8774L1.35956 8.8181C1.02328 8.48181 1.02328 7.93659 1.35956 7.6003C1.66528 7.29459 2.14367 7.2668 2.48078 7.51693L2.57736 7.6003L5.16667 10.1904V1.36111C5.16667 0.925164 5.49062 0.564881 5.91093 0.507861L6.02778 0.5L5.91093 0.507861Z" fill="{{access_token_obj.get_cobrowsing_console_theme_color.hex}}"/>
+                    </svg>   
+                {% else %}
+                    <svg width="13" height="16" viewBox="0 0 13 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0.861111 14.2778H11.1944C11.67 14.2778 12.0556 14.6633 12.0556 15.1389C12.0556 15.5748 11.7316 15.9351 11.3113 15.9921L11.1944 16H0.861111C0.385533 16 0 15.6145 0 15.1389C0 14.7029 0.323954 14.3427 0.744263 14.2856L0.861111 14.2778H11.1944H0.861111ZM5.91093 0.507861L6.02778 0.5C6.46373 0.5 6.82401 0.823955 6.88103 1.24426L6.88889 1.36111V10.1881L9.4782 7.6003C9.78391 7.29459 10.2623 7.2668 10.5994 7.51693L10.696 7.6003C11.0017 7.90602 11.0295 8.38441 10.7794 8.72152L10.696 8.8181L6.63667 12.8774C6.33096 13.1831 5.85257 13.2109 5.51546 12.9608L5.41888 12.8774L1.35956 8.8181C1.02328 8.48181 1.02328 7.93659 1.35956 7.6003C1.66528 7.29459 2.14367 7.2668 2.48078 7.51693L2.57736 7.6003L5.16667 10.1904V1.36111C5.16667 0.925164 5.49062 0.564881 5.91093 0.507861L6.02778 0.5L5.91093 0.507861Z" fill="#0254D7"/>
+                    </svg>
+                {% endif %}                 
+                Download Template
+                </button>
+                <button class="btn btn-secondary cancel-button" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary" id="submit_canned_response_excel" onclick="submit_canned_response_excel()">Upload</button> 
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade custom-modal" id="multi-delete-canned-response" tabindex="-1" role="dialog" aria-labelledby="client_location_details_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="export_mis_lable">Delete Canned Response</h5>
+            </div>
+            {% if cobrowse_agent.role != "admin" %}
+                <div class="modal-body">
+                    <h6 class="mb-0">Are you sure you want to delete these canned responses?</h6>
+                    <div class="canned-response-note d-flex align-items-center">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 0C13.9706 0 18 4.02944 18 9C18 13.9706 13.9706 18 9 18C4.02944 18 0 13.9706 0 9C0 4.02944 4.02944 0 9 0ZM9 1.34979C4.77491 1.34979 1.34979 4.77491 1.34979 9C1.34979 13.2251 4.77491 16.6502 9 16.6502C13.2251 16.6502 16.6502 13.2251 16.6502 9C16.6502 4.77491 13.2251 1.34979 9 1.34979ZM8.99672 7.64934C9.3384 7.64912 9.62093 7.90283 9.66584 8.23222L9.67206 8.32379L9.6753 13.2745C9.67554 13.6472 9.37358 13.9496 9.00084 13.9498C8.65917 13.95 8.37663 13.6963 8.33173 13.3669L8.32551 13.2753L8.32227 8.32468C8.32202 7.95194 8.62399 7.64958 8.99672 7.64934ZM9.0004 4.50184C9.49672 4.50184 9.89906 4.90418 9.89906 5.4005C9.89906 5.89681 9.49672 6.29915 9.0004 6.29915C8.50409 6.29915 8.10175 5.89681 8.10175 5.4005C8.10175 4.90418 8.50409 4.50184 9.0004 4.50184Z" fill="#4D4D4D"/>
+                        </svg>
+                        <p class="mb-0 canned-response-note-text">Responses added by the admin won’t be deleted</p>                  
+                    </div>
+                </div>
+            {% else %}
+                <div class="modal-body">
+                    <h6 class="mb-0">Are you sure you want to delete these canned responses?</h6>
+                </div>
+            {% endif %}
+            <div class="col-sm-12 mt-3 error-message-div d-none" id="error-message">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary cancel-button" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-danger" onclick="delete_canned_responses()">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade custom-modal" id="modal-filter-canned-response" tabindex="-1" role="dialog" aria-labelledby="client_location_details_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="export_mis_lable">Filter - Canned Responses</h5>
+                <span style="cursor: pointer;" data-dismiss="modal">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M18 6L6 18" stroke="#25282B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M6 6L18 18" stroke="#25282B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>                  
+                </span>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                    <h6>Filter by user type</h6>
+                    <div class="user-types d-flex">
+                        <div class="admin-user">
+                        <label class="mb-0">
+                            {% if cobrowse_agent.role == "admin" %}
+                                <input type="radio" id="admin-input" value="{{cobrowse_agent.user.username}}" hidden>
+                            {% else %}
+                                <input type="radio" id="admin-input" value="{{admin_obj.user.username}}" hidden>
+                            {% endif %}
+                            <div class="filter-box">
+                            <span>Admin</span>
+                            </div>
+                        </label>
+                        </div>
+                        <div class="supervisor-user">
+                        <label class="mb-0">            
+                                <input type="radio" id="supervisor-input" value="{{cobrowse_agent.user.username}}" hidden>
+                                <div class="filter-box">
+                            <span>Supervisor</span>
+                            </div>
+                        </label>
+                        </div>
+                    </div>
+                    </div>
+                    {% if cobrowse_agent.role != "supervisor" %}
+                        <div class="col-sm-12 mt-3 d-none" id="agent-filter-dropdown">
+                            <h6>Filter by email address</h6>
+                            <div class="eassyassist-canned-response-multi-dropdown eassyassist-multiselect-filter-dropdown ">
+                                {% if supervisors|length != 1 %}
+                                    <select id="select-agent-username-dropdown" multiple class="form-control" multiple>
+                                        {% for supervisor in supervisors %}
+                                            {% if supervisor != cobrowse_agent and supervisor != admin_obj %}
+                                                <option id="multiselect-option" value="{{ supervisor.user.username }}">{{ supervisor.user.username }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                {% else %}
+                                    <select disabled id="select-agent-username-dropdown" multiple class="form-control">
+                                        <option disabled id="multiselect-option" value="No supervsiors found">No supervsiors found</option>
+                                    </select>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="clear-filter" type="button" onclick="clear_canned_response_filter()">Clear Filter</button>
+                <button class="btn btn-primary" onclick="apply_canned_response_filter(this)">Apply</button> 
+            </div>
+        </div>
+    </div>
+</div>  
+<!-- End of Main Content -->
+
+<script>
+    
+    let previous_file_name = null;
+
+    $(document).ready(function() {
+        
+        // declared in admin-app js
+        on_canned_response_page = true;
+        window.AGENT_ROLE = "{{cobrowse_agent.role}}"
+        window.ADMIN_USERNAME = "{{ admin_obj.user.username }}"
+        window.TEMPLATE_PATH = "{{ template_path }}"
+        window.THEME_COLOR = "{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}"
+
+        $('#description-text, #response-text, #selectDate').keyup(function() {
+           if($('#description-text').val() != '' && $('#response-text').val() != '' &&  $("#selectDate").val() != '') {
+              $('#save-holiday-info').prop('disabled', false);
+           }else{
+            $('#save-holiday-info').prop('disabled', true);
+           }
+        });
+
+        $('#selectDate').on('change', function() {
+           if($('#description-text').val() != '' && $('#response-text').val() != '' &&  $("#selectDate").val() != '') {
+              $('#save-holiday-info').prop('disabled', false);
+           }else{
+            $('#save-holiday-info').prop('disabled', true);
+           }
+        });
+
+        $('#select-add-work-timing').on('change', function(){
+          if(this.value == 1){
+            $('.individual, .selectall').prop('disabled',false)
+          }else if (this.value == 2){
+            $('.individual, .selectall').prop('disabled',false)
+          }else{
+            $('.individual, .selectall').prop('disabled',true)
+          }
+        })
+
+        $('.individual, .selectall').on('change', function(){
+          if($('.individual, .selectall').is(':checked')){
+            $('#save-work-time').prop('disabled',false)
+          }else{
+            $('#save-work-time').prop('disabled',true)
+          }
+        })
+
+        {% if supervisors|length != 1 %}
+            $('#select-agent-username-dropdown').multiselect({
+                nonSelectedText: 'Select Email Address',
+                enableFiltering: true,
+                enableCaseInsensitiveFiltering: false,
+                selectAll: true,
+                includeSelectAllOption: true,
+            });
+        {% else %}
+            $('#select-agent-username-dropdown').multiselect({
+                nonSelectedText: 'No supervsiors found',
+                enableFiltering: true,
+                enableCaseInsensitiveFiltering: false,
+                selectAll: false,
+                includeSelectAllOption: false,
+            });
+        {% endif %}
+
+        let canned_table = $('#canned-responses-table').DataTable({
+            "bLengthChange": true,
+            paging: false,
+            "bFilter": true,
+            "bAutoWidth": true,
+            "ordering": false,
+            info: false,
+            "bSort": false,
+            "oLanguage": {
+                "sEmptyTable": "    "
+            }
+        });
+
+        $(".eassyassist-canned-response-multi-dropdown.eassyassist-multiselect-filter-dropdown .multiselect-container>li>a>label").addClass("custom-checkbox-input");
+        $(".eassyassist-canned-response-multi-dropdown.eassyassist-multiselect-filter-dropdown .multiselect-container>li").find(".custom-checkbox-input").append("<span class='custom-checkmark'></span>");
+
+        let current_page = window.localStorage.getItem("canned_response_page");
+
+        if(!current_page){
+            window.localStorage.setItem("canned_response_page", '1')
+        }
+
+        let searched_keyword = window.localStorage.getItem("searched_keyword");
+        if(searched_keyword){
+            document.getElementById("custom-table-search").value = searched_keyword;
+        }
+
+        let is_admin_filter_applied = window.localStorage.getItem("is_admin_filter_applied");
+        let is_supervisor_filter_applied = window.localStorage.getItem("is_supervisor_filter_applied");
+        if(is_admin_filter_applied == "true"){
+            $(".admin-user").click();
+            document.getElementById("filter-button-text").innerHTML = "Edit Filters";
+        } else if(is_supervisor_filter_applied == "true"){
+            $(".supervisor-user").click();
+            if(AGENT_ROLE == "admin" || AGENT_ROLE == "agent"){
+                let selected_supervisors = JSON.parse(localStorage.getItem("selected_supervisors"));
+                $("#select-agent-username-dropdown").val(selected_supervisors);
+                $("#select-agent-username-dropdown").multiselect("refresh");
+            }
+            document.getElementById("filter-button-text").innerHTML = "Edit Filters";
+        }
+
+        $("#custom-table-search").keypress(function(event) {
+            if (event.keyCode === 13) {
+                $(".search-bar-button").click();
+            }
+        });
+        
+        get_all_canned_response();
+    });
+
+        function count_input_character(){
+            const max_chars = 25
+            let error_message = document.getElementById('error-message');
+            let add_response_button = document.getElementById('add-canned-response-button');
+            let entered_chat_count = this.value.trim().length;
+            let char_counter = this.nextElementSibling.firstChild;
+            let counter = max_chars - entered_chat_count;
+            char_counter.textContent = `${entered_chat_count} `;
+            
+            if(entered_chat_count > max_chars){
+                this.style.setProperty('border','1px solid #B91C1C','important');
+                error_message.classList.remove('d-none')
+                error_message.textContent = `Keyword shouldn’t be more than ${max_chars} characters long`;
+            }else{
+                this.style.setProperty('border','1px solid #dadada','important');
+                error_message.classList.add('d-none')
+                error_message.textContent = ``;
+            }
+        }
+
+        function count_textarea_character(){
+            const max_chars = 500
+            let error_message = document.getElementById('error-message');
+            let add_response_button = document.getElementById('add-canned-response-button');
+            let entered_chat_count = this.value.trim().length;
+            let char_counter = this.nextElementSibling.firstChild;
+            let counter = max_chars - entered_chat_count;
+            char_counter.textContent = `${entered_chat_count} `;
+            if(entered_chat_count > max_chars){
+            this.style.setProperty('border','1px solid #B91C1C','important');
+            error_message.classList.remove('d-none')
+            error_message.textContent = `Response shouldn’t be more than ${max_chars} characters long`;
+            }else{
+            this.style.setProperty('border','1px solid #dadada','important');
+            error_message.classList.add('d-none')
+            error_message.style.setProperty('margin','0px','important')
+            }
+        }
+
+        $(document).on("keyup", '.canned-keyword-input', function (e) {
+            set_keyword_character_count(e.target);
+        });
+
+        $(document).on("keyup", '.canned-response-input', function (e) {
+            set_response_character_count(e.target);
+        });
+
+        document.querySelector('#add-canned-keyword').addEventListener('keyup',count_input_character)
+        document.querySelector('#add-canned-response').addEventListener('keyup',count_textarea_character)
+
+        let file_upload = document.getElementById("canned-response-batch-file-upload");
+        file_upload.addEventListener('change', function(){
+            let file_name = file_upload.value;
+            file_name = file_name.split("\\").pop()
+            if(file_name.length > 20){
+                file_name = get_shorter_canned_response_file_name(file_name, 20);
+            }
+            if(file_name != "...") {
+                previous_file_name = file_name;
+                document.querySelector('.file-name').textContent = file_name;
+            } else {
+                document.querySelector('.file-name').textContent = previous_file_name;
+            }
+        })
+
+        function select_all_canned_handler(el) {
+            const checked = el.checked;
+            let checked_count = 0;
+            const all_checkboxes = document.getElementsByClassName("canned-checkbox");
+
+            Array.from(all_checkboxes).forEach((checkbox) => {
+                checkbox.checked = checked;
+                checked_count++;
+            });
+
+            if(checked_count){
+                show_hide_canned_delete_btn(checked);
+            }
+        }
+        
+        $(function () {
+            $("#datepicker").datepicker({ 
+                autoclose: true, 
+                todayHighlight: true
+            })
+        });
+
+        $(".supervisor-user").click(function(){
+            document.getElementById("admin-input").checked = false;
+            document.getElementById("supervisor-input").checked = true;
+            if( AGENT_ROLE != "supervisor"){
+                let element = document.getElementById("agent-filter-dropdown");
+                if(element.classList.contains("d-none")){
+                    element.classList.remove("d-none")
+                }
+            }
+        })
+
+        $(".admin-user").click(function(){
+            document.getElementById("admin-input").checked = true;
+            document.getElementById("supervisor-input").checked = false;
+            if( AGENT_ROLE != "supervisor"){
+                let element = document.getElementById("agent-filter-dropdown");
+                if(!element.classList.contains("d-none")){
+                    element.classList.add("d-none")
+                }
+            }
+            
+        })
+    
+  </script>
+
+{% endblock %}

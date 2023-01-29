@@ -1,0 +1,547 @@
+{% extends 'EasyChatApp/base.html' %}
+{% block content %}
+{% load static %}
+<html>
+
+
+<body>
+  
+{% csrf_token %}
+<div class="add-scrolling">
+<div id = "access_token_html">
+<div class="row" style="padding-top: 20px">
+<div class="col s2">
+<select class="select" id="type_of_request">
+              {% if type_of_request == "rest" %}
+              <option value="rest" selected>REST API</option>                                
+              <option value="soap" >SOAP API</option>
+        </select>
+              {% else %}
+              <option value="rest" >REST API</option>                                
+              <option value="soap" selected>SOAP API</option>
+        </select>
+              {% endif %}
+        <h6><pre>  Access Token Function Generation</pre></h6>
+        </div>
+
+<div class="col s4"></div>
+<div class="col s4">
+  <ul>
+ <li> <b>-> Skip if generating ACCESS TOKEN CODE is not required. </b></li>
+ <li> <b>-> Use this feature if API requires BEARER AUTHORIZATION. </b></li>
+</ul>
+</div> 
+
+</div>
+
+<div class="row" style="padding:1em;" >
+<div class="col s5">
+  
+<label><h6 style="color:#3d3d3d; font-weight:400 !important"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M11.4611 5.41117H8.53887C7.89157 5.41117 7.32099 5.08266 6.98475 4.58328L5.20833 4.58341C4.89192 4.58341 4.63042 4.81854 4.58903 5.12361L4.58333 5.20841V16.4622C4.58333 16.7787 4.81846 17.0401 5.12352 17.0815L5.29314 17.0929C5.5982 17.1343 5.83333 17.3958 5.83333 17.7122C5.83333 18.0574 5.55351 18.3372 5.20833 18.3372C4.21594 18.3372 3.40362 17.5663 3.33765 16.5906L3.33333 16.4622V5.20841C3.33333 4.21603 4.1043 3.40371 5.07995 3.33774L5.20833 3.33341L6.67786 3.33296C6.78042 2.39589 7.5745 1.66675 8.53887 1.66675H11.4611C12.4255 1.66675 13.2196 2.39589 13.3221 3.33296L14.7917 3.33341C15.784 3.33341 16.5964 4.10438 16.6623 5.08004L16.6667 5.20841V9.79529C16.6667 10.1405 16.3868 10.4203 16.0417 10.4203C15.7252 10.4203 15.4638 10.1852 15.4224 9.8801L15.4167 9.79529V5.20841C15.4167 4.892 15.1815 4.63051 14.8765 4.58912L14.7917 4.58341L13.0152 4.58328C12.679 5.08266 12.1084 5.41117 11.4611 5.41117ZM14.1667 11.6647H15C16.8409 11.6647 18.3333 13.1571 18.3333 14.998C18.3333 16.7832 16.93 18.2406 15.1699 18.3273L15.0038 18.3313L14.1705 18.3352C13.7103 18.3373 13.3355 17.9659 13.3333 17.5057C13.3314 17.0783 13.6515 16.7246 14.0657 16.6746L14.1628 16.6685L15 16.6647C15.9205 16.6647 16.6667 15.9185 16.6667 14.998C16.6667 14.1194 15.9868 13.3995 15.1244 13.3359L15 13.3314H14.1667C13.7064 13.3314 13.3333 12.9583 13.3333 12.498C13.3333 12.0707 13.655 11.7184 14.0695 11.6703L14.1667 11.6647H15H14.1667ZM10.4167 11.6685H11.25C11.7102 11.6685 12.0833 12.0416 12.0833 12.5018C12.0833 12.9292 11.7616 13.2814 11.3472 13.3296L11.25 13.3352H10.4167C9.49619 13.3352 8.74999 14.0814 8.74999 15.0018C8.74999 15.8805 9.42989 16.6003 10.2923 16.6639L10.4167 16.6685H11.25C11.7102 16.6685 12.0833 17.0416 12.0833 17.5018C12.0833 17.9292 11.7616 18.2814 11.3472 18.3296L11.25 18.3352H10.4167C8.57571 18.3352 7.08333 16.8428 7.08333 15.0018C7.08333 13.2167 8.48664 11.7593 10.2503 11.6726L10.4167 11.6685H11.25H10.4167ZM10.4155 14.1666H15C15.4602 14.1666 15.8333 14.5397 15.8333 14.9999C15.8333 15.4273 15.5116 15.7795 15.0972 15.8277L15 15.8333H10.4155C9.95523 15.8333 9.58213 15.4602 9.58213 14.9999C9.58213 14.5726 9.90383 14.2203 10.3183 14.1722L10.4155 14.1666H15H10.4155ZM11.4611 2.91675H8.53887C8.19523 2.91675 7.91666 3.19532 7.91666 3.53896C7.91666 3.8826 8.19523 4.16117 8.53887 4.16117H11.4611C11.8048 4.16117 12.0833 3.8826 12.0833 3.53896C12.0833 3.19532 11.8048 2.91675 11.4611 2.91675Z" fill="#7B7B7B"/>
+  </svg>
+  &nbsp;
+  Paste the URL here</h6></label>
+<div id = "url_access_token">{{url_access_token}}</div>
+
+
+<br/>
+<label>
+  <h6 style="color:#3d3d3d; font-weight:400 !important; ">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M12.4889 3.3338C12.3868 2.39632 11.5924 1.66675 10.6277 1.66675H7.70554C6.74088 1.66675 5.94662 2.39632 5.84444 3.3338L4.375 3.33341L4.24663 3.33774C3.27097 3.40371 2.5 4.21603 2.5 5.20841V16.4622L2.50432 16.5906C2.5703 17.5662 3.38262 18.3372 4.375 18.3372L6.875 18.3368C7.22019 18.3368 7.5 18.0569 7.5 17.7117L7.49428 17.6268C7.45286 17.3218 7.19137 17.0868 6.875 17.0868L4.375 17.0872L4.29019 17.0815C3.98513 17.0402 3.75 16.7787 3.75 16.4622V5.20841L3.75571 5.12361C3.79709 4.81854 4.05858 4.58341 4.375 4.58341L6.15197 4.5841C6.48828 5.08302 7.05859 5.41116 7.70554 5.41116H10.6277C11.2747 5.41116 11.8451 5.08302 12.1813 4.5841L13.9583 4.58341L14.0432 4.58912C14.3482 4.63051 14.5833 4.892 14.5833 5.20841L14.589 5.29311C14.6303 5.59776 14.8915 5.83258 15.2075 5.83258L15.2938 5.82688C15.5985 5.78556 15.8333 5.52441 15.8333 5.20841L15.829 5.08004C15.763 4.10438 14.9507 3.33341 13.9583 3.33341L12.4889 3.3338ZM7.70554 2.91675H10.6277C10.9714 2.91675 11.25 3.19532 11.25 3.53896C11.25 3.8826 10.9714 4.16116 10.6277 4.16116H7.70554C7.36191 4.16116 7.08333 3.8826 7.08333 3.53896C7.08333 3.19532 7.36191 2.91675 7.70554 2.91675Z" fill="#7B7B7B"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M17.4957 8.41341C17.4297 7.43771 16.6174 6.66675 15.625 6.66675H10.2083L10.08 6.67107C9.10433 6.73705 8.33333 7.54937 8.33333 8.54175V16.4584L8.33767 16.5867C8.40367 17.5624 9.21592 18.3334 10.2083 18.3334H15.625L15.7533 18.3291C16.729 18.2631 17.5 17.4508 17.5 16.4584V8.54175L17.4957 8.41341ZM13 13.4737H10.4737C10.2121 13.4737 10 13.2616 10 13C10 12.7384 10.2121 12.5263 10.4737 12.5263H13C13.2616 12.5263 13.4737 12.7384 13.4737 13C13.4737 13.2616 13.2616 13.4737 13 13.4737ZM15.5263 10.9474H10.4737C10.2121 10.9474 10 10.7353 10 10.4737C10 10.2121 10.2121 10 10.4737 10H15.5263C15.7879 10 16 10.2121 16 10.4737C16 10.7353 15.7879 10.9474 15.5263 10.9474ZM14.2632 16H10.4737C10.2121 16 10 15.7879 10 15.5263C10 15.2647 10.2121 15.0526 10.4737 15.0526H14.2632C14.5248 15.0526 14.7368 15.2647 14.7368 15.5263C14.7368 15.7879 14.5248 16 14.2632 16Z" fill="#7B7B7B"/>
+      </svg>
+       &nbsp;
+  Paste the header here</h6>
+</label>
+<div id = "header_access_token">{{header_access_token}}</div>
+<input class="btn black-text right" onclick="access_token({{intent_pk}},{{tree_pk}},{{parent_tree_pk}},'{{typeofrequest}}')" type="submit" name="Submit" value="Submit" style="background-color: #e1bee7; margin-bottom: 15px; width: 20% !important">
+
+<input class="btn white transparent-btn black-text right" onclick="access_token({{intent_pk}},{{tree_pk}},{{parent_tree_pk}},'{{typeofrequest}}')" type="submit" name = "Skip" value="Skip" style="background-color: #e1bee7; margin-bottom: 15px; width: 20% !important">
+
+</div>
+ 
+</div>
+</div>
+<div id = "api_integration_part_one">
+  <a class="btn white transparent-btn black-text left" style="margin-top: 20px;margin-bottom: 10px;" id="go-back-access-token" onclick="previous_page_back_button(1)"><i class="material-icons inline-icon">arrow_back</i> Back</a>
+<div class="row no-gutters" style="padding:1em;" >
+<div class="col s12">
+
+<ul class="tabs" style="overflow-x: hidden !important;">
+              <li class="tab col s1">
+                <a onclick="next_tab(0)" id="url-tab" >URL
+                </a>
+              </li>
+              <li class="tab col s2"><a onclick="next_tab(1)" id="header-tab">Header</a></li>
+              <li class="tab col s3"><a onclick="next_tab(2)" id="basic-authorization-tab">Basic Authorization</a></li>
+              <li class="tab col s2"><a onclick="next_tab(3)" id="request-tab">Request Packet</a></li>
+              <li class="tab col s2"><a onclick="next_tab(4)" id="response-tab">Response Packet</a></li>
+              <li class="tab col s2"><a onclick="next_tab(5)" id="error-response-tab">Error Response</a></li>
+        </ul>   
+</div>
+</div>
+<div class="row" id="url-div" style="padding: 1em;">
+<div class="col s10">
+<label><h6 style="color:#3d3d3d; font-weight:400 !important"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M11.4611 5.41117H8.53887C7.89157 5.41117 7.32099 5.08266 6.98475 4.58328L5.20833 4.58341C4.89192 4.58341 4.63042 4.81854 4.58903 5.12361L4.58333 5.20841V16.4622C4.58333 16.7787 4.81846 17.0401 5.12352 17.0815L5.29314 17.0929C5.5982 17.1343 5.83333 17.3958 5.83333 17.7122C5.83333 18.0574 5.55351 18.3372 5.20833 18.3372C4.21594 18.3372 3.40362 17.5663 3.33765 16.5906L3.33333 16.4622V5.20841C3.33333 4.21603 4.1043 3.40371 5.07995 3.33774L5.20833 3.33341L6.67786 3.33296C6.78042 2.39589 7.5745 1.66675 8.53887 1.66675H11.4611C12.4255 1.66675 13.2196 2.39589 13.3221 3.33296L14.7917 3.33341C15.784 3.33341 16.5964 4.10438 16.6623 5.08004L16.6667 5.20841V9.79529C16.6667 10.1405 16.3868 10.4203 16.0417 10.4203C15.7252 10.4203 15.4638 10.1852 15.4224 9.8801L15.4167 9.79529V5.20841C15.4167 4.892 15.1815 4.63051 14.8765 4.58912L14.7917 4.58341L13.0152 4.58328C12.679 5.08266 12.1084 5.41117 11.4611 5.41117ZM14.1667 11.6647H15C16.8409 11.6647 18.3333 13.1571 18.3333 14.998C18.3333 16.7832 16.93 18.2406 15.1699 18.3273L15.0038 18.3313L14.1705 18.3352C13.7103 18.3373 13.3355 17.9659 13.3333 17.5057C13.3314 17.0783 13.6515 16.7246 14.0657 16.6746L14.1628 16.6685L15 16.6647C15.9205 16.6647 16.6667 15.9185 16.6667 14.998C16.6667 14.1194 15.9868 13.3995 15.1244 13.3359L15 13.3314H14.1667C13.7064 13.3314 13.3333 12.9583 13.3333 12.498C13.3333 12.0707 13.655 11.7184 14.0695 11.6703L14.1667 11.6647H15H14.1667ZM10.4167 11.6685H11.25C11.7102 11.6685 12.0833 12.0416 12.0833 12.5018C12.0833 12.9292 11.7616 13.2814 11.3472 13.3296L11.25 13.3352H10.4167C9.49619 13.3352 8.74999 14.0814 8.74999 15.0018C8.74999 15.8805 9.42989 16.6003 10.2923 16.6639L10.4167 16.6685H11.25C11.7102 16.6685 12.0833 17.0416 12.0833 17.5018C12.0833 17.9292 11.7616 18.2814 11.3472 18.3296L11.25 18.3352H10.4167C8.57571 18.3352 7.08333 16.8428 7.08333 15.0018C7.08333 13.2167 8.48664 11.7593 10.2503 11.6726L10.4167 11.6685H11.25H10.4167ZM10.4155 14.1666H15C15.4602 14.1666 15.8333 14.5397 15.8333 14.9999C15.8333 15.4273 15.5116 15.7795 15.0972 15.8277L15 15.8333H10.4155C9.95523 15.8333 9.58213 15.4602 9.58213 14.9999C9.58213 14.5726 9.90383 14.2203 10.3183 14.1722L10.4155 14.1666H15H10.4155ZM11.4611 2.91675H8.53887C8.19523 2.91675 7.91666 3.19532 7.91666 3.53896C7.91666 3.8826 8.19523 4.16117 8.53887 4.16117H11.4611C11.8048 4.16117 12.0833 3.8826 12.0833 3.53896C12.0833 3.19532 11.8048 2.91675 11.4611 2.91675Z" fill="#7B7B7B"/>
+  </svg>
+  &nbsp;
+  Paste the URL here</h6></label>
+<div id="url" required>{{url}}</div>
+     <a class="btn white transparent-btn black-text right" onclick="next_tab(1)" type="button" style="margin-right:0.5em;margin-top: 7px;">Next</a>
+</div>
+<div class="col s1"></div>
+<div class="col s3">
+  </div>
+</div>
+<div class="row" id="header-div" style="padding: 1em;display:none">
+  <div class="col s10">
+<label>
+  <h6 style="color:#3d3d3d; font-weight:400 !important; ">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M12.4889 3.3338C12.3868 2.39632 11.5924 1.66675 10.6277 1.66675H7.70554C6.74088 1.66675 5.94662 2.39632 5.84444 3.3338L4.375 3.33341L4.24663 3.33774C3.27097 3.40371 2.5 4.21603 2.5 5.20841V16.4622L2.50432 16.5906C2.5703 17.5662 3.38262 18.3372 4.375 18.3372L6.875 18.3368C7.22019 18.3368 7.5 18.0569 7.5 17.7117L7.49428 17.6268C7.45286 17.3218 7.19137 17.0868 6.875 17.0868L4.375 17.0872L4.29019 17.0815C3.98513 17.0402 3.75 16.7787 3.75 16.4622V5.20841L3.75571 5.12361C3.79709 4.81854 4.05858 4.58341 4.375 4.58341L6.15197 4.5841C6.48828 5.08302 7.05859 5.41116 7.70554 5.41116H10.6277C11.2747 5.41116 11.8451 5.08302 12.1813 4.5841L13.9583 4.58341L14.0432 4.58912C14.3482 4.63051 14.5833 4.892 14.5833 5.20841L14.589 5.29311C14.6303 5.59776 14.8915 5.83258 15.2075 5.83258L15.2938 5.82688C15.5985 5.78556 15.8333 5.52441 15.8333 5.20841L15.829 5.08004C15.763 4.10438 14.9507 3.33341 13.9583 3.33341L12.4889 3.3338ZM7.70554 2.91675H10.6277C10.9714 2.91675 11.25 3.19532 11.25 3.53896C11.25 3.8826 10.9714 4.16116 10.6277 4.16116H7.70554C7.36191 4.16116 7.08333 3.8826 7.08333 3.53896C7.08333 3.19532 7.36191 2.91675 7.70554 2.91675Z" fill="#7B7B7B"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M17.4957 8.41341C17.4297 7.43771 16.6174 6.66675 15.625 6.66675H10.2083L10.08 6.67107C9.10433 6.73705 8.33333 7.54937 8.33333 8.54175V16.4584L8.33767 16.5867C8.40367 17.5624 9.21592 18.3334 10.2083 18.3334H15.625L15.7533 18.3291C16.729 18.2631 17.5 17.4508 17.5 16.4584V8.54175L17.4957 8.41341ZM13 13.4737H10.4737C10.2121 13.4737 10 13.2616 10 13C10 12.7384 10.2121 12.5263 10.4737 12.5263H13C13.2616 12.5263 13.4737 12.7384 13.4737 13C13.4737 13.2616 13.2616 13.4737 13 13.4737ZM15.5263 10.9474H10.4737C10.2121 10.9474 10 10.7353 10 10.4737C10 10.2121 10.2121 10 10.4737 10H15.5263C15.7879 10 16 10.2121 16 10.4737C16 10.7353 15.7879 10.9474 15.5263 10.9474ZM14.2632 16H10.4737C10.2121 16 10 15.7879 10 15.5263C10 15.2647 10.2121 15.0526 10.4737 15.0526H14.2632C14.5248 15.0526 14.7368 15.2647 14.7368 15.5263C14.7368 15.7879 14.5248 16 14.2632 16Z" fill="#7B7B7B"/>
+      </svg>
+       &nbsp;
+  Paste the header here</h6>
+</label>
+<div id="header" required>{{header}}</div>
+<a class="btn white transparent-btn black-text right" onclick="next_tab(2)" type="button" style="margin-right:0.5em; margin-top: 7px;">Next</a>
+<a class="btn white transparent-btn black-text left" onclick="previous_tab(0)" type="button" style="margin-right:0.5em; margin-top: 7px;">Previous</a>
+</div>
+</div>
+
+
+
+<div class="row" id="basic-authorization-div" style="padding: 1em;display:none;">
+
+
+<div class="col s9">
+<label>
+  Username : 
+</label>
+<input id="username-basic-authorization" value="{{basic_authorization_username}}">
+<label>
+  Password:
+</label>
+<input id="password-basic-authorization" value="{{basic_authorization_password}}">
+<br/>
+  <a class="btn white transparent-btn black-text left" onclick="previous_tab(1)" type="button" style="margin-right:0.5em; margin-top: 7px;">Previous</a>
+<a class="btn white transparent-btn black-text right" onclick="next_tab(3)" type="button" style="margin-right:0.5em; margin-top: 7px;">Next</a>
+
+</div>
+<div class="col s3">
+  <p><b>IGNORE THIS SECTION IF NOT REQUIRED</b></p>
+  </div>
+</div>
+
+
+<div class="row" id="request-packet-div" style="padding: 1em; display: none;">
+<div class="col s10">
+<label><h6 style="color:#3d3d3d; font-weight:400 !important"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M12.7533 2C13.9109 2 14.8641 2.87549 14.9867 4.00046L16.75 4C17.9409 4 18.9156 4.92516 18.9948 6.09595L19 6.25C19 6.62919 18.7182 6.94257 18.3526 6.99216L18.249 6.999C17.8698 6.999 17.5564 6.71722 17.5068 6.35163L17.5 6.25C17.5 5.8703 17.2178 5.55651 16.8518 5.50685L16.75 5.5L14.6176 5.50082C14.2141 6.09953 13.5297 6.4933 12.7533 6.4933H9.24665C8.47031 6.4933 7.78594 6.09953 7.38237 5.50082L5.25 5.5C4.8703 5.5 4.55651 5.78215 4.50685 6.14823L4.5 6.25V19.7546C4.5 20.1343 4.78215 20.4481 5.14823 20.4977L5.25 20.5046L8.25 20.5041C8.62964 20.5041 8.94343 20.7861 8.99314 21.1521L9 21.254C9 21.6682 8.66423 22.0041 8.25 22.0041L5.25 22.0046C4.05914 22.0046 3.08436 21.0794 3.00519 19.9086L3 19.7546V6.25C3 5.05914 3.92516 4.08436 5.09595 4.00519L5.25 4L7.01333 4.00046C7.13595 2.87549 8.08906 2 9.24665 2H12.7533ZM18.75 8C19.9409 8 20.9156 8.92516 20.9948 10.096L21 10.25V19.75C21 20.9409 20.0748 21.9156 18.904 21.9948L18.75 22H12.25C11.0591 22 10.0844 21.0748 10.0052 19.904L10 19.75V10.25C10 9.05914 10.9252 8.08436 12.096 8.00519L12.25 8H18.75ZM18.75 9.5H12.25C11.8703 9.5 11.5565 9.78215 11.5068 10.1482L11.5 10.25V19.75C11.5 20.1297 11.7822 20.4435 12.1482 20.4932L12.25 20.5H18.75C19.1297 20.5 19.4435 20.2178 19.4932 19.8518L19.5 19.75V10.25C19.5 9.8703 19.2178 9.55651 18.8518 9.50685L18.75 9.5ZM12.7533 3.5H9.24665C8.83429 3.5 8.5 3.83429 8.5 4.24665C8.5 4.65902 8.83429 4.9933 9.24665 4.9933H12.7533C13.1657 4.9933 13.5 4.65902 13.5 4.24665C13.5 3.83429 13.1657 3.5 12.7533 3.5Z" fill="#7B7B7B"/>
+  <path d="M13.2213 15L16.5796 15.0006L16.6333 15.0068L16.6723 15.0155L16.7185 15.0308L16.7581 15.0488L16.7864 15.0646L16.8142 15.0831L16.8427 15.1052L16.8707 15.1312L16.9127 15.1799L16.9445 15.2293L16.9683 15.2794L16.984 15.3263L16.991 15.3552L16.9951 15.3785L16.9999 15.4445V18.7798C16.9999 19.0253 16.801 19.2243 16.5555 19.2243C16.3275 19.2243 16.1397 19.0527 16.114 18.8317L16.111 18.7798L16.1109 16.5175L12.5 20.5C12.3398 20.6602 12.5 20.5 11 21L11.5 20C11.3644 20.1744 13.3699 17.6302 11.5 20L11.9999 19.5L15.482 15.889H13.2213C12.9934 15.889 12.8055 15.7174 12.7799 15.4963L12.7769 15.4445C12.7769 15.199 12.9759 15 13.2213 15Z" fill="#7B7B7B"/>
+  </svg>
+  
+  &nbsp;Paste the request-packet here</h6></label><div id="request" required>{{request_packet}}</div>
+  <a class="btn white transparent-btn black-text right" onclick="next_tab(4)" type="button" style="margin-right:0.5em; margin-top: 7px;">Next</a>
+<a class="btn white transparent-btn black-text left" onclick="previous_tab(2)" type="button" style="margin-right:0.5em; margin-top: 7px;">Previous</a>
+</div>
+</div>
+<div class="col s1"></div>
+<div class="row" id="response-packet-div" style="padding: 1em; display: none;" >
+
+<div class="col s10">
+
+<label><h6 style="color:#3d3d3d; font-weight:400 !important"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M12.7533 2C13.9109 2 14.8641 2.87549 14.9867 4.00046L16.75 4C17.9409 4 18.9156 4.92516 18.9948 6.09595L19 6.25C19 6.62919 18.7182 6.94257 18.3526 6.99216L18.249 6.999C17.8698 6.999 17.5564 6.71722 17.5068 6.35163L17.5 6.25C17.5 5.8703 17.2178 5.55651 16.8518 5.50685L16.75 5.5L14.6176 5.50082C14.2141 6.09953 13.5297 6.4933 12.7533 6.4933H9.24665C8.47031 6.4933 7.78594 6.09953 7.38237 5.50082L5.25 5.5C4.8703 5.5 4.55651 5.78215 4.50685 6.14823L4.5 6.25V19.7546C4.5 20.1343 4.78215 20.4481 5.14823 20.4977L5.25 20.5046L8.25 20.5041C8.62964 20.5041 8.94343 20.7861 8.99314 21.1521L9 21.254C9 21.6682 8.66423 22.0041 8.25 22.0041L5.25 22.0046C4.05914 22.0046 3.08436 21.0794 3.00519 19.9086L3 19.7546V6.25C3 5.05914 3.92516 4.08436 5.09595 4.00519L5.25 4L7.01333 4.00046C7.13595 2.87549 8.08906 2 9.24665 2H12.7533ZM18.75 8C19.9409 8 20.9156 8.92516 20.9948 10.096L21 10.25V19.75C21 20.9409 20.0748 21.9156 18.904 21.9948L18.75 22H12.25C11.0591 22 10.0844 21.0748 10.0052 19.904L10 19.75V10.25C10 9.05914 10.9252 8.08436 12.096 8.00519L12.25 8H18.75ZM18.75 9.5H12.25C11.8703 9.5 11.5565 9.78215 11.5068 10.1482L11.5 10.25V19.75C11.5 20.1297 11.7822 20.4435 12.1482 20.4932L12.25 20.5H18.75C19.1297 20.5 19.4435 20.2178 19.4932 19.8518L19.5 19.75V10.25C19.5 9.8703 19.2178 9.55651 18.8518 9.50685L18.75 9.5ZM12.7533 3.5H9.24665C8.83429 3.5 8.5 3.83429 8.5 4.24665C8.5 4.65902 8.83429 4.9933 9.24665 4.9933H12.7533C13.1657 4.9933 13.5 4.65902 13.5 4.24665C13.5 3.83429 13.1657 3.5 12.7533 3.5Z" fill="#7B7B7B"/>
+  <path d="M17.7786 15L14.4204 14.9994L14.3666 14.9932L14.3277 14.9845L14.2815 14.9692L14.2418 14.9512L14.2135 14.9354L14.1857 14.9169L14.1573 14.8948L14.1292 14.8688L14.0873 14.8201L14.0554 14.7707L14.0317 14.7206L14.0159 14.6737L14.009 14.6448L14.0049 14.6215L14 14.5555V11.2202C14 10.9747 14.199 10.7757 14.4445 10.7757C14.6724 10.7757 14.8603 10.9473 14.8859 11.1683L14.8889 11.2202L14.889 13.4825L18.4999 9.5C18.6602 9.33978 18.4999 9.5 19.9999 9L19.4999 10C19.6355 9.82564 17.6301 12.3698 19.4999 10L19 10.5L15.518 14.111H17.7786C18.0065 14.111 18.1944 14.2826 18.2201 14.5037L18.2231 14.5555C18.2231 14.801 18.0241 15 17.7786 15Z" fill="#7B7B7B"/>
+  </svg>
+  &nbsp;Paste the response-packet here</h6></label>
+<div id="response" required>{{response_packet}}</div>
+
+  <input class="btn black-text right" onclick="api_integration({{tree_pk}},{{parent_tree_pk}},'{{type_of_request}}')" name="submit" value="submit" type="submit" style="background-color: #e1bee7; padding-top:50px ; width: 10% !important">
+  <a class="btn white transparent-btn black-text right" onclick="next_tab(5)" type="button" style="margin-right:0.5em; margin-top: 7px;">Next</a>
+<a class="btn white transparent-btn black-text left" onclick="previous_tab(3)" type="button" style="margin-right:0.5em; margin-top: 7px;">Previous</a>
+</div>
+</div>
+
+
+<div class="row" id="error-response-packet-div" style="padding: 1em; display: none;" >
+<div class="col s10">
+<label><h6 style="color:#3d3d3d; font-weight:400 !important"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M12.7533 2C13.9109 2 14.8641 2.87549 14.9867 4.00046L16.75 4C17.9409 4 18.9156 4.92516 18.9948 6.09595L19 6.25C19 6.62919 18.7182 6.94257 18.3526 6.99216L18.249 6.999C17.8698 6.999 17.5564 6.71722 17.5068 6.35163L17.5 6.25C17.5 5.8703 17.2178 5.55651 16.8518 5.50685L16.75 5.5L14.6176 5.50082C14.2141 6.09953 13.5297 6.4933 12.7533 6.4933H9.24665C8.47031 6.4933 7.78594 6.09953 7.38237 5.50082L5.25 5.5C4.8703 5.5 4.55651 5.78215 4.50685 6.14823L4.5 6.25V19.7546C4.5 20.1343 4.78215 20.4481 5.14823 20.4977L5.25 20.5046L8.25 20.5041C8.62964 20.5041 8.94343 20.7861 8.99314 21.1521L9 21.254C9 21.6682 8.66423 22.0041 8.25 22.0041L5.25 22.0046C4.05914 22.0046 3.08436 21.0794 3.00519 19.9086L3 19.7546V6.25C3 5.05914 3.92516 4.08436 5.09595 4.00519L5.25 4L7.01333 4.00046C7.13595 2.87549 8.08906 2 9.24665 2H12.7533ZM18.75 8C19.9409 8 20.9156 8.92516 20.9948 10.096L21 10.25V19.75C21 20.9409 20.0748 21.9156 18.904 21.9948L18.75 22H12.25C11.0591 22 10.0844 21.0748 10.0052 19.904L10 19.75V10.25C10 9.05914 10.9252 8.08436 12.096 8.00519L12.25 8H18.75ZM18.75 9.5H12.25C11.8703 9.5 11.5565 9.78215 11.5068 10.1482L11.5 10.25V19.75C11.5 20.1297 11.7822 20.4435 12.1482 20.4932L12.25 20.5H18.75C19.1297 20.5 19.4435 20.2178 19.4932 19.8518L19.5 19.75V10.25C19.5 9.8703 19.2178 9.55651 18.8518 9.50685L18.75 9.5ZM12.7533 3.5H9.24665C8.83429 3.5 8.5 3.83429 8.5 4.24665C8.5 4.65902 8.83429 4.9933 9.24665 4.9933H12.7533C13.1657 4.9933 13.5 4.65902 13.5 4.24665C13.5 3.83429 13.1657 3.5 12.7533 3.5Z" fill="#7B7B7B"/>
+  <path d="M17.7786 15L14.4204 14.9994L14.3666 14.9932L14.3277 14.9845L14.2815 14.9692L14.2418 14.9512L14.2135 14.9354L14.1857 14.9169L14.1573 14.8948L14.1292 14.8688L14.0873 14.8201L14.0554 14.7707L14.0317 14.7206L14.0159 14.6737L14.009 14.6448L14.0049 14.6215L14 14.5555V11.2202C14 10.9747 14.199 10.7757 14.4445 10.7757C14.6724 10.7757 14.8603 10.9473 14.8859 11.1683L14.8889 11.2202L14.889 13.4825L18.4999 9.5C18.6602 9.33978 18.4999 9.5 19.9999 9L19.4999 10C19.6355 9.82564 17.6301 12.3698 19.4999 10L19 10.5L15.518 14.111H17.7786C18.0065 14.111 18.1944 14.2826 18.2201 14.5037L18.2231 14.5555C18.2231 14.801 18.0241 15 17.7786 15Z" fill="#7B7B7B"/>
+  </svg>
+  &nbsp;Paste the error-response packet here</h6></label>
+<div id="error_response">{{error_response_packet}}</div>
+  <input class="btn black-text right" onclick="api_integration({{tree_pk}},{{parent_tree_pk}},'{{type_of_request}}')" name="submit" value="submit" type="submit" style="background-color: #e1bee7; padding-top:50px ; width: 10% !important">
+  <a class="btn white transparent-btn black-text left" onclick="previous_tab(4)" type="button" style="margin-right:0.5em; margin-top: 7px;">Previous</a>
+</div>
+</div>
+</div>
+
+
+<div id = "api_integration_part_two">
+  <div class="row">
+    <div class="col s12">
+  <a class="btn white transparent-btn black-text left" style="margin-top: 20px;margin-bottom: 10px;" id="go_back_edit_packets" onclick="previous_page_back_button(2)"><i class="material-icons inline-icon">arrow_back</i> Back</a>
+</div>
+</div>
+<div class="row" style="padding:1em;">
+<div class="col s4">
+<label><h6 style="color:black; font-weight:400 !important">REQUEST PACKET</h6></label>
+<div id="request_packet_two" ></div>
+<h6 >Request Packet Tree </h6>
+<div id = "request_tree_html"></div>
+</div>
+<div class="col s4">
+  <label><h6 style="color:black; font-weight:400 !important">RESPONSE PACKET</h6></label>
+
+<div id="response_packet_two"></div>
+   <h6 >Response Packet Tree </h6>
+<div id = "response_tree_html"></div>
+ </div> 
+
+<div class="col s4">
+  <label><h6 style="color:black; font-weight:400 !important">ERROR RESPONSE PACKET</h6></label>
+
+<div id="error_response_packet_two"></div>
+   <h6 >Error Response Packet Tree </h6>
+<div id = "html_error_response"></div>
+
+<div class="row">
+<h6 style="color:black; font-weight:400 !important">BOT RESPONSE</h6>
+<ul class="collapsible">
+<li>
+<div class="collapsible-header">Enter variable to show in bot response:</div>
+<div class="collapsible-body">
+<label style="color:black;">Enter the variable without {/ and /}, example : display</label>
+<input type="text" id="bot-response-variable" class="bot-response" value="{{bot_response_variable}}">
+</div>
+</li>
+</ul>
+<ul class="collapsible">
+<li>
+<div class="collapsible-header">Enter Success response to be stored corresponding to bot response variable :</div>
+<div class="collapsible-body">
+<label style="color:black;">Example Bot Response: Your account id: {/account_id/} has balance {/balance/} </label>
+<input type="text" id="bot-response-value" class="bot-response" value="{{bot_response_value}}">
+</div>
+</li>
+</ul>
+<ul class="collapsible">
+<li>
+<div class="collapsible-header">Enter Error response to be stored corresponding to bot response variable :</div>
+<div class="collapsible-body">
+<label style="color:black;">Example Error Response: There is an error: {/error_message/}</label>
+<input type="text" id="bot-error-response-value" class="bot-response" value="{{bot_error_response_value}}">
+</div>
+</li>
+</ul>
+</div>
+<br>
+<br>
+<a onclick='request_values({{tree_pk}}, {{parent_tree_pk}} , "{{type_of_request}}")' class='btn green lighten-2 black-text right' >Submit </a>
+</div> 
+</div>
+</div>
+</div>
+
+
+</body>
+{% if request.user.enable_s3_bucket %}
+<script src="https://static.allincall.in/static/EasyChatApp/js/ace.js" type="text/javascript" charset="utf-8"></script>
+
+{% else %}
+<script src="{% static 'EasyChatApp/js/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+
+{% endif %}
+
+
+<script>
+    var url_access_token = ace.edit("url_access_token");
+    url_access_token.setTheme("ace/theme/xcode");
+
+    var header_access_token = ace.edit("header_access_token");
+    header_access_token.setTheme("ace/theme/xcode");
+
+    var url = ace.edit("url");
+    url.setTheme("ace/theme/xcode");
+
+    var header = ace.edit("header");
+    header.setTheme("ace/theme/xcode");
+
+    var request = ace.edit("request");
+    request.setTheme("ace/theme/xcode");
+
+    var response = ace.edit("response");
+    response.setTheme("ace/theme/xcode");
+
+    var error_response = ace.edit("error_response");
+    error_response.setTheme("ace/theme/xcode");
+
+    var request_packet_two = ace.edit("request_packet_two");
+    request_packet_two.setTheme("ace/theme/xcode");
+
+    var response_packet_two = ace.edit("response_packet_two");
+    response_packet_two.setTheme("ace/theme/xcode");
+
+    var error_response_packet_two = ace.edit("error_response_packet_two");
+    response_packet_two.setTheme("ace/theme/xcode");
+
+
+</script>
+
+<link rel="stylesheet" type="text/css" href="/static/EasyChatApp/css/api_integration.css?v={% random_int 1 100 %}">
+
+<script>
+    
+
+function next_tab(next_page) {
+  var url = document.getElementById("url-div")
+    var header_div = document.getElementById("header-div")
+    var basic_authorization_div = document.getElementById("basic-authorization-div")
+    var request = document.getElementById("request-packet-div")
+    var response = document.getElementById("response-packet-div")
+    var error_response = document.getElementById("error-response-packet-div")
+    var url_tab = document.getElementById("url-tab")
+    var header_tab = document.getElementById("header-tab")
+    var basic_authorization_tab = document.getElementById("basic-authorization-tab")
+    var request_tab = document.getElementById("request-tab")
+    var response_tab = document.getElementById("response-tab")
+    var error_response_tab = document.getElementById("error-response-tab")
+ 
+  if (next_page==0){
+    url.style.display="block"
+    header_div.style.display = "none"
+    basic_authorization_div.style.display = "none"
+    request.style.display = "none"
+    response.style.display = "none"
+    error_response.style.display = "none"
+
+    url_tab.classList.add("active")
+    header_tab.classList.remove("active")
+    basic_authorization_tab.classList.remove("active")
+    request_tab.classList.remove("active")
+    response_tab.classList.remove("active")
+    error_response_tab.classList.remove("active")
+
+
+  }
+
+
+  else if(next_page==1){
+    url.style.display="none"
+    header_div.style.display = "block"
+    basic_authorization_div.style.display = "none"
+    request.style.display = "none"
+    response.style.display = "none"
+    error_response.style.display = "none"
+
+    url_tab.classList.remove("active")
+    header_tab.classList.add("active")
+    basic_authorization_tab.classList.remove("active")
+    request_tab.classList.remove("active")
+    response_tab.classList.remove("active")
+    error_response_tab.classList.remove("active")
+  }
+  else if (next_page==2){
+    url.style.display="none"
+    header_div.style.display = "none"
+    basic_authorization_div.style.display = "block"
+    request.style.display = "none"
+    response.style.display = "none"
+    error_response.style.display = "none"
+
+    url_tab.classList.remove("active")
+    header_tab.classList.remove("active")
+    basic_authorization_tab.classList.add("active")
+    request_tab.classList.remove("active")
+    response_tab.classList.remove("active")
+    error_response_tab.classList.remove("active")
+  }
+  else if(next_page==3){
+    url.style.display="none"
+    header_div.style.display = "none"
+    basic_authorization_div.style.display = "none"
+    request.style.display = "block"
+    response.style.display = "none"
+    error_response.style.display = "none"
+
+    url_tab.classList.remove("active")
+    header_tab.classList.remove("active")
+    basic_authorization_tab.classList.remove("active")
+    request_tab.classList.add("active")
+    response_tab.classList.remove("active")
+    error_response_tab.classList.remove("active")
+  }
+  else if(next_page==4){
+    url.style.display="none"
+    header_div.style.display = "none"
+    basic_authorization_div.style.display = "none"
+    request.style.display = "none"
+    response.style.display = "block"
+    error_response.style.display = "none"
+
+    url_tab.classList.remove("active")
+    header_tab.classList.remove("active")
+    basic_authorization_tab.classList.remove("active")
+    request_tab.classList.remove("active")
+    response_tab.classList.add("active")
+    error_response_tab.classList.remove("active")
+  }
+  else if (next_page==5){
+    url.style.display="none"
+    header_div.style.display = "none"
+    basic_authorization_div.style.display = "none"
+    request.style.display = "none"
+    response.style.display = "none"
+    error_response.style.display = "block"
+
+    url_tab.classList.remove("active")
+    header_tab.classList.remove("active")
+    basic_authorization_tab.classList.remove("active")
+    request_tab.classList.remove("active")
+    response_tab.classList.remove("active")
+    error_response_tab.classList.add("active")
+  }
+}
+
+
+function previous_tab(previous_page) {
+  var url = document.getElementById("url-div")
+    var header_div = document.getElementById("header-div")
+    var basic_authorization_div = document.getElementById("basic-authorization-div")
+    var request = document.getElementById("request-packet-div")
+    var response = document.getElementById("response-packet-div")
+    var error_response = document.getElementById("error-response-packet-div")
+    var url_tab = document.getElementById("url-tab")
+    var header_tab = document.getElementById("header-tab")
+    var basic_authorization_tab = document.getElementById("basic-authorization-tab")
+    var request_tab = document.getElementById("request-tab")
+    var response_tab = document.getElementById("response-tab")
+    var error_response_tab = document.getElementById("error-response-tab")
+ 
+  if (previous_page==0){
+    url.style.display="block"
+    header_div.style.display = "none"
+    basic_authorization_div.style.display = "none"
+    request.style.display = "none"
+    response.style.display = "none"
+    error_response.style.display = "none"
+    url_tab.classList.add("active")
+    header_tab.classList.remove("active")
+    basic_authorization_tab.classList.remove("active")
+    request_tab.classList.remove("active")
+    response_tab.classList.remove("active")
+    error_response_tab.classList.remove("active")
+  }
+
+
+  else if(previous_page==1){
+    url.style.display="none"
+    header_div.style.display = "block"
+    basic_authorization_div.style.display = "none"
+    request.style.display = "none"
+    response.style.display = "none"
+    error_response.style.display = "none"
+
+    url_tab.classList.remove("active")
+    header_tab.classList.add("active")
+    basic_authorization_tab.classList.remove("active")
+    request_tab.classList.remove("active")
+    response_tab.classList.remove("active")
+    error_response_tab.classList.remove("active")
+  }
+  else if (previous_page==2){
+    url.style.display="none"
+    header_div.style.display = "none"
+    basic_authorization_div.style.display = "block"
+    request.style.display = "none"
+    response.style.display = "none"
+    error_response.style.display = "none"
+
+    url_tab.classList.remove("active")
+    header_tab.classList.remove("active")
+    basic_authorization_tab.classList.add("active")
+    request_tab.classList.remove("active")
+    response_tab.classList.remove("active")
+    error_response_tab.classList.remove("active")
+  }
+  else if(previous_page==3){
+    url.style.display="none"
+    header_div.style.display = "none"
+    basic_authorization_div.style.display = "none"
+    request.style.display = "block"
+    response.style.display = "none"
+    error_response.style.display = "none"
+
+    url_tab.classList.remove("active")
+    header_tab.classList.remove("active")
+    basic_authorization_tab.classList.remove("active")
+    request_tab.classList.add("active")
+    response_tab.classList.remove("active")
+    error_response_tab.classList.remove("active")
+  }
+  else if(previous_page==4){
+    url.style.display="none"
+    header_div.style.display = "none"
+    basic_authorization_div.style.display = "none"
+    request.style.display = "none"
+    response.style.display = "block"
+    error_response.style.display = "none"
+
+    url_tab.classList.remove("active")
+    header_tab.classList.remove("active")
+    basic_authorization_tab.classList.remove("active")
+    request_tab.classList.remove("active")
+    response_tab.classList.add("active")
+    error_response_tab.classList.remove("active")
+  }
+}
+
+function previous_page_back_button(backPage){
+  if(backPage==1){
+    document.getElementById("access_token_html").style.display = "block"
+    document.getElementById("api_integration_part_one").style.display = "none"
+    document.getElementById("api_integration_part_two").style.display = "none"
+  }
+  else if (backPage ==2){
+    document.getElementById("access_token_html").style.display = "none"
+    document.getElementById("api_integration_part_one").style.display = "block"
+    document.getElementById("api_integration_part_two").style.display = "none"
+  }
+}
+
+
+
+$('#type_of_request').on('change', function (e) {
+    var optionSelected = $("option:selected", this);
+    var valueSelected = this.value;
+    if (valueSelected=="rest"){
+  window.location.href = '/chat/api-integration/?intent_pk='+{{intent_pk}}+'&tree_pk='+{{tree_pk}}+'&type=rest'
+}
+else{
+  window.location.href = '/chat/api-integration/?intent_pk='+{{intent_pk}}+'&tree_pk='+{{tree_pk}}+'&type=soap'
+}
+});
+
+var toggler = document.getElementsByClassName("caret");
+var i;
+
+for (i = 0; i < toggler.length; i++) {
+  toggler[i].addEventListener("click", function(e) {
+    e.preventDefault();
+    this.parentElement.querySelector(".nested").classList.toggle("active");
+    this.classList.toggle("caret-down");
+    
+
+  });
+}
+</script>
+</html>
+
+{% endblock %}

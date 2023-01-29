@@ -1,0 +1,600 @@
+{% extends 'EasyAssistApp/console.html' %}
+{% block content %}
+{% load static %}
+
+{% if request.user.enable_s3_bucket %}
+<script src="https://static.allincall.in/static/EasyAssistApp/js/ace.js" type="text/javascript"
+    charset="utf-8"></script>
+<script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/jscolor.min.js"></script>
+{% else %}
+<script src="{% static 'EasyAssistApp/js/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/jscolor.min.js' %}"></script>
+{% endif %}
+
+<link href="{% static 'EasyAssistApp/css/settings.css' %}" rel="stylesheet" type="text/css">
+
+<div class="container-fluid">
+    <div>
+        <div id="pills-video-call-agent-setting-options">
+            <div class="page-header">
+                <div class="row justify-content-between">
+                    <div class="col-sm-8 d-flex align-items-center">
+                        <div class="nav nav-pills navbar-right">
+                            <a class="anchor-reset back-btn" href="/easy-assist/sales-ai/settings/options/video-call">
+                                <span class="mr-3 mb-auto" style="cursor: pointer;">
+                                    <svg class="back-arrow-svg" width="44" height="44" viewBox="0 0 44 44" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <rect width="44" height="44" rx="22" transform="matrix(1 0 0 -1 0 44)"
+                                            fill="white" />
+                                            {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                                            <path
+                                            d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                                            fill="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" />
+                                            {% else %}
+                   
+                                            <path
+                                            d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                                            fill="#0254D7" />
+                                            {% endif %} 
+                                        
+                                    </svg>
+                                </span>
+                            </a>
+                            <h5 class="nav_btn mr-2 mt-2"><a class="anchor-reset"
+                                    href="/easy-assist/sales-ai/settings">Settings</a>
+                            </h5>
+                            <div class=" mr-2 pt-2">
+                                <svg class="mini-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                                        fill="#475569" />
+                                </svg>
+                            </div>
+                            <h5 class="nav_btn mr-2 mt-2"><a class="anchor-reset"
+                                    href="/easy-assist/sales-ai/settings/options">Options</a>
+                            </h5>
+                            <div class=" mr-2 pt-2">
+                                <svg class="mini-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                                        fill="#475569" />
+                                </svg>
+                            </div>
+                            <h5 class="nav_btn mr-2 mt-2"><a class="anchor-reset"
+                                    href="/easy-assist/sales-ai/settings/options/video-call">Video Call </a></h5>
+                            <div class=" mr-2 pt-2">
+                                <svg class="mini-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                                        fill="#475569" />
+                                </svg>
+                            </div>
+                            <h5 class="nav_btn active1 mt-2">Admin Settings</h5>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 d-flex justify-content-end">
+                        <button class="btn btn-width-100" data-toggle="modal" data-target="#modal-confirm-reset-all" id="reset-button">Reset All</button>
+                        <button class="btn btn-width-100" id="save-button" onclick="save_video_admin_settings(this)"
+                          style="background: #10B981!important;">Save</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow mb-4 mt-30">
+                <div class="card-body p-0">
+                    <div class="card">
+                        <div class="card-body table-responsive p-0">
+                            <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                                <tbody>
+                                    <tr>
+                                        {% if access_token_obj.allow_agent_to_customer_cobrowsing %}
+                                        <th scope="row" class="disable-menu-tab heading-toggle-text" style="color: #CBCACA !important;">Allow only video call</th>
+                                            <td style="vertical-align: inherit;">
+                                                {% if access_token_obj.allow_video_meeting_only %}
+                                                <label class="easyassist-option-switch" data-toggle="tooltip" data-placement="bottom" data-original-title="Not applicable to Reverse Co-browsing">
+                                                    <input type="checkbox" id="allow_video_meeting_only" disabled checked>
+                                                    <span class="easyassist-option-switch-slider round"></span>
+                                                </label>
+                                                {% else %}
+                                                <label class="easyassist-option-switch" data-toggle="tooltip" data-placement="bottom" data-original-title="Not applicable to Reverse Co-browsing">
+                                                    <input type="checkbox" id="allow_video_meeting_only" disabled >
+                                                    <span class="easyassist-option-switch-slider round"></span>
+                                                </label>
+                                                {% endif %}
+                                            </td>
+                                        {% else %}
+                                        <th scope="row" class="heading-toggle-text" >Allow only video call</th>
+                                        <td style="vertical-align: inherit;">
+                                            {% if access_token_obj.allow_video_meeting_only %}
+                                            <label class="easyassist-option-switch">
+                                                <input type="checkbox" id="allow_video_meeting_only" checked>
+                                                <span class="easyassist-option-switch-slider round"></span>
+                                            </label>
+                                            {% else %}
+                                            <label class="easyassist-option-switch">
+                                                <input type="checkbox" id="allow_video_meeting_only">
+                                                <span class="easyassist-option-switch-slider round"></span>
+                                            </label>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow mb-4 mt-30">
+                <div class="card-body p-0">
+                    <div class="card">
+                        <div class="card-body table-responsive p-0">
+                            <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                                <tbody>
+                                    <tr>
+                                        
+                                        <th scope="row" class="heading-toggle-text" >Enable Scheduled meeting</th>
+                                        <td style="vertical-align: inherit;">
+                                            {% if access_token_obj.allow_generate_meeting %}
+                                            <label class="easyassist-option-switch">
+                                                <input type="checkbox" id="enable_scheduled_meeting" checked>
+                                                <span class="easyassist-option-switch-slider round"></span>
+                                            </label>
+                                            {% else %}
+                                            <label class="easyassist-option-switch">
+                                                <input type="checkbox" id="enable_scheduled_meeting">
+                                                <span class="easyassist-option-switch-slider round"></span>
+                                            </label>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow mb-4 mt-30" style="display: none;">
+                <div class="card-body p-0">
+                    <div class="card">
+                        <div class="card-body table-responsive p-0">
+                            <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                                <tbody>
+                                    
+                                    <tr id="enable_dyte_video_calling_tr">
+                                        
+                                        <th scope="row" class="heading-toggle-text">Enable Dyte for video calling
+                                            <span style="margin-right: 0.5rem;" data-toggle="tooltip" data-placement="bottom" title="Enabling this will switch the video calling SDK from Jitsi to Dyte. This is only applicable to “Scheduled Meet”."><i class="fas fa-info-circle"></i></span>
+                                            <svg class="easyassist-beta-tag" style="vertical-align: text-bottom;" width="49" height="22" viewBox="0 0 49 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <rect width="49" height="22" rx="4" />
+                                                <path d="M11.0664 15V6.59766H13.9844C14.7734 6.59766 15.3965 6.80078 15.8535 7.20703C16.3105 7.61328 16.5391 8.13477 16.5391 8.77148C16.5391 9.16992 16.4492 9.52148 16.2695 9.82617C16.0938 10.1309 15.8438 10.3711 15.5195 10.5469V10.6172C15.6719 10.6758 15.8184 10.7559 15.959 10.8574C16.0996 10.959 16.2383 11.0879 16.375 11.2441C16.5117 11.4004 16.6211 11.5957 16.7031 11.8301C16.7852 12.0605 16.8262 12.3125 16.8262 12.5859C16.8262 13.0781 16.7051 13.5098 16.4629 13.8809C16.2246 14.252 15.9102 14.5312 15.5195 14.7188C15.1289 14.9062 14.6973 15 14.2246 15H11.0664ZM12.3262 13.8984H13.9492C14.4102 13.8984 14.7812 13.7812 15.0625 13.5469C15.3438 13.3125 15.4844 12.9648 15.4844 12.5039C15.4844 12.1992 15.4062 11.9414 15.25 11.7305C15.0938 11.5195 14.8965 11.3711 14.6582 11.2852C14.4238 11.1953 14.1582 11.1504 13.8613 11.1504H12.3262V13.8984ZM12.3262 10.1426H13.8789C14.293 10.1426 14.625 10.0273 14.875 9.79688C15.1289 9.56641 15.2559 9.26562 15.2559 8.89453C15.2559 8.53906 15.1289 8.25195 14.875 8.0332C14.625 7.81445 14.3008 7.70508 13.9023 7.70508H12.3262V10.1426ZM18.4258 15V6.59766H23.4062V7.74023H19.7207V10.1777H22.8789V11.3027H19.7207V13.8691H23.5293V15H18.4258ZM24.4316 7.75195V6.59766H30.707V7.75195H28.2168V15H26.9277V7.75195H24.4316ZM30.6543 15L33.7598 6.59766H35.3359L38.4531 15H37.0879L36.4258 13.1777H32.6465L31.9844 15H30.6543ZM33.0508 12.0117H36.0156L34.5801 8.05078H34.4922L33.0508 12.0117Z" fill="white"/>
+                                            </svg>
+                                        </th>
+                                        <td style="vertical-align: inherit;">
+                                            {% if access_token_obj.enable_cognomeet %}
+                                            <label class="easyassist-option-switch">
+                                                <input type="checkbox" id="enable_dyte_video_calling" checked>
+                                                <span class="easyassist-option-switch-slider round"></span>
+                                            </label>
+                                            {% else %}
+                                            <label class="easyassist-option-switch">
+                                                <input type="checkbox" id="enable_dyte_video_calling">
+                                                <span class="easyassist-option-switch-slider round"></span>
+                                            </label>
+                                            {% endif %}                                            
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr id="enable_dyte_video_calling_disabled_tr">
+                                        <th scope="row" class="heading-toggle-text disable-menu-tab" style="color: #CBCACA !important;">Enable Dyte for video calling
+                                            <span style="margin-right: 0.5rem;" data-toggle="tooltip" data-placement="bottom" title="Enabling this will switch the video calling SDK from Jitsi to Dyte. This is only applicable to “Scheduled Meet”."><i class="fas fa-info-circle"></i></span>
+                                            <svg class="easyassist-beta-tag" style="vertical-align: text-bottom;" width="49" height="22" viewBox="0 0 49 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <rect width="49" height="22" rx="4" />
+                                                <path d="M11.0664 15V6.59766H13.9844C14.7734 6.59766 15.3965 6.80078 15.8535 7.20703C16.3105 7.61328 16.5391 8.13477 16.5391 8.77148C16.5391 9.16992 16.4492 9.52148 16.2695 9.82617C16.0938 10.1309 15.8438 10.3711 15.5195 10.5469V10.6172C15.6719 10.6758 15.8184 10.7559 15.959 10.8574C16.0996 10.959 16.2383 11.0879 16.375 11.2441C16.5117 11.4004 16.6211 11.5957 16.7031 11.8301C16.7852 12.0605 16.8262 12.3125 16.8262 12.5859C16.8262 13.0781 16.7051 13.5098 16.4629 13.8809C16.2246 14.252 15.9102 14.5312 15.5195 14.7188C15.1289 14.9062 14.6973 15 14.2246 15H11.0664ZM12.3262 13.8984H13.9492C14.4102 13.8984 14.7812 13.7812 15.0625 13.5469C15.3438 13.3125 15.4844 12.9648 15.4844 12.5039C15.4844 12.1992 15.4062 11.9414 15.25 11.7305C15.0938 11.5195 14.8965 11.3711 14.6582 11.2852C14.4238 11.1953 14.1582 11.1504 13.8613 11.1504H12.3262V13.8984ZM12.3262 10.1426H13.8789C14.293 10.1426 14.625 10.0273 14.875 9.79688C15.1289 9.56641 15.2559 9.26562 15.2559 8.89453C15.2559 8.53906 15.1289 8.25195 14.875 8.0332C14.625 7.81445 14.3008 7.70508 13.9023 7.70508H12.3262V10.1426ZM18.4258 15V6.59766H23.4062V7.74023H19.7207V10.1777H22.8789V11.3027H19.7207V13.8691H23.5293V15H18.4258ZM24.4316 7.75195V6.59766H30.707V7.75195H28.2168V15H26.9277V7.75195H24.4316ZM30.6543 15L33.7598 6.59766H35.3359L38.4531 15H37.0879L36.4258 13.1777H32.6465L31.9844 15H30.6543ZM33.0508 12.0117H36.0156L34.5801 8.05078H34.4922L33.0508 12.0117Z" fill="white"/>
+                                            </svg>
+                                        </th>
+                                        <td style="vertical-align: inherit;">
+                                          <label class="easyassist-option-switch">
+                                            <input type="checkbox" id="enable_dyte_video_calling_disabled_in" style="color: #CBCACA !important;" disabled="">
+                                            <span data-toggle="tooltip" data-placement="bottom"
+                                                data-original-title="This is only applicable to “Scheduled Meeting”. Please enable “Scheduled Meeting” to access this."
+                                                class="easyassist-option-switch-slider round" style="color: #CBCACA !important;" disabled="">
+                                            </span>
+                                          </label>
+                                        </td>
+                                      </tr>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow mb-4 mt-30">
+                <div class="card-body p-0">
+                    <div class="card">
+                        <div class="card-body table-responsive p-0">
+                            <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                                <tbody>
+                                    <tr>
+                                        
+                                        <th scope="row" class="heading-toggle-text" >Enable auto recording
+                                            <span data-toggle="tooltip" data-placement="bottom" title="Allows automatically recording all meetings from the start to the end."><i class="fas fa-info-circle"></i></span>
+                                        </th>
+                                        <td style="vertical-align: inherit;">
+                                            {% if access_token_obj.enable_meeting_recording %}
+                                            <label class="easyassist-option-switch">
+                                                <input type="checkbox" id="enable_meeting_recording" checked>
+                                                <span class="easyassist-option-switch-slider round"></span>
+                                            </label>
+                                            {% else %}
+                                            <label class="easyassist-option-switch">
+                                                <input type="checkbox" id="enable_meeting_recording">
+                                                <span class="easyassist-option-switch-slider round"></span>
+                                            </label>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow mb-4 mt-20">
+                <div class="card-body p-0">
+                    <div class="card">
+                        <div class="card-body table-responsive p-0">
+                            <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                                <tbody>
+                                    <tr>
+                                        <th scope="row" class="heading-toggle-text">Allow feedback in meeting</th>
+                                        <td style="vertical-align: inherit;">
+                                        {% if access_token_obj.allow_meeting_feedback %}
+                                            <label class="easyassist-option-switch">
+                                            <input type="checkbox" id="allow_meeting_feedback" checked>
+                                            <span class="easyassist-option-switch-slider round"></span>
+                                            </label>
+                                        {% else %}
+                                            <label class="easyassist-option-switch">
+                                            <input type="checkbox" id="allow_meeting_feedback">
+                                            <span class="easyassist-option-switch-slider round"></span>
+                                            </label>
+                                        {% endif %}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow mb-4 mt-20">
+                <div class="card-body p-0">
+                    <div class="card">
+                        <div class="card-body table-responsive p-0">
+                            <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                                <tbody>
+                                    <tr class="tr-flex-sm">
+                                        <th scope="row" class="heading-toggle-text">Set default meeting password</th>
+                                        <td style="vertical-align: inherit;">
+                                            {% if access_token_obj.meeting_default_password == "" or access_token_obj.meeting_default_password == None %}
+                                            <input type="text" aria-label="Checkbox for following text input" id="meeting_default_password" value="">
+                                            {% else %}
+                                            <input type="text" aria-label="Checkbox for following text input" id="meeting_default_password" value="{{access_token_obj.meeting_default_password}}">
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow mb-4 mt-20">
+                <div class="card-body p-0">
+                    <div class="card">
+                        <div class="card-body table-responsive p-0">
+                            <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                                <tbody>
+                                    <tr class="tr-flex-sm">
+                                        <th scope="row" class="heading-toggle-text">Meeting URL where meeting will take
+                                            place (e.g. xyz.com)</th>
+                                        <td style="vertical-align: inherit;">
+                                            <input type="text" aria-label="Checkbox for following text input" id="meeting_url" value="{{ access_token_obj.meeting_host_url }}">
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow mb-4 mt-20">
+                <div class="card-body p-0">
+                    <div class="card">
+                        <div class="card-body table-responsive p-0">
+                            <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                                <tbody>
+                                    <tr>
+                                        <th scope="row" class="heading-toggle-text">Allow agents set time duration for
+                                            meetings</th>
+                                        <td style="vertical-align: inherit;">
+                                            {% if access_token_obj.allow_meeting_end_time %}
+                                                <label class="easyassist-option-switch">
+                                                <input type="checkbox" id="allow_meeting_end_time" checked>
+                                                <span class="easyassist-option-switch-slider round"></span>
+                                                </label>
+                                            {% else %}
+                                                <label class="easyassist-option-switch">
+                                                <input type="checkbox" id="allow_meeting_end_time">
+                                                <span class="easyassist-option-switch-slider round"></span>
+                                                </label>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr id="meeting_end_time_div" class="tr-flex-sm">
+                                        <th scope="row" class="sub-heading-toggle-text">Set a maximum time duration for
+                                            meetings (In mins)</th>
+                                        <td style="vertical-align: inherit;">
+                                            <input type="text" id="meeting_end_time" value="{{ access_token_obj.meeting_end_time }}" style="width:50%;"
+                                                class="positive_numeric">
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow mb-4 mt-20">
+                <div class="card-body p-0">
+                    <div class="card">
+                        <div class="card-body table-responsive p-0">
+                            <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                                <tbody>
+                                    {% if access_token_obj.allow_agent_to_customer_cobrowsing %}
+                                        <tr id="tr_no_agent_connects_toast_meeting">
+                                        <th class="heading-toggle-text disable-menu-tab"  style="color: #CBCACA !important;" scope="row">No Agent permit meeting toast
+                                            <span data-toggle="tooltip" data-placement="bottom" title="Enabling this will display a timer if the meeting host does not permit the customer's meeting joining request after the specified time below.">
+                                            <i class="fas fa-info-circle"></i>
+                                            </span>
+                                        </th>
+                                        <td style="vertical-align: inherit;">
+                                            <label class="easyassist-option-switch" data-toggle="tooltip" data-placement="bottom" data-original-title="Not applicable to Reverse Co-browsing">
+                                            <input type="checkbox" id="no_agent_connects_toast_meeting" disabled>
+                                            <span class="easyassist-option-switch-slider round"></span>
+                                            </label>
+                                        </td>
+                                        </tr>
+                                    {% else %}
+                                        <tr id="tr_no_agent_connects_toast_meeting">
+                                        <th class="heading-toggle-text" scope="row">No agent permit meeting toast
+                                            <span data-toggle="tooltip" data-placement="bottom" title="Enabling this will display a timer if the meeting host does not permit the customer's meeting joining request after the specified time below.">
+                                            <i class="fas fa-info-circle"></i>
+                                            </span>
+                                        </th>
+                                        <td style="vertical-align: inherit;">
+                                            {% if access_token_obj.enable_no_agent_connects_toast_meeting %}
+                                            <label class="easyassist-option-switch">
+                                                <input type="checkbox" id="no_agent_connects_toast_meeting" checked>
+                                                <span class="easyassist-option-switch-slider round"></span>
+                                            </label>
+                                            {% else %}
+                                            <label class="easyassist-option-switch">
+                                                <input type="checkbox" id="no_agent_connects_toast_meeting">
+                                                <span class="easyassist-option-switch-slider round"></span>
+                                            </label>
+                                            {% endif %}
+                                        </td>
+                                        </tr>
+                                    {% endif %}
+                                    <tr id="tr_no_agent_connects_meeting_toast_threshold" class="tr-flex-sm">
+                                        <th scope="row" class="sub-heading-toggle-text">No agent permit meeting toast time (In mins)</th>
+                                        <td style="vertical-align: inherit;">
+                                            <input type="text" id="no_agent_connects_meeting_toast_threshold" value="{{ access_token_obj.no_agent_connects_meeting_toast_threshold }}"
+                                                class="positive_numeric">
+                                        </td>
+                                    </tr>
+                                    <tr id="tr_no_agent_connects_meeting_toast_text" class="tr-flex-sm">
+                                        <th scope="row" class="sub-heading-toggle-text">No agent permit meeting toast text
+                                        </th>
+                                        <td style="vertical-align: inherit;">
+                                            <textarea class="form-control" style="height:10em;" id="no_agent_connects_meeting_toast_text" maxlength="1024">{{ access_token_obj.no_agent_connects_meeting_toast_text }}</textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow mb-4 mt-20">
+                <div class="card-body p-0">
+                    <div class="card">
+                        <div class="card-body table-responsive p-0">
+                            <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                                <tbody>
+                                    <tr class="tr-flex-sm">
+                                        <th scope="row" class="heading-toggle-text">Meeting background color</th>
+                                        <td style="vertical-align: inherit;">
+                                            <input type="text" class="form-control jscolor" id="meet_background_color"
+                                                placeholder="HEX" value="{{ access_token_obj.meet_background_color }}" style="width:50%;">
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow mb-4 mt-20">
+                <div class="card-body p-0">
+                    <div class="card">
+                        <div class="card-body table-responsive p-0">
+                            <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                                <tbody>
+                                    <tr style="display:none;">
+                                        <th scope="row" class="heading-toggle-text">Proxy Server</th>
+                                        <td style="vertical-align: inherit;">
+                                            <input type="text" aria-label="Checkbox for following text input"
+                                                id="proxy_pass_server" value="{{ access_token_obj.proxy_pass_server }}" value="">
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade upload_file_modal" id="modal-confirm-reset-all" tabindex="-1" role="dialog"aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Reset All Settings</h5>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-12">
+                  <p>This will reset all settings across the console. Are you sure you want to continue?<p>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-text-only" type="button" data-dismiss="modal">Cancel</button>
+          <button class="btn btn-primary" onclick="reset_cobrowsing_meta_details(this)">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+
+    let no_agent_connects_toast_meeting_value = "{{ access_token_obj.enable_no_agent_connects_toast_meeting }}"
+
+    function get_tr_tag_from_parent_recursive(element){
+        var current_element = element;
+        var selected_element = null;
+
+        while(current_element){
+        if(current_element.tagName.toLowerCase() == "tr"){
+            selected_element = current_element;
+        }
+        current_element = current_element.parentElement;
+        }
+
+        return selected_element;
+    }
+
+    function allow_only_video_calling_actions(){
+        var check_element = document.getElementById("allow_video_meeting_only");
+        var tr_check_element = get_tr_tag_from_parent_recursive(check_element);
+        if(check_element.checked == true && tr_check_element.classList.contains("easyassist_hidden_div") == false){
+        document.getElementById("no_agent_connects_toast_meeting").checked = true;
+        document.getElementById("tr_no_agent_connects_meeting_toast_threshold").classList.remove("easyassist_hidden_div");
+        document.getElementById("tr_no_agent_connects_meeting_toast_text").classList.remove("easyassist_hidden_div");
+        } else {
+        document.getElementById("no_agent_connects_toast_meeting").checked = false;
+        document.getElementById("tr_no_agent_connects_meeting_toast_threshold").classList.add("easyassist_hidden_div");
+        document.getElementById("tr_no_agent_connects_meeting_toast_text").classList.add("easyassist_hidden_div");
+        }
+    }
+    
+    function allow_meeting_end_time_change_actions(){
+        var check_element = document.getElementById("allow_meeting_end_time");
+        var tr_check_element = get_tr_tag_from_parent_recursive(check_element);
+        if(check_element.checked == true && tr_check_element.classList.contains("easyassist_hidden_div") == false){
+        document.getElementById("meeting_end_time_div").classList.remove("easyassist_hidden_div");
+        } else {
+        document.getElementById("meeting_end_time_div").classList.add("easyassist_hidden_div");
+        }
+    }
+
+    function allow_no_agent_connect_toast_meeting_actions(){
+        var check_element = document.getElementById("no_agent_connects_toast_meeting");
+        var tr_check_element = get_tr_tag_from_parent_recursive(check_element);
+        if(check_element.checked == true && tr_check_element.classList.contains("easyassist_hidden_div") == false){
+        document.getElementById("tr_no_agent_connects_meeting_toast_threshold").classList.remove("easyassist_hidden_div");
+        document.getElementById("tr_no_agent_connects_meeting_toast_text").classList.remove("easyassist_hidden_div");
+        } else {
+        document.getElementById("tr_no_agent_connects_meeting_toast_threshold").classList.add("easyassist_hidden_div");
+        document.getElementById("tr_no_agent_connects_meeting_toast_text").classList.add("easyassist_hidden_div");
+        }
+    }
+
+    function allow_scheduled_meeting_dyte_calling(){
+        var check_element = document.getElementById("enable_scheduled_meeting");
+        if(check_element.checked == true){
+        
+        document.getElementById("enable_dyte_video_calling_disabled_tr").style.display = 'none';
+        
+        document.getElementById("enable_dyte_video_calling_tr").style.display = 'flex';
+        document.getElementById("enable_dyte_video_calling_tr").style.alignItems = "baseline";;
+            
+        } else {
+            document.getElementById("enable_dyte_video_calling_tr").style.display = 'none';
+            
+            document.getElementById("enable_dyte_video_calling_disabled_tr").style.display = 'flex';
+            document.getElementById("enable_dyte_video_calling_disabled_tr").style.alignItems = "baseline";;
+        }
+    }
+
+    function dependent_toggles_actions() {
+        if(no_agent_connects_toast_meeting_value == "True") {
+            document.getElementById("no_agent_connects_toast_meeting").checked = true;
+        } else {
+            document.getElementById("no_agent_connects_toast_meeting").checked = false;
+        }
+        allow_no_agent_connect_toast_meeting_actions();
+    }
+
+    function default_function_calls() {
+        allow_only_video_calling_actions();   
+        allow_meeting_end_time_change_actions();
+        allow_no_agent_connect_toast_meeting_actions();
+        allow_scheduled_meeting_dyte_calling();
+        dependent_toggles_actions();
+    }
+
+    default_function_calls();
+    
+    document.getElementById("allow_video_meeting_only").addEventListener(
+    "click", allow_only_video_calling_actions);
+    document.getElementById("allow_meeting_end_time").addEventListener(
+    "click", allow_meeting_end_time_change_actions);
+    document.getElementById("no_agent_connects_toast_meeting").addEventListener(
+    "click", allow_no_agent_connect_toast_meeting_actions);
+    document.getElementById("enable_scheduled_meeting").addEventListener(
+    "click", allow_scheduled_meeting_dyte_calling);
+    
+    $(document).ready(function() {
+        try {
+            document.getElementById("nav-settings-menu").classList.add("active")
+        } catch(err) {}
+    });
+
+    if (document.getElementById("meeting_end_time")) {
+        $("#meeting_end_time").on("keypress", function(event){
+            var event_value = String.fromCharCode(event.which);
+            var entered_value = $(this).val() + event_value;
+            if(entered_value <= 0 || entered_value > 1440){
+              event.preventDefault();
+              show_easyassist_toast("Maximum time duration for meetings should be between 1-1440 mins.");
+            }
+        });
+      }
+
+</script>
+{% endblock %}

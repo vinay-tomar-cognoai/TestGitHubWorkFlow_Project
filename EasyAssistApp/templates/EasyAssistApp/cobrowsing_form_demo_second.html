@@ -1,0 +1,178 @@
+{% load static %}
+<!doctype html>
+<html lang=en-us prefix="og: http://ogp.me/ns#">
+    <meta charset=utf-8>
+    <meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1">
+    {% if cobrowse_config_obj.cobrowsing_favicon %}
+        <link rel="shortcut icon" type="image/x-icon" href="{{ cobrowse_config_obj.cobrowsing_favicon }}">
+    {% else %}
+        <link rel="shortcut icon" type="image/x-icon" href="{% static 'EasyAssistApp/img/cobrowseLogoShort.svg' %}">
+    {% endif %}
+    <title>{{ cobrowse_config_obj.cobrowsing_title_text }} Form Demo</title>
+    <style>
+        body {
+            padding: 2em 5em;
+        }
+
+        .timer-container {
+            display: flex;
+            justify-content: center;
+            gap: 0.5em;
+            margin-top: 5em;
+        }
+
+        .timer-container span {
+            font-size: 50px;
+            font-family: sans-serif;
+        }
+        h2 {
+            margin-top: 2em;
+            font-family: sans-serif;
+            line-height: 30px;
+            text-align: center;
+        }
+
+        #failure-message,
+        #success-message {
+            margin-top: 2em;
+            font-family: sans-serif;
+            line-height: 30px;
+            text-align: center;
+            font-size: 20px;
+        }
+
+        .back-btn {
+            background: #0245d7;
+            outline: none;
+            border: none;
+            padding: 0.5em 1em;
+            color: white;
+            font-size: 18px;
+            margin-top: 1em;
+            cursor: pointer;
+        }
+    </style>
+    <body>
+        <h2>
+            Thank you for taking the time to apply for Cobrowsing Tester position.
+            <br>If we find a good match for you, our recruiting manager Ajay will contact you within -
+        </h2>
+        <div class="timer-container" style="display: none;" id="timer-container">
+            <span id="hour"></span>
+            <span>:</span>
+            <span id="minute"></span>
+            <span>:</span>
+            <span id="second"></second>
+        </div>
+
+        <div id="failure-message" style="display: none;">
+            <div>
+                Thank you for your interest in joining the Cobrowsing team.
+                <br>We wanted to let you know that although your profile was very competitive for the Cobrowsing Tester role,
+                <br>Ajay reviewed your application and did not select it for further consideration.
+                <br>
+                We will, however, keep your resume on record and get in touch with you for future opportunities that may be a better fit for your skills and experience.
+            </div>
+            <div style="margin-top: 2em;">
+                <div>Feel free to apply again</div>
+                <div>
+                    <button class="back-btn" type="button" onclick="redirect();">Apply</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="success-message" style="display: none;">
+            <div>
+                Dear candidate,
+                Ajay has found your profile match very much with our requirement.
+                <br> We are pleased to extend an offer to you at Cobrowsing team and will be happy to have you join the Cobrowsing family.
+            </div>
+            <div style="margin-top: 2em;">
+                <div>Wanna refer your friends?</div>
+                <div>
+                    <button class="back-btn" type="button" onclick="redirect();">Refer</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            var hour = 0;
+            var minute = 0;
+            var second = 30;
+            var timer_interval = null;
+
+            window.addEventListener("load", function() {
+                update_timer();
+                timer_interval = setInterval(update_timer, 1000);
+            });
+
+            function update_timer() {
+                document.getElementById("timer-container").style.display = "";
+                var hour_element = document.getElementById("hour");
+                var minute_element = document.getElementById("minute");
+                var second_element = document.getElementById("second");
+
+                var hour_text = hour.toString();
+                var minute_text = minute.toString();
+                var second_text = second.toString();
+                if(hour < 10) {
+                    hour_text = "0" + hour_text;
+                }
+                if(minute < 10) {
+                    minute_text = "0" + minute_text;
+                }
+                if(second < 10) {
+                    second_text = "0" + second_text;
+                }
+
+                hour_element.innerHTML = hour_text;
+                minute_element.innerHTML = minute_text;
+                second_element.innerHTML = second_text;
+
+                second --;
+                if(second < 0) {
+                    second = 59;
+                    minute --;
+                }
+
+                if(minute < 0) {
+                    minute = 59;
+                    hour --;
+                }
+
+                if(hour < 0) {
+                    show_message();
+                    clearInterval(timer_interval);
+                }
+            }
+
+            function show_message() {
+                var success_msg_element = document.getElementById("success-message");
+                var failure_msg_element = document.getElementById("failure-message");
+
+                success_msg_element.style.display = "none";
+                failure_msg_element.style.display = "none";
+
+                var offset = parseInt(Math.random() * 1000) % 2;
+                if(offset == 0) {
+                    success_msg_element.style.display = "";
+                } else {
+                    failure_msg_element.style.display = "";
+                }
+            }
+
+            function redirect() {
+                window.location.href = "/easy-assist/cobrowsing-form-demo/first/{{ access_token }}"
+            }
+        </script>
+        {% if DEVELOPMENT %}
+            {% if request.META.HTTP_HOST == "127.0.0.1:8000" %}
+                <script type="text/javascript" src="http://{{ request.META.HTTP_HOST }}/static/EasyAssistApp/js/assist.js?key={{ access_token }}"></script>
+            {% else %}
+                <script type="text/javascript" src="https://{{ request.META.HTTP_HOST }}/static/EasyAssistApp/js/assist.js?key={{ access_token }}"></script>
+            {% endif%}
+        {% else %}
+            <script type="text/javascript" src="https://{{ request.META.HTTP_HOST }}/static/EasyAssistApp/js/easy-assist-v6.js?key={{ access_token }}"></script>
+        {% endif %}
+    </body>
+</html>

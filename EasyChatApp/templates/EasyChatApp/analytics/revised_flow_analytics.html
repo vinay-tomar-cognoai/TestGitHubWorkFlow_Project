@@ -1,0 +1,365 @@
+{% extends 'EasyChatApp/base.html' %}
+{% block content %}
+{% load static %}
+
+<link href="{% static 'EasyChatApp/css/bootstrapcombined.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+<link href="{% static 'EasyChatApp/css/materialize.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+<link href="{% static 'EasyChatApp/css/style3.css' %}?v={% random_int 1 100 %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+<link href="{% static 'EasyChatApp/css/style.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+<link href="{% static 'EasyChatApp/css/changes.css' %}?v={% random_int 1 100 %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+<link href="{% static 'EasyChatApp/css/revised_flow_analytics.css' %}?v={% random_int 1 100 %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+<div class="add-scrolling">
+<div class="row">
+            <div class="col s6" style="margin-left: 25px;margin-top: 20px !important;">
+                <a class="btn white transparent-btn black-text left flow-analytics-back-btn-div" style="margin-left:1em" href="/chat/revised-analytics/?bot_id={{bot_id}}&selected_language={{ dropdown_language }}">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3.59863 5.83983C3.59837 5.62795 3.68938 5.42623 3.84839 5.28621L7.41926 2.14472C7.66536 1.93822 8.03131 1.96595 8.24349 2.20718C8.45567 2.44841 8.43646 2.81491 8.20023 3.03264L5.07764 5.77963C5.0603 5.79483 5.05035 5.81677 5.05035 5.83983C5.05035 5.86289 5.0603 5.88483 5.07764 5.90003L8.20023 8.64702C8.3646 8.78495 8.44137 9.00108 8.40084 9.21179C8.3603 9.4225 8.20882 9.59472 8.00501 9.66182C7.8012 9.72892 7.57704 9.68036 7.41926 9.53494L3.84967 6.39442C3.69027 6.25415 3.59883 6.05216 3.59863 5.83983Z" fill="#1B65DB"/>
+                        </svg>
+                    <span>Back</span>
+                </a>
+                <a href="#modal-flow-analytics-filter" style="margin-left:0.5em" class="btn flow-analytics-btn-div left white black-text modal-trigger tooltipped" data-tooltip="Filter Data">
+                    <svg width="16" height="10" viewBox="0 0 16 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0 0.9375L15.0002 0.9375" stroke="white" stroke-width="1.87502"/>
+                        <path d="M1.875 4.6875L13.1251 4.6875" stroke="white" stroke-width="1.87502"/>
+                        <path d="M4.68799 8.43774L10.3131 8.43774" stroke="white" stroke-width="1.87502"/>
+                        </svg>
+                    <span> Filter</span>
+                </a>
+                <a class="btn left white black-text flow-analytics-btn-div" style="margin-left:0.5em" onclick="download_flow_analytics('{{intent_id}}')">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M5.26474 2.22698C5.26474 1.82548 5.59353 1.5 5.99911 1.5C6.4047 1.5 6.73349 1.82548 6.73349 2.22698V5.62603C6.73349 5.6778 6.77588 5.71976 6.82818 5.71976H7.83525C7.97912 5.71982 8.10972 5.80301 8.16939 5.93261C8.22906 6.0622 8.20682 6.21435 8.11248 6.32189L6.27635 8.41246C6.20665 8.49201 6.1055 8.53771 5.99911 8.53771C5.89273 8.53771 5.79158 8.49201 5.72188 8.41246L3.88575 6.32189C3.79141 6.21435 3.76917 6.0622 3.82884 5.93261C3.88851 5.80301 4.01911 5.71982 4.16298 5.71976H5.17005C5.22235 5.71976 5.26474 5.6778 5.26474 5.62603V2.22698ZM9.58004 8.30482C9.58004 8.05386 9.78556 7.85041 10.0391 7.85041C10.1611 7.84992 10.2784 7.89757 10.3649 7.98284C10.4514 8.06811 10.5 8.18398 10.5 8.30482V9.0003C10.5 9.82856 9.82173 10.5 8.98504 10.5H3.01307C2.17712 10.499 1.5 9.82783 1.5 9.0003V8.30482C1.5 8.05386 1.70552 7.85041 1.95903 7.85041C2.21255 7.85041 2.41807 8.05386 2.41807 8.30482V9.0003C2.41848 9.32537 2.68469 9.58873 3.01307 9.58893H8.98504C9.31342 9.58873 9.57962 9.32537 9.58004 9.0003V8.30482Z" fill="white"/>
+                        </svg>
+                    <span>  Download Excel</span>
+                </a>
+                <a class="btn left white black-text flow-analytics-btn-div" style="margin-left:0.5em" onclick="download_user_specific_dropoff_analytics('{{intent_id}}')">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M5.26474 2.22698C5.26474 1.82548 5.59353 1.5 5.99911 1.5C6.4047 1.5 6.73349 1.82548 6.73349 2.22698V5.62603C6.73349 5.6778 6.77588 5.71976 6.82818 5.71976H7.83525C7.97912 5.71982 8.10972 5.80301 8.16939 5.93261C8.22906 6.0622 8.20682 6.21435 8.11248 6.32189L6.27635 8.41246C6.20665 8.49201 6.1055 8.53771 5.99911 8.53771C5.89273 8.53771 5.79158 8.49201 5.72188 8.41246L3.88575 6.32189C3.79141 6.21435 3.76917 6.0622 3.82884 5.93261C3.88851 5.80301 4.01911 5.71982 4.16298 5.71976H5.17005C5.22235 5.71976 5.26474 5.6778 5.26474 5.62603V2.22698ZM9.58004 8.30482C9.58004 8.05386 9.78556 7.85041 10.0391 7.85041C10.1611 7.84992 10.2784 7.89757 10.3649 7.98284C10.4514 8.06811 10.5 8.18398 10.5 8.30482V9.0003C10.5 9.82856 9.82173 10.5 8.98504 10.5H3.01307C2.17712 10.499 1.5 9.82783 1.5 9.0003V8.30482C1.5 8.05386 1.70552 7.85041 1.95903 7.85041C2.21255 7.85041 2.41807 8.05386 2.41807 8.30482V9.0003C2.41848 9.32537 2.68469 9.58873 3.01307 9.58893H8.98504C9.31342 9.58873 9.57962 9.32537 9.58004 9.0003V8.30482Z" fill="white"/>
+                        </svg>
+                    <span> User Specific Dropoff</span>
+                </a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="node-analytics-wrapper-div"></div>
+        </div>
+
+    </div>
+    <div id="modal-flow-analytics-filter" class="modal open" tabindex="0"
+    style="z-index: 1005;  top: 10%; transform: scaleX(1) scaleY(1);">
+    <div class="modal-content">
+        <div class="row" style="margin-bottom: 12px !important;">
+            <div class="modal-header">
+                <h6>Filter- Flow Analytics</h6>
+                <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                    <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z"
+                            fill="black" fill-opacity="0.54"></path>
+                    </svg>
+
+                </a>
+            </div>
+
+            <div class="modal-overflow-content-div">
+                <div class="col s12 analytics-filter-select-area">
+                    <div class="filter-heading">
+                        Select Date range
+                    </div>
+                    <label onclick="show_custom_date();">
+
+                        <input type="radio" name="analytics-card-filter-btn" id="date_range_1"
+                            start_date_value='{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}' end_date_value='{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}' checked>
+
+                        <div class=" filter-box">
+                            <span>Last week</span>
+                        </div>
+                    </label>
+                    <label onclick="show_custom_date();">
+
+                        <input type="radio" name="analytics-card-filter-btn" id="date_range_2"
+                            start_date_value='{{ LAST_MONTH_START_DATETIME|date:"Y-m-d" }}' end_date_value='{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}'>
+
+                        <div class=" filter-box">
+                            <span>Last Month</span>
+                        </div>
+                    </label>
+                    <label onclick="show_custom_date();">
+
+                        <input type="radio" name="analytics-card-filter-btn" id="date_range_3"
+                            start_date_value='{{ LAST3_MONTH_START_DATETIME|date:"Y-m-d" }}' end_date_value='{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}'>
+
+                        <div class=" filter-box">
+                            <span>Last 3 Month</span>
+                        </div>
+                    </label>
+                    <label onclick="show_custom_date();">
+
+                        <input type="radio" name="analytics-card-filter-btn" id="date_range_4"
+                            start_date_value='{{ go_live_date|date:"Y-m-d" }}' end_date_value='{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}'>
+
+                        <div class=" filter-box">
+                            <span>From beginning</span>
+                        </div>
+                    </label>
+                    <label onclick="show_custom_date();">
+
+                        <input type="radio" name="analytics-card-filter-btn" id="date_range_5">
+
+                        <div class=" filter-box">
+                            <span>Custom Date</span>
+                        </div>
+                    </label>
+
+
+
+                </div>
+
+                <div class="col s10 analytics-custom-date-select-area" id="analytics-custom-date-select-area"
+                    style="display: none;">
+
+
+                    <div class="col s6" style="padding-left: 0px; font-weight: 600;color: #4d4d4d;
+        font-size: 14px;">
+                        Start Date
+                        <input type="date" id="custom_start_date" class="message-default-start-date" value='{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}'
+                            style="border: 2px solid #F6F6F6 !important; border-radius:4px !important;">
+                    </div>
+                    <div class="col s6" style="font-weight: 600; padding-right: 0px !important;color: #4d4d4d;
+        font-size: 14px;">
+                        End Date
+                        <input type="date" id="custom_end_date" class="message-default-end-date" value='{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}'
+                            style="border: 2px solid #F6F6F6 !important; border-radius:4px !important;">
+                    </div>
+                </div>
+                <div class="col s12 analytics-channel-select-area">
+                    <div class="filter-heading">
+                        Select Channel
+                    </div>
+                    {% for channel in channel_list %}
+                    <div class=" channel-box">
+                        <input class="flow-analytics-channel-checkbox" type="checkbox" id="{{channel.name}}" name="{{channel.name}}" value="{{channel.name}}">
+                        <label for="{{channel.name}}">
+                            {{channel.icon|safe}}
+                            <span>{{channel.name}}</span>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+
+        <a onclick="reset_flow_analytics_filter('{{intent_id}}','{{ DEFAULT_ANALYTICS_START_DATETIME|date:'Y-m-d'}}','{{ DEFAULT_ANALYTICS_END_DATETIME|date:'Y-m-d'}}','{{bot_id}}')" href="javascript:void(0)"
+            class="modal-close btn filter-modal-footer-btn-cancel">Clear filter</a>
+        <a onclick="load_flow_analytics('{{intent_id}}','{{bot_id}}')" class="btn filter-modal-footer-btn">Apply filter</a>
+
+    </div>
+
+    </div>
+</div>
+    <!-- Build bot modal -->
+
+    <script type="text/javascript" src="{% static 'EasyChatApp/js/d3.min.js' %}?v={% random_int 1 100 %}"></script>
+    <script type="text/javascript" src="{% static 'EasyChatApp/js/d3plus.min.js' %}?v={% random_int 1 100 %}"></script>
+
+    <script>    
+        window.date_filter = "{{date_filter}}";
+        window.channel_filter = {{channel_filter|safe}};
+        var boxWidth = 200,
+            boxHeight = 175,
+            textMargin = 5;
+        // Setup zoom and pan
+        var zoom = d3.behavior.zoom()
+            .scaleExtent([.1, 1])
+            .on('zoom', function() {
+                $('svg').removeAttr("viewBox");
+                svg.attr("transform", "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")");
+            })
+            // Offset so that first pan and zoom does not jump back to the origin
+            .translate([150, 200]);
+
+        var svg = d3.select(".node-analytics-wrapper-div").append("svg")
+            // .attr('width', 1200)
+            // .attr('height', 600)
+            .attr("viewBox", "0 0 2100 700")
+            .call(zoom)
+            .append('g')
+            // Left padding of tree so that the whole root node is on the screen.
+            // TODO: find a better way
+            .attr("transform", "translate(150,240)");
+
+        var tree = d3.layout.tree()
+            // Using nodeSize we are able to control
+            // the separation between nodes. If we used
+            // the size parameter instead then d3 would
+            // calculate the separation dynamically to fill
+            // the available space.
+            .nodeSize([380, 320])
+            // By default, cousins are drawn further apart than siblings.
+            // By returning the same value in all cases, we draw cousins
+            // the same distance apart as siblings.
+            .separation(function() {
+                return .5;
+            })
+            // Tell d3 what the child nodes are. Remember, we're drawing
+            // a tree so the ancestors are child nodes.
+            .children(function(person) {
+                return person.children;
+            });
+
+        // d3.json('data/4gensLongNames.json', function(error, json) {
+
+            var json = JSON.parse("{{ flow_tree_data | escapejs }}")
+            var max_level = "{{max_level}}"
+
+            var nodes = tree.nodes(json),
+                links = tree.links(nodes);
+
+
+            var link = svg.selectAll(".link")
+                .data(links)
+                .enter()
+                .append("g")
+                .attr("class", "link");
+
+            link.append("path")
+                .attr("fill", "none")
+                .attr("stroke", "#40B3E0")
+                .attr("stroke-width", "1.5px")
+                .attr("d", elbow);
+
+            link.append("text")
+
+            .attr("fill", "#2d2d2d")
+                .style("font", "normal 12px sans-serif")
+                .attr("transform", function(d) {
+                    return "translate(" +
+                        ((d.source.y + d.target.y) / 2 + 12) + "," +
+                        ((d.target.x) / 1) + ")";
+                })
+                .attr("dy", "-0.20em")
+                .attr("text-anchor", "middle")
+
+            .text(function(d) {
+                    return d.target.rule + '% of clicked';
+                });
+
+
+            // Style nodes    
+            var node = svg.selectAll("g.analytics-node-person")
+                .data(nodes)
+                .enter().append("g")
+                .attr("class", "analytics-node-person")
+                .attr("transform", function(d) {
+                    return "translate(" + d.y + "," + d.x + ")";
+                });
+
+
+
+            // Draw the rectangle person boxes
+            node.append("rect")
+                .attr({
+                    x: -(boxWidth / 2),
+                    y: -(boxHeight / 2),
+                    width: boxWidth,
+                    height: boxHeight
+                })
+                .attr('rx', 8);
+            node.on("click", function(d) {
+
+                    let all_nodes = document.querySelectorAll(".node-percentage-level-of-parent-text-div");
+
+                    for (let i = 0; i < all_nodes.length; i++) {
+                        all_nodes[i].style.display = "none";
+                    }
+
+                    while (d.parent) {
+                        document.getElementById("level-"+d.tree_pk).style.display = "block";
+                        d = d.parent;
+                    }
+
+            });
+
+            node.append('foreignObject')
+                .attr('x', -100)
+                .attr('y', -87.5)
+                .attr('width', function() {
+                    return (boxWidth)
+
+                })
+                .attr('height', function() {
+                    return (boxHeight)
+                })
+                .append('xhtml').html(function(d) {
+                    var drop_percent = (100 - d.click_percent - d.abort_percent);
+                    var status = {{ status }};
+                    var intent_name = "";
+                    if(status == 200){
+                        intent_name = d.multilingual_name
+                    }
+                    else {
+                        intent_name = d.name
+                    }
+                    if(parseInt(d.size) == 0)
+                        drop_percent = 0;
+                    var progress_div = '<div class="node-closing-intent-div">Closing Actions</div>';
+                    if(d.children){
+                    progress_div = '<div class="progressbar-wrapper-div"><div class="progressbar dropped-progress"> <div class="clicked-progress" style="width: ' +
+                        (d.click_percent) + '%;"></div> <div class="abort-progress" style=" width: ' +
+                        (d.abort_percent) + '%;"></div></div>' +
+                        '<div class="progressbar-name-div"><p class="progressbar-clicked-text-div">' + d.click_percent + '% Clicked</p> <p class="progressbar-aborted-text-div">' + (d.abort_percent) + '% Aborted/ Terminated</p> <p class="progressbar-dropped-text-div">' + drop_percent + '% Dropped</p>  </div></div>'}
+                    return '<div style="width: ' +
+                        (boxWidth) + 'px; height: ' +
+                        (boxHeight) + 'px;" class="node-container">' +
+                        '<div class="node-level-status-div"><div class="node-edit-icon-div" onclick="redirect_to_intent_page(' + '{{intent_id}}' + ',' + d.tree_pk + ',' + d.parent_tree_pk + ');"></div><div>' + d.level + '</div><div>(' + d.behavior + ')</div></div>' +
+                        '<div class="node-full-detail-div"><div class="node-name-div">' + intent_name + '</div>' +
+                        '<div class="node-actions-div">' + d.size + ' Actions</div>' +
+                        progress_div
+                        +
+                        '<div class="node-percentage-level-of-parent-text-div" id="level-' + d.tree_pk + '">' + d.percentage_of_parent + '% of Level 1</div>' +
+
+                        '</div></div>';
+                })
+
+        // });
+
+        /**
+         * Custom path function that creates straight connecting lines.
+         */
+        function elbow(d) {
+            return "M" + d.source.y + "," + d.source.x +
+                "H" + (d.source.y + (d.target.y - d.source.y) / 2) +
+                "V" + d.target.x +
+                "H" + d.target.y;
+        }
+    </script>
+
+    <script type="text/javascript">
+        function show_custom_date() {
+            if (document.getElementById('date_range_5').checked) {
+                document.getElementById("analytics-custom-date-select-area").style.display = "block";
+            } else {
+                document.getElementById("analytics-custom-date-select-area").style.display = "none";
+
+            }
+        }
+        $("#home-button").click(function() {
+            if ($("#panel").is(":visible") == true) {
+                $("#panel").hide(100);
+            } else {
+                $("#panel").show(100);
+            }
+        });
+
+
+        $(document).ready(function() {
+            $('.modal').modal();
+            $('.modal').on('shown.bs.modal', function(e) {
+                $('#modal-general-feedback').find('input:text, input:file, input:password, select, textarea').val('');
+                $(this).removeData();
+            });
+        });
+    </script>
+
+{% endblock %}

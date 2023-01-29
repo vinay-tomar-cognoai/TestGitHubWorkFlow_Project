@@ -1,0 +1,367 @@
+{% extends 'EasyChatApp/base.html' %}
+{% block content %}
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/supervisor.css' %}?v={% random_int 1 100 %}">
+
+<div class="row" style="padding:1em; overflow-y: auto;
+    height: calc(100vh - 7rem);
+    padding-bottom: 30px;">
+
+	<div class="col s12">
+	  <div class="row">
+	    <div class="col s12">
+	      <ul class="tabs">
+	      	<li class="col s1" style="margin-right: 20px; margin-top: 7px"><a class="btn white transparent-btn black-text" href="/chat/bots/"><i class="material-icons inline-icon">arrow_back</i> Back</a></li>
+	        <li class="tab col s3" style="margin-left: 20px;"><a href="#bot-managers" onclick="window.location.hash='#bot-managers'">Bot Managers</a></li>
+	        <li class="tab col s3" style="margin-left: -20px;"><a href="#sandbox-credentials" onclick="window.location.hash='#sandbox-credentials'">Sandbox Credentials</a></li>
+
+	      </ul>
+	    </div>
+
+
+	    <div id="bot-managers" class="col s12">
+
+	    	<div class="row" style="padding:1em;">
+	    		
+	    		<div class="col s12">
+	    			<a href="#modal-add-bot-manager" class="btn easychat-button modal-trigger">Add Bot Manager</a>
+	    		</div>
+	    		<br>
+	    		<br>
+	    		<br>
+
+	    		<div class="col s12">
+
+	    			{% if managers %}
+
+						<table id="sandbox-user-table" class="display">
+						    <thead>
+						        <tr>
+						            <th>Manager</th>
+						            <th>Contact Details</th>
+						            <th>Bot Access</th>
+						            <th></th>
+						        </tr>
+						    </thead>
+						    <tbody>
+				    			{% for manager in managers %}
+				    	
+					        	<tr class="sandbox_user_table_row">
+					            	<td >
+					            		{{ manager.first_name }} {{ manager.last_name }}
+					            	</td>
+					            <td>{{ manager.email }}</td>
+					            <td>
+					            	{% if manager.get_related_bot_objs %}
+						            	{% for bot_obj in manager.get_related_bot_objs %}
+						            		<p>{{ bot_obj.name }}&nbsp; <a href="#unshare-bot-manager-{{ manager.pk }}-{{bot_obj.pk}}" class="modal-trigger">
+						            		<i class="tiny material-icons red-text text-darken-3">cancel</i></a></p>
+											<div id="unshare-bot-manager-{{ manager.pk }}-{{bot_obj.pk}}" class="modal bot-manager-delete-modal">
+											    <div class="modal-content">
+											        <div class="row">
+											            <div class="col s12">
+										                    <h6 >Are you sure, you want to revoke access from <b>{{ manager.username }}</b> as a bot manager?</h6>
+										                    <ul>
+										                    	<li>He/She will not be able to access the {{ bot_obj.name }} bot anymore.</li>
+										                    </ul>
+											            </div>
+											        </div>
+											    </div>
+											    <div  class="modal-footer">
+											    	<a class="btn transparent-btn white black-text modal-close">Cancel</a>&nbsp;&nbsp;&nbsp;&nbsp;
+									                <a class="btn waves-effect waves-light white-text" style="background-color:#C62828 !important;"  onclick="unshare({{manager.id}}, {{bot_obj.pk}})">Delete</a>
+											    </div>
+											</div>
+						            	{% endfor %}
+						            {% else %}
+						            	-
+						            {% endif %}
+
+					            </td>
+					            <td class ="sandbox-user-edit-delete-icons">
+					            	<div id="edit-delete-buttons" style="">
+					            		<a href="#modal-edit-bot-manager-{{ manager.pk }}" class="modal-trigger">
+					            			<svg width="16" height="18" viewBox="0 0 16 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+											<path d="M11.248 0.917223C12.3351 -0.305741 14.0976 -0.305741 15.1847 0.917223C16.2265 2.08923 16.2699 3.95909 15.3149 5.18925L15.1847 5.34597L5.57646 16.1552C5.37132 16.386 5.12452 16.5633 4.85358 16.6756L4.68826 16.7351L0.632269 17.9796C0.285594 18.0859 -0.0345501 17.7612 0.0030073 17.378L0.018175 17.2887L1.12435 12.7257C1.20069 12.4108 1.33679 12.1192 1.5225 11.8704L1.6398 11.7265L11.248 0.917223ZM10.3876 3.47712L2.34708 12.5222C2.25477 12.626 2.18172 12.7489 2.13164 12.8835L2.08936 13.0218L1.21251 16.6347L4.42508 15.6495C4.50904 15.6237 4.5893 15.5858 4.66395 15.5371L4.77147 15.456L4.86918 15.3595L12.9092 6.31396L10.3876 3.47712ZM14.4774 1.71292C13.8196 0.972932 12.7759 0.931822 12.0752 1.58959L11.9553 1.71292L11.0948 2.68155L13.6164 5.51838L14.4774 4.55027C15.1352 3.81029 15.1717 2.63608 14.587 1.84784L14.4774 1.71292Z" fill="#2755CB"/>
+											</svg>&nbsp;&nbsp;
+					            		</a>  
+						            	<a href="#remove-bot-manager-{{ manager.pk }}" class="modal-trigger">
+						            		<svg width="16" height="18" viewBox="0 0 16 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+												<path d="M8 0C9.60341 0 10.913 1.19168 10.9958 2.69116L11 2.84211H15.4C15.7314 2.84211 16 3.0966 16 3.41053C16 3.6983 15.7743 3.93612 15.4814 3.97376L15.4 3.97895H14.5528L13.5769 15.3876C13.4506 16.8633 12.1496 18 10.5867 18H5.41328C3.85044 18 2.5494 16.8633 2.42309 15.3876L1.4464 3.97895H0.6C0.296243 3.97895 0.0452071 3.7651 0.00547714 3.48766L0 3.41053C0 3.12276 0.225723 2.88493 0.518584 2.84729L0.6 2.84211H5C5 1.27245 6.34315 0 8 0ZM13.3494 3.97895H2.65062L3.61917 15.2957C3.69495 16.1812 4.47557 16.8632 5.41328 16.8632H10.5867C11.5244 16.8632 12.305 16.1812 12.3808 15.2957L13.3494 3.97895ZM6.2 6.82105C6.50376 6.82105 6.75479 7.0349 6.79452 7.31234L6.8 7.38947V13.4526C6.8 13.7666 6.53137 14.0211 6.2 14.0211C5.89624 14.0211 5.64521 13.8072 5.60548 13.5298L5.6 13.4526V7.38947C5.6 7.07554 5.86863 6.82105 6.2 6.82105ZM9.8 6.82105C10.1038 6.82105 10.3548 7.0349 10.3945 7.31234L10.4 7.38947V13.4526C10.4 13.7666 10.1314 14.0211 9.8 14.0211C9.49624 14.0211 9.24521 13.8072 9.20548 13.5298L9.2 13.4526V7.38947C9.2 7.07554 9.46863 6.82105 9.8 6.82105ZM8 1.13684C7.04731 1.13684 6.26748 1.83802 6.20415 2.72535L6.2 2.84211H9.8L9.79585 2.72535C9.73252 1.83802 8.95269 1.13684 8 1.13684Z" fill="#ED2727"/>
+											</svg>
+						            	</a>
+						            </div>
+						        </td>
+					        </tr>
+					        <!-- Modal Structure -->
+							<div id="remove-bot-manager-{{ manager.pk }}" class="modal bot-manager-delete-modal">
+								<form action="/supervisor/remove-bot-manager/{{ manager.pk }}" method="POST">
+									{% csrf_token %}
+									<div class="modal-content">
+										<div class="row">
+											<div class="col s12">
+												<h6 style="font-weight: 400 !important; word-break: break-word;">Are you sure, you want to delete user <b>{{ manager.username }}</b>?</h6>
+											</div>
+										</div>
+									</div>
+									<div class="modal-footer">
+										<a class="btn transparent-btn white black-text modal-close">Cancel</a>
+										<button type="submit" class="btn waves-effect waves-light white-text" style="background-color: #C62828 !important;">Delete
+										</a>
+									</div>
+								</form>
+							</div>
+					    {% endfor %}
+				    	</tbody>
+						</table>
+
+					{% else %}
+						<p class="green lighten-1 center" style="padding:1em">No bot managers.</p>
+					{% endif %}
+	    		</div>
+
+	    	</div>
+
+		</div>
+	  <!-- </div>		
+	</div>
+
+</div> -->
+{% for manager in managers %}
+	<!-- Modal Structure -->
+	<div id="modal-edit-bot-manager-{{ manager.pk }}" class="modal">
+	    <div class="modal-content">
+	        <div class="row">
+	        	<div class="col s12">
+	        		<h5>Edit Bot Manager</h5>
+	        	</div>
+	        	<table style="table-layout: fixed;word-wrap: break-word;">
+	        		<tbody>
+	        			<tr style="background-color: #ffffff">
+	        				<th style="background-color: #ffffff">
+	        					<h6 style="color:#4d4d4d;">First Name<span style="color: red;">*</span></h6>
+	        					<input id="bot-manager-firstname-{{ manager.pk }}" type="text" class="validate" placeholder="First Name" autocomplete="off" value="{{ manager.first_name }}">
+	        				</th>
+	        				<th style="background-color: #ffffff">
+	        					<h6 style="color:#4d4d4d;">Last Name<span style="color: red;">*</span></h6>
+	        					<input id="bot-manager-lastname-{{ manager.pk }}" type="text" class="validate" placeholder="Last Name" autocomplete="off" value="{{ manager.last_name }}">
+	        				</th>
+	        			</tr>
+	        		</tbody>
+	        	</table>
+	        </div>
+	    </div>
+	   	<div class="modal-footer">
+	     	<a class="btn transparent-btn black-text white modal-close">Close</a>&nbsp;&nbsp;&nbsp;&nbsp;
+	      	<a class="btn waves-effect waves-light black-text" style="background-color:#038456 !important;" onclick="edit_bot_manager(this, '{{ manager.pk }}')">Save</a>
+	    </div>
+	</div>
+{% endfor %}
+
+
+<div id="sandbox-credentials" class="col s12" style="display: none;">
+
+	<div class="row" style="padding:1em;">
+		
+		<div class="col s12">
+			<a href="#modal-add-user" class="btn easychat-button modal-trigger">Add User</a>
+		</div>
+		<br>
+		<br>
+		<br>
+
+		<div class="col s12">
+
+			{% if sandbox_users %}
+
+				<table id="sandbox-user-table" class="display">
+				    <thead>
+				        <tr>
+				            <th>Email ID</th>
+				            <th>Created On</th>
+							<th>Will Expire On</th>
+				            <th></th>
+							<th></th>
+				            
+				        </tr>
+				    </thead>
+
+				    <tbody>
+				    	{% for user in sandbox_users %}
+				    	
+					        <tr class="sandbox_user_table_row">
+					            <td >
+					            	{{ user.username }} 
+					            </td>
+					            <!-- <td>{{ user.password }}</td> -->
+					            <td>	
+					            	{{user.created_on}}
+					            </td>
+								<td>{{ user.will_expire_on }}</td>
+								<td class="sandbox-credentials-extend-button">
+									<a href="#modal-extend-sandbox-user-{{ user.pk }}" class="modal-trigger ">
+										Extend
+									</a>
+									<!-- <button>Extend</button> -->
+								</td>
+					            <td class ="sandbox-user-edit-delete-icons">
+					            	<div id="edit-delete-buttons" style="">
+					            		<a href="javascript:void(0)" onclick="copy_password('{{user.password}}')">
+					            			<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 20" stroke="#254a9c">
+											  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path>
+											</svg>&nbsp;&nbsp;&nbsp;
+					            		</a>
+					            		<a href="#remove-sandbox-user-{{ user.pk }}" class="modal-trigger">
+					            			<svg width="16" height="18" viewBox="0 0 16 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+												<path d="M8 0C9.60341 0 10.913 1.19168 10.9958 2.69116L11 2.84211H15.4C15.7314 2.84211 16 3.0966 16 3.41053C16 3.6983 15.7743 3.93612 15.4814 3.97376L15.4 3.97895H14.5528L13.5769 15.3876C13.4506 16.8633 12.1496 18 10.5867 18H5.41328C3.85044 18 2.5494 16.8633 2.42309 15.3876L1.4464 3.97895H0.6C0.296243 3.97895 0.0452071 3.7651 0.00547714 3.48766L0 3.41053C0 3.12276 0.225723 2.88493 0.518584 2.84729L0.6 2.84211H5C5 1.27245 6.34315 0 8 0ZM13.3494 3.97895H2.65062L3.61917 15.2957C3.69495 16.1812 4.47557 16.8632 5.41328 16.8632H10.5867C11.5244 16.8632 12.305 16.1812 12.3808 15.2957L13.3494 3.97895ZM6.2 6.82105C6.50376 6.82105 6.75479 7.0349 6.79452 7.31234L6.8 7.38947V13.4526C6.8 13.7666 6.53137 14.0211 6.2 14.0211C5.89624 14.0211 5.64521 13.8072 5.60548 13.5298L5.6 13.4526V7.38947C5.6 7.07554 5.86863 6.82105 6.2 6.82105ZM9.8 6.82105C10.1038 6.82105 10.3548 7.0349 10.3945 7.31234L10.4 7.38947V13.4526C10.4 13.7666 10.1314 14.0211 9.8 14.0211C9.49624 14.0211 9.24521 13.8072 9.20548 13.5298L9.2 13.4526V7.38947C9.2 7.07554 9.46863 6.82105 9.8 6.82105ZM8 1.13684C7.04731 1.13684 6.26748 1.83802 6.20415 2.72535L6.2 2.84211H9.8L9.79585 2.72535C9.73252 1.83802 8.95269 1.13684 8 1.13684Z" fill="#ED2727"/>
+											</svg>
+					            		</a>
+						            </div>
+						        </td>
+					        </tr>
+							<!-- Modal Structure -->
+							<div id="modal-extend-sandbox-user-{{user.pk}}" class="sandbox-user-modal modal" style="width:40% !important; background-color: #FFF !important;">
+								<div class="modal-content">
+									<div class="row">
+										<div class="modal-header">
+											<h5>Extension Confirmation</h5>
+										</div>
+										<div class="modal-body">
+											<div class="">
+												<p style="color: #7b7979;">On confirming, an extension of 15 days will be provided.</p>
+											</div>
+											<div class="">
+												<p style="font-weight: bold;">Are you sure you want to give an extension? </p>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div id="sandbox-modal-footer" class="modal-footer" style="margin-top: -3em;height: 46px;">
+									<a class="btn transparent-btn black-text white modal-close">Cancel</a>&nbsp;&nbsp;&nbsp;&nbsp;
+									<a class="btn waves-effect waves-light black-text" onclick="extend_sandbox_user({{user.pk}})"style="background-color: #81C784;">Confirm</a>
+								</div>
+							</div>
+							<!-- Modal Structure -->
+							<div id="remove-sandbox-user-{{ user.pk }}" class="sandbox-user-modal modal">
+							    <div class="modal-content">
+							        <div class="row">
+							            <div class="col s12">
+						                    <h6 style="font-weight: 400 !important;" >Are you sure, you want to delete user <b class="sandbox-username">{{ user.username }}</b>? 
+						                    </h6>
+						                    <!-- <ul>
+						                    	<li>He/She will not be able to access the bot anymore.</li>
+						                    </ul> -->
+							            </div>
+							        </div>
+							    </div>
+							    <div id ="sandbox-user-delete" class="modal-footer">
+							    	<a class="btn transparent-btn white black-text modal-close">Cancel</a>
+				                	<a class="btn waves-effect waves-light white-text" style="background-color: #C62828 !important;" href="/supervisor/remove-sandbox-user/{{ user.pk }}" >Delete
+				   					</a>
+							    </div>
+							</div>
+					    {% endfor %}
+				    </tbody>
+				</table>
+
+			{% else %}
+				<p class="green lighten-1 center" style="padding:1em">No Sandbox users</p>
+			{% endif %}
+		</div>
+
+	</div>
+</div>
+
+<!-- Modal Structure -->
+<div id="modal-add-bot-manager" class="modal">
+    <div class="modal-content">
+        <div class="row">
+        	<div class="col s12">
+        		<h5>Add Bot Manager</h5>
+        	</div>
+        	<table style="table-layout: fixed;word-wrap: break-word;">
+        		<tbody>
+        			<tr style="background-color: #ffffff">
+        				<th style="background-color: #ffffff">
+        					<h6 style="color:#4d4d4d;">First Name<span style="color: red;">*</span></h6>
+        					<input id="bot-manager-firstname" type="text" class="validate" placeholder="First Name" autocomplete="off">
+        				</th>
+        				<th style="background-color: #ffffff">
+        					<h6 style="color:#4d4d4d;">Last Name<span style="color: red;">*</span></h6>
+        					<input id="bot-manager-lastname" type="text" class="validate" placeholder="Last Name*" autocomplete="off">
+        				</th>
+        			</tr>
+        			<tr style="background-color: #ffffff">
+        				<th style="background-color: #ffffff">
+        					<h6 style="color:#4d4d4d;">Email ID<span style="color: red;">*</span></h6>
+        					<form autocomplete="off">
+        						<input id="bot-manager-email" type="email" class="validate" placeholder="Email ID">
+        					</form>
+        				</th>
+        				<th style="background-color: #ffffff">
+        					<h6 style="color:#4d4d4d;">Password<span style="color: red;">*</span></h6>
+        					<form autocomplete="off">
+        						<input id="bot-manager-password" type="password" class="validate" placeholder="Password">
+        					</form>
+        				</th>
+        			</tr>
+        		</tbody>
+        	</table>
+        </div>
+		<div class="row" id="password_check_bot_manager" style="margin-left:0.5em;color: red; display: none;">
+			<ul class="password-validation-list">
+            	<li id="bot-manager-password-cap-small-check"><p>Password must contain one upper case letter and one lower case letter</p></li>
+             	<li id="bot-manager-password-number-check"><p>Password must contain one number</p></li>
+              	<li id="bot-manager-password-special-char-check"><p>Password must contain one special character</p></li>
+              	<li id="bot-manager-password-length-check"><p>Password length must be between 8-32 characters</p></li>
+            </ul>
+	  </div>
+    </div>
+   	<div class="modal-footer">
+     	<a class="btn transparent-btn white black-text modal-close">Close</a>&nbsp;&nbsp;&nbsp;&nbsp;
+      	<a class="btn waves-effect waves-light black-text" style="background-color:#038456 !important;" onclick="add_bot_manager(this)">Add</a>
+    </div>
+</div>
+
+<div id="modal-add-user" class="modal"  >
+    <div class="modal-content" style="padding:20px;padding-top: 0em;">
+        <div class="row">
+        	<div class="col s12">
+        		<h6 style="color:#2d2d2d;">Add New User</h6>
+        	</div>
+        	<table class ="sandbox-add-modal"style="table-layout: fixed;word-wrap: break-word;">
+        		<tbody>        			
+        			<tr style="background-color: #ffffff">
+        				<th style="background-color: #ffffff">
+        					<h6 style="color:#4d4d4d;">Email Id</h6>
+        					<form autocomplete="off">
+        						<input id="sandbox-user-username" maxlength="100" type="text" class="validate" placeholder="Enter Email-Id" >
+        					</form>
+        				</th>
+        			</tr>
+        			<tr style="background-color: #fff">	
+        				<th style="background-color: #fff">
+        					<h6 style="color:#4d4d4d;">Password</h6>
+        					<input id="sandbox-user-password" type="text" class="validate" placeholder="Enter Password" autocomplete="off">
+        				</th>
+        			</tr>
+        		</tbody>
+        	</table>
+        </div>
+        <div class="row" id="password_check_sandbox_user" style="margin-left:0.5em;color: red;display: none;">
+			<ul class="password-validation-list">
+				<li id="sandbox-password-cap-small-check"> <p > Password must contain one upper case letter and one lower case letter</p></li>
+				<li id="sandbox-password-number-check"> <p > Password must contain one number</p></li>
+				<li id="sandbox-password-special-char-check"><p>Password must contain one special character</p></li>
+				<li id="sandbox-password-length-check"><p> Password length must be between 8-32 characters</p></li>
+			</ul>
+        </div>
+    </div>
+   	<div class="modal-footer" id="sandbox-add-modal-footer" style="margin-top: -3em;">
+     	<a class="btn transparent-btn white black-text modal-close">Cancel</a>&nbsp;&nbsp;&nbsp;&nbsp;
+      	<a class="btn waves-effect waves-light black-text" style="background-color:#038456 !important;" onclick="add_sandbox_user(this)">Save</a>
+    </div>
+</div>
+<script type="text/javascript" src="{% static 'EasyChatApp/js/access_management.js' %}?v={% random_int 1 100 %}"></script>
+{% endblock %}

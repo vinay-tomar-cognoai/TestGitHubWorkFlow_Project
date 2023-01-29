@@ -1,0 +1,388 @@
+{% extends 'EasyChatApp/base.html' %}
+{% block content %}
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'EasyChatApp/css/show_easychat_data_collect.css' %}?v={% random_int 1 100 %}"/>
+<div class="add-scrolling">
+<div class="row" style="margin-top:1%;">
+
+  <div class="col s12">
+    <div class="input-field col s7">
+      <select id="select-data-entry-bot">
+          <option value="None">---Choose Bot---</option>
+          {% for bot_obj in bot_objs %}
+            {% if bot_obj ==  selected_bot_obj %}
+                <option value="{{ bot_obj.pk }}" selected="">{{ bot_obj.name }}</option>
+              {% else %}
+                <option value="{{ bot_obj.pk }}">{{ bot_obj.name }}</option>
+              {% endif %}
+        {% endfor %}
+      </select>
+    </div>
+    {% if selected_bot_obj %}
+     <div class="col s5" style="margin-top:1em;">
+        {% if data_collect_form_ui_data %}
+        <button id="get_data_collect_link" style="margin:0 1em; padding: 0rem 1rem !important;" class="waves-effect waves-light btn black-text purple lighten-4" >Get Link</button>
+        <button class="waves-effect waves-light btn black-text purple lighten-4"  onclick="window.open('/bot-data-collect/?id={{selected_bot_obj.pk}}', '_blank');" style="margin:0 1em; padding: 0rem 1rem !important;">See Form</button>
+        <a href="#make-data-entry-form-modal" class="waves-effect waves-light btn black-text purple lighten-4 modal-trigger" style="margin-top:0 1em; box-shadow: 0px 0px 1px black; margin-left: 1em;" >Edit Form</a>
+        {% else %}
+        <a href="#make-data-entry-form-modal" class="waves-effect waves-light btn black-text purple lighten-4 modal-trigger" style="margin-top:0 1em;" >Make Form</a>
+        {% endif %}
+    </div>
+    <div id="data-entry-link-modal" class="modal" style="padding: 1em">
+      <div class="modal-content">
+          <h5>Data Collection Form Link</h5>
+      </div>
+      <div class="col s10">
+          <input type="text" value="" id="data-entry-link-input" readonly style="border: 0.1em solid black;padding:1em;font-family: Consolas, monaco, monospace;word-wrap: break-word;background-color:white;">
+          <button onclick="copyToClipboard('data-entry-link-input')">Copy Link</button>
+          <br><br><br>
+      </div>
+    </div>
+    <div id="make-data-entry-form-modal" class="modal">
+      <div class="modal-content data-entry-form-modal-content">
+        <h5>Data Collection Form</h5>
+        <i class="material-icons right add-input-to-form">add_circle</i>
+        <br>
+        <br>
+        {% if data_collect_form_ui_data %}
+        {% for form_ui_obj in data_collect_form_ui_data%}
+          {% if forloop.counter == 1 %}
+          <div class="row data-entry-form-div" id="data-entry-form-div-1" style="border: 1px solid black;padding: 1em 0;position: relative;">
+                <div class="input-field col s4" style="margin: 0">
+                  <input disabled id="data-entry-input-name-1" type="text" value="Question">
+                  <label for="data-entry-input-name-1">Input Name</label>
+                </div>
+                <div class="input-field col s3" style="margin: 0; margin-top: 1rem">
+                  <select disabled class="select-data-entry-input-type" id="select-data-entry-input-type-1">
+                      <option value="None">---Choose Input Type---</option>
+                      <option selected value="data-entry-form-input-text">Text Field</option>
+                      <option value="data-entry-form-input-number">Number Field</option>
+                      <option value="data-entry-form-input-dropdown">DropDown</option>
+                  </select>
+                </div>
+                <div class="input-field col s2" style="margin: 0">
+                  <label>
+                    <input type="checkbox" checked="checked" disabled="disabled" id="data-entry-input-necessary-1"/>
+                    <span>Mandatory field</span>
+                  </label>
+                </div>
+          </div>
+        {% else %}
+          {% if forloop.counter == 2 %}
+          <div class="row data-entry-form-div" id="data-entry-form-div-2" style="border: 1px solid black;padding: 1em 0;position: relative;">
+                <span class="close-div" id="delete-div-2"><i class="material-icons">delete</i></span>
+                <div class="input-field col s4" style="margin: 0">
+                  <input disabled id="data-entry-input-name-2" type="text" value="Answer">
+                  <label for="data-entry-input-name-2">Input Name</label>
+                </div>
+                <div class="input-field col s3" style="margin: 0; margin-top: 1rem">
+                  <select disabled class="select-data-entry-input-type" id="select-data-entry-input-type-2">
+                      <option value="None">---Choose Input Type---</option>
+                      <option selected value="data-entry-form-input-text">Text Field</option>
+                      <option value="data-entry-form-input-number">Number Field</option>
+                      <option value="data-entry-form-input-dropdown">DropDown</option>
+                  </select>
+                </div>
+                <div class="input-field col s2" style="margin: 0">
+                  <label>
+                    {% if form_ui_obj.input_is_necessary %}
+                      <input type="checkbox" checked="checked" id="data-entry-input-necessary-2"/>
+                    {% else %}
+                      <input type="checkbox" id="data-entry-input-necessary-2"/>
+                    {% endif%}
+                    <span>Mandatory field</span>
+                  </label>
+                </div>
+          </div>
+          {% else %}
+            <div class="row data-entry-form-div" id="data-entry-form-div-{{forloop.counter}}" style="border: 1px solid black;padding: 1em 0;position: relative;">
+                <span class="close-div" id="delete-div-{{forloop.counter}}"><i class="material-icons">delete</i></span>
+                <div class="input-field col s4" style="margin: 0">
+                  <input id="data-entry-input-name-{{forloop.counter}}" type="text" value="{{form_ui_obj.input_name}}">
+                  <label for="data-entry-input-name-{{forloop.counter}}">Input Name</label>
+                </div>
+                <div class="input-field col s3" style="margin: 0; margin-top: 1rem">
+                  <select class="select-data-entry-input-type" id="select-data-entry-input-type-{{forloop.counter}}">
+                      <option value="None">---Choose Input Type---</option>
+                      {% ifequal form_ui_obj.input_type "data-entry-form-input-text" %}
+                      <option selected value="data-entry-form-input-text">Text Field</option>
+                      {% else %}
+                      <option value="data-entry-form-input-text">Text Field</option>
+                      {% endifequal %}
+                      {% ifequal form_ui_obj.input_type "data-entry-form-input-number" %}
+                      <option selected value="data-entry-form-input-number">Number Field</option>
+                      {% else %}
+                      <option value="data-entry-form-input-number">Number Field</option>
+                      {% endifequal %}
+                      {% ifequal form_ui_obj.input_type "data-entry-form-input-dropdown" %}
+                      <option selected value="data-entry-form-input-dropdown">DropDown</option>
+                      {% else %}
+                      <option value="data-entry-form-input-dropdown">DropDown</option>
+                      {% endifequal %}
+                  </select>
+                </div>
+                <div class="input-field col s2" style="margin: 0">
+                  <label>
+                    {% if form_ui_obj.input_is_necessary %}
+                      <input type="checkbox" checked="checked" id="data-entry-input-necessary-{{forloop.counter}}"/>
+                    {% else %}
+                      <input type="checkbox" id="data-entry-input-necessary-{{forloop.counter}}"/>
+                    {% endif%}
+                    <span>Mandatory field</span>
+                  </label>
+                </div>
+                {% ifequal form_ui_obj.input_type "data-entry-form-input-dropdown" %}
+                <div class="input-field col s12" id = "data-entry-dropdown-options-div-{{forloop.counter}}">
+                  <input id="data-entry-dropdown-options-{{forloop.counter}}" type="text" value="{{form_ui_obj.dropdown_options|join:','}}">
+                  <label for="data-entry-dropdown-options-{{forloop.counter}}">Dropdown options (Saparated by comma(,))</label>
+                </div>
+                {% else %}
+                <div class="input-field col s12" id = "data-entry-dropdown-options-div-{{forloop.counter}}" style="display: none;">
+                  <input id="data-entry-dropdown-options-{{forloop.counter}}" type="text">
+                  <label for="data-entry-dropdown-options-{{forloop.counter}}">Dropdown options (Saparated by comma(,))</label>
+                </div>
+                {% endifequal %}
+          </div>
+          {% endif  %}
+        {% endif  %}
+        {% endfor %}
+        {% else %}
+        <div class="row data-entry-form-div" id="data-entry-form-div-1" style="border: 1px solid black;padding: 1em 0;position: relative;">
+                <div class="input-field col s4" style="margin: 0">
+                  <input disabled id="data-entry-input-name-1" type="text" value="Question">
+                  <label for="data-entry-input-name-1">Input Name</label>
+                </div>
+                <div class="input-field col s3" style="margin: 0; margin-top: 1rem">
+                  <select disabled class="select-data-entry-input-type" id="select-data-entry-input-type-1">
+                      <option value="None">---Choose Input Type---</option>
+                      <option selected value="data-entry-form-input-text">Text Field</option>
+                      <option value="data-entry-form-input-number">Number Field</option>
+                      <option value="data-entry-form-input-dropdown">DropDown</option>
+                  </select>
+                </div>
+                <div class="input-field col s2" style="margin: 0">
+                  <label>
+                    <input type="checkbox" checked="checked" disabled="disabled" id="data-entry-input-necessary-1"/>
+                    <span>Mandatory field</span>
+                  </label>
+                </div>
+          </div>
+        <div class="row data-entry-form-div" id="data-entry-form-div-2" style="border: 1px solid black;padding: 1em 0;position: relative;">
+                <span class="close-div" id="delete-div-2"><i class="material-icons">delete</i></span>
+                <div class="input-field col s4" style="margin: 0">
+                  <input disabled id="data-entry-input-name-2" type="text" value="Answer">
+                  <label for="data-entry-input-name-2">Input Name</label>
+                </div>
+                <div class="input-field col s3" style="margin: 0; margin-top: 1rem">
+                  <select disabled class="select-data-entry-input-type" id="select-data-entry-input-type-2">
+                      <option value="None">---Choose Input Type---</option>
+                      <option selected value="data-entry-form-input-text">Text Field</option>
+                      <option value="data-entry-form-input-number">Number Field</option>
+                      <option value="data-entry-form-input-dropdown">DropDown</option>
+                  </select>
+                </div>
+                <div class="input-field col s2" style="margin: 0">
+                  <label>
+                    <input type="checkbox" id="data-entry-input-necessary-2"/>
+                    <span>Mandatory field</span>
+                  </label>
+                </div>
+          </div>
+        {% endif %}
+        <div class=".data-entry-form-modal-content">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a href="javascript:void(0)" class="modal-close transparent-btn btn white black-text">Cancel</a>
+        {% if data_collect_form_ui_data %}
+        <a href="javascript:void(0)" id="data-entry-form-data-save" class="modal-close waves-effect waves-green btn green lighten-2 black-text" style="margin-left: 1%">Save Changes</a>
+        {% else %}
+        <a href="javascript:void(0)" id="data-entry-form-data-save" class="modal-close waves-effect waves-green btn green lighten-2 black-text" style="margin-left: 1%">Create Form</a>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+{% if selected_bot_obj %}
+
+  {% if data_collect_list %}
+    <div class="col s12">
+        <p class="white black-text center" style="padding:1em;">Total Entries: {{total_data_objects}}</p>
+    </div>
+    <button style="margin:0 0 1em 1em;display: none;" id="data-collect-entry-delete-selected" class="left waves-effect waves-light btn black-text red darken-3" ><i class="material-icons" style="vertical-align: bottom;">delete</i> Delete Selected Entries</button>
+     <button style="margin:0 0 1em 1em;display: none;" id="data-collect-entry-add-to-intent-selected" class="left waves-effect waves-light btn green lighten-2" ><i class="material-icons" style="vertical-align: bottom;">add</i> Add Selected Entries to Existing Intent</button>
+    <button style="margin:0 1em 1em 0; padding: 0rem 1rem;" id="download_excel_data_collect" class="right waves-effect waves-light btn black-text purple lighten-4">Download Excel</button>
+    <div style="margin: 1%">
+    <table id="data-collect-info-table" class="striped highlight responsive-table white">
+        <thead>
+            <tr>
+                <th style="width:5%;" class="center">
+                  <strong>
+                  <div>
+                    <label>
+                      <input type="checkbox" id="modify-data-collect-entry-select-all-checkbox"/>
+                      <span></span>
+                    </label>
+                  </div>
+                  </strong>
+                </th>
+                {% for form_ui_obj in data_collect_form_ui_data%}
+                  {% if forloop.counter < 4 %}
+                  <th style="width:25%;" >{{form_ui_obj.input_name}}</th>
+                  {% endif  %}
+                {% endfor %}
+                <th style="width:10%;">Time</th>
+                <th class="entry-options" style="width:10%;" >Options</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for data_collect_obj in data_collect_list %}
+              <tr class="text-darken-3">
+                    <td style="width:5%;" class="center">
+                      <strong>
+                      <div>
+                        <label>
+                          <input class="modify-data-collect-entry-checkbox" type="checkbox" id="modify-data-collect-entry-checkbox-{{ data_collect_obj.pk }}"/>
+                          <span></span>
+                        </label>
+                      </div>
+                      </strong>
+                    </td>
+                    <td id = "entry_id_pk_{{ data_collect_obj.pk }}" style="width:25%;" >{{ data_collect_obj.input_1.value}}</td>
+                    {% if data_collect_form_ui_data|length > 1 %}
+                      {% if data_collect_obj.input_2 %}
+                        <td style="width:25%;" >{{ data_collect_obj.input_2.value}}</td>
+                      {% else %}
+                        <td style="width:25%;" > --- </td>
+                      {% endif %}
+                    {% endif %}
+                    {% if data_collect_form_ui_data|length > 2 %}
+                      {% if data_collect_obj.input_3 %}
+                        <td style="width:25%;" >{{ data_collect_obj.input_3.value}}</td>
+                      {% else %}
+                        <td style="width:25%;" > --- </td>
+                      {% endif %}
+                    {% endif %}
+                    <td style="width:10%;">{{ data_collect_obj.time }} </td>
+                    <td class="entry-options" style="width:10%;" >
+                        <i class="material-icons red-text text-darken-3 tooltipped delete_data_entry" id="entry_{{ data_collect_obj.pk }}" data-position="bottom" data-tooltip="Delete Entry">delete</i> 
+                        <a target="_blank"  href="/chat/create-intent/?bot_pk={{ selected_bot_obj.pk }}&val={{ data_collect_obj.input_1.value }}"><i class="material-icons blue-text darken-3 tooltipped" data-position="bottom"  data-tooltip="Create New Intent">fiber_new</i></a>
+                        <i class="material-icons grey-text darken-3 tooltipped add-data-entry-to-intent" id="add-data-entry-to-intent-pk-{{ data_collect_obj.pk }}" data-position="bottom" data-tooltip="Add to Existing Intent">library_add</i>
+                        {% if data_collect_obj.more_info %}
+                          <a href="#more-info-modal-{{ data_collect_obj.pk }}" class="modal-trigger"><i style="-webkit-transform: rotate(180deg)" class="material-icons purple-text lighten-3 tooltipped" data-position="bottom"  data-tooltip="More Info">more</i></a>
+                        {% endif %} 
+                   </td>
+                                      
+                </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+  </div>
+  {% else %}
+      <div class="col s12">
+      <p class="center green lighten-1 green-text text-darken-4" style="padding:1em;">
+          No Entries associated with selected bot.
+      </p>
+    </div>
+  {% endif %}
+{% else %}
+<div class="col s12">
+<p class="center green lighten-1 green-text text-darken-4" style="padding:1em;">
+    Kindly select valid bot from the list.
+</p>
+</div>
+{% endif %}
+  </div>
+
+  <div class="col s12 right-align">
+      {% if data_collect_list.has_other_pages %}
+        <ul class="pagination">
+          {% if data_collect_list.has_previous %}
+            <li><a href="?page={{ data_collect_list.previous_page_number }}"><i class="material-icons">chevron_left</i></a></li>
+          {% else %}
+            <li class="disabled"><i class="material-icons">chevron_left</i></li>
+          {% endif %}
+          {% for i in data_collect_list.paginator.page_range %}
+            {% if data_collect_list.number == i %}
+              <li class="active black-text purple lighten-4"><a href="?page={{ i }}">{{ i }}</a></li>
+            {% else %}
+              <li><a href="?page={{ i }}">{{ i }}</a></li>
+            {% endif %}
+          {% endfor %}
+          {% if data_collect_list.has_next %}
+            <li><a href="?page={{ data_collect_list.next_page_number }}"><i class="material-icons">chevron_right</i></a></li>
+          {% else %}
+            <li class="disabled"><i class="material-icons">chevron_right</i></li>
+          {% endif %}
+        </ul>          
+      {% endif %}
+  </div>
+
+
+</div>
+{% if data_collect_list %}
+  {% for data_collect_obj in data_collect_list %}
+    {% if data_collect_obj.more_info %}  
+      <div id="more-info-modal-{{data_collect_obj.pk}}" class="modal">
+        <div class="modal-content">
+          <table style="width:100%" class="striped highlight responsive-table white">
+            {% for key,s in data_collect_obj.items %}
+              {% if "input_" in key %}
+                <tr>
+                <th>{{ s.name}}</th>
+                <td>{{ s.value}}</td>
+                </tr>
+              {% endif %}
+            {% endfor %}
+          </table>
+        </div>
+        <div class="modal-footer">
+          <a href="javascript:void(0)" class="modal-close waves-effect waves-green btn white black-text">Close</a>
+        </div>
+      </div>
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+<div id="delete_data_collect_entry-modal" class="modal">
+  <div class="modal-content">
+    <h4>Delete Entry</h4>
+    <p>Are you sure, you want to delete Entry?</p>
+  </div>
+  <div class="modal-footer">
+    <a href="javascript:void(0)" class="modal-close waves-effect waves-green btn white black-text">Cancel</a>
+    <a href="javascript:void(0)" id="" class="modal-close waves-effect waves-green btn delete_data_collect_entry red darken-3 white-text">Delete</a>
+  </div>
+</div>
+
+<div id="add_to_intent_data_collect_entry-modal" class="modal">
+  <div class="modal-content">
+    <div class="row">
+    <h4>Add this to Existing Intent</h4>
+    <p id="selected_entry_qstn"></p>
+    <div id="data_entry_add_to_intent_div">
+      <select class="browser-default" id="select-add-to-intent">
+      <option value="">---Choose Intent---</option>
+      {% for intent_obj in intent_objs %}
+      <option value="{{intent_obj.pk}}">{{intent_obj.name}}</option>
+      {% endfor %}
+      </select>  
+    </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <a href="javascript:void(0)" class="modal-close waves-effect waves-green btn transparent-btn white black-text">Cancel</a>
+    <a href="#!" class="btn green lighten-2 add-training-qstn-to-intent-data-entry">Add to Intent</a>
+  </div>
+</div>
+</div>
+<script type="text/javascript">
+    $(document).on("change", "#select-data-entry-bot", function(e){
+        bot_id = document.getElementById("select-data-entry-bot").value;
+        if(bot_id!="None"){
+            window.location="/chat/show-data-collect/?bot_pk="+bot_id;
+        }
+    });
+</script>
+{% endblock %}

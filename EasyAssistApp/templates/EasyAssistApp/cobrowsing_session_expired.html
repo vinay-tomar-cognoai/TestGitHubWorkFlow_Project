@@ -1,0 +1,726 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    {% if cobrowse_config_obj.cobrowsing_favicon %}
+        <link rel="shortcut icon" type="image/x-icon" href="{{ cobrowse_config_obj.cobrowsing_favicon }}">
+    {% else %}        
+        {% if cobrowse_agent.get_access_token_obj and cobrowse_agent.get_access_token_obj.agent.user.enable_s3_bucket %}
+        <link rel="shortcut icon" type="image/x-icon" href="https://static.allincall.in/static/EasyAssistApp/img/cobrowseLogoShort.svg">
+        {% else %}
+        <link rel="shortcut icon" type="image/x-icon" href="{% static 'EasyAssistApp/img/cobrowseLogoShort.svg' %}">
+        {% endif %}
+    {% endif %}
+
+    <title>Agent | Cobrowsing</title>
+    <!-- Custom fonts for this template-->
+    {% if cobrowse_agent.get_access_token_obj and cobrowse_agent.get_access_token_obj.agent.user.enable_s3_bucket %}
+    <link href="https://static.allincall.in/static/EasyAssistApp/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    {% else %}
+    <link href="{% static 'EasyAssistApp/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+    {% endif %}
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <!-- Custom styles for this template-->
+    {% if cobrowse_agent.get_access_token_obj and cobrowse_agent.get_access_token_obj.agent.user.enable_s3_bucket %}
+    <link rel="stylesheet" href="https://static.allincall.in/static/EasyAssistApp/css/bootstrap.min.css">
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/vendor/jquery/jquery.min.js"></script>
+    <script src="https://static.allincall.in/static/EasyAssistApp/js/popper.min.js"></script>
+    <script src="https://static.allincall.in/static/EasyAssistApp/js/bootstrap.min.js"></script>
+    <link href="https://static.allincall.in/static/EasyAssistApp/css/sb-admin-2.min.css" rel="stylesheet">
+    {% else %}
+    <link rel="stylesheet" href="{% static 'EasyAssistApp/css/bootstrap.min.css' %}">
+    <script type="text/javascript" src="/static/EasyAssistApp/vendor/jquery/jquery.min.js"></script>
+    <script src="{% static 'EasyAssistApp/js/popper.min.js' %}"></script>
+    <script src="{% static 'EasyAssistApp/js/bootstrap.min.js' %}"></script>
+    <link href="{% static 'EasyAssistApp/css/sb-admin-2.min.css' %}" rel="stylesheet">
+    {% endif %}
+    <script type="text/javascript" src="{% static 'EasyAssistApp/js/validations.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'EasyAssistApp/css/console.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'EasyAssistApp/css/cobrowse_changes.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'EasyAssistApp/css/cobrowse_responsive.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'EasyAssistApp/css/easyassist-custom-select.css' %}">
+
+    {% if easyassist_font_family != 'Silka' %}
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family={{easyassist_font_family}}">
+    {% endif %}
+
+    <style>
+
+        {% if easyassist_font_family == 'Silka' %}
+            *{
+              font-family: Silka, sans-serif !important;
+            }
+        {% else %}
+            *{
+              font-family: {{easyassist_font_family}} !important;
+            }
+        {% endif %}
+
+        #logo {
+            display: flex;
+            justify-content: center;
+            padding-top: 3em;
+        }
+
+        .meeting-ended-text {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 26px;
+            line-height: 31px;
+            color: #000000;
+            text-align: center;
+        }
+
+        .card {
+            border: none!important;
+            max-width: 487px!important;
+            margin-bottom: 2rem!important;
+        }
+
+        .card-header {
+            background: #FFFFFF;
+            border: 1px solid #D9D9D9!important;
+            border-top-left-radius: 25px!important;
+            border-top-right-radius: 25px!important;
+            border-bottom: none!important;
+            padding: 1rem 1.25rem 0rem 1.25rem
+        }
+
+        .card-header .card-title {
+            font-style: normal;
+            font-weight: 600;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            color: #4D4D4D;
+            margin: 0!important;
+        }
+
+        .card-body {
+            border: 1px solid #D9D9D9!important;
+            border-top: none!important;
+            border-bottom: none!important;
+        }
+
+        .card-body label {
+            font-style: normal;
+            font-weight: 500;
+            font-size: 13px;
+            color: #4D4D4D;
+        }
+
+        textarea {
+            background: #FFFFFF;
+            border: 1px solid #E6E6E6!important;
+            box-sizing: border-box;
+            border-radius: 10px;
+            resize: none;
+            font-style: normal;
+            font-weight: normal!important;
+            font-size: 13px!important;
+            height: 71px!important;
+            outline: none!important;
+            box-shadow: none!important;
+
+            color: #4D4D4D!important;
+        }
+
+        .modal-end-session-text {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 13px;
+            color: #4D4D4D;
+        }
+
+        .card-footer {
+            border: 1px solid #D9D9D9!important;
+            border-top: none!important;
+            border-bottom-left-radius: 25px!important;
+            border-bottom-right-radius: 25px!important;
+            background: #FFFFFF;
+
+            padding: 0em 1.25rem 0.75rem 1.25rem!important;
+
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .card-footer .btn-primary {
+            background: #0254D7;
+            width: 107px;
+            height: 39px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #predefined-remarks-buttons-list {
+            padding: 0px;
+            margin-bottom: 0px !important;
+            overflow-y: auto;
+            white-space: nowrap;
+        }
+
+        .predefined-remarks-list-item {
+            display: inline-block;
+            padding: 8px 12px 8px 0px;
+            margin-bottom: 15px;
+        }
+
+        .predefined-remarks-list-item:last-child {
+            padding-right: 0px;
+        }
+
+        .predefined-remarks-button {
+            border-radius: 100px;
+            font-size: 14px;
+            font-weight: normal;
+            line-height: 14px;
+            box-shadow: none !important;
+            color: {{ floating_button_bg_color}}!important;
+            height: 30px;
+        }
+
+        .predefined-remarks-button-clicked {
+            background-color: {{ floating_button_bg_color }}!important;
+            color: #fff !important;
+        }
+
+        .predefined-remarks-list-item:last-child {
+            padding-right: 0px;
+        }
+
+        #predefined-remarks-buttons-list::-webkit-scrollbar {
+            width: 8px;
+            height: 5px;
+        }
+
+        #predefined-remarks-buttons-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #predefined-remarks-buttons-list::-webkit-scrollbar-thumb {
+            background: #c1c2c9;
+            border-radius: 10px;
+        }
+
+        .predefined-remarks-container {
+            background: #FFFFFF;
+            border: 1px solid #E6E6E6;
+            box-sizing: border-box;
+            border-radius: 10px;
+            padding: 1em 1em!important;
+        }
+
+        .padding-0 {
+            padding: 0!important;
+        }
+
+        .btn-primary, .btn-primary:hover {
+            background-color: {{ floating_button_bg_color }}!important;
+            border: 1px solid {{ floating_button_bg_color }}!important;
+        }
+
+        .checkbox-btn-container-item {
+            width: 100%;
+            margin: auto;
+            position: relative;
+            display: block;
+        }
+
+        .checkbox-btn-container-item input[type="checkbox"] {
+            width: auto;
+            opacity: 0.00000001;
+            position: absolute;
+            left: 0;
+            margin-left: -20px;
+        }
+
+        .checkbox-btn-container-item label {
+            position: relative;
+        }
+
+        .checkbox-btn-container-item label:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 2px;
+            width: 16px;
+            height: 16px;
+            transition: transform 0.28s ease;
+            border-radius: 3px;
+            border: 1px solid #e6e6e6;
+        }
+
+        .checkbox-btn-container-item label:after {
+            content: '';
+            display: block;
+            width: 10px;
+            height: 5px;
+            border-bottom: 3px solid #fff;
+            border-left: 3px solid #fff;
+            -webkit-transform: rotate( -45deg) scale(0);
+            transform: rotate( -45deg) scale(0);
+            transition: transform ease 0.25s;
+            will-change: transform;
+            position: absolute;
+            top: 7px;
+            left: 3px;
+        }
+
+        .checkbox-btn-container-item input[type="checkbox"]:checked~label::before {
+            color: #7bbe72;
+            background-color: #7bbe72;
+            border-color: #7bbe72;
+        }
+
+        .checkbox-btn-container-item input[type="checkbox"]:checked~label::after {
+            -webkit-transform: rotate(-45deg) scale(1);
+            transform: rotate(-45deg) scale(1);
+        }
+
+        .checkbox-btn-container-item label {
+            min-height: 34px;
+            display: block;
+            padding-left: 25px;
+            margin-bottom: 0;
+            font-weight: normal;
+            cursor: pointer;
+            vertical-align: sub;
+        }
+
+        .checkbox-btn-container-item input[type="checkbox"]:focus+label::before {
+            outline: 0;
+        }
+
+        .checkbox-btn-container-item input[type="checkbox"]:checked~label::before {
+            color: {{ floating_button_bg_color }}!important;
+            background-color: {{ floating_button_bg_color }}!important;
+            border-color: {{ floating_button_bg_color }}!important;
+        }
+    </style>
+</head>
+
+
+<body>
+    {% csrf_token %}
+    <div id="logo">
+        {% if cobrowse_config_obj.cobrowsing_logo %}
+          <img id="cobrowseLogoImage" src="{{ cobrowse_config_obj.cobrowsing_logo }}" alt="Logo" max-width="90px" height="50px"/>
+        {% else %}    
+            {% if logo %}
+            <img id="cobrowseLogoImage" src="/{{ logo }}" alt="Cogno CoBrowse" max-width="90px" height="50px" />
+            {% else %}
+            {% if cobrowse_agent.get_access_token_obj and cobrowse_agent.get_access_token_obj.agent.user.enable_s3_bucket %}
+            <img id="cobrowseLogoImage" src="https://static.allincall.in/static/EasyAssistApp/img/cobrowseLogo.svg" id="sales-ai-logo" alt="Cogno CoBrowse" style="height: 100%; width: 13em;"/>
+            {% else %}
+            <img id="cobrowseLogoImage" src="{% static 'EasyAssistApp/img/cobrowseLogo.svg' %}" id="sales-ai-logo" alt="Cogno CoBrowse" style="height: 100%; width: 13em;"/>
+            {% endif %}
+            {% endif %}
+        {% endif %}
+    </div>
+    {% if is_admin_agent %}
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-sm-12 mb-4" style="margin-top: 3em">
+                <h2 class="meeting-ended-text">Cobrowsing session has ended</h2>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-sm-12" style="display: flex; justify-content: center;">
+                <div class="card" id="close_session_modal">
+                    <div class="card-header">
+                        <h5 class="card-title" id="close_session_modal_label">Update status of the lead?</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="checkbox-btn-container-item">
+                                    <input type="checkbox" id="mask-successfull-cobrowsing-session" checked>
+                                    <label for="mask-successfull-cobrowsing-session"><span>{{ lead_conversion_checkbox_text }}</span></label>
+                                 </div>
+                            </div>
+                            <div class="col-12">
+                                <label for="close-session-remarks">                                    
+                                    {%if not predefined_remarks_optional %}
+                                        Remarks<sup style="color: red;">*</sup>
+                                    {% else %}
+                                        Remarks
+                                    {% endif %}
+                                </label>
+                                <div class="row">
+                                    {% if enable_predefined_remarks %}
+                                    <div class="col-12 mt-2">
+                                        <div>
+                                            <select id="close-session-remarks" onchange="show_comments_textbox(this)">
+                                                {% for predefined_remark in predefined_remarks %}
+                                                <option value="{{ predefined_remark.remark }}">{{ predefined_remark.remark }}</option>
+                                                {% endfor %}
+                                                <option value="others">Others</option>
+                                            </select>
+                                        </div>
+                                        <span class="close-session-error" id="close-session-remarks-error" style="margin-left: 1em; display: none; color: red;"></span>
+                                    </div>
+                                    {% if enable_predefined_subremarks %}
+                                    <div class="col-12 mt-4 subremarks-container" style="display: none;">
+                                        <label for="close-session-subremarks">
+                                            {%if not predefined_remarks_optional %}
+                                                Sub-Remarks<sup style='color: red;'>*</sup>
+                                            {% else %}
+                                                Sub-Remarks
+                                            {% endif %}
+                                        </label>
+                                        <div>
+                                            <select id="close-session-subremarks" onchange="show_comments_textbox(this)">
+                                                <option value="None">None</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    <div class="col-12 mt-4">
+                                        <label for="close-session-remarks-text">Comments</label>
+                                        {%if not predefined_remarks_optional %}
+                                            <textarea class="form-control close-session-remarks-text" id="close-session-remarks-text" placeholder="" disabled></textarea>
+                                        {% else %}
+                                            <textarea class="form-control close-session-remarks-text" id="close-session-remarks-text" placeholder=""></textarea>
+                                        {% endif %}
+                                        <span class="close-session-error" id="close-session-text-error" style="color: red;"></span>
+                                    </div>
+                                    {% elif enable_predefined_remarks_with_buttons %}
+                                    <div class="col-12 mt-2">
+                                        <textarea class="form-control close-session-remarks-text" rows="1" id="close-session-remarks-text" placeholder="Remarks"></textarea>
+                                        <span class="close-session-error" id="close-session-text-error" style="color: red;"></span>
+                                    </div>
+                                    <label class="col-12 mt-3">Suggestions</label>
+                                    <div class="col-12">
+                                        <ul id="predefined-remarks-buttons-list">
+                                            {% for predefined_remark in predefined_remarks_with_buttons %}
+                                            <li class="predefined-remarks-list-item">
+                                                <button class="btn predefined-remarks-button" onclick="set_remarks_in_textbox(this)">{{predefined_remark}}</button>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                    {% else %}
+                                    <div class="col-12 mt-2">
+                                        <textarea class="form-control close-session-remarks-text" id="close-session-remarks-text" placeholder="Remarks"></textarea>
+                                        <span class="close-session-error" id="close-session-text-error"></span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-12 mt-3">
+                                <span class="modal-end-session-text">Click on Submit if you want to update the status of the lead</span>
+                            </div>
+                            <div class="col-sm-12 mt-4" style="display: none;">
+                                <label for="mask-test-cobrowsing-session">Mark as Test Lead.</label>
+                                <input id="mask-test-cobrowsing-session" type="checkbox"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a class="btn btn-primary btn-width-100" href="javascript:void(0)" onclick="close_agent_confirm_session(this)">
+                            Submit
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-sm-12 mb-4" style="margin-top: 4em">
+                <h2 class="meeting-ended-text">Cobrowsing session has ended</h2>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if request.user.enable_s3_bucket %}
+        <script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/crypto-js.min.js"></script>
+    {% else %}
+        <script type="text/javascript" src="{% static 'EasyAssistApp/js/crypto-js.min.js' %}"></script>
+    {% endif %}
+
+    <script src="{% static 'EasyAssistApp/js/encrypt.js' %}"></script>
+    <script type="text/javascript" src="{% static 'EasyAssistApp/js/easyassist-custom-select.js' %}"></script>
+    <script type="text/javascript">
+        {% if is_admin_agent %}
+        window.COBROWSE_SESSION_ID = "{{session_id}}";
+        window.FLOATING_BUTTON_BG_COLOR = "{{floating_button_bg_color}}";
+        window.ENABLE_PREDEFINED_REMARKS = "{{ enable_predefined_remarks }}";
+        window.ENABLE_PREDEFINED_SUBREMARKS = "{{ enable_predefined_subremarks }}";
+        window.ENABLE_REMARKS_WITH_BUTTON = "{{ enable_predefined_remarks_with_buttons }}";
+        window.PREDEFINED_REMARKS_OPTIONAL = "{{predefined_remarks_optional}}";
+
+        $(document).ready(function() {
+            if(document.getElementById("close-session-remarks")) {
+                $('#close-session-remarks')[0].selectedIndex = -1;
+                new EasyassistCustomSelect("#close-session-remarks", "Select One", FLOATING_BUTTON_BG_COLOR);
+            }
+
+            if (document.getElementById("close-session-subremarks")) {
+                $('#close-session-subremarks')[0].selectedIndex = -1;
+                new EasyassistCustomSelect("#close-session-subremarks", "Select One", FLOATING_BUTTON_BG_COLOR);
+
+                document.getElementById("close-session-remarks").addEventListener('change', function() {
+                    var val = this.value;
+                    var close_session_subremarks = $('#close-session-subremarks')[0];
+                    var predefined_remarks = {{predefined_remarks | safe}};
+                    var subremark_list = [];
+                    for (var idx = 0; idx < predefined_remarks.length; idx++) {
+                        if (predefined_remarks[idx].remark == val) {
+                            subremark_list = predefined_remarks[idx].subremark;
+                            break;
+                        }
+                    }
+
+                    var option_html = `<option value="None">None</option>`;
+                    for (var idx = 0; idx < subremark_list.length; idx++) {
+                        var ele = subremark_list[idx].remark;
+                        option_html += `<option value="${ele}">${ele}</option>`;
+                    }
+
+                    close_session_subremarks.innerHTML = option_html;
+                    close_session_subremarks.selectedIndex = -1;
+                    close_session_subremarks.reinitialize();
+                    close_session_subremarks.closest(".subremarks-container").style.display = "";
+                });
+            }
+
+            $('.predefined-remarks-button').css('background',get_color_with_alpha(FLOATING_BUTTON_BG_COLOR, 0.07));
+
+            if (document.getElementById("close-session-remarks-text")) {
+                if (ENABLE_REMARKS_WITH_BUTTON == "True") {
+                    document.getElementById("close-session-remarks-text").addEventListener("keyup", function(event) {
+                        var input_text = event.target.value;
+                        var predefined_remarks_list = document.getElementById("predefined-remarks-buttons-list").children;
+                        for (var idx = 0; idx < predefined_remarks_list.length; idx++) {
+                            var predefined_remarks = predefined_remarks_list[idx];
+                            var button_element = predefined_remarks.getElementsByTagName("button")[0];
+                            if (button_element.innerHTML.toLowerCase().indexOf(input_text.toLowerCase()) >= 0) {
+                                predefined_remarks.style.display = "inline-block";
+                            } else {
+                                predefined_remarks.style.display = "none";
+                            }
+                            button_element.classList.remove("predefined-remarks-button-clicked")
+                        }
+                    });
+                }
+            }
+        });
+
+        function get_color_with_alpha(color, alpha) {
+            var R = parseInt(color.substring(1,3),16);
+            var G = parseInt(color.substring(3,5),16);
+            var B = parseInt(color.substring(5,7),16);
+
+            return 'rgba(' + R +', ' + G +', ' + B + ', ' + alpha + ')';
+        }
+
+        function set_remarks_in_textbox(element) {
+            document.getElementById('close-session-remarks-text').value = element.innerHTML;
+            $(".predefined-remarks-button").removeClass('predefined-remarks-button-clicked');
+            element.classList.add('predefined-remarks-button-clicked');
+            document.getElementById("close-session-text-error").style.display = "none";
+        }
+
+        function show_comments_textbox(element){
+            document.getElementById("close-session-remarks-error").style.display = "none";
+            document.getElementById("close-session-text-error").style.display = "none";
+            document.getElementById("close-session-remarks-text").removeAttribute("disabled");
+            setTimeout(function () {
+                  document.getElementById("close-session-remarks-text").focus();
+            }, 100);
+        }
+
+        function close_agent_confirm_session(element) {
+            close_session_remark_error_el = document.getElementById("close-session-remarks-error");
+            close_session_text_error_el = document.getElementById("close-session-text-error");
+
+            close_session_text_error_el.style.display = "none";
+            if(close_session_remark_error_el) {
+                close_session_remark_error_el.style.display = "none";
+            }
+
+            comment_desc = "";
+            comments = "";
+            subcomments = "";
+
+            is_helpful = document.getElementById("mask-successfull-cobrowsing-session").checked;
+            is_test = document.getElementById("mask-test-cobrowsing-session").checked;
+
+            if(ENABLE_PREDEFINED_REMARKS == "True") {
+                comments = document.getElementById("close-session-remarks").value;
+                comment_desc = document.getElementById("close-session-remarks-text").value.trim();
+
+                if(PREDEFINED_REMARKS_OPTIONAL == "False" && !comment_desc.length) {
+                    close_session_text_error_el.innerHTML = "Remarks cannot be empty";
+                    close_session_text_error_el.style.display = 'block';
+                    return;
+                }
+
+                if(comment_desc && !is_input_text_valid(comment_desc)) {
+                    close_session_text_error_el.innerHTML = "Please enter a valid remark (Only a-z A-z 0-9 .,@ are allowed)";
+                    close_session_text_error_el.style.display = 'block';
+                    return;
+                }
+                
+                if(ENABLE_PREDEFINED_SUBREMARKS == "True") {
+                    subcomments = document.getElementById("close-session-subremarks").value;
+                }
+
+                if(PREDEFINED_REMARKS_OPTIONAL == "False") {
+                    if (comments.length == 0) {
+                        close_session_remark_error_el.innerHTML = "Please select a remark";
+                        close_session_remark_error_el.style.display = 'block';
+                        return;
+                    }
+
+                    if(remarks_validation(comments, close_session_text_error_el, "Remarks", 1, 200) == "invalid"){
+                        return;
+                    }
+
+                    if(ENABLE_PREDEFINED_SUBREMARKS == "True") {
+                        if(remarks_validation(subcomments, close_session_text_error_el, "Sub-remarks", 1, 200) == "invalid") {
+                            return;
+                        }
+                    }
+
+                    if(!comment_desc.length) {
+                        close_session_text_error_el.innerHTML = "Comments cannot be empty";
+                        close_session_text_error_el.style.display = 'block';
+                        return;
+                    }
+                }
+
+                if(comments == "others"){
+                
+                    if(!comment_desc.length) {
+                        close_session_text_error_el.innerHTML = "Comments cannot be empty";
+                        close_session_text_error_el.style.display = 'block';
+                        return;
+                    }
+
+                    if(!is_input_text_valid(comment_desc)) {
+                        close_session_text_error_el.innerHTML = "Please enter a valid comment (Only a-z A-z 0-9 .,@ are allowed)";
+                        close_session_text_error_el.style.display = 'block';
+                        return;
+                    }
+                    
+                    if(is_test == false  && remarks_validation(comment_desc, close_session_text_error_el, "Comments", 1, 200) == "invalid"){
+                        return
+                    }
+                } else {
+                    
+                    if(comment_desc && !is_input_text_valid(comment_desc)) {
+                        close_session_text_error_el.innerHTML = "Please enter a valid comment (Only a-z A-z 0-9 .,@ are allowed)";
+                        close_session_text_error_el.style.display = 'block';
+                        return;
+                    }
+
+                    if(is_test == false && remarks_validation(comment_desc, close_session_text_error_el, "Comments", 0, 200) == "invalid"){
+                        return
+                    }
+                }
+
+                comments = remove_special_characters_from_str(comments);
+                subcomments = remove_special_characters_from_str(subcomments);
+                comment_desc = remove_special_characters_from_str(comment_desc);
+
+            } else {
+                comments = document.getElementById("close-session-remarks-text").value.trim();
+                if(!comments.length) {
+                    close_session_text_error_el.innerHTML = "Remarks cannot be empty";
+                    close_session_text_error_el.style.display = 'block';
+                    return;
+                }
+
+                if(!is_input_text_valid(comments)) {
+                    close_session_text_error_el.innerHTML = "Please enter a valid remark (Only a-z A-z 0-9 .,@ are allowed)";
+                    close_session_text_error_el.style.display = 'block';
+                    return;
+                }
+                
+                comments = remove_special_characters_from_str(comments);
+
+                if(remarks_validation(comments, close_session_text_error_el, "Remarks", 1, 200) == "invalid"){
+                    return;
+                }
+            }
+
+            json_string = JSON.stringify({
+                "id": COBROWSE_SESSION_ID,
+                "is_helpful": is_helpful,
+                "is_test": is_test,
+                "is_lead_updated": true,
+                "comments": comments,
+                "subcomments": subcomments,
+                "comment_desc": comment_desc
+            });
+
+            encrypted_data = easyassist_custom_encrypt(json_string);
+            encrypted_data = {
+                "Request": encrypted_data
+            };
+            const params = JSON.stringify(encrypted_data);
+
+            element.innerHTML = "Closing...";
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", window.location.protocol + "//" + window.location.host + "/easy-assist/agent/close-session/", true);
+            xhttp.setRequestHeader('Content-Type', 'application/json');
+            xhttp.setRequestHeader('X-CSRFToken', get_csrfmiddlewaretoken());
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    response = JSON.parse(this.responseText);
+                    response = easyassist_custom_decrypt(response.Response);
+                    response = JSON.parse(response);
+                    if (response.status == 200) {
+                        json_string = JSON.stringify({
+                            "type": "end_session",
+                        });
+
+                        encrypted_data = easyassist_custom_encrypt(json_string)
+                        encrypted_data = {
+                            "Request": encrypted_data
+                        };
+
+                        window.location = "/easy-assist/sales-ai/dashboard/";
+                    } else {
+                        element.innerHTML = "Submit";
+                    }
+                }
+            }
+            xhttp.send(params);
+        }
+
+        function remarks_validation(remarks, close_session_text_error_el, remarks_type, min_length, max_length){
+            if(min_length > 0){
+                if(!remarks){
+                    close_session_text_error_el.innerHTML = remarks_type + " cannot be empty."
+                    close_session_text_error_el.style.display = 'block';
+                    close_session_text_error_el.style.color = "red";
+                    return "invalid";
+                }
+            }
+            if(remarks.length > max_length) {
+                close_session_text_error_el.innerHTML = remarks_type + " cannot be more than 200 characters."
+                close_session_text_error_el.style.display = 'block';
+                close_session_text_error_el.style.color = "red";
+                return "invalid";
+            }
+            return "valid";
+        }
+        {% endif %}
+    </script>
+</body>
+
+</html>

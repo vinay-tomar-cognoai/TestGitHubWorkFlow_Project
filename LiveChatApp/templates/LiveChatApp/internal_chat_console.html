@@ -1,0 +1,855 @@
+{% extends 'LiveChatApp/base_new.html' %}
+{% block content %}
+{% load static %}
+<!-- <link href="{% static 'LiveChatApp/css/agent_chatbot.css' %}" rel="stylesheet"> -->
+     
+ <link href="{% static 'LiveChatApp/css/agent_console.css' %}?v={% random_int 1 100 %}" rel="stylesheet">
+ <link href="{% static 'LiveChatApp/css/internal_chat_console.css' %}?v={% random_int 1 100 %}" rel="stylesheet">
+
+ <link href="{% static 'LiveChatApp/css/group_chat.css' %}?v={% random_int 1 100 %}" rel="stylesheet">
+ <link href="{% static 'LiveChatApp/css/dropdown.css' %}?v={% random_int 1 100 %}" rel="stylesheet">
+
+ <style type="text/css">
+    .livechat-welcome-image {
+        fill: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+    }
+
+    .live-chat-resolve {
+        border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }};
+        color: {{ admin_config.get_livechat_theme_lighten_one }};
+    }
+
+    .live-chat-customer-name p,
+    .live-chat-btn:hover {
+        color: {{ admin_config.get_livechat_theme_lighten_one }};
+    }
+
+    .transfer-chat-model .form-popup .form-container .addBtn,
+    .resolve-chat-model .form-popup .form-container .addBtn {
+        border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }};
+        background: linear-gradient(270deg, {{ admin_config.get_livechat_theme_lighten_five }} 0%, {{ admin_config.get_livechat_theme_lighten_one }} 100%);
+    }
+
+    .live-chat-reply {
+        color: {{ admin_config.get_livechat_theme_lighten_one }};
+        border-top: 2px solid {{ admin_config.get_livechat_theme_lighten_one }};
+    }
+
+    .tooltip-textarea .tooltiptext {
+        background: {{ admin_config.get_livechat_theme_lighten_one }};
+    }
+
+    .tooltip-textarea .tooltiptext::after {
+        border-color: {{ admin_config.get_livechat_theme_lighten_one }} transparent transparent transparent;
+    }
+  
+ 
+    #file-upload-progress-bar .ui-widget-header {
+        background: {{ admin_config.get_livechat_theme_lighten_one }};
+        border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }};
+        margin: 0;
+    }
+
+    .live-chat-customer-details::-webkit-scrollbar-thumb, 
+    .livechat-customer-group-search-result-list-wrapper::-webkit-scrollbar-thumb, 
+    .livechat-agent-contact-list-div::-webkit-scrollbar-thumb, 
+    .livechat-group-contacts-section::-webkit-scrollbar-thumb,
+    .container .select-box .options-container::-webkit-scrollbar-thumb {
+        background: {{ admin_config.get_livechat_theme_lighten_six }};
+    }
+
+    .livechat-customer-group-member-icon-div, .spinner div, .live-chat-client-image,
+    .live-chat-group-active-customer-item .live-chat-active-group-icon-div {
+        background-color: {{admin_config.get_livechat_theme_lighten_one}} !important;
+    }
+
+    .livechat-customer-group-supervisor-identity-button,
+    .live-chat-active-group-message-notification-div {
+        background: {{admin_config.get_livechat_theme_lighten_one}} !important;
+    }
+
+    .customer-details-admin-add-member-button {
+        background: {{admin_config.get_livechat_theme_lighten_two}};
+    }
+
+    .livechat-customer-group-member-remove-button, .customer-details-admin-add-member-button, .group-chat-element{
+        color: {{admin_config.get_livechat_theme_lighten_one}};
+    }
+
+    .live-chat-message-wrapper {
+        margin-bottom: 20px;
+    }
+
+    option:checked {
+        background-color: {{admin_config.get_livechat_theme_lighten_one}};
+    	border-color: {{admin_config.get_livechat_theme_lighten_one}};
+	}
+
+	.livechat-multiselect-dropdown.livechat-multiselect-filter-dropdown ::-webkit-scrollbar-thumb,
+    .livechat-admin-group-member-list-area::-webkit-scrollbar-thumb  {
+		background: {{ admin_config.get_livechat_theme_lighten_six }} !important;
+	}
+
+	.multiselect-all {
+		color: {{admin_config.get_livechat_theme_lighten_one}} !important;	
+	}
+
+    .custom-checkbox-input input:checked~.checkmark {
+        background-color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+    }
+
+    .custom-checkbox-input  .checkmark{
+        border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }} !important;
+    }
+
+    .livechat-add-member-container .select-box .option.member-option span.checkmark {
+    border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }} !important;
+  }
+  .livechat-add-member-container .select-box .option.member-option input:checked~.checkmark {
+    background-color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+  }
+  .livechat-add-member-container .select-box .option.member-option input:checked~.checkmark {
+    border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }} !important;
+  }
+
+</style>
+
+<!-- Begin Page Content -->
+
+<!-- Topbar -->
+<nav class="navbar navbar-expand navbar-light bg-white topbar static-top border-bottom livechat-groupchat-top-navbar">
+
+    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+        <i class="fa fa-bars" style="color: rgb(203,97,22,1)"></i>
+    </button>
+
+    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-12 col-12 groupchat-topnav-search-wrapper">
+        <div class="livechat-group-member-searchbar-wrapper">
+            <input type="text" class="livechat-group-member-searchbar" id="groupchat-user-search-global" onkeyup="groupchatUserSearch()" placeholder="Search..." name="search" autocomplete="off">
+            <span>
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="#CBCACA" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8.5 3C11.5376 3 14 5.46243 14 8.5C14 9.74832 13.5841 10.8995 12.8834 11.8226L17.0303 15.9697C17.3232 16.2626 17.3232 16.7374 17.0303 17.0303C16.7641 17.2966 16.3474 17.3208 16.0538 17.1029L15.9697 17.0303L11.8226 12.8834C10.8995 13.5841 9.74832 14 8.5 14C5.46243 14 3 11.5376 3 8.5C3 5.46243 5.46243 3 8.5 3ZM8.5 4.5C6.29086 4.5 4.5 6.29086 4.5 8.5C4.5 10.7091 6.29086 12.5 8.5 12.5C10.7091 12.5 12.5 10.7091 12.5 8.5C12.5 6.29086 10.7091 4.5 8.5 4.5Z" />
+                </svg>
+            </span>
+            <div class="group-member-searchbar-cross-icon" style="display: none;">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="#2D2D2D" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.89705 2.05379L1.96967 1.96967C2.23594 1.7034 2.6526 1.6792 2.94621 1.89705L3.03033 1.96967L6 4.939L8.96967 1.96967C9.26256 1.67678 9.73744 1.67678 10.0303 1.96967C10.3232 2.26256 10.3232 2.73744 10.0303 3.03033L7.061 6L10.0303 8.96967C10.2966 9.23594 10.3208 9.6526 10.1029 9.94621L10.0303 10.0303C9.76406 10.2966 9.3474 10.3208 9.05379 10.1029L8.96967 10.0303L6 7.061L3.03033 10.0303C2.73744 10.3232 2.26256 10.3232 1.96967 10.0303C1.67678 9.73744 1.67678 9.26256 1.96967 8.96967L4.939 6L1.96967 3.03033C1.7034 2.76406 1.6792 2.3474 1.89705 2.05379L1.96967 1.96967L1.89705 2.05379Z"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12 groupchat-topnav-group-btns-wrapper">
+        
+        <div class="group-name-member-count-wrapper" style="width: 80%;">
+            <div id="livechat_group_name_header" class="livechat-group-name-navbar-div" style="display: none;">
+                Group Name
+            </div>
+        </div>
+
+
+        <button id="livechat_group_leave_button" class="group-chat-leave-button" style="display: none;" data-toggle="modal" data-target="#livechat-leave-group-modal">
+            Leave
+        </button>
+
+        <button id="livechat_group_delete_button" class="group-chat-delete-group-button" style="display: none;" data-toggle="modal" data-target="#livechat-delete-group-modal">
+            Delete
+        </button>
+
+        {% if user_obj.status != '3' %}
+        <a style="display: none;" href="javascript:void(0)" class="live-chat-btn live-chat-resolve livechat-admin-group-add-member-btn" id="livechat_add_members_btn" data-toggle="modal" data-target="#livechat-group-add-member-chat-modal"><span>Add Members</span></a>
+        {% endif %}
+
+    </div>
+
+    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-12 col-12 px-0 groupchat-toggle-setting-wrapper">
+        <!-- Topbar Navbar -->
+        <ul class="navbar-nav ml-auto">
+            {% if user_obj.is_allow_toggle %}
+            <!-- Agent/Supervisor switch -->
+            <li id="navitemtoggle" style ="cursor:default;" class="nav-item">
+                <div class="custom-control custom-switch nav-link" style="height:54px;">
+                    {% if user_obj.status == "1" %}
+                    <input type="checkbox" class="custom-control-input" style="margin-left: 20px;" id="supervisor-to-agent-switch">
+
+                    <label class="custom-control-label switch-buttons" for="supervisor-to-agent-switch" style="margin-left: 44px;cursor: pointer;"></label>
+                    <span class="space-right" style="cursor: default;">Admin</span> {% else %}
+                    <input type="checkbox" class="custom-control-input" style="margin-left: 20px;"id="supervisor-to-agent-switch" checked>
+                    <label class="custom-control-label switch-buttons" for="supervisor-to-agent-switch" style="margin-left: 44px;cursor: pointer;"></label>
+                    <span class="space-right" style="cursor: default;">Agent</span> {% endif %}
+                </div>
+            </li>
+            {% endif %} {% if user_obj.status == "3" %}
+            <!-- Online/Offline Agent switch -->
+            <li id="navitemtoggle" style ="cursor:default;" class="nav-item">
+                <div class="custom-control custom-switch nav-link" style="height: 54px;">
+                    {% if not user_obj.is_online %}
+                    <input type="checkbox" class="custom-control-input" style="margin-left: 20px;" id="offline-to-online-agent-switch">
+                    <label class="custom-control-label switch-buttons" for="offline-to-online-agent-switch" id="offline-to-online-agent-switch-lever" style="margin-left: 44px;cursor: pointer;"></label>
+                    <span class="space-right" style="cursor: default;">Offline</span> {% else %}
+                    <input type="checkbox" class="custom-control-input" style="margin-left: 20px;" id="offline-to-online-agent-switch" checked>
+                    <label class="custom-control-label switch-buttons" for="offline-to-online-agent-switch" id="offline-to-online-agent-switch-lever" style="margin-left: 44px;cursor: pointer;"></label>
+                    <span class="space-right" style="cursor: default;">Online</span> {% endif %}
+
+                </div>
+            </li>
+            {% endif %}
+            <!-- Nav Item - User Information -->
+            <li class="nav-item  no-arrow" style="height: 54px;">
+                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" style="margin-left: 0px;" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="mr-2 d-none d-lg-inline text-gray-600 small" style="margin-bottom: 1em;">
+                        {% if request.user.username == 'admin' %}
+                        {{ request.user.username }}
+                        {% else %}
+                        {{ user_obj.user.first_name }}
+                        {% endif %}
+                    </span>
+
+                    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 108.3 108.3" style="enable-background:new 0 0 108.3 108.3; margin-bottom: 1em;" xml:space="preserve" class="img-profile rounded-circle">
+                        <style type="text/css">
+                            .st0{fill:#E6E6E6;}
+                            .st1{fill:#FFB8B8;}
+                            .st2{fill:#575A89;}
+                            .st3{fill:#2F2E41;}
+                        </style>
+                        <g id="Group_45" transform="translate(-191 -152.079)">
+                            <g id="Group_30" transform="translate(282.246 224.353)">
+                                <path id="Path_944" class="st0" d="M17.1-18.1c0,10.5-3,20.8-8.8,29.6c-1.2,1.9-2.5,3.6-4,5.3c-3.4,4-7.3,7.4-11.6,10.3
+                                    c-1.2,0.8-2.4,1.5-3.6,2.2c-6.5,3.6-13.7,5.8-21,6.5c-1.7,0.2-3.4,0.2-5.1,0.2c-4.7,0-9.4-0.6-14-1.8c-2.6-0.7-5.1-1.6-7.6-2.6
+                                    c-1.3-0.5-2.5-1.1-3.7-1.8c-2.9-1.5-5.6-3.3-8.2-5.3c-1.2-0.9-2.3-1.9-3.4-2.9C-95.8,1.3-97.1-33-76.8-54.9s54.6-23.3,76.5-2.9
+                                    C10.8-47.6,17.1-33.2,17.1-18.1L17.1-18.1z"/>
+                                <path id="Path_945" class="st1" d="M-50.2-13.2c0,0,4.9,13.7,1.1,21.4s6,16.4,6,16.4s25.8-13.1,22.5-19.7s-8.8-15.3-7.7-20.8
+                                    L-50.2-13.2z"/>
+                                <ellipse id="Ellipse_185" class="st1" cx="-40.6" cy="-25.5" rx="17.5" ry="17.5"/>
+                                <path id="Path_946" class="st2" d="M-51.1,34.2c-2.6-0.7-5.1-1.6-7.6-2.6l0.5-13.3l4.9-11c1.1,0.9,2.3,1.6,3.5,2.3
+                                    c0.3,0.2,0.6,0.3,0.9,0.5c4.6,2.2,12.2,4.2,19.5-1.3c2.7-2.1,5-4.7,6.7-7.6L-8.8,9l0.7,8.4l0.8,9.8c-1.2,0.8-2.4,1.5-3.6,2.2
+                                    c-6.5,3.6-13.7,5.8-21,6.5c-1.7,0.2-3.4,0.2-5.1,0.2C-41.8,36.1-46.5,35.4-51.1,34.2z"/>
+                                <path id="Path_947" class="st2" d="M-47.7-0.9L-47.7-0.9l-0.7,7.2l-0.4,3.8l-0.5,5.6l-1.8,18.5c-2.6-0.7-5.1-1.6-7.6-2.6
+                                    c-1.3-0.5-2.5-1.1-3.7-1.8c-2.9-1.5-5.6-3.3-8.2-5.3l-1.9-9l0.1-0.1L-47.7-0.9z"/>
+                                <path id="Path_948" class="st2" d="M-10.9,29.3c-6.5,3.6-13.7,5.8-21,6.5c0.4-6.7,1-13.1,1.6-18.8c0.3-2.9,0.7-5.7,1.1-8.2
+                                    c1.2-8,2.5-13.5,3.4-14.2l6.1,4L4.9,7.3l-0.5,9.5c-3.4,4-7.3,7.4-11.6,10.3C-8.5,27.9-9.7,28.7-10.9,29.3z"/>
+                                <path id="Path_949" class="st2" d="M-70.5,24.6c-1.2-0.9-2.3-1.9-3.4-2.9l0.9-6.1l0.7-0.1l3.1-0.4l6.8,14.8
+                                    C-65.2,28.3-67.9,26.6-70.5,24.6L-70.5,24.6z"/>
+                                <path id="Path_950" class="st2" d="M8.3,11.5c-1.2,1.9-2.5,3.6-4,5.3c-3.4,4-7.3,7.4-11.6,10.3c-1.2,0.8-2.4,1.5-3.6,2.2l-0.6-2.8
+                                    l3.5-9.1l4.2-11.1l8.8,1.1C6.1,8.7,7.2,10.1,8.3,11.5z"/>
+                                <path id="Path_951" class="st3" d="M-23.9-41.4c-2.7-4.3-6.8-7.5-11.6-8.9l-3.6,2.9l1.4-3.3c-1.2-0.2-2.3-0.2-3.5-0.2l-3.2,4.1
+                                    l1.3-4c-5.6,0.7-10.7,3.7-14,8.3c-4.1,5.9-4.8,14.1-0.8,20c1.1-3.4,2.4-6.6,3.5-9.9c0.9,0.1,1.7,0.1,2.6,0l1.3-3.1l0.4,3
+                                    c4.2-0.4,10.3-1.2,14.3-1.9l-0.4-2.3l2.3,1.9c1.2-0.3,1.9-0.5,1.9-0.7c2.9,4.7,5.8,7.7,8.8,12.5C-22.1-29.8-20.2-35.3-23.9-41.4z"
+                                    />
+                                <ellipse id="Ellipse_186" class="st1" cx="-24.9" cy="-26.1" rx="1.2" ry="2.4"/>
+                            </g>
+                        </g>
+                    </svg>
+                </a>
+                <!-- Dropdown - User Information -->
+                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown" style="margin-top: 14px;">
+                    <!-- <a class="dropdown-item" href="/chat/logout/">
+                        <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i> Logout
+                    </a> -->
+                    <div onclick="check_user_has_assigned_chats()" id="logout-api">
+                        <div class="logout-api-div-class">
+                            <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                            <span>Logout</span>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container-fluid" style="overflow: hidden;">
+
+    <div class="row livechat-groupchat-main-container">
+
+        <div class="col-xl-3 col-lg-3 col-md-3 col-sm-12 col-12 live-chat-active-customers" id="live-chat-active-customers-sidebar">
+            <div class="livechat-group-chats-header">
+                <div class="livechat-group-chats-heading-div">
+                    Groups
+                </div>
+                {% if user_obj.status == "1" or admin_config.is_supervisor_allowed_to_create_group and user_obj.status == '2' %}
+                <button class="livechat-agent-section-add-chat-btn" data-toggle="tooltip" data-placement="top" title="" data-original-title="Create New Group">
+                    <svg data-toggle="modal" data-target="#livechat-create-new-group-chat-modal" width="14" height="14" viewBox="0 0 14 14" fill="#CBCACA" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12.9999 8H7.99994V13C7.99994 13.55 7.54994 14 6.99994 14C6.44994 14 5.99994 13.55 5.99994 13V8H0.999939C0.449939 8 -6.10352e-05 7.55 -6.10352e-05 7C-6.10352e-05 6.45 0.449939 6 0.999939 6H5.99994V1C5.99994 0.45 6.44994 0 6.99994 0C7.54994 0 7.99994 0.45 7.99994 1V6H12.9999C13.5499 6 13.9999 6.45 13.9999 7C13.9999 7.55 13.5499 8 12.9999 8Z"></path>
+                    </svg>
+                </button>
+                {% endif %}
+            </div>
+
+            <div class="live-chat-contacts live-chat-group-chats-contacts">
+                <div class="livechat-group-contacts-section" id="livechat_group_list">
+                    <div class="groupchat-search-no-result-div" id="group-search-no-result-div">
+                        No group found
+                    </div>
+                </div>
+
+                <div class="livechat-agent-contacts-section">
+
+                    <div class="livechat-agent-section-header-wrapper livechat-group-chats-header">
+                        <div class="livechat-agent-contacts-heading-div">
+                            Chat
+                        </div>
+                        <div class="livechat-group-chats-header-search" id="livechat-groupchat-agent-searchbar">
+                            <div class="search-container">
+
+                                <button type="submit">
+                                    <!-- <img src="./img/Vector-search.svg"> -->
+                                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect width="13" height="13" fill="#E5E5E5"></rect>
+                                        <g clip-path="url(#clip0)">
+                                        <rect width="1440" height="660" transform="translate(-1209 -141)" fill="white"></rect>
+                                        <rect x="-962" y="-85" width="1193" height="604" fill="#FAFAFA"></rect>
+                                        <rect x="-952" y="-74" width="1174" height="114" fill="white"></rect>
+                                        <g filter="url(#filter0_d)">
+                                        <rect x="-14" y="-10" width="219" height="33" rx="5" fill="white"></rect>
+                                        </g>
+                                        <path d="M5.55942 11.1182C6.79289 11.118 7.99083 10.7051 8.96247 9.94526L12.0174 13L13 12.0174L9.9451 8.96269C10.7054 7.991 11.1185 6.79285 11.1188 5.55912C11.1188 2.49396 8.62474 0 5.55942 0C2.49409 0 0 2.49396 0 5.55912C0 8.62428 2.49409 11.1182 5.55942 11.1182ZM5.55942 1.38978C7.85893 1.38978 9.72898 3.25973 9.72898 5.55912C9.72898 7.85851 7.85893 9.72846 5.55942 9.72846C3.2599 9.72846 1.38985 7.85851 1.38985 5.55912C1.38985 3.25973 3.2599 1.38978 5.55942 1.38978Z" fill="#757575"></path>
+                                        </g>
+                                        <defs>
+                                        <filter id="filter0_d" x="-22" y="-18" width="235" height="49" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                                        <feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood>
+                                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"></feColorMatrix>
+                                        <feOffset></feOffset>
+                                        <feGaussianBlur stdDeviation="4"></feGaussianBlur>
+                                        <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.08 0"></feColorMatrix>
+                                        <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"></feBlend>
+                                        <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"></feBlend>
+                                        </filter>
+                                        <clipPath id="clip0">
+                                        <rect width="1440" height="660" fill="white" transform="translate(-1209 -141)"></rect>
+                                        </clipPath>
+                                        </defs>
+                                        </svg>
+                                        
+                                </button>
+                                <input type="text" id="livechat-groupchat-agent-search" placeholder="Search" name="search" autocomplete="off">
+                                <!-- <input type="text" placeholder="Search" name="search" autocomplete="off"> -->
+                            </div>
+                        </div>
+                        <button class="livechat-agent-section-add-chat-btn" id="livechat_agent_search_bar_toggle" data-toggle="tooltip" data-placement="top" title="" data-original-title="Start new chat">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="#CBCACA" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12.9999 8H7.99994V13C7.99994 13.55 7.54994 14 6.99994 14C6.44994 14 5.99994 13.55 5.99994 13V8H0.999939C0.449939 8 -6.10352e-05 7.55 -6.10352e-05 7C-6.10352e-05 6.45 0.449939 6 0.999939 6H5.99994V1C5.99994 0.45 6.44994 0 6.99994 0C7.54994 0 7.99994 0.45 7.99994 1V6H12.9999C13.5499 6 13.9999 6.45 13.9999 7C13.9999 7.55 13.5499 8 12.9999 8Z"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                <div class="livechat-agent-contact-list-div" id="livechat_agent_contact_list">
+                  </div>
+                </div>
+
+            </div>
+            <p class="mobile-display-no-chats-appear">
+                Active customers appear here
+            </p>
+        </div>
+
+        <div class="col-xl-9 col-lg-9 col-md-9 col-sm-12 col-12 py-0 px-0" id="live-chat-no-chat-opened" style="height: calc(100vh - 3.375rem); display: flex; justify-content: center;">
+            <div class="live-chat-empty-area" style="display: flex; flex-flow: column; align-items: center;">
+                <svg width="302" height="248" viewBox="0 0 302 248" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M69.2351 50.1455L70.5207 156.419L126.072 183.533L124.787 77.2593L69.2351 50.1455Z" fill="#F1F8FF"/>
+                  <path d="M52.3545 41.656L10.845 127.042L67.1674 154.532L65.8818 48.2585L52.3545 41.656Z" fill="#F1F8FF"/>
+                  <path d="M302 161.608L189.889 106.889L191.175 213.162L260.491 246.994L302 161.608Z" fill="#F1F8FF"/>
+                  <path d="M129.809 77.2593L131.094 183.533L186.645 210.646L185.36 104.373L129.809 77.2593Z" fill="#F1F8FF"/>
+                  <path d="M255.194 81.7858L248.218 82.0569L248.566 91.0439L255.542 90.7728L255.194 81.7858Z" fill="#6C63FF"/>
+                  <path d="M223.726 113.26C223.726 113.26 214.066 108.635 214.22 112.629C214.375 116.624 223.958 119.251 223.958 119.251L223.726 113.26Z" fill="white"/>
+                  <path d="M229.026 147.056C229.026 147.056 224.468 158.233 222.785 166.299C221.101 174.365 218.536 185.465 221.835 193.337C225.134 201.21 234.513 224.346 234.609 226.843C234.706 229.339 233.806 231.874 235.799 231.797C237.792 231.719 248.638 228.298 249.078 226.781C249.519 225.263 245.378 221.424 245.378 221.424L235.153 189.32L245.821 168.404L253.516 199.607L255.023 238.55C255.023 238.55 262.42 236.263 263.494 238.221C263.494 238.221 266.808 233.592 267.229 231.576C267.65 229.559 265.664 191.134 265.664 191.134C265.664 191.134 272.454 147.368 266.973 147.581C261.491 147.794 240.023 134.628 229.026 147.056Z" fill="#1B1B1B"/>
+                  <path d="M235.722 229.8C235.722 229.8 230.666 240.997 230.187 241.515C229.708 242.034 226.413 247.162 228.904 247.066C231.396 246.969 237.278 244.24 241.608 240.072C245.938 235.903 251.647 228.681 251.13 228.201C250.612 227.721 247.066 226.359 247.066 226.359L235.722 229.8Z" fill="#2D2C2C"/>
+                  <path d="M255.923 236.015C255.923 236.015 255.618 241.027 254.699 243.063C253.779 245.099 253.895 248.095 256.387 247.998C258.878 247.901 265.317 246.651 265.317 246.651C265.317 246.651 265.7 243.636 265.182 243.156C264.664 242.676 262.459 237.261 263.397 235.725C264.336 234.188 255.923 236.015 255.923 236.015Z" fill="#2D2C2C"/>
+                  <path d="M259.609 73.364C259.609 73.364 264.92 81.6581 266.991 83.5777C269.061 85.4974 263.236 89.7239 263.236 89.7239L252.811 91.129C252.811 91.129 252.942 81.6234 252.405 80.6442C251.868 79.6651 259.609 73.364 259.609 73.364Z" fill="white"/>
+                  <path d="M250.547 84.2166C250.547 84.2166 252.695 88.1333 254.688 88.0558C256.681 87.9784 266.991 83.5776 267.431 82.0605C267.871 80.5433 270.846 92.9283 270.846 92.9283L245.62 137.411L239.467 133.149L242.448 107.032L244.897 92.9365L250.547 84.2166Z" fill="#468DFF"/>
+                  <path d="M268.361 124.027C267.355 126.136 266.727 128.335 266.814 130.587C266.818 130.687 266.821 130.787 266.83 130.886C267.069 135.507 268.768 140.852 269.377 144.738C269.82 147.526 269.694 149.561 268.066 150.039C264.118 151.193 268.641 152.017 253.368 157.111C238.096 162.204 235.431 157.808 235.392 156.809C235.353 155.811 237.555 148.225 237.037 147.745C236.52 147.265 229.795 154.026 227.763 153.105C225.731 152.184 227.531 147.114 227.531 147.114C227.531 147.114 232.108 136.436 232.012 133.939C231.915 131.443 238.945 119.669 238.945 119.669L243.726 88.482C243.726 88.482 245.565 84.4103 248.037 83.8143C250.509 83.2182 252.56 84.6386 252.56 84.6386L248.423 93.7997L244.059 109.97L244.789 115.942C244.789 115.942 249.864 105.244 253.198 101.115C256.531 96.9849 263.638 87.2083 263.638 87.2083C263.638 87.2083 265.297 81.5985 264.045 79.9221C262.792 78.2407 269.269 77.989 272.031 84.882C273.495 88.5353 275.872 93.9833 277.36 99.0557C278.687 103.549 279.314 107.75 277.999 110.151C275.991 113.82 270.937 118.641 268.361 124.027Z" fill="#468DFF"/>
+                  <path opacity="0.1" d="M277.999 110.151C275.991 113.82 270.937 118.641 268.361 124.026C267.688 121.597 266.868 119.084 266.868 119.084C266.868 119.084 263.719 102.206 273.032 97.8437C274.575 97.6942 276.118 98.1263 277.36 99.0556C278.687 103.549 279.314 107.75 277.999 110.151Z" fill="black"/>
+                  <path d="M241.03 109.088L233.135 111.395L222.173 111.82L221.045 121.365L239.061 122.665C239.061 122.665 243.56 109.989 241.03 109.088Z" fill="#468DFF"/>
+                  <path d="M253.905 141.178C253.905 141.178 243.342 142.934 245.753 146.119C248.164 149.304 257.521 145.956 257.521 145.956L253.905 141.178Z" fill="white"/>
+                  <path opacity="0.1" d="M266.83 130.886C267.069 135.507 268.768 140.851 269.378 144.738C266.013 147.929 262.813 150.743 261.607 150.79C259.116 150.887 255.11 150.542 253.635 151.1C252.159 151.657 251.294 142.19 251.294 142.19C251.294 142.19 252.175 139.156 256.103 137.503C258.754 136.385 263.837 133.353 266.83 130.886Z" fill="black"/>
+                  <path d="M272.916 94.8481C272.916 94.8481 281.348 93.5204 280.893 107.539C280.437 121.557 281.781 130.505 278.39 133.137C274.999 135.769 263.983 147.698 261.491 147.795C259 147.891 254.994 147.547 253.519 148.104C252.043 148.662 251.178 139.195 251.178 139.195C251.178 139.195 252.059 136.16 255.987 134.508C259.915 132.855 269.17 126.995 269.093 124.998C269.015 123.001 266.752 116.089 266.752 116.089C266.752 116.089 263.603 99.2102 272.916 94.8481Z" fill="#468DFF"/>
+                  <path d="M262.644 74.6529C262.644 80.4486 257.955 85.1452 252.173 85.1452C246.392 85.1452 241.703 80.4486 241.703 74.6529C241.703 68.8573 246.392 64.1606 252.173 64.1606C257.955 64.1606 262.644 68.8573 262.644 74.6529Z" fill="white" stroke="#E6E6E6"/>
+                  <path d="M244.787 58.898C244.522 59.1264 244.205 59.2857 243.864 59.3618C243.693 59.3923 243.517 59.3538 243.374 59.2546C243.231 59.1554 243.133 59.0036 243.102 58.8323C242.851 59.3539 242.567 59.9098 242.055 60.1774C241.543 60.445 240.75 60.2206 240.676 59.6463C240.601 60.0824 240.409 60.4896 240.12 60.8238C239.802 61.1275 239.225 61.2042 238.948 60.863C239.172 62.0919 239.033 63.3557 239.104 64.6029C239.174 65.8502 239.506 67.1725 240.447 67.9927C241.818 69.1888 243.881 68.8936 245.685 68.667C245.958 68.6096 246.241 68.6251 246.506 68.712C247.181 69.0004 247.151 69.9426 247.16 70.6783C247.215 71.9692 247.725 73.1987 248.599 74.1486C249.473 75.0985 250.655 75.7072 251.934 75.8667C252.651 75.9775 253.381 75.7988 253.966 75.3699C254.478 74.9349 254.74 74.2258 255.327 73.8989C256.282 73.3673 257.44 74.1426 258.138 74.9844C258.836 75.8263 259.524 76.8618 260.605 77.0159C262.036 77.2197 263.125 75.7591 263.659 74.4143C264.397 72.5294 264.75 70.5157 264.698 68.4918C264.647 66.468 264.191 64.475 263.359 62.6303C260.372 56.1073 250.17 55.0756 244.787 58.898Z" fill="#2F2E41"/>
+                  <path d="M120.839 245.907H3.13864V246.536H120.839V245.907Z" fill="#2F2E41"/>
+                  <path d="M294.407 247.165H176.707V247.794H294.407V247.165Z" fill="#2F2E41"/>
+                  <g filter="url(#filter0_d)">
+                  <path d="M215.499 56.3699H64.2159V147.259H215.499V56.3699Z" fill="white"/>
+                  </g>
+                  <path d="M70.1794 61.4018C71.0462 61.4018 71.7488 60.6978 71.7488 59.8293C71.7488 58.9609 71.0462 58.2568 70.1794 58.2568C69.3127 58.2568 68.6101 58.9609 68.6101 59.8293C68.6101 60.6978 69.3127 61.4018 70.1794 61.4018Z" fill="#FF5D01"/>
+                  <path d="M75.829 61.4018C76.6958 61.4018 77.3984 60.6978 77.3984 59.8293C77.3984 58.9609 76.6958 58.2568 75.829 58.2568C74.9623 58.2568 74.2597 58.9609 74.2597 59.8293C74.2597 60.6978 74.9623 61.4018 75.829 61.4018Z" fill="#FF5D01"/>
+                  <path d="M81.4786 61.4018C82.3453 61.4018 83.048 60.6978 83.048 59.8293C83.048 58.9609 82.3453 58.2568 81.4786 58.2568C80.6119 58.2568 79.9093 58.9609 79.9093 59.8293C79.9093 60.6978 80.6119 61.4018 81.4786 61.4018Z" fill="#FF5D01"/>
+                  <path d="M215.5 63.3459H64.3426V63.975H215.5V63.3459Z" fill="#2F2E41"/>
+                  <path d="M111.134 109.509L105.618 116.14L106.178 110.243L106.282 109.148H105.183H102.492V82.844H151.966V109.148H111.903H111.434L111.134 109.509Z" fill="white" stroke="#C2DAFF" stroke-width="2"/>
+                  <path opacity="0.1" d="M152.412 110.148V91.5933H143.153H133.894V110.148H152.412Z" fill="#0254D7"/>
+                  <path d="M179.039 122.986H138.975V96.6816H188.449V122.986H185.757H184.658L184.762 124.081L185.322 129.977L179.808 123.347L179.508 122.986H179.039Z" fill="white" stroke="#C2DAFF" stroke-width="2"/>
+                  <path opacity="0.1" d="M104.077 123.833C110.317 123.833 115.376 123.338 115.376 122.728C115.376 122.118 110.317 121.624 104.077 121.624C97.8366 121.624 92.7778 122.118 92.7778 122.728C92.7778 123.338 97.8366 123.833 104.077 123.833Z" fill="black"/>
+                  <path opacity="0.1" d="M186.624 138.767C193.731 138.767 199.492 138.204 199.492 137.509C199.492 136.815 193.731 136.251 186.624 136.251C179.517 136.251 173.755 136.815 173.755 137.509C173.755 138.204 179.517 138.767 186.624 138.767Z" fill="black"/>
+                  <defs>
+                  <filter id="filter0_d" x="49.2159" y="41.3699" width="181.284" height="120.889" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                  <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                  <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
+                  <feOffset/>
+                  <feGaussianBlur stdDeviation="7.5"/>
+                  <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.15 0"/>
+                  <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+                  <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+                  </filter>
+                  </defs>
+                </svg>        
+                  <p> Hello {{user_obj.user.first_name}}
+                    {% if user_obj.user.last_name == "" %}
+                    !
+                    {% else %}
+                    {{user_obj.user.last_name}}!
+                    {% endif %}<br> Time to ace those conversations</p>
+              </div>
+        </div>
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12 py-0 px-0 live-chat-mobile-chat-detail" id="livechat-main-console" style="height: calc(100vh - 3.375rem); display: none;">
+            <h4 class="live-chat-mobile-display">
+                <div class="live-chat-customer-name">
+                    <div class="live-chat-mobile-display back-arrow">
+                    </div>
+                    <span style="font-size: 22px; color: #4D4D4D; padding-left: 10px; font-weight: 500;">Shubham Sethia</span>
+                    <div class="dropdown no-arrow live-chat-mobile-display mobile-menu-dots">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <a class="dropdown-item" href="#" id="live-chat-customer-details-opener">Customer Details</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" data-toggle="modal" data-target="#agent-transfer-chat-modal" href="#">Transfer Chat</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" data-toggle="modal" data-target="#agent-resolve-chat-modal" href="#">Resolve</a>
+                        </div>
+                    </div>
+                </div>
+            </h4>
+            <br>
+            <!-- <div class="live-chat-button-wrapper live-chat-desktop-display livechat-admin-group-chat-transfer-resolve-div">
+                {% if user_obj.status != '3' %}
+                <a href="#" class="live-chat-btn live-chat-resolve livechat-admin-group-add-member-btn" id="livechat_add_members_btn" data-toggle="modal" data-target="#livechat-group-add-member-chat-modal"><span>Add Members</span></a>
+                {% endif %}
+                {% if user_obj.status == '1' or admin_config.is_supervisor_allowed_to_create_group and user_obj.status == '2' %}
+                <div id="livechat-group-console-menu">
+                    <div class="dropdown no-arrow ">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in " aria-labelledby="dropdownMenuLink">
+
+                            <a class="dropdown-item livechat-admin-delete-group-option" id="delete_group_link" href="javascript:void(0);" data-toggle="modal" data-target="#livechat-delete-group-modal">
+                                <svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M18.3007 6.20999C18.1139 6.02273 17.8602 5.9175 17.5957 5.9175C17.3312 5.9175 17.0775 6.02273 16.8907 6.20999L12.0007 11.09L7.1107 6.19999C6.92387 6.01273 6.67022 5.9075 6.4057 5.9075C6.14119 5.9075 5.88753 6.01273 5.7007 6.19999C5.3107 6.58999 5.3107 7.21999 5.7007 7.60999L10.5907 12.5L5.7007 17.39C5.3107 17.78 5.3107 18.41 5.7007 18.8C6.0907 19.19 6.7207 19.19 7.1107 18.8L12.0007 13.91L16.8907 18.8C17.2807 19.19 17.9107 19.19 18.3007 18.8C18.6907 18.41 18.6907 17.78 18.3007 17.39L13.4107 12.5L18.3007 7.60999C18.6807 7.22999 18.6807 6.58999 18.3007 6.20999Z" fill="black" fill-opacity="0.54"/>
+                                </svg> Delete Group
+                            </a>
+
+                            <a style="display: none;" id="remove_group_link" class="dropdown-item livechat-admin-delete-group-option" href="javascript:void(0);" data-toggle="modal" data-target="#livechat-remove-group-modal">
+                                <svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M18.3007 6.20999C18.1139 6.02273 17.8602 5.9175 17.5957 5.9175C17.3312 5.9175 17.0775 6.02273 16.8907 6.20999L12.0007 11.09L7.1107 6.19999C6.92387 6.01273 6.67022 5.9075 6.4057 5.9075C6.14119 5.9075 5.88753 6.01273 5.7007 6.19999C5.3107 6.58999 5.3107 7.21999 5.7007 7.60999L10.5907 12.5L5.7007 17.39C5.3107 17.78 5.3107 18.41 5.7007 18.8C6.0907 19.19 6.7207 19.19 7.1107 18.8L12.0007 13.91L16.8907 18.8C17.2807 19.19 17.9107 19.19 18.3007 18.8C18.6907 18.41 18.6907 17.78 18.3007 17.39L13.4107 12.5L18.3007 7.60999C18.6807 7.22999 18.6807 6.58999 18.3007 6.20999Z" fill="black" fill-opacity="0.54"/>
+                                </svg> Remove Group
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div> -->
+            <div class="live-chat-area">
+                <div id="livechat-customer-typing"></div>
+                
+                <div class="live-chat-text-box-wrapper" id="livechat_input_box">
+                    <div class="live-chat-text-box textarea-desktop" role="text-area">
+                        <textarea id="query" class="live-chat-text-area" placeholder="Type here..." autofocus></textarea>
+                    </div>
+                    <div class="live-chat-text-box textarea-mobile" role="text-area">
+                        <textarea class="live-chat-text-area" placeholder="Type a Message
+                        " autofocus></textarea>
+                    </div>
+
+
+                    <div class="live-chat-text-format-icons">
+
+                        <div class="live-chat-text-format-icon-wrapper attachment tooltip-textarea" onclick="append_livechat_file_upload_modal('true')" >
+                            <input type="file" id="real-file-attach" hidden="hidden" />
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" id="custom-button-attach" class="live-chat-text-format-icon"> 
+                                <path d="M9.80019 0C12.1197 0 14 1.8804 14 4.2C14 5.27611 13.5925 6.28904 12.8773 7.05847L12.7444 7.19489L6.63569 13.3037L6.5985 13.3383L6.5595 13.3698C6.09107 13.7731 5.49259 14 4.86049 14C3.42198 14 2.25584 12.8338 2.25584 11.3952C2.25584 10.7643 2.48194 10.1674 2.8827 9.7002L2.9865 9.58617L2.99706 9.57782L8.10054 4.46516C8.37365 4.19155 8.81685 4.19116 9.09044 4.46429C9.36403 4.73742 9.36442 5.18063 9.09131 5.45424L3.98783 10.5669L3.98017 10.5727C3.77277 10.7945 3.65577 11.0848 3.65577 11.3952C3.65577 12.0606 4.19515 12.6 4.86049 12.6C5.12575 12.6 5.3763 12.5146 5.58232 12.36L5.6678 12.2895L5.66834 12.2906L11.7597 6.19995L11.8707 6.08487C12.3363 5.57409 12.6001 4.90875 12.6001 4.2C12.6001 2.6536 11.3465 1.4 9.80019 1.4C9.05708 1.4 8.36203 1.69022 7.8437 2.19701L7.73538 2.30889L7.72244 2.31797L1.19503 8.84819C0.921738 9.12162 0.478543 9.12171 0.205127 8.84841C-0.0682891 8.5751 -0.0683882 8.13189 0.204905 7.85846L6.72088 1.33927L6.75351 1.30915C7.54021 0.480039 8.63244 0 9.80019 0Z" fill="#2F405B"></path>
+                            </svg>
+
+                            <span class="tooltiptext">Attach File</span>
+                        </div>
+
+                        <div class="live-chat-text-format-icon-wrapper mic tooltip-textarea" onclick="activate_mic()" id = "mic_group">
+                            <svg width="12" height="15" viewBox="0 0 12 15" fill="none" xmlns="http://www.w3.org/2000/svg" class="live-chat-text-format-icon">
+                                <path id="btn-mic-up" d="M8.60545 7.01785V2.81596C8.60545 1.26337 7.35538 0 5.81889 0C5.7696 0.000296166 5.7205 0.00616947 5.67253 0.0175078C4.95348 0.0523697 4.27535 0.362311 3.77844 0.883203C3.28154 1.40409 3.00388 2.09607 3.00293 2.81596V7.01785C3.00293 8.56275 4.25929 9.81911 5.80419 9.81911C7.34908 9.81911 8.60545 8.56275 8.60545 7.01785ZM4.40356 7.01785V2.81596C4.40356 2.04352 5.03174 1.41534 5.80419 1.41534C5.84248 1.41535 5.88069 1.41183 5.91834 1.40483C6.63616 1.45735 7.20482 2.07013 7.20482 2.81596V7.01785C7.20482 7.7903 6.57664 8.41848 5.80419 8.41848C5.03174 8.41848 4.40356 7.7903 4.40356 7.01785Z" fill="#2F405B"></path>
+                                <path id="btn-mic-down" d="M1.6018 7.01785H0.201172C0.201172 9.86953 2.34483 12.2254 5.10337 12.572V14.021H6.504V12.572C9.26254 12.2254 11.4062 9.87023 11.4062 7.01785H10.0056C10.0056 9.33519 8.12103 11.2197 5.80369 11.2197C3.48635 11.2197 1.6018 9.33519 1.6018 7.01785Z" fill="#2F405B"></path>
+                                </svg>
+                            <span class="tooltiptext">Microphone</span>
+                        </div>
+                        <div class="live-chat-text-format-icon-wrapper send tooltip-textarea" id="submit-response">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" class="live-chat-text-format-icon">
+                                <path id="fill-submit-btn" d="M13.683 6.4793L0.864958 0.0616166C0.764494 0.011306 0.651648 -0.00885246 0.540008 0.00356875C0.428368 0.01599 0.322693 0.0604612 0.235708 0.131628C0.152638 0.201343 0.0906346 0.292879 0.0566685 0.395945C0.0227024 0.499011 0.0181203 0.609522 0.0434371 0.715053L1.58743 6.41512L8.17708 6.41512V7.58197L1.58743 7.58197L0.0201316 13.2645C-0.00362467 13.3527 -0.00639775 13.4451 0.0120354 13.5345C0.0304685 13.6239 0.0695937 13.7078 0.126265 13.7793C0.182935 13.8508 0.255571 13.908 0.33833 13.9462C0.42109 13.9845 0.511664 14.0028 0.602771 13.9997C0.693978 13.9991 0.783784 13.9771 0.864958 13.9355L13.683 7.51779C13.7785 7.46883 13.8586 7.39445 13.9145 7.30283C13.9704 7.21122 14 7.10592 14 6.99855C14 6.89117 13.9704 6.78587 13.9145 6.69426C13.8586 6.60264 13.7785 6.52826 13.683 6.4793Z" fill="{{admin_config.get_livechat_theme_lighten_six}}"></path>
+                                </svg>
+                            <span class="tooltiptext">Send</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="live-chat-text-box-wrapper live-chat-cant-send-message-div" id="livechat_cant_send_message_div" style="display: none;">
+                    <p>You can’t send messages to this group because you’re no longer a participant.</p>
+                </div>
+            </div>
+        </div>
+      <div class="col-xl-3 col-lg-3 col-md-3 col-sm-12 col-12 live-chat-customer-details" id="live-chat-group-details-sidebar" style="display: flex;">
+
+      </div>
+
+<div class="modal fade" id="livechat-create-new-group-chat-modal" tabindex="-1" role="dialog" aria-labelledby="agent_transfer_chat_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6>Create New Group</h6>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+
+                    <div class="col-6">
+                        <label>Group Name<sup style="color: red;">*</sup></label>
+                        <input class="form-control show-char-count" type="text" id="livechat-new-group-name" 
+                        placeholder="Enter Group Name"
+                        maxlength="{{character_limit_small_text}}"
+                        style="margin-bottom: 3px;"
+                        >
+                        <div class="livechat-char-count">
+							<p id="livechat-new-group-name-char-count">0</p>
+							<p>/{{ character_limit_small_text }}</p>
+						</div>
+                    </div>
+                    <div class="col-6" style="display: flex; align-items: center; justify-content: space-evenly; height: 90px;">
+                        <div class="livechat-admin-upload-icon-text-div">
+                            <div>Upload Icon</div>
+                            <input id="upload_group_image" type="file" accept=".jpg, .jpeg, .png" hidden />
+                        </div>
+                        <div class="livechat-admin-upload-icon-div" id="group_image_icon">
+                            <svg width="31" height="30" viewBox="0 0 31 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g opacity="0.65">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M10.1343 27.0426H20.6995C24.8325 27.0426 27.6082 24.1435 27.6082 19.8297V9.87406C27.6082 5.56025 24.8325 2.66116 20.7007 2.66116H10.1343C6.0025 2.66116 3.22681 5.56025 3.22681 9.87406V19.8297C3.22681 24.1435 6.0025 27.0426 10.1343 27.0426ZM11.1494 13.6328C9.46871 13.6328 8.1031 12.2653 8.1031 10.5851C8.1031 8.90491 9.46871 7.53744 11.1494 7.53744C12.8288 7.53744 14.1957 8.90491 14.1957 10.5851C14.1957 12.2653 12.8288 13.6328 11.1494 13.6328ZM24.9516 18.4286C25.3598 19.4753 25.1478 20.7333 24.7114 21.77C24.194 23.0029 23.2035 23.9364 21.9556 24.344C21.4015 24.5252 20.8205 24.6044 20.2406 24.6044H9.96662C8.94425 24.6044 8.03956 24.3591 7.29791 23.9024C6.8333 23.6156 6.75117 22.9538 7.09564 22.5248C7.6718 21.8077 8.2406 21.0881 8.8143 20.3622C9.90778 18.9733 10.6445 18.5707 11.4634 18.9242C11.7956 19.0702 12.1291 19.2891 12.4723 19.5206C13.3868 20.142 14.658 20.9963 16.3326 20.0691C17.4785 19.4273 18.1431 18.3264 18.7219 17.3677L18.7316 17.3516C18.7726 17.2844 18.8132 17.2171 18.8538 17.1501C19.0483 16.8282 19.2402 16.5107 19.4573 16.2181C19.7294 15.852 20.7383 14.7072 22.0451 15.5224C22.8775 16.0357 23.5774 16.7302 24.3264 17.4737C24.6121 17.758 24.8156 18.0813 24.9516 18.4286Z" fill="black"/>
+                                </g>
+                                </svg>
+
+                        </div>
+
+                    </div>
+                    <div class="col-12 col-md-12 mb-2">
+                        <label>Description<sup style="color: red;">*</sup></label>
+                        <textarea name="group-desc" class="livechat-admin-group-description show-char-count"
+                        id="livechat-new-group-desc" placeholder="Description" maxlength="{{character_limit_large_text}}"></textarea>
+                        <div class="livechat-char-count" style="margin-top: -4px;">
+							<p id="livechat-new-group-desc-char-count">0</p>
+							<p>/{{ character_limit_large_text }}</p>
+						</div>
+                    </div>
+                    <div class="col-8 col-md-8 mb-2">
+                        <label>Group Members<sup style="color: red;">*</sup></label>
+
+                        <div class="livechat-multiselect-dropdown     livechat-multiselect-filter-dropdown ">
+                            <select id="select-group-member-dropdown" multiple="" class="form-control">
+                                {% for agent in agents %}
+                                    <option value="{{agent}}" id="{{agent}}-{{forloop.counter}}">{{agent}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                    </div>
+                    <div class="col-8 col-md-8 mb-2 livechat-admin-group-member-list-area" id="livechat_added_members_list">
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div style="float: right;">
+                    <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                    <button class="btn-primary" type="button" id="livechat-create-group-btn">Create</button>
+                </div>
+                <div class="col-md-12" id="create_group_error_text"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+</div>
+
+<div class="modal fade backdrop" id="preview-livechat-customer-attachment-modal" tabindex="-1" role="dialog" aria-labelledby="preview-livechat-customer-attachment_modal_label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style role="document">
+      <div class="modal-content"> 
+        <div class="modal-header">
+          
+            <svg data-dismiss="modal" id="preview-livechat-customer-attachment-cross-button" onclick="close_livechat_attachment_image()" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 1.85364L13.1464 0L7.5 5.64636L1.85364 0L0 1.85364L5.64636 7.5L0 13.1464L1.85364 15L7.5 9.35364L13.1464 15L15 13.1464L9.35364 7.5L15 1.85364Z" fill="white"></path>
+            </svg>
+           
+       </div>
+         <img id="preview-livechat-customer-attachment">
+      </div>
+  </div>
+</div>
+
+<!-- File upload modal -->
+<div class="modal fade backdrop" id="livechat-file-upload-modal" tabindex="-1" aria-labelledby="Admin_manage_user_Uploadexcel_modal_label" aria-modal="true" role="dialog">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h6>Send document</h6>
+          </div>
+          <div class="modal-body">
+              <div class="row">
+                  <div class="col-12 mb-4">
+                      <input type="file" id="easychat-livechat-file-attchment-input" hidden="hidden" onchange="upload_internal_file_attachment(this)">
+                      <button type="button" id="custom-button" onclick="attach_file()">Choose File </button>
+                  </div>
+
+                  <div class="live-chat-file-wrapper" id="live_chat_file_wrapper">
+
+                  </div>
+
+                  <div class="col-12" style="margin-top: 1em;">
+                    <p class="upload-message-heading">Message</p>
+                    <textarea class="file-upload-message" id="query-file" style="padding: 4px 10px 4px 10px;"></textarea>
+                  </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+              <div style="float: right;">
+                  <button class="btn-close" type="button" data-dismiss="modal" onclick="reset_internal_chat_modal()">Cancel</button>
+                  <button class="btn-primary disabled" type="button" id="send_internal_chat_attachment" style="pointer-events: none;">Send Document</button>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- Remove Group Member Modal -->
+<div class="modal fade backdrop" id="livechat-remove-group-member-modal" tabindex="-1" aria-labelledby="Admin_manage_user_Uploadexcel_modal_label" aria-modal="true" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6>Remove this member?</h6>
+            </div>
+            <div class="modal-body" style="display: flex; justify-content: flex-start; color: #4d4d4d;" id="remove_member_modal_display_text">
+              <p style="font-size: 13px;">Remove {} from {}?</p>
+            </div>
+            <div class="modal-footer">
+                <div style="float: right;">
+                    <button class="btn-close" type="button" id="cancel_remove_group_member_btn" data-dismiss="modal">Cancel</button>
+                    <button class="btn-danger" type="button" id="remove_group_member_btn" >Remove</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Group Modal -->
+<div class="modal fade backdrop" id="livechat-delete-group-modal" tabindex="-1" aria-labelledby="Admin_manage_user_Uploadexcel_modal_label" aria-modal="true" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6>Delete this group?</h6>
+            </div>
+            <div class="modal-body" style="display: flex; justify-content: flex-start; color: #4d4d4d;" id="remove_member_modal_display_text">
+              <p style="font-size: 13px;">All the conversation will be deleted</p>
+            </div>
+            <div class="modal-footer">
+                <div style="float: right;">
+                    <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                    <button class="btn-danger" type="button" id="remove_group_btn" >Delete Group</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Leave Group Modal -->
+<div class="modal fade backdrop" id="livechat-leave-group-modal" tabindex="-1" aria-labelledby="Admin_manage_user_Uploadexcel_modal_label" aria-modal="true" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6>Leave this group?</h6>
+            </div>
+            <div class="modal-body" style="display: flex; justify-content: flex-start; color: #4d4d4d;" id="remove_member_modal_display_text">
+              <p style="font-size: 13px;">You will not be able to send or recieve messages in this group anymore</p>
+            </div>
+            <div class="modal-footer">
+                <div style="float: right;">
+                    <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                    <button class="btn-danger" type="button" id="leave_group_btn" >Leave Group</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Remove Group Modal -->
+<div class="modal fade backdrop" id="livechat-remove-group-modal" tabindex="-1" aria-labelledby="Admin_manage_user_Uploadexcel_modal_label" aria-modal="true" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6>Remove this group?</h6>
+            </div>
+            <div class="modal-body" style="display: flex; justify-content: flex-start; color: #4d4d4d;" id="remove_member_modal_display_text">
+              <p style="font-size: 13px;">All the conversation will be deleted</p>
+            </div>
+            <div class="modal-footer">
+                <div style="float: right;">
+                    <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                    <button class="btn-danger" type="button" id="remove_group_btn" >Remove Group</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Member Modal -->
+<div class="modal fade" id="livechat-group-add-member-chat-modal" tabindex="-1" role="dialog" aria-labelledby="agent_transfer_chat_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="border-radius: 16px; overflow-x: hidden;">
+            <div class="modal-header">
+                <h6>Add Member</h6>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+
+
+
+                    <div class="col-12 col-md-12 mb-2">
+                        <label>Search</label>
+                        <div class="container livechat-add-member-container" style="padding-left: 0;">
+                            <div class="select-box" style="width: 100%;">
+                                <div id="user-box-options-container" class="options-container">
+
+                                    {% for agent in agents %}
+                                    <label class="custom-checkbox-input" for="{{agent}}-{{forloop.counter}}" style="margin: 0;">
+                                        <div class="option member-option" id="add-user-{{agent}}">
+                                            <p>{{agent}}</p>
+                                            <input type="checkbox" style="width: 10% !important;height: 0.8rem !important " class="item-checkbox member-checkbox user-group-add-member-checkbox"  value="{{agent}}" id="agent-{{agent}}-{{forloop.counter}}" name="{{agent}}">
+                                            <span class="checkmark"></span>
+                                        </div>
+                                    </label>
+                                    {% endfor %}
+                                    
+                                    <div class='no-elem'>No such member found</div>
+                                </div>
+                                <div id="add-user-dropdown-wrapper" class="wrapper-box">
+                                <div class="box">
+
+                                    <div class="selected" style="max-height: 74px;overflow: auto; border: none;" >
+                                        Add Members
+                                    </div>
+                                    
+                                </div>
+                                <div id="user-dropdown-arrow" class="arrow">
+                                    <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0.200408 0.739665C0.48226 0.436132 0.956809 0.418556 1.26034 0.700408L5 4.22652L8.73967 0.700408C9.0432 0.418556 9.51775 0.436132 9.7996 0.739665C10.0815 1.0432 10.0639 1.51775 9.76034 1.7996L5.51034 5.7996C5.22258 6.0668 4.77743 6.0668 4.48967 5.7996L0.239665 1.7996C-0.0638681 1.51775 -0.081444 1.0432 0.200408 0.739665Z" fill="#909090"/>
+                                    </svg>
+                                </div>
+                                </div>
+                            
+                                <div id="user-options-search-box" class="search-box" style="display: none; width: 100%;">
+                                    <input type="text" style="width: 406px !important;border: 1px solid #e1e1e1 !important;" placeholder="&nbsp; &nbsp; &nbsp; Search Members">
+                                    </input>
+                                </div>
+                                
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-12 col-md-12 mb-2 livechat-admin-group-member-list-area" id="livechat_added_members_list">
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="background: #F6F6F6;">
+                <div style="float: right;">
+                    <button class="btn-close" type="button" data-dismiss="modal" style="border: none; background-color: transparent;">Cancel</button>
+                    <button class="btn-primary" type="button" id="livechat-add-user-to-user-group-btn">Add</button>
+                </div>
+                <div class="col-md-12" id="create_group_error_text"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'LiveChatApp/js/bootstrap-multiselect.js' %}"></script>
+
+<script type="text/javascript">
+    window.AGENTS = {{agents|safe}}
+    window.SENDER_WEBSOCKET_TOKEN = '{{sender_websocket_token}}';
+    window.SENDER_NAME = '{{sender_name}}';
+    window.SENDER_USERNAME = '{{request.user.username}}';
+    window.GROUP_SIZE_LIMIT = {{admin_config.group_size_limit}};
+
+    function milliseconds_to_time(duration) {
+        var milliseconds = parseInt((duration % 1000) / 100),
+        seconds = Math.floor((duration / 1000) % 60),
+        minutes = Math.floor((duration / (1000 * 60)) % 60),
+        hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+
+        hours = (hours < 10) ? "0" + hours : hours;
+        minutes = (minutes < 10) ? "0" + minutes : minutes;
+        seconds = (seconds < 10) ? "0" + seconds : seconds;
+        return [hours,minutes,seconds]
+    }
+
+    var STATIC_IMG_PATH = "/static/LiveChatApp/img";
+    // document.getElementById("id-select-chat").style.display="none";
+
+    function attach_file() {
+        $('#easychat-livechat-file-attchment-input').click();
+    }
+
+    function groupchatUserSearch() {
+            var input, filter, groupusername, agentusername, i, txtValue;
+            input = document.getElementById("groupchat-user-search-global");
+            filter = input.value.toUpperCase();
+            groupusername = document.querySelectorAll('.livechat-group-contacts-section .live-chat-group-active-customer-item');
+            let count = 0
+            for (i = 0; i < groupusername.length; i++) {
+
+                txtValue = groupusername[i].textContent || groupusername[i].innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    groupusername[i].style.display = "";
+
+                    count++;
+
+                } else {
+                    groupusername[i].style.display = "none";
+                }
+            }
+            if (count == 0) {
+
+                document.getElementById('group-search-no-result-div').style.display = "block";
+            } else {
+                document.getElementById('group-search-no-result-div').style.display = "none";
+            }
+            agentusername = document.querySelectorAll('.livechat-agent-contact-list-div .live-chat-group-personname-div');
+
+            count = 0
+            for (i = 0; i < agentusername.length; i++) {
+
+                txtValue = agentusername[i].textContent || agentusername[i].innerText;
+                const id = agentusername[i].id.split('_')[1];
+
+                const el = document.getElementById(id)
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    el.style.display = "";
+
+                    count++;
+
+                } else {
+                    el.style.display = "none";
+                }
+            }
+
+            if (count == 0) {
+                document.getElementById('agent-search-no-result-div').style.display = "block";
+            } else {
+                document.getElementById('agent-search-no-result-div').style.display = "none";
+
+            }
+        } 
+</script>
+
+{% endblock %}

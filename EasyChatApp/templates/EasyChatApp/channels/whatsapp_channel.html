@@ -1,0 +1,1370 @@
+{% extends 'EasyChatApp/console.html' %}
+{% block consolecontent %}
+{% load static %}
+{% load custom_filters %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/changes_placement.css' %}?v={% random_int 1 100 %}">
+
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/common_integrated_channel.css' %}?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/revised_channel_components.css' %}?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/whatsapp_channel.css' %}?v={% random_int 1 100 %}">
+
+    <div style="padding: 1em;">
+
+      <div class="row">
+        {% include "EasyChatApp/channels/channel_components/channel_integration_document_button.html" with channel_doc_download_link="https://drive.google.com/uc?export=download&id=1FqZG3a_DCOVcSrRfjI74vAIUiZiyekCg" channel_name="WhatsApp" %}
+      </div>
+
+      {% include "EasyChatApp/channels/channel_components/language_dropdown_go_back.html" %}
+
+      <div class="row">
+        {% include "EasyChatApp/channels/channel_components/custom_message.html" with area="whatsapp-textarea" %}
+        <div class="col s12">
+          <div class="row">
+            {% if selected_language == "en" %}
+            <div class="outer-intent-container">
+              <ul class="collapsible">
+                  <li>
+                      <div class="collapsible-header">Add Language to your Channel&nbsp;&nbsp;&nbsp;
+                      </div>
+                      <div class="collapsible-body" id="add-language-colapsible-body">
+                          <span style="color: #6C7A93;">(*English language is supported by default)</span>
+                          <hr class="dashed-line" />
+                          <div class="row" id="select-channel-language-supported-container">
+                            <div class="input-field col s12" style="display: grid;margin:30px 0px 20px 20px;">
+                              <div class="row" class="intent-container" id="channel-languages">
+                                  <div class="col s4" style="width: 31% !important; ">
+                                      <span class="choose_language" >
+                                          &#160;&#160;&#160;Choose Language </span>  
+                                  </div>
+                                  <div class="col s4 easychat-initial-questions-dropdown">
+                                    {% if bot_channel_obj.channel.name in "WhatsApp Telegram Alexa GoogleHome Viber" %}
+                                      <select name="basic[]" multiple id="language-box-options-container" onchange="revised_language_change_sideeffect(true)">
+                                    {% else %}
+                                      <select name="basic[]" multiple id="language-box-options-container" onchange="revised_language_change_sideeffect()">
+                                    {% endif %}
+                                        {% for lan_obj in master_languages %}
+                                        {% if lan_obj in bot_channel_obj.languages_supported.all %}
+                                        {% if lan_obj.lang == "en" %}
+                                        <option value="{{ lan_obj.lang }}" id="{{lan_obj.name_in_english}}-{{ lan_obj.lang }}" selected disabled>{{lan_obj.name_in_english}}</option>
+                                        {% else %}
+                                        <option value="{{ lan_obj.lang }}" id="{{lan_obj.name_in_english}}-{{ lan_obj.lang }}" selected>{{lan_obj.name_in_english}}</option>
+                                        {% endif %}
+                                        {% else %}
+                                        <option value="{{ lan_obj.lang }}" id="{{lan_obj.name_in_english}}-{{ lan_obj.lang }}">{{lan_obj.name_in_english}}</option>
+                                        {% endif %}
+                                        {% endfor %} 
+                                      </select>
+                                  </div>
+                                  <div class="col s4 preview-container preview-container1" style="padding: 4px 6px; max-height: 250px; display: none;">
+                                    </div>
+                              </div>
+                            </div>
+                            {% if bot_channel_obj.languages_supported.count != 1%}
+                              <div class="col s12" id="bot_language_auto_detection_div" style="display: grid;grid-template-columns: 2fr 5fr; align-items: center; justify-content: space-between; margin-bottom: 20px; margin-left: 50px;margin-top: 30px;" id="bot_language_auto_detection_div">
+                            {% else %}
+                              <div class="col s12" style="visibility: hidden; display: grid; grid-template-columns: 2fr 5fr; align-items: center; justify-content: space-between; margin-bottom: 20px; margin-left: 50px;margin-top: 30px;" id="bot_language_auto_detection_div">
+                            {% endif %}
+                              <div class="row-title" >
+                              Enable bot language auto detection.<br/><span style="color: #4D4D4D;"></span>
+                              </div>
+                              <div class="row-content" style="padding-left: 10px; margin-top: 5px;">
+                                <label>
+                                {% if bot_channel_obj.languages_supported.count != 1%}
+                                    {% if bot_channel_obj.is_language_auto_detection_enabled %}
+                                        <input type="checkbox" id="is_language_auto_detection_enabled" checked>
+                                    {% else %}
+                                        <input type="checkbox" id="is_language_auto_detection_enabled">
+                                    {% endif %}
+                                {% else %}
+                                    <input type="checkbox" id="is_language_auto_detection_enabled" disabled="true">
+                                {% endif %}
+                                <span></span>
+                                </label>
+                              </div>
+                            </div>
+                                {% if bot_channel_obj.languages_supported.count != 1 %}
+                                  <div class="col s12" id="enable_choose_language_welcome_response_toogle_div" style="display: grid;grid-template-columns: 2fr 5fr;margin-left: 50px !important;margin-bottom: 20px;">
+                                {% else %}
+                                  <div class="col s12" id="enable_choose_language_welcome_response_toogle_div" style="display: none;grid-template-columns: 2fr 5fr;margin-left: 50px !important;margin-bottom: 20px;">
+                                {% endif %}
+                                      <div class="row-title">
+                                      Enable choose a language menu for customers with the welcome message.<br/><span style="color: #4D4D4D;"></span>
+                                      </div>
+                                      <div class="row-content"  style="padding-left: 10px; margin-top: 5px;">
+                                        <label>
+                                        {% if bot_channel_obj.languages_supported.count != 1%}
+                      
+                                            {% if bot_channel_obj.is_enable_choose_language_flow_enabled_for_welcome_response %}
+                                            <input type="checkbox" id="is_enable_choose_language_flow_enabled_for_welcome_response" checked>
+                      
+                                            {% else %}
+                                            <input type="checkbox" id="is_enable_choose_language_flow_enabled_for_welcome_response">
+                      
+                                            {% endif %}
+                      
+                                        {% else %}
+                      
+                                            <input type="checkbox" name="" id="is_enable_choose_language_flow_enabled_for_welcome_response" disabled="true">
+                                        {% endif %}
+                                        <span></span>
+                                        </label>
+                                    </div>
+                                  </div>
+                      </div>
+                  </li>
+              </ul>
+            </div>
+
+            <div class="outer-intent-container">
+              <ul class="collapsible">
+                <li id="collapsible-container-li">
+                    <div class="collapsible-header" id="collapsible-div">
+                        <p style="margin:0 !important">Initial Questions</p>
+                        
+                    </div>
+                    <div class="collapsible-body" id="zalo-intial-question">
+                        
+                        <hr class="dashed-line">
+                        <div class="row" id="channel-initial-messages" class="intent-container" style="margin-left: 30px;margin-top: 30px;">
+                            <div class="col s4" style="width: 28% !important; ">
+                                <p class="sub-head">*Search and select from existing Intent List</p>
+                            </div>
+                            <div class=" col s4 easychat-initial-questions-dropdown" style="margin-left: 30px;">
+                                <select name="basic[]" multiple id="multiple-select-whatsapp-initial-message-list">
+                                  {% for intent_name in intent_name_list %}
+                                  {% if intent_name.is_selected %}
+                                    <option value="{{ intent_name.intent_pk }}" selected>{{ intent_name.intent_name }}</option>
+                                  {% else %}
+                                    <option value="{{ intent_name.intent_pk }}">{{ intent_name.intent_name }}</option>
+                                  {% endif %}
+                                  {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col s4 preview-container preview-container2" style="padding: 4px 6px;max-height: 250px; display: none;">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            </div>
+
+            <div class="outer-intent-container">
+              <ul class="collapsible">
+                  <li>
+                      <div class="collapsible-header">Failure Recommendations</div>
+                      <div class="collapsible-body" id="zalo-failure-recommendations">
+                          
+                          <hr class="dashed-line">
+                          <div class="row" id="channel-failure-messages" class="intent-container" style="margin-left: 30px;margin-top: 30px;">
+                              <div class="col s4" style="width: 28% !important; ">
+                                  <p class="sub-head">*Search and select from existing Intent List</p>
+                              </div>
+                              <div class="col s4 easychat-initial-questions-dropdown" style="margin-left: 30px;">
+                                  <select name="basic1[]" multiple id="multiple-select-whatsapp-failure-message-list">
+                                    {% for intent_name in intent_name_list_failure %}
+                                        {% if intent_name.is_selected %}
+                                          <option value="{{ intent_name.intent_pk }}" selected>{{ intent_name.intent_name }}</option>
+                                        {% else %}
+                                          <option value="{{ intent_name.intent_pk }}">{{ intent_name.intent_name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                  </select>
+                              </div>
+                              <div class="col s4 preview-container preview-container3" style="padding: 4px 6px; max-height: 250px; display: none;">
+                                </div>
+                          </div>
+                      </div>
+                  </li>
+              </ul>
+            </div>
+            <ul class="collapsible">
+                <li>
+                  <div class="collapsible-header">Deploy links</div>
+                  <div class="collapsible-body">
+                    <div class="row" id="whatsapp-deploy">
+                      <div class="input-field col s12">
+                        <input type="text" value='{{whatsapp_url}}' id="whatsapp-deploy-link" readonly style="width:96% !important;border: 0.1em solid black !important;padding:1em;font-family: Consolas, monaco, monospace;word-wrap: break-word;background-color:white;">
+                      <button onclick="copyToClipboard('whatsapp-deploy-link', this)">Copy Script</button>
+                      <br>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+              {% endif %}
+
+              <ul class="collapsible" id="whatspp_catalogue_settings_wrapper">
+                <li>
+                    <div class="collapsible-header catalog-collapse-header" tabindex="0">Catalogue&nbsp;&nbsp;&nbsp;
+                        <svg width="60" height="23" viewBox="0 0 60 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="60" height="23" rx="6" fill="#2755CB"></rect>
+          <rect width="60" height="23" rx="6" stroke="#2755CB"></rect>
+          <path d="M14.959 17V7.89746H17.2378L20.7227 13.623H20.7988V7.89746H22.7856V17H20.5005L17.0283 11.2808H16.9521V17H14.959ZM24.582 17V7.89746H30.3457V9.65576H26.6387V11.541H29.7998V13.293H26.6387V15.229H30.4854V17H24.582ZM31.1582 7.89746H33.4053L34.7319 13.8135H34.8335L36.1855 7.89746H38.7246L40.0894 13.8135H40.1909L41.5176 7.89746H43.7646L41.397 17H38.9658L37.5122 10.8491H37.4106L35.938 17H33.5195L31.1582 7.89746Z" fill="white"></path>
+          <circle cx="46" cy="6" r="2" fill="white"></circle>
+      </svg></div>
+                    <div class="collapsible-body catalog-collapse-body">
+                        <div class="row">
+                            <div class="col" style="height: 28px; width: 100%;">
+                                <div class="col s4 easychat-collapse-data-header">
+                                    Enable WhatsApp Catalogue
+                                </div>
+                                <div class="col s8">
+                                    <div class="easychat-custom-switch-toggle-wrapper" id="whatsapp_catalog_toggle">
+                                        {% if selected_language == "en" %}
+                                        <label class="easychat-custom-toggle-switch">
+                                        <input type="checkbox" id="enable_whatsapp_catalog_cb">
+                                        {% else %}
+                                        <label class="easychat-custom-toggle-switch toggle-disabled">
+                                        <input type="checkbox" id="enable_whatsapp_catalog_cb" disabled>
+                                        {% endif %}
+                                        <span class="easychat-custom-toggle-slider easychat-custom-toggle-round"></span>
+                                        </label>
+                                        <a class="whatsapp-menu-format-btn" href="https://drive.google.com/uc?export=download&id=1zD6mZBBC7QIgOYezrlh0Y67Ojn8_N43X" target="_blank">
+                                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M6.14219 2.59814C6.14219 2.12972 6.52578 1.75 6.99897 1.75C7.47215 1.75 7.85574 2.12972 7.85574 2.59814V6.5637C7.85574 6.6241 7.9052 6.67305 7.96621 6.67305H9.14112C9.30897 6.67312 9.46134 6.77018 9.53095 6.92137C9.60057 7.07257 9.57462 7.25008 9.46457 7.37554L7.32241 9.81454C7.24109 9.90735 7.12308 9.96066 6.99897 9.96066C6.87485 9.96066 6.75685 9.90735 6.67552 9.81454L4.53337 7.37554C4.42331 7.25008 4.39737 7.07257 4.46698 6.92137C4.5366 6.77018 4.68896 6.67312 4.85681 6.67305H6.03173C6.09274 6.67305 6.14219 6.6241 6.14219 6.5637V2.59814ZM11.1767 9.68896C11.1767 9.39617 11.4165 9.15882 11.7123 9.15882C11.8547 9.15824 11.9915 9.21383 12.0924 9.31332C12.1933 9.4128 12.25 9.54798 12.25 9.68896V10.5004C12.25 11.4667 11.4587 12.25 10.4825 12.25H3.51524C2.53997 12.2488 1.75 11.4658 1.75 10.5004V9.68896C1.75 9.39617 1.98977 9.15882 2.28554 9.15882C2.58131 9.15882 2.82108 9.39617 2.82108 9.68896V10.5004C2.82156 10.8796 3.13214 11.1868 3.51524 11.1871H10.4825C10.8657 11.1868 11.1762 10.8796 11.1767 10.5004V9.68896Z" fill="#0254D7"></path>
+                                            </svg>
+                                            WhatsApp Catalogue Integration Document
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="catalogue_manager_options_div" style="display: none;">
+                                <div class="col" style="height: 28px; width: 100%; margin-top: 26px">
+                                    <div class="col s4 easychat-collapse-data-header">
+                                        Add WhatsApp Catalogue via Commerce Manager
+                                    </div>
+                                    <div class="col s8">
+                                        <div class="easychat-custom-switch-toggle-wrapper" id="whatsapp_catalog_commerce_manager_toggle">
+                                            {% if selected_language == "en" %}
+                                            <label class="easychat-custom-toggle-switch">
+                                            <input type="checkbox" id="enable_whatsapp_catalog_commerce_cb">
+                                            {% else %}
+                                            <label class="easychat-custom-toggle-switch toggle-disabled">
+                                            <input type="checkbox" id="enable_whatsapp_catalog_commerce_cb" disabled>
+                                            {% endif %}
+                                            <span class="easychat-custom-toggle-slider easychat-custom-toggle-round"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="whatsapp-catalog-data-wrapper-div">
+                                    <div class="col merge-cart-wrapper" style="width: 100%;">
+                                        <div class="col s4 easychat-collapse-data-header merge-cart">
+                                          Merge Cart
+                                        </div>
+                                        <div class="col s8">
+                                            <div class="easychat-custom-switch-toggle-wrapper" id="whatsapp_catalog_toggle" style="justify-content: space-between;">
+                                                {% if selected_language == "en" %}
+                                                <label class="easychat-custom-toggle-switch">
+                                                <input type="checkbox" id="wa_commerce_merge_cart_toggle">
+                                                {% else %}
+                                                <label class="easychat-custom-toggle-switch toggle-disabled">
+                                                <input type="checkbox" id="wa_commerce_merge_cart_toggle" disabled>
+                                                {% endif %}
+                                            
+                                            <span class="easychat-custom-toggle-slider easychat-custom-toggle-round"></span>
+                                            </label>
+        
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="commerce_merge_cart_response_wrapper" class="col Merge-cart-response" style="margin-bottom: 32px; width: 100%;display: none;">
+                                        <div class="col" style="margin-bottom: 32px; width: 100%;">
+                                                <div class="Merge-Cart-response-note">
+                                                    <p>Use variables accordingly : ||1|| - Previous cart items ,  ||2|| - Previous Cart Total , ||3|| - Current Cart Total , ||4|| - Merge Cart Total </p>
+                                                </div>
+                                        </div>
+                                      <div class="col s4 easychat-catalog-whatsapp-data-header" style="align-items: baseline;">
+                                        Merge cart response<span style="color: red;"> *</span>
+                                          
+                                      </div>
+                                      <div class="col s8 whatsapp-catalog-tymbug-editor">
+                                        <textarea id="wa_commerce_merge_cart_response" type="text" class="validate white response-text-area" style="height:5em; width:35em;border-radius:0.5em;border:0.05em solid black;">Looks like there are a few items present in your previous cart<br><br><br>||1|| <br><br><br><b>Previous Cart Total: ||2||</b><br><br><br><b>Current Cart Total: ||3||</b><br><br><br><b>Merge Cart Total: ||4||</b><br><br><br>Would you like to <b>Merge Cart</b> or <b>Continue</b> with current cart?</textarea>
+                                    </div>
+                                  </div>
+                                    <div class="col s12 whatsapp-catalog-radio-container">
+                                        <div class="col catalogue-selection-checkbox" style="width: 100%;">
+                                            <label>
+            
+                                        <input class="with-gap" name="catalogue_product_type" value="single_product" id="whatsapp_single_product_catalog-cb" type="radio" checked="">
+
+                                    <span>Single product </span>
+                                </label>
+                                            <label>
+                                    
+                                    
+
+                                        <input class="with-gap" name="catalogue_product_type" value="multiple_product" id="whatsapp_multiple_product_catalog-cb" type="radio">   
+
+                                    
+                                                                            
+                                    <span>Multiple product </span>
+                                </label>
+
+                                        </div>
+                                    </div>
+                                  
+                                    <div class="col s12 whatsapp-single-product-catalog-div whatsapp-catalog-padding-right">
+                                        <div style="margin:0px 10px ;">
+                                            <div class="col" style="margin-bottom: 32px; width: 100%;">
+                                                <div class="Merge-Cart-response-note">
+                                                    <p><span style="color: #000000;">Note:</span> The character limit is with respect to the end customer side on Whatsapp</p>
+                                                </div>
+                                           </div>
+                                           </div>
+                                        <div class="col" style="margin-bottom: 32px; width: 100%;">
+                                            <div class="col s4 easychat-catalog-whatsapp-data-header" style="align-items: baseline;">
+                                                Body Text <span style="color: red;"> *</span>
+                                                
+                                            </div>
+                                            <div class="col s8 whatsapp-catalog-tymbug-editor" id="single_product_body_text_wrapper">
+                                            <textarea id="catalog_single_product_bodytext" maxlength="1024" type="text" class="validate white response-text-area" style="height:5em; width:35em;border-radius:0.5em;border:0.05em solid black;">Hi! How may i assist you</textarea>
+                                            <span class="catalogue-details-counter"><span id="wa_single_body_text">0</span>/1024</span>
+                                        </div>
+                                        </div>
+                                        <div class="col" style="margin-bottom: 32px; width: 100%;">
+                                            <div class="col s4 easychat-catalog-whatsapp-data-header">
+                                                Footer Text (optional)
+                                            </div>
+                                            <div class="col s8">
+                                                <input type="text" maxlength="60" id="footer_text_single_product" class="whatsapp-catalog-detail-input" placeholder="Type here" style="width: 100% !important; box-sizing: border-box; margin: 0px !important; border: 2px solid #EBEBEB !important; border-radius: 4px; height: 40px !important;">
+                                                <span class="catalogue-details-counter"><span id="wa_single_footer_text">0</span>/60</span>
+                                            </div>
+                                        </div>
+                                        <div class="col" style="margin-bottom: 32px; width: 100%;">
+                                            <div class="col s4 easychat-catalog-whatsapp-data-header">
+                                                Catalogue ID <span style="color: red;"> *</span>
+
+                                            </div>
+                                            <div class="col s8">
+                                                <input type="text" id="catalogue_id_single_product" class="whatsapp-catalog-detail-input" placeholder="Type here" style="width: 100% !important; box-sizing: border-box; margin: 0px !important; border: 2px solid #EBEBEB !important; border-radius: 4px; height: 40px !important;">
+                                            </div>
+                                        </div>
+                                        <div class="col" style=" width: 100%;">
+                                            <div class="col s4 easychat-catalog-whatsapp-data-header">
+                                                Product ID <span style="color: red;"> *</span>
+
+                                            </div>
+                                            <div class="col s8">
+                                                <input type="text" id="product_id_single_product" class="whatsapp-catalog-detail-input" placeholder="Type here" style="width: 100% !important; box-sizing: border-box; margin: 0px !important; border: 2px solid #EBEBEB !important; border-radius: 4px; height: 40px !important;">
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                    <div id="whatsapp-multiple-product-catalog-div" class="col s12 whatsapp-multiple-product-catalog-div whatsapp-catalog-padding-right" style="display: none;">
+                                        <div style="margin:0px 10px ;">
+                                            <div class="col" style="margin-bottom: 32px; width: 100%;">
+                                                <div class="Merge-Cart-response-note">
+                                                    <p><span style="color: #000000;">Note:</span> The character limit is with respect to the end customer side on Whatsapp</p>
+                                                </div>
+                                           </div>
+                                           </div>
+                                        <div class="col " style="margin-bottom: 32px; width: 100%;">
+                                            <div class="col s4 easychat-catalog-whatsapp-data-header">
+                                                Header Text <span style="color: red;"> *</span>
+
+                                            </div>
+                                            <div class="col s8">
+                                                <input type="text" id="header_text_multiple_product" class="whatsapp-catalog-detail-input" maxlength="60" placeholder="Type here" style="width: 100% !important; box-sizing: border-box; margin: 0px !important; border: 2px solid #EBEBEB !important; border-radius: 4px; height: 40px !important;">
+                                                <span class="catalogue-details-counter"><span id="wa_commerce_header_count">0</span>/60</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col" style="margin-bottom: 32px; width: 100%;">
+                                            <div class="col s4 easychat-catalog-whatsapp-data-header" style="align-items: baseline;">
+                                                Body Text <span style="color: red;"> *</span>
+                                                
+                                            </div>
+                                            <div class="col s8 whatsapp-catalog-tymbug-editor" id="wa_multiple_body_text_wrapper">
+                                            <textarea id="catalog_multiple_product_bodytext" maxlength="1024" type="text" class="validate white response-text-area" style="height:5em; width:35em;border-radius:0.5em;border:0.05em solid black;">Hi! How may i assist you</textarea>
+                                            <span class="catalogue-details-counter"><span id="wa_multiple_body_text">0</span>/1024</span>
+                                        </div>
+                                            
+                                        </div>
+                                        <div class="col" style="margin-bottom: 32px; width: 100%;">
+                                            <div class="col s4 easychat-catalog-whatsapp-data-header">
+                                                Footer Text (optional)
+                                            </div>
+                                            <div class="col s8">
+                                                <input type="text" maxlength="60" id="footer_text_multiple_product" class="whatsapp-catalog-detail-input" placeholder="Type here" style="width: 100% !important; box-sizing: border-box; margin: 0px !important; border: 2px solid #EBEBEB !important; border-radius: 4px; height: 40px !important;">
+                                                <span class="catalogue-details-counter"><span id="wa_multiple_footer_text">0</span>/60</span>
+                                            </div>
+                                        </div>
+                                        <div class="col" style="margin-bottom: 32px; width: 100%;">
+                                            <div class="col s4 easychat-catalog-whatsapp-data-header">
+                                                Catalogue ID <span style="color: red;"> *</span>
+
+                                            </div>
+                                            <div class="col s8">
+                                                <input type="text" id="catalogue_id_multiple_product" class="whatsapp-catalog-detail-input" placeholder="Type here" style="width: 100% !important; box-sizing: border-box; margin: 0px !important; border: 2px solid #EBEBEB !important; border-radius: 4px; height: 40px !important;">
+                                            </div>
+                                        </div>
+                                        <div class="col whatsapp-menu-format-btns-wrapper" style="width: 100%; padding: 0px 22px;">
+
+                                            <a onclick="reset_section_modal()" href="#easychat_whatsapp_add_section_modal" class="whatsapp-menu-format-btn modal-trigger">
+                                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 8.66667H8.66668V12C8.66668 12.3667 8.36668 12.6667 8.00001 12.6667C7.63334 12.6667 7.33334 12.3667 7.33334 12V8.66667H4.00001C3.63334 8.66667 3.33334 8.36667 3.33334 8C3.33334 7.63334 3.63334 7.33334 4.00001 7.33334H7.33334V4C7.33334 3.63334 7.63334 3.33334 8.00001 3.33334C8.36668 3.33334 8.66668 3.63334 8.66668 4V7.33334H12C12.3667 7.33334 12.6667 7.63334 12.6667 8C12.6667 8.36667 12.3667 8.66667 12 8.66667Z" fill="white"></path>
+                            </svg>
+
+                                                <span>Section</span>
+
+                                            </a>
+
+                                        </div>
+                                        <div id="catalogue_sections_container" class="col" style="width: 100%; padding: 0px 22px;">
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col" style="height: 28px; width: 100%; margin-top: 26px">
+                                    <div class="col s4 easychat-collapse-data-header">
+                                        Add WhatsApp Catalogue via API
+                                    </div>
+                                    <div class="col s8">
+                                        <div class="easychat-custom-switch-toggle-wrapper" id="whatsapp_catalog_commerce_api_toggle">
+                                            {% if selected_language == "en" %}
+                                            <label class="easychat-custom-toggle-switch">
+                                            <input type="checkbox" id="enable_whatsapp_catalog_api_cb">
+                                            {% else %}
+                                            <label class="easychat-custom-toggle-switch toggle-disabled">
+                                            <input type="checkbox" id="enable_whatsapp_catalog_api_cb" disabled>
+                                            {% endif %}
+                                            <span class="easychat-custom-toggle-slider easychat-custom-toggle-round"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="catalogue_via_api_wrapper" class="col s12 whatsapp-multiple-product-catalog-div whatsapp-catalog-padding-right d-none" style="padding: 20px 14px!important;margin-top: 37px;">
+                                    <div class="col merge-cart-wrapper" style="width: 100%;padding: 0px 0px 22px 13px!important;margin-top: 0px;">
+                                      <div class="col s4 easychat-collapse-data-header merge-cart"style="padding-top: 6px;">
+                                        Add Item
+                                      </div>
+                                      <div class="col s8">
+                                        <div class="col whatsapp-menu-format-btns-wrapper" style="width: 100%;display: flex;
+                                        justify-content: flex-end;">
+        
+                                          <a href="/chat/channels/whatsapp/catalogue-manager/?id={{selected_bot_obj.pk}}" class="whatsapp-menu-format-btn ">
+                                              
+                                              <span>Add and view items</span>
+                                          </a>
+        
+                                      </div>
+                                      </div>
+                                  </div>
+                                  <div class="col" style="margin-bottom: 20px; width: 100%;">
+                                    <div class="col s4 easychat-catalog-whatsapp-data-header">
+                                      Business ID<span style="color: red;"> *</span>
+    
+                                    </div>
+                                    <div class="col s8">
+                                        <input type="text" id="wa_business_id" class="whatsapp-catalog-detail-input" placeholder="Type here" style="width: 100% !important; box-sizing: border-box; margin: 0px !important; border: 2px solid #EBEBEB !important; border-radius: 4px; height: 40px !important;background: #FFFFFF;">
+                                    </div>
+                                </div> 
+                                <div class="col auth-token-note" style="margin-bottom: 0px;width: 100%;">
+                                    <div style="padding: 0px 10px 0px 6px;">
+                                     <div class="col s12 auth-token-syncnow-note">
+                                         <p>Be highly vigilant while adding Auth Token Id and Catalogue Id, once added cannot be edited.</p>
+
+                                      </div>
+                                    </div>
+                                  </div> 
+                                <div class="col access-token-wrapper-div" style="margin-bottom: 20px; width: 100%;">
+                                  <div class="col s4 easychat-catalog-whatsapp-data-header">
+                                    <div style="display: flex;">
+                                    Access Token ID<span style="color: red;"> *</span>
+                                        </div>
+                                        <div style="display: flex;">
+                                    <p class="sub-note">Generate an access token  from 1st link and regenerate a never expiring token from 2nd link</p>
+                                        </div>
+                                    <br>
+                                  </div>
+                                  <div class="col s8">
+                                    <div class="access-token-div">
+                                      <p><a href="https://developers.facebook.com/tools/explorer" target="_blank">Click here</a> to create Access Token</p>
+                                      <p><a href="https://developers.facebook.com/tools/debug/accesstoken" target="_blank">Click here</a> to extend the generated Access Token</p>
+                                    </div>
+                                      <input id="wa_access_token" type="text" class="whatsapp-catalog-detail-input" placeholder="Type here" style="width: 100% !important; box-sizing: border-box; margin: 0px !important; border: 2px solid #EBEBEB !important; border-radius: 4px; height: 40px !important;background: #FFFFFF;">
+                                  </div>
+                              </div> 
+                                <div class="col catalog-id-wrapper-div" style="margin-bottom:0px!important;width: 100%;">
+                                      <div class="col s4 easychat-catalog-whatsapp-data-header">
+                                          Catalogue ID <span style="color: red;"> *</span>
+    
+                                      </div>
+                                      <div class="col s8">
+                                          <input id="wa_api_catalogue_id" type="text" class="whatsapp-catalog-detail-input" placeholder="Type here" style="width: 100% !important; box-sizing: border-box; margin: 0px !important; border: 2px solid #EBEBEB !important; border-radius: 4px; height: 40px !important;background: #FFFFFF;">
+                                      </div>
+                                    </div>
+                                    <div class="col catalog-id-wrapper-div" style="margin-bottom: 20px;width: 100%;">
+                                     <div style="padding: 0px 10px 0px 6px;">
+                                      <div class="col s12 syncnow-note">
+                                          <p>Note:- After adding never expiring Access Token add Catalogue ID and click on Sync Products.</p>
+                                          <a id="sync_products_fb_btn">
+                                           <svg id="sync_products_fb_svg" width="14" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                               <g clip-path="url(#clip0_869_21833)">
+                                                   <path d="M13.4166 12.1667V8.66666H9.91663" stroke="#0254D7" stroke-width="1.375" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                   <path d="M0.583374 2.83334V6.33334H4.08337" stroke="#0254D7" stroke-width="1.375" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                   <path d="M2.04754 9.25001C2.34339 10.086 2.8462 10.8335 3.50906 11.4227C4.17192 12.0118 4.97323 12.4235 5.83821 12.6192C6.70319 12.8149 7.60365 12.7883 8.45557 12.5419C9.30749 12.2955 10.0831 11.8373 10.71 11.21L13.4167 8.66667M0.583374 6.33334L3.29004 3.79001C3.91698 3.16276 4.69259 2.70454 5.54451 2.45812C6.39643 2.21171 7.2969 2.18511 8.16187 2.38082C9.02685 2.57654 9.82816 2.98818 10.491 3.57734C11.1539 4.16649 11.6567 4.91397 11.9525 5.75001" stroke="#0254D7" stroke-width="1.375" stroke-linecap="round" stroke-linejoin="round"></path>
+                                               </g>
+                                               <defs>
+                                                   <clipPath id="clip0_869_21833">
+                                                       <rect width="14" height="14" fill="white" transform="matrix(1 0 0 -1 0 14.5)"></rect>
+                                                   </clipPath>
+                                               </defs>
+                                           </svg>
+                                           Sync Products
+                                       </a>
+                                       </div>
+                                     </div>
+                                   </div>  
+                                   <div style="margin:0px 10px ;">
+                                    <div class="col" style="margin-bottom: 32px; width: 100%;">
+                                        <div class="Merge-Cart-response-note">
+                                            <p><span style="color: #000000;">Note:</span> The character limit is with respect to the end customer side on Whatsapp</p>
+                                        </div>
+                                   </div>
+                                   </div>
+                                    <div class="col " style="margin-bottom: 32px; width: 100%;">
+                                          <div class="col s4 easychat-catalog-whatsapp-data-header">
+                                              Header Text <span style="color: red;"> *</span>
+    
+                                          </div>
+                                          <div class="col s8">
+                                              <input type="text" id="wa_api_header_text" class="whatsapp-catalog-detail-input" placeholder="Type here" style="width: 100% !important; box-sizing: border-box; margin: 0px !important; border: 2px solid #EBEBEB !important; border-radius: 4px; height: 40px !important;background: #FFFFFF;" maxlength="60">
+                                              <span class="catalogue-details-counter"><span id="wa_api_header_count">0</span>/60</span>
+                                          </div>
+                                      </div>
+                                      <div class="col" style="margin-bottom: 32px; width: 100%;">
+                                          <div class="col s4 easychat-catalog-whatsapp-data-header" style="align-items: baseline;">
+                                              Body Text <span style="color: red;"> *</span>
+                                              
+                                          </div>
+                                          <div class="col s8 whatsapp-catalog-tymbug-editor" id="wa_api_body_text_wrapper">
+                                            <textarea id="wa_api_body_text" type="text" class="validate white response-text-area" style="height:5em; width:35em;border-radius:0.5em;border:0.05em solid black;" maxlength="1024">Hi! How may i assist you</textarea>
+                                            <span class="catalogue-details-counter"><span id="wa_api_body_count">0</span>/1024</span>
+                                        </div>
+                                          
+                                      </div>
+                                      <div class="col" style="margin-bottom: 32px; width: 100%;">
+                                          <div class="col s4 easychat-catalog-whatsapp-data-header">
+                                              Footer Text (optional)
+                                          </div>
+                                          <div class="col s8">
+                                              <input type="text" id="wa_api_footer_text" class="whatsapp-catalog-detail-input" placeholder="Type here" style="width: 100% !important; box-sizing: border-box; margin: 0px !important; border: 2px solid #EBEBEB !important; border-radius: 4px; height: 40px !important;background: #FFFFFF;" maxlength="60">
+                                              <span class="catalogue-details-counter"><span id="wa_api_footer_count">0</span>/60</span>
+                                          </div>
+                                      </div>
+                                      <div class="col merge-cart-wrapper" style="width: 100%;padding: 0px 0px 22px 13px!important;margin-top: 0px;">
+                                        <div class="col s4 easychat-collapse-data-header merge-cart">
+                                          Merge cart
+                                        </div>
+                                        <div class="col s8">
+                                            <div class="easychat-custom-switch-toggle-wrapper" id="whatsapp_catalog_toggle">
+                                                {% if selected_language == "en" %}
+                                                <label class="easychat-custom-toggle-switch">
+                                                <input type="checkbox" id="wa_api_merge_cart_toggle">
+                                                {% else %}
+                                                <label class="easychat-custom-toggle-switch toggle-disabled">
+                                                <input type="checkbox" id="wa_api_merge_cart_toggle" disabled>
+                                                {% endif %}
+                                            
+                                            <span class="easychat-custom-toggle-slider easychat-custom-toggle-round"></span>
+                                            </label>
+          
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="api_merge_cart_response_wrapper" style="display: none;">
+                                        <div class="col" style="margin-bottom: 32px; width: 100%;">
+                                            <div style="padding: 0px 10px 0px 6px;"> 
+                                                <div class="Merge-Cart-response-note">
+                                                    <p>Use variables accordingly : ||1|| - Previous cart items ,  ||2|| - Previous Cart Total , ||3|| - Current Cart Total , ||4|| - Merge Cart Total </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div  class="col whatsapp-merge-cart-div" style="margin-bottom: 32px; width: 100%;">
+                                      <div class="col s4 easychat-catalog-whatsapp-data-header" style="align-items: baseline;">
+                                        Merge cart response<span style="color: red;"> *</span>
+                                          
+                                      </div>
+                                      <div class="col s8 whatsapp-catalog-tymbug-editor">
+                                        <textarea id="wa_api_merge_cart_response" type="text" class="validate white response-text-area" style="height:5em; width:35em;border-radius:0.5em;border:0.05em solid black;">Looks like there are a few items present in your previous cart<br><br><br>||1|| <br><br><br><b>Previous Cart Total: ||2||</b><br><br><br><b>Current Cart Total: ||3||</b><br><br><br><b>Merge Cart Total: ||4||</b><br><br><br>Would you like to <b>Merge Cart</b> or <b>Continue</b> with current cart?</textarea>
+                                    </div>
+                                    </div>
+                                  </div>
+                                      <div id="catalogue_sections_container" class="col" style="width: 100%; padding: 0px 22px;">
+    
+                                      </div>
+                                    </div>
+                                      <div id="api_add_section_wrapper" class="col merge-cart-wrapper" style="width: 100%;padding: 20px 24px!important;margin-top: 24px; display: none;">
+                                
+                                        <div class="col s4 easychat-collapse-data-header merge-cart"style="padding-top: 6px;">
+                                          Add section
+                                        </div>
+                                        <div class="col s8"style="padding-right: 0px;">
+                                          <div class="col whatsapp-menu-format-btns-wrapper" style="width: 100%;display: flex;
+                                          justify-content: flex-end;padding-right: 0px;">
+        
+                                            <a onclick="reset_section_modal(true)" href="#easychat_whatsapp_add_section_modal" class="whatsapp-menu-format-btn modal-trigger">
+                                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M12 8.66667H8.66668V12C8.66668 12.3667 8.36668 12.6667 8.00001 12.6667C7.63334 12.6667 7.33334 12.3667 7.33334 12V8.66667H4.00001C3.63334 8.66667 3.33334 8.36667 3.33334 8C3.33334 7.63334 3.63334 7.33334 4.00001 7.33334H7.33334V4C7.33334 3.63334 7.63334 3.33334 8.00001 3.33334C8.36668 3.33334 8.66668 3.63334 8.66668 4V7.33334H12C12.3667 7.33334 12.6667 7.63334 12.6667 8C12.6667 8.36667 12.3667 8.66667 12 8.66667Z" fill="white"></path>
+                                                    </svg>
+                                                <span>Section</span>
+                                            </a>
+        
+                                        </div>
+                                        </div>
+                                        <div class="add-section-main-div-wrapper" id="add_section_main_div_wrapper"style="margin-top: 50px;">
+
+                                      </div>
+                                       
+                                    </div>
+                                  
+
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+
+            {% if selected_language == "en" %}
+
+            <div class="outer-intent-container">
+                <ul class="collapsible">
+                    <li>
+                        <div style="display: flex; flex-direction: column;" >
+                        <div class="collapsible-header">Configure Credentials</div>
+                        </div>
+                        <div class="collapsible-body" id="zalo-intial-question" style="padding-top: 2px!important;">
+                            <hr class="dashed-line">
+                            <div class="row sticky-intent-display-format-div" >
+                            </div>
+                            <div class="row" id="channel-sticky-intents">
+                                <div class="col s11">
+                                    <table class="configure-credential-table" id="easychat-zalo-channel-table" style="box-shadow: none !important;">
+                                        <tbody style="box-shadow: none !important;">
+                                            <tr>
+                                                <td style="width:300px;">
+                                                  <p>WhatsApp mobile number to be used for chatbot integration</p>
+                                                </td>
+                                                <td>
+                                                  <input autocomplete="off" id="easychat-whatsapp-mobile" type="text" value="{{bot_channel_obj.integrated_whatsapp_mobile|default_if_none:''}}" placeholder="9876543210" class="white input">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                  <p>URL<span style="color: red;"> *</span>
+                                                    <sup>
+                                                        <i class="material-icons inline-icon tooltipped" data-position="top" data-tooltip=" URL/Links added must consist of HTTP/HTTPS, Eg. https://www.google.com">help</i>
+                                                    </sup>
+                                                </p>
+                                                </td>
+                                                <td>
+                                                    <form autocomplete="off">
+                                                        <input autocomplete="off" id="easychat_whatsapp_vendor_url" type="text" maxlength="150" value="{{whatsapp_credentials_obj.host_url|default_if_none:''}}" placeholder="Enter URL here" class="white input">
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                  <p>Username<span style="color: red;"> *</span></p>
+                                                </td>
+                                                <td>
+                                                  <form autocomplete="off">
+                                                    <input autocomplete="false" id="easychat_whatsapp_vendor_username" maxlength="256" type="text" value="{{whatsapp_credentials_obj.username|default_if_none:''}}" placeholder="Enter username here" class="white input">
+                                                  </form>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                  <p>Password<span style="color: red;"> *</span></p>
+                                                </td>
+                                                <td>
+                                                    <div class="passowrd-field-div">
+                                                        <form autocomplete="off">
+                                                            <input autocomplete="false" id="easychat_whatsapp_vendor_password" type="password"  maxlength="256" value="{{whatsapp_credentials_obj.password|default_if_none:''}}" placeholder="Enter password here" class="white input whatsapp-config-password-field">
+                                                        </form>
+                                                        <span onclick="toggle_whatsapp_credentials_password_visibilty()">
+                                                            <svg class="hide-password-icon" width="17" height="17" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                              <g clip-path="url(#clip0_1_6011)">
+                                                              <path d="M7.65645 3.68002C8.17269 3.55918 8.70124 3.49877 9.23145 3.50002C14.4814 3.50002 17.4814 9.50002 17.4814 9.50002C17.0262 10.3517 16.4832 11.1536 15.8614 11.8925M10.8214 11.09C10.6155 11.3111 10.3671 11.4884 10.0911 11.6114C9.81506 11.7343 9.51712 11.8005 9.21501 11.8058C8.9129 11.8111 8.61282 11.7555 8.33265 11.6424C8.05249 11.5292 7.79799 11.3608 7.58433 11.1471C7.37067 10.9335 7.20224 10.679 7.08908 10.3988C6.97591 10.1186 6.92034 9.81856 6.92567 9.51645C6.931 9.21434 6.99713 8.9164 7.1201 8.6404C7.24308 8.36441 7.42039 8.11601 7.64145 7.91002M13.6864 13.955C12.4044 14.9323 10.8433 15.4737 9.23145 15.5C3.98145 15.5 0.981445 9.50002 0.981445 9.50002C1.91436 7.76144 3.2083 6.24247 4.77645 5.04502L13.6864 13.955Z" stroke="#d1d1d1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                              <path d="M0.981445 1.25L17.4814 17.75" stroke="#d1d1d1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                              </g>
+                                                              <defs>
+                                                              <clipPath id="clip0_1_6011">
+                                                              <rect width="18" height="18" fill="white" transform="translate(0.231445 0.5)"/>
+                                                              </clipPath>
+                                                              </defs>
+                                                            </svg>
+                                                            <svg class="show-password-icon" width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <g clip-path="url(#clip0_1_6005)">
+                                                                <path d="M0.981445 9.5C0.981445 9.5 3.98145 3.5 9.23145 3.5C14.4814 3.5 17.4814 9.5 17.4814 9.5C17.4814 9.5 14.4814 15.5 9.23145 15.5C3.98145 15.5 0.981445 9.5 0.981445 9.5Z" stroke="#4D4D4D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                <path d="M9.23145 11.75C10.4741 11.75 11.4814 10.7426 11.4814 9.5C11.4814 8.25736 10.4741 7.25 9.23145 7.25C7.9888 7.25 6.98145 8.25736 6.98145 9.5C6.98145 10.7426 7.9888 11.75 9.23145 11.75Z" stroke="#4D4D4D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                </g>
+                                                                <defs>
+                                                                <clipPath id="clip0_1_6005">
+                                                                <rect width="18" height="18" fill="white" transform="translate(0.231445 0.5)"/>
+                                                                </clipPath>
+                                                                </defs>
+                                                            </svg>
+                                                        </span>
+                                                    </div>
+                                                 
+                                                 
+                                                        
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="whatsapp-configure-credential-note-div">
+                                        <p>
+                                            <b>Note:</b> Please select the BSP (Advance Settings->WhatsApp Webhook Integration) in the webhook if not selected.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="outer-intent-container">
+              <ul class="collapsible">
+                  <li>
+                      <div style="display: flex; flex-direction: column;" >
+                      <div class="collapsible-header">Other Settings</div>
+                      </div>
+                      <div class="collapsible-body" id="zalo-intial-question" style="padding-top: 2px!important;">
+                          <hr class="dashed-line">
+                          <div class="row sticky-intent-display-format-div" >
+                          </div>
+                          <div class="row" id="channel-sticky-intents">
+                              <div class="col s10">
+                                  <table class="" id="easychat-zalo-channel-table" style="box-shadow: none !important;">
+                                      <tbody style="box-shadow: none !important;">
+                                          <tr >
+                                              <td style="padding-top:0;">
+                                                  <p class="sub-head">Add image in welcome response</p>
+                                                  <a class=" gy-flex gy-btn-outline modal-trigger" href="#modal-upload-image">
+                                                      Upload From Device</a>
+                                                  
+                                              </td>
+                                              <td>
+                                                  <img src="" id="uploaded-bot-welcome-image" style="max-height:10em;">
+                                                  <a id="remove-bot-welcome-image" style="display: none;"><i class="material-icons red-text text-darken-3">delete</i></a>
+                                              </td>
+                                          </tr>
+                                          <tr >
+                                              <td style="border: none !important; width: 30%;">
+                                                  <p class="sub-head">Add video in welcome response
+                                                    <sup>
+                                                        <i class="material-icons inline-icon tooltipped" data-position="top" data-tooltip=" URL/Links added must consist of HTTP/HTTPS, Eg. https://www.google.com">help</i>
+                                                        </sup> 
+                                                  </p>
+                                              </td>
+                                              <td>
+                                                  <input type="text" name="upload-bot-welcome-video-url" id="upload-bot-welcome-video-url" placeholder="Enter URL here" class="white">
+                                              </td>
+                                          </tr>
+                                            <tr>
+                                              <td id="edit-whatsapp-email-config-table">Enable Emails for Endpoint Failure</td>
+                                              <td>
+                                                {% if bot_channel_obj.is_email_notifiication_enabled %}
+                                                    <label>
+                                                        <input type="checkbox" id="checkbox-is-whatsapp-email-notifiication-enabled" checked/>
+                                                        <span></span>
+                                                    </label>
+                                                    <a class="right waves-effect btn easychat-button modal-trigger" id="edit-whatsapp-email-config" target="_blank" href="#modal-whatsapp-email-config" style="display: block;">Email Configuration</a>
+                                                {% else %}
+                                                    <label>        
+                                                        <input type="checkbox" id="checkbox-is-whatsapp-email-notifiication-enabled"/>
+                                                        <span></span>
+                                                    </label>
+                                                    <a class="right waves-effect btn easychat-button modal-trigger" target="_blank" id="edit-whatsapp-email-config" href="#modal-whatsapp-email-config" style="display: none;">Email Configuration</a>   
+                                                {% endif %}
+                                              </td>                                
+                                          </tr>
+                                          <tr>
+                                            <td>Whatsapp Number Masking</td>
+                                            <td>
+                                              {% if bot_channel_obj.mobile_number_masking_enabled %}
+                                                  <label>
+                                                      <input type="checkbox" id="checkbox-whatsapp-number-masking-enabled" checked/>
+                                                      <span></span>
+                                                  </label>
+                                              {% else %}
+                                                  <label>        
+                                                      <input type="checkbox" id="checkbox-whatsapp-number-masking-enabled"/>
+                                                      <span></span>
+                                                  </label>
+                                              {% endif %}
+                                            </td>                                
+                                        </tr>
+                                      </tbody>
+                                  </table>
+                              </div>
+                          </div>
+                      </div>
+                  </li>
+              </ul>
+            </div>
+            {% endif %}
+            <div class="outer-intent-container">
+              <ul class="collapsible">
+                  <li>
+                      <div style="display: flex; flex-direction: column;" >
+                      <div class="collapsible-header">Block Spam Users&nbsp;&nbsp;&nbsp;
+                      <svg width="60" height="23" viewBox="0 0 60 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <rect width="60" height="23" rx="6" fill="#2755CB"></rect>
+                          <rect width="60" height="23" rx="6" stroke="#2755CB"></rect>
+                          <path d="M14.959 17V7.89746H17.2378L20.7227 13.623H20.7988V7.89746H22.7856V17H20.5005L17.0283 11.2808H16.9521V17H14.959ZM24.582 17V7.89746H30.3457V9.65576H26.6387V11.541H29.7998V13.293H26.6387V15.229H30.4854V17H24.582ZM31.1582 7.89746H33.4053L34.7319 13.8135H34.8335L36.1855 7.89746H38.7246L40.0894 13.8135H40.1909L41.5176 7.89746H43.7646L41.397 17H38.9658L37.5122 10.8491H37.4106L35.938 17H33.5195L31.1582 7.89746Z" fill="white"></path>
+                          <circle cx="46" cy="6" r="2" fill="white"></circle>
+                      </svg></div>
+                      </div>
+                      <div class="collapsible-body" id="zalo-intial-question" style="padding-top: 2px!important;">
+                          <hr class="dashed-line">
+                          <div class="row sticky-intent-display-format-div" >
+                          </div>
+                          <div class="row enable-block-spam-user-div-wrapper" id="channel-sticky-intents">
+                              <div class="col s10">
+                                  <table id="easychat-zalo-channel-table" style="box-shadow: none !important;">
+                                      <tbody style="box-shadow: none !important;">
+                                          <tr >
+                                              <td style="border: none !important; width: 30%;">
+                                                  <p class="sub-head">Enable block spam user</p>
+                                              </td>
+                                              <td>
+                                                  <div class="easychat-custom-switch-toggle-wrapper"style="margin-left: 36px;">
+                                                    {% if selected_language == "en" %}
+                                                    <label class="easychat-custom-toggle-switch"for="enable_block_spam_user">
+                                                    {% else %}
+                                                    <label class="easychat-custom-toggle-switch toggle-disabled"for="enable_block_spam_user">
+                                                    {% endif %}
+                                                        {% if blocked_config_obj.is_block_spam_user_enabled %}
+                                                      <input type="checkbox"id="enable_block_spam_user" checked>
+                                                        {% else %}
+                                                      <input type="checkbox"id="enable_block_spam_user">
+                                                        {% endif %}
+                                                      <span class="easychat-custom-toggle-slider easychat-custom-toggle-round"></span>
+                                                      </label>
+                                                  </div>
+                                              </td>
+                                          </tr>
+                                          {% if blocked_config_obj.is_block_spam_user_enabled %}
+                                          <tr id="enable_block_user_number_div" class="block-user-wrapper">
+                                          {% else %}
+                                          <tr id="enable_block_user_number_div" class="block-user-wrapper" style="display: none;">
+                                          {% endif %}
+                                                      <td style="border: none !important; width: 30%;">
+                                                          <p class="sub-head">Block users based on number of 
+                                                              User queries</p>
+                                                      </td>
+                                                      <td>
+                                                          <div class="easychat-custom-switch-toggle-wrapper" style="margin-left: 18px;">
+                                                            {% if selected_language == "en" %}
+                                                            <label class="easychat-custom-toggle-switch"for="enable_block_user_number">
+                                                            {% else %}
+                                                            <label class="easychat-custom-toggle-switch toggle-disabled"for="enable_block_user_number">
+                                                            {% endif %}
+                                                                {% if blocked_config_obj.is_block_based_on_user_queries_enabled %}
+                                                              <input type="checkbox"id="enable_block_user_number" checked>
+                                                                {% else %}
+                                                              <input type="checkbox"id="enable_block_user_number" >
+                                                                {% endif %}
+                                                              <span class="easychat-custom-toggle-slider easychat-custom-toggle-round"></span>
+                                                              </label>
+                                                          </div>
+                                                      </td>
+                                           </tr>
+                                                {% if blocked_config_obj.is_block_based_on_user_queries_enabled and blocked_config_obj.is_block_spam_user_enabled %}
+                                                  <table id="Block_users_based_on_number_wrapper">
+                                                {% else %}
+                                                  <table id="Block_users_based_on_number_wrapper"style="display: none;">
+                                                {% endif %}
+                                                      <tr class="block-user-wrapper">
+                                                          <td style="border: none !important; width: 30%;">
+                                                              <p class="sub-head">Threshold for warning message
+                                                           <sup><i class="material-icons inline-icon tooltipped" data-position="top" data-tooltip="Once the threshold set for the number of messages for a user in a session reached the added warning message will be displayed.">help</i></sup>
+                                                          </p></td>
+                                                          <td>
+                                                              <div class="warning-msg-wrapper-div">
+                                                                {% if selected_language == "en" %}
+                                                              <div class="warning-msg-wrapper">
+                                                                {% else %}
+                                                                <div class="warning-msg-wrapper toggle-disabled">
+                                                                {% endif %}
+                                                                  <input id="query_warning_msg_count" onchange="handle_non_natural_numbers(event)" type="number" min="1" max="263" value="{{blocked_config_obj.user_query_warning_thresold}}" placeholder="100" class="white">
+                                                                 <p>messages</p>
+                                                              </div>
+                                                              <p class="warning-msg-wrapper-note">Value should be greater than or equal to 1 and lesser than or equal to 263</p>
+                                                             </div>
+                                                          </td>
+                                                     </tr>
+                                                     <tr class="block-user-wrapper">
+                                                      <td style="border: none !important; width: 30%;">
+                                                          <p class="sub-head">Text to be displayed for warning message
+                                                       <sup><i class="material-icons inline-icon tooltipped" data-position="top" data-tooltip="Text will be displayed once the threshold set for the number of messages for a user in a session is reached.">help</i></sup>
+                                                      </p></td>
+                                                      <td>
+                                                          <textarea id="query_warning_msg" type="text" class="validate white response-text-area intent_bot_response_text_text" style="height:5em; width:35em;border-radius:0.5em;border:0.05em solid black;"placeholder="Hi! How may i assist you">
+                                                            {{language_tuned_query_warning_message_text}}
+                                                          </textarea>
+                                                      </td>
+                                                     </tr>
+                                                     <tr class="block-user-wrapper">
+                                                      <td style="border: none !important; width: 30%;">
+                                                          <p class="sub-head">Threshold to block users
+                                                       <sup><i class="material-icons inline-icon tooltipped" data-position="top" data-tooltip="Once the threshold set for the number of messages in a session to block a user is reached the added warning message will be displayed.">help</i></sup>
+                                                      </p></td>
+                                                      <td>
+                                                          <div class="warning-msg-wrapper-div">
+                                                        {% if selected_language == "en" %}
+                                                          <div class="warning-msg-wrapper">
+                                                        {% else %}
+                                                        <div class="warning-msg-wrapper toggle-disabled">
+                                                        {% endif %}
+                                                              <input id="query_block_msg_count" onchange="handle_block_thresold_value(event)" type="number" min="2" max="264" value="{{blocked_config_obj.user_query_block_thresold}}" placeholder="101" class="white">
+                                                             <p>messages</p>
+                                                          </div>
+                                                          <p class="warning-msg-wrapper-note">Value should be greater than 1 and "Threshold for warning messages" and lesser than or equal to 264</p>
+                                                         </div>
+                                                      </td>
+                                                    </tr>
+                                                     <tr class="block-user-wrapper">
+                                                  <td style="border: none !important; width: 30%;">
+                                                      <p class="sub-head">Text to be displayed while blocking the user
+                                                   <sup><i class="material-icons inline-icon tooltipped" data-position="top" data-tooltip="Text will be displayed once the number of messages in a session to block a user is reached.">help</i></sup>
+                                                  </p></td>
+                                                  <td>
+                                                      <textarea id="query_block_msg" type="text" class="validate white response-text-area intent_bot_response_text_text" style="height:5em; width:35em;border-radius:0.5em;border:0.05em solid black;"placeholder="Hi! How may i assist you">
+                                                        {{language_tuned_query_block_message_text}}
+                                                      </textarea>
+                                                  </td>
+                                                    </tr>
+                                                     <tr class="block-user-wrapper">
+                                                  <td style="border: none !important; width: 30%;">
+                                                      <p class="sub-head">Blocking duration 
+                                                   <sup><i class="material-icons inline-icon tooltipped" data-position="top" data-tooltip="The system will block the user due to a lot of spamming messages when the threshold is reached.">help</i></sup>
+                                                  </p></td>
+                                                  <td>
+                                                      <div class="warning-msg-wrapper-div">
+                                                    {% if selected_language == "en" %}
+                                                      <div class="warning-msg-wrapper">
+                                                    {% else %}
+                                                    <div class="warning-msg-wrapper toggle-disabled">
+                                                    {% endif %}
+                                                          <input id="query_block_duration" onchange="handle_non_natural_numbers(event)" type="number" min="1" max="24" value="{{blocked_config_obj.user_query_block_duration}}" placeholder="12" class="white">
+                                                         <p>hour</p>
+                                                      </div>
+                                                     
+                                                     </div>
+                                                  </td>
+                                                     </tr>
+                                                  </table>
+                                                  {% if blocked_config_obj.is_block_spam_user_enabled %}
+                                                  <table id="block_user_based_on_keyword">
+                                                  {% else %}
+                                                  <table id="block_user_based_on_keyword" style="display: none;">
+                                                  {% endif %}
+                                                  <tr class="block-user-wrapper">
+                                                              <td style="border: none !important; width: 30%;">
+                                                                  <p class="sub-head">Block users based on keywords</p>
+                                                              </td>
+                                                              <td>
+                                                                  <div class="easychat-custom-switch-toggle-wrapper" style="margin-left: 18px;">
+                                                                    {% if selected_language == "en" %}
+                                                                      <label class="easychat-custom-toggle-switch"for="enable_block_user_keyword">
+                                                                    {% else %}
+                                                                    <label class="easychat-custom-toggle-switch toggle-disabled"for="enable_block_user_keyword">
+                                                                    {% endif %}
+                                                                        {% if blocked_config_obj.is_block_based_on_spam_keywords_enabled %}
+                                                                      <input type="checkbox"id="enable_block_user_keyword" checked>
+                                                                        {% else %}
+                                                                      <input type="checkbox"id="enable_block_user_keyword">
+                                                                        {% endif %}
+                                                                      <span class="easychat-custom-toggle-slider easychat-custom-toggle-round"></span>
+                                                                      </label>
+                                                                  </div>
+                                                              </td>
+                                                  </tr>
+                                               </table>
+                                               {% if blocked_config_obj.is_block_based_on_spam_keywords_enabled and blocked_config_obj.is_block_spam_user_enabled %}
+                                              <table id="Block_users_based_on_keyword_wrapper">
+                                               {% else %}
+                                              <table id="Block_users_based_on_keyword_wrapper"style="display: none;">
+                                               {% endif %}
+                                                  <tr class="block-user-wrapper">
+                                                      <td style="border: none !important; width: 30%;">
+                                                          <p class="sub-head">Block users when these keywords are used
+                                                       <sup><i class="material-icons inline-icon tooltipped" data-position="top" data-tooltip="Warn/Block when the user uses the added keywords in the user query.">help</i></sup>
+                                                      </p></td>
+                                                      <td>
+                                                        {% if selected_language == "en" %}
+                                                          <div>
+                                                        {% else %}
+                                                        <div class="toggle-disabled">
+                                                        {% endif %}
+                                                            <form name="spam_keyword_form" onsubmit="event.preventDefault(); handle_submit_spam_keywords(event)">
+                                                              <input type="text" name="spam_keyword" id="spam_keyword" placeholder="Enter keyword and hit enter" class="white">
+                                                            </form>
+                                                            {% if blocked_config_obj.spam_keywords.strip != "" %}
+                                                              <div class="keyword-preview-container">
+                                                            {% else %}
+                                                              <div class="keyword-preview-container" style="display: none;">
+                                                            {% endif %}
+                                                                  <div class="block_keyword_search_bar_div">
+                                                                      <span style="margin-top: 3.5px;">
+                                                                          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                              <path fill-rule="evenodd" clip-rule="evenodd" d="M10.7571 8.89195L14.6355 12.7714C14.9252 13.0616 14.9252 13.5317 14.6355 13.8219C14.3434 14.1069 13.8773 14.1069 13.5852 13.8219L9.70681 9.94247C7.39764 11.6996 4.12229 11.3665 2.21383 9.18062C0.305363 6.9947 0.416511 3.70349 2.4681 1.65138C4.51969 -0.40074 7.81004 -0.511917 9.9954 1.39704C12.1808 3.30599 12.5137 6.58219 10.7571 8.89195ZM6.388 1.55974C4.1735 1.55974 2.3783 3.3554 2.3783 5.57047C2.38091 7.78445 4.17459 9.57859 6.388 9.58121C8.6025 9.58121 10.3977 7.78554 10.3977 5.57047C10.3977 3.3554 8.6025 1.55974 6.388 1.55974Z" fill="#7B7A7B"></path>
+                                                                              </svg>
+                                                                        </span>
+                                                                        <input type="search" class="block-keyword-search-bar" id="block_keyword_search_bar" placeholder="Search keyword" onkeyup="handle_search_keyword()">
+                                                                    </div>
+                                                                    <div class="keyword-preview-container-div">
+                                                                        {% with blocked_config_obj.spam_keywords|split:"," as added_keywords %}
+                                                                        {% for keyword in added_keywords %}
+                                                                        {% if keyword.strip != "" %}
+                                                                            <span>{{keyword|safe}}<svg style="cursor: pointer;" width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg" onclick="handle_remove_keyword(event)">
+                                                                                <path d="M2.94727 2.8103L10.1597 10.3103" stroke="white" stroke-width="1.30211" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                                <path d="M10.1602 2.8103L2.94776 10.3103" stroke="white" stroke-width="1.30211" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                                </svg>
+                                                                            </span>
+                                                                        {% endif %}
+                                                                        {% endfor %}
+                                                                        {% endwith %}
+                                                                    </div>
+                                                                    <div id="no-keyword-div" style="margin: 10px 0; display: none; text-align: center;">
+                                                                        <span>No Keyword found</span>
+                                                                    </div>
+                                                              </div>
+                                                          </div>
+                                                      </td>
+                                                 </tr>
+                                                  <tr class="block-user-wrapper">
+                                                      <td style="border: none !important; width: 30%;">
+                                                          <p class="sub-head">Threshold for warning message
+                                                       <sup><i class="material-icons inline-icon tooltipped" data-position="top" data-tooltip=" Once the threshold is set for the number of times the keyword is used by a user in a session the added warning message will be displayed.">help</i></sup>
+                                                      </p></td>
+                                                      <td>
+                                                          <div class="warning-msg-wrapper-div">
+                                                            {% if selected_language == "en" %}
+                                                          <div class="warning-msg-wrapper">
+                                                            {% else %}
+                                                            <div class="warning-msg-wrapper toggle-disabled">
+                                                            {% endif %}
+                                                              <input id="keywords_warning_msg_count" onchange="handle_non_natural_numbers(event)" type="number" min="1" max="263" value="{{blocked_config_obj.spam_keywords_warning_thresold}}" placeholder="1" class="white">
+                                                             <p>messages</p>
+                                                          </div>
+                                                          <p class="warning-msg-wrapper-note">Value should be greater than or equal to 1 and lesser than or equal to 263</p>
+                                                         </div>
+                                                      </td>
+                                                 </tr>
+                                                 <tr class="block-user-wrapper">
+                                                  <td style="border: none !important; width: 30%;">
+                                                      <p class="sub-head">Text to be displayed for warning message
+                                                   <sup><i class="material-icons inline-icon tooltipped" data-position="top" data-tooltip=" Text will be displayed once the threshold set for the number of times the keyword used by a user in a session is reached.">help</i></sup>
+                                                  </p></td>
+                                                  <td>
+                                                      <textarea id="keywords_warning_msg" type="text" class="validate white response-text-area intent_bot_response_text_text" style="height:5em; width:35em;border-radius:0.5em;border:0.05em solid black;"placeholder="Hi! How may i assist you">
+                                                        {{language_tuned_keywords_warning_message_text}}
+                                                      </textarea>
+                                                  </td>
+                                                 </tr>
+                                                 <tr class="block-user-wrapper">
+                                                  <td style="border: none !important; width: 30%;">
+                                                      <p class="sub-head">Threshold to block users
+                                                   <sup><i class="material-icons inline-icon tooltipped" data-position="top" data-tooltip="Once the threshold set for the number of times the keyword used by a user in a session to block a user is reached the added warning message will be displayed.">help</i></sup>
+                                                  </p></td>
+                                                  <td>
+                                                      <div class="warning-msg-wrapper-div">
+                                                        {% if selected_language == "en" %}
+                                                      <div class="warning-msg-wrapper">
+                                                        {% else %}
+                                                      <div class="warning-msg-wrapper toggle-disabled">
+                                                        {% endif %}
+                                                          <input id="keywords_block_msg_count" onchange="handle_block_thresold_value(event)" type="number" min="2" max="264" value="{{blocked_config_obj.spam_keywords_block_thresold}}" placeholder="2" class="white">
+                                                         <p>messages</p>
+                                                      </div>
+                                                      <p class="warning-msg-wrapper-note">Value should be greater than 1 and "Threshold for warning messages" and lesser than or equal to 264</p>
+                                                     </div>
+                                                  </td>
+                                                </tr>
+                                                 <tr class="block-user-wrapper">
+                                              <td style="border: none !important; width: 30%;">
+                                                  <p class="sub-head">Text to be displayed while blocking the user
+                                               <sup><i class="material-icons inline-icon tooltipped" data-position="top" data-tooltip="Text will be displayed once the number of harmful keywords used in a session to block a user is reached.">help</i></sup>
+                                              </p></td>
+                                              <td>
+                                                  <textarea id="keywords_block_msg" type="text" class="validate white response-text-area intent_bot_response_text_text" style="height:5em; width:35em;border-radius:0.5em;border:0.05em solid black;"placeholder="Hi! How may i assist you">
+                                                    {{language_tuned_keywords_block_message_text}}
+                                                  </textarea>
+                                              </td>
+                                                </tr>
+                                                 <tr class="block-user-wrapper">
+                                              <td style="border: none !important; width: 30%;">
+                                                  <p class="sub-head">Blocking duration 
+                                               <sup><i class="material-icons inline-icon tooltipped" data-position="top" data-tooltip="The system will block the user due to using harmful keywords in the query when the threshold is reached.">help</i></sup>
+                                              </p></td>
+                                              <td>
+                                                  <div class="warning-msg-wrapper-div">
+                                                    {% if selected_language == "en" %}
+                                                  <div class="warning-msg-wrapper">
+                                                    {% else %}
+                                                    <div class="warning-msg-wrapper toggle-disabled">
+                                                    {% endif %}
+                                                      <input id="keywords_block_duration" onchange="handle_non_natural_numbers(event)" type="number" min="1" max="24" value="{{blocked_config_obj.spam_keywords_block_duration}}" placeholder="12" class="white">
+                                                     <p>Hour</p>
+                                                  </div>
+                                                 
+                                                 </div>
+                                              </td>
+                                                 </tr>
+                                              </table>
+                                      </tbody>
+                                  </table>
+                              </div>
+                          </div>
+                      </div>
+                  </li>
+              </ul>
+          </div>
+          {% if selected_language == "en" %}
+            <ul class="collapsible">
+              <li>
+                  <div class="collapsible-header">Advanced Settings&nbsp;&nbsp;&nbsp;</div>
+                  <div class="collapsible-body">
+                      <div class="row">
+                          <div class="col s12">
+                              <div class="row">
+                                  <div class="col s5">
+                                      <select id="select-intent-processor" tabindex="-1" class="select2-hidden-accessible" aria-hidden="true" data-select2-id="select2-data-select-intent-processor">
+                                        <option value="whatsapp-webhook">WhatsApp Webhook Integration</option>
+                                      </select>
+                                  </div>
+                                  <div class="col s6">
+                                      <div class="col s6 left">
+                                          <a href="/chat/whatsapp-webhook-console/?bot_pk={{ bot_id }}" class="btn green black-text">Go&nbsp;&nbsp;<i class="inline-icon material-icons">arrow_forward</i></a>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </li>
+            </ul>
+            {% endif %}
+          </div>   
+
+<div class="progress" id="easychat_whatsapp_channel_preloader" style="display: none;">
+    <div class="indeterminate"></div>
+  </div>
+{% if selected_language == "en" %}
+  <a class="btn green lighten-2" style="background-color: #82C784; margin-left: 0.2em;"id="save-whatsapp-channel">Save</a>
+{% else %}
+<a class="btn green lighten-2" style="background-color: #82C784; margin-left: 0.2em;" id="save-whatsapp-channel-for-non-primary-language">Save</a>
+{% endif %}
+</div>
+</div>
+    </div>
+
+
+<!-- Modal Structure -->
+<div id="modal-whatsapp-email-config" class="modal">
+    <div class="modal-content">
+        <h5 style="text-align: center;">Email Configuration</h5>
+        <div class="row">
+            <table style="table-layout: fixed;word-wrap: break-word;">
+                <tbody>
+                    <tr style="border-bottom:1px solid rgba(0,0,0,0.12);border-top:1px solid rgba(0,0,0,0.12)">
+                        <td>
+                            <p>Time interval (in minutes)<i class="material-icons inline-icon tooltipped" data-position="top" data-tooltip="This is the time interval between two mails that will be sent for the same API failure.">info</i></p> 
+                        </td>
+                        <td>
+                            <input type="number" id="mail_sender_time_interval_input_whatsapp" value="{{ bot_channel_obj.mail_sender_time_interval }}" style="text-align: center;">
+                        </td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(0,0,0,0.12);border-top:1px solid rgba(0,0,0,0.12)">
+                        <td>
+                            Email address
+                        </td>
+                        <td>
+                            <div class="col s12 chips chips-initial" id = "whatsapp-email-config-email-address" style="border: 0.1em solid black;padding:1em;font-family: Consolas, monaco, monospace;word-wrap: break-word;background-color:white;">
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="modal-footer">
+        {% if bot_channel_obj.is_email_notifiication_enabled and api_fail_email_configured %}
+            <tr>    
+                <td><a class="left waves-effect btn easychat-button" id="test-whatsapp-email-config" target="_blank" onclick="send_whatsapp_test_email('{{bot_channel_obj.pk}}')" style="display: block;">Send Test Mail</a></td>
+            </tr>
+        {% else %}
+            <tr>    
+                <td><a class="left waves-effect btn easychat-button" id="test-whatsapp-email-config" target="_blank" onclick="send_whatsapp_test_email('{{bot_channel_obj.pk}}')" style="display: none;">Send Test Mail</a></td>
+            </tr>
+        {% endif %}
+        <a class="modal-close btn transparent-btn white black-text" style="margin-right: 10px;">Cancel</a>
+        <a class="btn green lighten-2" onclick="save_whatsapp_email_configuration(this, '{{bot_channel_obj.pk}}')" style="margin-right: 10px;">Save</a>
+    </div>
+</div>
+
+  <div id="modal-upload-image" class="modal">
+    <div class="modal-content">
+      <h5>Choose Image</h5>
+      <div class="file-field input-field col s10">
+        <div class="btn-small easychat-button">
+          <span>Choose image</span>
+          <input id="input_upload_image_bot_welcome_message" type="file" style="width: 90% !important;">
+        </div>
+        <div class="file-path-wrapper">
+          <input id="input_upload_image_bot_welcome_message2" class="file-path validate" type="text">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a class="modal-close btn easychat-button" id="upload-bot-welcome-image">Upload</a>
+    </div>
+  </div>
+  <div id="easychat_whatsapp_add_section_modal" class="modal easychat-custom-modals-container" tabindex="0" style="z-index: 1003; display: none; opacity: 0; top: 4%; transform: scaleX(0.8) scaleY(0.8);">
+    <div class="modal-content">
+        <div class="row" style="margin-bottom: 12px !important;">
+            <div class="modal-header">
+                <div class="modal-heading-text-div" id="catalogue_section_heading">Add Section</div>
+                <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                    <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z" fill="black" fill-opacity="0.54"></path>
+</svg>
+                </a>
+            </div>
+            <div class="modal-overflow-content-div">
+                <div style="margin-top: 24px;">
+                    <div class="easychat-modal-custom-subheading">
+                        Section title<span style="color: red;">*</span>
+                    </div>
+                    <input type="text" class="whatsapp-add-section-title-input" id="catalogue_section_title" style="width: 60% !important; box-sizing: border-box; margin-bottom: 4px;" placeholder="Eg. section title" maxlength="24">
+                    <div class="whatsapp-add-section-title-input-limit-div">
+                        <span id="section_text_count">0</span>/24
+                    </div>
+                </div>
+                <div style="margin-top: 24px;">
+                    <div class="easychat-modal-custom-subheading">
+                        Product ID<span style="color: red;">*</span>
+                    </div>
+                    <div class="whatsapp-catalog-modal-note-div">
+                        Note:- Add Product created in Facebook's Commerce Manager and be highly vigilant while adding Product ID. If the issue exists we will trigger a bot break email to the users added in the Settings-> Bot break email configurations.
+                    </div>
+                    <div id="item_selection_dropdown_wrapper" class="preview-input-container-div" style="display: none; width: 100%; column-gap: 16px; margin-top: 16px;">
+                        <div class="product-id-dropdown-wrapper">
+                            <input class="c-pointer" id="add_product_id_input_div" type="text" value="Select Product " readonly="">
+                            <span class="product-id-dropdown-icon" id="add-product-id_dropdown_icon">
+                                <svg width="9" height="6" viewBox="0 0 9 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M4.16188 5.03062L0.719375 1.58812C0.426875 1.29562 0.426875 0.823125 0.719375 0.530625C1.01187 0.238125 1.48438 0.238125 1.77687 0.530625L4.69438 3.44062L7.60437 0.530625C7.89687 0.238125 8.36937 0.238125 8.66187 0.530625C8.95437 0.823125 8.95437 1.29562 8.66187 1.58812L5.21938 5.03062C4.93438 5.32313 4.45438 5.32313 4.16188 5.03062Z"
+                                        fill="#4D4D4D"></path>
+                                </svg>
+                            </span>
+                            <ul class="product-id-items-container" id="add_product_id_container" style="display: none;">
+                                <li class="product-id-item" style="padding: 4px 8px;">
+                                    <div class="product_id_search_bar_div">
+                                        <span class="product_id_search_icon"><svg width="14" height="14" viewBox="0 0 15 15" fill="none"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                                    d="M10.7571 8.89195L14.6355 12.7714C14.9252 13.0616 14.9252 13.5317 14.6355 13.8219C14.3434 14.1069 13.8773 14.1069 13.5852 13.8219L9.70681 9.94247C7.39764 11.6996 4.12229 11.3665 2.21383 9.18062C0.305363 6.9947 0.416511 3.70349 2.4681 1.65138C4.51969 -0.40074 7.81004 -0.511917 9.9954 1.39704C12.1808 3.30599 12.5137 6.58219 10.7571 8.89195ZM6.388 1.55974C4.1735 1.55974 2.3783 3.3554 2.3783 5.57047C2.38091 7.78445 4.17459 9.57859 6.388 9.58121C8.6025 9.58121 10.3977 7.78554 10.3977 5.57047C10.3977 3.3554 8.6025 1.55974 6.388 1.55974Z"
+                                                    fill="#7B7A7B"></path>
+                                            </svg>
+                                        </span>
+                                        <input type="text" class="product_id_search_bar" id="product-id-search-bar1" autocomplete="off"
+                                            placeholder="Search product" onkeyup="add_section_product_search()">
+                                    </div>
+                                </li>
+                                <li class="product-id-item product-item-no-data-found" id="product_item_no_data_found" style="display:none">
+                                    No product found
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div id="item_selection_manual_wrapper" class="preview-input-container-div" style="display: flex; width: 100%; column-gap: 16px; margin-top: 16px;">
+                        <input type="text" id="catalog_modal_product_id_input" placeholder="Type Id and hit enter">
+                        <div class="preview-container" style=" padding: 12px 4px 8px 12px;" id="whatsapp_catalog_productid_dragable">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0)" onclick="add_catalogue_section()" class="section-save-btn btn filter-modal-footer-btn">Save</a>
+    </div>
+    </div>
+    <div id="easychat_whatsapp_menu_delete_modal" class="modal easychat-custom-modals-wrapper easychat-custom-delete-modal" tabindex="0" style="z-index: 1003; display: none; opacity: 0; top: 4%; transform: scaleX(0.8) scaleY(0.8);">
+        <div class="modal-content">
+            <div style="margin-bottom: 0px !important;">
+                <div class="modal-overflow-content-div">
+                    <div class="termination-confirmation-modal-container">
+                        <div class="termination-icon">
+                            <svg width="83" height="82" viewBox="0 0 83 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M41.3395 6.83336C22.5888 6.83336 7.33337 22.1605 7.33337 41C7.33337 59.8395 22.6605 75.1667 41.5 75.1667C60.3395 75.1667 75.6667 59.8395 75.6667 41C75.6667 22.1605 60.2678 6.83336 41.3395 6.83336ZM44.9167 58.0834H38.0834V51.25H44.9167V58.0834ZM44.9167 44.4167H38.0834V23.9167H44.9167V44.4167Z" fill="#DB2A2A"></path>
+                            </svg>
+                        </div>
+                        <div class="termination-confirmation-heading-text">
+                            Are you sure you want to delete this section?
+                        </div>
+                        <div class="termination-buttons">
+                            <button class="termination-no-btn modal-close">Cancel</button>
+                            <button id="delete_catalogue_section">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script src="{% static 'EasyChatApp/js/channel_multiselect_dropdown.js' %}?v={% random_int 1 100 %}"></script>
+<script type="text/javascript">
+    window.block_spam_keywords = {}
+
+    for (const keyword of '{{blocked_config_obj.spam_keywords|safe}}'.split(",")) {
+        if (keyword.trim()) {
+            block_spam_keywords[keyword] = true
+        }
+    }
+
+</script>
+
+<script type="text/javascript">
+
+ $(".whatsapp-textarea").trumbowyg({
+                    tagsToKeep: [],
+                    allowTagsFromPaste: {
+                        allowedTags: ['h4', 'p', 'br']
+                    },
+                    minimalLinks: true,
+                    btns: [
+                        // ['viewHTML'],
+                        ['strong', 'em'], 
+                        ['emoji'],
+                        ['link'],
+                        ['unorderedList', 'orderedList'],
+                        ['underline'],
+                        ['justifyLeft'], ['justifyCenter'], ['justifyRight'], ['justifyFull'],
+                    ],
+  })
+  window.API_FAIL_EMAIL_CONFIGURED = '{{api_fail_email_configured}}'
+
+  mail_sent_to_list = {{bot_channel_obj.get_mail_sent_to_list | safe}}
+
+  mail_sent_to_list_data = []
+
+  for(var i = 0; i < mail_sent_to_list.length; i++){
+
+      mail_sent_to_list_data.push({"tag": mail_sent_to_list[i]});
+  }
+  $("#whatsapp-email-config-email-address").chips({data: mail_sent_to_list_data})
+</script>
+
+
+{% endblock %}

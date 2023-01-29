@@ -1,0 +1,219 @@
+{% extends 'EasyAssistApp/console.html' %}
+{% block content %}
+{% load static %}
+{% if request.user.enable_s3_bucket %}
+<script src="https://static.allincall.in/static/EasyAssistApp/js/ace.js" type="text/javascript"
+    charset="utf-8"></script>
+<script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/jscolor.min.js"></script>
+{% else %}
+<script src="{% static 'EasyAssistApp/js/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/jscolor.min.js' %}"></script>
+{% endif %}
+
+<link href="{% static 'EasyAssistApp/css/settings.css' %}" rel="stylesheet" type="text/css">
+
+<div class="container-fluid">
+    <div>
+        <div>
+            <div class="page-header">
+                <div class="row">
+                    <div class="col-sm-6 d-flex align-items-center">
+                        <div class="nav nav-pills navbar-right">
+                            <a class="anchor-reset back-btn" href="/easy-assist/sales-ai/settings">
+                                <span class="mr-3 mb-auto " style="cursor: pointer;">
+                                    <svg class="back-arrow-svg" width="44" height="44" viewBox="0 0 44 44" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <rect width="44" height="44" rx="22" transform="matrix(1 0 0 -1 0 44)"
+                                            fill="white" />
+                                        {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None%}
+                                        <path
+                                            d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                                            fill="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" />
+                                        {% else %}
+                                        <path
+                                            d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                                            fill="#0254D7" />
+
+                                        {% endif %}
+
+                                    </svg>
+                                </span>
+                            </a>
+                            <h5 class="nav_btn mr-2 mt-2"> <a class="anchor-reset"
+                                    href="/easy-assist/sales-ai/settings">Settings</a>
+                            </h5>
+
+                            <div class=" mr-2 pt-2">
+                                <svg class="mini-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                                        fill="#475569" />
+                                </svg>
+                            </div>
+
+                            <h5 class=" nav_btn active1 mt-2">Profile</h5>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 d-flex justify-content-end">
+                        <button class="btn btn-width-100" id="reset-button" style="display: none;"
+                            onclick="hide_change_password()">Cancel</button>
+                        <button class="btn btn-width-100" id="save-button" style="background: #10B981!important;"
+                            onclick="save_admin_details(this)">Save</button>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="card-block">
+                <div class="col-md-12">
+                    <div class="col-lg-12 col-md-12 col-sm-12 mb pt-3">
+                        <div class="card bg-white border rounded">
+                            <div class="d-flex align-items-center responsive-mobile">
+                                <div class="col-lg-4 col-md-5 col-sm-6 pl-20 mobile-responsive-heading">
+                                    <div class="card-block pb-0">
+                                        <h5 class="card-title mb-0">
+                                            <dt class="input-title-main">Email Id <span style="color: red;">*</span>
+                                            </dt>
+                                        </h5>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 input-div mb  ml-2 ">
+                                    {{ cobrowse_agent.user.mobile_number }}
+                                    <input class="profile_input" id="admin-email" type="text"
+                                        value="{{ cobrowse_agent.user.email }}" disabled>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-sm-12 mb pt-3">
+                        <div class="card bg-white border rounded">
+                            <div class="d-flex align-items-center responsive-mobile">
+                                <div class="col-lg-4 col-md-5 col-sm-6 pl-20 mobile-responsive-heading">
+                                    <div class="card-block  pb-0">
+                                        <h5 class="card-title mb-0  fs-18">
+                                            <dt class="input-title-main">Name <span style="color: red;">*</span></dt>
+                                        </h5>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 input-div mb ml-2">
+                                    <input class="profile_input" id="admin-name" type="text"
+                                        value="{{ cobrowse_agent.user.first_name }}">
+                                </div>
+                                <div id="name-error-message" class="invalid-feedback">
+                                    Maximum Character Limit reached
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-sm-12 mb pt-3 pb-3" id="divid" style="display:none">
+                        <div class="card bg-white border rounded" id="main_card">
+                            <h5 class="card-title  pl-20 mt-4">
+                                <dt class="input-title-main">Password </dt>
+                            </h5>
+                            <div class="d-flex align-items-center responsive-mobile">
+                                <div class="col-lg-4 col-md-5 pl-20 mobile-responsive-heading">
+                                    <div class="card-block pb-0">
+                                        <h6 class="card-title mb-0 ">
+                                            <dt class="input-title-sub">Old Password</dt>
+                                        </h6>
+                                    </div>
+                                </div>
+                                <div class="col-lg-5 input-div mb  ml-2">
+                                    <input id="old-password" type="password" placeholder="Old Password">
+                                </div>
+                            </div>
+                            <hr class="my-0">
+                            <div class="d-flex align-items-center responsive-mobile">
+                                <div class="col-lg-4  col-md-5 pl-20 mobile-responsive-heading">
+                                    <div class="card-block  pb-0">
+                                        <h6 class="card-title mb-0">
+                                            <dt class="input-title-sub">New Password</dt>
+                                        </h6>
+                                    </div>
+                                </div>
+                                <div class="col-lg-5 input-div ml-2 d-flex align-items-center justify-content-around">
+                                    <input type="password" name="password" placeholder="New Password" required=""
+                                        id="new-password">
+                                    <div class="ml-2 fa-eye-div">
+                                        <i class="far fa-eye" id="toggle-password" style="cursor: pointer;"></i>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <hr class="my-0">
+                            <div class="d-flex align-items-center responsive-mobile">
+                                <div class="col-lg-4 col-md-5 pl-20 mobile-responsive-heading">
+                                    <div class="card-block pb-0">
+                                        <h6 class="card-title mb-0">
+                                            <dt class="input-title-sub">Confirm Password</dt>
+                                        </h6>
+                                    </div>
+                                </div>
+                                <div class="col-lg-5  input-div ml-2 d-flex align-items-center justify-content-around">
+                                    <input type="password" name="password" placeholder="Confirm Password"
+                                        autocomplete="off" required="" id="confirm-password">
+                                    <div class="ml-2 fa-eye-div">
+                                        <i class="far fa-eye" id="toggle-password-first" style="cursor: pointer;"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="change-password" class="input-group my-4 input-group-sm change-password-option" style="font-size: 16px;">
+                        <button type="button" class="change-password-btn" id="change-password-button" onclick="show_change_password()" style="margin-right:12px; display: block; font-weight: 500;"> Change Password?</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function show_change_password() {
+        $("#divid").toggle();
+        if (document.getElementById("divid") && document.getElementById("divid").style.display != "none") {
+            $("#reset-button").css({ "display": "" });
+            $("#change-password").css({ "display": "none" });
+            $("#main_card").css({ "display": "" });
+        } else {
+            $("#reset-button").css({ "display": "none" });
+            $("#change-password").css({ "display": "flex" });
+        }
+    }
+
+    function hide_change_password() {
+        $("#divid").toggle();
+        $("#reset-button").css({ "display": "none" });
+        $("#change-password").css({ "display": "flex" });
+        document.getElementById("old-password").value = "";
+        document.getElementById("new-password").value = "";
+        document.getElementById("confirm-password").value = "";
+    }
+
+
+    const toggle_new_password = document.querySelector('#toggle-password');
+    const new_password = document.querySelector('#new-password');
+
+    toggle_new_password.addEventListener('click', function (e) {
+        const type = new_password.getAttribute('type') === 'password' ? 'text' : 'password';
+        new_password.setAttribute('type', type);
+        this.classList.toggle('fa-eye-slash');
+    });
+
+    const toggle_confirm_password = document.querySelector('#toggle-password-first');
+    const confirm_password = document.querySelector('#confirm-password');
+    toggle_confirm_password.addEventListener('click', function (e) {
+        const type = confirm_password.getAttribute('type') === 'password' ? 'text' : 'password';
+        confirm_password.setAttribute('type', type);
+        this.classList.toggle('fa-eye-slash');
+    });
+
+    $(document).ready(function() {
+		try {
+            document.getElementById("nav-settings-menu").classList.add("active")
+        } catch(err) {}
+	});
+    
+</script>
+
+{% endblock %}

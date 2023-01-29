@@ -1,0 +1,122 @@
+{% extends 'EasyAssistApp/console.html' %}
+{% block content %}
+{% load static %}
+
+{% if request.user.enable_s3_bucket %}
+    <script src="https://static.allincall.in/static/EasyAssistApp/js/ace.js" type="text/javascript"
+        charset="utf-8"></script>
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/jscolor.min.js"></script>
+{% else %}
+    <script src="{% static 'EasyAssistApp/js/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" src="{% static 'EasyAssistApp/js/jscolor.min.js' %}"></script>
+{% endif %}
+
+<link href="{% static 'EasyAssistApp/css/settings.css' %}" rel="stylesheet" type="text/css">
+
+<div class="container-fluid">
+    <div>
+        <div>
+            <div class="page-header">
+                <div class="row">
+                    <div class="col-sm-6 d-flex align-items-center">
+                        <div class="nav nav-pills navbar-right">
+                            <a class="anchor-reset back-btn" href="/easy-assist/sales-ai/settings">
+                                <span class="mr-3 mb-auto" style="cursor: pointer;">
+                                    <svg class="back-arrow-svg" width="44" height="44" viewBox="0 0 44 44" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <rect width="44" height="44" rx="22" transform="matrix(1 0 0 -1 0 44)"
+                                            fill="white" />
+                                            {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                                            <path
+                                            d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                                            fill="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" />
+                                             {% else %}
+                                             <path
+                                            d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                                            fill="#0254D7" />
+ 
+                                          {% endif %} 
+                                        
+                                    </svg>
+                                </span>
+                            </a>
+                            <h5 class="nav_btn mr-2 mt-2"><a class="anchor-reset" href="/easy-assist/sales-ai/settings">Settings</a>
+                            </h5>
+
+                            <div class=" mr-2 pt-2">
+                                <svg class="mini-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                                        fill="#475569" />
+                                </svg>
+                            </div>
+
+                            <h5 class="nav_btn active1 mt-2">Chrome Extension</h5>
+                        </div>
+                    </div>
+                    <div id="extension_download" class="col-sm-6 d-flex justify-content-end">
+                        {% if chrome_extension_obj.extension_path %}
+                            <a href="{{ chrome_extension_obj.extension_path }}" id="download-button" class="btn btn-width-100">Download</a>
+                        {% endif %}
+                        <button class="btn btn-width-100" id="save-button"
+                        style="background: #10B981!important;" onclick="save_extension(this, '{{ access_token_obj.key }}' )">Save</button>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-30" id="card-block">
+                <div class="col-md-12">
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+                        <div class="card bg-white border rounded">
+                            <div class="d-flex align-items-center responsive-mobile">
+                                <div class="col-lg-6 col-md-5 col-sm-6 mobile-responsive-heading">
+                                    <div class="card-block px-4  pb-0">
+                                        <h5 class="card-title mb-0 fs-18">
+                                            <dt class="input-title-main">Extension Name</dt>
+                                        </h5>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-6 input-div mb ml-2">
+                                    {% if chrome_extension_obj.extension_name %}
+                                        <input type="text" class="chrome-extension-input" id="extension-name" value="{{ chrome_extension_obj.extension_name }}" placeholder="CognoAI">
+                                    {% else %}
+                                        <input type="text" class="chrome-extension-input" id="extension-name" placeholder="CognoAI">
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-sm-12 mb mt-20">
+                        <div class="card bg-white border rounded">
+                            <div class="d-flex align-items-center responsive-mobile">
+                                <div class="col-lg-6 col-md-5 col-sm-6 mobile-responsive-heading">
+                                    <div class="card-block px-4  pb-0">
+                                        <h5 class="card-title mb-0 fs-18">
+                                            <dt class="input-title-main">Deploy Links</dt>
+                                        </h5>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-6 input-div mb  ml-2 ">
+                                    {% if chrome_extension_obj.deploy_links %}
+                                        <input type="text" class="chrome-extension-input" id="extension-deploy-domains" value="{{ chrome_extension_obj.deploy_links }}" placeholder="www.google.com">
+                                    {% else %}
+                                        <input type="text" class="chrome-extension-input" id="extension-deploy-domains" value="" placeholder="www.google.com">
+                                    {% endif %}
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        try {
+            document.getElementById("nav-settings-menu").classList.add("active")
+        } catch(err) {}
+    });
+</script>
+{% endblock %}

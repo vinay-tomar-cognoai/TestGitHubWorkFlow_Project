@@ -1,0 +1,196 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <link rel="shortcut icon" type="image/x-icon" href="{{ developer_config_obj.general_favicon }}">
+        <title>{{ developer_config_obj.general_title }}</title>
+        <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+        <!-- Custom fonts for this template-->
+        <link href="{% static 'AuditTrailApp/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="{% static 'AuditTrailApp/css/bootstrap-select.css' %}" />
+        <!-- Custom styles for this template-->
+        <link href="{% static 'AuditTrailApp/css/sb-admin-2.min.css' %}" rel="stylesheet">
+        <link href="{% static 'AuditTrailApp/vendor/datatables/dataTables.bootstrap4.min.css' %}" rel="stylesheet">
+        <script type="text/javascript" src="{% static 'AuditTrailApp/vendor/jquery/jquery.min.js' %}"></script>
+        <script src="{% static 'AuditTrailApp/vendor/chart.js/Chart.min.js' %}"></script>
+        <link rel="stylesheet" type="text/css" href="{% static 'AuditTrailApp/css/bootstrap-datepicker.min.css' %}">
+        <script type="text/javascript" src="{% static 'AuditTrailApp/js/bootstrap-datepicker.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'AuditTrailApp/js/bootstrap-multiselect.js' %}"></script>
+        <link rel="stylesheet" type="text/css" href="{% static 'AuditTrailApp/css/bootstrap-multiselect.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'AuditTrailApp/css/console.css' %}?v={% random_int 1 100 %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'AuditTrailApp/css/campaign_changes.css' %}?v={% random_int 1 100 %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'AuditTrailApp/css/campaign_responsive.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'AuditTrailApp/css/easyassist-custom-select.css' %}">
+        <!-- <link rel="stylesheet" href="https://static.allincall.in/static/EasyChatApp/css/materialize.min.css"> -->
+    </head>
+    <body id="page-top">
+        {% csrf_token %}
+        <!-- Page Wrapper -->
+        <div id="wrapper">
+            <!-- Sidebar -->
+            <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion toggled" id="accordionSidebar" style="z-index: 0; display: none;">
+                <!-- Sidebar - Brand -->
+                <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/" style="height:3.75rem !important;">
+                    <div class="sidebar-brand-icon rotate-n-15"></div>
+                    <img id="campaign-logo-large" src="{% static 'AuditTrailApp/img/campaignLogoLarge.svg' %}" alt="CognoDesk" max-width = "90px" height = "50px"/>
+                    <img id="campaign-logo-small" src="{% static 'AuditTrailApp/img/campaignLogoSmall.svg' %}" alt="CognoDesk" max-width = "90px" height = "50px"/>
+                </a>
+                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3 sidebar-toggle-btn" amino-styles="margin: 5px 0 10px 0 !important;" style="min-height: 42px!important;">
+                <em class="fa fa-bars"></em>
+                </button>
+                <!-- Divider -->
+                <hr class="sidebar-divider my-0">
+                <!-- Nav Item - Dashboard -->
+                <li class="nav-item nav-item-submenu" style="flex-direction: column;">
+                    <a class="nav-link text-truncate tooltip-navbar" id="campaign-navbar-submenu-1" href="#submenu1" data-toggle="collapse" data-target="#submenu1" data-tooltip="tooltip" data-original-title="Audit Trail">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="29" viewBox="0 0 28 29" fill="none">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M13.9532 7.37085V8.85616C13.9532 9.0616 13.7873 9.22849 13.5819 9.22972H9.12371C8.91739 9.22972 8.75014 9.06247 8.75014 8.85616V7.37085C8.75014 7.16454 8.91739 6.99729 9.12371 6.99729H9.68779C9.78315 6.99785 9.86349 6.92622 9.87383 6.83142C9.95849 6.07982 10.5942 5.51172 11.3505 5.51172C12.1069 5.51172 12.7426 6.07982 12.8272 6.83142C12.8382 6.92588 12.9182 6.99717 13.0133 6.99729H13.5796C13.7859 6.99729 13.9532 7.16454 13.9532 7.37085ZM11.7245 21.4005C11.7245 20.8872 11.3084 20.4711 10.7951 20.4711H7.63768C7.19755 20.4419 6.86368 20.0626 6.89055 19.6224V10.0725C6.87007 9.67887 7.13543 9.32747 7.51963 9.23944C7.61031 9.22106 7.67387 9.13907 7.66906 9.04668C7.63992 8.47438 7.63096 7.85127 7.62797 7.55241C7.62674 7.45013 7.54347 7.36786 7.44118 7.36787H6.15537C5.85842 7.36668 5.57324 7.48386 5.36292 7.69348C5.1526 7.9031 5.03447 8.18789 5.03467 8.48484V21.2137C5.03467 21.5097 5.15229 21.7936 5.36165 22.0028C5.571 22.212 5.85492 22.3294 6.15089 22.3292H10.7951C11.3081 22.3292 11.7241 21.9135 11.7245 21.4005ZM15.0463 9.04667C15.0391 9.14089 15.1031 9.22574 15.1957 9.24466C15.572 9.33861 15.8297 9.68509 15.8113 10.0725V11.1185C15.8113 11.6318 16.2275 12.0479 16.7408 12.0479C16.9874 12.0481 17.224 11.9503 17.3985 11.7759C17.5729 11.6016 17.671 11.3651 17.671 11.1185V8.48483C17.671 8.18801 17.5527 7.90342 17.3424 7.69396C17.1321 7.4845 16.8471 7.36742 16.5503 7.36861H15.2622C15.2125 7.36839 15.1647 7.38833 15.13 7.4239C15.0949 7.45895 15.0752 7.50656 15.0754 7.55614C15.0769 7.90954 15.0762 8.67087 15.0463 9.04667ZM19.2451 18.4172H16.2723C15.9628 18.4172 15.7119 18.6681 15.7119 18.9776C15.7119 19.2871 15.9628 19.5379 16.2723 19.5379H19.2451C19.5546 19.5379 19.8055 19.2871 19.8055 18.9776C19.8055 18.6681 19.5546 18.4172 19.2451 18.4172ZM16.2723 16.9379C15.9631 16.9379 15.7123 16.6875 15.7119 16.3783C15.7117 16.2295 15.7707 16.0868 15.8758 15.9816C15.9809 15.8763 16.1235 15.8172 16.2723 15.8172H18.1297C18.4391 15.8172 18.69 16.0681 18.69 16.3775C18.69 16.687 18.4391 16.9379 18.1297 16.9379H16.2723ZM22.5923 15.5714C22.5924 15.1765 22.4354 14.7978 22.156 14.5187L21.1055 13.4727C20.8261 13.1933 20.4472 13.0364 20.052 13.0364H14.3693C13.5481 13.036 12.8816 13.7005 12.8796 14.5217V21.9519C12.8796 22.7772 13.5486 23.4462 14.3738 23.4462H21.098C21.9233 23.4462 22.5923 22.7772 22.5923 21.9519V15.5714ZM15.1209 14.5254C14.7083 14.5254 14.3738 14.8599 14.3738 15.2725L14.3776 21.2048C14.3776 21.6174 14.7121 21.9519 15.1247 21.9519H20.3546C20.7672 21.9519 21.1017 21.6174 21.1017 21.2048V15.8822C21.1019 15.6838 21.0231 15.4935 20.8828 15.3532L20.2717 14.7436C20.1315 14.6037 19.9415 14.5252 19.7435 14.5254H15.1209Z" fill="#2D2D2D"/>
+                            <mask id="mask0" mask-type="alpha" maskUnits="userSpaceOnUse" x="5" y="5" width="18" height="19">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M13.9532 7.37085V8.85616C13.9532 9.0616 13.7873 9.22849 13.5819 9.22972H9.12371C8.91739 9.22972 8.75014 9.06247 8.75014 8.85616V7.37085C8.75014 7.16454 8.91739 6.99729 9.12371 6.99729H9.68779C9.78315 6.99785 9.86349 6.92622 9.87383 6.83142C9.95849 6.07982 10.5942 5.51172 11.3505 5.51172C12.1069 5.51172 12.7426 6.07982 12.8272 6.83142C12.8382 6.92588 12.9182 6.99717 13.0133 6.99729H13.5796C13.7859 6.99729 13.9532 7.16454 13.9532 7.37085ZM11.7245 21.4005C11.7245 20.8872 11.3084 20.4711 10.7951 20.4711H7.63768C7.19755 20.4419 6.86368 20.0626 6.89055 19.6224V10.0725C6.87007 9.67887 7.13543 9.32747 7.51963 9.23944C7.61031 9.22106 7.67387 9.13907 7.66906 9.04668C7.63992 8.47438 7.63096 7.85127 7.62797 7.55241C7.62674 7.45013 7.54347 7.36786 7.44118 7.36787H6.15537C5.85842 7.36668 5.57324 7.48386 5.36292 7.69348C5.1526 7.9031 5.03447 8.18789 5.03467 8.48484V21.2137C5.03467 21.5097 5.15229 21.7936 5.36165 22.0028C5.571 22.212 5.85492 22.3294 6.15089 22.3292H10.7951C11.3081 22.3292 11.7241 21.9135 11.7245 21.4005ZM15.0463 9.04667C15.0391 9.14089 15.1031 9.22574 15.1957 9.24466C15.572 9.33861 15.8297 9.68509 15.8113 10.0725V11.1185C15.8113 11.6318 16.2275 12.0479 16.7408 12.0479C16.9874 12.0481 17.224 11.9503 17.3985 11.7759C17.5729 11.6016 17.671 11.3651 17.671 11.1185V8.48483C17.671 8.18801 17.5527 7.90342 17.3424 7.69396C17.1321 7.4845 16.8471 7.36742 16.5503 7.36861H15.2622C15.2125 7.36839 15.1647 7.38833 15.13 7.4239C15.0949 7.45895 15.0752 7.50656 15.0754 7.55614C15.0769 7.90954 15.0762 8.67087 15.0463 9.04667ZM19.2451 18.4172H16.2723C15.9628 18.4172 15.7119 18.6681 15.7119 18.9776C15.7119 19.2871 15.9628 19.5379 16.2723 19.5379H19.2451C19.5546 19.5379 19.8055 19.2871 19.8055 18.9776C19.8055 18.6681 19.5546 18.4172 19.2451 18.4172ZM16.2723 16.9379C15.9631 16.9379 15.7123 16.6875 15.7119 16.3783C15.7117 16.2295 15.7707 16.0868 15.8758 15.9816C15.9809 15.8763 16.1235 15.8172 16.2723 15.8172H18.1297C18.4391 15.8172 18.69 16.0681 18.69 16.3775C18.69 16.687 18.4391 16.9379 18.1297 16.9379H16.2723ZM22.5923 15.5714C22.5924 15.1765 22.4354 14.7978 22.156 14.5187L21.1055 13.4727C20.8261 13.1933 20.4472 13.0364 20.052 13.0364H14.3693C13.5481 13.036 12.8816 13.7005 12.8796 14.5217V21.9519C12.8796 22.7772 13.5486 23.4462 14.3738 23.4462H21.098C21.9233 23.4462 22.5923 22.7772 22.5923 21.9519V15.5714ZM15.1209 14.5254C14.7083 14.5254 14.3738 14.8599 14.3738 15.2725L14.3776 21.2048C14.3776 21.6174 14.7121 21.9519 15.1247 21.9519H20.3546C20.7672 21.9519 21.1017 21.6174 21.1017 21.2048V15.8822C21.1019 15.6838 21.0231 15.4935 20.8828 15.3532L20.2717 14.7436C20.1315 14.6037 19.9415 14.5252 19.7435 14.5254H15.1209Z" fill="white"/>
+                            </mask>
+                            <g mask="url(#mask0)">
+                            </g>
+                        </svg>
+                        <span>Audit Trail</span>
+                    </a>
+                </li>
+                
+                <!-- Divider -->
+                <hr class="sidebar-divider">
+                <div class="text-center d-none d-md-inline">
+                    <button class="rounded-circle border-0" id="sidebarToggle" onclick="change_sales_logo_property()"></button>
+                </div>
+            </ul>
+            <!-- End of Sidebar -->
+            <!-- Content Wrapper -->
+            <div id="content-wrapper" class="d-flex flex-column">
+                <!-- Main Content -->
+                <div id="content">
+                    <!-- Topbar -->
+                    <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                        <!-- Sidebar Toggle (Topbar) -->
+                        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3 sidebar-toggle-btn">
+                        <em class="fa fa-bars"></em>
+                        </button>
+
+                        <!-- Cogno AI logo -->
+                        <a href="/" class="brand-logo red-text" style="padding-left: 10px;">
+                            <img src="{{ developer_config_obj.general_page_logo }}" alt="Cogno AI Logo" style="max-width: 125px; max-height: 30px;">
+                        </a>
+                        <!-- Congo AI logo ends -->
+
+                        <!-- Topbar Navbar -->
+                        <ul class="navbar-nav ml-auto">
+                            <li class="nav-item dropdown no-arrow">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small easychat-profile-username">
+                                    {% if request.user.first_name != "" or request.user.first_name != None %}
+                                        {{request.user.first_name}} 
+                                        {% if request.user.last_name != "" or request.user.last_name != None %}
+                                            {{request.user.last_name }}
+                                        {% endif %}
+                                    {% else %}
+                                        {{request.user.username}}
+                                    {% endif %}
+                                </span>
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9.78033 3.23123C9.48744 2.92292 9.01256 2.92292 8.71967 3.23123L6 6.09404L3.28033 3.23123C2.98744 2.92292 2.51256 2.92292 2.21967 3.23123C1.92678 3.53954 1.92678 4.03941 2.21967 4.34772L5.46967 7.76877C5.76256 8.07708 6.23744 8.07708 6.53033 7.76877L9.78033 4.34772C10.0732 4.03941 10.0732 3.53954 9.78033 3.23123Z" fill="#94A3B8"/>
+                                </svg>
+                                </a>
+                                <!-- Dropdown - User Information -->
+                                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                                    <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" data-target="#logoutModal">
+                                    <em class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></em>
+                                    Logout
+                                    </a>
+                                </div>
+                                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                                    <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" data-target="#logoutModal">
+                                    <em class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></em>
+                                    Logout
+                                    </a>
+                                </div>
+                            </li>
+                            <!-- Nav Item - User Information -->
+                        </ul>
+                        
+                    </nav>
+                    <!-- End of Topbar -->
+                    {% block content %}
+                    {% endblock %}
+                </div>
+                <!-- End of Main Content -->
+                 <footer id="campaign-footer" class="sticky-footer bg-white">
+                    <div class="container my-auto" style="display: inline-table;">
+                        <div class="copyright text-center my-auto">
+                            <span style="float: left;">Version: {{ easychat_version }}</span>
+                            <span>Copyright &copy; AllinCall Research and Solutions Pvt Ltd.&nbsp;&nbsp;
+                            </span>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+            <!-- End of Content Wrapper -->
+        </div>
+        <!-- End of Page Wrapper -->
+        <!-- Scroll to Top Button-->
+        <a class="scroll-to-top rounded" href="#page-top">
+        <em class="fas fa-angle-up"></em>
+        </a>
+        <!-- Logout Modal-->
+        <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    </div>
+                    <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                        <a class="btn btn-primary" href="/campaign/logout/">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="campaign-snackbar"></div>
+
+        <div class="cogno-celebration">
+            <div class="cogno-celebration-piece"></div>
+            <div class="cogno-celebration-piece"></div>
+            <div class="cogno-celebration-piece"></div>
+            <div class="cogno-celebration-piece"></div>
+            <div class="cogno-celebration-piece"></div>
+            <div class="cogno-celebration-piece"></div>
+            <div class="cogno-celebration-piece"></div>
+            <div class="cogno-celebration-piece"></div>
+            <div class="cogno-celebration-piece"></div>
+            <div class="cogno-celebration-piece"></div>
+            <div class="cogno-celebration-piece"></div>
+            <div class="cogno-celebration-piece"></div>
+            <div class="cogno-celebration-piece"></div>
+        </div>
+
+        <script type="text/javascript">
+            window.BOT_ID = "{{ selected_bot_obj.pk }}"
+        </script>
+        <script src="{% static 'AuditTrailApp/js/bootstrap.bundle.min.js' %}"></script>
+        <script src="{% static 'AuditTrailApp/js/bootstrap-select.min.js' %}"></script>
+        <script src="{% static 'AuditTrailApp/vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+        <!-- Custom scripts for all pages-->
+        <script src="{% static 'AuditTrailApp/js/sb-admin-2.min.js' %}"></script>
+        <script src="{% static 'AuditTrailApp/js/crypto-js.min.js' %}"></script>
+        <script src="/static/AuditTrailApp/vendor/datatables/jquery.dataTables.min.js"></script>
+        <script src="/static/AuditTrailApp/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+        <script type="text/javascript" src="{% static 'AuditTrailApp/js/html2canvas.min.js' %}"></script>
+        <script src="{% static 'AuditTrailApp/js/encrypt.js' %}"></script>
+        <script type="text/javascript" src="{% static 'AuditTrailApp/js/easyassist-custom-select.js' %}"></script>
+        <script type="text/javascript" src="{% static 'AuditTrailApp/js/col-resizable.js' %}"></script>
+        <script src="{% static 'AuditTrailApp/js/console.js' %}?v={% random_int 1 100 %}"></script>
+        <script type="text/javascript" src="{% static 'AuditTrailApp/js/jquery.json-editor.min.js' %}"></script>
+    </body>
+</html>

@@ -1,0 +1,178 @@
+{% extends 'EasyChatApp/base.html' %}
+{% block content %}
+{% load static %}
+<div class="add-scrolling">
+<div class="row" style="padding:1em;width: fit-content;">
+
+	<div class="col s12">
+
+		{% if audit_trail_objs %}
+
+			<table id="audit-trail-table" class="display" style="table-layout: fixed;">
+			    <thead>
+			        <tr>
+			            <th>User</th>
+			            <th>Action</th>
+			            <th>DateTime</th>
+			            <th>Data</th>
+			        </tr>
+			    </thead>
+			    <tbody>
+			    	{% for audit_trail_obj in audit_trail_objs %}
+				        <tr>
+				            <td>{{ audit_trail_obj.user.username }}</td>
+				            <td>{{ audit_trail_obj.get_action|safe }}</td>
+				            <td>{{ audit_trail_obj.datetime }}</td>
+				            <td>
+				            	{{ audit_trail_obj.get_redirect_data|safe }}
+				            	{% if audit_trail_obj.get_description %}
+							     	<a href="javascript:void(0)" onclick="show_modification_logs_modal('{{audit_trail_obj.pk}}')" class="black-text white right">
+                              		<i class="material-icons black-text inline-icon">open_in_new</i></a>
+								
+								{% elif audit_trail_obj.get_user_details %}
+									<a href="javascript:void(0)" onclick="show_modification_logs_modal('{{audit_trail_obj.pk}}')" class="black-text white right">
+										<i class="material-icons black-text inline-icon">open_in_new</i></a>
+				            	{% endif %}
+							</td>
+				        </tr>
+				    {% endfor %}
+			    </tbody>
+			</table>
+
+		{% else %}
+
+			<p style="padding:1em;" class="green lighten-3">No audit logs</p>
+
+		{% endif %}
+
+	</div>
+	<div class="col s12 right-align">
+	    {% if audit_trail_objs.has_other_pages %}
+	      <ul class="pagination">
+
+            {% if audit_trail_objs.has_previous %}
+                <li><a href="?page={{ audit_trail_objs.previous_page_number }}"><i class="material-icons">chevron_left</i></a></li>
+            {% else %}
+                <li class="disabled"><span><i class="material-icons">chevron_left</i></span></li>
+            {% endif %}
+
+            {% if audit_trail_objs.number|add:'-4' > 1 %}
+                <li><a href="?page={{ audit_trail_objs.number|add:'-5' }}">&hellip;</a></li>
+            {% endif %}
+
+            {% for i in audit_trail_objs.paginator.page_range %}
+                {% if audit_trail_objs.number == i %}
+                    <li class="active purple darken-3"><a href="?page={{ i }}">{{ i }}</a></li>
+                {% elif i > audit_trail_objs.number|add:'-5' and i < audit_trail_objs.number|add:'5' %}
+                    <li><a href="?page={{ i }}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if audit_trail_objs.paginator.num_pages > audit_trail_objs.number|add:'4' %}
+                <li><a href="?page={{ audit_trail_objs.number|add:'5' }}">&hellip;</a></li>
+            {% endif %}
+
+            {% if audit_trail_objs.has_next %}
+                <li><a href="?page={{ audit_trail_objs.next_page_number }}"><i class="material-icons">chevron_right</i></a></li>
+            {% else %}
+                <li class="disabled"><span><i class="material-icons">chevron_right</i></span></li>
+            {% endif %}
+	      </ul>
+	    {% endif %}
+	</div>
+    
+    {% for audit_trail_obj in audit_trail_objs %}
+        <div id="audit-details-{{audit_trail_obj.pk}}" class="easychat-modal">
+            <div class="easychat-modal-content" style="max-height: 80vh;min-height: 40vh; width: 50%; overflow-y: unset; border: 0.15em solid black;">
+                <div class="row">
+                	{% if audit_trail_obj.action == "2" or audit_trail_obj.action == "17" %}
+	                   <h4 style="margin: 0 !important;"><center>
+	                   	{% if audit_trail_obj.action == "2" %}
+	                   		Intent Deleted
+	                   	{% else %}
+	                   		Intent Added
+	                   	{% endif %}
+	                   <a href="javascript:void(0)" onclick="hide_modification_logs_modal('{{audit_trail_obj.pk}}')" class="right black-text" style="margin-right: 1em;font-size: x-large;">x</a></center></h4>
+	                   <hr>
+	                   <div id="modification-logs-audit-trail-div" style="height: 50vh;overflow: scroll;">
+	                   	<table id="modification-logs-audit-trail-table">
+	                   		<thead>
+						        <tr>
+						            <th>Number</th>
+						            <th>Intent Name</th>
+						        </tr>
+						    </thead>
+						    <tbody>
+						    	{% for item in audit_trail_obj.get_description %}
+						    		<tr>
+						    			<td>{{ item.number }}</td>
+						    			<td>{{ item.intent_name }}</td>
+						    		</tr>
+						    	{% endfor %}
+						    </tbody>
+	                   </table>
+	                   </div>
+					{% elif audit_trail_obj.action == "6" %}
+						<h4 style="margin: 0 !important;"><center>User Login Details
+							<a href="javascript:void(0)" onclick="hide_modification_logs_modal('{{audit_trail_obj.pk}}')" class="right black-text" style="margin-right: 1em;font-size: x-large;">x</a></center></h4>
+							<hr>
+							<div id="modification-logs-audit-trail-div" style="height: 50vh;overflow: scroll;">
+								<table id="modification-logs-audit-trail-table">
+									<thead>
+									<tr>
+										<th>User Browser</th>
+										<th>User IP Address</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										{% for item in audit_trail_obj.get_user_details %}
+											<td>{{item}}</td>
+										{% endfor %}
+									</tr>
+								</tbody>
+								</table>
+						</div>
+	                {% else %}
+	                   <h4 style="margin: 0 !important;"><center>Modification Logs
+	                   <a href="javascript:void(0)" onclick="hide_modification_logs_modal('{{audit_trail_obj.pk}}')" class="right black-text" style="margin-right: 1em;font-size: x-large;">x</a></center></h4>
+	                   <hr>
+	                   <div id="modification-logs-audit-trail-div" style="height: 50vh;overflow: scroll;">
+	                   	<table id="modification-logs-audit-trail-table">
+	                   		<thead>
+						        <tr>
+						            <th>Field Modified</th>
+						            <th>Previous State</th>
+						            <th>Current State</th>
+						        </tr>
+						    </thead>
+						    <tbody>
+						    	{% for item in audit_trail_obj.get_description %}
+						    		<tr>
+						    			<td>{{ item.heading }}</td>
+						    			<td>{{ item.old_data|safe }}</td>
+						    			<td>{{ item.new_data|safe }}</td>
+						    		</tr>
+						    	{% endfor %}
+						    </tbody>
+	                   	</table>
+	                   </div>
+	                {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    <script type="text/javascript">
+    	$(document).ready(function() {
+	        $('#audit-trail-table').DataTable({
+	            "language": {
+	              "info": 'Showing ' + '{{start_point}}' + ' to ' + '{{end_point}}' + ' entries out of ' + '{{total_audit_objs}}',
+	            },
+	            "bPaginate": false,
+	            "ordering": false
+	        });
+	    });
+    </script>
+</div>
+</div>
+{% endblock %}

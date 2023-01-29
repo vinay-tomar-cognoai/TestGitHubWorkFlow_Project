@@ -1,0 +1,263 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex" />
+  <meta name="googlebot" content="noindex" />
+  <meta name="googlebot-news" content="noindex" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+  <title>EasyChat</title>
+
+  {% if request.user.enable_s3_bucket %}
+  <link rel="shortcut icon" type="image/png" href="https://static.allincall.in/static/EasyChatApp/img/favicon.svg"/>
+  {% else %}
+  <link rel="shortcut icon" type="image/png" href="{% static 'EasyChatApp/img/favicon.svg' %}"/>
+  {% endif %}
+
+
+ 
+  <link href="{% static 'EasyChatApp/css/material_icons.css' %}" rel="stylesheet">
+  {% if request.user.enable_s3_bucket %}
+
+    <link href="https://static.allincall.in/static/EasyChatApp/css/select2.min.css" rel="stylesheet"/>
+    <link href="https://static.allincall.in/static/EasyChatApp/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+
+  {% else %}
+    <link href="{% static 'EasyChatApp/css/select2.min.css' %}" rel="stylesheet"/>
+    <link href="{% static 'EasyChatApp/css/materialize.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  {% endif %}
+
+  
+  
+  <link href="{% static 'EasyChatApp/css/style3.css' %}?v={% random_int 1 100 %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="{% static 'EasyChatApp/css/Treant.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+
+  {% if request.user.enable_s3_bucket %}
+    <link href="https://static.allincall.in/static/EasyChatApp/css/jquery.dataTables.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="https://static.allincall.in/static/EasyChatApp/css/style.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+
+  {% else %}
+
+    <link href="{% static 'EasyChatApp/css/jquery.dataTables.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="{% static 'EasyChatApp/css/style.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  {% endif %}
+
+
+  
+
+  <link href="{% static 'EasyChatApp/css/changes.css' %}?v={% random_int 1 100 %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+
+  {% if request.user.enable_s3_bucket %}
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/jquery.min.js"></script>
+ 
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/select2.min.js"></script>
+
+  {% else %}
+
+
+   <script type="text/javascript" src="{% static 'EasyChatApp/js/jquery.min.js' %}"></script>
+   <script type="text/javascript" src="{% static 'EasyChatApp/js/select2.min.js' %}"></script>
+  {% endif %}
+
+ 
+</head>
+
+<body class="grey lighten-4">
+
+  {% csrf_token %}
+
+  <div class="navbar-fixed">
+
+    <nav class="white lighten-1" role="navigation">
+      <div class="nav-wrapper">
+        <a href="#" class="brand-logo red-text">
+
+          <div class="row">
+
+            <div class="col center-align purple darken-3" style="width: 4.16%;">
+              <br>
+              <a href="/chat/home/" class="white-text tooltipped" data-position="right" data-tooltip="Home">
+                <i class="material-icons" id="home-button">home</i>
+              </a>
+            </div>
+
+            <div class="col s6">
+              <div class="row" id="show-global-search" style="display:none;">
+                <div class="input-field col s10">
+                  <i class="material-icons prefix">search</i>
+                  <input id="global_search" type="text" class="validate" autocomplete="on">
+                  <label for="global_search"></label>
+                </div>
+              </div>
+            </div>
+
+            <div class="col s5">
+              <div class="col s2 right">
+                <a href="/chat/logout/" class="black-text" data-position="bottom" title="Logout"><i class="material-icons">exit_to_app</i></a>
+              </div>
+              <div class="col s2 right">
+                <a href="javascript:void(0)" class="black-text" data-position="bottom" title="{{ request.user.username }}"><i class="material-icons">person</i></a>               
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+    </nav>
+
+    
+  </div>
+
+
+  <div class="row">
+    <div class="col s-half" style="position: fixed;">
+      <div class="row">
+        <div class="col s12 center-align" style="height: 100vh; background-color: #3A3F51;">
+          <br>
+        </div>
+      </div>
+    </div>
+
+    <div class="col s-eleven-half offset-s-half">
+        <div class="row" style="padding:1em;" id="easychat-processor-container">
+            <div class="col s12">
+              {% if request.user.supervisor and not request.user.package_reviewer %}
+                <a class="btn easychat-button modal-trigger right" style="text-align:center;" href="#modal-install-new-package">
+                  <i class="inline-icon material-icons">add</i> Install New Package</a>
+              {% endif %}
+            </div>
+            <div class="col s12">
+                <br>
+                <table id="table-package-installation" style="table-layout: fixed;word-wrap: break-word;">
+                    <thead>
+                        <tr>
+                            <th>Package</th>
+                            <th>Description</th>
+                            <th>Bot</th>
+                            {% if request.user.package_reviewer %}
+                                <th>Requested by</th>
+                            {% endif %}
+                            <th>Request DateTime</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for package_manager in package_managers %}
+                            <tr>
+                                <td>{{ package_manager.package }}</td>
+                                <td>{{ package_manager.description }}</td>
+                                <td>{{ package_manager.bot.name }}</td>
+                                {% if request.user.package_reviewer %}
+                                    <td>{{ package_manager.request_user.username }}</td>
+                                {% endif %}
+                                <td>{{ package_manager.request_datetime }}</td>
+                                <td>
+                                    {% if package_manager.status == "approved" %}
+                                        {% if package_manager.is_installed %}
+                                        <p style="color:green;">Approved by {{ package_manager.approved_by.username }} at {{ package_manager.approved_datetime }} and it is installed successfully.
+                                        </p>
+                                        {% else %}
+                                        <p style="color:#e65100;">Approved by {{ package_manager.approved_by.username }} at {{ package_manager.approved_datetime }} and it is installed successfully.
+                                        {% endif %}
+                                    {% elif package_manager.status == "denied" %}
+                                        <p style="color:#C62828;">Denied by {{ package_manager.approved_by.username }} at {{ package_manager.approved_datetime }}</p>
+                                    {% else %}
+                                        {% if request.user.package_reviewer %}
+                                          <p><a href="#modal-approve-package-installation-{{ package_manager.pk }}" class="modal-trigger"><u>Pending</u></a></p>
+                                        {% else %}
+                                            <p>Pending</p>
+                                        {% endif %}
+                                    {% endif %}
+                                </td>
+                            </tr>               
+
+                              <!-- Modal Structure -->
+                            <div id="modal-approve-package-installation-{{ package_manager.pk }}" class="modal">
+                              <div class="modal-content">
+                                <div class="row">
+                                    <div class="col s12">
+                                        <h6>Package Installation Request</h6><hr><br>
+                                    </div>
+                                    <div class="col s12">
+                                        <p><b><u>{{ package_manager.request_user }}</u></b> has requested to install <b><u>{{ package_manager.package }}</u></b> for {{ package_manager.bot.name }} bot.</p>
+                                        <p>Would like to approve the same?</p>
+                                    </div>
+                                </div>
+                              </div>
+                              <div class="modal-footer">
+                                  <a class="modal-close btn white lighten-2 black-text">Cancel</a>
+                                  <a class="btn green lighten-2 black-text" style="margin-left:1em;" onclick="take_package_installation_action(this, 'approved', '{{ package_manager.pk }}')">Approve</a>
+                                  <a class="btn red darken-3 white-text" style="margin-left:1em;" onclick="take_package_installation_action(this, 'denied', '{{ package_manager.pk }}')">Reject</a>
+                              </div>
+                            </div>
+
+                        {% endfor %}                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+  </div>
+
+
+<div class="easychat-footer">
+  <span class="left">Version: {{ request.session.EASYCHAT_VERSION }}</span>
+    <span class="left">Date of Release: {{ request.session.EASYCHAT_DATE_OF_RELEASE }}</span>
+    <a href="javascript:void(0)" target="_blank">Privacy Policy</a>
+    <a href="javascript:void(0)" target="_blank">Term of Use</a>
+    <span> © 2017 - {% now "Y" %}, Cogno AI or its affiliates. All rights reserved.</span>
+</div>
+
+
+    <!-- Modal Structure -->
+  <div id="modal-install-new-package" class="modal">
+    <div class="modal-content">
+      <div class="row">
+          <div class="col s12">
+              <h6>New Package Installation</h6><hr><br>
+          </div>
+          <div class="col s12 m6 l6">
+              <select id="selected-bot-for-package">
+                  <option value="None" selected>Choose bot</option>
+                  {% for bot in bots %}
+                      <option value="{{ bot.pk }}">{{ bot.name }}</option>
+                  {% endfor %}
+              </select>
+          </div>
+          <div class="col s12 m6 l6">
+              <input type="text" id="new-package-name" maxlength="100" placeholder="Package name e.g. numpy==1.18.4">
+          </div>
+          <div class="col s12">
+              <p>Why do you want to install this package?</p>
+              <textarea id="new-package-description" style="resize:none;height:5em;"></textarea><br>
+              <p>Note: Request will be submitted to technology team and will be installed after it is approved.</p>
+          </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+        <a class="modal-close btn white lighten-2 black-text">Cancel</a>
+        <a class="btn green lighten-2 black-text" style="margin-left:1em;" onclick="submit_request_for_package_installation(this)">Submit</a>          
+    </div>
+  </div>
+
+
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/materialize.js' %}"></script>
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/security_checks.js' %}?v={% random_int 1 100 %}"></script>
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/console.js' %}?v={% random_int 1 100 %}"></script>
+  {% if request.user.enable_s3_bucket %}
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="/static/EasyChatApp/js/easychat-crypto.js">
+    </script>
+    
+  {% else %}
+
+
+    <script type="text/javascript" src="{% static 'EasyChatApp/js/jquery.dataTables.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'EasyChatApp/js/easychat-crypto.js' %}">
+    </script>
+  {% endif %}
+  
+</body>
+</html>

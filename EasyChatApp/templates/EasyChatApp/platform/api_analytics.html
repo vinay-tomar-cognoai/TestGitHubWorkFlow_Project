@@ -1,0 +1,265 @@
+{% extends 'EasyChatApp/console.html' %}
+{% block consolecontent %}
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/api_analytics.css' %}?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/analyticsChanges.css' %}?v={% random_int 1 100 %}">
+
+<div class="row" style="padding:1em;">
+	
+		<div class="col s12" style="margin-top: 1em;">
+      <!-- <div class="col s6"></div> -->
+      <div class="col s6 switch" style="display: inline-block;">
+        <label>
+          API logs
+          {% if status == "0" %}
+            <input type="checkbox" id="logs-to-statistics-switch">
+            <span class="lever"></span>
+          {% else %}
+            <input type="checkbox" checked id="logs-to-statistics-switch">
+            <span class="lever"></span>
+          {% endif %}
+          API statistics
+        </label>
+      </div>
+      <div class="col s6" style="display: inline-block;">
+        <a href="#apply-filter-api-analytics" class="right btn modal-trigger black-text" style="background-color: white;"><i class="material-icons inline-icon">filter_list</i> &nbsp;Apply filters</a>
+      </div>
+	 </div>
+	
+	<div class="col s12">
+
+		{% if api_analytics_objs %}
+
+			<table id="api-analytics-table" class="display">
+			    <thead>
+			        <tr>
+			        	<th>User ID</th>
+			        	<th>API Name</th>
+		            <th>Request</th>
+		            <th>Response</th>
+		            <th>Elapsed Time</th>
+		            <th>API status/code</th>
+		            <th>Created at</th>
+			        </tr>
+			    </thead>
+			    <tbody>
+			    	{% for api_obj in api_analytics_objs %}
+				        <tr>
+				        	<td>{{api_obj.user.user_id}}</td>
+				        	<td>{{api_obj.api_name}}</td>
+				        	<td><a href="javascript:void(0)" onclick="show_api_request_modal('{{api_obj.pk}}')"><u>Click Here </u></td>
+				        	<td><a href="javascript:void(0)" onclick="show_api_response_modal('{{api_obj.pk}}')"><u>Click Here</u></td>
+				            <td>{{ api_obj.get_elapsed_time }}</td>
+                    
+                    {% if api_obj.api_status == "Passed" %}
+				            
+                    <td>{{ api_obj.api_status }}({{ api_obj.api_status_code }})</td>
+                    
+                    {% else %}
+                    <td style="color:#f56565">{{ api_obj.api_status }}({{ api_obj.api_status_code }})</td>
+
+                    {%endif%}
+
+
+				            <td>{{ api_obj.get_easychat_datetime }}</td>
+				        </tr>
+
+				        <!-- API Request -->
+				        <div id="API-Request-{{ api_obj.pk }}" class="easychat-modal">
+	                        <div class="easychat-modal-content" style="max-height: 80vh;min-height: 60vh; width: 50%; overflow-y: unset; border: 0.15em solid black;">
+	                           <div class="row" style="padding-left: 11px; padding-right: 11px;">
+		                           <h5 style="margin: 0rem 0 .656rem 0 !important;"><center>API Request&nbsp;&nbsp;
+                                <a href="javascript:void(0)" onclick="copyToClipboardfromPreTag('api-request-{{api_obj.pk}}', 'Request')"><i class="material-icons black-text prefix inline-icon">content_copy</i></a>&nbsp;&nbsp;
+                                <a href="javascript:void(0)" onclick="DownloadAsJSON('{{api_obj.pk}}', 'request')"><i class="material-icons black-text prefix inline-icon">file_download</i></a>
+		                            <a href="javascript:void(0)" onclick="hide_api_request_modal('{{api_obj.pk}}')" class="modal-close right black-text" style="margin-right: 1em;">x</a></center></h4>
+		                            <hr>
+		                            <div class="scrollbar row" style="position: absolute; overflow-x: scroll;">
+		                            	<pre id="api-request-{{api_obj.pk}}">{{api_obj.get_request_packet}}</pre>
+		                            </div>
+	                            </div>
+	                        </div>
+                        </div>
+
+                        <!-- API Response -->
+
+                        <div id="API-Response-{{ api_obj.pk }}" class="easychat-modal">
+	                        <div class="easychat-modal-content" style="max-height: 80vh;min-height: 60vh; width: 50%; overflow-y: unset; border: 0.15em solid black;">
+		                        <div class="row" style="padding-left: 11px; padding-right: 11px;">
+		                           <h5 style="margin: 0rem 0 .656rem 0 !important;"><center>API Response&nbsp;&nbsp;
+                                <a href="javascript:void(0)" onclick="copyToClipboardfromPreTag('api-response-{{api_obj.pk}}', 'Response')"><i class="material-icons black-text prefix inline-icon">content_copy</i></a>&nbsp;&nbsp;
+                                <a href="javascript:void(0)" onclick="DownloadAsJSON('{{api_obj.pk}}', 'response')"><i class="material-icons black-text prefix inline-icon">file_download</i></a>
+		                           <a href="javascript:void(0)" onclick="hide_api_response_modal('{{api_obj.pk}}')" class="modal-close right black-text" style="margin-right: 1em;">x</a></center></h4>
+		                           <hr>
+		                           <div class="scrollbar row" style="position: absolute; overflow-x: scroll;">
+		                           	<pre id="api-response-{{api_obj.pk}}">{{api_obj.get_response_packet}}</pre>
+		                           </div>
+	                            </div>
+	                        </div>
+                        </div>
+				    {% endfor %}
+			    </tbody>
+			</table>
+
+		{% else %}
+			<br>
+			<br>
+			<p style="padding:1em;text-align:center;" class="green lighten-1">No record found</p>
+		{% endif %}
+	</div>
+    <div class="col s12 right-align">
+        {% if api_analytics_objs.has_other_pages %}
+          <ul class="pagination">
+
+              {% if api_analytics_objs.has_previous %}
+                  <li><a href="?bot_pk={{selected_bot_obj.pk}}&filter_type={{filter_type}}&selected_api_status={{selected_api_status}}&start_date={{start_date|date:"Y-m-d"}}&end_date={{end_date|date:"Y-m-d"}}&selected_api_name={{selected_api_name}}&page={{ api_analytics_objs.previous_page_number }}"><i class="material-icons">chevron_left</i></a></li>
+              {% else %}
+                  <li class="disabled"><span><i class="material-icons">chevron_left</i></span></li>
+              {% endif %}
+
+              {% if api_analytics_objs.number|add:'-4' > 1 %}
+                  <li><a href="?bot_pk={{selected_bot_obj.pk}}&filter_type={{filter_type}}&selected_api_status={{selected_api_status}}&start_date={{start_date|date:"Y-m-d"}}&end_date={{end_date|date:"Y-m-d"}}&selected_api_name={{selected_api_name}}&page={{ api_analytics_objs.number|add:'-5' }}">&hellip;</a></li>
+              {% endif %}
+
+              {% for i in api_analytics_objs.paginator.page_range %}
+                  {% if api_analytics_objs.number == i %}
+                      <li class="active purple darken-3"><a href="?bot_pk={{selected_bot_obj.pk}}&filter_type={{filter_type}}&selected_api_status={{selected_api_status}}&start_date={{start_date|date:"Y-m-d"}}&end_date={{end_date|date:"Y-m-d"}}&selected_api_name={{selected_api_name}}&page={{ i }}">{{ i }}</a></li>
+                  {% elif i > api_analytics_objs.number|add:'-5' and i < api_analytics_objs.number|add:'5' %}
+                      <li><a href="?bot_pk={{selected_bot_obj.pk}}&filter_type={{filter_type}}&selected_api_status={{selected_api_status}}&start_date={{start_date|date:"Y-m-d"}}&end_date={{end_date|date:"Y-m-d"}}&selected_api_name={{selected_api_name}}&page={{ i }}">{{ i }}</a></li>
+                  {% endif %}
+              {% endfor %}
+
+              {% if api_analytics_objs.paginator.num_pages > api_analytics_objs.number|add:'4' %}
+                  <li><a href="?bot_pk={{selected_bot_obj.pk}}&filter_type={{filter_type}}&selected_api_status={{selected_api_status}}&start_date={{start_date|date:"Y-m-d"}}&end_date={{end_date|date:"Y-m-d"}}&selected_api_name={{selected_api_name}}&page={{ api_analytics_objs.number|add:'5' }}">&hellip;</a></li>
+              {% endif %}
+
+              {% if api_analytics_objs.has_next %}
+                  <li><a href="?bot_pk={{selected_bot_obj.pk}}&filter_type={{filter_type}}&selected_api_status={{selected_api_status}}&start_date={{start_date|date:"Y-m-d"}}&end_date={{end_date|date:"Y-m-d"}}&selected_api_name={{selected_api_name}}&page={{ api_analytics_objs.next_page_number }}"><i class="material-icons">chevron_right</i></a></li>
+              {% else %}
+                  <li class="disabled"><span><i class="material-icons">chevron_right</i></span></li>
+              {% endif %}
+          </ul>
+        {% endif %}
+    </div>
+
+    <div id="apply-filter-api-analytics" class="modal" style="max-height:100%; width: 50%; overflow:visible;width: 40%;">
+        <div class="modal-content">
+            <div class="row">
+              <div class="col s12">
+                <p><b>Filter by API name</b></p>
+                <select id="select-api-name" style="display: block;" autocomplete="new-password">
+                  <option value="All">All</option>
+                  {% for api_obj in api_objs_name_list %}
+                      {% if api_obj == selected_api_name %}
+                          <option value="{{ api_obj }}" selected>{{ api_obj }}</option>
+                        {% else %}
+                          <option value="{{ api_obj }}">{{ api_obj }}</option>
+                        {% endif %}
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col s12">
+                <p><b>Filter by API status</b></p>
+                <select id="select-api-status" style="display: block;">
+                	{% if selected_api_status == "Passed" %}
+                		<option value="All">All</option>
+                		<option value="Passed" selected>Passed</option>
+                		<option value="Failed">Failed</option>
+                	{% elif selected_api_status == "Failed" %}
+                		<option value="All">All</option>
+	            		<option value="Passed">Passed</option>
+	            	    <option value="Failed" selected>Failed</option>
+	            	{% else %}
+	            		<option value="All" selected>All</option>
+                		<option value="Passed">Passed</option>
+                		<option value="Failed">Failed</option>
+                	{% endif %}
+                 </select>
+              </div>
+              <div class="col s12">
+                <p><b>Filter by date</b></p>
+                <select id="modal-api-analytics">
+                  {% for item in filter_type_list %}
+                    {% if item.key == filter_type %}
+                        <option value="{{item.key}}" selected>{{item.value}}</option>
+                    {% else %}
+                        <option value="{{item.key}}">{{item.value}}</option>
+                    {% endif %}
+                  {% endfor %}
+                </select>
+                <div class="row" id="modal-api-analytics-custom-date" style="display: none;">
+                  <br>
+                  <div class="col s6">
+                    Start Date
+                    <input type="date" id="api-analytics-default-start-date" value="{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}" value_last_month="{{ LAST_MONTH_START_DATETIME|date:"Y-m-d" }}" value_last_week="{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}" value_golive="{{ go_live_date|date:"Y-m-d" }}">
+                  </div>
+                  <div class="col s6">
+                    End Date
+                    <input type="date" id="api-analytics-default-end-date" value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" value_last_month="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" value_last_week="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" value_golive="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}">
+                  </div>
+                </div>
+
+                <div class="row" id="modal-api-analytics-custom-timestamp-date" style="display: none;">
+                  <br>
+                  <div class="col s6">
+                    Date
+                    <input type="date" name="" id="api-analytics-timestamp-date" value="{{ TIMESTAMP_DATE }}" value_last_month="{{ LAST_MONTH_START_DATETIME|date:"Y-m-d" }}" value_last_week="{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}" value_golive="{{ go_live_date|date:"Y-m-d" }}">
+                  </div>
+              </div>    
+              <div class="row" id="modal-api-analytics-custom-timestamp-time" style="display: none;">
+                    <div class="col s6">
+                      Start Time
+                      <input type="time" name="" id="api-analytics-timestamp-start-time" value="{{ TIMESTAMP_START_TIME }}">
+                    </div>
+                    <div class="col s6">
+                      End Time
+                      <input type="time" name="" id="api-analytics-timestamp-end-time" value="{{ TIMESTAMP_END_TIME}}">
+                    </div> 
+              </div>
+              </div> 
+              <div class="col s12">
+                <p><b>Filter by User Id</b></p>
+                <select id="select-api-user-id" style="display: block;">
+                  <option value="">Choose one user id</option>
+                  {% for api_obj in api_analytics_objs %}
+                    <option value="{{api_obj.user.user_id}}">{{api_obj.user.user_id}}</option>
+                  {% endfor %}
+                 </select>
+              </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <a class="waves-effect waves-light btn black-text right" id="submit-filter" style="background-color: #038456 !important;margin-left: 2em;margin-right: 1em;" onclick="submit_api_analytics_filter('{{selected_bot_obj.pk}}')">Submit</a>
+          <a href="javascript:void(0)" class="btn modal-close transparent-btn right black-text">Cancel</a>
+        </div>
+    </div>
+
+</div>
+<script type="text/javascript">
+  window.SELECTED_BOT_PK = '{{selected_bot_obj.pk}}'
+  window.NEED_TO_BUILD = "{{ selected_bot_obj.need_to_build }}";
+
+  if('{{filter_type}}' == 'custom_date'){
+
+    document.getElementById("modal-api-analytics-custom-date").style.display = "block"
+  }
+</script>
+
+<script>
+  let ad_block_element = document.createElement("div");
+  ad_block_element.className = "textads banner-ads banner_ads ad-unit ad-zone ad-space adsbox"
+    
+  ad_block_element.style.height = "1px"
+  
+  document.body.appendChild(ad_block_element)
+  
+  let x_width = ad_block_element.offsetHeight;    
+  var element = document.getElementById("warning-msg");
+    
+  if(x_width==0){
+    element.style.display = "";   
+    $('#warning-msg').delay(7000).fadeOut(3000);
+  } 
+</script>
+
+{% endblock %}

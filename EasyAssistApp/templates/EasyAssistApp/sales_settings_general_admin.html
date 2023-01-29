@@ -1,0 +1,2569 @@
+{% extends 'EasyAssistApp/console.html' %}
+{% block content %}
+{% load static %}
+
+{% if request.user.enable_s3_bucket %}
+    <script src="https://static.allincall.in/static/EasyAssistApp/js/ace.js" type="text/javascript"
+        charset="utf-8"></script>
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/jscolor.min.js"></script>
+{% else %}
+    <script src="{% static 'EasyAssistApp/js/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" src="{% static 'EasyAssistApp/js/jscolor.min.js' %}"></script>
+{% endif %}
+
+<link href="{% static 'EasyAssistApp/css/settings.css' %}" rel="stylesheet" type="text/css">
+
+<style>
+
+{% if access_token_obj.cobrowsing_console_theme_color != None %}
+  .exit-intent-url-modal-button,
+  .inactivity-popup-url-modal-button {
+    background: var(--color_rgb) !important;
+  }
+
+  #exit-intent-url-Modal .modal-title,
+  #inactivity-popup-url-Modal .modal-title {
+    color: var(--color_rgb) !important;
+  }
+
+  .save-url-input-btn {
+    background: var(--color_rgb) !important;
+  }
+{% endif %}
+
+</style>
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <div>
+    <!-- GENERAL ADMIN SETTING TAB -->
+    <div  id="pills-option-general-admin-setting">
+          <!-- sprint 5.9 breadcrum navbar -->
+      <div class="page-header">
+        <div class="row justify-content-between">
+          <div class="col-sm-8 d-flex align-items-center">
+            <div class="nav nav-pills navbar-right">
+              <!-- sprint 5.9 back to previous Icon link -->
+              <a class="anchor-reset back-btn"  href="/easy-assist/sales-ai/settings/options/general">
+                <span class="mr-3 mb-auto" style="cursor: pointer;">
+                  <svg class="back-arrow-svg" width="44" height="44" viewBox="0 0 44 44" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <rect width="44" height="44" rx="22" transform="matrix(1 0 0 -1 0 44)" fill="white" />
+                    {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                    <path
+                      d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                      fill="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" />
+                          {% else %}
+                          <path
+                      d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                      fill="#0254D7" />
+ 
+                          {% endif %} 
+                    
+                  </svg>
+                </span>
+              </a>
+              <h5  class="nav_btn mr-2 mt-2"> <a class="anchor-reset"  href="/easy-assist/sales-ai/settings">Settings</a></h5>
+              <div class=" mr-2 pt-2">
+                <svg class="mini-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                    fill="#475569" />
+                </svg>
+              </div>
+               <!-- sprint 5.9 back to previous individual page wise link -->
+              <h5  class="nav_btn mr-2 mt-2"> <a class="anchor-reset"  href="/easy-assist/sales-ai/settings/options">Options</a></h5>
+  
+              <div class=" mr-2 pt-2">
+                <svg class="mini-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                    fill="#475569" />
+                </svg>
+              </div>
+               <!-- sprint 5.9 back to previous individual page wise link -->
+              <h5  class="nav_btn mr-2 mt-2"><a class="anchor-reset"  href="/easy-assist/sales-ai/settings/options/general">General</a></h5>
+  
+              <div class=" mr-2 pt-2">
+                <svg class="mini-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                    fill="#475569" />
+                </svg>
+              </div>
+  
+              <h5  class="nav_btn active1 mt-2">Admin Settings</h5>
+            </div>
+          </div>
+          <div class="col-sm-4 d-flex justify-content-end">
+            <button class="btn btn-width-100" data-toggle="modal" data-target="#modal-confirm-reset-all" id="reset-button">Reset All</button>
+            <button class="btn btn-width-100" id="save-button" onclick="chip_product_category();chip_language_support();save_general_admin_settings(this)"
+            style="background: #10B981!important;" >Save</button>
+          </div>
+        </div>
+      </div>
+      <div class="card shadow mb-4 mt-30">
+        <div class="card-body p-0">
+          <div class="card">
+  
+            <div class="card-body table-responsive p-0">
+              <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                <tbody>
+                  <tr>
+                    <th scope="row" class="heading-toggle-text">General</th>
+                    <td style="vertical-align: inherit;">
+                    </td>
+                  </tr>
+  
+                  <tr class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Co-browsing theme colour</th>
+                    <td style="vertical-align: inherit;">
+                      <input type="text" class="form-control jscolor jscolor-active" id="floating_button_bg_color" placeholder="HEX" value="{{ access_token_obj.floating_button_bg_color }}" style="width:50%;" onchange="show_floating_sidenav_easyassist_button();">
+                    </td>
+                  </tr>
+  
+                  <tr id="enable_greeting_bubble_div">
+                    <th scope="row" class="sub-heading-toggle-text">Enable greeting bubble
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="A greeting bubble will pop up after the configured time from the time the user lands on the website."><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+  
+                      {% if access_token_obj.enable_greeting_bubble %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_greeting_bubble" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_greeting_bubble">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+  
+                    </td>
+                  </tr>
+
+                  <tr class="tr-flex-sm" id="greeting-bubble-timer-div">
+                    <th scope="row" class="sub-heading-toggle-text">Greeting bubble auto pop up timer (In secs)</th>
+                    <td style="vertical-align: inherit;">
+                      <input type="number" aria-label="Checkbox for following text input"
+                        id="greeting_bubble_auto_popup_timer" value={{access_token_obj.greeting_bubble_auto_popup_timer}} min=0 class="positive_numeric">
+                    </td>
+                  </tr>
+  
+                  <tr id="greeting-bubble-text-div" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Greeting bubble text
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="The text provided in the field will be visible at the end customer when the greeting bubble pops up."><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      <textarea class="form-control" style="height:6.25em;" id="greeting_bubble_text"
+                        maxlength="100">{{access_token_obj.greeting_bubble_text}}</textarea>
+                    </td>
+                  </tr>
+                  
+                  <tr id="enable_lead_status_div">
+                    <th scope="row" class="sub-heading-toggle-text">Enable Lead Status
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="Enabling this toggle would add a new tab to display lead status inside Active Customers"><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+  
+                      {% if access_token_obj.enable_lead_status %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_lead_status" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_lead_status">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+                      
+  
+                    </td>
+                  </tr>
+
+                  <tr id="product-category-list-div" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Add Product category for the Agents <br>(Eg. Education Loan, Policy, Others)</th>
+                    <td style="vertical-align: inherit;">
+                      <div class="easyassist-noselect">
+                        <p id="product_category_list" style="display: none;"></p>
+                        <ul id="product_category_tag_list" class="cognoai-custom-tag-input" style="padding: 0;"></ul>
+                        <input type="text" maxLength ="25"id="input_product_category" placeholder="Add product category">
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+  
+      </div>
+      <!-- INBOUND SETTINGS -->
+      <div class="card shadow mb-4">
+        <div class="card-body p-0">
+          <div class="card">
+  
+            <div class="card-body table-responsive p-0">
+              <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                <tbody>
+                  <tr>
+                    <th scope="row" class="heading-toggle-text">Inbound</th>
+                    <td style="vertical-align: inherit;">
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row" class="sub-heading-toggle-text">
+                      Enable Inbound Co-browsing
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="Enabling this will enable inbound functionality"><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+  
+                      {% if access_token_obj.enable_inbound %}
+                        <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_inbound" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                        </label>
+                      {% else %}
+                        <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_inbound">
+                        <span class="easyassist-option-switch-slider round"></span>
+                        </label>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  <tr id="connect-with-virtual-agent-code-tr">
+                    <th scope="row" class="sub-heading-toggle-text">
+                      Ask support code to initiate a session
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="If this toggle is enabled the customer will need a support code to initiate an inbound support request"><i
+                        class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.allow_connect_with_virtual_agent_code %}
+                        <label class="easyassist-option-switch">
+                          <input type="checkbox" id="allow-connect-with-virtual-agent-code" checked>
+                          <span class="easyassist-option-switch-slider round"></span>
+                        </label>
+                      {% else %}
+                        <label class="easyassist-option-switch">
+                          <input type="checkbox" id="allow-connect-with-virtual-agent-code">
+                          <span class="easyassist-option-switch-slider round"></span>
+                        </label>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  <tr id="virtual-agent-code-mandatory-tr">
+                    <th scope="row" class="sub-heading-toggle-text">
+                      Keep support code mandatory
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="Enabling this will make the support code mandatory for customers to initiate an inbound support request"><i
+                        class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.connect_with_virtual_agent_code_mandatory %}
+                        <label class="easyassist-option-switch">
+                          <input type="checkbox" id="enable-virtual-agent-code-mandatory" checked>
+                          <span class="easyassist-option-switch-slider round"></span>
+                        </label>
+                      {% else %}
+                        <label class="easyassist-option-switch">
+                          <input type="checkbox" id="enable-virtual-agent-code-mandatory">
+                          <span class="easyassist-option-switch-slider round"></span>
+                        </label>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  <tr id="enable_request_in_queue_tr">
+                    <th scope="row" class="sub-heading-toggle-text">
+                        Requests in queue
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title=" Enabling this will switch lead assignment logic from round-robin to manual assignment"><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.enable_request_in_queue %}
+                        <label class="easyassist-option-switch">
+                          <input type="checkbox" id="enable_request_in_queue" checked>
+                          <span class="easyassist-option-switch-slider round"></span>
+                        </label>
+                      {% else %}
+                        <label class="easyassist-option-switch">
+                          <input type="checkbox" id="enable_request_in_queue">
+                          <span class="easyassist-option-switch-slider round"></span>
+                        </label>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  <tr id="maximum_active_leads_div">
+                    <th scope="row" class="sub-heading-toggle-text">Enable maximum leads that can be assigned to an agent</th>
+                    <td style="vertical-align: inherit;">
+  
+                      {% if access_token_obj.maximum_active_leads %}
+                        <label class="easyassist-option-switch">
+                        <input type="checkbox" id="maximum_active_leads" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                        </label>
+                      {% else %}
+                        <label class="easyassist-option-switch">
+                        <input type="checkbox" id="maximum_active_leads">
+                        <span class="easyassist-option-switch-slider round"></span>
+                        </label>
+                      {% endif %}
+
+                    </td>
+                  </tr>
+  
+                  <tr class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Maximum leads
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="Only positive integer values allowed."><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      <input type="number" aria-label="Checkbox for following text input"
+                        id="maximum_active_leads_threshold" onpaste="return false" value={{ access_token_obj.maximum_active_leads_threshold }} min=0 class="positive_numeric">
+                    </td>
+                  </tr>
+  
+                  <tr id="enable_auto_assign_unattended_lead_tr">
+                    <th scope="row" class="sub-heading-toggle-text">Enable auto assign to another available agent
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="If the lead is assigned to agent 1 and the agent 1 is busy with any customer, then after auto assign timer drains to 0 secs the lead will be assigned to next available agent based on category and language"><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+  
+                      {% if access_token_obj.enable_auto_assign_unattended_lead %}
+                        <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_auto_assign_unattended_lead" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                        </label>
+                      {% else %}
+                        <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_auto_assign_unattended_lead">
+                        <span class="easyassist-option-switch-slider round"></span>
+                        </label>
+                      {% endif %}
+  
+                    </td>
+                  </tr>
+  
+                  <tr id="auto_assign_unattended_lead_timer_tr" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Auto assign timer (In secs)</th>
+                    <td style="vertical-align: inherit;">
+                      <input type="number" onpaste="return false" aria-label="Checkbox for following text input"
+                        id="auto_assign_unattended_lead_timer_input" value="{{ access_token_obj.auto_assign_unattended_lead_timer }}" min="0" class="positive_numeric">
+                    </td>
+                  </tr>
+  
+                  <tr id="auto_assign_unattended_lead_transfer_count_tr" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Lead transfer count
+                      <span data-toggle="tooltip" data-placement="bottom" title="Number of times lead gets transferred to other available agents."><i class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      <input type="number" aria-label="Checkbox for following text input" value="{{ access_token_obj.unattended_lead_auto_assignment_counter }}" id="auto_assign_unattended_lead_transfer_count" min="1" class="positive_numeric">
+                    </td>
+                  </tr>
+  
+                  <tr id="auto_assign_unattended_lead_message_tr" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Lead auto assigned to another agent message
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="The message in the text box will be displayed at the customer side as soon as the lead is auto assigned to next available agent based on category and language."><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      <textarea class="form-control" style="height: 7em !important;" maxlength="1024"
+                        id="auto_assign_unattended_lead_message">{{ access_token_obj.auto_assign_unattended_lead_message }}</textarea>
+                    </td>
+                  </tr>
+  
+                  <!-- sprint 5.9 -->
+                  <tr id="assign_agent_under_same_supervisor_tr">
+                    <th scope="row" class="sub-heading-toggle-text">Auto assign to agents under same supervisor
+                      <span data-toggle="tooltip" data-placement="bottom" title="Enabling this toggle will transfer leads to agents under the primary assigned agent’s supervisor."><i class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.assign_agent_under_same_supervisor %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="assign_agent_under_same_supervisor" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                    {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="assign_agent_under_same_supervisor">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                    {% endif %}
+                      
+                    </td>
+                  </tr>
+  
+                  <tr id="enable_auto_assign_to_one_agent_tr">
+                    <th scope="row" class="sub-heading-toggle-text">End session if last auto assigned agent do not attend the session
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="If the lead assigned to the next available agent is also not able to attend the session then the lead will be registered in the unattended leads."><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+  
+                      {% if access_token_obj.enable_auto_assign_to_one_agent %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_auto_assign_to_one_agent" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_auto_assign_to_one_agent">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+  
+                    </td>
+                  </tr>
+  
+                  <tr id="auto_assigned_unattended_lead_archive_timer_tr" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Auto end session timer (In mins)</th>
+                    <td style="vertical-align: inherit;">
+                      <input type="number" aria-label="Checkbox for following text input"
+                        id="unattended-lead-archive-timer-input" onpaste="return false" value="{{ access_token_obj.auto_assigned_unattended_lead_archive_timer }}" min="1" class="positive_numeric">
+                    </td>
+                  </tr>
+  
+                  <tr id="auto_assign_lead_end_session_message_tr" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Auto end session message
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="This message will be displayed at the customer side as soon as the connect button replaces into archive."><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      <textarea class="form-control" style="height: 7em !important;" maxlength="1024"
+                        id="auto_assign_lead_end_session_message">{{ access_token_obj.auto_assign_lead_end_session_message }}</textarea>
+                    </td>
+                  </tr>
+                  <tr id="show_floating_easyassist_button_div">
+                    <th scope="row" class="sub-heading-toggle-text">Display floating button to 'Connect with an agent'</th>
+                    <td style="vertical-align: inherit;">
+  
+                      {% if access_token_obj.show_floating_easyassist_button %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="show_floating_easyassist_button" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="show_floating_easyassist_button">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+  
+                    </td>
+                  </tr>
+                  <tr id="show_easyassist_connect_agent_icon_div">
+                    <th scope="row" class="sub-heading-toggle-text">Display an icon to 'Connect with an agent'</th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.show_easyassist_connect_agent_icon %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="show_easyassist_connect_agent_icon" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                    {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="show_easyassist_connect_agent_icon">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                    {% endif %}
+  
+                    </td>
+                  </tr>
+                  <tr id="display_icon" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Upload icon for 'Connect with an agent' <br>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      <div class="row">
+                        <div class="col-md-6 col-sm-12"
+                          style="padding-left: 0.7em;display: flex;align-items: center;">
+                          {% if access_token_obj.source_easyassist_connect_agent_icon != "null" %}
+                          <button class="btn btn-info mb-2 mr-sm-2" data-toggle="modal"
+                            data-target="#connect_with_agent_icon_upload_modal"
+                            id="connect_with_agent_icon_upload_button">Change Icon</button>
+                          {% else %}
+                          <button class="btn btn-info mb-2 mr-sm-2" data-toggle="modal"
+                            data-target="#connect_with_agent_icon_upload_modal"
+                            id="connect_with_agent_icon_upload_button">Upload Icon</button>
+                          {% endif %}
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+  
+                          {% if access_token_obj.source_easyassist_connect_agent_icon != "null" %}
+                            <img alt="Connect with Agent Icon" src="/{{ access_token_obj.source_easyassist_connect_agent_icon }}" id="connect-with-agent-image" style="height: 9em; display: inline-box; width: 100%;">
+                          {% endif %}
+  
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr id="icon_position" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Change icon position
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="Use up arrow to move the icon to right, and down arrow to move the icon to left"><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      <input type="number" value="{{ access_token_obj.floating_button_left_right_position }}" id="floating_button_left_right_position">
+                    </td>
+                  </tr>
+                  <tr id="show_only_if_agent_available_div">
+                    <th scope="row" class="sub-heading-toggle-text">Display 'Connect with an agent' button only if agents are available
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="If enabled, the ‘Connect with an Agent’ button will not be displayed on the website during non-working hours or when agents are not online."><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.show_only_if_agent_available %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="show_only_if_agent_available" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="show_only_if_agent_available">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+  
+                    </td>
+                  </tr>
+                  <tr id="disable_connect_button_if_agent_unavailable_div">
+                    <th scope="row" class="sub-heading-toggle-text">Disable 'Connect with an agent' button if agents are unavailable
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="If enabled, the ‘Connect with an Agent’ button will be disabled and non clickable during non-working hours or when agents are not online."><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+  
+                      {% if access_token_obj.disable_connect_button_if_agent_unavailable %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="disable_connect_button_if_agent_unavailable" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="disable_connect_button_if_agent_unavailable">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+  
+                    </td>
+                  </tr>
+                  <tr id="message-if-agent-unavailable-div" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Message to be shown if agents are unavailable</th>
+                    <td style="vertical-align: inherit;">
+                      <textarea class="form-control" style="height:10em;" maxlength="1024"
+                        id="message_if_agent_unavailable">{{ access_token_obj.message_if_agent_unavailable }}</textarea>
+                    </td>
+                  </tr>
+                  <tr id="enable_non_working_hours_modal_popup_div">
+                    <th scope="row" class="sub-heading-toggle-text">
+                      Enable non working hours pop up
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="Enabling this will ask the customer for his/her details during non-working hours and show those leads in follow up leads tab."><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+  
+                      {% if access_token_obj.enable_non_working_hours_modal_popup %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_non_working_hours_modal_popup" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_non_working_hours_modal_popup">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+  
+                    </td>
+                  </tr>
+                  <tr id="message_on_non_working_hours_div" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Message to be shown to customers during non-working hours</th>
+                    <td style="vertical-align: inherit;">
+                      <textarea class="form-control" style="height:10em;" id="message_on_non_working_hours"
+                        maxlength="1024">{{ access_token_obj.message_on_non_working_hours }}</textarea>
+                    </td>
+                  </tr>
+                  <tr id="enable_followup_leads_tab_div">
+                    <th scope="row" class="sub-heading-toggle-text">Enable follow up Leads</th>
+                    <td style="vertical-align: inherit;">
+  
+                      {% if access_token_obj.enable_followup_leads_tab %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_followup_leads_tab" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_followup_leads_tab">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+  
+                    </td>
+                  </tr>
+  
+                  <tr id="choose_product_category_div">
+                    <th scope="row" class="sub-heading-toggle-text">Enable tag based assignment for Inbound</th>
+                    <td style="vertical-align: inherit;">
+                      
+                      {% if access_token_obj.choose_product_category %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="choose_product_category" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="choose_product_category">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+  
+                    </td>
+                  </tr>
+  
+                  <tr id="product_category_message_div" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Product category message</th>
+                    <td style="vertical-align: inherit;">
+                      <textarea class="form-control" style="height:10em;" maxlength="1024"
+                        id="message_on_choose_product_category_modal">{{ access_token_obj.message_on_choose_product_category_modal }}</textarea>
+                    </td>
+                  </tr>
+  
+                  <tr id="allow_language_support_div">
+                    <th scope="row" class="sub-heading-toggle-text">Enable language support</th>
+                    <td style="vertical-align: inherit;">
+  
+                      {% if access_token_obj.allow_language_support %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="allow_language_support" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="allow_language_support">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+  
+                    </td>
+                  </tr>
+  
+                  <tr id="supported-language-list-div" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Supported languages <br>(e.g. Hindi, English)</th>
+                    <td style="vertical-align: inherit;">
+                      <div class="easyassist-noselect">
+                        <p id="supported_language_list" style="display: none;"></p>
+                        <ul id="support_language_tag_list" class="cognoai-custom-tag-input"
+                          style="padding: 0;"></ul>
+                        <input type="text" maxLength="25" id="input_language_support"
+                          placeholder="Add Languages Supported">
+                      </div>
+                    </td>
+                  </tr>
+  
+                  <tr class="tr-flex-sm" id="connect_message_div">
+                    <th scope="row" class="sub-heading-toggle-text">Message to be shown on 'Connect with our experts' modal</th>
+                    <td style="vertical-align: inherit;">
+                      <textarea class="form-control" style="height:10em;" maxlength="1024"
+                        id="connect_message">{{ access_token_obj.connect_message }}</textarea>
+                    </td>
+                  </tr>
+  
+                  <tr id="no_agent_connects_toast_div">
+                    <th scope="row" class="sub-heading-toggle-text">
+                      No agent connects session toast
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="Enabling this will show a toast to the customer if the agent does not connect for more than below mentioned time."><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+  
+                      {% if access_token_obj.no_agent_connects_toast %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="no_agent_connects_toast" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="no_agent_connects_toast">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif%}
+  
+                    </td>
+                  </tr>
+                  <tr id="no_agent_connects_toast_threshold_section" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">No agent connects session toast time (In mins)</th>
+                    <td style="vertical-align: inherit;">
+                      <input type="number" aria-label="Checkbox for following text input"
+                        id="no_agent_connects_toast_threshold" value="{{ access_token_obj.no_agent_connects_toast_threshold }}" min="0" class="positive_numeric">
+                    </td>
+                  </tr>
+                  <tr id="no_agent_connects_toast_text_section" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Toast text to be shown</th>
+                    <td style="vertical-align: inherit;">
+                      <textarea class="form-control" style="height:10em;" maxlength="1024"
+                        id="no_agent_connects_toast_text"> {{ access_token_obj.no_agent_connects_toast_text }} </textarea>
+                    </td>
+                  </tr>
+  
+                  <tr id="no_agent_connect_timer_reset_count_tr" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">No. of times 'No agent connect timer' resets
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="This refers to the number of times no agent connect timer should reset before getting closed. '0' means, the timer modal closes after it exhausts once."><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      <input type="number" aria-label="Checkbox for following text input"
+                        id="no_agent_connect_timer_reset_count" value="{{ access_token_obj.no_agent_connects_toast_reset_count }}" min="0" class="positive_numeric">
+                    </td>
+                  </tr>
+  
+                  <tr id="no_agent_connect_timer_reset_message_tr" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Timer reset toast
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="This message will be displayed to the customer, when the timer reset value drains off."><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      <textarea class="form-control" style="height:10em;" maxlength="1024"
+                        id="no_agent_connect_timer_reset_message">{{ access_token_obj.no_agent_connects_toast_reset_message }}</textarea>
+                    </td>
+                  </tr>
+  
+                  <tr id="auto_archive_lead_timer_input_section" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Auto archive lead if agents are offline (In mins)
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="The lead will auto archive and get registered in follow up leads once this timer drains off."><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      <input type="number" value="{{ access_token_obj.archive_on_unassigned_time_threshold }}" id="auto-archive-lead-timer-input" min="0"
+                        class="positive_numeric" onpaste="return false">
+                    </td>
+                  </tr>
+                  <tr id="auto_archive_popup_text_section" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Auto archive pop up
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="This pop up would be shown to the customer when the lead gets auto archived and get registered inside follow up leads"><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      <textarea class="form-control" style="height:10em;" maxlength="160"
+                        id="auto-archive-popup-text">{{ access_token_obj.archive_message_on_unassigned_time_threshold }}</textarea>
+                    </td>
+                  </tr>
+  
+                  <tr id="field_stuck_event_handler_div">
+                    <th scope="row" class="sub-heading-toggle-text">Enable 'Connect with an agent' auto pop up after in-activity</th>
+                    <td style="vertical-align: inherit;">
+  
+                      {% if access_token_obj.field_stuck_event_handler %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="field_stuck_event_handler" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="field_stuck_event_handler">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+  
+                    </td>
+                  </tr>
+
+                  <tr id="enable_url_based_inactivity_popup_tr" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Enable in specific URLs
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="Enabling this will allow configuring in-activity popup in specific URLs."><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      <div class="col-md-6 col-sm-12 url-input-outer-div">
+                        <label class="easyassist-option-switch">
+                          {% if popup_configurations_obj.enable_url_based_inactivity_popup %}
+                            <input type="checkbox" id="enable_url_based_inactivity_popup" checked>
+                            <span class="easyassist-option-switch-slider round"></span>
+                          </label>
+                          {% else %}
+                            <input type="checkbox" id="enable_url_based_inactivity_popup">
+                            <span class="easyassist-option-switch-slider round"></span>
+                          </label>
+                        {% endif %}
+                        {% if not inactivity_popup_urls %}
+                          <button class="btn btn-info mr-sm-2 inactivity-popup-url-modal-button" data-toggle="modal"
+                            data-target="#inactivity-popup-url-Modal" id="inactivity-popup-url-modal-button"
+                              >Add URLs</button>
+                        {% else %}
+                          <button class="btn btn-info mr-sm-2 inactivity-popup-url-modal-button" data-toggle="modal"
+                            data-target="#inactivity-popup-url-Modal" onclick="show_urls_in_urls_modal('inactivity-popup-url-Modal')" id="inactivity-popup-url-modal-button"
+                              >Edit URLs</button>
+                        {% endif %}
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr id="field_stuck_event_handler_popup_time" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Number of times 'Connect with an agent' auto pop up after in-activity</th>
+                    <td style="vertical-align: inherit;">
+                      <input type="number" aria-label="Checkbox for following text input"
+                        id="inactivity_auto_popup_number" value="{{ access_token_obj.inactivity_auto_popup_number }}" min="0" class="positive_numeric">
+                    </td>
+                  </tr>
+                  <tr id="field_recursive_stuck_timer_div">
+                    <th scope="row" class="sub-heading-toggle-text">Show in-activity pop up recursively</th>
+                    <td style="vertical-align: inherit;">
+  
+                      {% if access_token_obj.field_recursive_stuck_event_check %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="field_recursive_stuck_event_check" onchange="hide_inactivity_popup_number()" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="field_recursive_stuck_event_check" onchange="hide_inactivity_popup_number()">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+  
+                    </td>
+                  </tr>
+                  <tr id="field_recursive_timer_div" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Set in-activity time interval (In secs)</th>
+                    <td style="vertical-align: inherit;">
+                      <input type="number" aria-label="Checkbox for following text input"
+                        id="field_stuck_timer" min=0 value={{ access_token_obj.field_stuck_timer }} class="positive_numeric">
+                    </td>
+                  </tr>
+                  <tr id="allow_popup_on_browser_leave_div">
+                    <th scope="row" class="sub-heading-toggle-text">
+                      Enable exit intent
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title='Enabling this will pop up a "Connect with experts" modal whenever the customer tries to close the tab. This only works when an agent is online.'><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+  
+                      {% if access_token_obj.allow_popup_on_browser_leave %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="allow_popup_on_browser_leave" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="allow_popup_on_browser_leave">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+  
+                    </td>
+                  </tr>
+
+                  <tr id="enable_url_based_exit_intent_popup_tr" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Enable in specific URLs
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="Enabling this will allow configuring exit intent in specific URLs."><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      <div class="col-md-6 col-sm-12 url-input-outer-div">
+                        <label class="easyassist-option-switch">
+                          {% if popup_configurations_obj.enable_url_based_exit_intent_popup %}
+                            <input type="checkbox" id="enable_url_based_exit_intent_popup" checked>
+                            <span class="easyassist-option-switch-slider round"></span>
+                          </label>
+                          {% else %}
+                            <input type="checkbox" id="enable_url_based_exit_intent_popup">
+                            <span class="easyassist-option-switch-slider round"></span>
+                          </label>
+                        {% endif %}
+                        {% if not exit_intent_popup_urls %}
+                        <button class="btn btn-info  mr-sm-2 exit-intent-url-modal-button" data-toggle="modal"
+                          data-target="#exit-intent-url-Modal" id="exit-intent-url-modal-button"
+                          >Add URLs</button>
+                        {% else %}
+                        <button class="btn btn-info  mr-sm-2 exit-intent-url-modal-button" data-toggle="modal"
+                          data-target="#exit-intent-url-Modal" onclick="show_urls_in_urls_modal('exit-intent-url-Modal')" id="exit-intent-url-modal-button"
+                          >Edit URLs</button>
+                        {% endif %}
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr id="exit_intent_popup_count_div" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Number of times exit intent should pop up</th>
+                    <td style="vertical-align: inherit;">
+                      <input type="number" aria-label="Checkbox for following text input"
+                        id="exit-intent-popup-count" onpaste="return false;" value={{access_token_obj.no_of_times_exit_intent_popup}} min="1" class="positive_numeric">
+                    </td>
+                  </tr>
+                  <tr id="recursive_exit_intent_div">
+                    <th scope="row" class="sub-heading-toggle-text">Show exit intent pop up recursively</th>
+                    <td style="vertical-align: inherit;">
+  
+                      {% if access_token_obj.enable_recursive_browser_leave_popup %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_recursive_browser_leave_popup" onchange="hide_exit_intent_popup_number()" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_recursive_browser_leave_popup" onchange="hide_exit_intent_popup_number()">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+  
+                    </td>
+                  </tr>
+  
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+  
+      </div>
+      <!-- OUTBOUND SETTINGS -->
+      <div class="card shadow mb-4">
+        <div class="card-body p-0">
+          <div class="card">
+  
+            <div class="card-body table-responsive p-0">
+              <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                <tbody>
+                  <tr>
+                    <th scope="row" class="heading-toggle-text">Outbound</th>
+                    <td style="vertical-align: inherit;">
+                    </td>
+                  </tr>
+  
+                  <tr>
+                    <th scope="row" class="sub-heading-toggle-text">
+                      Enable Outbound Co-browsing
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="Enabling this will enable Search Lead functionality"><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+  
+                      {% if access_token_obj.lead_generation %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="lead_generation" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="lead_generation">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+  
+                    </td>
+                  </tr>
+
+                  <tr id="enable-proxy-cobrowsing-div" class="easyassist_hidden_div">
+                    <th scope="row" class="sub-heading-toggle-text">
+                      Enable Proxy Co-browsing
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="Enabling this will enable co-browsing on third party pages"><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.get_proxy_config_obj.enable_proxy_cobrowsing %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable-proxy-cobrowsing" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable-proxy-cobrowsing">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+                    </td>
+                  </tr>
+
+                  <tr id="link-expiry-time-div" class="tr-flex-sm easyassist_hidden_div">
+                    <th scope="row" class="sub-heading-toggle-text">Link Expiry Time (In mins)
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      <input type="number" aria-label="Checkbox for following text input" id="link-expiry-time"
+                        value={{access_token_obj.get_proxy_config_obj.proxy_link_expire_time}} min=1 class="positive_numeric">
+                    </td>
+                  </tr>
+  
+                  <tr id="enable_tag_based_assignment_for_outbound_div">
+                    <th scope="row" class="sub-heading-toggle-text">Enable tag based assignment for outbound
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.enable_tag_based_assignment_for_outbound %}
+                        <label class="easyassist-option-switch">
+                          <input type="checkbox" id="enable_tag_based_assignment_for_outbound" checked>
+                          <span class="easyassist-option-switch-slider round"></span>
+                        </label>
+                      {% else %}
+                        <label class="easyassist-option-switch">
+                          <input type="checkbox" id="enable_tag_based_assignment_for_outbound">
+                          <span class="easyassist-option-switch-slider round"></span>
+                        </label>
+                      {% endif %}
+                    </td>
+                  </tr>
+
+                  <tr id="show_floating_button_after_lead_search_div">
+                    <th scope="row" class="sub-heading-toggle-text">Show floating button even after the lead is generated
+                      <span data-toggle="tooltip" data-placement="bottom" title="Enabling this will show the floating button until the co-browsing session hasn’t started or the customer has not requested for support."><i class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.show_floating_button_after_lead_search %}
+                        <label class="easyassist-option-switch">
+                          <input type="checkbox" id="show_floating_button_after_lead_search" checked>
+                          <span class="easyassist-option-switch-slider round"></span>
+                        </label>
+                      {% else %}
+                        <label class="easyassist-option-switch">
+                          <input type="checkbox" id="show_floating_button_after_lead_search">
+                          <span class="easyassist-option-switch-slider round"></span>
+                        </label>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+  
+      </div>
+      <!-- REVERSE SETTINGS -->
+      <div class="card shadow mb-4">
+        <div class="card-body p-0">
+          <div class="card">
+  
+            <div class="card-body table-responsive p-0">
+              <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                <tbody>
+                  <tr>
+                    <th scope="row" class="heading-toggle-text">Reverse</th>
+                    <td style="vertical-align: inherit;">
+                    </td>
+                  </tr>
+  
+                  <tr>
+                    <th scope="row" class="sub-heading-toggle-text">Enable Reverse Co-browsing</th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.allow_agent_to_customer_cobrowsing %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="allow_agent_to_customer_cobrowsing" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                        <input type="hidden" id="previous_reverse_toggle_value"
+                          value="{{access_token_obj.allow_agent_to_customer_cobrowsing}}">
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="allow_agent_to_customer_cobrowsing">
+                        <span class="easyassist-option-switch-slider round"></span>
+                        <input type="hidden" id="previous_reverse_toggle_value"
+                          value="{{access_token_obj.allow_agent_to_customer_cobrowsing}}">
+                      </label>
+                      {% endif %}
+                      </td>
+                      </tr>
+                      
+                      <tr id="allow_agent_to_screen_record_customer_cobrowsing_div">
+                        <th scope="row" class="sub-heading-toggle-text">Enable auto screen record</th>
+                        <td style="vertical-align: inherit;">
+                          {% if access_token_obj.allow_agent_to_screen_record_customer_cobrowsing %}
+                          <label class="easyassist-option-switch">
+                            <input type="checkbox" id="allow_agent_to_screen_record_customer_cobrowsing" checked>
+                            <span class="easyassist-option-switch-slider round"></span>
+                          </label>
+                          {% else %}
+                          <label class="easyassist-option-switch">
+                            <input type="checkbox" id="allow_agent_to_screen_record_customer_cobrowsing">
+                            <span class="easyassist-option-switch-slider round"></span>
+                          </label>
+                          {% endif %}
+                        </td>
+                      </tr>
+                      
+                      <tr id="allow_agent_to_audio_record_customer_cobrowsing_div">
+                        <th scope="row" class="sub-heading-toggle-text">Enable audio in screen recording</th>
+                        <td style="vertical-align: inherit;">
+                          {% if access_token_obj.allow_agent_to_audio_record_customer_cobrowsing %}
+                          <label class="easyassist-option-switch">
+                            <input type="checkbox" id="allow_agent_to_audio_record_customer_cobrowsing" checked>
+                            <span class="easyassist-option-switch-slider round"></span>
+                          </label>
+                          {% else %}
+                          <label class="easyassist-option-switch">
+                            <input type="checkbox" id="allow_agent_to_audio_record_customer_cobrowsing">
+                            <span class="easyassist-option-switch-slider round"></span>
+                          </label>
+                          {% endif %}
+                        </td>
+                      </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+  
+      </div>
+    </div>
+  
+      <!-- sprint 5.9 general Admin Settings Body end -->
+  
+  
+    </div>
+  </div>
+  <!-- sprint 5.9 content end -->
+  
+<!-- Modal for Adding URLs for Inactivity Popup -->
+<div class="modal fade" id="inactivity-popup-url-Modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog " role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add URLs</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          <p class="mb-2 url-note-heading">URLs will be matched exactly from the beginning.</p>
+          <div class="modal-input-field mb-3">
+              <input id="inactivity_url_input" class="mb-0" type="text" placeholder=" Hit “Enter” after adding an URL" autocomplete="off">
+              <p class="col-sm-12 mt-3 url-error-message"></p>
+          </div>
+
+          {% if inactivity_popup_urls %}
+            <div class="added-url-container">
+              <p class="mb-3 added-url-heading">Added URLs</p>
+              <div>
+                {% for inactivity_popup_url in inactivity_popup_urls%}
+                  <div class="input-url-chip">
+                    <a class="url-value" target="_blank" href="{{ inactivity_popup_url| safe }}"><u>{{ inactivity_popup_url| safe }}</u></a>
+                    <div class="remove-url-chip">
+                      <svg width="18" height="19" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3.23038 3.5L14.7702 15.5" stroke="#2D2D2D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M14.7699 3.5L3.23007 15.5" stroke="#2D2D2D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          {% else %}
+            <div class="added-url-container d-none">
+              <p class="mb-3 added-url-heading">Added URLs</p>
+              <div></div>
+            </div>
+          {% endif %}
+          
+      </div>
+      <div class="modal-footer custom-modal-footer-buttons">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <button class="btn save-url-input-btn" onclick="save_inactivity_popup_urls(this);">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Adding URLs for Exit Intent -->
+<div class="modal fade" id="exit-intent-url-Modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-scrollable" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add URLs</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <p class="mb-2 url-note-heading">URLs will be matched exactly from the beginning.</p>
+            <div class="modal-input-field mb-3">
+                <input id="exit_intent_url_input" class="mb-0"  type="text" placeholder=" Hit “Enter” after adding an URL" autocomplete="off">
+                <p class="col-sm-12 mt-3 url-error-message"></p>
+            </div>
+
+            {% if exit_intent_popup_urls %}
+              <div class="added-url-container">
+                <p class="mb-3 added-url-heading">Added URLs</p>
+                <div>
+                  {% for exit_intent_popup_url in exit_intent_popup_urls%}
+                    <div class="input-url-chip">  
+                      <a class="url-value" target="_blank" href="{{ exit_intent_popup_url| safe }}"><u>{{ exit_intent_popup_url| safe }}</u></a>
+                      <div class="remove-url-chip">
+                        <svg width="18" height="19" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M3.23038 3.5L14.7702 15.5" stroke="#2D2D2D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M14.7699 3.5L3.23007 15.5" stroke="#2D2D2D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            {% else %}
+              <div class="added-url-container d-none">
+                <p class="mb-3 added-url-heading">Added URLs</p>
+                <div></div>
+              </div>
+            {% endif %}
+            
+        </div>
+        <div class="modal-footer custom-modal-footer-buttons">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+          <button class="btn save-url-input-btn" onclick="save_exit_intent_popup_urls(this);">Save</button>
+        </div>
+      </div>
+    </div>
+</div>
+  
+  <div class="modal fade" id="cobrowse_delete_upload_modal" tabindex="-1" role="dialog" aria-labelledby="document_upload_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="document_upload_modal_modal_label">Delete Logo</h5>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-12">
+                  <p>Are you sure, you want to delete the logo?<p>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+          <button class="btn btn-danger" onclick="delete_cobrowse_logo()">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade upload_file_modal" id="cobrowse_logo_upload_modal" tabindex="-1" role="dialog" aria-labelledby="document_upload_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" >Upload Logo</h5>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-12">
+                  <label for="cobrowse_logo_input" class="custom-file-upload">
+                      Choose File
+                  </label>
+                  <input type="file" id="cobrowse_logo_input" class="form-control" name="" style="display: none !important;" accept=".png, .jpg, .jpeg, .PNG">
+                </div>
+                <div class="col-sm-11">
+                    <div class="col-md-12 col-sm-12 modal-upload-file mt-4" style="display: none;" id="cobrowse_image_file_upload_bar">
+                      <div class="col-md-1 col-sm-1 width-auto-sm pd-mg">
+                        <svg width="24" height="32" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path fill-rule="evenodd" clip-rule="evenodd" d="M14 0V8.50667C14 9.33333 14.6667 10 15.4933 10H24V30.5067C24 31.3333 23.3333 32 22.5067 32H1.49333C0.666665 32 0 31.3333 0 30.5067V1.49333C0 0.666667 0.666665 0 1.49333 0H14ZM17.4404 0.426667L23.5471 6.56C23.8404 6.85333 24.0004 7.22667 24.0004 7.62667V8H16.0004V0H16.3737C16.7737 0 17.147 0.16 17.4404 0.426667Z" fill="#ef827f"/>
+                          <defs>
+                            <linearGradient id="paint0_linear" x1="2.39111" y1="3" x2="23.3908" y2="32.0002" gradientUnits="userSpaceOnUse">
+                              <stop stop-color="#E08F8D"/>
+                              <stop offset="1" stop-color="#FE736F"/>
+                            </linearGradient>
+                          </defs>
+                        </svg>
+                      </div>
+                      <div class="col-md-10 col-sm-10 file-name-container">
+                        <div class="file-name-div">
+                        </div>
+                        <div class="progress">
+                          <div class="indeterminate"></div>
+                        </div>
+                      </div>
+                      <div class="col-md-1 col-sm-1 width-auto-sm pr-sm-0">
+                        <button class="upload-file-cross-btn" type="button" onclick="remove_uploaded_file();">
+                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M6.48438 4.98438L9.85938 1.64062C10.0469 1.45312 10.0469 1.10938 9.85938 0.921875L9.07812 0.140625C8.89062 -0.046875 8.54688 -0.046875 8.35938 0.140625L5.01562 3.51562L1.64062 0.140625C1.45312 -0.046875 1.10938 -0.046875 0.921875 0.140625L0.140625 0.921875C-0.046875 1.10938 -0.046875 1.45312 0.140625 1.64062L3.51562 4.98438L0.140625 8.35938C-0.046875 8.54688 -0.046875 8.89062 0.140625 9.07812L0.921875 9.85938C1.10938 10.0469 1.45312 10.0469 1.64062 9.85938L5.01562 6.48438L8.35938 9.85938C8.54688 10.0469 8.89062 10.0469 9.07812 9.85938L9.85938 9.07812C10.0469 8.89062 10.0469 8.54688 9.85938 8.35938L6.48438 4.98438Z" fill="#E08F8D"/>
+                            </svg>
+                        </button>
+                      </div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                  <p style="padding-top: 1em;" id="cobrowse_logo_input_error"></p>
+              </div>
+            </div>
+        </div>
+        <div class="modal-footer" id="modal_cobrowse_image_buttons">
+          
+          <button class="btn btn-text-only" type="button" data-dismiss="modal" id="cobrowse_logo_upload_modal_close">Cancel</button>
+          <button class="btn btn-primary" onclick="upload_cobrowse_logo(this)">Upload</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade upload_file_modal" id="connect_with_agent_icon_upload_modal" tabindex="-1" role="dialog" aria-labelledby="document_upload_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" >Upload Icon</h5>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-12">
+                  <label for="connect_with_agent_icon_input" class="custom-file-upload">
+                      Choose File
+                  </label>
+                  <input type="file" id="connect_with_agent_icon_input" class="form-control" name="" style="display: none !important;" accept=".png, .jpg, .jpeg, .PNG">
+                </div>
+                <div class="col-sm-11">
+                    <div class="col-md-12 col-sm-12 modal-upload-file mt-4" style="display: none;">
+                      <div class="col-md-1 col-sm-1 width-auto-sm pd-mg">
+                        <svg width="24" height="32" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path fill-rule="evenodd" clip-rule="evenodd" d="M14 0V8.50667C14 9.33333 14.6667 10 15.4933 10H24V30.5067C24 31.3333 23.3333 32 22.5067 32H1.49333C0.666665 32 0 31.3333 0 30.5067V1.49333C0 0.666667 0.666665 0 1.49333 0H14ZM17.4404 0.426667L23.5471 6.56C23.8404 6.85333 24.0004 7.22667 24.0004 7.62667V8H16.0004V0H16.3737C16.7737 0 17.147 0.16 17.4404 0.426667Z" fill="#ef827f"/>
+                          <defs>
+                            <linearGradient id="paint0_linear" x1="2.39111" y1="3" x2="23.3908" y2="32.0002" gradientUnits="userSpaceOnUse">
+                              <stop stop-color="#E08F8D"/>
+                              <stop offset="1" stop-color="#FE736F"/>
+                            </linearGradient>
+                          </defs>
+                        </svg>
+                      </div>
+                      <div class="col-md-10 col-sm-10 file-name-container">
+                        <div class="file-name-div">
+                        </div>
+                        <div class="progress">
+                          <div class="indeterminate"></div>
+                        </div>
+                      </div>
+                      <div class="col-md-1 col-sm-1 width-auto-sm pr-sm-0">
+                        <button class="upload-file-cross-btn" type="button" onclick="remove_uploaded_file_connect_icon();">
+                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M6.48438 4.98438L9.85938 1.64062C10.0469 1.45312 10.0469 1.10938 9.85938 0.921875L9.07812 0.140625C8.89062 -0.046875 8.54688 -0.046875 8.35938 0.140625L5.01562 3.51562L1.64062 0.140625C1.45312 -0.046875 1.10938 -0.046875 0.921875 0.140625L0.140625 0.921875C-0.046875 1.10938 -0.046875 1.45312 0.140625 1.64062L3.51562 4.98438L0.140625 8.35938C-0.046875 8.54688 -0.046875 8.89062 0.140625 9.07812L0.921875 9.85938C1.10938 10.0469 1.45312 10.0469 1.64062 9.85938L5.01562 6.48438L8.35938 9.85938C8.54688 10.0469 8.89062 10.0469 9.07812 9.85938L9.85938 9.07812C10.0469 8.89062 10.0469 8.54688 9.85938 8.35938L6.48438 4.98438Z" fill="#E08F8D"/>
+                            </svg>
+                        </button>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-text-only" type="button" data-dismiss="modal">Cancel</button>
+          <button class="btn btn-primary" onclick="upload_connect_with_agent_icon(this)">Upload</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal fade upload_file_modal" id="chat_icon_upload_modal" tabindex="-1" role="dialog" aria-labelledby="document_upload_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" >Upload Icon</h5>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-12">
+                  <label for="chat_icon_input" class="custom-file-upload">
+                      Choose File
+                  </label>
+                  <input type="file" id="chat_icon_input" class="form-control" name="" style="display: none !important;" accept=".png, .svg, .SVG .PNG">
+                </div>
+                <div class="col-sm-11" id="progress-modal-chat-icon">
+                    <div class="col-md-12 col-sm-12 modal-upload-file mt-4" style="display: none;">
+                      <div class="col-md-1 col-sm-1 width-auto-sm pd-mg">
+                        <svg width="24" height="32" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path fill-rule="evenodd" clip-rule="evenodd" d="M14 0V8.50667C14 9.33333 14.6667 10 15.4933 10H24V30.5067C24 31.3333 23.3333 32 22.5067 32H1.49333C0.666665 32 0 31.3333 0 30.5067V1.49333C0 0.666667 0.666665 0 1.49333 0H14ZM17.4404 0.426667L23.5471 6.56C23.8404 6.85333 24.0004 7.22667 24.0004 7.62667V8H16.0004V0H16.3737C16.7737 0 17.147 0.16 17.4404 0.426667Z" fill="#ef827f"/>
+                          <defs>
+                            <linearGradient id="paint0_linear" x1="2.39111" y1="3" x2="23.3908" y2="32.0002" gradientUnits="userSpaceOnUse">
+                              <stop stop-color="#E08F8D"/>
+                              <stop offset="1" stop-color="#FE736F"/>
+                            </linearGradient>
+                          </defs>
+                        </svg>
+                      </div>
+                      <div class="col-md-10 col-sm-10 file-name-container">
+                        <div class="file-name-div">
+                        </div>
+                        <div class="progress">
+                          <div class="indeterminate"></div>
+                        </div>
+                      </div>
+                      <div class="col-md-1 col-sm-1 width-auto-sm pr-sm-0">
+                        <button class="upload-file-cross-btn" type="button" onclick="remove_chat_icon();">
+                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M6.48438 4.98438L9.85938 1.64062C10.0469 1.45312 10.0469 1.10938 9.85938 0.921875L9.07812 0.140625C8.89062 -0.046875 8.54688 -0.046875 8.35938 0.140625L5.01562 3.51562L1.64062 0.140625C1.45312 -0.046875 1.10938 -0.046875 0.921875 0.140625L0.140625 0.921875C-0.046875 1.10938 -0.046875 1.45312 0.140625 1.64062L3.51562 4.98438L0.140625 8.35938C-0.046875 8.54688 -0.046875 8.89062 0.140625 9.07812L0.921875 9.85938C1.10938 10.0469 1.45312 10.0469 1.64062 9.85938L5.01562 6.48438L8.35938 9.85938C8.54688 10.0469 8.89062 10.0469 9.07812 9.85938L9.85938 9.07812C10.0469 8.89062 10.0469 8.54688 9.85938 8.35938L6.48438 4.98438Z" fill="#E08F8D"/>
+                            </svg>
+                        </button>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div id="icon-error-div">        
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-text-only" type="button" data-dismiss="modal">Cancel</button>
+          <button class="btn btn-primary" onclick="upload_chat_icon(this)">Upload</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal fade upload_file_modal" id="modal-confirm-reset-all" tabindex="-1" role="dialog"aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Reset All Settings</h5>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-12">
+                  <p>This will reset all settings across the console. Are you sure you want to continue?<p>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-text-only" type="button" data-dismiss="modal">Cancel</button>
+          <button class="btn btn-primary" onclick="reset_cobrowsing_meta_details(this)">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+
+    var input_product_category = document.getElementById('input_product_category');
+    var product_category_tag_list = document.getElementById('product_category_tag_list');
+    var product_categories_array = {{product_category|safe}};
+    {% if access_token_obj.source_easyassist_connect_agent_icon == "null" %}
+    window.is_icon_for_connect_with_agent = false;
+    {% else %}
+    window.is_icon_for_connect_with_agent = true;
+    {% endif %}
+    if(product_categories_array.length==1 && product_categories_array[0] =="")
+        product_categories_array = []
+  
+    var support_language_array = "{{access_token_obj.get_supported_languages|safe}}";
+    if(support_language_array === "")
+      support_language_array = []
+    else
+      support_language_array = support_language_array.split(",")
+  
+    for(var index=0 ; index<support_language_array.length ; index++) {
+      support_language_array[index] = support_language_array[index].trim();
+    }
+  
+    for(var index=0 ; index<product_categories_array.length ; index++) {
+      product_categories_array[index] = product_categories_array[index].trim();
+    }
+  
+  function chip_product_category(){
+    var product_category_string = window.PRODUCT_CATEGORY_TAG_OBJ.value_list.join(',');
+    document.getElementById("product_category_list").value = product_category_string;
+  }
+  
+  function chip_language_support(){
+    var support_language_string = window.LANGUAGE_TAG_OBJ.value_list.join(', ');
+    document.getElementById("supported_language_list").value = support_language_string;
+  }
+
+  function add_floating_sidenav_easyassist_button() {
+        bg_color = "{{ access_token_obj.floating_button_bg_color }}";
+        var nav_span = document.createElement("span");
+        nav_span.id = "easyassist-side-nav-options-co-browsing";
+        nav_span.style.backgroundColor = bg_color;
+        nav_span.textContent = "Request for Support";
+        nav_span.style.width = "auto";
+        document.getElementsByTagName("body")[0].appendChild(nav_span);
+        if ("{{ access_token_obj.floating_button_position }}" == "left") {
+            nav_span.style.left = "-70px";
+            nav_span.style.borderRadius = "0px 0px 10px 10px";
+        } else {
+            nav_span.style.right = "-70px";
+            nav_span.style.borderRadius = "10px 10px 0px 0px";
+        }
+    }
+    
+    add_floating_sidenav_easyassist_button();
+
+  
+  window.addEventListener("load", function() {
+      var option_btn_id = location.hash;
+      if( option_btn_id){
+        $(option_btn_id).click();
+      }
+  
+      hide_exit_intent_popup_number();
+      hide_inactivity_popup_number();
+    });
+  
+    if (document.getElementById("easy_assist_delete_logo") != null) {
+      var image_listener = document.getElementById("easy_assist_delete_logo");
+      image_listener.addEventListener('click', function(el){
+        $('#cobrowse_delete_upload_modal').modal('show');
+      });
+    }
+    
+    function show_upload_image(){
+      var show_image = document.getElementById("show_easyassist_connect_agent_icon");
+      var display_image = document.getElementById("display_icon");
+      if(show_image.checked == true){
+        display_image.style.display = "contents";
+      }
+      else{
+        display_image.style.setProperty('display', 'none', 'important');
+      }
+    }
+  
+    function hide_floating_sidenav_easyassist_button() {
+      document.getElementById("easyassist-side-nav-options-co-browsing").style.display = "none";
+    }
+      
+    function show_floating_sidenav_easyassist_button() {
+      bg_color = "#"+ document.getElementById("floating_button_bg_color").value;
+      position = "{{ access_token_obj.floating_button_position }}";
+      sidenav_element = document.getElementById("easyassist-side-nav-options-co-browsing");
+      sidenav_element.style.left = "";
+      sidenav_element.style.right = "";
+      if (position == "left") {
+        sidenav_element.style.top = "50vh";
+        sidenav_element.style.left = "-70px";
+        sidenav_element.style.transform = "rotate(-90deg)";
+        sidenav_element.style.borderRadius = "0px 0px 10px 10px";
+      } else if (position == "right") {
+        sidenav_element.style.top = "50vh";
+        sidenav_element.style.right = "-70px";
+        sidenav_element.style.transform = "rotate(-90deg)";
+        sidenav_element.style.borderRadius = "10px 10px 0px 0px";
+      } else if (position == "top") {
+        sidenav_element.style.top = "-5px";
+        sidenav_element.style.transform = "rotate(0deg)";
+        sidenav_element.style.left = "50vw";
+        sidenav_element.style.borderRadius = "0px 0px 10px 10px"
+      } else if (position == "bottom") {
+        sidenav_element.style.top = "96%";
+        sidenav_element.style.left = "50vw";
+        sidenav_element.style.transform = "rotate(0deg)";
+        sidenav_element.style.borderRadius = "10px 10px 0px 0px";
+      }
+      sidenav_element.style.backgroundColor = bg_color;
+      sidenav_element.style.display = "inline-block";
+    }
+  
+    function show_change_password() {
+      document.getElementById('change-password-button').style.display = "none";
+      document.getElementById("change-password-div").style.display = "block";
+      document.getElementById("change_password_cancel_btn").style.visibility = "visible";
+    }
+  
+    function hide_change_password() {
+      document.getElementById("change_password_cancel_btn").style.visibility = "hidden";
+      document.getElementById("change-password-div").style.display = "none";
+      document.getElementById('change-password-button').style.display = "block";
+      document.getElementById("old-password").value = "";
+      document.getElementById("new-password").value = "";
+      document.getElementById("confirm-password").value = "";
+      document.getElementById("save-details-error").innerHTML = "";
+    }
+  
+    function disable_connect_button_if_agent_unavailable_change_actions(){
+      var check_element = document.getElementById("disable_connect_button_if_agent_unavailable");
+      var tr_check_element = get_tr_tag_from_parent_recursive(check_element);
+      if(check_element.checked == true && tr_check_element.classList.contains("easyassist_hidden_div") == false){
+        document.getElementById("message-if-agent-unavailable-div").classList.remove("easyassist_hidden_div");
+      }else{
+        document.getElementById("message-if-agent-unavailable-div").classList.add("easyassist_hidden_div");
+      }
+    }
+  
+    function allow_language_support_change_actions(){
+      var check_element = document.getElementById("allow_language_support");
+      var tr_check_element = get_tr_tag_from_parent_recursive(check_element);
+      if(check_element.checked == true && tr_check_element.classList.contains("easyassist_hidden_div") == false){
+        document.getElementById("supported-language-list-div").classList.remove("easyassist_hidden_div");
+      }else{
+        document.getElementById("supported-language-list-div").classList.add("easyassist_hidden_div");
+      }
+    }
+  
+    function change_product_category_list_div_visiblity(){
+      var check_element_1 = document.getElementById("choose_product_category");
+      var check_element_2 = document.getElementById("enable_tag_based_assignment_for_outbound");
+      var tr_check_element_1 = get_tr_tag_from_parent_recursive(check_element_1);
+      var tr_check_element_2 = get_tr_tag_from_parent_recursive(check_element_2);
+      if( 
+        (check_element_1.checked == true && tr_check_element_1.classList.contains("easyassist_hidden_div") == false) || 
+        (check_element_2.checked == true && tr_check_element_2.classList.contains("easyassist_hidden_div") == false) 
+      ){
+        document.getElementById("product-category-list-div").classList.remove("easyassist_hidden_div");
+      }else{
+        document.getElementById("product-category-list-div").classList.add("easyassist_hidden_div");
+      }
+    }
+  
+    function choose_product_category_change_actions(){
+      var check_element = document.getElementById("choose_product_category");
+      var tr_check_element = get_tr_tag_from_parent_recursive(check_element);
+      if(check_element.checked == true && tr_check_element.classList.contains("easyassist_hidden_div") == false){
+        document.getElementById("product_category_message_div").classList.remove("easyassist_hidden_div");
+      }else{
+        document.getElementById("product_category_message_div").classList.add("easyassist_hidden_div");
+      }
+    }
+  
+    function lead_generation_change_actions(){
+      var check_element = document.getElementById("lead_generation");
+      var tr_check_element = get_tr_tag_from_parent_recursive(check_element);
+      if(check_element.checked == true && tr_check_element.classList.contains("easyassist_hidden_div") == false){
+        document.getElementById("enable_tag_based_assignment_for_outbound_div").classList.remove("easyassist_hidden_div");
+        document.getElementById("show_floating_button_after_lead_search_div").classList.remove("easyassist_hidden_div");
+        document.getElementById("allow_agent_to_customer_cobrowsing").checked = false;
+        // document.getElementById("enable-proxy-cobrowsing-div").classList.remove("easyassist_hidden_div");
+        reverse_cobrowsing_toggles_action();
+      } else {
+        document.getElementById("enable_tag_based_assignment_for_outbound_div").classList.add("easyassist_hidden_div");
+        document.getElementById("show_floating_button_after_lead_search_div").classList.add("easyassist_hidden_div");
+        document.getElementById("enable_tag_based_assignment_for_outbound").checked = false;
+        document.getElementById("enable-proxy-cobrowsing").checked = false;
+        // document.getElementById("enable-proxy-cobrowsing-div").classList.add("easyassist_hidden_div");
+        change_product_category_list_div_visiblity();
+      }
+      // proxy_cobrowsing_toggle_actions();
+    }
+
+    function proxy_cobrowsing_toggle_actions(){
+      let check_element = document.getElementById("enable-proxy-cobrowsing");
+      let link_expiry_div = document.getElementById("link-expiry-time-div");
+      let check_element_div = document.getElementById("enable-proxy-cobrowsing-div");
+      if(check_element.checked){
+        link_expiry_div.classList.remove("easyassist_hidden_div");
+      } else {
+        link_expiry_div.classList.add("easyassist_hidden_div");
+      }
+    }
+  
+    function show_floating_easyassist_button_change_actions(){
+      var check_element = document.getElementById("show_floating_easyassist_button");
+      var tr_check_element = get_tr_tag_from_parent_recursive(check_element);
+      if(check_element.checked == true && tr_check_element.classList.contains("easyassist_hidden_div") == false){
+        document.getElementById("show_easyassist_connect_agent_icon").checked = false;
+        document.getElementById("display_icon").classList.add("easyassist_hidden_div");
+  
+        show_easyassist_connect_agent_icon_change_actions();
+      }
+      if(check_element.checked == false && document.getElementById("show_easyassist_connect_agent_icon").checked == false){
+        let greeting_bubble_element = document.getElementById('enable_greeting_bubble');
+        if(greeting_bubble_element){
+          document.getElementById('enable_greeting_bubble').checked = false;
+          document.getElementById('greeting-bubble-timer-div').classList.add('easyassist_hidden_div');
+          document.getElementById('greeting-bubble-text-div').classList.add('easyassist_hidden_div');
+        }
+      }
+    }
+  
+    function show_easyassist_connect_agent_icon_change_actions(){
+      var check_element = document.getElementById("show_easyassist_connect_agent_icon");
+      var tr_check_element = get_tr_tag_from_parent_recursive(check_element);
+      if(check_element.checked == true && tr_check_element.classList.contains("easyassist_hidden_div") == false){
+        document.getElementById("display_icon").classList.remove("easyassist_hidden_div");
+        document.getElementById("show_floating_easyassist_button").checked = false;
+      } else {
+        document.getElementById("display_icon").classList.add("easyassist_hidden_div");
+      }
+      if(check_element.checked == false && document.getElementById("show_floating_easyassist_button").checked == false){
+        let greeting_bubble_element = document.getElementById('enable_greeting_bubble');
+        if(greeting_bubble_element){
+          document.getElementById('enable_greeting_bubble').checked = false;
+          document.getElementById('greeting-bubble-timer-div').classList.add('easyassist_hidden_div');
+          document.getElementById('greeting-bubble-text-div').classList.add('easyassist_hidden_div');
+        }
+      }
+    }
+  
+    function field_stuck_event_handler_change_actions(){
+      var check_element = document.getElementById("field_stuck_event_handler");
+      var tr_check_element = get_tr_tag_from_parent_recursive(check_element);
+      if(check_element.checked == true && tr_check_element.classList.contains("easyassist_hidden_div") == false){
+        document.getElementById("field_recursive_timer_div").classList.remove("easyassist_hidden_div");
+        document.getElementById("field_recursive_stuck_timer_div").classList.remove("easyassist_hidden_div");
+        document.getElementById("field_stuck_event_handler_popup_time").classList.remove("easyassist_hidden_div");      
+        document.getElementById('enable_url_based_inactivity_popup_tr').classList.remove("easyassist_hidden_div");
+      } else {
+        document.getElementById("field_recursive_stuck_event_check").checked = false;
+        document.getElementById("field_recursive_timer_div").classList.add("easyassist_hidden_div");
+        document.getElementById("field_recursive_stuck_timer_div").classList.add("easyassist_hidden_div");
+        document.getElementById("field_stuck_event_handler_popup_time").classList.add("easyassist_hidden_div");
+        document.getElementById('enable_url_based_inactivity_popup_tr').classList.add("easyassist_hidden_div");
+      }
+    }
+  
+    function maximum_active_leads_change_actions(){
+      var check_element = document.getElementById("maximum_active_leads");
+      var tr_check_element = get_tr_tag_from_parent_recursive(check_element);
+      var target_element = document.getElementById("maximum_active_leads_threshold");
+      var tr_target_element = get_tr_tag_from_parent_recursive(target_element);
+      if(check_element.checked == true && tr_check_element.classList.contains("easyassist_hidden_div") == false){
+        tr_target_element.classList.remove("easyassist_hidden_div");
+      } else {
+        tr_target_element.classList.add("easyassist_hidden_div");
+      }
+    }
+
+    function modified_inbound_change_actions(){
+      var check_element = document.getElementById("allow-connect-with-virtual-agent-code");
+      var tr_check_element = get_tr_tag_from_parent_recursive(check_element);
+      var target_element = document.getElementById("enable-virtual-agent-code-mandatory");
+      var tr_target_element = get_tr_tag_from_parent_recursive(target_element);
+      if(check_element.checked == true && tr_check_element.classList.contains("easyassist_hidden_div") == false){
+        tr_target_element.classList.remove("easyassist_hidden_div");
+      } else {
+        tr_target_element.classList.add("easyassist_hidden_div");
+        target_element.checked = false;
+        modified_inbound_mandatory_toggle_actions();
+      }
+    }
+
+    function modified_inbound_mandatory_toggle_actions(is_disable_change_required=true) {
+      var check_element = document.getElementById("enable-virtual-agent-code-mandatory");
+      if(check_element.checked) {
+        document.getElementById("enable_auto_assign_unattended_lead").checked = false;
+        auto_assign_unattended_leads_change_actions();
+        document.getElementById("enable_auto_assign_unattended_lead_tr").style.display = "none";
+
+        document.getElementById("enable_request_in_queue").checked = false;
+        document.getElementById("enable_request_in_queue_tr").style.display = "none";
+      } else {
+        if(!is_disable_change_required) {
+          return;
+        }
+        document.getElementById("enable_auto_assign_unattended_lead").checked = true;
+        document.getElementById("enable_auto_assign_unattended_lead_tr").style.display = "";
+        auto_assign_unattended_leads_change_actions();
+
+        document.getElementById("enable_request_in_queue_tr").style.display = "";
+      }
+    }
+
+    function auto_assign_unattended_leads_change_actions(){
+      var check_element = document.getElementById("enable_auto_assign_unattended_lead");
+  
+      var elements_to_hide = [
+        'auto_assign_unattended_lead_timer_tr',
+        'auto_assign_unattended_lead_transfer_count_tr',
+        'auto_assign_unattended_lead_message_tr',
+        'assign_agent_under_same_supervisor_tr',
+        'enable_auto_assign_to_one_agent_tr'
+      ]
+      if (document.getElementById('enable_auto_assign_to_one_agent').checked) {
+        elements_to_hide.push('auto_assign_lead_end_session_message_tr');
+        elements_to_hide.push('auto_assigned_unattended_lead_archive_timer_tr');
+      }
+  
+  
+      var check_element = document.getElementById("enable_auto_assign_unattended_lead");
+      var tr_check_element = get_tr_tag_from_parent_recursive(check_element);
+      
+      if(check_element.checked == true && tr_check_element.classList.contains("easyassist_hidden_div") == false){
+        for(var index=0; index < elements_to_hide.length; index++){
+          try{
+            document.getElementById(elements_to_hide[index]).classList.remove("easyassist_hidden_div");
+          }catch(err){
+  
+          }
+        }
+      } else {
+        for(var index=0; index < elements_to_hide.length; index++){
+          try{
+            document.getElementById(elements_to_hide[index]).classList.add("easyassist_hidden_div");
+          }catch(err){
+  
+          }
+        }
+      }
+    }
+    
+    function auto_assign_to_one_agent_change_actions(){
+      var check_element = document.getElementById("enable_auto_assign_to_one_agent");
+      var tr_check_element = get_tr_tag_from_parent_recursive(check_element);
+      var target_element = document.getElementById("auto_assign_lead_end_session_message");
+      var tr_target_element = get_tr_tag_from_parent_recursive(target_element);
+      var unattended_lead_archive_timer_input_ele = document.getElementById("unattended-lead-archive-timer-input");
+      var unattended_lead_archive_timer_input_tr = get_tr_tag_from_parent_recursive(unattended_lead_archive_timer_input_ele);
+      if(check_element.checked == true && tr_check_element.classList.contains("easyassist_hidden_div") == false) {
+        tr_target_element.classList.remove("easyassist_hidden_div");
+        unattended_lead_archive_timer_input_tr.classList.remove("easyassist_hidden_div");
+      } else {
+        tr_target_element.classList.add("easyassist_hidden_div");
+        unattended_lead_archive_timer_input_tr.classList.add("easyassist_hidden_div");
+      }
+    }
+
+    function request_in_queue_change_actions() {
+      var check_element = document.getElementById("enable_request_in_queue");
+      if(check_element.checked == true) {
+        document.getElementById("enable_auto_assign_unattended_lead").checked = false;
+        auto_assign_unattended_leads_change_actions();
+        document.getElementById("enable_auto_assign_unattended_lead_tr").style.display="none";
+      } else {
+        document.getElementById("enable_auto_assign_unattended_lead").checked = true;
+        document.getElementById("enable_auto_assign_unattended_lead_tr").style.display="";
+        auto_assign_unattended_leads_change_actions();
+      }
+    }
+  
+  
+    function no_agent_connects_toast_change_actions(){
+      var check_element = document.getElementById("no_agent_connects_toast");
+      var tr_check_element = get_tr_tag_from_parent_recursive(check_element);
+      if(check_element.checked == true && tr_check_element.classList.contains("easyassist_hidden_div") == false){
+        document.getElementById("no_agent_connects_toast_threshold_section").classList.remove("easyassist_hidden_div");
+        document.getElementById("no_agent_connects_toast_text_section").classList.remove("easyassist_hidden_div");
+        document.getElementById("no_agent_connect_timer_reset_count_tr").classList.remove("easyassist_hidden_div");
+        document.getElementById("no_agent_connect_timer_reset_message_tr").classList.remove("easyassist_hidden_div");
+      } else {
+        document.getElementById("no_agent_connects_toast_threshold_section").classList.add("easyassist_hidden_div");
+        document.getElementById("no_agent_connects_toast_text_section").classList.add("easyassist_hidden_div");
+        document.getElementById("no_agent_connect_timer_reset_count_tr").classList.add("easyassist_hidden_div");
+        document.getElementById("no_agent_connect_timer_reset_message_tr").classList.add("easyassist_hidden_div");
+      }
+    }
+  
+    function allow_popup_on_browser_leave_change_actions(){
+      var check_element = document.getElementById("allow_popup_on_browser_leave");
+      var tr_check_element = get_tr_tag_from_parent_recursive(check_element);
+      if(check_element.checked == true && tr_check_element.classList.contains("easyassist_hidden_div") == false){
+        document.getElementById("recursive_exit_intent_div").classList.remove("easyassist_hidden_div");
+        document.getElementById("exit_intent_popup_count_div").classList.remove("easyassist_hidden_div");
+        document.getElementById("enable_url_based_exit_intent_popup_tr").classList.remove("easyassist_hidden_div");
+      } else {
+        document.getElementById("enable_recursive_browser_leave_popup").checked = false;
+        document.getElementById("recursive_exit_intent_div").classList.add("easyassist_hidden_div");
+        document.getElementById("enable_url_based_exit_intent_popup_tr").classList.add("easyassist_hidden_div");
+        // hide exit popup number input----
+        document.getElementById("exit_intent_popup_count_div").classList.add("easyassist_hidden_div");
+      }
+    }
+  
+    function enable_url_based_inactivity_changes_action(){
+      let check_element = document.getElementById("enable_url_based_inactivity_popup");
+      if(check_element.checked){
+          document.getElementById("inactivity-popup-url-modal-button").style.display = "block";
+      }else{
+          document.getElementById("inactivity-popup-url-modal-button").style.display = "none";
+      }
+    }
+
+    function enable_url_based_exit_intent_changes_action(){
+      let check_element = document.getElementById("enable_url_based_exit_intent_popup");
+      if(check_element.checked){
+          document.getElementById("exit-intent-url-modal-button").style.display = "block";
+      }else{
+          document.getElementById("exit-intent-url-modal-button").style.display = "none";
+      }
+    }
+  
+    function hide_exit_intent_popup_number(){
+      var check_element = document.getElementById("enable_recursive_browser_leave_popup");
+      var ele_exit_intent = document.getElementById("allow_popup_on_browser_leave");
+      if(check_element.checked == true || ele_exit_intent.checked == false){
+          document.getElementById("exit_intent_popup_count_div").classList.add("easyassist_hidden_div");
+      }else{
+          document.getElementById("exit_intent_popup_count_div").classList.remove("easyassist_hidden_div");
+      }
+    }
+  
+    function hide_inactivity_popup_number(){
+      var recursive_check = document.getElementById("field_recursive_stuck_event_check");    
+      var main_check = document.getElementById("field_stuck_event_handler");         
+      if(recursive_check.checked == true || main_check.checked == false){
+          document.getElementById("field_stuck_event_handler_popup_time").classList.add("easyassist_hidden_div");
+      }else{
+          document.getElementById("field_stuck_event_handler_popup_time").classList.remove("easyassist_hidden_div");
+      }
+    }
+  
+    function enable_followup_leads_tab_change_actions(e){
+      var check_element = document.getElementById("enable_followup_leads_tab");
+      var tr_check_element = get_tr_tag_from_parent_recursive(check_element);
+      if(check_element.checked == false){
+        document.getElementById("enable_non_working_hours_modal_popup").checked = false;
+        document.getElementById("message_on_non_working_hours_div").style.display = "none";
+      }
+    }
+
+    function enable_non_working_hours_change_actions(){
+      var check_element = document.getElementById("enable_non_working_hours_modal_popup");
+      var tr_check_element = get_tr_tag_from_parent_recursive(check_element);
+      if(check_element.checked == false){
+        document.getElementById("message_on_non_working_hours_div").style.display = "none";
+      } else {
+        document.getElementById("message_on_non_working_hours_div").style.display = "";
+      }
+    }
+  
+    function reverse_cobrowsing_toggles_action(){
+      if(document.getElementById("allow_agent_to_customer_cobrowsing").checked){
+        document.getElementById("allow_agent_to_screen_record_customer_cobrowsing_div").style.display = "";
+        if(document.getElementById("allow_agent_to_screen_record_customer_cobrowsing").checked){
+          document.getElementById("allow_agent_to_audio_record_customer_cobrowsing_div").style.display = "";
+        }else{
+          document.getElementById("allow_agent_to_audio_record_customer_cobrowsing_div").style.display = "none";
+          document.getElementById("allow_agent_to_audio_record_customer_cobrowsing").checked = false;
+        }
+      }else{
+        document.getElementById("allow_agent_to_screen_record_customer_cobrowsing_div").style.setProperty("display", "none", "important");
+        document.getElementById("allow_agent_to_audio_record_customer_cobrowsing_div").style.display = "none";
+        document.getElementById("allow_agent_to_screen_record_customer_cobrowsing").checked = false;
+        document.getElementById("allow_agent_to_audio_record_customer_cobrowsing").checked = false;
+      }
+    }
+  
+    function reverse_function_toggles(){
+      if(document.getElementById("allow_agent_to_customer_cobrowsing").checked){
+        document.getElementById("allow_agent_to_screen_record_customer_cobrowsing_div").style.display = "";
+        if(document.getElementById("allow_agent_to_screen_record_customer_cobrowsing").checked){
+          document.getElementById("allow_agent_to_audio_record_customer_cobrowsing_div").style.display = "";
+        }else{
+          document.getElementById("allow_agent_to_audio_record_customer_cobrowsing_div").style.display = "none";
+          document.getElementById("allow_agent_to_audio_record_customer_cobrowsing").checked = false;
+        }
+        document.getElementById("enable_inbound").checked = false;
+        inbound_toggles_change_actions(event);
+        document.getElementById("lead_generation").checked = false;
+        lead_generation_change_actions();
+      }else{
+        document.getElementById("allow_agent_to_screen_record_customer_cobrowsing_div").style.setProperty("display", "none", "important");
+        document.getElementById("allow_agent_to_audio_record_customer_cobrowsing_div").style.display = "none";
+        document.getElementById("allow_agent_to_screen_record_customer_cobrowsing").checked = false;
+        document.getElementById("allow_agent_to_audio_record_customer_cobrowsing").checked = false;
+      }
+    }
+  
+    var inbound_options_div_id_list = [
+          'show_floating_easyassist_button_div',
+          'show_easyassist_connect_agent_icon_div',
+          'show_only_if_agent_available_div',
+          'disable_connect_button_if_agent_unavailable_div',
+          'enable_non_working_hours_modal_popup_div',
+          'message_on_non_working_hours_div',
+          'enable_followup_leads_tab_div',
+          'auto_archive_lead_timer_input_section',
+          'auto_archive_popup_text_section',
+          'choose_product_category_div',
+          'auto_assign_unattended_lead_transfer_count_tr',
+          'assign_agent_under_same_supervisor_tr',
+          'allow_language_support_div',
+          'connect_message_div',
+          'no_agent_connects_toast_div',
+          'field_stuck_event_handler_div',
+          'allow_popup_on_browser_leave_div',
+          'start_time_end_time_div',
+          'maximum_active_leads_div',
+          'connect-with-virtual-agent-code-tr',
+          'working_days_div',
+          'enable_auto_assign_unattended_lead_tr',
+          'enable_auto_assign_to_one_agent_tr',
+          'enable_request_in_queue_tr'
+        ]
+  
+    function inbound_toggles_change_actions(event){
+      if(document.getElementById("enable_inbound").checked){
+        if(event){
+          document.getElementById("show_floating_easyassist_button").checked = true;
+          document.getElementById("show_easyassist_connect_agent_icon").checked = false;
+  
+          show_floating_easyassist_button_change_actions();
+          show_easyassist_connect_agent_icon_change_actions();
+        }
+        document.getElementById("allow_agent_to_customer_cobrowsing").checked = false;
+        document.getElementById("enable_greeting_bubble_div").classList.remove("easyassist_hidden_div");
+        for(var index=0 ; index<inbound_options_div_id_list.length ; index++){
+          try{
+            document.getElementById(inbound_options_div_id_list[index]).classList.remove("easyassist_hidden_div");
+          }catch(err){}
+        }
+      }else{
+        if(event){
+          document.getElementById("show_floating_easyassist_button").checked = false;
+          document.getElementById("show_easyassist_connect_agent_icon").checked = false;
+          document.getElementById("choose_product_category").checked = false;
+          document.getElementById("field_stuck_event_handler").checked = false;
+          document.getElementById("allow_popup_on_browser_leave").checked = false;
+          document.getElementById("enable_followup_leads_tab").checked = false;
+          document.getElementById("enable_auto_assign_unattended_lead_tr").checked = false;
+          document.getElementById("enable_auto_assign_to_one_agent_tr").checked = false;
+          document.getElementById("enable_greeting_bubble").checked = false;
+          document.getElementById("enable_request_in_queue").checked = false;
+        }
+        document.getElementById("enable_greeting_bubble_div").classList.add("easyassist_hidden_div");
+        for(var index=0 ; index<inbound_options_div_id_list.length ; index++){
+          try{
+            document.getElementById(inbound_options_div_id_list[index]).classList.add("easyassist_hidden_div");
+          }catch(err){}
+        }
+      }
+      default_calls_for_inbound_changes();
+    }
+    
+    function enable_inbound_change_actions(event){
+      if(document.getElementById("enable_inbound").checked){
+        if(event){
+          document.getElementById("show_floating_easyassist_button").checked = true;
+          document.getElementById("show_easyassist_connect_agent_icon").checked = false;
+  
+          show_floating_easyassist_button_change_actions();
+          show_easyassist_connect_agent_icon_change_actions();
+        }
+        document.getElementById("allow_agent_to_customer_cobrowsing").checked = false;
+        document.getElementById("enable_greeting_bubble_div").classList.remove("easyassist_hidden_div");
+        for(var index=0 ; index<inbound_options_div_id_list.length ; index++){
+          try{
+            document.getElementById(inbound_options_div_id_list[index]).classList.remove("easyassist_hidden_div");
+          }catch(err){}
+        }
+      }else{
+        if(event){
+          document.getElementById("show_floating_easyassist_button").checked = false;
+          document.getElementById("show_easyassist_connect_agent_icon").checked = false;
+          document.getElementById("choose_product_category").checked = false;
+          document.getElementById("field_stuck_event_handler").checked = false;
+          document.getElementById("allow_popup_on_browser_leave").checked = false;
+          document.getElementById("enable_followup_leads_tab").checked = false;
+          document.getElementById("enable_auto_assign_unattended_lead_tr").checked = false;
+          document.getElementById("enable_auto_assign_to_one_agent_tr").checked = false;
+          document.getElementById("enable_greeting_bubble").checked = false;
+        }
+        document.getElementById("enable_greeting_bubble_div").classList.add("easyassist_hidden_div");
+        for(var index=0 ; index<inbound_options_div_id_list.length ; index++){
+          try{
+            document.getElementById(inbound_options_div_id_list[index]).classList.add("easyassist_hidden_div");
+          }catch(err){}
+        }
+      }  
+      default_function_calls();
+    }
+  
+    function default_calls_for_inbound_changes(){
+      disable_connect_button_if_agent_unavailable_change_actions();
+      allow_language_support_change_actions();
+      choose_product_category_change_actions();
+      change_product_category_list_div_visiblity();
+      show_floating_easyassist_button_change_actions();
+      show_easyassist_connect_agent_icon_change_actions();
+      field_stuck_event_handler_change_actions();
+      no_agent_connects_toast_change_actions();
+      allow_popup_on_browser_leave_change_actions();
+      enable_followup_leads_tab_change_actions();
+      maximum_active_leads_change_actions();
+      modified_inbound_change_actions();
+      auto_assign_unattended_leads_change_actions();
+      auto_assign_to_one_agent_change_actions();
+      hide_greeting_bubble_div();
+      enable_non_working_hours_change_actions();
+    }
+  
+    function default_function_calls(){
+      disable_connect_button_if_agent_unavailable_change_actions();
+      allow_language_support_change_actions();
+      choose_product_category_change_actions();
+      change_product_category_list_div_visiblity();
+      lead_generation_change_actions();
+      // proxy_cobrowsing_toggle_actions();
+      show_floating_easyassist_button_change_actions();
+      show_easyassist_connect_agent_icon_change_actions();
+      field_stuck_event_handler_change_actions();
+      no_agent_connects_toast_change_actions();
+      allow_popup_on_browser_leave_change_actions();
+      enable_followup_leads_tab_change_actions();
+      enable_non_working_hours_change_actions();
+      reverse_cobrowsing_toggles_action();
+      maximum_active_leads_change_actions();
+      modified_inbound_change_actions();
+      auto_assign_unattended_leads_change_actions();
+      auto_assign_to_one_agent_change_actions();
+      hide_greeting_bubble_div();
+      request_in_queue_change_actions();
+      modified_inbound_mandatory_toggle_actions(is_disable_change_required=false);
+      enable_url_based_inactivity_changes_action();
+      enable_url_based_exit_intent_changes_action()
+    }
+    // default_function_calls();
+  
+    enable_inbound_change_actions();
+    document.getElementById("disable_connect_button_if_agent_unavailable").addEventListener(
+      "click", disable_connect_button_if_agent_unavailable_change_actions);
+    document.getElementById("allow_language_support").addEventListener(
+      "click", allow_language_support_change_actions);
+    document.getElementById("choose_product_category").addEventListener(
+      "click", choose_product_category_change_actions);
+    document.getElementById("choose_product_category").addEventListener(
+      "click", change_product_category_list_div_visiblity);
+    document.getElementById("enable_tag_based_assignment_for_outbound").addEventListener(
+      "click", change_product_category_list_div_visiblity);
+    document.getElementById("lead_generation").addEventListener(
+      'change', lead_generation_change_actions);
+    document.getElementById("show_floating_easyassist_button").addEventListener(
+      'change', show_floating_easyassist_button_change_actions);
+    document.getElementById("show_easyassist_connect_agent_icon").addEventListener(
+      'change', show_easyassist_connect_agent_icon_change_actions)
+    document.getElementById("field_stuck_event_handler").addEventListener(
+      'change', field_stuck_event_handler_change_actions)
+    document.getElementById("enable_greeting_bubble").addEventListener(
+      'change', hide_greeting_bubble_div);  
+    document.getElementById("no_agent_connects_toast").addEventListener(
+      'change', no_agent_connects_toast_change_actions);
+    document.getElementById("allow_popup_on_browser_leave").addEventListener(
+      'change', allow_popup_on_browser_leave_change_actions);
+    document.getElementById("enable_followup_leads_tab").addEventListener(
+      'change', enable_followup_leads_tab_change_actions)
+    document.getElementById("enable_non_working_hours_modal_popup").addEventListener(
+      'change', enable_non_working_hours_change_actions)
+    document.getElementById("allow_agent_to_customer_cobrowsing").addEventListener(
+      "click", reverse_function_toggles)
+    document.getElementById("allow_agent_to_screen_record_customer_cobrowsing").addEventListener(
+      "click", reverse_function_toggles)
+    document.getElementById("enable_inbound").addEventListener(
+      "click", enable_inbound_change_actions)
+    document.getElementById("maximum_active_leads").addEventListener(
+      "click", maximum_active_leads_change_actions)
+    document.getElementById("allow-connect-with-virtual-agent-code").addEventListener(
+      "click", modified_inbound_change_actions)
+    document.getElementById("enable-virtual-agent-code-mandatory").addEventListener(
+      "click", modified_inbound_mandatory_toggle_actions)
+    document.getElementById("enable_auto_assign_unattended_lead").addEventListener(
+      "click", auto_assign_unattended_leads_change_actions)
+    document.getElementById("enable_auto_assign_to_one_agent").addEventListener(
+      "click", auto_assign_to_one_agent_change_actions)
+    document.getElementById("enable_request_in_queue").addEventListener(
+      "click", request_in_queue_change_actions)
+    document.getElementById('enable_url_based_inactivity_popup').addEventListener(
+      "click", enable_url_based_inactivity_changes_action);
+    document.getElementById('enable_url_based_exit_intent_popup').addEventListener(
+      "click", enable_url_based_exit_intent_changes_action);
+    // document.getElementById("enable-proxy-cobrowsing").addEventListener('click',
+      // proxy_cobrowsing_toggle_actions)
+  
+    function get_tr_tag_from_parent_recursive(element){
+      var current_element = element;
+      var selected_element = null;
+  
+      while(current_element){
+        if(current_element.tagName.toLowerCase() == "tr"){
+          selected_element = current_element;
+        }
+        current_element = current_element.parentElement;
+      }
+  
+      return selected_element;
+    }
+
+    var cobrowse_logo_input_file_global = undefined;
+    document.getElementById("cobrowse_logo_input").addEventListener('change', function(event) {
+      var file = document.getElementById("cobrowse_logo_input").files[0];
+      if(file) {
+        cobrowse_logo_input_file_global = ($("#cobrowse_logo_input"))[0].files[0];
+        var filename = file.name;
+        if (filename.length > 30) {
+          filename = get_shorter_file_name(filename, 20);
+        }
+        $('#cobrowse_logo_upload_modal .file-name-div').html(filename);
+        $('#cobrowse_logo_upload_modal .modal-upload-file').show();
+        $('#cobrowse_logo_upload_modal .progress').show();
+  
+        var progress_div = $('#cobrowse_logo_upload_modal .progress')[0].children[0];
+        progress_div.classList.remove('determinate');
+        progress_div.classList.add('indeterminate');
+        setTimeout(function() {
+          progress_div.classList.remove('indeterminate');
+          progress_div.classList.add('determinate');
+        }, 300);
+      } else {
+        if(cobrowse_logo_input_file_global == undefined){
+          $('#cobrowse_logo_upload_modal .file-name-div').html("No file selected");
+          $('#cobrowse_logo_upload_modal .progress').hide();
+        }
+      }
+    });
+  
+    function remove_uploaded_file() {
+      $('#cobrowse_logo_upload_modal .file-name-div').html("");
+      $('#cobrowse_logo_upload_modal .modal-upload-file').hide();
+      document.getElementById("cobrowse_logo_input").value = "";
+      cobrowse_logo_input_file_global = undefined;
+    }
+  
+    var connect_with_agent_icon_input_file_global = undefined;
+    document.getElementById("connect_with_agent_icon_input").addEventListener('change', function(event) {
+      var file = document.getElementById("connect_with_agent_icon_input").files[0];
+      if(file) {
+        connect_with_agent_icon_input_file_global = ($("#connect_with_agent_icon_input"))[0].files[0];
+        var filename = file.name;
+        if (filename.length > 30) {
+          filename = get_shorter_file_name(filename, 20);
+        }
+        $('#connect_with_agent_icon_upload_modal .file-name-div').html(filename);
+        $('#connect_with_agent_icon_upload_modal .modal-upload-file').show();
+        $('#connect_with_agent_icon_upload_modal .progress').show();
+  
+        var progress_div = $('#connect_with_agent_icon_upload_modal .progress')[0].children[0];
+        progress_div.classList.remove('determinate');
+        progress_div.classList.add('indeterminate');
+        setTimeout(function() {
+          progress_div.classList.remove('indeterminate');
+          progress_div.classList.add('determinate');
+        }, 300);
+      } else {
+        if(connect_with_agent_icon_input_file_global == undefined){
+          $('#connect_with_agent_icon_upload_modal .file-name-div').html("No file selected");
+          $('#connect_with_agent_icon_upload_modal .progress').hide();
+        }
+      }
+    });
+  
+    function remove_uploaded_file_connect_icon() {
+      $('#connect_with_agent_icon_upload_modal .file-name-div').html("");
+      $('#connect_with_agent_icon_upload_modal .modal-upload-file').hide();
+      document.getElementById("connect_with_agent_icon_input").value = "";
+      connect_with_agent_icon_input_file_global = undefined;
+    }
+  
+  
+    function show_edit_masking_field_modal(field_id) {
+      $("#edit_masking_field_modal_" + field_id).modal("show");
+    }
+  
+    function show_delete_masking_field_modal(field_id) {
+      $("#delete_masking_field_modal_" + field_id).modal("show");
+    }
+  
+    function show_search_tag_field_modal(field_id) {
+      $("#edit_search_tag_field_modal_" + field_id).modal("show");
+    }
+  
+    function show_delete_search_tag_field_modal(field_id) {
+      $("#delete_search_tag_field_field_modal_" + field_id).modal("show");
+    }
+  
+    function show_edit_auto_fetch_field_modal(field_id) {
+      $("#edit_auto_fetch_field_modal_" + field_id).modal("show");
+    }
+  
+    function show_delete_auto_fetch_field_modal(field_id) {
+      $("#delete_auto_fetch_field_field_modal_" + field_id).modal("show");
+    }
+  
+    $(document).ready(function() {
+      var verify_inputs = document.getElementsByClassName('pii-data-otp');
+      for(let idx = 0; idx < verify_inputs.length; idx ++) {
+          verify_inputs[idx].addEventListener('keyup', function(e) {
+              if(e.key == 'Backspace') {
+                  if(this.previousElementSibling) {
+                      this.previousElementSibling.focus();
+                  }
+              } else if(e.key >= '0' && e.key <= '9') {
+                  keys = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+                  if (keys.indexOf(this.value) != -1) {
+                      if(this.nextElementSibling) {
+                          this.nextElementSibling.focus();
+                      }
+                  }
+              }
+          });
+  
+          verify_inputs[idx].addEventListener('keydown', function(e) {
+              if(e.key >= 0 && e.key <= 9) {
+                  if(this.value.length + 1 > 1) {
+                      if(this.nextElementSibling) {
+                          this.nextElementSibling.focus();
+                      } else {
+                          e.preventDefault();
+                          e.stopPropagation();
+                      }
+                  }
+              } else if(e.key == "ArrowDown" || e.key == "ArrowUp") {
+                  e.preventDefault();
+                  e.stopPropagation();
+              } else if(e.key == "-" || e.key == "_" || e.key == "+" || e.key == "=" || e.key == "e" || e.key == "E") {
+                  e.preventDefault();
+                  e.stopPropagation();
+              }
+          });
+  
+          verify_inputs[idx].addEventListener('paste', function(e) {
+              var regex_code = /^[0-9]{6}$/g;
+              var clipboard_data = e.clipboardData || e.originalEvent.clipboardData || window.clipboardData;
+              var pasted_data = clipboard_data.getData('text');
+  
+              if(idx == 0) {
+                  if(regex_code.test(pasted_data)){
+                      for(var index = 0; index < verify_inputs.length; index ++) {
+                          verify_inputs[index].value = pasted_data[index];
+                          verify_inputs[index].focus();
+                      }
+                  }
+              }
+              e.preventDefault();
+              e.stopPropagation();
+          });
+      }
+      easyassist_font_family_list("{{ access_token_obj.font_family }}");
+  
+      $("#floating_button_left_right_position").on("keypress input", function(e) {
+        if(e.key == "e") {
+          event.preventDefault();
+        }
+      })
+    });
+  
+    try{
+      document.getElementById("working-day-all").addEventListener("change", function() {
+          if(document.getElementById("working-day-all").checked) {
+              is_checked = true;
+          } else {
+              is_checked = false;
+          }
+  
+          for(idx = 0; idx < 7; idx ++) {
+              document.getElementById("working-day-"+idx).checked = is_checked;
+          }
+      });
+  
+      for(var index = 0; index < 7; index ++) {
+        document.getElementById("working-day-" + index).addEventListener('change', function() {
+          if(this.checked) {
+            var all_working_day_selected = true;
+            for(var idx = 0; idx < 7; idx ++) {
+              if(!document.getElementById("working-day-" + idx).checked) {
+                all_working_day_selected = false;
+              }
+            }
+            if(all_working_day_selected) {
+              document.getElementById("working-day-all").checked = true;
+            } else {
+              document.getElementById("working-day-all").checked = false;
+            }
+          } else {
+            document.getElementById("working-day-all").checked = false;
+          }  
+        });
+      }
+    }catch(err){}
+  
+  function handleDragIconMouseOver(type,element){
+      element.querySelector("svg").style.display="";
+      if(type==="Button" && document.getElementById("enable_predefined_subremarks_with_buttons").checked==true)
+      element.querySelector(".add-sub-remark-btn").style.display="";
+      if(type==="Dropdown" && document.getElementById("enable_predefined_subremarks").checked==true)
+      element.querySelector(".add-sub-remark-btn").style.display="";
+  }
+  function handleDragIconMouseOut(type,element){
+      if(type==="Button" && document.getElementById("enable_predefined_subremarks_with_buttons").checked==true)
+      element.querySelector(".add-sub-remark-btn").style.display="none";
+      if(type==="Dropdown" && document.getElementById("enable_predefined_subremarks").checked==true)
+      element.querySelector(".add-sub-remark-btn").style.display="none";
+  }
+  function change_predefined_remarks_list_with_buttons_div_text(element){
+      if(!element.previousElementSibling.checked)
+      {
+          document.getElementById("map-sub-remarks-text-for-buttons").style.display="inline-block";
+          document.getElementById("predefined_remarks_list_with_buttons_div_tooltip").setAttribute("data-original-title",`Please hit "Enter" to add the remark. You can add multiple sub-remarks by clicking on the remarks added.
+  (Eg: Remarks- Lead Drop, Sub remarks - No Payment, Out of Coverage Area).`)
+      } 
+      else
+      {
+          document.getElementById("map-sub-remarks-text-for-buttons").style.display="none";
+          document.getElementById("predefined_remarks_list_with_buttons_div_tooltip").setAttribute("data-original-title",`Press enter to save the remark. You can add multiple remarks.`)
+      }
+      
+  }
+  
+  function change_predefined_remarks_list_with_dropdown_div_text(element){
+      if(!element.previousElementSibling.checked)
+      {
+          document.getElementById("map-sub-remarks-text-for-dropdown").style.display="inline-block";
+          document.getElementById("predefined_remarks_list_with_dropdown_div_tooltip").setAttribute("data-original-title",`Please hit "Enter" to add the remark. You can add multiple sub-remarks by clicking on the remarks added.
+  (Eg: Remarks- Lead Drop, Sub remarks - No Payment, Out of Coverage Area).`)
+      } 
+      else
+      {
+          document.getElementById("map-sub-remarks-text-for-dropdown").style.display="none";
+          document.getElementById("predefined_remarks_list_with_dropdown_div_tooltip").setAttribute("data-original-title",`Press enter to save the remark. You can add multiple remarks.`)
+      }
+      
+  }
+  
+  function hide_greeting_bubble_div(){
+      var check_element_1 = document.getElementById('enable_greeting_bubble');
+      if(check_element_1.checked == false){
+          document.getElementById('greeting-bubble-timer-div').classList.add('easyassist_hidden_div');
+          document.getElementById('greeting-bubble-text-div').classList.add('easyassist_hidden_div');
+      }else{
+          document.getElementById('greeting-bubble-timer-div').classList.remove('easyassist_hidden_div');
+          document.getElementById('greeting-bubble-text-div').classList.remove('easyassist_hidden_div');
+          if (document.getElementById("show_floating_easyassist_button").checked == false && document.getElementById("show_easyassist_connect_agent_icon").checked == false){
+            document.getElementById("show_floating_easyassist_button").checked = true;
+            // document.getElementById("floating-button-postion-div").classList.remove("easyassist_hidden_div");
+  
+            show_easyassist_connect_agent_icon_change_actions();
+          }
+      }
+  }
+  
+  function handle_mouse_out_drag_icon_subremarks_modal(element){
+    element.querySelector(".dragable-item-icon").style.display="none";
+  }
+  function handle_mouse_over_drag_icon_subremarks_modal(element){
+    element.querySelector(".dragable-item-icon").style.display="block";
+  }
+  
+  // individual elements event listeners
+  if (document.getElementById("auto_assign_unattended_lead_timer_input")) {
+    $("#auto_assign_unattended_lead_timer_input").on("keypress", function(event){
+        var currentValue = String.fromCharCode(event.which);
+        var finalValue = $(this).val() + currentValue;
+        if(finalValue > 600){
+          event.preventDefault();
+          show_easyassist_toast("Auto Assign Timer should not be more than 600 seconds");
+          return ;
+        }
+    });
+  }
+  
+  if (document.getElementById("auto_assign_unattended_lead_transfer_count")) {
+    $("#auto_assign_unattended_lead_transfer_count").on("keypress", function(event){
+        var currentValue = String.fromCharCode(event.which);
+        var finalValue = $(this).val() + currentValue;
+        if(finalValue > 30 || finalValue < 1){
+          event.preventDefault();
+          show_easyassist_toast("\"Lead Transfer Count\" value should be between 1-30");
+          return;
+        }
+    });
+  }
+
+  if (document.getElementById("auto-archive-lead-timer-input")) {
+    $("#auto-archive-lead-timer-input").on("keypress", function(event){
+        var event_value = String.fromCharCode(event.which);
+        var entered_value = $(this).val() + event_value;
+        if(entered_value > 120){
+          event.preventDefault();
+          show_easyassist_toast("Auto Archive Timer value should be between 1-120 minutes.");
+        } else if (entered_value == 0) {
+          event.preventDefault();
+          show_easyassist_toast("Auto Archive Timer value should be between 1-120 minutes.");
+        }
+    });
+  }
+  
+  if (document.getElementById("unattended-lead-archive-timer-input")) {
+    $("#unattended-lead-archive-timer-input").on("keypress", function(event){
+        var event_value = String.fromCharCode(event.which);
+        var entered_value = $(this).val() + event_value;
+        if(entered_value > 120){
+          event.preventDefault();
+          show_easyassist_toast("Auto end session timer value should be between 1-120 minutes.");
+        } else if (entered_value == 0) {
+          event.preventDefault();
+          show_easyassist_toast("Auto end session timer value should be between 1-120 minutes.");
+        }
+    });
+  }
+  
+  document.getElementById("chat_icon_input").addEventListener('change', (event) => {
+      $("#icon-error-div").css({"display":"none"});
+      $("#icon-error-div").text("");
+      if (event.target.files.length) {
+          var file = document.getElementById("chat_icon_input").files[0];
+          var icon_error = document.getElementById("icon-error-div");
+      
+          if (file == undefined || file == null) {
+              icon_error.innerHTML = "Please choose a file.";
+              return;
+          }
+  
+          var cleaned_filename = sanitize_filename(file.name)
+  
+          if (check_image_file(cleaned_filename, ["png", "PNG", "svg"], false) == false) {
+              icon_error.innerHTML = "Please upload valid image file. Only '.png' or '.svg' files are allowed.";
+          }
+  
+          if (cleaned_filename.size / 10000 > 30) {
+              icon_error.innerHTML = "File size cannot exceed 30 KB";
+              return;
+          }
+  
+          chat_logo_input_file_global = ($("#chat_icon_input"))[0].files[0];
+          var filename = cleaned_filename;
+          if (filename.length > 30) {
+              filename = get_shorter_file_name(filename, 20);
+          }
+          $("#progress-modal-chat-icon").css({"display":"block"});
+          $('#chat_icon_upload_modal .file-name-div').html(filename);
+          $('#chat_icon_upload_modal .modal-upload-file').show();
+          $('#chat_icon_upload_modal .progress').show();
+  
+          var progress_div = $('#chat_icon_upload_modal .progress')[0].children[0];
+          progress_div.classList.remove('determinate');
+          progress_div.classList.add('indeterminate');
+          setTimeout(function () {
+              progress_div.classList.remove('indeterminate');
+              progress_div.classList.add('determinate');
+          }, 300);
+      }
+  });
+  
+  $('.remove-url-chip').click(function () {
+    let url_element_container = $(this).closest('.added-url-container');
+    let url_added_heading = $(this).closest('.added-url-container').find('.added-url-heading')
+    
+    $(this).parent().addClass("d-none");
+    let childrens = url_element_container.find('.input-url-chip')
+    let display_none_counter = 0;
+
+    for(let i=0; i < childrens.length; i++) {
+      if (childrens[i].className.includes("d-none")) {
+        display_none_counter++;
+      }
+    }
+    if (display_none_counter == childrens.length) {
+        url_added_heading.addClass('d-none');
+        url_element_container.addClass('d-none');
+      }
+  })
+
+  if(document.getElementById("exit-intent-popup-count")) {
+    document.getElementById("exit-intent-popup-count").addEventListener("keypress", function(event) {
+      let count = event.target.value.length;
+      if(count >= 4){
+          event.preventDefault();
+          show_easyassist_toast("Number of times Exit Intent should pop up cannot be more than 4 characters");
+      }
+    });
+  }
+  
+  $(document).ready(function() {
+    try {
+        document.getElementById("nav-settings-menu").classList.add("active")
+    } catch(err) {}
+  });
+
+  </script>
+
+{% endblock %}

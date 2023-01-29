@@ -1,0 +1,122 @@
+{% extends 'CampaignApp/campaign_base.html' %}
+{% block content %}
+{% load static %}
+<div class="container-fluid" >
+    {% if campaign_obj %}
+        <input type="hidden" id="campaign_id" value="{{campaign_obj.pk}}"/>
+    {% else %}
+        <input type="hidden" id="campaign_id" />
+    {% endif %}
+
+
+
+    <div class="card mb-4 campaign-table-card-wrapper-custom" id="outer-card">
+        <div class="card-header">
+            <div class="d-flex align-items-center">
+                <a href="/campaign/dashboard/?bot_pk={{ selected_bot_obj.pk }}">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12.6594 6.1708H3.35107L7.41774 2.10413C7.74274 1.77913 7.74274 1.2458 7.41774 0.920801C7.26205 0.764757 7.05067 0.677063 6.83024 0.677063C6.60981 0.677063 6.39843 0.764757 6.24274 0.920801L0.751074 6.41247C0.426074 6.73747 0.426074 7.26247 0.751074 7.58747L6.24274 13.0791C6.56774 13.4041 7.09274 13.4041 7.41774 13.0791C7.74274 12.7541 7.74274 12.2291 7.41774 11.9041L3.35107 7.83747H12.6594C13.1177 7.83747 13.4927 7.46247 13.4927 7.00413C13.4927 6.5458 13.1177 6.1708 12.6594 6.1708Z" fill="black" ></path>
+                    </svg>
+                </a> 
+                <div style="margin-left:24px;">
+                    <h5 class="font-weight-bold">Basic Information</h5>
+                    <div class="tag-audience-sub-heading">
+                        <span>Get started with selecting your channel</span>
+                    </div>
+                 </div>                
+          
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="col-md-12">
+                <span class="campaign_name_label mx-2">Campaign Name</span>
+                <input class="campaign_name_input ml-3" type="text" value="{{campaign_obj.name}}" id="campaign-name" placeholder="Enter campaign name" autofocus autocomplete="off">
+            </div>
+            <div class="row my-4 ml-2">
+
+                {% for channel in campaign_channels %}
+                <div class="col-md-4 col-sm-12" id="channel-{{channel.value}}" onclick="select_channel(this);" style="cursor: pointer;">
+                    <div class="card campaign_channel_card">
+                        <div class="card-body" style="border: none;">
+                            <div class="campaign_channel_icon_container">
+                                <img src="/{{ channel.logo }}" />
+                                <input id="{{channel.value}}" value="{{channel.name}}" {% if campaign_obj.channel == channel %}checked {% else %}checked {% endif %} class="campaign_channel_cb" name="campaign_channel_cb" type="radio" channel_id="{{ channel.pk }}">
+                            </div>
+                            <div class="campaign_channel_name_container">
+                                <span class="campaign_channel_name">{{ channel.name }}
+                                    {% if channel.value != 'whatsapp' %}
+                                    <svg width="54" height="32" viewBox="0 0 54 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="transform: scale(0.6);margin-left: -10px;margin-top: -3px;">
+                                        <path d="M0 4C0 1.79086 1.79086 0 4 0H50C52.2091 0 54 1.79086 54 4V28C54 30.2091 52.2091 32 50 32H4C1.79086 32 0 30.2091 0 28V4Z" fill="#0254D7"></path>
+                                        <path d="M11.5303 21V11.1973H14.9346C15.8551 11.1973 16.582 11.4342 17.1152 11.9082C17.6484 12.3822 17.915 12.9906 17.915 13.7334C17.915 14.1982 17.8102 14.6084 17.6006 14.9639C17.3955 15.3193 17.1038 15.5996 16.7256 15.8047V15.8867C16.9033 15.9551 17.0742 16.0485 17.2383 16.167C17.4023 16.2855 17.5641 16.4359 17.7236 16.6182C17.8831 16.8005 18.0107 17.0283 18.1064 17.3018C18.2021 17.5706 18.25 17.8646 18.25 18.1836C18.25 18.7578 18.1087 19.2614 17.8262 19.6943C17.5482 20.1273 17.1813 20.4531 16.7256 20.6719C16.2699 20.8906 15.7663 21 15.2148 21H11.5303ZM13 19.7148H14.8936C15.4313 19.7148 15.8643 19.5781 16.1924 19.3047C16.5205 19.0312 16.6846 18.6257 16.6846 18.0879C16.6846 17.7324 16.5934 17.4316 16.4111 17.1855C16.2288 16.9395 15.9987 16.7663 15.7207 16.666C15.4473 16.5612 15.1374 16.5088 14.791 16.5088H13V19.7148ZM13 15.333H14.8115C15.2946 15.333 15.682 15.1986 15.9736 14.9297C16.2699 14.6608 16.418 14.3099 16.418 13.877C16.418 13.4622 16.2699 13.1273 15.9736 12.8721C15.682 12.6169 15.3037 12.4893 14.8389 12.4893H13V15.333ZM20.1162 21V11.1973H25.9268V12.5303H21.627V15.374H25.3115V16.6865H21.627V19.6807H26.0703V21H20.1162ZM27.123 12.5439V11.1973H34.4443V12.5439H31.5391V21H30.0352V12.5439H27.123ZM34.3828 21L38.0059 11.1973H39.8447L43.4814 21H41.8887L41.1162 18.874H36.707L35.9346 21H34.3828ZM37.1787 17.5137H40.6377L38.9629 12.8926H38.8604L37.1787 17.5137Z" fill="white"></path>
+                                    </svg>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="campaign_channel_desc_container mt-2">
+                                <span class="campaign_channel_desc">
+                                    {{ channel.description }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+    </div>
+</div>
+
+<p class="save-campaign-error" id="save-campaign-error-message"></p>
+    <footer id="campaign-footer" class="sticky-footer bg-white w-100">
+        <p class="save-campaign-error" id="save-campaign-error-message"></p>
+        <div class="card" id="footer-buttons" style="margin: 0 -25px;">
+            <div class="card-body py-2" >
+                <div class="d-flex justify-content-end">
+                    <button class="btn btn-outline-secondary rounded btn-width-100 rect-border" data-toggle="modal"
+                        data-target="#cancel_create_campaign_modal">Cancel</button>
+                    <button
+                        class="btn btn-outline-primary rounded btn-save-outline-primary btn-width-100 rect-border save-draft-campaign" 
+                        style="margin: 0 12px !important; opacity: 0.5; pointer-events: none;" onclick="save_campaign_basic_detail(this);">Save as
+                        Draft</button>
+                    <button class="btn btn-primary rounded btn-next-primary btn-width-100 rect-border save-draft-campaign" style="opacity: 0.5; pointer-events: none;" 
+                        id="save_template_next_btn" onclick="save_campaign_basic_detail(this, true);">Next</button>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<div class="modal fade custom_modal" id="cancel_create_campaign_modal" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row">
+                    <div class="col-10">
+                        <h5 class="modal-title">Do you want to leave this page?</h5>
+                    </div>
+                    <div class="col-2" style="text-align: right; padding-right: 0">
+                        <button class="btn" type="button" data-dismiss="modal" style="padding: 0!important">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13.4931 0.710017C13.3063 0.522765 13.0526 0.417532 12.7881 0.417532C12.5236 0.417532 12.2699 0.522765 12.0831 0.710017L7.19309 5.59002L2.30309 0.700017C2.11625 0.512765 1.8626 0.407532 1.59809 0.407532C1.33357 0.407532 1.07992 0.512765 0.893086 0.700017C0.503086 1.09002 0.503086 1.72002 0.893086 2.11002L5.78309 7.00002L0.893086 11.89C0.503086 12.28 0.503086 12.91 0.893086 13.3C1.28309 13.69 1.91309 13.69 2.30309 13.3L7.19309 8.41002L12.0831 13.3C12.4731 13.69 13.1031 13.69 13.4931 13.3C13.8831 12.91 13.8831 12.28 13.4931 11.89L8.60309 7.00002L13.4931 2.11002C13.8731 1.73002 13.8731 1.09002 13.4931 0.710017Z" fill="black" fill-opacity="0.54"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <hr />
+            </div>
+            <div class="modal-body">
+                <p>Changes you have made may not be saved. Please click "Save as Draft" to save the changes.</p>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-danger btn-width-100" href="/campaign/dashboard/?bot_pk={{ selected_bot_obj.pk }}" style="cursor:pointer">Leave</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+    update_campaign_sidebar('info');
+    $('input[name="campaign_channel_cb"]:checked').click()
+});
+</script>
+{% endblock %}

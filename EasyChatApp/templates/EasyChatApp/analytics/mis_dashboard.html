@@ -1,0 +1,155 @@
+{% extends 'EasyChatApp/base.html' %}
+{% block content %}
+{% load static %}
+<div class="add-scrolling">
+<div class="row">
+
+  <!--<div class="col s1" id="main-console-sidenav">
+
+  </div>-->
+  <div class="col s12" id="main-console-container">
+    <div class="row" style="margin:2%">
+        <a class="waves-effect waves-light btn purple darken-2 modal-trigger" href="#modal-mis-filter">Export With Dates</a>
+        <a class="waves-effect waves-light btn purple darken-2 modal-trigger" href="#modal-mis-keyword">Export with Keywords</a>
+        <span class="right"><h6><span class="orange-text text-darken-3">UAT</span> | <span class="green-text text-darken-3">PRODUCTION</span></h6></span>
+    </div> 
+    <div class="row" style="margin:1%">        
+        <table id="mis-dashboard-info-table" class="white striped highlight responsive-table">
+            <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>User Query</th>
+                        <th>Bot Name</th>
+                        <th>Bot Response</th>
+                        <th>Intent Recognized</th>
+                        <th>Channel</th>
+                        <th>User ID</th>
+                        <th>API Request Packet</th>
+                        <th>API Response Packet</th>
+                        <th>User Feedback</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mis_object in mis_objects_list %}
+                        {% if mis_object.get_bot_obj.is_uat %}
+                        <tr class="orange-text text-darken-3">
+                            <td>{{ mis_object.get_datetime }}</td>
+                            <td>{{ mis_object.get_message_received }}</td>
+                            <td><u><a href="/chat/mis-dashboard/?bot_id={{ mis_object.get_bot_obj.pk }}" target="_blank">{{ mis_object.get_bot_obj.name }}</a></u></td>
+                            <td>{{ mis_object.get_bot_response }}</td>
+                            {% if mis_object.get_intent_obj %}
+                                <td>{{ mis_object.get_intent_obj.name }}</td>
+                            {% else %}
+                                <td>None</td>
+                            {% endif %}
+                            <td><u><a href="/chat/mis-dashboard/?channel_name={{ mis_object.get_channel_name }}" target="_blank">{{ mis_object.get_channel_name }}</a></u></td>
+                            <td><u><a href="/chat/user-details/{{ mis_object.get_user_id }}" target="_blank">{{ mis_object.get_user_id|slice:":15" }}</a>
+                            </u></td>
+                            <td>{{ mis_object.get_api_request_packet }}</td>
+                            <td>{{ mis_object.get_api_response_packet }}</td>
+                            <td>
+                                {% if mis_object.is_helpful %}
+                                    <i class="material-icons green-text text-darken-3">thumb_up</i>
+                                {% endif %}
+                                {% if mis_object.is_unhelpFul %}
+                                    <i class="material-icons red-text text-darken-3">thumb_down</i>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr class="green-text text-darken-3">
+                            <td>{{ mis_object.get_datetime }}</td>
+                            <td>{{ mis_object.get_message_received }}</td>
+                            <td><u><a href="/chat/mis-dashboard/?bot_id={{ mis_object.get_bot_obj.pk }}" target="_blank">{{ mis_object.get_bot_obj.name }}</a></u></td>
+                            <td>{{ mis_object.get_bot_response }}</td>
+                            {% if mis_object.get_intent_obj %}
+                                <td>{{ mis_object.get_intent_obj.name }}</td>
+                            {% else %}
+                                <td>None</td>
+                            {% endif %}
+                            <td><u><a href="/chat/mis-dashboard/?channel_name={{ mis_object.get_channel_name }}" target="_blank">{{ mis_object.get_channel_name }}</a></u></td>
+                            <td><u><a href="/chat/user-details/{{ mis_object.get_user_id }}" target="_blank">{{ mis_object.get_user_id|slice:":15" }}</a>
+                            </u></td>
+                            <td>{{ mis_object.get_api_request_packet }}</td>
+                            <td>{{ mis_object.get_api_response_packet }}</td>
+                            <td>
+                                {% if mis_object.is_helpful %}
+                                    <i class="material-icons green-text text-darken-3">thumb_up</i>
+                                {% endif %}
+                                {% if mis_object.is_unhelpFul %}
+                                    <i class="material-icons red-text text-darken-3">thumb_down</i>
+                                {% endif %}
+                                
+                            </td>
+                        </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+        </table>          
+    </div>
+  </div>
+
+    <div class="col s12 right-align">
+        {% if mis_objects_list.has_other_pages %}
+          <ul class="pagination">
+            {% if mis_objects_list.has_previous %}
+              <li><a href="?page={{ mis_objects_list.previous_page_number }}"><i class="material-icons">chevron_left</i></a></li>
+            {% else %}
+              <li class="disabled"><i class="material-icons">chevron_left</i></li>
+            {% endif %}
+            {% for i in mis_objects_list.paginator.page_range %}
+              {% if mis_objects_list.number == i %}
+                <li class="active purple darken-3"><a href="?page={{ i }}">{{ i }}</a></li>
+              {% else %}
+                <li><a href="?page={{ i }}">{{ i }}</a></li>
+              {% endif %}
+            {% endfor %}
+            {% if mis_objects_list.has_next %}
+              <li><a href="?page={{ mis_objects_list.next_page_number }}"><i class="material-icons">chevron_right</i></a></li>
+            {% else %}
+              <li class="disabled"><i class="material-icons">chevron_right</i></li>
+            {% endif %}
+          </ul>          
+        {% endif %}
+    </div>
+
+</div>
+
+
+<!-- Modal Container-->
+<div id="console-modal-container">
+    <div id="modal-mis-filter" class="modal">
+        <div class="modal-content">
+            <h6 style="color: #3e95cd">Filter parameter</h6>
+            <div class="input-field col s12">
+                <select id="filter">
+                    <option value="0" selected="selected">None - (All messages)</option>
+                    <option value="1">Unanswered Messages</option>
+                </select>
+            </div>
+            <h6 style="color: #3e95cd">From Date</h6>
+            <input type = "date" class="datepicker" id="startdate"/> 
+            <h6 style="color: #3e95cd">To Date</h6>
+            <input type = "date" class="datepicker" id="enddate"/> 
+        </div>
+        <div class="modal-footer">
+          <button id="export-mis-filter" class="modal-action modal-close waves-effect waves-green btn-flat">Export</button>
+        </div>
+    </div>
+    <div id="modal-mis-keyword" class="modal">
+        <div class="modal-content">
+            <div class="row">
+                <h6 style="color: #3e95cd">Keywords for filter</h6>
+                <div class="input-field col s12">
+                    <input placeholder="Write Keywords with comma(,) separation" id="keyword_str" type="text" class="validate">
+                </div>                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button id="export-mis-keyword" class="modal-action modal-close waves-effect waves-green btn-flat">Export</button>
+        </div>
+    </div>
+</div> 
+</div>
+
+{% endblock %}

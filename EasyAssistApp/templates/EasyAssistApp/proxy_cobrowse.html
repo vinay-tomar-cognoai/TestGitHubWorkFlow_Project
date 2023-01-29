@@ -1,0 +1,200 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Customer | Cobrowse</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <style>
+    
+    *{
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      border: none;
+    }
+    
+    .loader {
+      border: 16px solid #f3f3f3; /* Light grey */
+      border-top: 16px solid #3498db; /* Blue */
+      border-radius: 50%;
+      width: 120px;
+      height: 120px;
+      animation: spin 2s linear infinite;
+      position: absolute;
+      top: 45%;
+      left: 45%;
+    }
+
+    .easyassist-client-page-loader {
+      position: fixed;
+      width: 100%;
+      height: calc(100% - 40px);
+      overflow: hidden;
+      bottom: 0;
+      left: 0;
+      background: #f7f7f7;
+      z-index: 200000;
+    }
+
+  .gy-loader {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    height: 100% !important;
+}
+
+.loading-message {
+    color: #464646;
+    font-size: 18px;
+    text-align: center;
+    margin-bottom: 10px;
+    /*font-family: "Silka", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;*/
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+}
+
+.loading-image {
+    font-weight: 400;
+    color: #464646;
+    font-size: 18px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+
+/* -----------------------------------------
+  =CSS3 Loading animations
+-------------------------------------------- */
+
+.line {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: #204daf;
+}
+
+
+/**** Animation stuff ****/
+
+.gy-loader .line:nth-last-child(1) {
+    animation: loadingC 1s 0.2s linear infinite;
+}
+
+.gy-loader .line:nth-last-child(2) {
+    animation: loadingC 1s 0.4s linear infinite;
+}
+
+.gy-loader .line:nth-last-child(3) {
+    animation: loadingC 1s 0.6s linear infinite;
+}
+
+@-webkit-keyframes loadingC {
+    0% {
+        -webkit-transform: translate(0, 0);
+        transform: translate(0, 0);
+    }
+    50% {
+        -webkit-transform: translate(0, 15px);
+        transform: translate(0, 15px);
+    }
+    100% {
+        -webkit-transform: translate(0, 0);
+        transform: translate(0, 0);
+    }
+}
+
+@keyframes loadingC {
+    0% {
+        -webkit-transform: translate(0, 0);
+        transform: translate(0, 0);
+    }
+    50% {
+        -webkit-transform: translate(0, 15px);
+        transform: translate(0, 15px);
+    }
+    100% {
+        -webkit-transform: translate(0, 0);
+        transform: translate(0, 0);
+    }
+}
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+   <link href="{% static 'EasyAssistApp/css/sb-admin-2.min.css' %}" rel="stylesheet">
+
+   <link rel="shortcut icon" type="image/x-icon" href="{% static 'EasyAssistApp/img/cobrowseLogoShort.svg' %}">
+ 
+   <link rel="stylesheet" type="text/css" href="{% static 'EasyAssistApp/css/cognoai_cobrowse.css' %}">
+ 
+</head>
+
+<body style="margin: unset;" oncontextmenu="return false">
+  {% csrf_token %}
+
+  <div class="gy-loader easyassist-client-page-loader" id="easyassist-client-page-loader">
+    <div class="loading-image">
+        {% if cobrowse_config_obj.cobrowsing_logo %}
+            <img src="{{ cobrowse_config_obj.cobrowsing_logo }}" alt="Loading Image" width="220px">
+        {% else %}
+            {% if request.user.enable_s3_bucket %}
+                <img src="https://static.allincall.in/static/EasyAssistApp/img/loadingImage.svg" alt="Loading Image" width="220px">
+            {% else %}
+                <img src="{% static 'EasyAssistApp/img/loadingImage.svg' %}" alt="Loading Image" width="220px">
+            {% endif %}
+        {% endif %}
+    </div>
+    <div class="loading-lines" style="height: 50px;">
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+    </div>
+    <br>
+    <br>
+    <div class="loading-message">
+        Loading Customer Experiences at Scale.
+    </div>
+  </div>
+
+  <div style="position: relative; width: 100vw !important; height: 100vh !important;">
+    <div id="frames-container" style="overflow: hidden;">
+      <iframe onresize="resize_iframe()" id="proxy-iframe" src="" allow="microphone *"></iframe>
+    </div>
+  </div>
+  
+  <script type="text/javascript">
+    window.easychat_host_url = "{{easychat_host_url}}";
+    window.proxy_key = "{{proxy_cobrowse_io.session_id}}";
+    window.proxy_active_url = "{{proxy_cobrowse_io.client_page_link}}";
+  </script>
+
+  <script type="text/javascript" src="{% static 'EasyAssistApp/vendor/jquery/jquery.min.js' %}"></script>
+  <script src="{% static 'EasyAssistApp/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'EasyAssistApp/vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'EasyAssistApp/js/sb-admin-2.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'EasyAssistApp/js/crypto-js.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'EasyAssistApp/js/encrypt.js' %}"></script>
+  <script type="text/javascript" src="{% static 'EasyAssistApp/js/lz-string.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'EasyAssistApp/js/initialize_proxy_cobrowsing.js' %}"></script>
+  <script type="text/javascript" src="{{easychat_host_url}}/static/EasyAssistApp/js/easy-assist-v6.js?key={{access_token}}"></script>
+
+</body>
+
+</html>

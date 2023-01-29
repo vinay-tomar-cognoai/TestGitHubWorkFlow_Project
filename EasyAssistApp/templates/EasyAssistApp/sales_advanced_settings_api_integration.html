@@ -1,0 +1,352 @@
+{% extends 'EasyAssistApp/console.html' %}
+{% block content %}
+{% load static %}
+<style type="text/css" media="screen">
+	#editor-code { 
+		width:100%;
+		height:40em;
+		overflow:auto;
+	}
+  
+
+	#pills-api-integration-tabContent .dropdown{
+		width: 100% !important;
+	}
+
+    .bootstrap-select button {
+        border-radius: 5px!important;
+        border: 0px solid #2755cb !important;
+        box-shadow: 0 0 1px #000 inset !important;
+        text-align: left;
+        font-size: 1rem!important;
+        width: 100%!important;
+    }
+
+    .bootstrap-select .filter-option {
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    .bootstrap-select .dropdown-item {
+        color: #6e707e;
+        font-size: 1rem;
+        background-color: transparent;
+    }
+
+    .bootstrap-select .dropdown-item:hover {
+        background-color: #F8F9F9;
+    }
+  	
+  	.bootstrap-select .dropdown-toggle, .bootstrap-select .dropdown-toggle:focus {
+  		transform: none!important;
+	    background: white!important;
+	    border: 1px solid #E6E6E6!important;
+	    box-shadow: none!important;
+	    outline: none!important;
+  	}
+
+  	.dropdown-menu {
+  		min-width: 100%!important;
+  	}
+
+    #api-integration-tabContent .dropdown {
+        width: 75% !important;
+    }
+
+    #output-tab #run-code-btn{
+        padding: 6px 22px !important;
+        width: 119px;
+        border: none;
+    }
+
+    #api-integration-tabContent #save-btn{
+        padding: 6px 22px !important;
+        width: 119px;
+    }
+
+    #output-tab .dropdown{
+        width: 100% !important;
+    }
+
+    #custom-accordion .card{
+        background: #fff;
+    }
+
+    #custom-accordion .card-header {
+        margin-bottom: 0;
+        border: none !important;
+        background: #fff;
+        padding: 0 !important;
+    }
+
+    #custom-accordion .accordion-button{
+        font-size: 14px !important;
+        padding: 14px 10px 10px 20px;
+        border-radius: 12px;
+        
+    }
+
+    #custom-accordion .btn:hover, .btn-small:hover {
+        transform: none;
+        box-shadow: 0px 0px 0px rgb(0 0 0 / 20%) !important;
+        transition: none;
+    }
+
+    #custom-accordion .accordion-body{
+        font-size: 12px !important;
+        padding-top: 0;
+        border-radius: 12px;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    #custom-accordion .accordion-button:not(.collapsed) {
+        background-color: #FFFFFF !important;
+        box-shadow: none;
+    }
+
+    #custom-accordion .accordion-button:focus {
+        z-index: 3;
+        border-color: none !important;
+        outline: 0;
+        box-shadow: none !important;
+    }
+
+    #custom-accordion .card-title{
+        font-size: 22px !important;
+        font-weight: 400; 
+    }
+
+    #custom-accordion .card-text{
+        font-size: 12px;
+    }
+
+    .rotate-svg .down-arrow-svg{
+        transform: rotate(180deg);
+    }
+
+    #custom-accordion .card-header {
+        border-radius: 10px  !important;
+    }
+
+    #agent-details-api-output-console{
+        width: 100%;
+        background: #2d2d2d;
+        height: 270px; 
+        margin-top : 40px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        margin-left: 5px;
+        overflow-y: auto;
+        color: #FFFFFF;
+        max-height: 370px;
+        min-height: 370px;
+    }
+
+    #agent-details-api-output-console::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+
+    #agent-details-api-output-console::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    #api-integration-tabContent .dropdown  .dropdown-toggle::after {
+        display: inline-block;
+        vertical-align: 4px;
+        content: "";
+        border-top: 5px solid;
+        border-right: 5px solid transparent;
+        border-bottom: 0;
+        border-left: 5px solid transparent;
+    }
+</style>
+
+<div class="container-fluid">
+	<div class="col-md-12 mb">
+	    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+	        <li class="nav-item">
+	            <a class="nav-link" id="pills-static-tab" href="/easy-assist/sales-ai/advanced-settings/static/" role="tab" aria-controls="pills-static" aria-selected="false">Static</a>
+	        </li>
+	        <li class="nav-item">
+	            <a class="nav-link" id="pills-assign-task-tab" href="/easy-assist/sales-ai/advanced-settings/assigntask/" role="tab" aria-controls="pills-assign-task" aria-selected="false">Assign Task</a>
+	        </li>
+	        <li class="nav-item">
+	            <a class="nav-link" id="pills-logs-tab" href="/easy-assist/sales-ai/advanced-settings/logs/" role="tab" aria-controls="pills-logs" aria-selected="false">Logs</a>
+	        </li>
+	        <li class="nav-item">
+			    <a class="nav-link active" id="pills-api-integration-tab" href="/easy-assist/sales-ai/advanced-settings/api-integration/" role="tab" aria-controls="pills-api-integration" aria-selected="true">API Integration</a>
+	        </li>
+	    </ul>
+        <div class="col-md-12 mb d-flex px-0">
+            <div class="col-md-8 px-0">
+                <div class="tab-content" id="api-integration-tabContent">
+                    <div class="tab-pane fade show active" id="pills-static" role="tabpanel" aria-labelledby="pills-static-tab">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="card-header">
+                                    <div class="d-sm-flex align-items-center justify-content-between">
+                                        <select class="selectpicker" data-live-search="true" data-none-results-text="No match found" id="admin_list_select" onchange="admin_list_select_change(this.value)">
+                                            <option value="none" selected>Select Admin</option>
+                                            {% for access_token_obj in access_token_objs %}
+                                                <option value="{{access_token_obj.key}}">{{access_token_obj.agent.user.username}}</option>
+                                            {% endfor %}
+                                        </select>
+                                        {% comment %} <div class="col-md-2 col-sm-12 mt-1 mb-1" style="text-align: right;">
+                                            <button class="btn btn-primary" style="width: 100%; min-width: 60px;" onclick="save_assign_task_process(this);">Save</button>
+                                            <input type="hidden" id="api-details-process-id">
+                                        </div> {% endcomment %}
+                                        <button class="btn btn-primary" id="save-btn" onclick="save_agent_details_api_process(this);">Save</button>
+                                        <input type="hidden" id="api-details-process-id">
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-12 d-flex justify-content-between mb-2">
+                                            <p class="mb-0">Python 3.6</p>
+                                            <a href="javascript:void(0)" data-position="top" data-tooltip="Full-screen mode" onclick="go_full_screen_mode()">
+                                                <i class="fas fa-expand" style="color: black; font-size: 20px;"></i>
+                                            </a>
+                                        </div>
+                                    <div class="col-md-12">
+                                        <div id="editor-code"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade show active my-4" id="output-tab" role="tabpanel" aria-labelledby="pills-static-tab">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center" style="padding: 0.5rem 1rem;">
+                                <input type="text" id="agent-unique-identifier-input" class="form-control w-75" placeholder="Input your unique identifier here, For eg : john@example.com" />
+                                <button class="btn btn-success" id="run-code-btn" onclick="execute_agent_details_api(this)">Run</button>
+                            </div>
+                            <div class="col-md-12" >
+                                <textarea name="" style="display: none;" readonly id="agent-details-api-output-console"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 pr-0" id="custom-accordion">
+            <div class="card">
+               <div class="card-body">
+                  <h5 class="card-title">Documentation</h5>
+                  <p class="card-text">Use this processor to fetch additional details of the agent connected with a customer in a Cobrowsing session.</p>
+               </div>
+            </div>
+            <div class="card mt-1">
+               <div class="card-header" id="headingOne">
+                  <h2 class="mb-0">
+                     <button class="accordion-button w-100 d-flex align-items-center justify-content-between btn collapsed" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                        Input
+                        <span>
+                           <svg class="down-arrow-svg" width="12" height="13" viewBox="0 0 12 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M2.21967 4.96967C2.51256 4.67678 2.98744 4.67678 3.28033 4.96967L6 7.68934L8.71967 4.96967C9.01256 4.67678 9.48744 4.67678 9.78033 4.96967C10.0732 5.26256 10.0732 5.73744 9.78033 6.03033L6.53033 9.28033C6.23744 9.57322 5.76256 9.57322 5.46967 9.28033L2.21967 6.03033C1.92678 5.73744 1.92678 5.26256 2.21967 4.96967Z" fill="#7B7A7B"/>
+                           </svg>
+                        </span>
+                     </button>
+                  </h2>
+               </div>
+               <div id="collapseOne" class="collapse" aria-labelledby="headingOne">
+                  <div class="accordion-body card-body">
+                    In foo(agent_unique_identifier), the parameter "agent_unique_identifier" is used for fetching the additional details of the agent connected with the customer. <br/><br/>
+                    The value of "agent_unique_identifier" is fetched from the "agent_code" column of the CobrowseAgent table.
+                  </div>
+               </div>
+            </div>
+            <div class="card mt-1">
+               <div class="card-header" id="headingTwo">
+                  <h2 class="mb-0">
+                     <button class="accordion-button w-100 d-flex align-items-center justify-content-between btn collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                        Output
+                        <span >
+                           <svg class="down-arrow-svg" width="12" height="13" viewBox="0 0 12 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M2.21967 4.96967C2.51256 4.67678 2.98744 4.67678 3.28033 4.96967L6 7.68934L8.71967 4.96967C9.01256 4.67678 9.48744 4.67678 9.78033 4.96967C10.0732 5.26256 10.0732 5.73744 9.78033 6.03033L6.53033 9.28033C6.23744 9.57322 5.76256 9.57322 5.46967 9.28033L2.21967 6.03033C1.92678 5.73744 1.92678 5.26256 2.21967 4.96967Z" fill="#7B7A7B"/>
+                           </svg>
+                        </span>
+                     </button>
+                  </h2>
+               </div>
+               <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo">
+                  <div class="accordion-body card-body">
+                    The output format should be like the following: <br/><br/>
+                    json_response = {<br/>
+                    &nbsp;&nbsp;"status_code": 200, &nbsp;&nbsp;&nbsp;&nbsp;// 200 or 500<br/>
+                    &nbsp;&nbsp;"response_body": {"name": "Agent One", "Agent ID": "EX123"},<br/>
+                    &nbsp;&nbsp;"error_message": ""<br/>
+                    } <br/><br/>
+                    json_response["status_code"] comprises of the status code. If the API execution is successful then pass 200.<br/><br/>
+                    json_response["response_body"] should consist of the output of the API in the form of a JSON string. We check for "response_body" only if "status_code" is 200.<br/>
+                    
+                  </div>
+               </div>
+            </div>
+        </div>
+    </div>
+  </div>
+</div>
+
+{% if request.user.enable_s3_bucket %}
+<script src="https://static.allincall.in/static/EasyAssistApp/vendor/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+{% else %}
+<script src="{% static 'EasyAssistApp/vendor/ace/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+{% endif %}
+
+<script>
+	$(document).ready(function() {
+	    window.editor = ace.edit("editor-code");
+	    editor.setTheme("ace/theme/monokai");
+	    document.getElementById('editor-code').style.fontSize='14px';
+	    editor.getSession().setMode("ace/mode/python");
+	    editor.setOptions({
+		    enableBasicAutocompletion: true,
+		    enableSnippets: true
+		});
+
+		try {
+            document.getElementById("sales-developer-settings-container").classList.add("active")
+        } catch(err) {}
+        
+        $("#admin_list_select").selectpicker("val", "{{ access_token_obj.key }}");
+        admin_list_select_change("{{ access_token_obj.key }}");
+
+	});
+    
+    function go_full_screen_mode() {
+	    editor.container.webkitRequestFullscreen()
+	}
+
+    const accordionBtns = document.querySelectorAll(".accordion-button");
+    accordionBtns.forEach((acc) => acc.addEventListener("click", toggleAcc));
+    function toggleAcc() {
+        // toggle active class on current item
+        if (this.classList != "rotate-svg") {
+            this.classList.toggle("rotate-svg");
+        }
+    }
+
+	function admin_list_select_change(access_token_key) {
+        document.getElementById("agent-unique-identifier-input").value = "";
+        show_agent_details_api_console(false);
+        document.getElementById("agent-details-api-output-console").value = "";
+		if(access_token_key == "none") {
+			editor.setValue("");
+			document.getElementById("api-details-process-id").value = "";
+			return;
+		}
+
+		{% for access_token_obj in access_token_objs %}
+			var access_token = "{{ access_token_obj.key }}";
+			if(access_token == access_token_key) {
+				editor.setValue(`{{ access_token_obj.get_agent_details_api_processor_obj.function|safe }}`);
+				document.getElementById("api-details-process-id").value = "{{ access_token_obj.get_agent_details_api_processor_obj.pk }}"
+			}
+		{% endfor %}
+	}
+</script>
+{% endblock %}

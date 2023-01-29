@@ -1,0 +1,160 @@
+{% extends 'EasyAssistApp/console.html' %}
+{% block content %}
+{% load static %}
+
+<link href="{% static 'EasyAssistApp/css/settings.css' %}" rel="stylesheet" type="text/css">
+
+<style>
+    {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color %}
+
+        input:checked+.easyassist-option-switch-slider {
+            background-color: var(--color_rgb) !important;
+            border: 2px solid var(--color_rgb) !important;
+        }
+
+        .btn-profile-tab a {
+            color: var(--color_rgb) !important;
+        }
+
+        .btn-delete-profile svg path {
+            fill: var(--color_rgb) !important;
+        }
+
+        .btn-profile-tab a.active {
+            background: var(--color_rgba_5) !important;
+        }
+
+        .card-subheader-heading-text {
+            color: #2D2D2D !important;
+        }
+
+        .sub-heading-text-primary {
+            color: var(--color_rgb) !important;
+        }
+
+    {% endif %}
+</style>
+
+<link rel="stylesheet" type="text/css" href="{% static 'EasyAssistApp/css/cobrowse_email_analytics_settings.css' %}">
+
+<div class="container-fluid email-setting-div mb-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="page-header">
+                <div class="row">
+                    <div class="col-sm-7 d-flex align-items-center">
+                        <div class="nav nav-pills navbar-right">
+                            <a class="anchor-reset back-btn" href="/easy-assist/sales-ai/settings">
+                                <span class="mr-3 mb-auto" style="cursor: pointer">
+                                    <svg class="back-arrow-svg" width="44" height="44" viewBox="0 0 44 44" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <rect width="44" height="44" rx="22" transform="matrix(1 0 0 -1 0 44)"
+                                            fill="white" />
+                                            {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                                            <path
+                                            d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                                            fill="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" />
+                                            {% else %}
+                                            <path
+                                            d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                                            fill="#0254D7" />
+                   
+                                            {% endif %} 
+                                        
+                                    </svg>
+                                </span>
+                            </a>
+                            <h5 class="nav_btn mr-2 mt-2">
+                                <a class="anchor-reset" href="/easy-assist/sales-ai/settings">Settings</a>
+                            </h5>
+
+                            <div class="mr-2 pt-2">
+                                <svg class="mini-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                                        fill="#475569" />
+                                </svg>
+                            </div>
+
+                            <h5 class="nav_btn active1 mt-2">Email Settings</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12 mt-30">
+            <div class="card custom-card-settings">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary heading-text-primary">
+                        Email Settings
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-8 col-md-6">
+                            <div>Enable Email Settings</div>
+                        </div>
+                        <div class="col-4 col-md-6">
+                            {% if access_token_obj.enable_mailer_analytics %}
+                                <label class="easyassist-option-switch">
+                                    <input type="checkbox" id="enable_email_settings" checked/>
+                                    <span class="easyassist-option-switch-slider round"></span>
+                                </label>
+                            {% else %}
+                                <label class="easyassist-option-switch">
+                                    <input type="checkbox" id="enable_email_settings" />
+                                    <span class="easyassist-option-switch-slider round"></span>
+                                </label>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row mt-4" id="analytics-profile-container" style="display: none">
+                        <div class="col-md-12">
+                            <ul class="nav nav-tabs" id="tabs">
+                                <li class="btn-profile-tab">
+                                    <a href="#" id="add-new-tab-btn">
+                                        <svg width="14" height="15" viewBox="0 0 14 15" fill="none"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <path
+                                                d="M13 8.32922H8V13.3292C8 13.8792 7.55 14.3292 7 14.3292C6.45 14.3292 6 13.8792 6 13.3292V8.32922H1C0.45 8.32922 0 7.87922 0 7.32922C0 6.77922 0.45 6.32922 1 6.32922H6V1.32922C6 0.779224 6.45 0.329224 7 0.329224C7.55 0.329224 8 0.779224 8 1.32922V6.32922H13C13.55 6.32922 14 6.77922 14 7.32922C14 7.87922 13.55 8.32922 13 8.32922Z"
+                                                fill="black" fill-opacity="0.54" />
+                                        </svg>
+                                    </a>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="tab-content-container"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade upload_file_modal delete_profile_modal" id="delete-email-analytics-profile-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Profile</h5>
+            </div>
+            <div class="modal-body">
+                <span class="modal-text">Are you sure you want to delete this profile?</span>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-text-only" type="button" data-dismiss="modal">Cancel</button>
+              <button class="btn btn-danger btn-width-100" type="button" onclick="delete_mailer_analytics_profile()" id="delete-profile-modal-btn">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    window.EMAIL_ANALATYICS_DEFAULT_DATA = '{{email_analytics_default_data|safe}}';
+    window.EMAIL_ANALATYICS_DEFAULT_DATA = JSON.parse(EMAIL_ANALATYICS_DEFAULT_DATA);
+
+</script>
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/cobrowse_email_analytics_settings.js' %}"></script>
+
+{% endblock %}

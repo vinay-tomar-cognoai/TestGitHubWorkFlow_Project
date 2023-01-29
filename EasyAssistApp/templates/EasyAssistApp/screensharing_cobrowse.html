@@ -1,0 +1,395 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Customer | Cobrowsing</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    {% if request.user.enable_s3_bucket %}
+    <link href="https://static.allincall.in/static/EasyAssistApp/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://static.allincall.in/static/EasyAssistApp/css/sb-admin-2.min.css" rel="stylesheet">
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/vendor/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/bootstrap-multiselect.js"></script>
+    <link rel="stylesheet" href="https://static.allincall.in/static/EasyAssistApp/css/bootstrap-multiselect.css">
+    <link rel="stylesheet" type="text/css" href="https://static.allincall.in/static/EasyAssistApp/css/bootstrap.min.css">
+    {% else %}
+    <link href="{% static 'EasyAssistApp/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'EasyAssistApp/css/sb-admin-2.min.css' %}" rel="stylesheet">
+    <script type="text/javascript" src="{% static 'EasyAssistApp/vendor/jquery/jquery.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'EasyAssistApp/js/bootstrap-multiselect.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'EasyAssistApp/css/bootstrap-multiselect.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'EasyAssistApp/css/bootstrap.min.css' %}">
+    {% endif %}
+
+    {% if cobrowse_config_obj.cobrowsing_favicon %}
+        <link rel="shortcut icon" type="image/x-icon" href="{{ cobrowse_config_obj.cobrowsing_favicon }}">
+    {% else %}
+        {% if source_easyassist_cobrowse_logo %}
+        <link rel="shortcut icon" type="image/x-icon" href="/{{source_easyassist_cobrowse_logo}}">
+        {% else %}
+            {% if request.user.enable_s3_bucket %}
+            <link rel="shortcut icon" type="image/x-icon" href="https://static.allincall.in/static/EasyAssistApp/img/cobrowseLogoShort.svg">
+            {% else %}
+            <link rel="shortcut icon" type="image/x-icon" href="{% static 'EasyAssistApp/img/cobrowseLogoShort.svg' %}">
+            {% endif %}
+        {% endif %}
+    {% endif %}
+    
+
+    {% if DEVELOPMENT %}
+    <link rel="stylesheet" type="text/css" href="{% static 'EasyAssistApp/css/agent.css' %}">
+    {% else %}
+    <link rel="stylesheet" type="text/css" href="/static/EasyAssistApp/css/{{access_token}}/agent.css">
+    {% endif %}
+
+    <script type="text/javascript" src="https://{{easyassist_access_token.meeting_host_url}}/external_api.js"></script>
+
+    {% if easyassist_font_family != 'Silka' %}
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family={{easyassist_font_family}}">
+    {% endif %}
+
+    <style type="text/css">
+
+        {% if easyassist_font_family == 'Silka' %}
+          *{
+            font-family: Silka, sans-serif !important;
+          }
+        {% else %}
+          *{
+            font-family: {{easyassist_font_family}} !important;
+          }
+        {% endif %}
+
+    </style>
+</head>
+<body>
+<div class="container my-5">
+    {% if cobrowse_io.is_archived %}
+        <div class="px-3 text-center pb-3">
+            <h3>Customer support session has been ended.</h3>
+        </div>
+    {% else %}
+        <section id="steps">
+            <div class="text-center mb-5">
+                <span>STEPS</span>
+                <h2 class="font-weight-bold display-4 ">You need to <span style=" color: #9B5DE5">follow.</span></h2>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="bg-light position-relative px-3 my-5">
+                        <div class="font-weight-bold circle text-white rounded-circle d-flex align-items-center justify-content-center mx-auto position-relative border border-white"
+                             style="width: 60px;height: 60px;top: -30px;border-width: 4px !important; background-color: #9B5DE5">
+                            1
+                        </div>
+                        <div class="px-3 text-center pb-3">
+                            <h4>Start Screen Sharing</h4>
+                            <p class="font-weight-light my-3">Please click the below button to share your entire screen.</p>
+                            <button class="btn btn-primary" type="button" id="easyassist-start-screensharing" style="display: none;" onclick="start_screen_sharing()">Start screen sharing</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="bg-light position-relative px-3 my-5">
+                        <div class="font-weight-bold circle text-white rounded-circle d-flex align-items-center justify-content-center mx-auto position-relative border border-white"
+                             style="width: 60px;height: 60px;top: -30px;border-width: 4px !important; background-color: #9B5DE5">
+                            2
+                        </div>
+                        <div class="px-3 text-center pb-3">
+                            <h4>Select Tab and share</h4>
+                            <p class="font-weight-light my-3">Please select the form tab and click on <b>"share"</b></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="bg-light position-relative px-3 my-5">
+                        <div class="font-weight-bold circle text-white rounded-circle d-flex align-items-center justify-content-center mx-auto position-relative border border-white"
+                             style="width: 60px;height: 60px;top: -30px;border-width: 4px !important; background-color: #9B5DE5">
+                            3
+                        </div>
+                        <div class="px-3 text-center pb-3">
+                            <h4>Go back</h4>
+                            <p class="font-weight-light my-3">Retun back to form page.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+    <div id="easyassist-screensharing-cobrowse" style="display: none;">
+        
+    </div>
+</div>
+
+<div class="modal fade" id="easyassist_function_fail_modal" tabindex="-1" role="dialog" aria-labelledby="easyassist_function_fail_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-text" id="easyassist_function_fail_code"> Ooops! </span>
+                <span class="modal-text" id="easyassist_function_fail_message"> OK </span>
+            </div>
+            <div class="modal-body mt-4">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary" type="button" data-dismiss="modal" onclick="window.location.reload()">Refresh</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if request.user.enable_s3_bucket %}
+<script src="https://static.allincall.in/static/EasyAssistApp/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="https://static.allincall.in/static/EasyAssistApp/vendor/jquery-easing/jquery.easing.min.js"></script>
+<script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/sb-admin-2.min.js"></script>
+<script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/crypto-js.min.js"></script>
+<script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/lz-string.min.js"></script>
+{% else %}
+<script src="{% static 'EasyAssistApp/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'EasyAssistApp/vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/sb-admin-2.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/crypto-js.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/lz-string.min.js' %}"></script>
+{% endif %}
+
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/encrypt.js' %}"></script>
+
+<script type="text/javascript">
+    console.log('{{cobrowse_io.is_archived}}')
+    window.EASYASSIST_COBROWSE_HOST = '{{easyassist_cobrowse_host}}'
+    window.EASYASSIST_HOST_PROTOCOL = '{{easyassist_host_protocol}}'
+
+    var client_websocket = null;
+    var jitsi_meet_api = null;
+    var client_websocket_open = true;
+    var client_heartbeat_timer = null;
+
+    window.onload = function(e){
+
+        if ('{{ cobrowse_io.is_archived }}' == 'False'){
+
+            start_screensharing_cobrowse();
+            create_easyassist_socket('{{cobrowse_io.session_id}}', 'client_loby');
+        }
+    }
+
+    function start_screensharing_cobrowse() {
+
+        try{
+            domain = "{{easyassist_access_token.meeting_host_url}}";
+
+            options = {
+                roomName: '{{easyassist_session_id}}',
+                configOverwrite: {
+                    startWithVideoMuted: true,
+                    startWithAudioMuted: true,
+                    startSilent:true,
+                    disableDeepLinking: true,
+                    remoteVideoMenu: {
+                        disableKick: true,
+                    },
+                    prejoinPageEnabled: false
+                },
+                parentNode: document.querySelector('#easyassist-screensharing-cobrowse'),
+                userInfo: {
+                    displayName: "Customer"
+                },
+                interfaceConfigOverwrite: {
+                    MOBILE_APP_PROMO: true,
+                    TOOLBAR_BUTTONS: [],
+
+                }
+            };
+            jitsi_meet_api = new JitsiMeetExternalAPI(domain, options);
+
+            jitsi_meet_api.addEventListener("screenSharingStatusChanged",function(e){
+                if(e["on"] == false){
+                    show_start_screensharing_button();
+                }else if(e["on"] == true) {
+                    hide_start_screensharing_button();
+                }
+            })
+            setTimeout(function() {
+                show_start_screensharing_button();
+            }, 4000);
+        }catch(err){
+            console.log(err);
+            easyassist_show_function_fail_modal(code=611);
+        }
+    }
+
+    function show_start_screensharing_button() {
+
+        var element = document.getElementById("easyassist-start-screensharing");
+        if(element != null && element != undefined) {
+
+            element.style.display = "";
+        }
+    }
+
+    function hide_start_screensharing_button() {
+
+        var element = document.getElementById("easyassist-start-screensharing");
+        if(element != null && element != undefined) {
+
+            element.style.display = "none";
+        }
+    }
+
+    function start_screen_sharing() {
+
+        jitsi_meet_api.executeCommand('toggleShareScreen');
+    }
+
+    function create_easyassist_socket(jid, sender) {
+        ws_scheme = EASYASSIST_HOST_PROTOCOL == "http" ? "ws" : "wss"
+        url = ws_scheme + '://' + EASYASSIST_COBROWSE_HOST + '/ws/cobrowse/' + jid + '/' + sender + "/";
+        if(client_websocket == null){
+            client_websocket = new WebSocket(url);
+            client_websocket.onmessage = check_for_activity;
+            client_websocket.onerror = error_easyassist_websocket;
+            client_websocket.onopen = open_easyassist_websocket;
+            client_websocket.onclose = close_easyassist_websocket;
+        }
+        //console.log("socket has been created");
+    }
+
+    function check_for_activity(e) {
+
+        var data = JSON.parse(e.data);
+        message = data.message;
+        response_packet = message.body.Request;
+
+        if (message.body.is_encrypted == false) {
+            response_packet = JSON.parse(response_packet);
+        } else {
+            response_packet = easyassist_custom_decrypt(response_packet);
+            response_packet = JSON.parse(response_packet);
+        }
+        if (message.header.sender == "agent" || message.header.sender == "client") {
+
+            if (response_packet.type == "end_session") {
+                setTimeout(function(){window.location.reload()}, 3000);
+            }
+        }
+    }
+
+    var easyassist_socket_not_open_count = 0;
+    function error_easyassist_websocket(e) {
+
+        console.error("WebSocket error observed:", e);
+        try{
+            client_websocket.close();
+        } catch (err) {
+            client_websocket.onmessage = null;
+            client_websocket = null;
+            setTimeout(function(){
+                create_easyassist_socket('{{cobrowse_io.session_id}}', 'client_loby');
+            }, 1000)
+        }
+    }
+
+    function close_easyassist_websocket(e) {
+
+        if (client_websocket == null) {
+            return;
+        }
+        client_websocket_open = false;
+        client_websocket = null;
+        setTimeout(function(){
+            easyassist_socket_not_open_count++;
+            if(easyassist_socket_not_open_count >= 5){
+                easyassist_show_function_fail_modal(code=601);
+            }
+            create_easyassist_socket('{{cobrowse_io.session_id}}', 'client_loby');
+        }, 1000);
+    }
+
+    function open_easyassist_websocket(e) {
+        console.log("websocket connected")
+        client_websocket_open = true;
+        if(client_heartbeat_timer == null){
+            client_heartbeat_timer = setInterval(function(e) {
+                client_heartbeat();
+            }, 5000);
+        }
+    }
+
+    function send_message_over_easyassist_socket(message, sender) {
+
+        if (client_websocket_open && client_websocket != null) {
+
+            var packet = JSON.stringify({
+                "message": {
+                    "header": {
+                        "sender": sender,
+                    },
+                    "body": message
+                }
+            })
+
+            client_websocket.send(packet);
+
+        }
+    }
+
+    function client_heartbeat() {
+
+        json_string = JSON.stringify({
+            "type": "heartbeat",
+            "active_url": window.location.href
+        });
+
+        encrypted_data = {
+            "Request": json_string,
+            'is_encrypted': false
+        };
+
+        send_message_over_easyassist_socket(encrypted_data, "client_loby");
+    }
+
+    var EASYASSIST_FUNCTION_FAIL_DEFAULT_CODE = 500;
+    var EASYASSIST_FUNCTION_FAIL_DEFAULT_MESSAGE = "Due to some network issue, we are unable to process your request. Please Refresh the page.";
+    var easyassist_function_fail_time = 0;
+    var easyassist_function_fail_count = 0;
+
+    function easyassist_show_function_fail_modal(code=EASYASSIST_FUNCTION_FAIL_DEFAULT_CODE, message=EASYASSIST_FUNCTION_FAIL_DEFAULT_MESSAGE) {
+        var current_time = Date.now();
+        var difference = (current_time - easyassist_function_fail_time) / 1000;
+
+        if(difference < 30) {
+            return;
+        } else if(difference >= 300) {
+            easyassist_function_fail_count = 0;
+        }
+
+        if(message == null) {
+            message = EASYASSIST_FUNCTION_FAIL_DEFAULT_MESSAGE;
+        }
+
+        if(easyassist_function_fail_count <= 6) {
+            if(code != null) {
+                message = message + " [" + code + "]"
+            }
+            document.getElementById("easyassist_function_fail_message").innerHTML = message;
+            easyassist_display_function_fail_modal();
+        }
+
+        easyassist_function_fail_count++;
+        easyassist_function_fail_time = Date.now();
+    }
+
+    function easyassist_display_function_fail_modal(){
+        $("#easyassist_function_fail_modal").modal("show");
+    }
+
+    function easyassist_hide_function_fail_modal() {
+        $("#easyassist_function_fail_modal").modal("hide");
+    }
+
+</script>
+</body>
+</html>

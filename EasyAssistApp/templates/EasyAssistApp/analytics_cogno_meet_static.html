@@ -1,0 +1,297 @@
+{% extends 'EasyAssistApp/console.html' %} {% block content %} {% load static %}
+
+<style type="text/css">
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #f3f6ff !important;
+}
+
+.shadow {
+    /* box-shadow: 0 1px 0 rgba(0, 6, 85, 0.05), 0 10px 7px rgba(0, 30, 65, 0.06), 0 7px 70px rgba(68, 93, 184, 0.205) !important; */
+    box-shadow: 0px 0px 25px 0px rgba(0,0,0,0.15);
+}
+
+.icon-cobrowse {
+    background-color: rgba(116, 170, 252, 0.5);
+    height: 45px;
+    width: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    position: absolute;
+    left: 18px;
+    top: 18px;
+    transition: all 0.2s ease;
+}
+
+.icon-download {
+    background-color: rgba(116, 170, 252, 0.5);
+    height: 30px;
+    width: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    position: absolute;
+    right: 18px;
+    top: 18px;
+    transition: all 0.2s ease;
+}
+
+.stats-cobrowse {
+    color: white;
+    text-align: center;
+    font-size: 30px;
+    font-weight: 600;
+    line-height: 95%;
+}
+
+.card-cobrowse:hover .icon-cobrowse {
+    top: 10px;
+    transition: all 0.2s ease;
+}
+
+.text-cobrowse {
+    text-align: center;
+    margin-top: 12px;
+    color: white !important;
+    font-weight: 400 !important;
+    letter-spacing: -0.04em;
+
+}
+
+.card-cobrowse {
+    height: 136px !important;
+    border-radius: 20px !important;
+    background: linear-gradient(0deg, #282DA5 0%, #445DB8 94.37%);
+    width: 90%;
+
+}
+
+@media only screen and (max-width: 600px) {
+  .chart-area {
+    height: 20rem;
+    width: 35rem;
+  }
+
+  .card-body-sm {
+    overflow: auto;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+    .pull-left-md {
+    float: left;
+  }
+
+  .pull-right-md {
+    float: right;
+  }
+
+  .col-filter {
+    padding-right: 3.5em;
+  }
+}
+
+.datepicker {
+    padding: 8px;
+}
+
+.select-agent-dropdown {
+    min-width: 100px!important;
+    margin-right: 10px;
+    height: 35px!important;
+}
+</style>
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="row mb-4">
+        <div class="col-md-4 text-center">
+            <h1 class="h3 mb-0 text-gray-800 pull-left-md">Dashboard</h1>
+        </div>
+        <div class="col-md-8 text-center col-filter">
+            <div class="pull-right-md">
+                <input class="datepicker" data-date-format="dd/mm/yyyy" placeholder="Start Date" id="start-date" autocomplete="off" value='{{ datetime_start|date:"d/m/Y" }}' style="width:8em; margin-right: 0.5em!important;">
+                <span> to </span>
+                <input class="datepicker" data-date-format="dd/mm/yyyy" placeholder="End Date" id="end-date" autocomplete="off" value='{{ datetime_end|date:"d/m/Y" }}' style="width:8em; margin-left: 0.5em!important;">
+                <button class="btn btn-primary ml-3" onclick="show_cogno_meet_analysis()">Get Analytics</button>
+            </div>
+        </div>
+    </div>
+    <!-- Content Row -->
+    <div class="row">
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2 card-cobrowse">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="col-auto">
+                                <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="cogno-meet-total-meeting-scheduled">
+                                    ...
+                                </div>
+                            </div>
+                            <div class="mb-1 text-cobrowse" style="color: #806ef3;">
+                                Meeting Scheduled
+                            </div>
+                        </div>
+                        <div class="icon-cobrowse">
+                            <svg width="24" height="19" viewBox="0 0 24 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18 15.25C18 17.0449 16.5449 18.5 14.75 18.5H7.25C5.45507 18.5 4 17.0449 4 15.25V6.75C4 4.95507 5.45507 3.5 7.25 3.5H14.75C16.5449 3.5 18 4.95507 18 6.75V15.25ZM23.762 4.89334C23.9156 5.07414 24 5.30368 24 5.54096V16.4588C24 17.0111 23.5523 17.4588 23 17.4588C22.7627 17.4588 22.5332 17.3744 22.3524 17.2208L19 14.3709V7.62794L22.3524 4.77899C22.7732 4.42132 23.4043 4.47252 23.762 4.89334Z" fill="white"/>
+                                {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                                <circle cx="6" cy="6" r="6" fill="{{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.hex }}"/>
+                                {% else %}
+                                <circle cx="6" cy="6" r="6" fill="blue"/>
+                                {% endif %}
+                                <path d="M8.11364 3C8.60316 3 9 3.39684 9 3.88636V8.11364C9 8.60316 8.60316 9 8.11364 9H3.88636C3.39684 9 3 8.60316 3 8.11364V3.88636C3 3.39684 3.39684 3 3.88636 3H8.11364ZM4.5 6.40909C4.27407 6.40909 4.09091 6.59225 4.09091 6.81818C4.09091 7.04412 4.27407 7.22727 4.5 7.22727C4.72593 7.22727 4.90909 7.04412 4.90909 6.81818C4.90909 6.59225 4.72593 6.40909 4.5 6.40909ZM6 6.40909C5.77407 6.40909 5.59091 6.59225 5.59091 6.81818C5.59091 7.04412 5.77407 7.22727 6 7.22727C6.22593 7.22727 6.40909 7.04412 6.40909 6.81818C6.40909 6.59225 6.22593 6.40909 6 6.40909ZM4.5 4.77273C4.27407 4.77273 4.09091 4.95588 4.09091 5.18182C4.09091 5.40775 4.27407 5.59091 4.5 5.59091C4.72593 5.59091 4.90909 5.40775 4.90909 5.18182C4.90909 4.95588 4.72593 4.77273 4.5 4.77273ZM6 4.77273C5.77407 4.77273 5.59091 4.95588 5.59091 5.18182C5.59091 5.40775 5.77407 5.59091 6 5.59091C6.22593 5.59091 6.40909 5.40775 6.40909 5.18182C6.40909 4.95588 6.22593 4.77273 6 4.77273ZM7.5 4.77273C7.27407 4.77273 7.09091 4.95588 7.09091 5.18182C7.09091 5.40775 7.27407 5.59091 7.5 5.59091C7.72593 5.59091 7.90909 5.40775 7.90909 5.18182C7.90909 4.95588 7.72593 4.77273 7.5 4.77273Z" fill="white"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4 ">
+            <div class="card border-left-warning shadow h-100 py-2 card-cobrowse">
+                <div class="card-body">
+                    <div class="col mr-2">
+                        <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="cogno-meet-total-meeting-completed">
+                            ...
+                        </div>
+                        <div class=" mb-1 text-cobrowse" style="color: #16A1AA;">
+                            Meeting Completed
+                        </div>
+                    </div>
+                    <div class="icon-cobrowse">
+                        <svg width="24" height="19" viewBox="0 0 24 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 15.75C18 17.5449 16.5449 19 14.75 19H7.25C5.45507 19 4 17.5449 4 15.75V7.25C4 5.45507 5.45507 4 7.25 4H14.75C16.5449 4 18 5.45507 18 7.25V15.75ZM23.762 5.39334C23.9156 5.57414 24 5.80368 24 6.04096V16.9588C24 17.5111 23.5523 17.9588 23 17.9588C22.7627 17.9588 22.5332 17.8744 22.3524 17.7208L19 14.8709V8.12794L22.3524 5.27899C22.7732 4.92132 23.4043 4.97252 23.762 5.39334Z" fill="white"/>
+                            {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                            <circle cx="6" cy="6" r="6" fill="{{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.hex }}"/>
+                            {% else %}
+                            <circle cx="6" cy="6" r="6" fill="blue"/>
+                            {% endif %}
+                            <path d="M4.2 7.88575L2.68284 6.13518C2.52663 5.95494 2.27337 5.95494 2.11716 6.13518C1.96095 6.31542 1.96095 6.60765 2.11716 6.7879L3.91716 8.86482C4.07337 9.04506 4.32663 9.04506 4.48284 8.86482L8.88284 3.7879C9.03905 3.60765 9.03905 3.31542 8.88284 3.13518C8.72663 2.95494 8.47337 2.95494 8.31716 3.13518L4.2 7.88575Z" fill="white"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4 ">
+            <div class="card border-left-warning shadow h-100 py-2 card-cobrowse">
+                <div class="card-body">
+                    <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="cogno-meet-total-ongoing-meeting">
+                        ...
+                    </div>
+                    <div class="col mr-2">
+                        <div class=" mb-1 text-cobrowse" style="color: #1caf3d">
+                            Ongoing Meeting
+                        </div>
+                    </div>
+                    <div class="icon-cobrowse">
+                        <svg width="23" height="19" viewBox="0 0 23 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17 15.75C17 17.5449 15.5449 19 13.75 19H6.25C4.45507 19 3 17.5449 3 15.75V7.25C3 5.45507 4.45507 4 6.25 4H13.75C15.5449 4 17 5.45507 17 7.25V15.75ZM22.762 5.39334C22.9156 5.57414 23 5.80368 23 6.04096V16.9588C23 17.5111 22.5523 17.9588 22 17.9588C21.7627 17.9588 21.5332 17.8744 21.3524 17.7208L18 14.8709V8.12794L21.3524 5.27899C21.7732 4.92132 22.4043 4.97252 22.762 5.39334Z" fill="white"/>
+                            {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                            <circle cx="6" cy="6" r="6" fill="{{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.hex }}"/>
+                            {% else %}
+                            <circle cx="6" cy="6" r="6" fill="blue"/>
+                            {% endif %}
+                            <path d="M6 2C8.20914 2 10 3.79086 10 6C10 8.20914 8.20914 10 6 10C3.79086 10 2 8.20914 2 6C2 3.79086 3.79086 2 6 2ZM5.73684 3.47368C5.5915 3.47368 5.47368 3.5915 5.47368 3.73684V6.26316C5.47368 6.4085 5.5915 6.52632 5.73684 6.52632H7.42105C7.56639 6.52632 7.68421 6.4085 7.68421 6.26316C7.68421 6.11782 7.56639 6 7.42105 6H6V3.73684C6 3.5915 5.88218 3.47368 5.73684 3.47368Z" fill="white"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Video Conference Analytics</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="javascript:void(0)" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Timeline:</div>
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="show_daily_cogno_meeting_analytics()">Daily</a>
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="show_weekly_cogno_meeting_analytics()">Weekly</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="show_monthly_cogno_meeting_analytics()">Monthly</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body card-body-sm">
+                    <div class="chart-area">
+                        <canvas id="cogno-meet-analytics"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Daily Call Time Trend</h6>
+                </div>
+                <div class="card-body card-body-sm">
+                    <div class="chart-area">
+                        <canvas id="cogno-meet-daily-time-trend"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+         <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Session Initiated In</h6>
+                </div>
+                <div class="card-body card-body-sm">
+                    <div class="chart-area">
+                        <canvas id="cogno-meet-cobrowse-pie-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if cobrowse_agent.role == 'admin' %}
+        <div class="col-md-12 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Agent wise Video Meeting Analytics</h6>
+                    <div style="display: flex; align-items: center">
+                        <select class="form-control select-agent-dropdown" onchange="show_agent_wise_cogno_meet_analytics();" id="cogno-meet-select-agent">
+                            {% for agent_obj in agent_objs %}
+                                <option value="{{ agent_obj.pk }}">{{ agent_obj.user.username }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="dropdown no-arrow">
+                            <a class="dropdown-toggle" href="javascript:void(0)" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                                <div class="dropdown-header">Timeline:</div>
+                                <a class="dropdown-item" href="javascript:void(0)" onclick="show_daily_agent_wise_cogno_meet_analytics()">Daily</a>
+                                <a class="dropdown-item" href="javascript:void(0)" onclick="show_weekly_agent_wise_cogno_meet_analytics()">Weekly</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="javascript:void(0)" onclick="show_monthly_agent_wise_cogno_meet_analytics()">Monthly</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body card-body-sm">
+                    <div class="chart-area">
+                        <canvas id="cogno-meet-agent-wise-analytics"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/analytics_cogno_meet_static.js' %}"></script>
+<script type="text/javascript">
+</script>
+{% endblock %}

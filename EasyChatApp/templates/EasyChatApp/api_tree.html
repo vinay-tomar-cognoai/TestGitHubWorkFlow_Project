@@ -1,0 +1,451 @@
+{% extends 'EasyChatApp/edit_processor.html' %}
+{% block processorcontent %}
+{% load static %}
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<div id = "easychat_post_processor" class="post-processor-col-div">
+	<h4 style="margin-top: 0px">API Tree</h4>
+	<ul class="collection">
+            
+		<li class="collection-item configure-now-list">
+
+			<p id="email-config-message" >
+				In case of an API Failure, an email will be sent. 
+				<a class="modal-trigger" href="#modal-api-fail-email-config">Configure Now</a>
+			</p>
+		</li>
+
+		<li class="collection-item format-follow-list" >
+			Kindly follow this format for logger.info, logger.error and logger.warning : 
+			<p><b>logger.info("MESSAGE", extra={'AppName': 'EasyChat', 'user_id': 'None', 'source': 'None', 'channel': 'None', 'bot_id': 'None'})</b></p>
+			<p>Replace 'bot_id', 'channel' and 'user_id' parameter values with the BOT ID and Channel and User ID for detailed logs. </p> 
+		</li>
+
+		<li class="collection-item">
+		  	<button class="easychat_processor_collapsible">
+                <span>
+                    API_REQUEST_PACKET & API_RESPONSE_PACKET
+                </span> 
+            </button>
+
+		  	<div class="easychat_processor_content">
+		  		<ul>
+					<li>1. Both are dictionary type data packet.</li>
+					<li>2. API_REQUEST_PACKET is used to store the request packet during API call.</li>
+					<li>3. API_RESPONSE_PACKET is used to store the response packet during API call.</li>
+					<li>4. Here is one example for API_REQUEST_PACKET: API_REQUEST_PACKET = {"url": request_url, "data": data, "header": ""}</li>
+					<li>5. Here is one example for API_RESPONSE_PACKET: API_RESPONSE_PACKET = {"response": ""}</li>
+					<li class="note-item">
+						<b>NOTE:</b>
+						<ul class="note-list">
+							<li>
+							1. If you are using any API then it is mandatory to put the appropriate request & response packet.
+							</li>
+							<li>
+							2. In case of no API, you have to put the value of every key empty(''). Ex. API_REQUEST_PACKET = {"url": '', "data": '', "header": ''} and API_RESPONSE_PACKET = {"response": ''}
+							</li>
+						</ul>
+            		</li>
+		  		</ul>
+		  	</div>
+		</li>
+
+		<li class="collection-item">
+			<button class="easychat_processor_collapsible">status_code</button>
+			<div class="easychat_processor_content">
+				<ul>
+					<li><b>200:</b> This status code represents the "SUCCESS".</li>
+					<li><b>206:</b> This status code is used to "REDIRECT" the flow to same intent.</li>
+					<li><b>308:</b> This status code is used to search the reponse in all existing intents. If no intent found then it will reprompt the same intent, otherwise it will proceed with the new flow.</li>
+					<li><b>400:</b> If you are using any external API and external API failes then you have to use this status code.</li>
+					<li><b>500:</b> This status code represents the "Internal server error".</li>
+				</ul>
+			</div>
+		</li>
+
+		<li class="collection-item">
+			<button class="easychat_processor_collapsible">status_message</button>
+			<div class="easychat_processor_content">
+				<p>Status message is based status code.</p>
+				<ul>
+					<li><b>200:</b> "SUCCESS".</li>
+					<li><b>206:</b> "REDIRECT".</li>
+					<li><b>308:</b> "REDIRECT"</li>
+					<li><b>400:</b> "External API failure."</li>
+					<li><b>500:</b> "Internal server error".</li>
+				</ul>
+			</div>
+		</li>
+		<li class="collection-item">
+		  	<button class="easychat_processor_collapsible">data</button>
+		  	<div class="easychat_processor_content">
+				<ul>
+					<li>
+					1. It is the dictionary in which you can set "key": "value". This key and value will be stored in data model. <br>
+					Ex. reponse["data"] = {"key1": value1, "key2": value2}.
+					</li>
+				
+					<li class="note-item">
+						<b>NOTE:</b>
+						<ul class="note-list">
+							<li>
+							&nbsp;If you set a variable "is_cache": True. It will store the variable in data model permanently. <br>
+							Ex. reponse["data"] = {"key1": value1, "key2": value2, "is_cache": True}.
+							</li>
+						</ul>
+					</li>
+				</ul>
+		  	</div>
+
+		</li>
+
+		<li class="collection-item">
+    	  	<button class="easychat_processor_collapsible">API List</button>
+    	  	<div class="easychat_processor_content">
+	  			<div class="row">
+					<div class="col s8">
+						Please save all the used API URLS here. After listing the urls, click outside modal and then click on save.
+					</div>
+					<div class="col s4" >
+						<a class="btn black-text lighten-2 left modal-trigger" id="save-api" style="background-color: #82C784;" href="#modal-save-apis">Click Here</a>
+					</div>
+    	  		</div>
+    	  	</div>
+    	</li>
+		<li class="collection-item">
+			<button class="easychat_processor_collapsible">cards | choices | images | videos</button>
+			<!-- add class processor-content-multiple-lists  -->
+			<div class="easychat_processor_content processor-content-multiple-lists ">
+			  <ul>
+				  <b>Cards</b>
+				<li>1. It is a list of dictionary.</li>
+				<li>
+					2. In each dictionary packet, you have to put "title", "content", "link" and "img_url". <br>
+				  Ex. response["cards"] = [{"title": title, "content": content, "link": link, "img_url": img_url}, {"title": title1, "content": content1, "link": link1, "img_url": img_url1}]
+			  </li>
+			  </ul>
+			  <!-- <hr> -->
+			  <ul>
+				  <b>Choices</b>
+				<li>1. It is a list of dictionary.</li>
+				<li>
+					2. In each dictionary packet, you have to put "display" and "value".
+					<br>
+					Ex. response["choices"] = [{"display": display, "value": value}, {"display": display1, "value": value1}]
+			  </li>
+				
+			  </ul>
+			  <!-- <hr> -->
+			  <ul>
+				  <b>Images</b>
+				  <li>1. It is a list of string.</li>
+				  <li>
+					  2. Elements in the list will be image links. <br>
+					  Ex. response["images"] = ["image_link1", "image_link2"]
+				  </li>
+				</ul>
+				<!-- <hr> -->
+				<ul>
+					<b>Videos</b>
+			  <li>1. It is a list of string.</li>
+			  <li>
+				  2. Elements in the list will be video links. <br>
+				  Ex. response["videos"] = ["video_link1", "video_link2"]
+			  </li>
+		  
+			</ul>
+			</div>
+		</li>
+		
+		<li class="collection-item">
+			<button class="easychat_processor_collapsible">recommendations</button>
+			<div class="easychat_processor_content">
+			  <ul>
+			  <li>1. It is a list.</li>
+			  <li>
+				  2. You can recommend name of intent by adding name of intent to this list.
+				  <br>
+				  Ex. response["recommendations"] = ["hi", "bye", "good night"]
+			  </li>
+		  
+			</ul>
+			</div>
+		</li>
+		<li class="collection-item">
+		  	<button class="easychat_processor_collapsible">Some Important points and Debugging</button>
+		  	<div class="easychat_processor_content">
+
+        		<ul>
+					<li>
+						1. You can acces the variables from data model by declaring the variable in the following format: <br>
+						Ex. mobile_number = "{/mobile_number/}"
+					</li>
+            		<li>
+						2. If the variable, you are trying to access is not present in the data model, it will return None, otherwise you will get the stored value.
+					</li>
+              
+		  			<li class="note-item">
+						<b>NOTE:</b>
+						<ul class="note-list">
+							<li>
+							You can not use the variable from data model during writting processors in cosole.
+							</li>
+							<li>
+							<b>Tip 1:</b> <br> 
+							During executing processors in cosole, comment all the variable which are being access from data model.
+							</li>
+							<li>
+							<b>Tip 2:</b> <br>
+							To debug, you can send print statement in response. Ex. response["print"] = "hello world!".
+							</li>
+						</ul>
+					</li>
+				</ul>
+		  	</div>
+		</li>
+		<li class="collection-item">
+		<button class="easychat_processor_collapsible">Dynamic Variables</button>
+		<div class="easychat_processor_content">
+			{% if dynamic_variable %}
+			{% for variable in dynamic_variable %}
+				<div class="collapsable-dynamic-variable-wrapper"><div class="collapsable-dynamic-variable-subheading">{{variable.key}}<span class="red-text">*</span></div>
+				<input type="text" class="easychat_dynamic_variable input" name="{{variable.key}}" value="{{variable.value}}" placeholder="Enter value here">
+				</div>
+			{% endfor %}
+		{% else %}
+			<p>No Dynamic variable in existing code.</p>
+		{% endif %}
+		</div>
+		</li>
+
+		<li class="collection-item">
+			<button class="easychat_processor_collapsible">Widgets</button>
+			<div class="easychat_processor_content">
+				<p><b>1. Calendar Picker widget:</b><br><br>
+			  For dynamic calendar picker widget you need to pass below response parameters through the API Tree.<br><br>
+
+			  response["dynamic_widget_type"] = "calendar_picker"<br><br>
+			  response["modes"] = {"is_calender": "true"}<br><br>
+
+			  You have to generate a modes_param dictionary based on the type of calendar picker you want to show. For example if you want to show a double date picker with double time picker then pass below dictionary in modes_param.<br><br>
+
+			  response["modes_param"] = {"datepicker_list": [<br>
+			  &emsp;&emsp;{<br>
+				  &emsp;&emsp;&emsp;"placeholder": "From Date"<br>
+				  &emsp;&emsp;},<br>
+				  &emsp;&emsp;{<br>
+					  &emsp;&emsp;&emsp;"placeholder": "To Date"<br>
+					  &emsp;&emsp;}<br>
+					  &emsp;],<br>
+					  &emsp;"timepicker_list": [<br>
+					  &emsp;&emsp;{<br>
+						  &emsp;&emsp;&emsp;"placeholder": "From Time"<br>
+						  &emsp;&emsp;},<br>
+						  &emsp;&emsp;{<br>
+							  &emsp;&emsp;&emsp;"placeholder": "To Time"<br>
+							  &emsp;&emsp;}<br>
+							  &emsp;]<br>
+			  }<br><br>
+
+			  If you want to show a single date picker with no time picker then pass the below dictionary in modes_param.<br><br>
+
+			  response["modes_param"] = {"datepicker_list": [<br>
+			  &emsp;&emsp;{<br>
+				  &emsp;&emsp;&emsp;"placeholder": "Date"<br>
+				  &emsp;&emsp;}<br>
+				  &emsp;],<br>
+				  &emsp;"timepicker_list": []<br>
+			  }<br><br>
+
+			  If you want to show a single time picker with no date picker then pass the below dictionary in modes_param.<br><br>
+
+			  response["modes_param"] = {"datepicker_list": [],<br>
+				  &emsp;"timepicker_list": [<br>
+				  &emsp;&emsp;{<br>
+					  &emsp;&emsp;&emsp;"placeholder": "Time"<br>
+					  &emsp;&emsp;}<br>
+					  &emsp;]<br>
+			  }<br><br>
+
+			  Like this you need to generate the modes_param dictionary based on required calendar type.<br><br>
+
+
+			  <b>2. Radio Button widget:</b><br><br>
+
+			  For dynamic radio button you need to pass the below response parameters through the API Tree.<br><br>
+
+			  response["dynamic_widget_type"] = "radio_button"<br><br>
+
+			  response["modes"] = {<br>
+				  &emsp;"is_radio_button": "true"<br>
+			  }<br><br>
+
+			  response["modes_param"] = {<br>
+				  &emsp;"radio_button_choices": [<br>
+				  &emsp;&emsp;"Button 1",<br>
+				  &emsp;&emsp;"Button 2",<br>
+				  &emsp;&emsp;"Button 3",<br>
+				  &emsp;&emsp;"Button 4"<br>
+				  &emsp;]<br>
+			  }<br><br>
+
+			  <b>3. Checkbox widget:</b><br><br>
+
+			  For dynamic checkbox you need to pass the below response parameters through the API Tree.<br><br>
+
+			  response["dynamic_widget_type"] = "checkbox"<br><br>
+
+			  response["modes"] = {<br>
+				  &emsp;"is_check_box": "true"<br>
+			  }<br><br>
+
+			  response["modes_param"] = {<br>
+				  &emsp;"check_box_choices": [<br>
+				  &emsp;&emsp;"Checkbox 1",<br>
+				  &emsp;&emsp;"Checkbox 2",<br>
+				  &emsp;&emsp;"Checkbox 3",<br>
+				  &emsp;&emsp;"Checkbox 4"<br>
+				  &emsp;]<br>
+			  }<br><br>
+
+			  <b>4. Drop Down widget:</b><br><br>
+
+			  For dynamic drop down you need to pass the below response parameters through the API Tree.<br><br>
+
+			  response["dynamic_widget_type"] = "drop_down"<br><br>
+
+			  response["modes"] = {<br>
+				  &emsp;"is_drop_down": "true"<br>    
+			  }<br><br>
+
+			  response["modes_param"] = {<br>
+				  &emsp;"drop_down_choices": [<br>
+				  &emsp;&emsp;"Dropdown element 1",<br>
+				  &emsp;&emsp;"Dropdown element 2",<br>
+				  &emsp;&emsp;"Dropdown element 3"<br>
+				  &emsp;]<br>
+			  }<br><br>
+
+			  <b>5. Range Slider:</b><br><br>
+
+			  For dynamic range slider you need to pass the below response parameters through the API Tree.<br><br>
+
+			  response["dynamic_widget_type"] = "range_slider"<br><br>
+
+			  response["modes"] = {<br>
+				  &emsp;"is_range_slider": "true"<br>
+			  }<br><br>
+
+			  response["modes_param"] = {<br>
+				  &emsp;"range_slider_list": [<br>
+				  &emsp;&emsp;{<br>
+					  &emsp;&emsp;&emsp;"placeholder": "Select Range",<br>
+					  &emsp;&emsp;&emsp;"min": 1,<br>
+					  &emsp;&emsp;&emsp;"max": 100,<br>
+					  &emsp;&emsp;&emsp;"range_type": range_type<br>
+					  &emsp;&emsp;}<br>
+					  &emsp;]<br>
+			  }<br><br>
+
+			  If you need a single range slider then pass the value of "range_type" in modes_param dictionary as "single-range-slider", if you need a multiple range slider then pass "multi-range-slider". Also you can pass min and max integer values. Value of min and max can be integer or floating point integers.</p>
+			</div>
+		</li>
+		<li class="collection-item">
+			<button class="easychat_processor_collapsible">Common Utils</button>
+			<div class="easychat_processor_content">
+				<p>In order to use functions in Common Utils kindly follow the steps:
+					<pre> If you have a function def fun(), use response_function  = result_dict['fun']() </pre>
+					<pre> If you have a function def fun(id,name), use response_function  = result_dict['fun'](id,name) </pre>
+				</p>
+			</div>
+		</li>
+
+		<li class="collection-item">
+			<button class="easychat_processor_collapsible">Category Based Response</button>
+			<div class="easychat_processor_content">
+					<pre> Please use 'category_name' as a variable name to assign the category and cache should be true. </pre>
+					<pre> Child name of the intent should be same as category name. </pre>
+					<pre> Use one level FAQs for category based response.</pre>
+				</p>
+			</div>
+		</li>
+
+	</ul>
+
+</div>
+
+
+<div id="modal-save-apis" class="modal easychat-new-modal-div">
+	<div class="modal-content">
+		<div class="modal-content-header">
+			<div class="modal-content-header-with-subheading">
+				<h5 style="text-align: center;">APIs</h5>
+				<span>
+				Delete and add new to edit 
+				</span>
+			</div>
+
+			<svg class="modal-close" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M18 6L6 18" stroke="#25282B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+				<path d="M6 6L18 18" stroke="#25282B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+			</svg>
+		</div>
+
+		<div class="easychat-modal-table-div easychat-add-new-api-div">
+			<table style="table-layout: fixed;word-wrap: break-word;">
+			  <tbody>
+				  <tr>
+					  <td>
+						  <p>
+							Add new API
+						  </p> 
+					  </td>
+					  <td>
+						  <input type="text" class="validate input browser-default" id="add_enter_api_url"  placeholder='Hit "ENTER" after adding the api'>
+					  </td>
+				  </tr>
+				  <tr>
+					  <td>
+						<ul class="collection with-header" id="api_collection">
+							<p>
+								List of all APIs
+							</p> 
+						    {% for key,value in apis_used_ids.items %}
+								<li class="collection-item" id="{{key}}">
+									<div class="api-added-collection-list-div">
+										<input id="{{key}}" type="text" value="{{value}}" style="width: 100%">
+										<div class="secondary-content">
+											<a href="" class="delete-button-api-url" id="{{key}}">
+												<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+													<path fill-rule="evenodd" clip-rule="evenodd" d="M5.78997 3.33337L5.93819 2.66639C5.97076 2.60665 6.02879 2.5218 6.10562 2.45095C6.19775 2.36599 6.27992 2.33337 6.35185 2.33337H9.31481C9.31449 2.33337 9.31456 2.33338 9.31502 2.33341C9.31797 2.33363 9.33695 2.33504 9.36833 2.34387C9.40259 2.3535 9.44447 2.37001 9.48859 2.39629C9.56583 2.44229 9.65609 2.52156 9.72769 2.66287L9.87669 3.33337H5.78997ZM5.15683 4.33337C5.16372 4.33352 5.17059 4.33352 5.17744 4.33337H10.4892C10.4961 4.33352 10.5029 4.33352 10.5098 4.33337H13.1667C13.4428 4.33337 13.6667 4.10952 13.6667 3.83337C13.6667 3.55723 13.4428 3.33337 13.1667 3.33337H10.9011L10.6918 2.39158L10.6809 2.34271L10.6606 2.29697C10.3311 1.55552 9.67791 1.33337 9.31481 1.33337H6.35185C5.9497 1.33337 5.63682 1.52298 5.42771 1.7158C5.22096 1.90646 5.0796 2.1315 5.00606 2.29697L4.98573 2.34271L4.97487 2.39158L4.76558 3.33337H2.5C2.22386 3.33337 2 3.55723 2 3.83337C2 4.10952 2.22386 4.33337 2.5 4.33337H5.15683ZM3.09959 5.00456C3.37324 4.96751 3.6251 5.15932 3.66215 5.43296L4.65773 12.787C4.7031 12.9453 4.80538 13.1798 4.96108 13.369C5.12181 13.5643 5.29845 13.6667 5.5 13.6667H10.5C10.5571 13.6667 10.6813 13.6397 10.7862 13.543C10.8763 13.46 11 13.2816 11 12.8867V12.853L11.0045 12.8196L12.0045 5.43296C12.0416 5.15932 12.2934 4.96751 12.5671 5.00456C12.8407 5.04161 13.0325 5.29347 12.9955 5.56712L11.9998 12.922C11.9921 13.5331 11.7842 13.9831 11.4638 14.2784C11.1521 14.5657 10.7763 14.6667 10.5 14.6667H5.5C4.90155 14.6667 4.46708 14.3424 4.18892 14.0044C3.9146 13.6711 3.75283 13.2816 3.6828 13.0127L3.67522 12.9836L3.67119 12.9538L2.67119 5.56712C2.63414 5.29347 2.82594 5.04161 3.09959 5.00456Z" fill="#E10E00"/>
+												</svg>
+											</a>
+										</div>
+									</div>
+								</li>
+                           {% endfor %}    
+						</ul>
+					  </td>
+				  </tr>
+			  </tbody>
+			</table>
+		</div>
+
+    </div>
+</div>
+
+<script>
+	window.SYSTEM_COMMANDS = {{ system_commands | safe }}
+	try {
+		window.mail_sender_time_interval_editor = {{ bot_obj.mail_sender_time_interval }}
+	} catch(err) {
+		window.mail_sender_time_interval_editor = 0
+	}
+	window.api_fail_email_configured_editor = "{{ api_fail_email_configured }}"
+	window.mail_sent_to_list = {{mail_sent_to_list | safe}}
+</script>
+
+<script  type="text/javascript" src="{% static 'EasyChatApp/js/enforced_email_processor.js' %}?v={% random_int 1 100 %}"></script>
+	
+{% endblock %}

@@ -1,0 +1,470 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'EasyAssistSalesforceApp/img/cobrowseLogoShort.svg' %}">
+    <title>Cogno Meet </title>
+    <!-- Custom fonts for this template-->
+    <link href="{% static 'EasyAssistSalesforceApp/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <!-- Custom styles for this template-->
+    <link rel="stylesheet" href="{% static 'EasyAssistSalesforceApp/css/bootstrap-select.css' %}" />
+    <link href="{% static 'EasyAssistSalesforceApp/css/sb-admin-2.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'EasyAssistSalesforceApp/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'EasyAssistSalesforceApp/css/bootstrap-multiselect.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'EasyAssistSalesforceApp/css/console.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'EasyAssistSalesforceApp/css/cobrowse_changes.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'EasyAssistSalesforceApp/css/cobrowse_responsive.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'EasyAssistSalesforceApp/css/data_collect_form.css' %}">
+
+    <script type="text/javascript" src="/static/EasyAssistSalesforceApp/js/jquery.min.js"></script>
+    <script src="{% static 'EasyAssistSalesforceApp/js/popper.min.js' %}"></script>
+    <script src="{% static 'EasyAssistSalesforceApp/js/bootstrap_4.5.min.js' %}"></script>
+
+    <style>
+    {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+
+        :root {
+
+          --color_rgba_3: rgba({{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.red }}, {{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.green }}, {{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.blue }}, 0.03);
+
+          --color_rgb: {{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.rgb }};
+
+          --color_text: #4A4A4A;
+        }
+
+        .cobrowse-form-data-warpper {
+            background: var(--color_rgba_3)!important;
+        }
+
+        .btn-primary, .btn-info {
+          background: var(--color_rgb) !important;
+        }
+
+        .btn-primary:hover,
+        .btn-info:hover {
+          color: #FFFFFF!important;
+          background: var(--color_rgb) !important;
+        }
+
+        .cobrowse-form-data-warpper .cobrowse-collect-data-sidebar .section-active {
+            color: var(--color_rgb)!important;
+        }
+    {% endif %}
+    </style>
+</head>
+
+<body>
+    {% csrf_token %}
+    <div class="cobrowse-collect-data-topbar shadow">
+        <div>
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/" style="height:3.75rem !important;">
+                <div class="sidebar-brand-icon rotate-n-15"></div>
+                {% if cobrowse_agent.get_access_token_obj.source_easyassist_cobrowse_logo %}
+                <img id="cobrowseLogoImage" src="/{{ cobrowse_agent.get_access_token_obj.source_easyassist_cobrowse_logo }}" alt="Cogno CoBrowse" max-width = "90px" height = "50px" />
+                {% else %}
+                <img id="cobrowseLogoImage" src="{% static 'EasyAssistSalesforceApp/img/cobrowseLogo.svg' %}" id="sales-ai-logo" alt="Cogno CoBrowse" height = "50px" style="max-width: 133px;"/>
+                {% endif %}
+            </a>
+            <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle" amino-styles="margin: 5px 0 10px 0 !important;" onclick="show_form_section();">
+            <i class="fa fa-bars"></i>
+        </button>
+        </div>
+        <div>
+            <span class="cobrowse-form-heading">Form</span>
+        </div>
+        <div>
+            {% for form_category in cobrowse_form_categories %}
+            <button class="btn btn-primary save-form-button" id="save-form-btn-{{ form_category.pk }}" type="button" onclick="save_cobrowse_form_data(this, '{{ form_category.pk }}');" style="display: none;">
+                Submit
+            </button>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="cobrowse-form-data-warpper">
+        <div class="cobrowse-collect-data-sidebar">
+            {% for form_category in cobrowse_form_categories %}
+                <button class="cobrowse-form-section btn" id="cobrowse-sidebar-category-btn-{{ form_category.pk }}" onclick="show_cobrowse_form(this, '{{ form_category.pk }}')">
+                    {{ form_category.title }}
+                </button>
+            {% endfor %}
+        </div>
+
+        <div class="cobrowse-form-data">
+            {% for form_category in cobrowse_form_categories %}
+            <div class="row justify-content-center" id="form-category-container-{{ form_category.pk }}" style="margin-bottom: 1em; display: none;">
+                <div class="col-md-10 col-sm-12">
+                    <div class="card">
+                        <div class="card-body" style="padding: 1.5rem 2rem">
+                            <div class="row">
+                                {% for form_element in cobrowse_form_elements %}
+                                    {% if form_element.form_category == form_category %}
+
+                                        {% ifequal form_element.element_type 'number' %}
+                                        <div class="col-12 mb-4">
+                                            <div class="card cobrowse-collect-data-card">
+                                                <div class="card-body">
+                                                    {% if form_element.is_mandatory %}
+                                                        <label class="form-field-title">{{form_element.element_label}} <span style="color: red">*</span></label>
+                                                    {% else %}
+                                                        <label class="form-field-title">{{form_element.element_label}} (optional)</label>
+                                                    {% endif %}
+                                                    <div class="mt-2">
+                                                    {% if form_element.collected_data|length %}
+                                                        {% if is_readonly %}
+                                                            <input class="form-field-input" id="input_{{form_element.pk}}" type="number" autocomplete="off" placeholder="Number field" value="{{ form_element.collected_data.0.value }}" readonly>
+                                                        {% else %}
+                                                            <input class="form-field-input" id="input_{{form_element.pk}}" type="number" autocomplete="off" placeholder="Number field" value="{{ form_element.collected_data.0.value }}" onkeypress="check_input_number(this, event);">
+                                                        {% endif %}
+                                                    {% else %}
+                                                        {% if is_readonly %}
+                                                            <input class="form-field-input" id="input_{{form_element.pk}}" type="number" autocomplete="off" placeholder="Number field" readonly>
+                                                        {% else %}
+                                                            <input class="form-field-input" id="input_{{form_element.pk}}" type="number" autocomplete="off" placeholder="Number field" onkeypress="check_input_number(this, event);">
+                                                        {% endif %}
+                                                    {% endif %}
+                                                    <span class="text-error">Please enter only numeric values</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endifequal %}
+
+                                        {% ifequal form_element.element_type 'text' %}
+                                        <div class="col-12 mb-4">
+                                            <div class="card cobrowse-collect-data-card">
+                                                <div class="card-body">
+                                                    {% if form_element.is_mandatory %}
+                                                        <label class="form-field-title" for="text_{{form_element.pk}}">{{form_element.element_label}} <span style="color: red">*</span></label>
+                                                    {% else %}
+                                                        <label class="form-field-title" for="text_{{form_element.pk}}">{{form_element.element_label}} (optional)</label>
+                                                    {% endif %}
+                                                    <div class="mt-2">
+                                                        {% if form_element.collected_data|length %}
+                                                            {% if is_readonly %}
+                                                                <input class="form-field-text" id="text_{{form_element.pk}}" type="text" value="{{ form_element.collected_data.0.value }}" placeholder="Input field" readonly/>
+                                                            {% else %}
+                                                                <input class="form-field-text" id="text_{{form_element.pk}}"  type="text" value="{{ form_element.collected_data.0.value }}" placeholder="Input field"/>
+                                                            {% endif %}
+                                                        {% else %}
+                                                            {% if is_readonly %}
+                                                                <input class="form-field-text" id="text_{{form_element.pk}}" type="text" value="{{ form_element.collected_data.0.value }}" placeholder="Input field" readonly/>
+                                                            {% else %}
+                                                                <input class="form-field-text" id="text_{{form_element.pk}}" type="text" value="{{ form_element.collected_data.0.value }}" placeholder="Input field"/>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endifequal %}
+
+                                        {% ifequal form_element.element_type 'radio' %}
+                                        <div class="col-12 mb-4">
+                                            <div class="card cobrowse-collect-data-card">
+                                                <div class="card-body">
+                                                    {% if form_element.is_mandatory %}
+                                                        <label class="form-field-title">{{form_element.element_label}} <span style="color: red">*</span></label>
+                                                    {% else %}
+                                                        <label class="form-field-title">{{form_element.element_label}} (optional)</label>
+                                                    {% endif %}
+                                                    <div class="mt-2">
+                                                        {% for choice in form_element.element_choices %}
+                                                            <label>
+                                                                {% if form_element.collected_data|length %}
+                                                                    {% ifequal choice form_element.collected_data.0.value %}
+                                                                        <input name="radio_input_{{form_element.pk}}" type="radio" value="{{ choice }}" checked />
+                                                                    {% else %}
+                                                                        {% if is_readonly %}
+                                                                            <input name="radio_input_{{form_element.pk}}" type="radio" value="{{ choice }}" disabled/>
+                                                                        {% else %}
+                                                                            <input name="radio_input_{{form_element.pk}}" type="radio" value="{{ choice }}"/>
+                                                                        {% endif %}
+                                                                    {% endifequal %}
+                                                                {% else %}
+                                                                    <input name="radio_input_{{form_element.pk}}" type="radio" value="{{ choice }}"/>
+                                                                {% endif %}
+                                                                <span class="form-field-radio-text">{{ choice }}</span>
+                                                            </label>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endifequal %}
+
+                                        {% ifequal form_element.element_type 'checkbox' %}
+                                        <div class="col-12 mb-4">
+                                            <div class="card cobrowse-collect-data-card">
+                                                <div class="card-body">
+                                                    {% if form_element.is_mandatory %}
+                                                        <label class="form-field-title">{{form_element.element_label}} <span style="color: red">*</span></label>
+                                                    {% else %}
+                                                        <label class="form-field-title">{{form_element.element_label}} (optional)</label>
+                                                    {% endif %}
+                                                    <div class="mt-2">
+                                                        {% for choice in form_element.element_choices %}
+                                                            <label>
+                                                            {% if form_element.collected_data|length %}
+                                                                {% if choice in form_element.collected_data.0.value %}
+                                                                    {% if is_readonly %}
+                                                                        <input name="checkbox_input_{{form_element.pk}}" type="checkbox" value="{{ choice }}" checked onclick="return false" />
+                                                                    {% else %}
+                                                                        <input name="checkbox_input_{{form_element.pk}}" type="checkbox" value="{{ choice }}" checked />
+                                                                    {% endif %}
+                                                                {% else %}
+                                                                    {% if is_readonly %}
+                                                                        <input name="checkbox_input_{{form_element.pk}}" type="checkbox" value="{{ choice }}" onclick="return false" />
+                                                                    {% else %}
+                                                                        <input name="checkbox_input_{{form_element.pk}}" type="checkbox" value="{{ choice }}"/>
+                                                                    {% endif %}
+                                                                {% endif %}
+                                                            {% else %}
+                                                                <input name="checkbox_input_{{form_element.pk}}" type="checkbox" value="{{ choice }}"/>
+                                                            {% endif %}
+                                                            <span class="form-field-radio-text">{{ choice }}</span>
+                                                            </label>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endifequal %}
+
+                                        {% ifequal form_element.element_type 'dropdown' %}
+                                        <div class="col-12 mb-4">
+                                            <div class="card cobrowse-collect-data-card">
+                                                <div class="card-body">
+                                                    {% if form_element.is_mandatory %}
+                                                        <label class="form-field-title">{{form_element.element_label}} <span style="color: red">*</span></label>
+                                                    {% else %}
+                                                        <label class="form-field-title">{{form_element.element_label}} (optional)</label>
+                                                    {% endif %}
+                                                    <div class="my-3">
+                                                        <select class="selectpicker" id="dropdown_{{form_element.pk}}">
+                                                            {% for choice in form_element.element_choices %}
+                                                                {% if form_element.collected_data|length %}
+                                                                    {% if form_element.collected_data.0.value == choice %}
+                                                                        <option value="{{forloop.counter}}" selected>{{ choice }}</option>
+                                                                    {% else %}
+                                                                        {% if is_readonly %}
+                                                                            <option value="{{forloop.counter}}" disabled>{{ choice }}</option>
+                                                                        {% else %}
+                                                                            <option value="{{forloop.counter}}">{{ choice }}</option>
+                                                                        {% endif %}
+                                                                    {% endif %}
+                                                                {% else %}
+                                                                    <option value="{{forloop.counter}}">{{ choice }}</option>
+                                                                {% endif %}
+                        
+                                                            {% empty %}
+                                                                <option value="{{forloop.counter}}" disabled>No option</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endifequal %}
+
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="cobrowse-form-backdrop"></div>
+    <div id="easyassist-snackbar"></div>
+    <script src="{% static 'EasyAssistSalesforceApp/js/bootstrap-select.min.js' %}"></script>
+    <script type="text/javascript" src="/static/EasyAssistSalesforceApp/js/crypto-js.min.js"></script>
+    <script src="{% static 'EasyAssistSalesforceApp/js/timezz.min.js' %}"></script>
+    <script type="text/javascript" src="/static/EasyAssistSalesforceApp/js/encrypt.js"></script>
+    <script src="{% static 'EasyAssistSalesforceApp/js/cobrowse_data_collect_form.js' %}"></script>
+    <script>
+
+        function check_input_number(el, evt) {
+            if(evt.keyCode >= 48 && evt.keyCode <= 57) {
+                $(el).parent().find('.text-error').css('display', 'none');
+            } else {
+                $(el).parent().find('.text-error').css('display', 'block');
+            }
+        }
+
+        function show_form_section() {
+            $('.cobrowse-collect-data-sidebar').toggleClass('show');
+            $('.cobrowse-form-backdrop').toggleClass('show');
+        }
+
+        function show_cobrowse_form(el, category_id) {
+            {% for form_category in cobrowse_form_categories %}
+                document.getElementById('form-category-container-{{ form_category.pk }}').style.display = 'none';
+                document.getElementById('cobrowse-sidebar-category-btn-{{ form_category.pk }}').classList.remove('section-active');
+                document.getElementById('save-form-btn-{{ form_category.pk }}').style.display = 'none';
+            {% endfor %}
+
+            document.getElementById('form-category-container-' + category_id).style.display = 'flex';
+            document.getElementById('save-form-btn-' + category_id).style.display = 'block';
+
+            el.classList.toggle('section-active');
+        }
+
+        {% if not is_readonly %}
+        window.meeting_id = '{{ meeting_id }}';
+        window.is_agent = '{{ is_agent }}';
+        function save_cobrowse_form_data(el, category_id) {
+            var meeting_id = '{{ meeting_id }}';
+            var form_id = '{{ cobrowse_form_obj.pk }}';
+            var category_id = category_id;
+            var collected_data  = [];
+
+            {% for form_element in cobrowse_form_elements %}
+                var form_category_pk = '{{ form_element.form_category.pk }}';
+
+                if(form_category_pk == category_id) {
+                    {% ifequal form_element.element_type 'number' %}
+                        var input_value = $('#input_{{form_element.pk}}').val();
+                        input_value = stripHTML(input_value);
+                        input_value = remove_special_characters_from_str(input_value);
+
+                        {% if form_element.is_mandatory %}
+                            if(input_value == '' || input_value == null) {
+                                show_easyassist_toast("\"{{form_element.element_label}}\" is required.");
+                                return;
+                            }
+                        {% endif %}
+                        collected_data.push({
+                            "id": "{{ form_element.pk }}",
+                            "value": input_value
+                        });
+                    {% endifequal %}
+
+                    {% ifequal form_element.element_type 'text' %}
+                        var input_value = $('#text_{{ form_element.pk }}').val();
+                        input_value = stripHTML(input_value);
+                        input_value = remove_special_characters_from_str(input_value);
+
+                        {% if form_element.is_mandatory %}
+                            if(input_value == '' || input_value == null) {
+                                show_easyassist_toast("\"{{form_element.element_label}}\" is requied.");
+                                return;
+                            }
+                        {% endif %}
+                        collected_data.push({
+                            "id": "{{ form_element.pk }}",
+                            "value": input_value
+                        });
+                    {% endifequal %}
+
+                    {% ifequal form_element.element_type 'radio' %}
+                        {% if form_element.element_choices|length %}
+                            var input_value = $('input[name="radio_input_{{form_element.pk}}"]:checked').val();
+                            {% if form_element.is_mandatory %}
+                                if(input_value == '' || input_value == null) {
+                                    show_easyassist_toast("Please select valid option for \"{{form_element.element_label}}\".");
+                                    return;
+                                }
+                            {% endif %}
+                            collected_data.push({
+                                "id": "{{ form_element.pk }}",
+                                "value": input_value
+                            });
+                        {% endif %}
+                    {% endifequal %}
+
+                    {% ifequal form_element.element_type 'checkbox' %}
+                        {% if form_element.element_choices|length %}
+                            var selected_values = [];
+                            $.each($('input[name="checkbox_input_{{form_element.pk}}"]:checked'), function(e){
+                                selected_values.push($(this).val());
+                            });
+
+                            {% if form_element.is_mandatory %}
+                                if(selected_values.length == 0) {
+                                    show_easyassist_toast("Please select valid option for \"{{form_element.element_label}}\".");
+                                    return;
+                                }
+                            {% endif %}
+                            collected_data.push({
+                                "id": "{{ form_element.pk }}",
+                                "value": selected_values
+                            });
+                        {% endif %}
+                    {% endifequal %}
+
+                    {% ifequal form_element.element_type 'dropdown' %}
+                        {% if form_element.element_choices|length %}
+                            var input_value = $('#dropdown_{{form_element.pk}} option:selected').text();
+                            {% if form_element.is_mandatory %}
+                                if(input_value == '' || input_value == null) {
+                                    show_easyassist_toast("Please select valid option for \"{{form_element.element_label}}\".");
+                                    return;
+                                }
+                            {% endif %}
+                            collected_data.push({
+                                "id": "{{ form_element.pk }}",
+                                "value": input_value
+                            });
+                        {% endif %}
+                    {% endifequal %}
+                }
+            {% endfor %}
+
+            el.disabled = true;
+            el.innerHTML = "<span>Submitting...</span>";
+
+            var request_params = {
+                "meeting_id": meeting_id,
+                "form_id": form_id,
+                "category_id": category_id,
+                "collected_data": collected_data,
+            };
+
+            json_params = JSON.stringify(request_params);
+            encrypted_data = custom_encrypt(json_params);
+            encrypted_data = {
+                "Request": encrypted_data
+            };
+            const params = JSON.stringify(encrypted_data);
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "/easy-assist-salesforce/save-cobrowse-collected-form-data/", true);
+            xhttp.setRequestHeader('Content-Type', 'application/json');
+            xhttp.setRequestHeader('X-CSRFToken', get_csrfmiddlewaretoken());
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    response = JSON.parse(this.responseText);
+                    response = custom_decrypt(response.Response);
+                    response = JSON.parse(response);
+                    if (response.status == 200) {
+                        show_easyassist_toast("Form section data saved successfully.");
+                        $('#cobrowse-sidebar-category-btn-' + category_id).next().click();
+                        if(el == $('.save-form-button:last')[0]) {
+                            send_cobrowse_form_submit_status_over_socket(form_id);
+                        }
+                    } else {
+                        show_easyassist_toast("Unable to save form. Please try again");
+                    }
+
+                    el.disabled = false;
+                    el.innerHTML = "<span>Submit</span>";
+                }
+            }
+
+            xhttp.send(params);
+        }
+        {% endif %}
+    </script>
+</body>
+
+</html>

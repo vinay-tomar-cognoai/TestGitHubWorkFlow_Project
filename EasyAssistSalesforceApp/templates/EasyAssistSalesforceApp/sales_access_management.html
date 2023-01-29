@@ -1,0 +1,595 @@
+{% extends 'EasyAssistSalesforceApp/console.html' %}
+{% block content %}
+{% load static %}
+<!-- Begin Page Content -->
+<style type="text/css">
+    #easyassist-language-support-list-div .dropdown {
+        width: 100%;
+    }
+
+    #easyassist-product-category-list-div .dropdown {
+        width: 100%;
+    }
+
+    .modal .dropdown{
+        width: inherit !important;
+    }
+
+    .dropdown-menu.show{
+        width: inherit !important;
+    }
+
+    .bootstrap-select .dropdown-item{
+        padding-left: 0.8em;
+    }
+
+    .bootstrap-select.show-tick .dropdown-menu li a span.text{
+        width: 95% !important;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .bootstrap-select button {
+        border-radius: 5px!important;
+        border: 1px solid #E6E6E6 !important;
+        box-shadow: none !important;
+        text-align: left;
+        font-size: 1rem!important;
+        width: 100%!important;
+        transform: none!important;
+        outline: none!important;
+        transition: none!important;
+    }
+
+    .bootstrap-select .filter-option {
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    .bootstrap-select .dropdown-item {
+        color: #6e707e!important;
+        font-size: 1rem;
+        background-color: transparent;
+    }
+
+    .bootstrap-select .dropdown-item:hover {
+        background-color: #F8F9F9;
+    }
+    button:focus {
+        outline:none !important; ;
+        box-shadow: none !important; ;
+    }
+
+    #selected-supervisor-div {
+        padding-top: unset!important;
+    }
+
+    #easyassist-language-support-list-div {
+        padding-top: unset!important;
+    }
+</style>
+<div class="container-fluid">
+    <div class="col-md-12 mb">
+        <div class="row">
+            <div class="col-md-12">
+                <svg style="display: block; margin: auto;" width="278" height="38" viewBox="0 0 278 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1.05493" y="0.5" width="275.89" height="37" rx="18.5" fill="white" stroke="#E6E6E6"/>
+                    <text x="20" y="23" font-family="Silka" font-size="15px" font-weight="500" fill="#2655CB" onclick="show_agent_details('all')" style="cursor: pointer;">Total: {{ total_agent_count }}</text>
+                    <text x="102" y="23" font-family="Silka" font-size="15px" font-weight="500" fill="#38B27F" onclick="show_agent_details('online')" style="cursor: pointer;">Online: {{ active_agent_count }}</text>
+                    <text x="190" y="23" font-family="Silka" font-size="15px" font-weight="500" fill="#858796" onclick="show_agent_details('offline')" style="cursor: pointer;">Offline: {{ offline_agent_count }}</text>
+                    <path d="M89.0627 1.42926V36.2807" stroke="#E6E6E6"/>
+                    <path d="M179.59 1.42926V36.2807" stroke="#E6E6E6"/>
+                </svg>
+            </div>
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-sm-3" style="display: flex;">
+                        {% if cobrowse_agent.role == "admin" %}
+                        <button class="btn btn-info mb-2 mr-sm-2" data-toggle="modal" data-target="#add_new_agent_modal" onclick="populate_new_agent_modal()">Add User</button>
+                        {% else %}
+                        <button class="btn btn-info mb-2 mr-sm-2" data-toggle="modal" data-target="#add_new_agent_modal">Add Agent</button>
+                        {% endif %}
+                    </div>
+                    <div class="col-sm-9" style="display: flex; justify-content: flex-end;">
+                        <svg style="display:none; cursor:pointer;" onclick="activate_user(this)" id="button-activate-account" width="100" height="35" viewBox="0 0 103 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="1.01562" y="1.00739" width="100" height="35" rx="13.9926" stroke="#00DB3D" stroke-opacity="0.5"/>
+                            <text x="21" y="23" font-family="Silka" font-size="15px" fill="#00DB3D" >Activate</text>
+                        </svg>
+                        <svg style="display:none; cursor:pointer;" onclick="deactivate_user(this)" id="button-deactivate-account" width="100" height="35" viewBox="0 0 103 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="1.01562" y="1.00739" width="100" height="35" rx="13.9926" stroke="#E53E3E" stroke-opacity="0.5"/>
+                            <text x="12" y="23" font-family="Silka" font-size="15px" fill="#E53E3E" >Deactivate</text>
+                        </svg>
+                        <div class="dropdown no-arrow">
+                            <a class="dropdown-toggle" href="javascript:void(0)" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="31" height="32" viewBox="0 0 31 32" fill="none">
+                                    <path d="M17.0449 16C17.0449 15.1716 16.3733 14.5 15.5449 14.5C14.7165 14.5 14.0449 15.1716 14.0449 16C14.0449 16.8284 14.7165 17.5 15.5449 17.5C16.3733 17.5 17.0449 16.8284 17.0449 16Z" fill="#757575"/>
+                                    <path d="M12.0449 16C12.0449 15.1716 11.3733 14.5 10.5449 14.5C9.71649 14.5 9.04492 15.1716 9.04492 16C9.04492 16.8284 9.71649 17.5 10.5449 17.5C11.3733 17.5 12.0449 16.8284 12.0449 16Z" fill="#757575"/>
+                                    <path d="M22.0449 16C22.0449 15.1716 21.3734 14.5 20.5449 14.5C19.7165 14.5 19.0449 15.1716 19.0449 16C19.0449 16.8284 19.7165 17.5 20.5449 17.5C21.3734 17.5 22.0449 16.8284 22.0449 16Z" fill="#757575"/>
+                                    <circle cx="15.5447" cy="16" r="14.5373" stroke="#757575"/>
+                                </svg>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                                <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" data-target="#user_details_upload_modal">Create users via Excel</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="javascript:void(0)" onclick="export_user_excel_details(this)">Export Agent Details</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="/easy-assist-salesforce/sales-ai/access-management/?salesforce_token={{salesforce_token}}">Refresh</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <!-- DataTales Example -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Agents</h6>
+                    </div>
+                    <div class="card-body">
+                        {% if agents %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Name</th>
+                                        <th>Email ID</th>
+                                        <th>Mobile Number</th>
+                                        {% if cobrowse_agent.get_access_token_obj.choose_product_category %}
+                                        <th>Product Category</th>
+                                        {% endif %}
+                                        <th>Status</th>
+                                        <th>Account Status</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for agent in agents %}
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ agent.pk }}"></td>
+                                        <td><a data-toggle="modal" style="color:#2655CB; text-decoration: underline;cursor: pointer;" data-target="#save-agent-modal-{{ agent.pk }}">{{ agent.user.first_name }}</a></td>
+                                        <td>{{ agent.user.email }}</td>
+                                        <td>{{ agent.mobile_number }}</td>
+                                        {% if cobrowse_agent.get_access_token_obj.choose_product_category %}
+                                        <td>{{ agent.get_product_categories }}</td>
+                                        {% endif %}
+                                        <td>
+                                            {% if agent.is_active %}
+                                            <p style="color:#38B27F; font-weight: 500;">Online</p>
+                                            {% else %}
+                                            <p style="color:#858796; font-weight: 500;">Offline</p>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if agent.is_account_active %}
+                                            <p style="color:#38B27F; font-weight: 500;">Active</p>
+                                            {% else %}
+                                            <p style="color:#F56565; font-weight: 500;">Inactive</p>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ agent.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="table-responsive">
+                            Active agents not available
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% if supervisors %}
+            <div class="col-md-12">
+                <!-- DataTales Example -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Supervisors</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Name</th>
+                                        <th>Email ID</th>
+                                        <th>Mobile Number</th>
+                                        <th>Account Status</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for supervisor in supervisors %}
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ supervisor.pk }}"></td>
+                                        <td><a  style="color:#2655CB; text-decoration: underline;cursor: pointer;" data-toggle="modal" data-target="#save-supervisor-modal-{{ supervisor.pk }}">{{ supervisor.user.first_name }}</a></td>
+                                        <td>{{ supervisor.user.email }}</td>
+                                        <td>{{ supervisor.mobile_number }}</td>
+                                        <td>
+                                            {% if supervisor.is_account_active %}
+                                            <p style="color:#38B27F; font-weight: 500;">Active</p>
+                                            {% else %}
+                                            <p style="color:#F56565; font-weight: 500;">Inactive</p>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ supervisor.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="add_new_agent_modal" tabindex="-1" role="dialog" aria-labelledby="add_new_agent_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                {% if cobrowse_agent.role == "admin" %}
+                <h5 class="modal-title" id="add_new_agent_modal_modal_label">Add User</h5>
+                {% else %}
+                <h5 class="modal-title" id="add_new_agent_modal_modal_label">Add Agent</h5>
+                {% endif %}
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                        <form class="form-inline" action="javascript:void(0)">
+                            {% if cobrowse_agent.role == "admin" %}
+                                <div class="col-sm-6 mb-2">
+                                    <select class="custom-select" id="inline-form-input-user-type" onchange="check_selected_user_status(this)" style="width: 100%;">
+                                        <!-- <option selected="" value="None">Choose user type...</option> -->
+                                        <option value="agent" selected>Agent</option>
+                                        <option value="supervisor">Supervisor</option>
+                                    </select>
+                                </div>
+                            {% endif %}
+                            <div class="col-sm-6 mb-2">
+                                <label class="sr-only" for="inline-form-input-agent-name">User Name</label>
+                                <input type="text" style="width: 100%;" class="form-control" id="inline-form-input-agent-name" placeholder="User Name">
+                            </div>
+                            <div class="col-sm-6 mb-2">
+                                <label class="sr-only" for="inline-form-input-agent-email">User Email</label>
+                                <input type="text" style="width: 100%;" class="form-control" id="inline-form-input-agent-email" placeholder="User Email">
+                            </div>
+                            <div class="col-sm-6 mb-2">
+                                <label class="sr-only" for="inline-form-input-agent-mobile">User Mobile No. (optional)</label>
+                                <input type="text" style="width: 100%;" class="form-control" id="inline-form-input-agent-mobile" placeholder="User Mobile No. (optional)">
+                            </div>
+                            {% if cobrowse_agent.get_access_token_obj.allow_language_support %}
+                                <div class="col-sm-6 mb-2" id="easyassist-language-support-list-div">
+                                    <select class="selectpicker" multiple data-live-search="true" title="Select Language Support" id="easyassist-language-support-selected">
+                                        {% for language in supported_language_objs %}
+                                            {% if language.title == "English" %}
+                                                <option value="{{ language.pk }}" selected>{{ language.title }}</option>
+                                            {% else %}
+                                                <option value="{{ language.pk }}">{{ language.title }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            {% endif %}
+                            {% if cobrowse_agent.get_access_token_obj.choose_product_category %}
+                                <div class="col-sm-6 mb-2" id="easyassist-product-category-list-div">
+                                    <select class="selectpicker" multiple data-live-search="true" title="Select Product Category" id="easyassist-product-category-selected">
+                                        {% for category in product_category_objs %}
+                                            <option value="{{ category.pk }}">{{ category.title }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            {% endif %}
+                            <div class="col-sm-6 mb-2">
+                                <select class="custom-select" id="inline-form-input-agent-support-level" style="width:100%;">
+                                    <option selected="" value="None">Choose support level</option>
+                                    {% for agent_support_name, agent_support_value in COBROWSING_AGENT_SUPPORT %}
+                                        <option value="{{ agent_support_value }}">{{ agent_support_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% if cobrowse_agent.role == "admin" %}
+                                <div class="col-sm-6 mb-2" id="selected-supervisor-div">
+                                    <select class="selectpicker" title="Choose Supervisor" multiple id="inline-form-input-supervisor-pk" style="width: 100%;">
+                                        <option value="{{ cobrowse_agent.pk }}">{{ cobrowse_agent.user.email }}(Self)</option>
+                                        {% for supervisor in supervisors %}
+                                            <option value="{{ supervisor.pk }}">{{ supervisor.user.email }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            {% else %}
+                                <div class="col-sm-6 mb-2" id="selected-supervisor-div" style="display:none;width: 100%;">
+                                    <select class="selectpicker" title="Choose Supervisor" multiple id="inline-form-input-supervisor-pk">
+                                        <option value="{{ cobrowse_agent.pk }}">{{ cobrowse_agent.user.email }}(Self)</option>
+                                    </select>
+                                </div>
+                            {% endif %}
+                        </form>
+                        <p id="add-new-agent-error"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-success" id = "add-new-agent" onclick="add_new_agent(this)">Add</button>
+                <button class="btn btn-success" id="save-agent-details" onclick="add_new_agent(this)" style="display: none;">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% for agent in agents %}
+<div class="modal fade" id="save-agent-modal-{{agent.pk}}" tabindex="-1" role="dialog" aria-labelledby="edit_agent_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                {% if cobrowse_agent.role == "admin" %}
+                    <h5 class="modal-title" id="edit_agent_modal_modal_label">&nbsp;Edit User</h5>
+                {% else %}
+                    <h5 class="modal-title" id="edit_agent_modal_modal_label">&nbsp;Edit Agent</h5>
+                {% endif %}
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                        <form class="form-inline" action="javascript:void(0)">
+                            {% if cobrowse_agent.role == "admin" %}
+                            <div class="col-sm-6 mb-2">
+                                <select class="custom-select" id="inline-form-input-user-type-{{agent.pk}}" onchange="check_selected_user_status(this,'{{agent.pk}}')" style="width: 100%;">
+                                    <option selected="" value="None">Choose user type...</option>
+                                    <option value="agent" selected>Agent</option>
+                                    <option value="supervisor">Supervisor</option>
+                                </select>
+                            </div>
+                            {% endif %}
+                            <div class="col-sm-6 mb-2">
+                                <label class="sr-only" for="inline-form-input-agent-name-{{agent.pk}}">User Name</label>
+                                <input type="text" style="width: 100%;" class="form-control" id="inline-form-input-agent-name-{{agent.pk}}" value="{{agent.user.first_name}}" placeholder="User Name">
+                            </div>
+                            <div class="col-sm-6 mb-2">
+                                <label class="sr-only" for="inline-form-input-agent-email-{{agent.pk}}">User Email</label>
+                                <input type="text" style="width: 100%;" class="form-control" id="inline-form-input-agent-email-{{agent.pk}}" value="{{agent.user.email}}" placeholder="User Email">
+                            </div>
+                            <div class="col-sm-6 mb-2">
+                                <label class="sr-only" for="inline-form-input-agent-mobile-{{agent.pk}}">User Mobile No. (optional)</label>
+                                {% if agent.mobile_number != None %}
+                                    <input type="text" style="width: 100%;" class="form-control" id="inline-form-input-agent-mobile-{{agent.pk}}" value="{{agent.mobile_number}}" placeholder="User Mobile No. (optional)">
+                                {% else %}
+                                    <input type="text" style="width: 100%;" class="form-control" id="inline-form-input-agent-mobile-{{agent.pk}}" placeholder="User Mobile No. (optional)">
+                                {% endif %}
+                            </div>
+                            
+                            {% if cobrowse_agent.get_access_token_obj.allow_language_support %}
+                                <div class="col-sm-6 mb-2" id="easyassist-language-support-list-div-{{agent.pk}}">
+                                    <select class="selectpicker" multiple data-live-search="true" title="Select Language Support" id="easyassist-language-support-selected-{{agent.pk}}">
+                                        {% for language in supported_language_objs %}
+                                            {% if language in agent.supported_language.all %}
+                                                <option value="{{ language.pk }}" selected>{{ language.title }}</option>
+                                            {% else %}
+                                                <option value="{{ language.pk }}">{{ language.title }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            {% endif %}
+                            {% if cobrowse_agent.get_access_token_obj.choose_product_category %}
+                                <div class="col-sm-6 mb-2" id="easyassist-product-category-list-div-{{agent.pk}}">
+                                    <select class="selectpicker" multiple data-live-search="true" title="Select Product Category" id="easyassist-product-category-selected-{{agent.pk}}">
+                                        {% for category in product_category_objs %}
+                                            {% if category in agent.product_category.all %}
+                                                <option value="{{ category.pk }}" selected>{{ category.title }}</option>
+                                            {% else %}
+                                                <option value="{{ category.pk }}">{{ category.title }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            {% endif %}
+                            <div class="col-sm-6 mb-2">
+                                <select class="custom-select" id="inline-form-input-agent-support-level-{{agent.pk}}" style="width: 100%;">
+                                    <option selected="" value="None">Choose support level</option>
+                                    {% for agent_support_name, agent_support_value in COBROWSING_AGENT_SUPPORT %}
+                                        {% if agent_support_name == agent.support_level %}
+                                            <option value="{{ agent_support_value }}" selected>{{ agent_support_name }}</option>
+                                        {% else %}
+                                            <option value="{{ agent_support_value }}">{{ agent_support_name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% if cobrowse_agent.role == "admin" %}
+                            <div class="col-sm-6 mb-2" id="selected-supervisor-div-{{agent.pk}}" style="display:inline;">
+                                <select class="selectpicker" multiple title="Choose Supervisor" id="inline-form-input-supervisor-pk-{{agent.pk}}">
+                                    {% if agent in cobrowse_agent.agents.all %}
+                                        <option value="{{ cobrowse_agent.pk }}" selected>{{ cobrowse_agent.user.email }}(Self)</option>
+                                    {% else %}
+                                        <option value="{{ cobrowse_agent.pk }}">{{ cobrowse_agent.user.email }}(Self)</option>
+                                    {% endif %}
+                                    {% for supervisor in supervisors %}
+                                        {% if agent in supervisor.agents.all %}
+                                            <option value="{{ supervisor.pk }}" selected>{{ supervisor.user.email }}</option>
+                                        {% else %}
+                                            <option value="{{ supervisor.pk }}">{{ supervisor.user.email }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% else %}
+                            <div class="col-sm-6 mb-2" id="selected-supervisor-div-{{agent.pk}}" style="display:none;">
+                                <select class="selectpicker" multiple id="inline-form-input-supervisor-pk-{{agent.pk}}">
+                                    <option value="{{ cobrowse_agent.pk }}" selected>Select Supervisor</option>
+                                    <option value="{{ cobrowse_agent.pk }}">{{ cobrowse_agent.user.email }}(Self)</option>
+                                </select>
+                            </div>
+                            {% endif %}
+                        </form>
+                        <p id="save-agent-details-error-{{agent.pk}}"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-success" id="save-agent-details" onclick="update_agent_details(this,'{{agent.pk}}')">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% for supervisor in supervisors %}
+<div class="modal fade" id="save-supervisor-modal-{{supervisor.pk}}" tabindex="-1" role="dialog" aria-labelledby="edit_supervisor_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                {% if cobrowse_agent.role == "admin" %}
+                    <h5 class="modal-title" id="edit_supervisor_modal_modal_label">Edit User</h5>
+                {% else %}
+                    <h5 class="modal-title" id="edit_supervisor_modal_modal_label">Edit Agent</h5>
+                {% endif %}
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <form class="form-inline" action="javascript:void(0)">
+                            <div class="col-sm-6">
+                                <label class="sr-only" for="inline-form-input-agent-name-{{supervisor.pk}}">User Name</label>
+                                <input type="text" style="width: 100%;" class="form-control mb-2" id="inline-form-input-agent-name-{{supervisor.pk}}" value="{{supervisor.user.first_name}}" placeholder="User Name">
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="sr-only" for="inline-form-input-agent-email-{{supervisor.pk}}">User Email</label>
+                                <input type="text" style="width: 100%;" class="form-control mb-2" id="inline-form-input-agent-email-{{supervisor.pk}}" value="{{supervisor.user.email}}" placeholder="User Email">
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="sr-only" for="inline-form-input-agent-mobile-{{supervisor.pk}}">User Mobile No. (optional)</label>
+                                {% if agent.mobile_number != None %}
+                                    <input type="text" style="width: 100%;" class="form-control mb-2" id="inline-form-input-agent-mobile-{{supervisor.pk}}" value="{{supervisor.mobile_number}}" placeholder="User Mobile No. (optional)">
+                                {% else %}
+                                    <input type="text" style="width: 100%;" class="form-control mb-2" id="inline-form-input-agent-mobile-{{supervisor.pk}}" placeholder="User Mobile No. (optional)">
+                                {% endif %}
+                            </div>
+                            {% if cobrowse_agent.role == "admin" %}
+                                <div class="col-sm-6">
+                                    <select class="custom-select" id="inline-form-input-user-type-{{supervisor.pk}}" onchange="check_selected_user_status(this,'{{supervisor.pk}}')" style="width: 100%;margin-bottom: .5rem;">
+                                        <option selected="" value="None">Choose user type...</option>
+                                        <option value="agent">Agent</option>
+                                        <option value="supervisor" selected>Supervisor</option>
+                                    </select>
+                                </div>
+                            {% endif %}
+                            {% if cobrowse_agent.get_access_token_obj.allow_language_support %}
+                                <div class="col-sm-6" id="easyassist-language-support-list-div-{{supervisor.pk}}">
+                                    <select class="selectpicker" multiple data-live-search="true" title="Select Language Support" id="easyassist-language-support-selected-{{supervisor.pk}}">
+                                        {% for language in supported_language_objs %}
+                                            {% if language in supervisor.supported_language.all %}
+                                                <option value="{{ language.pk }}" selected>{{ language.title }}</option>
+                                            {% else %}
+                                                <option value="{{ language.pk }}">{{ language.title }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            {% endif %}
+                            {% if cobrowse_agent.get_access_token_obj.choose_product_category %}
+                                <div class="col-sm-6" id="easyassist-product-category-list-div-{{supervisor.pk}}">
+                                    <select class="selectpicker" multiple data-live-search="true" title="Select Product Category" id="easyassist-product-category-selected-{{supervisor.pk}}">
+                                        {% for category in product_category_objs %}
+                                            {% if category in supervisor.product_category.all %}
+                                                <option value="{{ category.pk }}" selected>{{ category.title }}</option>
+                                            {% else %}
+                                                <option value="{{ category.pk }}">{{ category.title }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            {% endif %}
+                            <div class="col-sm-6" style="padding-top: 5px;">
+                                <select class="custom-select" id="inline-form-input-agent-support-level-{{supervisor.pk}}" style="width: 100%;">
+                                    <option selected="" value="None">Choose support level</option>
+                                    {% for agent_support_name, agent_support_value in COBROWSING_AGENT_SUPPORT %}
+                                        {% if agent_support_name == supervisor.support_level %}
+                                            <option value="{{ agent_support_value }}" selected>{{ agent_support_name }}</option>
+                                        {% else %}
+                                            <option value="{{ agent_support_value }}">{{ agent_support_name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-sm-6" id="selected-supervisor-div-{{supervisor.pk}}" style="display: none;padding-top: 5px;">
+                                <select class="selectpicker" multiple title="Select Supervisor" id="inline-form-input-supervisor-pk-{{supervisor.pk}}">
+                                    <option value="{{ cobrowse_agent.pk }}">{{ cobrowse_agent.user.email }}(Self)</option>
+                                    {% for supervise in supervisors %}
+                                        {% if supervise != supervisor %}
+                                            <option value="{{ supervise.pk }}">{{ supervise.user.email }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </form>
+                        <p id="save-agent-details-error-{{supervisor.pk}}"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-success" id="save-agent-details" onclick="update_agent_details(this,'{{supervisor.pk}}')">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+<div class="modal fade" id="user_details_upload_modal" tabindex="-1" role="dialog" aria-labelledby="document_upload_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="document_upload_modal_modal_label">Add Users Via Excel</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <form class="form-inline" action="javascript:void(0)">
+                            <div class="col-sm-12">
+                                <input type="file" id="user_details_upload_input" class="form-control" name="" style="box-shadow:none !important;" multiple>
+                            </div>
+                            <div class="col-sm-12">
+                                <p style="padding-top: 1em;" id="user_details_upload_input_error"></p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; align-items: center; justify-content: space-between;">
+                <button class="btn btn-info" onclick="download_user_details_excel_template(this)" id="user-details-download-template-button">Download template</button>
+                <div>
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <button class="btn btn-success" onclick="upload_user_excel_details()">Upload</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function(){
+        setTimeout(function(){
+            $('.bootstrap-select button').removeClass();
+            $('.bootstrap-select button').addClass('custom-select');
+        }, 1000);
+    });
+    function check_selected_user_status(element,pk=""){
+        var selected_supervisor_div = "selected-supervisor-div";
+        if(pk !== "")
+            selected_supervisor_div += '-' + pk;
+        if(element.value=="agent"){
+            document.getElementById(selected_supervisor_div).style.display="block";
+        }else{
+            document.getElementById(selected_supervisor_div).style.display="none";
+        }
+    }
+    function populate_new_agent_modal(){
+        document.getElementById('selected-supervisor-div').style.display="block";   
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,702 @@
+{% extends 'EasyAssistApp/console.html' %}
+{% block content %}
+{% load static %}
+
+{% if request.user.enable_s3_bucket %}
+    <script src="https://static.allincall.in/static/EasyAssistApp/js/ace.js" type="text/javascript"
+        charset="utf-8"></script>
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/jscolor.min.js"></script>
+{% else %}
+    <script src="{% static 'EasyAssistApp/js/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" src="{% static 'EasyAssistApp/js/jscolor.min.js' %}"></script>
+{% endif %}
+
+<link href="{% static 'EasyAssistApp/css/drop-down.css' %}" rel="stylesheet" type="text/css">
+<link href="{% static 'EasyAssistApp/css/settings.css' %}" rel="stylesheet" type="text/css">
+
+<div class="container-fluid">
+    <div>
+    <div id="pills-option-general-agent-setting">
+      <div class="page-header">
+        <div class="row justify-content-between">
+          <div class="col-sm-8 d-flex align-items-center">
+            <div class="nav nav-pills navbar-right">
+              <a class="anchor-reset back-btn"  href="/easy-assist/sales-ai/settings/options/general">
+                <span class="mr-3 mb-auto " style="cursor: pointer;">
+                  <svg class="back-arrow-svg" width="44" height="44" viewBox="0 0 44 44" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <rect width="44" height="44" rx="22" transform="matrix(1 0 0 -1 0 44)" fill="white" />
+                    {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                    <path
+                      d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                      fill="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" />
+                          {% else %}
+                          <path
+                      d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                      fill="#0254D7" />
+ 
+                          {% endif %} 
+                    
+                  </svg>
+                </span>
+              </a>
+              <h5  class="nav_btn mr-2 mt-2"> <a class="anchor-reset"  href="/easy-assist/sales-ai/settings">Settings</a> </h5>
+              <div class=" mr-2 pt-2">
+                <svg class="mini-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                    fill="#475569" />
+                </svg>
+              </div>
+              <h5  class="nav_btn mr-2 mt-2"> <a class="anchor-reset"  href="/easy-assist/sales-ai/settings/options">Options</a></h5>
+              <div class=" mr-2 pt-2">
+                <svg class="mini-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                    fill="#475569" />
+                </svg>
+              </div>
+              <h5  class="nav_btn mr-2 mt-2"><a class="anchor-reset"  href="/easy-assist/sales-ai/settings/options/general">General</a></h5>
+              <div class=" mr-2 pt-2">
+                <svg class="mini-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                    fill="#475569" />
+                </svg>
+              </div>
+              <h5  class="nav_btn active1 mt-2">Agent Settings</h5>
+            </div>
+          </div>
+          <div class="col-sm-4 d-flex justify-content-end">
+            <button class="btn btn-width-100" id="reset-button" data-toggle="modal" data-target="#modal-confirm-reset-all">Reset All</button>
+            <button class="btn btn-width-100" id="save-button" onclick="save_general_agent_settings(this)"
+            style="background: #10B981!important;">Save</button>
+          </div>
+        </div>
+      </div>
+      <div class="card shadow mb-4 mt-30">
+        <div class="card-body p-0">
+          <div class="card">
+            <div class="card-body table-responsive p-0">
+              <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                <tbody>
+                  <tr>
+                    <th scope="row" class="heading-toggle-text">Enable chat functionality</th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.enable_chat_functionality %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_chat_functionality" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                    {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_chat_functionality">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                    {% endif %}                      
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+  
+      </div>
+      <div id="chat-bubble-div" class="card shadow mb-4 mt-20">
+        <div class="card-body p-0">
+          <div class="card">
+            <div class="card-body table-responsive p-0">
+              <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                <tbody>
+                 <tr id="enable_greeting_chat_div">
+                    <th scope="row" class="heading-toggle-text">Enable chat bubble
+                      <span data-toggle="tooltip" data-placement="bottom" title="" data-original-title="This will display LiveChat as a chat bubble while on a co-browsing session."><i class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.enable_chat_bubble %}
+                        <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_chat_bubble" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                        </label>
+                      {% else %}
+                        <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_chat_bubble">
+                        <span class="easyassist-option-switch-slider round"></span>
+                        </label>
+                      {% endif %}  
+                    </td>
+                  </tr>
+  
+                  <tr id="display_chat_icon" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Upload chat bubble Icon<br>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      <div class="row">
+                        <div class="col-md-4 col-sm-12" style="padding-left: 0.7em;display: flex;align-items: center;">
+                          <button class="btn btn-info mb-2 mr-sm-2" data-toggle="modal" data-target="#chat_icon_upload_modal" id="chat_icon_upload_button">Change Icon</button>                                    
+                        </div>
+                        <div class="col-md-4 col-sm-12 default-chat-icon" style="display: none">
+                            <img alt="Chat Icon"  src="/{{ access_token_obj.chat_bubble_icon_source }}" id="default-chat-icon-image">
+                        </div>
+                        <div class="col-md-4 col-sm-12 reset-icon" style="display: none">    
+                            <svg class="chat-svg-icon" width="95" height="95" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <g filter="url(#filter0_dd_145_7801)">
+                              <rect x="28" y="16" width="80" height="80" rx="18" fill="{{ access_token_obj.floating_button_bg_color }}"/>
+                              <path fill-rule="evenodd" clip-rule="evenodd" d="M55.7863 67.1339C53.277 66.0647 49.9999 64.6685 50 60.663V44.7989C50 41.2922 53.1694 38 56.5454 38H80.4421C83.7148 38 86 41.1728 86 44.7989V60.663C86 62.9293 85.1273 67.4619 81.6364 67.4619H64.1819L58.7273 71.9945C53.7383 75.9669 54.5415 73.5381 56.0207 69.0651L56.0208 69.0649L56.0209 69.0645C56.1895 68.5547 56.3669 68.0184 56.5454 67.4619C56.3039 67.3544 56.0494 67.2459 55.7863 67.1339ZM58.7267 56.1303C59.9317 56.1303 60.9085 55.1156 60.9085 53.864C60.9085 52.6123 59.9317 51.5977 58.7267 51.5977C57.5218 51.5977 56.5449 52.6123 56.5449 53.864C56.5449 55.1156 57.5218 56.1303 58.7267 56.1303ZM78.3636 53.864C78.3636 55.1156 77.3868 56.1303 76.1818 56.1303C74.9768 56.1303 74 55.1156 74 53.864C74 52.6123 74.9768 51.5977 76.1818 51.5977C77.3868 51.5977 78.3636 52.6123 78.3636 53.864ZM67.4552 56.1303C68.6602 56.1303 69.6371 55.1156 69.6371 53.864C69.6371 52.6123 68.6602 51.5977 67.4552 51.5977C66.2503 51.5977 65.2734 52.6123 65.2734 53.864C65.2734 55.1156 66.2503 56.1303 67.4552 56.1303Z" fill="white"/>
+                              <rect x="29.25" y="17.25" width="77.5" height="77.5" rx="16.75" stroke="white" stroke-width="2.5"/>
+                              </g>
+                              <defs>
+                              <filter id="filter0_dd_145_7801" x="0" y="0" width="136" height="136" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                              <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                              <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                              <feOffset dy="12"/>
+                              <feGaussianBlur stdDeviation="14"/>
+                              <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0.12549 0 0 0 0 0.2 0 0 0 0.12 0"/>
+                              <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_145_7801"/>
+                              <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                              <feOffset dy="8"/>
+                              <feGaussianBlur stdDeviation="4"/>
+                              <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0.12549 0 0 0 0 0.2 0 0 0 0.04 0"/>
+                              <feBlend mode="normal" in2="effect1_dropShadow_145_7801" result="effect2_dropShadow_145_7801"/>
+                              <feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_145_7801" result="shape"/>
+                              </filter>
+                              </defs>
+                            </svg>                                      
+                          </div>
+                        <div class="col-md-4 col-sm-12 reset-chat-icon" style="padding-left: 0.3em;display: flex;align-items: center; cursor:pointer;" onclick="set_default_icon()">
+                          <svg width="80" height="32" viewBox="0 0 80 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0 16C0 7.16344 7.16344 0 16 0H64C72.8366 0 80 7.16344 80 16V16C80 24.8366 72.8366 32 64 32H16C7.16344 32 0 24.8366 0 16V16Z" fill="#F1F5F9"/>
+                            <path d="M21.5977 21V11.1973H25.0977C26.0911 11.1973 26.8887 11.4775 27.4902 12.0381C28.0918 12.5941 28.3926 13.3187 28.3926 14.2119C28.3926 14.8864 28.208 15.4766 27.8389 15.9824C27.4743 16.4883 27.0094 16.8438 26.4443 17.0488L28.6729 21H26.9639L24.9609 17.2744H23.1084V21H21.5977ZM23.1084 15.9619H25.0293C25.5671 15.9619 26.0023 15.8115 26.335 15.5107C26.6676 15.21 26.834 14.777 26.834 14.2119C26.834 13.7152 26.6699 13.3073 26.3418 12.9883C26.0182 12.6647 25.5625 12.5029 24.9746 12.5029H23.1084V15.9619ZM29.7871 17.3633C29.7871 16.6022 29.9466 15.9277 30.2656 15.3398C30.5846 14.7474 31.0199 14.2917 31.5713 13.9727C32.1273 13.6536 32.7516 13.4941 33.4443 13.4941C34.0003 13.4941 34.5062 13.5921 34.9619 13.7881C35.4176 13.984 35.7936 14.2529 36.0898 14.5947C36.3906 14.9365 36.6208 15.3353 36.7803 15.791C36.9443 16.2467 37.0264 16.7367 37.0264 17.2607V17.8076H31.2568C31.2842 18.4502 31.5007 18.9674 31.9062 19.3594C32.3118 19.7513 32.8473 19.9473 33.5127 19.9473C33.9775 19.9473 34.3923 19.8424 34.7568 19.6328C35.126 19.4232 35.3835 19.1406 35.5293 18.7852H36.958C36.7666 19.5052 36.3587 20.0863 35.7344 20.5283C35.1146 20.9658 34.3604 21.1846 33.4717 21.1846C32.3825 21.1846 31.4961 20.8268 30.8125 20.1113C30.1289 19.3913 29.7871 18.4753 29.7871 17.3633ZM31.2842 16.6729H35.5703C35.5247 16.0713 35.3037 15.5973 34.9072 15.251C34.5107 14.9001 34.0231 14.7246 33.4443 14.7246C32.8792 14.7246 32.3916 14.9069 31.9814 15.2715C31.5713 15.6361 31.3389 16.1032 31.2842 16.6729ZM38.3867 18.833H39.7744C39.8701 19.5941 40.4033 19.9746 41.374 19.9746C41.848 19.9746 42.2148 19.8789 42.4746 19.6875C42.7389 19.4915 42.8711 19.2295 42.8711 18.9014C42.8711 18.6598 42.7913 18.4661 42.6318 18.3203C42.4769 18.1699 42.2718 18.0605 42.0166 17.9922C41.766 17.9193 41.488 17.8577 41.1826 17.8076C40.8773 17.7575 40.5719 17.6914 40.2666 17.6094C39.9658 17.5273 39.6878 17.418 39.4326 17.2812C39.182 17.1445 38.9769 16.9395 38.8174 16.666C38.6624 16.388 38.585 16.0462 38.585 15.6406C38.585 15.0163 38.8402 14.5036 39.3506 14.1025C39.861 13.6969 40.5309 13.4941 41.3604 13.4941C42.1123 13.4941 42.7412 13.6901 43.2471 14.082C43.7529 14.474 44.0332 15.0117 44.0879 15.6953H42.7412C42.7002 15.3763 42.5566 15.1257 42.3105 14.9434C42.0645 14.7611 41.7272 14.6699 41.2988 14.6699C40.8932 14.6699 40.5674 14.7588 40.3213 14.9365C40.0798 15.1097 39.959 15.3353 39.959 15.6133C39.959 15.8047 40.0205 15.9642 40.1436 16.0918C40.2712 16.2194 40.4352 16.3105 40.6357 16.3652C40.8408 16.4199 41.0732 16.4746 41.333 16.5293C41.5928 16.5794 41.8571 16.625 42.126 16.666C42.3994 16.707 42.666 16.7777 42.9258 16.8779C43.1855 16.9782 43.4157 17.1012 43.6162 17.2471C43.8213 17.3883 43.9854 17.5957 44.1084 17.8691C44.236 18.1426 44.2998 18.4639 44.2998 18.833C44.2998 19.5348 44.0309 20.1022 43.4932 20.5352C42.96 20.9681 42.2399 21.1846 41.333 21.1846C40.4261 21.1846 39.7197 20.9749 39.2139 20.5557C38.7126 20.1318 38.4368 19.5576 38.3867 18.833ZM45.7148 17.3633C45.7148 16.6022 45.8743 15.9277 46.1934 15.3398C46.5124 14.7474 46.9476 14.2917 47.499 13.9727C48.055 13.6536 48.6794 13.4941 49.3721 13.4941C49.9281 13.4941 50.4339 13.5921 50.8896 13.7881C51.3454 13.984 51.7214 14.2529 52.0176 14.5947C52.3184 14.9365 52.5485 15.3353 52.708 15.791C52.8721 16.2467 52.9541 16.7367 52.9541 17.2607V17.8076H47.1846C47.2119 18.4502 47.4284 18.9674 47.834 19.3594C48.2396 19.7513 48.7751 19.9473 49.4404 19.9473C49.9053 19.9473 50.32 19.8424 50.6846 19.6328C51.0537 19.4232 51.3112 19.1406 51.457 18.7852H52.8857C52.6943 19.5052 52.2865 20.0863 51.6621 20.5283C51.0423 20.9658 50.2881 21.1846 49.3994 21.1846C48.3102 21.1846 47.4238 20.8268 46.7402 20.1113C46.0566 19.3913 45.7148 18.4753 45.7148 17.3633ZM47.2119 16.6729H51.498C51.4525 16.0713 51.2314 15.5973 50.835 15.251C50.4385 14.9001 49.9508 14.7246 49.3721 14.7246C48.807 14.7246 48.3193 14.9069 47.9092 15.2715C47.499 15.6361 47.2666 16.1032 47.2119 16.6729ZM54.1367 14.8818V13.6924H55.1006C55.2282 13.6924 55.333 13.6491 55.415 13.5625C55.4971 13.4759 55.5381 13.3597 55.5381 13.2139V11.6074H56.9189V13.6787H59.0518V14.8818H56.9189V18.6348C56.9189 19.3822 57.2744 19.7559 57.9854 19.7559H58.9766V21H57.7598C57.0306 21 56.4632 20.8018 56.0576 20.4053C55.652 20.0042 55.4492 19.4277 55.4492 18.6758V14.8818H54.1367Z" fill="#334155"/>
+                        </svg>
+                        </div>                                      
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="document-sharing-div" class="card shadow mb-4 mt-20">
+        <div class="card-body p-0">
+          <div class="card">
+            <div class="card-body table-responsive p-0">
+              <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                <tbody>
+                  <tr>
+                    <th scope="row" class="heading-toggle-text">Enable doc sharing through chat
+                      <span data-toggle="tooltip" data-placement="bottom" title="Enabling this will allow attachments option in agent and customer chatbox."><i class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.share_document_from_livechat %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="share_document_from_livechat" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                    {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="share_document_from_livechat">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                    {% endif %}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="document-coview-div" class="card shadow mb-4 mt-20">
+        <div class="card-body p-0">
+          <div class="card">
+            <div class="card-body table-responsive p-0">
+              <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                <tbody>
+                  <tr id="enable_document_coview_div">
+                    <th scope="row" class="heading-toggle-text">Enable document co-viewing
+                      <span data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Enabling this toggle would let agents and customer co-view shared documents."><i class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.enable_preview_functionality %}
+                        <label class="easyassist-option-switch">
+                          <input type="checkbox" id="enable-document-coview" checked="">
+                          <span class="easyassist-option-switch-slider round"></span>
+                        </label>
+                      {% else %}
+                        <label class="easyassist-option-switch">
+                          <input type="checkbox" id="enable-document-coview">
+                          <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="preapproved-document-div" class="card shadow mb-4 mt-20">
+        <div class="card-body p-0">
+          <div class="card">
+            <div class="card-body table-responsive p-0">
+              <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                <tbody>
+                  <tr>
+                    <th scope="row" class="heading-toggle-text">Enable pre-approved document sharing
+                      <span data-toggle="tooltip" data-placement="bottom" title="Enabling this will display documents icon in the agent's navigation bar while Co-browsing."><i class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.allow_support_documents %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="allow_support_documents" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                    {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="allow_support_documents">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                    {% endif %}
+                    </td>
+                  </tr>
+                <tr id="allow_only_support_documents_div">
+                    <th scope="row" class="sub-heading-toggle-text">Enable agents to share only pre-approved documents
+                      <span data-toggle="tooltip" data-placement="bottom" title="Enabling this will hide the attachment icon from the agent's chatbox even if doc sharing through chat is on."><i class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      
+                      {% if access_token_obj.allow_only_support_documents %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="allow_only_support_documents" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="allow_only_support_documents">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+                      
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card shadow mb-4 mt-20">
+        <div class="card-body p-0">
+          <div class="card">
+            <div class="card-body table-responsive p-0">
+              <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                <tbody>
+                  <tr class="dropdown-tr-tag">
+                              
+                    {% if access_token_obj.show_easyassist_connect_agent_icon %}
+                              <th class="heading-toggle-text" scope="row" id="floating_button_and_navbar_position_text">Icon and NavBar Position
+
+                              <span style="position: relative;" data-toggle="tooltip" data-placement="bottom" title="Change position of Icon and NavBar." id="floating_button_and_navbar_position_tooltip"><i
+                                    class="fas fa-info-circle"></i></span>   
+                                    
+                              </th>
+                            {% else %}
+                              <th class="heading-toggle-text" scope="row" id="floating_button_and_navbar_position_text">Floating Button and NavBar Position
+
+                              <span style="position: relative;" data-toggle="tooltip" data-placement="bottom" title="Change position of floating button and NavBar." id="floating_button_and_navbar_position_tooltip"><i
+                                    class="fas fa-info-circle"></i></span>   
+                                    
+                              </th>
+                            {% endif %}
+                            <td class="dropdown-tr-td" style="vertical-align: inherit;">
+                              <select id="floating_button_position" class="form-control custom-select-dropdown-navbar-position" style="width:50%;"
+                                onchange="show_floating_sidenav_easyassist_button()">
+                                {% for value, position in FLOATING_BUTTON_POSITION %}
+                                {% if value == access_token_obj.floating_button_position %}
+                                <option value="{{ value }}" selected>{{ position| title }}</option>
+                                {% else %}
+                                <option value="{{ value }}">{{ position| title }}</option>
+                                {% endif %}
+                                {% endfor %}
+                              </select>
+                            </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card shadow mb-4 mt-20">
+        <div class="card-body p-0">
+          <div class="card">
+            <div class="card-body table-responsive p-0">
+              <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                <tbody>
+                  {% if access_token_obj.allow_agent_to_customer_cobrowsing %}
+                  <tr id="auto_offline_agent_div">
+                    <th scope="row" class="heading-toggle-text disable-menu-tab" style="color: #CBCACA !important;">Enable auto offline agent
+                      <span data-toggle="tooltip" data-placement="bottom" title="On enabling, the agent will be automatically offline after 30 sec of inactivity."><i class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="auto_offline_agent" style="color: #CBCACA !important;" disabled>
+                        <span  data-toggle="tooltip" data-placement="bottom" data-original-title="Not applicable to Reverse Co-browsing" class="easyassist-option-switch-slider round" style="color: #CBCACA !important;" disabled></span>
+                      </label>
+                    </td>
+                  </tr>
+                  {% else %}
+                    <tr id="auto_offline_agent_div">
+                      <th scope="row" class="heading-toggle-text">Enable auto offline agent
+                        <span data-toggle="tooltip" data-placement="bottom" title="On enabling, the agent will be automatically offline after 30 sec of inactivity."><i class="fas fa-info-circle"></i></span>
+                      </th>
+                      <td style="vertical-align: inherit;">
+                        {% if access_token_obj.disable_auto_offline_agent %}
+                          <label class="easyassist-option-switch">
+                          <input type="checkbox" id="auto_offline_agent" >
+                          <span class="easyassist-option-switch-slider round"></span>
+                          </label>
+                        {% else %}
+                          <label class="easyassist-option-switch">
+                          <input type="checkbox" id="auto_offline_agent" checked>
+                          <span class="easyassist-option-switch-slider round"></span>
+                          </label>
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+    </div>
+      <div class="card shadow mb-4 mt-20">
+        <div class="card-body p-0">
+          <div class="card">
+            <div class="card-body table-responsive p-0">
+              <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                <tbody>
+                  <tr id="display_agent_profile_div">
+                    <th scope="row" class="heading-toggle-text">Display agent profile picture
+                      <span data-toggle="tooltip" data-placement="bottom" title="Allows agents to add profile pictures. This will be visible to customers."><i class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.display_agent_profile %}
+                              <label class="easyassist-option-switch">
+                                <input type="checkbox" id="display_agent_profile" checked>
+                                <span class="easyassist-option-switch-slider round"></span>
+                              </label>
+                              {% else %}
+                              <label class="easyassist-option-switch">
+                                <input type="checkbox" id="display_agent_profile">
+                                <span class="easyassist-option-switch-slider round"></span>
+                              </label>
+                              {% endif %}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>    
+    </div>  
+    </div>
+  </div>
+  
+  <div class="modal fade upload_file_modal" id="chat_icon_upload_modal" tabindex="-1" role="dialog" aria-labelledby="document_upload_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" >Upload Icon</h5>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-12">
+                  <label for="chat_icon_input" class="custom-file-upload">
+                      Choose File
+                  </label>
+                  <input type="file" id="chat_icon_input" class="form-control" name="" style="display: none !important;" accept=".png, .PNG">
+                </div>
+                <div class="col-sm-11" id="progress-modal-chat-icon">
+                    <div class="col-md-12 col-sm-12 modal-upload-file mt-4" style="display: none;">
+                      <div class="col-md-1 col-sm-1 width-auto-sm pd-mg">
+                        <svg width="24" height="32" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path fill-rule="evenodd" clip-rule="evenodd" d="M14 0V8.50667C14 9.33333 14.6667 10 15.4933 10H24V30.5067C24 31.3333 23.3333 32 22.5067 32H1.49333C0.666665 32 0 31.3333 0 30.5067V1.49333C0 0.666667 0.666665 0 1.49333 0H14ZM17.4404 0.426667L23.5471 6.56C23.8404 6.85333 24.0004 7.22667 24.0004 7.62667V8H16.0004V0H16.3737C16.7737 0 17.147 0.16 17.4404 0.426667Z" fill="#ef827f"/>
+                          <defs>
+                            <linearGradient id="paint0_linear" x1="2.39111" y1="3" x2="23.3908" y2="32.0002" gradientUnits="userSpaceOnUse">
+                              <stop stop-color="#E08F8D"/>
+                              <stop offset="1" stop-color="#FE736F"/>
+                            </linearGradient>
+                          </defs>
+                        </svg>
+                      </div>
+                      <div class="col-md-10 col-sm-10 file-name-container">
+                        <div class="file-name-div">
+                        </div>
+                        <div class="progress">
+                          <div class="indeterminate"></div>
+                        </div>
+                      </div>
+                      <div class="col-md-1 col-sm-1 width-auto-sm pr-sm-0">
+                        <button class="upload-file-cross-btn" type="button" onclick="remove_chat_icon();">
+                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M6.48438 4.98438L9.85938 1.64062C10.0469 1.45312 10.0469 1.10938 9.85938 0.921875L9.07812 0.140625C8.89062 -0.046875 8.54688 -0.046875 8.35938 0.140625L5.01562 3.51562L1.64062 0.140625C1.45312 -0.046875 1.10938 -0.046875 0.921875 0.140625L0.140625 0.921875C-0.046875 1.10938 -0.046875 1.45312 0.140625 1.64062L3.51562 4.98438L0.140625 8.35938C-0.046875 8.54688 -0.046875 8.89062 0.140625 9.07812L0.921875 9.85938C1.10938 10.0469 1.45312 10.0469 1.64062 9.85938L5.01562 6.48438L8.35938 9.85938C8.54688 10.0469 8.89062 10.0469 9.07812 9.85938L9.85938 9.07812C10.0469 8.89062 10.0469 8.54688 9.85938 8.35938L6.48438 4.98438Z" fill="#E08F8D"/>
+                            </svg>
+                        </button>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div id="icon-error-div">        
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-text-only" type="button" data-dismiss="modal">Cancel</button>
+          <button class="btn btn-primary" onclick="upload_chat_icon(this)">Upload</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal fade upload_file_modal" id="modal-confirm-reset-all" tabindex="-1" role="dialog"aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Reset All Settings</h5>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-12">
+                  <p>This will reset all settings across the console. Are you sure you want to continue?<p>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-text-only" type="button" data-dismiss="modal">Cancel</button>
+          <button class="btn btn-primary" onclick="reset_cobrowsing_meta_details(this)">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  
+  window.chat_bubble_icon_path = "{{access_token_obj.chat_bubble_icon_source}}";
+
+  window.addEventListener("load", function() {
+    if(chat_bubble_icon_path != "") {
+      $(".default-chat-icon").css({"display":"flex"});
+    } else {
+      $(".reset-icon").css({"display":"flex"});
+      $(".reset-chat-icon").css({"display":"none"})
+    }
+  });
+
+  function action_for_chat_functionality() {
+      let enable_chat_functionality = document.getElementById("enable_chat_functionality");
+      if(enable_chat_functionality.checked == false){ 
+        document.getElementById("enable_greeting_chat_div").style.display = "none";
+        document.getElementById("chat-bubble-div").style.display = "none";
+        document.getElementById("display_chat_icon").style.display = "none";
+        document.getElementById("enable_chat_bubble").checked = false;
+        document.getElementById("enable-document-coview").checked = false;
+        document.getElementById("enable_document_coview_div").style.display = "none";
+        document.getElementById("allow_support_documents").checked = false;
+        document.getElementById("share_document_from_livechat").checked = false;
+        document.getElementById("document-sharing-div").classList.add("easyassist_hidden_div");
+        document.getElementById("document-coview-div").classList.add("easyassist_hidden_div");
+        document.getElementById("preapproved-document-div").classList.add("easyassist_hidden_div");
+        action_for_chat_bubble();
+        allow_support_documents_change_actions();
+      } else {
+        document.getElementById("chat-bubble-div").style.display = "";
+        document.getElementById("enable_greeting_chat_div").style.display = "";
+        document.getElementById("enable_document_coview_div").style.display = "";
+        document.getElementById("document-sharing-div").classList.remove("easyassist_hidden_div");
+        document.getElementById("document-coview-div").classList.remove("easyassist_hidden_div");
+        document.getElementById("preapproved-document-div").classList.remove("easyassist_hidden_div");
+      }
+    }
+
+    function action_for_chat_bubble() {
+      let enable_chat_bubble = document.getElementById("enable_chat_bubble");
+      if(enable_chat_bubble.checked == false) {
+        document.getElementById("display_chat_icon").setAttribute('style', 'display:none !important');
+      } else {
+        document.getElementById("display_chat_icon").style.display = "";
+      }
+    }
+
+    function document_option_change_action(){
+      let doc_sharing_through_chat = document.getElementById("share_document_from_livechat");
+      let doc_coviewing = document.getElementById("share_document_from_livechat");
+      let pre_approved_doc_sharing = document.getElementById("allow_support_documents")
+      if( doc_sharing_through_chat.checked == false && pre_approved_doc_sharing.checked == false){
+        document.getElementById("document-coview-div").style.display = "none";
+      } else {
+        document.getElementById("document-coview-div").style.display = "";
+      }
+    }
+
+    function default_function_calls() {
+      action_for_chat_functionality();
+      action_for_chat_bubble();
+      allow_support_documents_change_actions();
+      document_option_change_action();
+    }
+
+    default_function_calls();
+
+    document.getElementById("enable_chat_functionality").addEventListener(
+      'change', action_for_chat_functionality);
+    document.getElementById("enable_chat_bubble").addEventListener(
+      'change', action_for_chat_bubble);
+    document.getElementById("allow_support_documents").addEventListener(
+    'change', allow_support_documents_change_actions);
+    document.getElementById("share_document_from_livechat").addEventListener(
+    'change', document_option_change_action);
+    
+    document.getElementById("chat_icon_input").addEventListener('change', (event) => {
+        $("#icon-error-div").css({"display":"none"});
+        $("#icon-error-div").text("");
+        if (event.target.files.length) {
+            var file = document.getElementById("chat_icon_input").files[0];
+            var icon_error = document.getElementById("icon-error-div");
+        
+            if (file == undefined || file == null) {
+                icon_error.innerHTML = "Please choose a file.";
+                return;
+            }
+
+            var cleaned_filename = sanitize_filename(file.name)
+
+            if (check_image_file(cleaned_filename, ["png", "PNG"], false) == false) {
+                icon_error.innerHTML = "Please upload valid image file. Only '.png' files are allowed.";
+            }
+
+            if (cleaned_filename.size / 10000 > 30) {
+                icon_error.innerHTML = "File size cannot exceed 30 KB";
+                return;
+            }
+
+            chat_logo_input_file_global = ($("#chat_icon_input"))[0].files[0];
+            var filename = cleaned_filename;
+            if (filename.length > 30) {
+                filename = get_shorter_file_name(filename, 20);
+            }
+            $("#progress-modal-chat-icon").css({"display":"block"});
+            $('#chat_icon_upload_modal .file-name-div').html(filename);
+            $('#chat_icon_upload_modal .modal-upload-file').show();
+            $('#chat_icon_upload_modal .progress').show();
+
+            var progress_div = $('#chat_icon_upload_modal .progress')[0].children[0];
+            progress_div.classList.remove('determinate');
+            progress_div.classList.add('indeterminate');
+            setTimeout(function () {
+                progress_div.classList.remove('indeterminate');
+                progress_div.classList.add('determinate');
+            }, 300);
+        }
+    });
+
+    function add_floating_sidenav_easyassist_button() {
+      bg_color = "{{ access_token_obj.floating_button_bg_color }}";
+      var nav_span = document.createElement("span");
+      nav_span.id = "easyassist-side-nav-options-co-browsing";
+      nav_span.style.backgroundColor = bg_color;
+      nav_span.textContent = "Request for Support";
+      nav_span.setAttribute("onclick", "show_easyassist_browsing_modal()");
+      nav_span.style.width = "auto";
+      document.getElementsByTagName("body")[0].appendChild(nav_span);
+      if ("{{ access_token_obj.floating_button_position }}" == "left") {
+          nav_span.style.left = "-70px";
+          nav_span.style.borderRadius = "0px 0px 10px 10px";
+      } else {
+          nav_span.style.right = "-70px";
+          nav_span.style.borderRadius = "10px 10px 0px 0px";
+      }
+  }
+
+  add_floating_sidenav_easyassist_button();
+
+  function hide_floating_sidenav_easyassist_button() {
+    document.getElementById("easyassist-side-nav-options-co-browsing").style.display = "none";
+  }
+
+  function show_floating_sidenav_easyassist_button() {
+    bg_color = "#"+"{{ access_token_obj.floating_button_bg_color }}";
+    position = document.getElementById("floating_button_position").value;
+    sidenav_element = document.getElementById("easyassist-side-nav-options-co-browsing");
+    sidenav_element.style.left = "";
+    sidenav_element.style.right = "";
+    
+    if (position == "left") {
+      sidenav_element.style.top = "50vh";
+      sidenav_element.style.left = "-70px";
+      sidenav_element.style.transform = "rotate(-90deg)";
+      sidenav_element.style.borderRadius = "0px 0px 10px 10px";
+    } else if (position == "right") {
+      sidenav_element.style.top = "50vh";
+      sidenav_element.style.right = "-70px";
+      sidenav_element.style.transform = "rotate(-90deg)";
+      sidenav_element.style.borderRadius = "10px 10px 0px 0px";
+    } else if (position == "top") {
+      sidenav_element.style.top = "-5px";
+      sidenav_element.style.transform = "rotate(0deg) translateX(-50%)";
+      sidenav_element.style.left = "50vw";
+      sidenav_element.style.borderRadius = "0px 0px 10px 10px"
+    } else if (position == "bottom") {
+      sidenav_element.style.top = "96%";
+      sidenav_element.style.left = "50vw";
+      sidenav_element.style.transform = "rotate(0deg) translateX(-50%)";
+      sidenav_element.style.borderRadius = "10px 10px 0px 0px";
+    }
+    sidenav_element.style.backgroundColor = bg_color;
+    sidenav_element.style.display = "inline-block";
+  }
+
+  function get_tr_tag_from_parent_recursive(element){
+    var current_element = element;
+    var selected_element = null;
+
+    while(current_element){
+      if(current_element.tagName.toLowerCase() == "tr"){
+        selected_element = current_element;
+      }
+      current_element = current_element.parentElement;
+    }
+
+    return selected_element;
+  }
+
+  function allow_support_documents_change_actions(){
+    var check_element = document.getElementById("allow_support_documents");
+    var tr_check_element = get_tr_tag_from_parent_recursive(check_element);
+    if(check_element.checked == true && tr_check_element.classList.contains("easyassist_hidden_div") == false){
+      document.getElementById("allow_only_support_documents_div").classList.remove("easyassist_hidden_div");
+      document_option_change_action();
+    } else {
+      document.getElementById("allow_only_support_documents_div").classList.add("easyassist_hidden_div");
+      document.getElementById("allow_only_support_documents").checked = false;
+      document_option_change_action();
+    }
+  }
+
+  $(document).ready(function() {
+    try {
+        document.getElementById("nav-settings-menu").classList.add("active")
+    } catch(err) {}
+  });
+
+  </script>
+  {% endblock %}

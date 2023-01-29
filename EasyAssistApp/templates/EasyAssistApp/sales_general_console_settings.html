@@ -1,0 +1,289 @@
+{% extends 'EasyAssistApp/console.html' %}
+{% block content %}
+{% load static %}
+
+{% if request.user.enable_s3_bucket %}
+    <script src="https://static.allincall.in/static/EasyAssistApp/js/ace.js" type="text/javascript"
+        charset="utf-8"></script>
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/jscolor.min.js"></script>
+{% else %}
+    <script src="{% static 'EasyAssistApp/js/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" src="{% static 'EasyAssistApp/js/jscolor.min.js' %}"></script>
+{% endif %}
+
+<link href="{% static 'EasyAssistApp/css/settings.css' %}" rel="stylesheet" type="text/css">
+
+<div class="container-fluid">
+    <div>
+    <div id="pills-option-general-console-setting">
+      <div class="page-header">
+        <div class="row justify-content-between">
+          <div class="col-sm-8 d-flex align-items-center">
+            <div class="nav nav-pills navbar-right">
+              <a class="anchor-reset back-btn"  href="/easy-assist/sales-ai/settings/options/general">
+                <span class="mr-3 mb-auto " style="cursor: pointer;">
+                  <svg class="back-arrow-svg" width="44" height="44" viewBox="0 0 44 44" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <rect width="44" height="44" rx="22" transform="matrix(1 0 0 -1 0 44)" fill="white" />
+                    {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                    <path
+                      d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                      fill="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" />
+                          {% else %}
+                          <path
+                      d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                      fill="#0254D7" />
+ 
+                          {% endif %} 
+                    
+                  </svg>
+                </span>
+              </a>
+               <!-- sprint 5.9 back to previous individual page wise link -->
+              <h5  class="nav_btn mr-2 mt-2"> <a class="anchor-reset"  href="/easy-assist/sales-ai/settings">Settings</a> </h5>
+  
+              <div class=" mr-2 pt-2">
+                <svg class="mini-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                    fill="#475569" />
+                </svg>
+              </div>
+               <!-- sprint 5.9 back to previous individual page wise link -->
+              <h5  class="nav_btn mr-2 mt-2"> <a class="anchor-reset"  href="/easy-assist/sales-ai/settings/options">Options</a></h5>
+  
+              <div class=" mr-2 pt-2">
+                <svg class="mini-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                    fill="#475569" />
+                </svg>
+              </div>
+               <!-- sprint 5.9 back to previous individual page wise link -->
+              <h5  class="nav_btn mr-2 mt-2"><a class="anchor-reset"  href="/easy-assist/sales-ai/settings/options/general">General</a></h5>
+  
+              <div class=" mr-2 pt-2">
+                <svg class="mini-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                    fill="#475569" />
+                </svg>
+              </div>
+  
+              <h5  class="nav_btn active1 mt-2">Console Settings</h5>
+            </div>
+          </div>
+                  <!-- sprint 5.9 reset and save button -->
+          <div class="col-sm-4 d-flex justify-content-end">
+            <button class="btn btn-width-100" id="reset-button" data-toggle="modal" data-target="#modal-confirm-reset-all">Reset All</button>
+            <button class="btn btn-width-100" id="save-button" onclick="save_general_console_settings(this)"
+            style="background: #10B981!important;" >Save</button>
+          </div>
+        </div>
+      </div>
+     <!-- sprint 5.9 breadcrum navbar end -->
+      <!-- sprint 5.9 general console Settings Body Start -->
+      <!-- Change console color -->
+      <div class="card shadow mb-4 mt-30">
+        <div class="card-body p-0">
+          <div class="card">
+            <div class="card-body table-responsive p-0">
+              <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                <tbody>
+                  <tr class="tr-flex-sm">
+                    <th scope="row" class="heading-toggle-text">Change console color</th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.get_cobrowsing_console_theme_color == None %}
+                      <input type="text" class="form-control jscolor" id="cobrowsing-console-theme-color" placeholder="HEX" value=""
+                        style="width:50%;">
+                      {% else %}
+                      <input type="text" class="form-control jscolor" id="cobrowsing-console-theme-color" placeholder="HEX"
+                        value="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" style="width:50%;">
+                      {% endif %}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+  
+      </div>
+  
+      <!-- Go-live date -->
+      <div class="card shadow mb-4 mt-20">
+        <div class="card-body p-0">
+          <div class="card">
+            <div class="card-body table-responsive p-0">
+              <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                <tbody>
+                  <tr class="tr-flex-sm">
+                    <th scope="row" class="heading-toggle-text">Go-live date</th>
+                    <td style="vertical-align: inherit;">
+                      <input class="form-control datepicker" autocomplete="off" data-date-format="dd-mm-yyyy" id="go_live_date" value="{{access_token_obj.go_live_date|date:'d-m-Y'}}" style="width: 50%">
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+  
+      </div>
+  
+      <!-- Whitelisted domains -->
+      <div class="card shadow mb-4 mt-20">
+        <div class="card-body p-0">
+          <div class="card">
+            <div class="card-body table-responsive p-0">
+              <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                <tbody>
+                  <tr class="tr-flex-sm">
+                    <th scope="row" class="heading-toggle-text">Whitelisted domains <br> <span class="sub-heading-toggle-text">(e.g. www.xyz.com, www.abc.com)<br><br>Note: Add '*' to activate the script in all domains</span></th>
+                    <td style="vertical-align: inherit;">
+                      <textarea class="form-control" style="height:10em;" id="whitelisted_domain">{{ access_token_obj.whitelisted_domain }}</textarea>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+  
+      </div>
+  
+      <!-- Password prefix -->
+      <div class="card shadow mb-4 mt-20">
+        <div class="card-body p-0">
+          <div class="card">
+            <div class="card-body table-responsive p-0">
+              <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                <tbody>
+                  <tr class="tr-flex-sm">
+                    <th scope="row" class="heading-toggle-text">Password prefix</th>
+                    <td style="vertical-align: inherit;">
+                      <input type="text" class="form-control" id="cobrowsing_default_password_prefix" value="{{access_token_obj.password_prefix}}" style="width:50%;" autocomplete="off">
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+  
+      </div>
+  
+      <!-- DEPLOY CHATBOT -->
+      <div class="card shadow mb-4 mt-20">
+        <div class="card-body p-0">
+          <div class="card">
+            <div class="card-body table-responsive p-0">
+              <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                <tbody>
+                  <tr>
+                    <th scope="row" class="heading-toggle-text">
+                      Deploy ChatBot
+                    <span data-toggle="tooltip" data-placement="bottom" title="Enabling this will allow you to integrate a chatbot to the cobrowsing console."><i class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      
+                      {% if access_token_obj.deploy_chatbot_flag %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="deploy_chatbot_flag" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="deploy_chatbot_flag">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif%}
+                      
+                    </td>
+                  </tr>
+                  <tr id="deploy_chatbot_url_section" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">ChatBot CJS 
+                    <span data-toggle="tooltip" data-placement="bottom" title="Paste the CJS script of your chatbot."><i class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      <input type="text" class="form-control" value="{{ access_token_obj.deploy_chatbot_url }}" id="deploy_chatbot_url" style="width:50%;" placeholder="Paste ChatBot CJS script" autocomplete="off">
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  <div class="modal fade upload_file_modal" id="modal-confirm-reset-all" tabindex="-1" role="dialog"aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Reset All Settings</h5>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-12">
+                  <p>This will reset all settings across the console. Are you sure you want to continue?<p>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-text-only" type="button" data-dismiss="modal">Cancel</button>
+          <button class="btn btn-primary" onclick="reset_cobrowsing_meta_details(this)">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal fade upload_file_modal" id="modal-confirm-reset-all" tabindex="-1" role="dialog"aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Reset All Settings</h5>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-12">
+                  <p>This will reset all settings across the console. Are you sure you want to continue?<p>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-text-only" type="button" data-dismiss="modal">Cancel</button>
+          <button class="btn btn-primary" onclick="reset_cobrowsing_meta_details(this)">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  
+  document.getElementById("deploy_chatbot_flag").addEventListener(
+    'change', deploy_chatbot_flag_change_actions);
+
+  function deploy_chatbot_flag_change_actions(e){
+    var check_element = document.getElementById("deploy_chatbot_flag");
+    if(check_element.checked == false){
+      document.getElementById("deploy_chatbot_url_section").style.setProperty("display", "none", "important");
+    } else {
+      document.getElementById("deploy_chatbot_url_section").style.display = "";
+    }
+  }
+
+  deploy_chatbot_flag_change_actions();
+  
+  $(document).ready(function() {
+    try {
+        document.getElementById("nav-settings-menu").classList.add("active")
+    } catch(err) {}
+  });
+
+</script>
+{% endblock %}

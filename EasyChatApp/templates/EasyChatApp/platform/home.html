@@ -1,0 +1,453 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex" />
+  <meta name="googlebot" content="noindex" />
+  <meta name="googlebot-news" content="noindex" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+  <title>{{ developer_config_obj.general_title }}</title>
+
+  {% if developer_config_obj.general_favicon %}
+  <link rel="shortcut icon" type="image/png" href="{{ developer_config_obj.general_favicon }}"/>
+  {% elif request.user.enable_s3_bucket %}
+  <link rel="shortcut icon" type="image/png" href="https://static.allincall.in/static/EasyChatApp/img/favicon.svg"/>
+  {% else %}
+  <link rel="shortcut icon" type="image/png" href="{% static 'EasyChatApp/img/favicon.svg' %}"/>
+  {% endif %}
+
+
+ 
+  <link href="{% static 'EasyChatApp/css/material_icons.css' %}" rel="stylesheet">
+  {% if request.user.enable_s3_bucket %}
+
+    <link href="https://static.allincall.in/static/EasyChatApp/css/select2.min.css" rel="stylesheet"/>
+    <link href="https://static.allincall.in/static/EasyChatApp/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+
+  {% else %}
+    <link href="{% static 'EasyChatApp/css/select2.min.css' %}" rel="stylesheet"/>
+    <link href="{% static 'EasyChatApp/css/materialize.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  {% endif %}
+ 
+  <!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/css/select2.min.css" rel="stylesheet" /> -->
+  
+  <link href="{% static 'EasyChatApp/css/style3.css' %}?v={% random_int 1 100 %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="{% static 'EasyChatApp/css/Treant.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  {% if request.user.enable_s3_bucket %}
+    <link href="https://static.allincall.in/static/EasyChatApp/css/jquery.dataTables.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="https://static.allincall.in/static/EasyChatApp/css/style.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/jquery.min.js"></script>
+  
+  {% else %}
+
+   <link href="{% static 'EasyChatApp/css/jquery.dataTables.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="{% static 'EasyChatApp/css/style.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/jquery.min.js' %}"></script>
+  
+  {% endif %}
+  
+  <link href="{% static 'EasyChatApp/css/changes.css' %}?v={% random_int 1 100 %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+
+  <!-- trumbowyg changes -->
+<link rel="stylesheet" href="{% static 'EasyChatApp/trumbowyg/dist/ui/trumbowyg.min.css' %}">
+<link rel="stylesheet" href="{% static 'EasyChatApp/trumbowyg/dist/plugins/emoji/ui/trumbowyg.emoji.css' %}">
+
+<script type="text/javascript" src="{% static 'EasyChatApp/trumbowyg/dist/trumbowyg.min.js' %}"></script>
+<script src="{% static 'EasyChatApp/trumbowyg/dist/plugins/emoji/trumbowyg.emoji.js' %}"></script>
+
+  <link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/home.css' %}?v={% random_int 1 100 %}">
+  {% if request.user.enable_s3_bucket %}
+
+  <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/jstree.min.js"></script>
+  <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/jscolor.js"></script>
+  <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/select2.min.js"></script>
+
+  {% else %}
+
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/jstree.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/jscolor.js' %}"></script>
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/select2.min.js' %}"></script>
+
+  {% endif %}
+  
+
+  <style type="text/css">
+    textarea{
+      height:10em; 
+      width:100%;
+      border-radius:0.5em;
+      border:0.05em solid black;
+    }
+    #modal-general-feedback {
+      width: 35%;
+      height: auto;
+      max-height: 100%;
+      top:1% !important;
+    }
+
+  </style>
+
+</head>
+<body class="white-color">
+  {% csrf_token %}
+
+  <div class="navbar-fixed">
+
+    <nav class="white-new lighten-1 main-nav-wrapper" role="navigation">
+      <div class="nav-wrapper">
+        <a href="#" class="brand-logo red-text">
+
+          <div class="row">
+            {% include "EasyChatApp/sidenavbar/brand_logo.html" %}
+            
+            <div class="col s6">
+              <div class="row" id="show-global-search" style="display: none;">
+                <div class="input-field col s10">
+                  <i class="material-icons prefix">search</i>
+                  <input id="global_search" type="text" class="validate" autocomplete="on" >
+                  <label for="global_search"></label>
+                </div>
+              </div>
+            </div>
+
+            <ul id="dropdown1" class="dropdown-content">
+                <li>
+                    <a href="javascript:void(0)" class="user_mail_svg">
+                      <div>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M5.05479 5.08976C4.7628 5.2024 4.51428 5.41085 4.29815 5.72433C3.98973 6.1716 4.00004 5.97176 4.00004 11.5019C4.00004 16.51 4.00014 16.5143 4.10274 16.8201C4.24491 17.2436 4.67901 17.7264 5.0603 17.885L5.3368 18L12.5891 17.9861L19.8415 17.9722L20.1095 17.8258C20.4221 17.6548 20.7335 17.3005 20.8788 16.9504L20.9815 16.7031L20.9943 11.5915C21.007 6.51866 21.0063 6.47778 20.9078 6.18461C20.7843 5.81709 20.4352 5.38251 20.0951 5.17278L19.8415 5.01636L12.5739 5.00451C5.63097 4.9932 5.29505 4.99701 5.05479 5.08976ZM19.6553 6.25304C19.8115 6.35907 19.996 6.71876 19.9292 6.78703C19.9071 6.80961 18.2751 8.0262 16.3027 9.49058C12.8959 12.0197 12.7057 12.153 12.5026 12.153C12.2996 12.1529 12.1077 12.0183 8.66697 9.46171C6.67494 7.98151 5.04505 6.74822 5.04505 6.72104C5.04505 6.69391 5.07864 6.59285 5.11968 6.49661C5.27543 6.1312 4.7438 6.15584 12.5026 6.15473C19.2748 6.15373 19.5139 6.15701 19.6553 6.25304ZM8.44358 10.7039C10.2854 12.0724 11.8801 13.2265 11.9872 13.2686C12.2248 13.3619 12.7306 13.368 12.9959 13.2809C13.1078 13.2441 14.6336 12.1476 16.5639 10.7168L19.9365 8.21699L19.9486 12.2663C19.9595 15.8694 19.9525 16.335 19.8856 16.492C19.7289 16.8598 20.2553 16.8353 12.4955 16.8351C5.73139 16.8349 5.49142 16.8315 5.35001 16.7356C5.03318 16.5205 5.04505 16.6952 5.04505 12.2399C5.04505 10.0265 5.05626 8.21567 5.06994 8.21567C5.08362 8.21567 6.60174 9.33537 8.44358 10.7039Z" fill="#4D4D4D"/>
+                        </svg>
+                      </div >
+                      <div style="margin-top: 6px;"><p class="dropdown-content-text">
+                      {% if request.user.is_sandbox_user%}
+                        {{request.user.username}}
+                      {% else %}
+                        {{request.user.email}}
+                      {%endif%}
+                      </p></div>
+                    </a>
+                </li>
+                {% if request.user.username|slice:"-12:" == "@getcogno.ai" or request.user.username|slice:"-13:" == "@allincall.in" or request.user.is_staff %}
+                  <li>
+                      <a href="/audit-trail/">
+                          <svg style="margin-left: -3px;" xmlns="http://www.w3.org/2000/svg" width="28" height="29" viewBox="0 0 28 29" fill="none">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M13.9532 7.37085V8.85616C13.9532 9.0616 13.7873 9.22849 13.5819 9.22972H9.12371C8.91739 9.22972 8.75014 9.06247 8.75014 8.85616V7.37085C8.75014 7.16454 8.91739 6.99729 9.12371 6.99729H9.68779C9.78315 6.99785 9.86349 6.92622 9.87383 6.83142C9.95849 6.07982 10.5942 5.51172 11.3505 5.51172C12.1069 5.51172 12.7426 6.07982 12.8272 6.83142C12.8382 6.92588 12.9182 6.99717 13.0133 6.99729H13.5796C13.7859 6.99729 13.9532 7.16454 13.9532 7.37085ZM11.7245 21.4005C11.7245 20.8872 11.3084 20.4711 10.7951 20.4711H7.63768C7.19755 20.4419 6.86368 20.0626 6.89055 19.6224V10.0725C6.87007 9.67887 7.13543 9.32747 7.51963 9.23944C7.61031 9.22106 7.67387 9.13907 7.66906 9.04668C7.63992 8.47438 7.63096 7.85127 7.62797 7.55241C7.62674 7.45013 7.54347 7.36786 7.44118 7.36787H6.15537C5.85842 7.36668 5.57324 7.48386 5.36292 7.69348C5.1526 7.9031 5.03447 8.18789 5.03467 8.48484V21.2137C5.03467 21.5097 5.15229 21.7936 5.36165 22.0028C5.571 22.212 5.85492 22.3294 6.15089 22.3292H10.7951C11.3081 22.3292 11.7241 21.9135 11.7245 21.4005ZM15.0463 9.04667C15.0391 9.14089 15.1031 9.22574 15.1957 9.24466C15.572 9.33861 15.8297 9.68509 15.8113 10.0725V11.1185C15.8113 11.6318 16.2275 12.0479 16.7408 12.0479C16.9874 12.0481 17.224 11.9503 17.3985 11.7759C17.5729 11.6016 17.671 11.3651 17.671 11.1185V8.48483C17.671 8.18801 17.5527 7.90342 17.3424 7.69396C17.1321 7.4845 16.8471 7.36742 16.5503 7.36861H15.2622C15.2125 7.36839 15.1647 7.38833 15.13 7.4239C15.0949 7.45895 15.0752 7.50656 15.0754 7.55614C15.0769 7.90954 15.0762 8.67087 15.0463 9.04667ZM19.2451 18.4172H16.2723C15.9628 18.4172 15.7119 18.6681 15.7119 18.9776C15.7119 19.2871 15.9628 19.5379 16.2723 19.5379H19.2451C19.5546 19.5379 19.8055 19.2871 19.8055 18.9776C19.8055 18.6681 19.5546 18.4172 19.2451 18.4172ZM16.2723 16.9379C15.9631 16.9379 15.7123 16.6875 15.7119 16.3783C15.7117 16.2295 15.7707 16.0868 15.8758 15.9816C15.9809 15.8763 16.1235 15.8172 16.2723 15.8172H18.1297C18.4391 15.8172 18.69 16.0681 18.69 16.3775C18.69 16.687 18.4391 16.9379 18.1297 16.9379H16.2723ZM22.5923 15.5714C22.5924 15.1765 22.4354 14.7978 22.156 14.5187L21.1055 13.4727C20.8261 13.1933 20.4472 13.0364 20.052 13.0364H14.3693C13.5481 13.036 12.8816 13.7005 12.8796 14.5217V21.9519C12.8796 22.7772 13.5486 23.4462 14.3738 23.4462H21.098C21.9233 23.4462 22.5923 22.7772 22.5923 21.9519V15.5714ZM15.1209 14.5254C14.7083 14.5254 14.3738 14.8599 14.3738 15.2725L14.3776 21.2048C14.3776 21.6174 14.7121 21.9519 15.1247 21.9519H20.3546C20.7672 21.9519 21.1017 21.6174 21.1017 21.2048V15.8822C21.1019 15.6838 21.0231 15.4935 20.8828 15.3532L20.2717 14.7436C20.1315 14.6037 19.9415 14.5252 19.7435 14.5254H15.1209Z" fill="#2D2D2D"/>
+                                <mask id="mask0" mask-type="alpha" maskUnits="userSpaceOnUse" x="5" y="5" width="18" height="19">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M13.9532 7.37085V8.85616C13.9532 9.0616 13.7873 9.22849 13.5819 9.22972H9.12371C8.91739 9.22972 8.75014 9.06247 8.75014 8.85616V7.37085C8.75014 7.16454 8.91739 6.99729 9.12371 6.99729H9.68779C9.78315 6.99785 9.86349 6.92622 9.87383 6.83142C9.95849 6.07982 10.5942 5.51172 11.3505 5.51172C12.1069 5.51172 12.7426 6.07982 12.8272 6.83142C12.8382 6.92588 12.9182 6.99717 13.0133 6.99729H13.5796C13.7859 6.99729 13.9532 7.16454 13.9532 7.37085ZM11.7245 21.4005C11.7245 20.8872 11.3084 20.4711 10.7951 20.4711H7.63768C7.19755 20.4419 6.86368 20.0626 6.89055 19.6224V10.0725C6.87007 9.67887 7.13543 9.32747 7.51963 9.23944C7.61031 9.22106 7.67387 9.13907 7.66906 9.04668C7.63992 8.47438 7.63096 7.85127 7.62797 7.55241C7.62674 7.45013 7.54347 7.36786 7.44118 7.36787H6.15537C5.85842 7.36668 5.57324 7.48386 5.36292 7.69348C5.1526 7.9031 5.03447 8.18789 5.03467 8.48484V21.2137C5.03467 21.5097 5.15229 21.7936 5.36165 22.0028C5.571 22.212 5.85492 22.3294 6.15089 22.3292H10.7951C11.3081 22.3292 11.7241 21.9135 11.7245 21.4005ZM15.0463 9.04667C15.0391 9.14089 15.1031 9.22574 15.1957 9.24466C15.572 9.33861 15.8297 9.68509 15.8113 10.0725V11.1185C15.8113 11.6318 16.2275 12.0479 16.7408 12.0479C16.9874 12.0481 17.224 11.9503 17.3985 11.7759C17.5729 11.6016 17.671 11.3651 17.671 11.1185V8.48483C17.671 8.18801 17.5527 7.90342 17.3424 7.69396C17.1321 7.4845 16.8471 7.36742 16.5503 7.36861H15.2622C15.2125 7.36839 15.1647 7.38833 15.13 7.4239C15.0949 7.45895 15.0752 7.50656 15.0754 7.55614C15.0769 7.90954 15.0762 8.67087 15.0463 9.04667ZM19.2451 18.4172H16.2723C15.9628 18.4172 15.7119 18.6681 15.7119 18.9776C15.7119 19.2871 15.9628 19.5379 16.2723 19.5379H19.2451C19.5546 19.5379 19.8055 19.2871 19.8055 18.9776C19.8055 18.6681 19.5546 18.4172 19.2451 18.4172ZM16.2723 16.9379C15.9631 16.9379 15.7123 16.6875 15.7119 16.3783C15.7117 16.2295 15.7707 16.0868 15.8758 15.9816C15.9809 15.8763 16.1235 15.8172 16.2723 15.8172H18.1297C18.4391 15.8172 18.69 16.0681 18.69 16.3775C18.69 16.687 18.4391 16.9379 18.1297 16.9379H16.2723ZM22.5923 15.5714C22.5924 15.1765 22.4354 14.7978 22.156 14.5187L21.1055 13.4727C20.8261 13.1933 20.4472 13.0364 20.052 13.0364H14.3693C13.5481 13.036 12.8816 13.7005 12.8796 14.5217V21.9519C12.8796 22.7772 13.5486 23.4462 14.3738 23.4462H21.098C21.9233 23.4462 22.5923 22.7772 22.5923 21.9519V15.5714ZM15.1209 14.5254C14.7083 14.5254 14.3738 14.8599 14.3738 15.2725L14.3776 21.2048C14.3776 21.6174 14.7121 21.9519 15.1247 21.9519H20.3546C20.7672 21.9519 21.1017 21.6174 21.1017 21.2048V15.8822C21.1019 15.6838 21.0231 15.4935 20.8828 15.3532L20.2717 14.7436C20.1315 14.6037 19.9415 14.5252 19.7435 14.5254H15.1209Z" fill="white"/>
+                                </mask>
+                                <g mask="url(#mask0)">
+                                </g>
+                          </svg>
+                          <p class="dropdown-content-text"> Audit Trail</p>
+                      </a>
+                  </li>
+                {% endif %}
+                {% if request.user.enable_white_label_option %}
+                  <li>
+                    <a href="/developer-console/whitelabel/general/">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19.4357 13.474L13.4823 19.4274C13.3281 19.5818 13.1449 19.7043 12.9433 19.7879C12.7417 19.8715 12.5256 19.9145 12.3074 19.9145C12.0892 19.9145 11.8731 19.8715 11.6715 19.7879C11.4699 19.7043 11.2867 19.5818 11.1325 19.4274L4 12.3033V4H12.3033L19.4357 11.1325C19.745 11.4436 19.9186 11.8645 19.9186 12.3033C19.9186 12.742 19.745 13.1629 19.4357 13.474V13.474Z" stroke="black" stroke-width="1.66065" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M8.68195 7.6655H8.69195" stroke="black" stroke-width="1.87278" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+
+                        <p class="dropdown-content-text">White Label</p>
+                    </a>
+                  </li>
+                {% endif %}
+              <li>
+                <form action="/chat/logout/" method="POST" id ="logout-api" class="nav-link">
+                  {% csrf_token %}
+                  <input type="submit" value="">
+                  <div class="logout-api-div-class">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg> 
+                    <span class="dropdown-content-text">Logout</span>
+                  </div>
+                </form>
+              </li>
+            </ul>
+            <div class="col s5 " id="easychat-user-profile-section">
+              <a class="dropdown-trigger" href="javascript:void(0)" data-target="dropdown1">
+                <span class="easychat-profile-username">
+                  {% if request.user.first_name and request.user.first_name.strip %}
+                    {{request.user.first_name}} 
+                    {% if request.user.last_name and request.user.last_name.strip %}
+                      {{request.user.last_name }}
+                    {% endif %}
+                  {% else %}
+                    {{request.user.username}}
+                  {% endif %}
+                </span>
+
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9.78033 3.23123C9.48744 2.92292 9.01256 2.92292 8.71967 3.23123L6 6.09404L3.28033 3.23123C2.98744 2.92292 2.51256 2.92292 2.21967 3.23123C1.92678 3.53954 1.92678 4.03941 2.21967 4.34772L5.46967 7.76877C5.76256 8.07708 6.23744 8.07708 6.53033 7.76877L9.78033 4.34772C10.0732 4.03941 10.0732 3.53954 9.78033 3.23123Z" fill="#94A3B8"/>
+                </svg>
+                    
+              </a>
+            </div>
+          </div>
+        </a>
+      </div>
+    </nav>
+
+    
+  </div>
+
+
+  <div class="row">
+    <div class="welcome-wrapper">
+        <div>
+            <h1 class="welcome-wrapper-text">
+              👋 Welcome aboard{% if request.user.first_name and request.user.first_name.strip  %}, {{request.user.first_name}}{% endif %}!
+            </h1>
+            <p class="welcome-wrapper-sub-text">Experience the power of conversational AI by clicking <br>
+              on the product below</p>
+        </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col s-eleven-half offset-s-half card-content-wrapper" style="padding-left: 3% !important">
+        
+      <div class="row" style="padding:1em;" id="card_wrapper">
+        {% if is_chatbot_allowed %}    
+          <div class="col s12 m3 l3 card-wrapper-div">
+                <a href="/chat/bots/"><div class="card white">
+                    <div class="card-image">
+                      <svg width="68" height="68" viewBox="0 0 68 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0.37915 12.2463C0.37915 5.6814 5.70182 0.358734 12.2667 0.358734H55.3257C61.8906 0.358734 67.2132 5.6814 67.2132 12.2463V55.3053C67.2132 61.8702 61.8906 67.1928 55.3257 67.1928H12.2667C5.70182 67.1928 0.37915 61.8702 0.37915 55.3053V12.2463Z" fill="url(#paint0_linear_1221_36247)"/>
+                        <path d="M51.1729 33.7761C51.1729 24.1789 43.3931 16.3992 33.796 16.3992C24.1989 16.3992 16.4191 24.1789 16.4191 33.7761C16.4191 43.3732 24.1989 51.1529 33.796 51.1529H43.7587C47.8536 51.1529 51.1729 47.8337 51.1729 43.7388V33.7761Z" fill="url(#paint1_linear_1221_36247)"/>
+                        <path d="M48.9812 36.0927C48.9812 34.8133 47.9437 33.7758 46.6643 33.7758H27.2022C25.9228 33.7758 24.8853 34.8133 24.8853 36.0927C24.8853 37.3721 25.9228 38.4096 27.2022 38.4096H46.6643C47.9437 38.4096 48.9812 37.3721 48.9812 36.0927Z" fill="#3360FF"/>
+                        <path d="M48.6599 43.2213C48.6599 41.9419 47.6224 40.9044 46.343 40.9044H35.2218C33.9424 40.9044 32.9049 41.9419 32.9049 43.2213C32.9049 44.5007 33.9424 45.5382 35.2218 45.5382H46.343C47.6224 45.5382 48.6599 44.5007 48.6599 43.2213Z" fill="#3360FF"/>
+                        <defs>
+                        <linearGradient id="paint0_linear_1221_36247" x1="-10.3143" y1="4.78811" x2="36.9445" y2="52.0469" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#55FFE0"/>
+                        <stop offset="1" stop-color="#3360FF"/>
+                        </linearGradient>
+                        <linearGradient id="paint1_linear_1221_36247" x1="56.3219" y1="18.6917" x2="30.4948" y2="41.9465" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="white"/>
+                        <stop offset="1" stop-color="white"/>
+                        </linearGradient>
+                        </defs>
+                        </svg>
+                    </div>
+                    <div class="card-content black-text card-content-text">
+                      <span class="card-title center">{{ easychat_config_obj.title_text }}</span>
+                    </div>
+                </div>
+                </a>
+          </div>
+        {% endif %}
+
+        {% if is_livechat_allowed %}
+            <div class="col s12 m3 l3 card-wrapper-div">
+                <a href="/livechat/"><div class="card white">
+                    <div class="card-image">
+                      <svg width="67" height="68" viewBox="0 0 67 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0.119141 12.2463C0.119141 5.6814 5.44181 0.358734 12.0067 0.358734H55.0657C61.6306 0.358734 66.9532 5.6814 66.9532 12.2463V55.3053C66.9532 61.8702 61.6306 67.1929 55.0657 67.1929H12.0067C5.44181 67.1929 0.119141 61.8702 0.119141 55.3053V12.2463Z" fill="url(#paint0_linear_1221_36251)"/>
+                        <path d="M50.6302 32.7099C50.6375 35.1592 49.9834 37.5755 48.7213 39.7618C47.2249 42.3816 44.9244 44.5853 42.0775 46.1257C39.2306 47.6663 35.9499 48.4828 32.6025 48.4839C29.9381 48.49 27.3081 47.9719 24.9062 46.9697C24.6684 46.8704 24.4077 46.8365 24.1534 46.879L16.4985 48.1616C15.5776 48.316 14.7923 47.4908 14.9919 46.5786L16.3746 40.2608C16.4449 39.9397 16.3904 39.6051 16.236 39.315C15.1362 37.2484 14.5682 34.9935 14.575 32.7099C14.5763 29.7809 15.5095 26.9102 17.2701 24.4193C19.0306 21.9282 21.5491 19.9153 24.5432 18.6059C27.0419 17.5016 29.8032 16.9294 32.6025 16.9357H33.663C38.0836 17.1491 42.2591 18.7817 45.3897 21.521C48.5203 24.2604 50.3862 27.9138 50.6302 31.7819V32.7099Z" fill="white"/>
+                        <defs>
+                        <linearGradient id="paint0_linear_1221_36251" x1="-10.5743" y1="4.78811" x2="36.6845" y2="52.0469" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#FFC700"/>
+                        <stop offset="1" stop-color="#FF5D01"/>
+                        </linearGradient>
+                        </defs>
+                      </svg>
+                    </div>
+                    <div class="card-content black-text card-content-text" >
+                    <span class="card-title center">{{livechat_config_obj.livechat_title}}</span>
+                    </div>
+                </div>
+                </a>
+            </div>
+        {% endif %}
+
+            {% if is_fusion_allowed %}
+
+            <div class="col s12 m3 l3 card-wrapper-div">
+                <a href="{{developer_config_obj.ameyo_fusion_url}}"><div class="card white">
+                    <div class="card-image">
+                        <svg width="67" height="68" viewBox="0 0 67 68" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <circle cx="66" cy="66" r="66" fill="white"/>
+                        <rect width="67" height="68" rx="66" fill="url(#pattern0)"/>
+                        <defs>
+                        <pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">
+                        <use xlink:href="#image0_3_1003" transform="translate(-0.00072338 0.0030777) scale(0.0246914 0.025)"/>
+                        </pattern>
+                        <image id="image0_3_1003" width="150" height="40" xlink:href="data:image/png;base64,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"/>
+                        </defs>
+                        </svg>
+                    </div>
+                    <div class="card-content black-text card-content-text" >
+                    <span class="card-title center">LiveChat (Ameyo fusion)</span>
+                    </div>
+                </div>
+                </a>
+            </div>
+
+            {% endif %}
+
+            {% if is_easyassist_allowed %}
+
+            <div class="col s12 m3 l3 card-wrapper-div">
+
+              <a href="/easy-assist/sales-ai/dashboard/"><div class="card white">
+                <div class="card-image">
+                  <svg width="66.83" height="66.83" viewBox="0 0 73 73" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M0.184082 13.0352C0.184082 5.96277 5.91816 0.228699 12.9905 0.228699H59.3776C66.45 0.228699 72.1841 5.96277 72.1841 13.0352V59.4222C72.1841 66.4946 66.45 72.2287 59.3776 72.2287H12.9905C5.91816 72.2287 0.184082 66.4946 0.184082 59.4222V13.0352ZM21.2816 45.3466H41.2825C45.921 45.3466 49.6823 49.108 49.6823 53.7467C49.6823 58.3862 45.921 62.1466 41.2825 62.1466H21.2816C16.643 62.1466 12.8817 58.3862 12.8817 53.7467C12.8817 49.108 16.643 45.3466 21.2816 45.3466ZM16.4106 37.9312C17.1947 38.2293 17.1699 39.3315 16.3733 39.5948L14.3516 40.263L16.2083 42.1594C16.6097 42.5692 16.5981 43.2224 16.1826 43.6184C15.7668 44.014 15.1046 44.0028 14.7032 43.5928L12.7228 41.5701L11.6186 43.2814C11.1935 43.9399 10.1747 43.7722 9.99002 43.0129L8.37072 36.3601C8.20214 35.6673 8.89116 35.0724 9.56553 35.3285L16.4106 37.9312ZM37.6011 19.426H57.6017C62.2405 19.426 66.0016 23.1874 66.0016 27.8261C66.0016 32.4656 62.2405 36.226 57.6017 36.226H37.6011C32.9624 36.226 29.2011 32.4656 29.2011 27.8261C29.2011 23.1874 32.9624 19.426 37.6011 19.426ZM32.73 12.0106C33.514 12.3087 33.4893 13.4109 32.6927 13.6742L30.671 14.3425L32.5276 16.2388C32.9291 16.6486 32.9174 17.3018 32.502 17.6978C32.0861 18.0934 31.4239 18.0822 31.0225 17.6722L29.0421 15.6495L27.9379 17.3608C27.5128 18.0193 26.494 17.8516 26.3094 17.0923L24.69 10.4394C24.5214 9.74664 25.2105 9.15175 25.8848 9.40793L32.73 12.0106Z" fill="url(#paint0_linear_1221_36255)"/>
+                    <defs>
+                    <linearGradient id="paint0_linear_1221_36255" x1="6.99489" y1="4.12058" x2="65.3733" y2="72.2287" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#BE4EFF"/>
+                    <stop offset="1" stop-color="#7033FF"/>
+                    </linearGradient>
+                    </defs>
+                  </svg>
+                </div>
+                <div class="card-content black-text card-content-text" >
+                  <span class="card-title center">{{cobrowse_config_obj.cobrowsing_title_text}}</span>
+                  <!-- <p>Manage LiveChat with Customers</p> -->
+                </div>
+                <!-- <div class="card-action">
+                  <a href="/livechat/" class="purple-text text-darken-3">Open Console</a>
+                </div> -->
+              </div>
+            </a>
+            </div>
+        {% endif %}
+
+        {% if is_tms_allowed %}
+            <div class="col s12 m3 l3 card-wrapper-div">
+                <a href="/tms/"><div class="card white">
+                    <div class="card-image">
+                      <svg width="66.83" height="66.83" viewBox="0 0 73 73" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g clip-path="url(#clip0_1221_36288)">
+                        <path d="M0.73999 13.0351C0.73999 5.96278 6.47407 0.228699 13.5464 0.228699H59.9336C67.0059 0.228699 72.74 5.96278 72.74 13.0351V59.4223C72.74 66.4946 67.0059 72.2287 59.9336 72.2287H13.5464C6.47407 72.2287 0.73999 66.4946 0.73999 59.4223V13.0351Z" fill="url(#paint0_linear_1221_36288)"/>
+                        <path d="M40.2892 18.7676H33.1492C32.3042 18.7676 31.6192 19.4446 31.6192 20.2796C31.6192 21.1146 32.3042 21.7916 33.1492 21.7916H40.2892C41.1342 21.7916 41.8192 21.1146 41.8192 20.2796C41.8192 19.4446 41.1342 18.7676 40.2892 18.7676ZM40.2892 15.7436C42.613 15.7436 44.5334 17.4501 44.8373 19.6641L44.865 19.9369L44.851 19.7745L48.4492 19.7756C50.9841 19.7756 53.0392 21.8065 53.0392 24.3116V51.5277C53.0392 54.0328 50.9841 56.0636 48.4492 56.0636H24.9892C22.4543 56.0636 20.3992 54.0328 20.3992 51.5277V24.3116C20.3992 21.8065 22.4543 19.7756 24.9892 19.7756L28.5873 19.7745L28.5714 19.9369L28.6011 19.6641C28.905 17.4501 30.8255 15.7436 33.1492 15.7436H40.2892ZM40.7992 45.9836H28.5592C27.7142 45.9836 27.0292 46.6606 27.0292 47.4956C27.0292 48.3308 27.7142 49.0076 28.5592 49.0076H40.7992C41.6442 49.0076 42.3292 48.3308 42.3292 47.4956C42.3292 46.6606 41.6442 45.9836 40.7992 45.9836ZM36.7191 37.9196H28.5592C27.7142 37.9196 27.0292 38.5966 27.0292 39.4316C27.0292 40.2668 27.7142 40.9436 28.5592 40.9436H36.7191C37.5643 40.9436 38.2491 40.2668 38.2491 39.4316C38.2491 38.5966 37.5643 37.9196 36.7191 37.9196ZM44.8792 29.8556H28.5592C27.7142 29.8556 27.0292 30.5326 27.0292 31.3676C27.0292 32.2026 27.7142 32.8796 28.5592 32.8796H44.8792C45.7242 32.8796 46.4092 32.2026 46.4092 31.3676C46.4092 30.5326 45.7242 29.8556 44.8792 29.8556Z" fill="white"/>
+                        </g>
+                        <defs>
+                        <linearGradient id="paint0_linear_1221_36288" x1="-9.36009" y1="4.93844" x2="45.7951" y2="51.2192" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#DDFF0A"/>
+                        <stop offset="1" stop-color="#00B87A"/>
+                        </linearGradient>
+                        <clipPath id="clip0_1221_36288">
+                        <rect width="72" height="72" fill="white" transform="translate(0.73999 0.228699)"/>
+                        </clipPath>
+                        </defs>
+                      </svg>
+                    </div>
+                    <div class="card-content black-text card-content-text">
+                    <span class="card-title center">{{ cognodesk_config_obj.title_text }}</span>
+                    <!-- <p>Manage your service tickets with ease.</p> -->
+                    </div>
+                    <!-- <div class="card-action">
+                    <a href="/tms/"  class="purple-text text-darken-3">Open Console</a>
+                    </div> -->
+                </div>
+                </a>
+            </div>
+        {% endif %}
+        </div>
+    </div>
+  </div>
+
+  {% if developer_config_obj.enable_footer_over_entire_console %}
+  <div class="easychat-footer">
+    <span class="left">Version: {{ request.session.EASYCHAT_VERSION }}</span>
+    <span class="left">Date of Release: {{ request.session.EASYCHAT_DATE_OF_RELEASE }}</span>
+    <span> © 2017 - {% now "Y" %}, Cogno AI or its affiliates. All rights reserved.</span>
+  </div>
+  {% endif %}
+
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/easychat-crypto.js' %}"></script>
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/materialize.js' %}"></script>
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/canvasjs.min.js' %}"></script>
+
+
+  {% if request.user.enable_s3_bucket %}
+
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/analytics.js"></script>
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/security_checks.js"></script>
+
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/console.js"></script>
+
+  {% else %}
+    <script type="text/javascript" src="{% static 'EasyChatApp/js/jquery.dataTables.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'EasyChatApp/js/analytics.js' %}?v={% random_int 1 100 %}"></script>
+    <script type="text/javascript" src="{% static 'EasyChatApp/js/security_checks.js' %}?v={% random_int 1 100 %}"></script>
+    <script type="text/javascript" src="{% static 'EasyChatApp/js/console.js' %}?v={% random_int 1 100 %}"></script>  
+
+  {% endif %}
+
+  {% if request.user.get_ms_integration_url != "" %}
+  <script type="text/javascript" src="{{request.user.get_ms_integration_url}}webresources/Widget/msdyn_ciLibrary.js" data-crmurl="{{request.user.get_ms_integration_url}}" data-cifid="CIFMainLibrary">
+  </script>
+  {% endif %}
+  {% if request.user.get_ms_integration_url != "" %}
+
+  <script>
+    function successCallback(response) {
+      console.log(response)
+    }
+
+    function errorCallback(err) {
+      console.log(err);
+    }
+
+    setTimeout(function () {
+        var outer_width = window.outerWidth
+        var screen_width = (outer_width * 0.9 )
+
+        var set_wid = Microsoft.CIFramework.setWidth(screen_width).then(successCallback, errorCallback);
+    }, 200);
+  </script>
+
+  {% endif %}
+  <script type="text/javascript">
+    $("#home-button").click(function() {
+      if ($("#panel").is(":visible") == true) {
+        $("#panel").hide(100);  
+      } else {
+        $("#panel").show(100);
+      }
+    });
+
+  $(document).on('contextmenu', '.collapsible_custom', function(e){
+      e.preventDefault();
+      var d = document.getElementById('menu-div');
+      d.style.position = "absolute";
+      d.style.left = e.pageX + 'px';
+      d.style.top = e.pageY + 'px';
+      pk_list = this.id.split("_");
+      global_select_intent_id = pk_list[0];
+      global_select_parent_id = pk_list[1];
+      global_select_tree_id = pk_list[2];
+      var tree_name = document.getElementById(this.id+"_tree_name_container").getAttribute("value");
+      document.getElementById("modal_tree_name").value = tree_name;
+      $("#menu-div").show();
+      return false;
+  });
+  $("#home-button").click(function() {
+      if ($("#panel").is(":visible") == true) {
+        $("#panel").hide(100);  
+      } else {
+        $("#panel").show(100);
+      }
+    });
+  $(document).ready(function() {
+        $('.modal').modal();
+        $('.modal').on('shown.bs.modal', function(e)
+    { 
+      $('#modal-general-feedback').find('input:text, input:file, input:password, select, textarea').val('');
+        $(this).removeData();
+    }) ;
+  });
+
+  </script>
+
+</body>
+</html>
+

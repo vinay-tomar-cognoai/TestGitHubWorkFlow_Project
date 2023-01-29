@@ -1,0 +1,108 @@
+{% extends 'EasyChatApp/base.html' %}
+{% block content %}
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/whatsapp_function_console.css' %}?v={% random_int 1 100 %}"">
+<div class="add-scrolling">
+<div class="row" style="padding:1em;" id="easychat-whatsapp-webhooks-container">
+  <div class="col s8">
+    <div class="col s6 easychat-autosave" style="padding-bottom: 10px;">
+          <a class="btn green lighten-2" id="save-whatsapp-webhooks-btn" style="background-color: #82C784;" onclick="save_whatsapp_webhooks_function('{{ bot_pk }}')">Save Function</a>
+      <span id="easychat-autosave-span">Changes saved</span>
+    </div>
+    <div class="col s12">
+      <div class="col s12" style="background-color: #dddddd69;">
+        <a href="javascript:void(0)" class="right tooltipped" data-position="top" data-tooltip="Full-screen mode" onclick="go_full_screen_mode()"><i class="material-icons inline-icon black-text" style="font-size: 28px !important;">fullscreen</i></a>
+      </div>
+      <div id="editor-extra-code-whatsapp">{{code}}</div><br><br>
+      <div class="col s12">
+        <br>
+        <textarea col="30" id="easychat-processor-status" disabled style="color: #F1F2EB;resize:none;height: 18em;border-radius: 0.5em;overflow: auto;display: none;background-color: #272822"></textarea>
+      </div>
+      <div class="processor-errors" id="system-command-error">Don't use system commands.</div>
+    </div>
+  </div>
+  <div class="col s4">
+  <div id = "easychat_whatsapp">
+    <h4>WhatsApp Webhook Extra</h4>
+    <ul class="collection">
+      <li class="collection-item">
+        <button class="easychat_whatsapp_collapsible">status_code</button>
+        <div class="easychat_whatsapp_content">
+          <ul>
+            <li>200: This status code represents the "SUCCESS".</li>
+            <li>101: This status code represent whether the channel does not supports the WhatsApp or you haven't configured the WhatsApp Mobile Number.</li>
+            <li>400: This status code represents when there is no response from the Whatsapp API.</li>
+            <li>500: This status code represents the "Internal server error".</li>
+          </ul>
+        </div>
+      </li>
+      <li class="collection-item">
+        <button class="easychat_whatsapp_collapsible">status_message</button>
+        <div class="easychat_whatsapp_content">
+          <p>Status message is based status code.</p>
+          <ul>
+        <li>200: "SUCCESS".</li>
+        <li>101: "This channel currently not supported" or "Please configure whatsapp number".</li>
+        <li>400: "Whatsapp end point API failed."</li>
+        <li>500: "Internal server error".</li>
+        </ul>
+        </div>
+      </li>
+      <li class="collection-item">
+        <button class="easychat_whatsapp_collapsible">Important points to remember</button>
+        <div class="easychat_whatsapp_content">
+          <p>1. You will get user mobile number from the 'user_mobile_number' parameter</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+  </div>
+</div>
+</div>
+{% if request.user.enable_s3_bucket %}
+
+<script src="https://static.allincall.in/static/EasyChatApp/js/ace.js" type="text/javascript" charset="utf-8"></script>
+
+{% else %}
+
+<script src="{% static 'EasyChatApp/js/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+
+{% endif %}
+
+<script>
+  window.SYSTEM_COMMANDS = {{ system_commands | safe }};
+  var coll = document.getElementsByClassName("easychat_whatsapp_collapsible");
+  var i;
+
+  for (i = 0; i < coll.length; i++) {
+    coll[i].addEventListener("click", function() {
+      this.classList.toggle("active");
+      var content = this.nextElementSibling;
+      if (content.style.maxHeight){
+        content.style.maxHeight = null;
+        setTimeout( function(){set_attributes(content)}, 360);
+      } else {
+        content.style.maxHeight = content.scrollHeight + "px";
+        content.style.border = "1px solid black";
+        content.style.borderRadius = "0.5em";
+        content.style.padding = "2% 4%";
+        content.style.overflow = "scroll";
+      } 
+    });
+  }
+  function set_attributes(content){
+
+    content.style.border = "unset";
+    content.style.borderRadius = "0";
+    content.style.padding = "0";
+  }
+  </script>
+
+<script>
+    var editor = ace.edit("editor-extra-code-whatsapp");
+    editor.setTheme("ace/theme/monokai");
+    editor.session.setMode("ace/mode/python");
+</script>
+
+{% endblock %}

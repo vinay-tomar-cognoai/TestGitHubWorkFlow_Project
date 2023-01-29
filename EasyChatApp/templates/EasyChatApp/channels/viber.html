@@ -1,0 +1,303 @@
+{% extends 'EasyChatApp/console.html' %}
+{% block consolecontent %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/changes_placement.css' %}?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/common_integrated_channel.css' %}?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/viber_css.css' %}?v={% random_int 1 100 %}">
+<script src="{% static 'EasyChatApp/js/viber-multiselect-dropdown.js' %}?v={% random_int 1 100 %}"></script>
+<div style="padding: 1em;">
+<div class="row">
+    {% include "EasyChatApp/channels/channel_components/channel_integration_document_button.html" with channel_doc_download_link="https://drive.google.com/uc?export=download&id=1BBqy_f8KVjw936BHuGB5PSAh8mIWRVWf" channel_name="Viber" %}
+</div>
+{% include "EasyChatApp/channels/channel_components/language_dropdown_go_back.html" %}
+<div class="row">
+   {% include "EasyChatApp/channels/channel_components/custom_message.html" with area="viber-textarea" %}
+<div class="col s12">
+   
+       {% if selected_language == "en" %}
+       {% include "EasyChatApp/channels/channel_components/update_language_specific.html" %}
+       
+       <div class="outer-intent-container">
+        <ul class="collapsible">
+            <li id="collapsible-container-li">
+                <div class="collapsible-header" id="collapsible-div">
+                    <p style="margin:0 !important">Initial Questions</p>
+                    
+                </div>
+                <div class="collapsible-body" id="zalo-intial-question">
+                    
+                    <hr class="dashed-line">
+                    <div class="row" class="intent-container" style="margin-left: 30px;margin-top: 30px;">
+                        <div class="col s4" style="width: 28% !important; ">
+                            <p class="sub-head">*Search and select from existing Intent List</p>
+                        </div>
+                        <div class=" col s4 easychat-initial-questions-dropdown" id="initial_questions" onclick="" style="margin-left: 30px;">
+                            <select name="basic[]" multiple id="multiple-select-viber-initial-message-list">
+                                {% for intent_name in intent_name_list %}
+                                {% if intent_name.is_selected %}
+                                <option value="{{ intent_name.intent_pk }}"  selected>{{ intent_name.intent_name }}</option>
+                                {% else %}
+                                <option value="{{ intent_name.intent_pk }}"  >{{ intent_name.intent_name }}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="col s4 preview-container" id="initial_questions_container" style="min-height: 100px; padding: 8px; max-height: 250px; display: block;"></div>
+                        
+                    </div>
+                </div>
+            </li>
+        </ul>
+        </div>
+        <div class="outer-intent-container">
+            <ul class="collapsible">
+                <li id="collapsible-container-li">
+                    <div class="collapsible-header" id="collapsible-div">
+                        <p style="margin:0 !important">Failure Recommendations</p>
+                        
+                    </div>
+                    <div class="collapsible-body" id="zalo-intial-question">
+                        
+                        <hr class="dashed-line">
+                        <div class="row" class="intent-container" style="margin-left: 30px;margin-top: 30px;">
+                            <div class="col s4" style="width: 28% !important; ">
+                                <p class="sub-head">*Search and select from existing Intent List</p>
+                            </div>
+                            <div class=" col s4 easychat-initial-questions-dropdown" style="margin-left: 30px;">
+                                <select name="basic[]" multiple id="multiple-select-viber-failure-message-list">
+                                    {% for intent_name in intent_name_list_failure %}
+                                        {% if intent_name.is_selected %}
+                                        <option value="{{ intent_name.intent_pk }}" selected>{{ intent_name.intent_name }}</option>
+                                        {% else %}
+                                        <option value="{{ intent_name.intent_pk }}">{{ intent_name.intent_name }}</option>
+                                        {% endif %}
+                                        {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col s4 preview-container" id="failure_recommendation_container" style="min-height: 100px; padding: 8px; max-height: 250px; display: block;" >
+                                
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            </div>
+        
+       <div class="outer-intent-container">
+       <ul class="collapsible">
+           <li>
+               <div class="collapsible-header">Viber Webhook Configurations</div>
+               <div class="collapsible-body" id="zalo-intial-question">
+                <hr class="dashed-line">
+                   <div class="row" id="channel-initial-messages">
+                       <div class="input-field col s12">
+                           {% if viber_url %}
+                           <input type="text" id="viber-url" value="{{viber_url}}" disabled>
+                           <label for="viber-url">URL*</label>
+                           {% else %}
+                           <input type="text" id="viber-url" value="">
+                           <label for="viber-url">URL*</label>
+                           {% endif %}
+                       </div>
+                       <div class="input-field col s12">
+                           {% if viber_auth_token %}
+                           <input type="text" id="viber-auth-token" value="{{viber_auth_token}}">
+                           <label for="viber-auth-token">Auth Token*</label>
+                           {% else %}
+                           <input type="text" id="viber-auth-token" value="">
+                           <label for="viber-auth-token">Auth Token*</label>
+                           {% endif %}
+                       </div>
+                   </div>
+                   {% if viber_auth_token != "" %}
+                       <a class="btn red lighten-2" style="background-color: #82C784; margin-left: 0.2em;"onclick="set_viber_webhook(this)" >Re-Connect Webhook</a>
+                   {% else %}
+                       <a class="btn green lighten-2" style="background-color: #82C784; margin-left: 0.2em;" onclick="set_viber_webhook(this)">Connect Webhook</a>
+                   {% endif %}
+               </div>
+           </li>
+       </ul>
+    </div>
+       <div class="outer-intent-container">
+        <ul class="collapsible">
+            <li>
+                <div style="display: flex; flex-direction: column;" >
+                <div class="collapsible-header">Other Settings</div>
+                </div>
+                <div class="collapsible-body" id="zalo-intial-question" style="padding-top: 2px!important;">
+                    <hr class="dashed-line">
+                    <div class="row sticky-intent-display-format-div" >
+                    </div>
+                    <div class="row" id="channel-sticky-intents">
+                        <div class="col s10">
+                            <table id="easychat-zalo-channel-table" style="box-shadow: none !important;">
+                                <tbody style="box-shadow: none !important;">
+                                    <tr >
+                                        <td style="padding-top:0;">
+                                            <p class="sub-head">Add image in welcome response</p>
+                                            <a class=" gy-flex gy-btn-outline modal-trigger" href="#modal-upload-image">
+                                                Upload From Device</a>
+                                            
+                                        </td>
+                                        <td>
+                                            {% if initial_messages_images %}
+                                           <img src="{{initial_messages_images}}" id="uploaded-bot-welcome-image" style="max-height:10em;">
+                                           <a id="remove-bot-welcome-image"><i class="material-icons red-text text-darken-3">delete</i></a>
+                                           {% else %}
+                                           <img src="" id="uploaded-bot-welcome-image" style="max-height:10em;">
+                                           <a id="remove-bot-welcome-image" style="display: none;"><i class="material-icons red-text text-darken-3">delete</i></a>
+                                           {% endif %}
+                                            <a id="remove-bot-welcome-image" style="display: none;"><i class="material-icons red-text text-darken-3">delete</i></a>
+                                        </td>
+                                    </tr>
+                                    <tr >
+                                        <td style="border: none !important; width: 30%;">
+                                            <p class="sub-head">Add video in welcome response
+                                                <sup>
+                                                    <i class="material-icons inline-icon tooltipped" data-position="top" data-tooltip=" URL/Links added must consist of HTTP/HTTPS, Eg. https://www.google.com">help</i>
+                                                </sup> 
+                                            </p>
+                                        </td>
+                                        <td>
+                                            {% if initial_messages_videos %}
+                                           <input type="text" value="{{initial_messages_videos}}" name="upload-bot-welcome-video-url" id="upload-bot-welcome-video-url" placeholder="Enter URL here" class="white">
+                                           {% else %}
+                                           <input type="text" name="upload-bot-welcome-video-url" id="upload-bot-welcome-video-url" placeholder="Enter URL here" class="white">
+                                           {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr >
+                                        <td style="padding-top:0;">
+                                            <p class="sub-head">Add Viber Bot Logo</p>
+                                            <a class=" gy-flex gy-btn-outline modal-trigger" href="#modal-sender-logo">
+                                                Upload From Device</a>
+                                            
+                                        </td>
+                                        <td>
+                                           {% if viber_sender_logo %}
+                                           <img src="{{viber_sender_logo}}" id="uploaded-bot-viber-bot-logo-image" style="max-height:10em;">
+                                           <a id="remove-viber-sender-logo"><i class="material-icons red-text text-darken-3">delete</i></a>
+                                           {% else %}
+                                           <img src="" id="uploaded-bot-viber-bot-logo-image" style="max-height:10em;">
+                                           <a id="remove-viber-sender-logo" style="display: none;"><i class="material-icons red-text text-darken-3">delete</i></a>
+                                           {% endif %}
+                                        </td>
+                                    </tr>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+ 
+       {% endif %}
+       <div class="progress" id="easychat_viber_channel_preloader" style="display: none;">
+           <div class="indeterminate"></div>
+       </div>
+       {% if selected_language == "en" %}
+       <a class="btn green lighten-2 " style="background-color: #82C784; margin-left: 0.2em"id="save-viber-channel">Save</a>
+       {% else %}
+       <a class="btn green lighten-2" style="background-color: #82C784; margin-left: 0.2em;" id="save-viber-channel-for-non-primary-language">Save</a>
+       {% endif %}
+   </div>
+</div>
+<div id="modal-upload-image" class="modal">
+   <div class="modal-content">
+       <h5>Choose Image</h5>
+       <div class="file-field input-field col s10">
+           <div class="btn-small easychat-button">
+               <span>Choose image</span>
+               <input id="input_upload_image_bot_welcome_message" type="file">
+           </div>
+           <div class="file-path-wrapper">
+               <input id="input_upload_image_bot_welcome_message2" class="file-path validate" type="text">
+           </div>
+       </div>
+   </div>
+   <div class="modal-footer">
+       <a class="modal-close btn easychat-button" id="upload-bot-welcome-image">Upload</a>
+   </div>
+</div>
+<div id="modal-sender-logo" class="modal">
+   <div class="modal-content">
+       <h5>Choose Image</h5>
+       <div class="file-field input-field col s10">
+           <div class="btn-small easychat-button">
+               <span>Choose image</span>
+               <input id="input_upload_viber_sender_logo" type="file">
+           </div>
+           <div class="file-path-wrapper">
+               <input id="input_upload_viber_sender_logo2" class="file-path validate" type="text">
+           </div>
+       </div>
+   </div>
+   <div class="modal-footer">
+       <a class="modal-close btn easychat-button" id="upload-viber-sender-logo">Upload</a>
+   </div>
+</div>
+</div>
+<!-- <script type="text/javascript" src="https://easychat-dev.allincall.in/static/EasyChatApp/js/web_channel.js?v=11.85"></script> -->
+<script type="text/javascript">
+    $(function() {
+                $('#multiple-select-viber-initial-message-list').multiselect({
+                        columns: 1,
+                        placeholder: 'Select Intent',
+                        search: true,
+                        searchOptions: {
+                            'default': 'Search Intent'
+                        },
+                        selectAll: false,
+                    });
+                    $('#multiple-select-viber-failure-message-list').multiselect({
+                        columns: 1,
+                        placeholder: 'Select Intent',
+                        search: true,
+                        searchOptions: {
+                            'default': 'Search Intent'
+                        },
+                        selectAll: false,
+                    });
+                        
+                    $('#multiple-select-viber-language-message-list').multiselect({
+                        columns: 1,
+                        placeholder: 'Select Language',
+                        search: true,
+                        searchOptions: {
+                            'default': 'Search Language'
+                        },
+                        selectAll: false,
+                    });
+                });
+                    $("#is-minimization-enabled").on("change", function(event) {
+                        if (this.checked) {
+                            $("#disable_auto_popup_minimized_wrapper").show();
+                        } else {
+                            $('#disable_auto_popup_minimized_wrapper').hide();
+                            $('#disable_auto_popup_minimized_cb').prop('checked', false);
+                        }
+                    });
+ 
+   $(".viber-textarea").trumbowyg({
+                   tagsToKeep: [],
+                   allowTagsFromPaste: {
+                       allowedTags: ['h4', 'p', 'br']
+                   },
+                   minimalLinks: true,
+                   btns: [
+                       // ['viewHTML'],
+                       ['strong', 'em'],
+                       ['emoji'],
+                       ['link'],
+                       ['unorderedList', 'orderedList'],
+                       ['underline'],
+                       ['justifyLeft'], ['justifyCenter'], ['justifyRight'], ['justifyFull'],
+                   ],
+ })
+    $(".integration-document-btn").hide();
+</script>
+{% endblock %}

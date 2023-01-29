@@ -1,0 +1,207 @@
+{% extends 'EasyAssistApp/console.html' %}
+{% block content %}
+{% load static %}
+{% if request.user.enable_s3_bucket %}
+<script src="https://static.allincall.in/static/EasyAssistApp/js/ace.js" type="text/javascript"
+    charset="utf-8"></script>
+<script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/jscolor.min.js"></script>
+{% else %}
+<script src="{% static 'EasyAssistApp/js/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/jscolor.min.js' %}"></script>
+{% endif %}
+
+<link href="{% static 'EasyAssistApp/css/settings.css' %}" rel="stylesheet" type="text/css">
+
+<div class="container-fluid">
+    <div>
+        <div>
+            <div class="page-header">
+                <div class="nav nav-pills navbar-right">
+                    <a class="anchor-reset back-btn" href="/easy-assist/sales-ai/settings">
+                        <span class="mr-3 mb-auto" style="cursor: pointer;">
+                            <svg class="back-arrow-svg" width="44" height="44" viewBox="0 0 44 44" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <rect width="44" height="44" rx="22" transform="matrix(1 0 0 -1 0 44)" fill="white" />
+                                {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                                <path
+                                d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                                fill="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" />
+                          {% else %}
+                          <path
+                          d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                          fill="#0254D7" />
+                          {% endif %} 
+                               
+                            </svg>
+                        </span>
+                    </a>
+                    <h5 class="nav_btn mr-2 mt-2"> <a class="anchor-reset" href="/easy-assist/sales-ai/settings">Settings</a></h5>
+                    <div class=" mr-2 pt-2">
+                        <svg class="mini-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                                fill="#475569" />
+                        </svg>
+                    </div>
+                    <h5 class="nav_btn active1 mt-2">Integration</h5>
+                </div>
+            </div>
+            <div class="card mt-30">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div id="editor-code" style="overflow: hidden;" class=" ace_editor ace_hidpi ace-chrome">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br><a href="javascript:void(0)" class="btn btn_green " onclick="copy_script()"
+                style="display: inline-flex;background: #10B981 !important">
+                <span class="mr-3">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd"
+                            d="M14 4C14 2.93913 13.5786 1.92172 12.8284 1.17157C12.0783 0.421427 11.0609 0 10 0H4C2.93913 0 1.92172 0.421427 1.17157 1.17157C0.421427 1.92172 0 2.93913 0 4V10C0 11.0609 0.421427 12.0783 1.17157 12.8284C1.92172 13.5786 2.93913 14 4 14H5V9.5C5 7.737 5.746 6.587 6.708 5.894C7.644 5.22 8.753 5 9.5 5H14V4ZM14.5 6H9.5C8.913 6 8.022 6.18 7.292 6.706C6.588 7.213 6 8.063 6 9.5V16C6 17.0609 6.42143 18.0783 7.17157 18.8284C7.92172 19.5786 8.93913 20 10 20H16C17.0609 20 18.0783 19.5786 18.8284 18.8284C19.5786 18.0783 20 17.0609 20 16V10C20 8.93913 19.5786 7.92172 18.8284 7.17157C18.0783 6.42143 17.0609 6 16 6H14.5Z"
+                            fill="white" />
+                    </svg>
+                </span>
+                <span class="text text-light">Copy Script</span><br>
+            </a><br><br>
+            <div class="card">
+                <div class="card-body">
+                    <div id="editor-code-cjs" style="overflow: hidden;"></div>
+                </div>
+            </div>
+            <br><a href="javascript:void(0)" class="btn btn_green" id="copy-cjs-script" onclick="copy_cjs_script()"
+                style="display: inline-flex; background: #10B981 !important">
+                <span class="mr-3">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd"
+                            d="M14 4C14 2.93913 13.5786 1.92172 12.8284 1.17157C12.0783 0.421427 11.0609 0 10 0H4C2.93913 0 1.92172 0.421427 1.17157 1.17157C0.421427 1.92172 0 2.93913 0 4V10C0 11.0609 0.421427 12.0783 1.17157 12.8284C1.92172 13.5786 2.93913 14 4 14H5V9.5C5 7.737 5.746 6.587 6.708 5.894C7.644 5.22 8.753 5 9.5 5H14V4ZM14.5 6H9.5C8.913 6 8.022 6.18 7.292 6.706C6.588 7.213 6 8.063 6 9.5V16C6 17.0609 6.42143 18.0783 7.17157 18.8284C7.92172 19.5786 8.93913 20 10 20H16C17.0609 20 18.0783 19.5786 18.8284 18.8284C19.5786 18.0783 20 17.0609 20 16V10C20 8.93913 19.5786 7.92172 18.8284 7.17157C18.0783 6.42143 17.0609 6 16 6H14.5Z"
+                            fill="white" />
+                    </svg>
+                </span>
+                <span class="text text-light">Copy CJS Script</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    var host_protocol = window.location.protocol;
+    var host_name = window.location.host;
+    var script = host_protocol + '//' +  host_name +'/static/EasyAssistApp/js/easy-assist-v6.js?key=' + "{{ access_token_obj.key }}";
+
+    var load_script = '<script type="text/javascript" src="'+script+'"></scr'+'ipt>';
+    var script_editor = ace.edit("editor-code");
+    script_editor.setTheme("ace/theme/chrome");
+    script_editor.session.setMode("ace/mode/javascript");
+    script_editor.setValue(load_script);
+    script_editor.setFontSize("15px");
+    script_editor.session.setUseWorker(false);
+    script_editor.setReadOnly(true);
+    script_editor.setOption("dragEnabled", false);
+    script_editor.setAutoScrollEditorIntoView(true);
+    script_editor.setOption("maxLines", 4);
+
+    var load_script = script;
+    var cjs_editor = ace.edit("editor-code-cjs");
+    cjs_editor.setTheme("ace/theme/chrome");
+    cjs_editor.session.setMode("ace/mode/javascript");
+    cjs_editor.setValue(load_script);
+    cjs_editor.setFontSize("15px");
+    cjs_editor.session.setUseWorker(false);
+    cjs_editor.setReadOnly(true);
+    cjs_editor.setOption("dragEnabled", false);
+    cjs_editor.setAutoScrollEditorIntoView(true);
+    cjs_editor.setOption("maxLines", 4);
+
+    window.Clipboard = (function(window, document, navigator) {
+    var text_area,
+        copy;
+
+    function is_ios() {
+        return navigator.userAgent.match(/ipad|iphone/i);
+    }
+
+    function create_text_area(text) {
+        text_area = document.createElement('textArea');
+        text_area.value = text;
+        document.body.appendChild(text_area);
+    }
+
+    function select_text() {
+        var range,
+            selection;
+
+        if (is_ios()) {
+            range = document.createRange();
+            range.selectNodeContents(text_area);
+            selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            text_area.setSelectionRange(0, 999999);
+        } else {
+            text_area.select();
+        }
+    }
+
+    function copy_to_clipboard() {
+        document.execCommand('copy');
+        document.body.removeChild(text_area);
+    }
+
+    copy = function(text) {
+        create_text_area(text);
+        select_text();
+        copy_to_clipboard();
+    };
+
+    return {
+        copy: copy
+    };
+})(window, document, navigator);
+
+function cjs_input_text(){
+    return document.querySelector("#editor-code > div.ace_scroller > div > div.ace_layer.ace_text-layer > div > span:nth-child(10)").childNodes[0].data.slice(1,-1);
+}
+
+    function copy_script() {
+      script_editor.selectAll();
+      try{
+        let copy_text = cjs_input_text();
+        copy_text = '<script type="text/javascript" src="'+copy_text+'"></scr'+'ipt>';
+        Clipboard.copy(copy_text);
+      }
+      catch{
+        let copy_text = document.getElementById("editor-code").childNodes[1];
+        copy_text.select();
+        document.execCommand("copy");
+      }
+      show_easyassist_toast("Script copied");
+  }
+
+  function copy_cjs_script() {
+      cjs_editor.selectAll();
+      try{
+        let copy_text = cjs_input_text();
+        Clipboard.copy(copy_text);
+      }
+      catch{
+        let copy_text = document.getElementById("editor-code-cjs").childNodes[1];
+        copy_text.select();
+        document.execCommand("copy");
+      }
+      show_easyassist_toast("CJS script copied");
+  }
+
+  $(document).ready(function() {
+    try {
+        document.getElementById("nav-settings-menu").classList.add("active")
+    } catch(err) {}
+  });
+
+</script>
+{% endblock %}

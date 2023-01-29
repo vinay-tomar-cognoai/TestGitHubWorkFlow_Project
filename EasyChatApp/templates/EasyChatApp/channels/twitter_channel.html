@@ -1,0 +1,251 @@
+{% extends 'EasyChatApp/console.html' %}
+{% block consolecontent %}
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/changes_placement.css' %}?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/web_channel.css' %}?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/common_integrated_channel.css' %}?v={% random_int 1 100 %}">
+
+<div style="padding: 1em;">
+    <div class="row">
+        {% include "EasyChatApp/channels/channel_components/channel_integration_document_button.html" with channel_doc_download_link="https://drive.google.com/uc?export=download&id=1fk2poI-K0qgAZKN--PCj9xvYJkUiZUqW" channel_name="Twitter" %}
+    </div>
+    {% include "EasyChatApp/channels/channel_components/language_dropdown_go_back.html" %}
+    <div class="row">
+        {% include "EasyChatApp/channels/channel_components/custom_message.html" with area="twitter-textarea" %}
+        <div class="col s12">
+            <div class="row">
+                {% if selected_language == "en" %}
+                {% include "EasyChatApp/channels/channel_components/language_specific.html" %}
+                <ul class="collapsible">
+                    <li>
+                        <div class="collapsible-header">Failure Recommendations</div>
+                        <div class="collapsible-body">
+                            <div class="row" id="channel-initial-messages">
+                                *Search and select from existing Intent List
+                                <div class="input-field col s12">
+                                    <select multiple id="multiple-select-twitter-failure-message-list">
+                                        {% for intent_name in intent_name_list_failure %}
+                                        {% if intent_name.is_selected %}
+                                        <option value="{{ intent_name.intent_pk }}" selected>{{ intent_name.intent_name }}</option>
+                                        {% else %}
+                                        <option value="{{ intent_name.intent_pk }}">{{ intent_name.intent_name }}</option>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                {% endif %}
+                <ul class="collapsible">
+                    <li>
+                        <div class="collapsible-header">Twitter Configurations</div>
+                        <div class="collapsible-body">
+                            <div class="row">
+                                <div class="input-field col s12">
+                                  {% if twitter_app_id %}
+                                  <input type="text" id="twitter_app_id" value="{{twitter_app_id}}">
+                                  <label for="twitter_app_id">App ID*</label>
+                                  {% else %}
+                                  <input type="text" id="twitter_app_id" value="">
+                                  <label for="twitter_app_id">App ID*</label>
+                                  {% endif %}
+                                </div>
+                                <div class="input-field col s12">
+                                  {% if twitter_api_key %}
+                                  <input type="text" id="twitter_api_key" value="{{twitter_api_key}}">
+                                  <label for="twitter_api_key">API Key*</label>
+                                  {% else %}
+                                  <input type="text" id="twitter_api_key" value="">
+                                  <label for="twitter_api_key">API Key*</label>
+                                  {% endif %}
+                                </div>
+                                <div class="input-field col s12">
+                                  {% if twitter_key_api_secret %}
+                                  <input type="text" id="twitter_key_api_secret" value="{{twitter_key_api_secret}}">
+                                  <label for="twitter_key_api_secret">API Key Secret*</label>
+                                  {% else %}
+                                  <input type="text" id="twitter_key_api_secret" value="">
+                                  <label for="twitter_key_api_secret">API Key Secret*</label>
+                                  {% endif %}
+                                </div>
+                                <div class="input-field col s12">
+                                  {% if twitter_access_token %}
+                                  <input type="text" id="twitter_access_token" value="{{twitter_access_token}}">
+                                  <label for="twitter_access_token">Access Token*</label>
+                                  {% else %}
+                                  <input type="text" id="twitter_access_token" value="">
+                                  <label for="twitter_access_token">Access Token*</label>
+                                  {% endif %}
+                                </div>
+                                <div class="input-field col s12">
+                                  {% if twitter_access_token_secret %}
+                                  <input type="text" id="twitter_access_token_secret" value="{{twitter_access_token_secret}}">
+                                  <label for="twitter_access_token_secret">Access Token Secret*</label>
+                                  {% else %}
+                                  <input type="text" id="twitter_access_token_secret" value="">
+                                  <label for="twitter_access_token_secret">Access Token Secret*</label>
+                                  {% endif %}
+                                </div>
+                                <div class="input-field col s12">
+                                  {% if twitter_bearer_token %}
+                                  <input type="text" id="twitter_bearer_token" value="{{twitter_bearer_token}}">
+                                  <label for="twitter_bearer_token">Bearer Token*</label>
+                                  {% else %}
+                                  <input type="text" id="twitter_bearer_token" value="">
+                                  <label for="twitter_bearer_token">Bearer Token*</label>
+                                  {% endif %}
+                                </div>
+                                <div class="input-field col s12">
+                                  {% if twitter_dev_env_label %}
+                                  <input type="text" id="twitter_dev_env_label" value="{{twitter_dev_env_label}}">
+                                  <label for="twitter_dev_env_label">Dev environment label*</label>
+                                  {% else %}
+                                  <input type="text" id="twitter_dev_env_label" value="">
+                                  <label for="twitter_dev_env_label">Dev environment label*</label>
+                                  {% endif %}
+                                </div>
+                                {% if twitter_webhook_id %}
+                                <div class="input-field col s12">
+                                  <input type="text" id="twitter_webhook_id" value="{{twitter_webhook_id}}" disabled>
+                                  <label for="twitter_webhook_id">Webhook ID</label>
+                                </div>
+                                <a class="waves-effect waves-light btn modal-trigger red darken-3" onclick="twitter_delete_webhook()">Delete Webhook</a>
+                                <a class="waves-effect waves-light btn modal-trigger easychat-button" onclick="twitter_reset_config()">Reset Configuration</a>
+                                {% else %}
+                                    {% if twitter_app_id %}
+                                    <a class="waves-effect waves-light btn modal-trigger easychat-button" onclick="twitter_subscribe_webhook()">Subscribe Webhook</a>
+                                    <a class="waves-effect waves-light btn modal-trigger easychat-button" onclick="twitter_reset_config()">Reset Configuration</a>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <ul class="collapsible">
+                    <li>
+                        <div class="collapsible-header">Deploy links</div>
+                        <div class="collapsible-body">
+                            <div class="row">
+                                <div class="input-field col s12">
+                                    <input type="text" value='{{twitter_webhook_url}}' id="twitter-deploy-link" readonly style="width:96%;border: 0.1em solid black !important;padding:1em;font-family: Consolas, monaco, monospace;word-wrap: break-word;background-color:white;">
+                                    <button onclick="copyToClipboard('twitter-deploy-link', this)">Copy Script</button>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                {% if selected_language == "en" %}
+                <ul class="collapsible">
+                    <li>
+                        <div style="display: flex; flex-direction: column;">
+                            <div class="collapsible-header">Other Settings</div>
+                        </div>
+                        <div class="collapsible-body">
+                            <div style="padding-bottom: 1em; color: #6C7A93" ; font-weight: 400;>
+                                Customise the look and feel of your bot.
+                            </div>
+                            <div class="row sticky-intent-display-format-div" style=" border-bottom: 1px dashed #9AAAEB;
+                                margin: 0px 0px 36px 0px;
+                                padding-bottom: 16px; ">
+                            </div>
+                            <div class="row" id="channel-sticky-intents">
+                                <div class="col s10">
+                                    <table id="easychat-web-channel-table" style="box-shadow: none !important;">
+                                        <tbody style="box-shadow: none !important;">
+                                            <tr>
+                                                <td>
+                                                    <p>Add image in welcome response</p>
+                                                    {% if initial_messages_images %}
+                                                    <img src="{{initial_messages_images}}" id="uploaded-bot-welcome-image" style="max-height:10em;">
+                                                    <a id="remove-bot-welcome-image"><i class="material-icons red-text text-darken-3">delete</i></a>
+                                                    {% else %}
+                                                    <img src="" id="uploaded-bot-welcome-image" style="max-height:10em;">
+                                                    <a id="remove-bot-welcome-image" style="display: none;"><i class="material-icons red-text text-darken-3">delete</i></a>
+                                                    {% endif %}
+                                                    
+                                                </td>
+                                                <td>
+                                                    <a class=" gy-btn-outline gy-flex modal-trigger" href="#modal-upload-image">
+                                                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M3.9375 15.375H14.0608C14.3714 15.375 14.6233 15.6268 14.6233 15.9375C14.6233 16.2223 14.4116 16.4576 14.1371 16.4949L14.0608 16.5H3.9375C3.62684 16.5 3.375 16.2482 3.375 15.9375C3.375 15.6527 3.58662 15.4174 3.86117 15.3801L3.9375 15.375H14.0608H3.9375ZM4.71972 5.46708L8.46796 1.71962C8.7382 1.44943 9.16334 1.42853 9.45754 1.657L9.5282 1.71931L13.2808 5.46677C13.5739 5.75946 13.5742 6.23433 13.2815 6.52743C13.0113 6.79798 12.5859 6.81906 12.2915 6.5905L12.2209 6.52815L9.74925 4.05975L9.74913 13.5001C9.7491 13.8847 9.45954 14.2016 9.08653 14.245L8.99907 14.25C8.61444 14.25 8.29746 13.9604 8.25417 13.5874L8.24913 13.4999L8.25 4.05825L5.78028 6.52784C5.50988 6.79818 5.08446 6.81893 4.79026 6.59013L4.71961 6.52774C4.44928 6.25734 4.42853 5.83192 4.65733 5.53772L4.71972 5.46708L8.46796 1.71962L4.71972 5.46708Z" fill="#2743cb" />
+                                                        </svg>
+                                                        &nbsp;
+                                                        Upload From
+                                                        Device</a>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <p>Add video in welcome response
+                                                        <sup>
+                                                            <i class="material-icons inline-icon tooltipped" data-position="top" data-tooltip=" URL/Links added must consist of HTTP/HTTPS, Eg. https://www.google.com">help</i>
+                                                        </sup> 
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    {% if initial_messages_videos %}
+                                                    <input type="text" value="{{initial_messages_videos}}" name="upload-bot-welcome-video-url" id="upload-bot-welcome-video-url" placeholder="Copy video url here" class="white" style="padding:0em 1em 0em 1em;width:20em;border-radius:0.5em;">
+                                                    {% else %}
+                                                    <input type="text" name="upload-bot-welcome-video-url" id="upload-bot-welcome-video-url" placeholder="Copy video url here" class="white" style="padding:0em 1em 0em 1em;width:20em;border-radius:0.5em;">
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                {% endif %}
+                {% if selected_language == "en" %}
+                <a class="btn green lighten-2 " style="background-color: #82C784; margin-left: 0.2em" id="save-twitter-channel">Save</a>
+                {% else %}
+                <a class="btn green lighten-2" style="background-color: #82C784; margin-left: 0.2em;" id="save-twitter-channel-for-non-primary-language">Save</a>
+                {% endif %}
+            </div>
+        </div>
+        <div id="modal-upload-image" class="modal">
+            <div class="modal-content">
+                <h5>Choose Image</h5>
+                <div class="file-field input-field col s10">
+                    <div class="btn-small easychat-button">
+                        <span>Choose image</span>
+                        <input id="input_upload_image_bot_welcome_message" type="file">
+                    </div>
+                    <div class="file-path-wrapper">
+                        <input id="input_upload_image_bot_welcome_message2" class="file-path validate" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a class="modal-close btn easychat-button" id="upload-bot-welcome-image">Upload</a>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    $(".twitter-textarea").trumbowyg({
+                    tagsToKeep: [],
+                    allowTagsFromPaste: {
+                        allowedTags: ['h4', 'p', 'br']
+                    },
+                    minimalLinks: true,
+                    btns: [
+                        // ['viewHTML'],
+                        ['strong', 'em'], 
+                        ['emoji'],
+                        ['link'],
+                        ['unorderedList', 'orderedList'],
+                        ['underline'],
+                        ['justifyLeft'], ['justifyCenter'], ['justifyRight'], ['justifyFull'],
+                    ],
+  })
+
+</script>
+{% endblock %}

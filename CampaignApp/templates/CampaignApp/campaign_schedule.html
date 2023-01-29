@@ -1,0 +1,873 @@
+{% extends 'CampaignApp/campaign_base.html' %}
+{% block content %}
+{% load static %}
+<style>
+@media only screen and (min-width: 768px) {
+    .schedule-campaign-container {
+        padding-right: 1.5rem!important;
+    }
+}
+</style>
+<link rel="stylesheet" type="text/css" href="{% static 'CampaignApp/css/campaign_schedule.css' %}?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="{% static 'CampaignApp/css/whatsapp_styles.css' %}?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="{% static 'CampaignApp/css/whatsapp_webhook_console.css' %}?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="{% static 'CampaignApp/css/timepicker.css' %}">
+
+
+<script type="text/javascript" src="{% static 'CampaignApp/js/jquery.js' %}"></script>
+
+<script type="text/javascript" src="{% static 'CampaignApp/js/jquery-ui.min.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'CampaignApp/css/bootstrap-datetimepicker.min.css' %}?v={% random_int 1 100 %}">
+
+<script type="text/javascript" src="{% static 'LiveChatApp/js/moment.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'CampaignApp/js/bootstrap-datetimepicker.min.js' %}"></script>
+
+<div class="successfull-note scheduled-campaign-note green-note create_successfull_note_toaster" style="display: none">
+    <div class="credentials-note-data">
+    <p class="credentials-note-text"> The campaign schedule is created successfully. </p>
+
+    </div>
+</div>
+<div class="successfull-note scheduled-campaign-note green-note edit_successfull_note_toaster" style="display: none">
+    <div class="credentials-note-data">
+    <p class="credentials-note-text"> The scheduled campaign is edited successfully. </p>
+
+    </div>
+</div>
+<div class="successfull-note scheduled-campaign-note red-note deleted_successfull_note_toaster" id="unsuccessfull_note_toaster" style="display: none;">
+    <div class="credentials-note-data">
+    <p class="credentials-note-text"> The scheduled campaign(s) are deleted successfully. </p>
+
+    </div>
+</div>
+
+<div class="container-fluid schedule-campaign-container">
+    <!-- <div class="campaign-schedule-wrapper" >
+        <div class="campaign-schedule-heading-div">
+            Campaign Name - Schedule
+        </div>
+        <div class="campaign-schedule-heading-div">
+            <span style="font-size: 12px;">To add time slots click Shift + Enter or Enter</span>
+        </div>
+        <div class="campaign-schedule-slots-wrapper" id="campaign-schedule-slots-wrapper">
+            <div class="campaign-schedule-input-item">
+
+                <input type="text" class="campaign-schedule-input-field schedule_datepicker" id="campaign_datepicker">
+            </div>
+            <div class="campaign-schedule-input-item">
+                <button class="campaign-schedule-remove-item-btn" onclick="remove_slots_function(this);">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="8" cy="8" r="8" fill="#F8F8F8"/>
+                        <path d="M3.89705 4.05379L3.96967 3.96967C4.23594 3.7034 4.6526 3.6792 4.94621 3.89705L5.03033 3.96967L8 6.939L10.9697 3.96967C11.2626 3.67678 11.7374 3.67678 12.0303 3.96967C12.3232 4.26256 12.3232 4.73744 12.0303 5.03033L9.061 8L12.0303 10.9697C12.2966 11.2359 12.3208 11.6526 12.1029 11.9462L12.0303 12.0303C11.7641 12.2966 11.3474 12.3208 11.0538 12.1029L10.9697 12.0303L8 9.061L5.03033 12.0303C4.73744 12.3232 4.26256 12.3232 3.96967 12.0303C3.67678 11.7374 3.67678 11.2626 3.96967 10.9697L6.939 8L3.96967 5.03033C3.7034 4.76406 3.6792 4.3474 3.89705 4.05379L3.96967 3.96967L3.89705 4.05379Z" fill="#E53E3E"/>
+                        </svg>
+
+                </button>
+                <input type="text" class="campaign-schedule-input-field schedule-timepicker time_slots" value="8:00 AM" />
+            </div>
+            <div class="campaign-schedule-input-item">
+                <input type="text" class="campaign-schedule-add-time-slot-field schedule-timepicker" id="campaign-schedule-add-time-slot-input" value="" / style="z-index: 1; background: transparent;">
+                <button class="campaign-schedule-add-time-slot-field campaign-schedule-add-time-slot-btn" style="z-index: 0; position: absolute;">
+                    Add Time Slot
+                </button>
+
+
+            </div>
+
+        </div>
+        <div class="campaign-schedule-list-dropdown-container">
+            <select class="form-control campaign-select"  id="campaign-schedule-list-select" name="campaign-schedule-list-select">
+                <option value="does_not_repeat" selected>Does not repeat</option>
+
+                <option value="daily">Daily</option>
+
+                <option value="weekly">Weekly on Friday</option>
+                <option value="monthly">Monthly on Last Friday</option>
+
+                <option value="annually">Annually on Sep 5</option>
+                <option value="weekend_or_weekday">Every Weekday (Mon - Fri)</option>
+                <option value="custom" onclick="schedule_custom_options(this)">Custom...</option>
+            </select>
+        </div>
+        <div class="campaign-schedule-btn-container">
+            <button class="campaign-schedule-reset-btn" onclick="reset_current_wrapper()" data-toggle="modal" data-target="#campaign_schedule_reset_modal">
+                Reset
+            </button>
+            <div style="display: flex; align-items: center; column-gap: 10px;">
+                <button class="campaign-schedule-cancel-btn">
+                    Cancel
+                </button>
+                <button class="campaign-schedule-save-btn" id="campaign-schedule-save-btn" onclick="create_new_schedule()">
+                    Schedule
+                </button>
+            </div>
+        </div>
+
+    </div> -->
+    <div class="card-body upcoming-schedule-card-body" id="complete_table_div">
+        <div class="campaign-schedule-table-header">
+            <div class="campaign-schedule-heading-subheading-div">
+                <h5 class="campaign-schedule-table-heading">
+                    Upcoming Schedules
+                </h5>
+                <p class="upcoming-schedule-subheading">
+                    Create and manage your campaign schedules
+                </p>
+            </div>
+            <div class="campaign-schedule-buttons-div">
+                <button class="btn btn-primary campaign-primary-btn" data-toggle="modal" id="create_schedule_campaign_btn" data-target="#schedule_campaign_modal" onclick="reset_time_date_schedule_create()">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7.89823 3.00685L8 3C8.3797 3 8.69349 3.28215 8.74315 3.64823L8.75 3.75V7.25H12.25C12.6297 7.25 12.9435 7.53215 12.9932 7.89823L13 8C13 8.3797 12.7178 8.69349 12.3518 8.74315L12.25 8.75H8.75V12.25C8.75 12.6297 8.46785 12.9435 8.10177 12.9932L8 13C7.6203 13 7.30651 12.7178 7.25685 12.3518L7.25 12.25V8.75H3.75C3.3703 8.75 3.05651 8.46785 3.00685 8.10177L3 8C3 7.6203 3.28215 7.30651 3.64823 7.25685L3.75 7.25H7.25V3.75C7.25 3.3703 7.53215 3.05651 7.89823 3.00685L8 3L7.89823 3.00685Z" fill="white"/>
+                    </svg>
+                    <span>Schedule Campaign</span>
+                </button>
+                <button class="btn btn-primary custom_filter_btn campaign-primary-btn" data-toggle="modal" id="filter_schedule_campaign_btn" data-target="#filter-schedule_campaign_modal" onclick="set_date_value_for_filter()">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5.79372 5.20714C5.79372 5.0196 5.71667 4.83973 5.57954 4.70712C5.4424 4.5745 5.2564 4.5 5.06246 4.5C4.86852 4.5 4.68252 4.5745 4.54538 4.70712C4.40824 4.83973 4.3312 5.0196 4.3312 5.20714V10.3467C4.10889 10.4708 3.92428 10.6493 3.79593 10.8643C3.66758 11.0793 3.60001 11.3232 3.60001 11.5714C3.60001 11.8197 3.66758 12.0635 3.79593 12.2785C3.92428 12.4935 4.10889 12.6721 4.3312 12.7962V13.6929C4.3312 13.8804 4.40824 14.0603 4.54538 14.1929C4.68252 14.3255 4.86852 14.4 5.06246 14.4C5.2564 14.4 5.4424 14.3255 5.57954 14.1929C5.71667 14.0603 5.79372 13.8804 5.79372 13.6929V12.7962C6.01603 12.6721 6.20064 12.4935 6.32899 12.2785C6.45734 12.0635 6.52491 11.8197 6.52491 11.5714C6.52491 11.3232 6.45734 11.0793 6.32899 10.8643C6.20064 10.6493 6.01603 10.4708 5.79372 10.3467V5.20714ZM10.1813 5.20714C10.1813 5.0196 10.1042 4.83973 9.96708 4.70712C9.82995 4.5745 9.64395 4.5 9.45001 4.5C9.25606 4.5 9.07007 4.5745 8.93293 4.70712C8.79579 4.83973 8.71875 5.0196 8.71875 5.20714V6.1038C8.49644 6.22793 8.31183 6.40647 8.18348 6.62146C8.05513 6.83645 7.98755 7.08032 7.98755 7.32857C7.98755 7.57682 8.05513 7.82069 8.18348 8.03568C8.31183 8.25067 8.49644 8.42921 8.71875 8.55334V13.6929C8.71875 13.8804 8.79579 14.0603 8.93293 14.1929C9.07007 14.3255 9.25606 14.4 9.45001 14.4C9.64395 14.4 9.82995 14.3255 9.96708 14.1929C10.1042 14.0603 10.1813 13.8804 10.1813 13.6929V8.55334C10.4036 8.42921 10.5882 8.25067 10.7165 8.03568C10.8449 7.82069 10.9125 7.57682 10.9125 7.32857C10.9125 7.08032 10.8449 6.83645 10.7165 6.62146C10.5882 6.40647 10.4036 6.22793 10.1813 6.1038V5.20714ZM13.8376 4.5C14.0315 4.5 14.2175 4.5745 14.3546 4.70712C14.4918 4.83973 14.5688 5.0196 14.5688 5.20714V10.3467C14.7911 10.4708 14.9757 10.6493 15.1041 10.8643C15.2324 11.0793 15.3 11.3232 15.3 11.5714C15.3 11.8197 15.2324 12.0635 15.1041 12.2785C14.9757 12.4935 14.7911 12.6721 14.5688 12.7962V13.6929C14.5688 13.8804 14.4918 14.0603 14.3546 14.1929C14.2175 14.3255 14.0315 14.4 13.8376 14.4C13.6436 14.4 13.4576 14.3255 13.3205 14.1929C13.1833 14.0603 13.1063 13.8804 13.1063 13.6929V12.7962C12.884 12.6721 12.6994 12.4935 12.571 12.2785C12.4427 12.0635 12.3751 11.8197 12.3751 11.5714C12.3751 11.3232 12.4427 11.0793 12.571 10.8643C12.6994 10.6493 12.884 10.4708 13.1063 10.3467V5.20714C13.1063 5.0196 13.1833 4.83973 13.3205 4.70712C13.4576 4.5745 13.6436 4.5 13.8376 4.5V4.5Z" fill="white"/>
+                    </svg>
+                    <span>Filter</span>
+                </button>
+                <button class="custom-schedule-table-delete-btn delete_campaign_btn" id="campaign_schedule_delete_selected_items_btn" data-toggle="modal" data-target="#campaign_multiple_schedule_delete_modal">
+                    <!-- style="opacity: 0.25; -->
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10.35 3.60001C10.35 2.85442 9.74558 2.25001 9 2.25001C8.25442 2.25001 7.65 2.85442 7.65 3.60001H6.75C6.75 2.35737 7.75736 1.35001 9 1.35001C10.2426 1.35001 11.25 2.35737 11.25 3.60001H15.3C15.5485 3.60001 15.75 3.80148 15.75 4.05001C15.75 4.29853 15.5485 4.50001 15.3 4.50001H14.8014L13.6349 14.6063C13.5301 15.5146 12.7611 16.2 11.8468 16.2H6.15319C5.2389 16.2 4.46985 15.5146 4.36505 14.6063L3.1977 4.50001H2.7C2.47909 4.50001 2.29535 4.34082 2.25725 4.13089L2.25 4.05001C2.25 3.80148 2.45147 3.60001 2.7 3.60001H10.35ZM13.8942 4.50001H4.1049L5.25912 14.5032C5.31152 14.9573 5.69604 15.3 6.15319 15.3H11.8468C12.304 15.3 12.6885 14.9573 12.7409 14.5032L13.8942 4.50001ZM7.65 6.75001C7.87091 6.75001 8.05465 6.8893 8.09275 7.07298L8.1 7.14376V12.6563C8.1 12.8737 7.89853 13.05 7.65 13.05C7.42909 13.05 7.24535 12.9107 7.20725 12.727L7.2 12.6563V7.14376C7.2 6.92629 7.40147 6.75001 7.65 6.75001ZM10.35 6.75001C10.5709 6.75001 10.7546 6.8893 10.7927 7.07298L10.8 7.14376V12.6563C10.8 12.8737 10.5985 13.05 10.35 13.05C10.1291 13.05 9.94535 12.9107 9.90725 12.727L9.9 12.6563V7.14376C9.9 6.92629 10.1015 6.75001 10.35 6.75001Z" fill="white"></path>
+                    </svg>
+                    <span>Delete</span>
+                </button>
+            </div>
+        </div>
+        <div class="all-selected-text-div">
+            <p class="page-selection-count-text">
+                <span id="total_deleting_campaign_selected">All 25 scheduled campaigns on this page are selected.</span>
+                <span id="select_all_in_total_campaigns" class="select-all-campaigns-text">
+                    Select all the scheduled campaigns created in total
+                </span>
+                <span id="clear_all_selected_campaigns_in_total" class="select-all-campaigns-text clear-all-selection-text" style="display:none">
+                    Clear Selection
+                </span>
+            </p>
+        </div>
+        <div class="table-responsive avtive-customer-table campaign-table-div-wrapper" id="campaign_dashboard_schedule_table">
+                <div class="row campaign-table-row">
+                    <div class="col-sm-12 campaign-table-column">
+
+                        <table class="table table-bordered dataTable no-footer campaign-default-table" id="campaign_schedule_table" width="100%" cellspacing="0" role="grid" style="width: 100%;">
+                        </table>
+                    </div>
+                </div>
+                <div class="row mt-2" id="campaign_table_pagination_div">
+                </div>
+        </div>
+        <div class="data-not-found-wrapper upcoming-schedule-no-data-div" id="no-data-loader" style="display: none;">
+            <div id="no_data_found_img">
+                <div>
+                    <img id="no_data_image_loader" src="/static/EasyChatApp/images/bots_loading.gif"> 
+                    <div class="linear-activity">
+                        <div class="indeterminate"></div>
+                    </div>
+                    <div id="no_data_found_text">Fetching Data. Please Wait!</div>
+                </div>
+            </div>
+        </div>
+        <div id="table_no_data_found" class="col-sm-12 table-no-data-found-div-wrapper upcoming-schedule-no-data-div">
+            <div class="no-data-svg-text-div">
+                <svg class="no-data-svg" width="121" height="85" viewBox="0 0 121 85" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_1_1896)">
+                    <path d="M106.903 84.5572H14.0485L27.4747 8.41204H120.329L106.903 84.5572Z" fill="#F2F8FF"></path>
+                    <path d="M59.2541 0.526333H28.8651L27.4747 8.41205H59.9962L59.2541 0.526333Z" fill="#F2F8FF"></path>
+                    <path d="M59.9962 8.41205H27.4747L28.8651 0.526333H59.2541L59.9962 8.41205Z" fill="#E1E7EF"></path>
+                    <path d="M106.903 84.5572H14.0484L27.4747 8.41204H120.329L118.929 16.3514L115.8 34.0995L106.903 84.5572Z" fill="#E1E7EF"></path>
+                    <path d="M106.767 84.5572H13.712L0.5 11.1765H93.5548L106.767 84.5572Z" fill="#F1F5F9"></path>
+                    <path d="M36.6133 52.167C36.6133 54.3031 34.8817 56.0348 32.7456 56.0348C30.6095 56.0348 28.8779 54.3031 28.8779 52.167C28.8779 50.0309 30.6095 48.2993 32.7456 48.2993C34.8817 48.2993 36.6133 50.0309 36.6133 52.167Z" fill="#17282F"></path>
+                    <path d="M67.1889 52.167C67.1889 54.3031 65.4569 56.0348 63.3208 56.0348C61.1851 56.0348 59.4531 54.3031 59.4531 52.167C59.4531 50.0309 61.1851 48.2993 63.3208 48.2993C65.4569 48.2993 67.1889 50.0309 67.1889 52.167Z" fill="#17282F"></path>
+                    <path d="M53.5886 56.6522L53.3762 56.2472C53.357 56.2106 51.3589 52.5175 47.3385 52.5175C43.6719 52.5175 42.7781 55.9948 42.7418 56.143L42.6333 56.5861L41.7464 56.3718L41.8531 55.9281C41.8635 55.8851 42.9426 51.6032 47.3385 51.6032C51.9212 51.6032 54.0957 55.6505 54.1859 55.823L54.3983 56.2277L53.5886 56.6522Z" fill="#17282F"></path>
+                    </g>
+                    <defs>
+                    <clipPath id="clip0_1_1896">
+                    <rect width="120" height="84.1143" fill="white" transform="translate(0.5 0.442841)"></rect>
+                    </clipPath>
+                    </defs>
+                </svg>
+                <p class="no-data-text">No Data Found</p>
+
+            </div>
+            <!-- <div class="reload-div-wrapper" id="reload_page_button">
+                <svg class="reload-svg" width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12.7028 3.3838V5.59994C12.7028 5.94613 12.4137 6.22677 12.057 6.22677H9.7737C9.41703 6.22677 9.12789 5.94613 9.12789 5.59994C9.12789 5.25376 9.41703 4.97312 9.7737 4.97312L10.3045 4.97248C8.56824 3.96446 6.2853 4.18629 4.78963 5.63797C3.0242 7.35149 3.0242 10.1297 4.78963 11.8432C6.55507 13.5567 9.41741 13.5567 11.1828 11.8432C12.2574 10.8003 12.7071 9.3278 12.4249 7.90593C12.3574 7.566 12.5867 7.23733 12.9369 7.17184C13.2871 7.10635 13.6257 7.32883 13.6932 7.66876C14.0557 9.49493 13.477 11.3894 12.0962 12.7296C9.82632 14.9327 6.14617 14.9327 3.87632 12.7296C1.60647 10.5265 1.60647 6.95461 3.87632 4.75151C5.92983 2.75838 9.13762 2.56842 11.4112 4.18161L11.4112 3.3838C11.4112 3.03761 11.7003 2.75697 12.057 2.75697C12.4137 2.75697 12.7028 3.03761 12.7028 3.3838Z" fill="#7B7A7B"/>
+                </svg>
+                <span class="reload-text">Reload</span>
+            </div> -->
+        </div>
+    </div>
+</div>
+                <div class="modal fade custom_modal" id="schedule_campaign_modal" role="dialog">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <div class="row">
+                                    <div class="col-10">
+                                        <h5 class="modal-title">Create Schedule - {{campaign_name}}</h5>
+                                    </div>
+                                    <div class="col-2 text-right">
+                                        <button class="btn" type="button" data-dismiss="modal" style="padding: 0!important">
+                                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M13.4931 0.710017C13.3063 0.522765 13.0526 0.417532 12.7881 0.417532C12.5236 0.417532 12.2699 0.522765 12.0831 0.710017L7.19309 5.59002L2.30309 0.700017C2.11625 0.512765 1.8626 0.407532 1.59809 0.407532C1.33357 0.407532 1.07992 0.512765 0.893086 0.700017C0.503086 1.09002 0.503086 1.72002 0.893086 2.11002L5.78309 7.00002L0.893086 11.89C0.503086 12.28 0.503086 12.91 0.893086 13.3C1.28309 13.69 1.91309 13.69 2.30309 13.3L7.19309 8.41002L12.0831 13.3C12.4731 13.69 13.1031 13.69 13.4931 13.3C13.8831 12.91 13.8831 12.28 13.4931 11.89L8.60309 7.00002L13.4931 2.11002C13.8731 1.73002 13.8731 1.09002 13.4931 0.710017Z" fill="black" fill-opacity="0.54"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-body">
+                                <span class="sub-card-heading">Create Date & Time</span>
+                                <div class="card campaign-sub-card mt-2">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-6 d-flex align-items-center">
+                                                <span class="sub-card-sub-heading">Trigger Date</span>
+                                                <div class="input-container ml-3">
+                                                    <input type="text" class="campaign-schedule-input-field schedule_datepicker" id="campaign_datepicker" autocomplete="off">
+                                                    <div class="icon">
+                                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M5.03644 1.33325C5.31258 1.33325 5.53644 1.55711 5.53644 1.83325V2.54372H10.4635V1.83325C10.4635 1.55711 10.6874 1.33325 10.9635 1.33325C11.2397 1.33325 11.4635 1.55711 11.4635 1.83325V2.54372H12.6666C13.7712 2.54372 14.6666 3.43915 14.6666 4.54372V13.3324C14.6666 14.4369 13.7712 15.3324 12.6666 15.3324H3.33331C2.22874 15.3324 1.33331 14.4369 1.33331 13.3324V4.54373C1.33331 3.43916 2.22874 2.54372 3.33331 2.54372H4.53644V1.83325C4.53644 1.55711 4.7603 1.33325 5.03644 1.33325ZM10.4635 3.54372V4.31993C10.4635 4.59607 10.6874 4.81993 10.9635 4.81993C11.2397 4.81993 11.4635 4.59607 11.4635 4.31993V3.54372H12.6666C13.2189 3.54372 13.6666 3.99144 13.6666 4.54372V5.7819C13.6318 5.76952 13.5942 5.76278 13.5551 5.76278H2.44399C2.40519 5.76278 2.36794 5.76941 2.33331 5.78159V4.54373C2.33331 3.99144 2.78103 3.54372 3.33331 3.54372H4.53644V4.31993C4.53644 4.59607 4.7603 4.81993 5.03644 4.81993C5.31258 4.81993 5.53644 4.59607 5.53644 4.31993V3.54372H10.4635ZM2.33331 6.41063V13.3324C2.33331 13.8846 2.78103 14.3324 3.33331 14.3324H12.6666C13.2189 14.3324 13.6666 13.8846 13.6666 13.3324V6.41033C13.6318 6.42271 13.5942 6.42945 13.5551 6.42945H2.44399C2.40519 6.42945 2.36794 6.42282 2.33331 6.41063ZM3.05597 8.93803C3.05597 8.66189 3.27983 8.43803 3.55597 8.43803H5.03745C5.31359 8.43803 5.53745 8.66189 5.53745 8.93803C5.53745 9.21418 5.31359 9.43803 5.03745 9.43803H3.55597C3.27983 9.43803 3.05597 9.21418 3.05597 8.93803ZM7.25909 8.43803C6.98295 8.43803 6.75909 8.66189 6.75909 8.93803C6.75909 9.21418 6.98295 9.43803 7.25909 9.43803H8.74058C9.01672 9.43803 9.24058 9.21418 9.24058 8.93803C9.24058 8.66189 9.01672 8.43803 8.74058 8.43803H7.25909ZM10.4635 8.93803C10.4635 8.66189 10.6874 8.43803 10.9635 8.43803H12.445C12.7211 8.43803 12.945 8.66189 12.945 8.93803C12.945 9.21418 12.7211 9.43803 12.445 9.43803H10.9635C10.6874 9.43803 10.4635 9.21418 10.4635 8.93803ZM3.55597 11.28C3.27983 11.28 3.05597 11.5038 3.05597 11.78C3.05597 12.0561 3.27983 12.28 3.55597 12.28H5.03745C5.31359 12.28 5.53745 12.0561 5.53745 11.78C5.53745 11.5038 5.31359 11.28 5.03745 11.28H3.55597ZM6.75909 11.78C6.75909 11.5038 6.98295 11.28 7.25909 11.28H8.74058C9.01672 11.28 9.24058 11.5038 9.24058 11.78C9.24058 12.0561 9.01672 12.28 8.74058 12.28H7.25909C6.98295 12.28 6.75909 12.0561 6.75909 11.78ZM10.9635 11.28C10.6874 11.28 10.4635 11.5038 10.4635 11.78C10.4635 12.0561 10.6874 12.28 10.9635 12.28H12.445C12.7211 12.28 12.945 12.0561 12.945 11.78C12.945 11.5038 12.7211 11.28 12.445 11.28H10.9635Z" fill="#525252"/>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6 d-flex align-items-center">
+                                                <span class="sub-card-sub-heading">Trigger Time</span>
+                                                <div class="input-container ml-3">
+                                                    <input type="text" class="campaign-schedule-input-field custom-timepicker-input time_slots" id="create_campaign_timepicker" autocomplete="off">
+                                                    <div class="icon">
+                                                        <svg width="15" height="14" viewBox="0 0 15 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M7.50001 12.6666C10.6296 12.6666 13.1667 10.1295 13.1667 6.99992C13.1667 3.87031 10.6296 1.33325 7.50001 1.33325C4.3704 1.33325 1.83334 3.87031 1.83334 6.99992C1.83334 10.1295 4.3704 12.6666 7.50001 12.6666ZM7.50001 13.6666C11.1819 13.6666 14.1667 10.6818 14.1667 6.99992C14.1667 3.31802 11.1819 0.333252 7.50001 0.333252C3.81811 0.333252 0.833344 3.31802 0.833344 6.99992C0.833344 10.6818 3.81811 13.6666 7.50001 13.6666Z" fill="#525252"/>
+                                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M7.5 3.83325C7.77614 3.83325 8 4.05711 8 4.33325V6.73233L9.77735 7.91723C10.0071 8.0704 10.0692 8.38084 9.91603 8.6106C9.76285 8.84037 9.45241 8.90245 9.22265 8.74928L7.37108 7.5149C7.13925 7.36034 7 7.10015 7 6.82152V4.33325C7 4.05711 7.22386 3.83325 7.5 3.83325Z" fill="#525252"/>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card campaign-sub-card mt-3">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="d-flex frequency-dropdown-wrapper">
+                                                    <span class="sub-card-sub-heading" style="padding-top: 11px;">Frequency</span>
+                                                    <div class="campaign-schedule-list-dropdown-container ml-3 w-100" id="campaign-frequency-dropdown-div">
+                                                        <select class="form-control campaign-select"  id="campaign-schedule-list-select" name="campaign-schedule-list-select" onchange="schedule_custom_options(this)">
+                                                            <option value="does_not_repeat" selected>Does not repeat</option>
+                                                            
+                                                            <option value="daily">Daily</option>
+                                                        
+                                                            <option value="weekly">Weekly On Wednesday</option>
+                                                            <option value="monthly">Monthly on Third Wednesday</option>
+                            
+                                                            <!-- <option value="annually">Annually on Sep 5</option> -->
+                                                            <option value="weekend_or_weekday">Every Weekday ( Monday - Friday )</option>
+                                                            <option value="custom" >Custom</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="custom-frequency-div" id="weekdays_block">
+                                            <div class="row mt-3">
+                                                <div class="col-12">
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="sub-card-sub-heading">Repeat On</span>
+                                                        <div class="ml-3">
+                                                            <div class="custom-day-selector">
+                                                                <input type="checkbox" id="weekday-mon" class="weekday week-checkbox-day" />
+                                                                <label for="weekday-mon">M</label>
+                                                                <input type="checkbox" id="weekday-tue" class="weekday week-checkbox-day" />
+                                                                <label for="weekday-tue">T</label>
+                                                                <input type="checkbox" id="weekday-wed" class="weekday week-checkbox-day" />
+                                                                <label for="weekday-wed">W</label>
+                                                                <input type="checkbox" id="weekday-thu" class="weekday week-checkbox-day" />
+                                                                <label for="weekday-thu">T</label>
+                                                                <input type="checkbox" id="weekday-fri" class="weekday week-checkbox-day" />
+                                                                <label for="weekday-fri">F</label>
+                                                                <input type="checkbox" id="weekday-sat" class="weekday week-checkbox-day" />
+                                                                <label for="weekday-sat">S</label>
+                                                                <input type="checkbox" id="weekday-sun" class="weekday week-checkbox-day" />
+                                                                <label for="weekday-sun">S</label>
+                                                              </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                            </div>
+                                            <div class="row mt-3">
+                                                <div class="col-12">
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="sub-card-sub-heading">Ends</span>
+                                                        <div class="d-flex align-items-center ml-3">
+                                                            <div class="custom-radio-btn-container mb-0">
+                                                                <input type="radio" id="never_ending" name="radio-group2" checked>
+                                                                <label for="never_ending" class="mb-0">Never</label>
+                                                            </div>
+                                                            <div class="custom-radio-btn-container mb-0 ml-3">
+                                                                <input type="radio" id="ends_on" name="radio-group2">
+                                                                <label for="ends_on" class="mb-0">On</label>
+                                                            </div>
+                                                            <div class="input-container ml-3 custom-campaign-end-date-card">
+                                                                <input type="text" class="campaign-schedule-input-field schedule_datepicker" id="campaign_end_datepicker">
+                                                                <div class="icon">
+                                                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M5.03644 1.33325C5.31258 1.33325 5.53644 1.55711 5.53644 1.83325V2.54372H10.4635V1.83325C10.4635 1.55711 10.6874 1.33325 10.9635 1.33325C11.2397 1.33325 11.4635 1.55711 11.4635 1.83325V2.54372H12.6666C13.7712 2.54372 14.6666 3.43915 14.6666 4.54372V13.3324C14.6666 14.4369 13.7712 15.3324 12.6666 15.3324H3.33331C2.22874 15.3324 1.33331 14.4369 1.33331 13.3324V4.54373C1.33331 3.43916 2.22874 2.54372 3.33331 2.54372H4.53644V1.83325C4.53644 1.55711 4.7603 1.33325 5.03644 1.33325ZM10.4635 3.54372V4.31993C10.4635 4.59607 10.6874 4.81993 10.9635 4.81993C11.2397 4.81993 11.4635 4.59607 11.4635 4.31993V3.54372H12.6666C13.2189 3.54372 13.6666 3.99144 13.6666 4.54372V5.7819C13.6318 5.76952 13.5942 5.76278 13.5551 5.76278H2.44399C2.40519 5.76278 2.36794 5.76941 2.33331 5.78159V4.54373C2.33331 3.99144 2.78103 3.54372 3.33331 3.54372H4.53644V4.31993C4.53644 4.59607 4.7603 4.81993 5.03644 4.81993C5.31258 4.81993 5.53644 4.59607 5.53644 4.31993V3.54372H10.4635ZM2.33331 6.41063V13.3324C2.33331 13.8846 2.78103 14.3324 3.33331 14.3324H12.6666C13.2189 14.3324 13.6666 13.8846 13.6666 13.3324V6.41033C13.6318 6.42271 13.5942 6.42945 13.5551 6.42945H2.44399C2.40519 6.42945 2.36794 6.42282 2.33331 6.41063ZM3.05597 8.93803C3.05597 8.66189 3.27983 8.43803 3.55597 8.43803H5.03745C5.31359 8.43803 5.53745 8.66189 5.53745 8.93803C5.53745 9.21418 5.31359 9.43803 5.03745 9.43803H3.55597C3.27983 9.43803 3.05597 9.21418 3.05597 8.93803ZM7.25909 8.43803C6.98295 8.43803 6.75909 8.66189 6.75909 8.93803C6.75909 9.21418 6.98295 9.43803 7.25909 9.43803H8.74058C9.01672 9.43803 9.24058 9.21418 9.24058 8.93803C9.24058 8.66189 9.01672 8.43803 8.74058 8.43803H7.25909ZM10.4635 8.93803C10.4635 8.66189 10.6874 8.43803 10.9635 8.43803H12.445C12.7211 8.43803 12.945 8.66189 12.945 8.93803C12.945 9.21418 12.7211 9.43803 12.445 9.43803H10.9635C10.6874 9.43803 10.4635 9.21418 10.4635 8.93803ZM3.55597 11.28C3.27983 11.28 3.05597 11.5038 3.05597 11.78C3.05597 12.0561 3.27983 12.28 3.55597 12.28H5.03745C5.31359 12.28 5.53745 12.0561 5.53745 11.78C5.53745 11.5038 5.31359 11.28 5.03745 11.28H3.55597ZM6.75909 11.78C6.75909 11.5038 6.98295 11.28 7.25909 11.28H8.74058C9.01672 11.28 9.24058 11.5038 9.24058 11.78C9.24058 12.0561 9.01672 12.28 8.74058 12.28H7.25909C6.98295 12.28 6.75909 12.0561 6.75909 11.78ZM10.9635 11.28C10.6874 11.28 10.4635 11.5038 10.4635 11.78C10.4635 12.0561 10.6874 12.28 10.9635 12.28H12.445C12.7211 12.28 12.945 12.0561 12.945 11.78C12.945 11.5038 12.7211 11.28 12.445 11.28H10.9635Z" fill="#525252"/>
+                                                                    </svg>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="audience-batch-options-error-note mt-3" id="create_modal_error_message" style="display: none;">
+                                    <p><span style="font-weight: 700;">Error</span> : <span id="create_error_message">The selected audience batch has different columns as compared to the previously selected batch. Please select another audience batch with the same columns as the previous audience batch associated with this scheduled campaign.</span></p>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-primary btn-width-100" type="button" onclick="create_new_schedule()">Schedule Campaign</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- <div class="modal fade custom_modal" id="campaign_custom_filter_modal" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <div class="row">
+                                    <div class="col-10">
+                                        <h5 class="modal-title">Filter </h5>
+                                    </div>
+                                    <div class="col-2" style="text-align: right; ">
+                                        <button class="btn" type="button" data-dismiss="modal" style="padding: 0!important">
+                                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M13.4931 0.710017C13.3063 0.522765 13.0526 0.417532 12.7881 0.417532C12.5236 0.417532 12.2699 0.522765 12.0831 0.710017L7.19309 5.59002L2.30309 0.700017C2.11625 0.512765 1.8626 0.407532 1.59809 0.407532C1.33357 0.407532 1.07992 0.512765 0.893086 0.700017C0.503086 1.09002 0.503086 1.72002 0.893086 2.11002L5.78309 7.00002L0.893086 11.89C0.503086 12.28 0.503086 12.91 0.893086 13.3C1.28309 13.69 1.91309 13.69 2.30309 13.3L7.19309 8.41002L12.0831 13.3C12.4731 13.69 13.1031 13.69 13.4931 13.3C13.8831 12.91 13.8831 12.28 13.4931 11.89L8.60309 7.00002L13.4931 2.11002C13.8731 1.73002 13.8731 1.09002 13.4931 0.710017Z" fill="black" fill-opacity="0.54"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-body">
+
+
+                                <div class="col-sm-12 campaign-custom-date-select-area" id="campaign-custom-date-select-area-flow" style="display: flex; gap: 1em;">
+
+                                    <div class="col-sm-5" style="padding: 0px; font-weight: 600;color: #4d4d4d;font-size: 14px;">
+                                        Start Date
+                                        <input type="text" class="form-control" id="" placeholder="From Date" autocomplete="off" style="margin-top: 10px; background-color: #f6f6f6; border: none;">
+                                    </div>
+                                    <div class="col-sm-5" style="font-weight: 600; padding: 0px;color: #4d4d4d;font-size: 14px;">
+                                        End Date
+                                        <input type="text" class="form-control" id="" autocomplete="off" placeholder="To Date" style="margin-top: 10px; background-color: #f6f6f6; border: none;">
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            <div class="modal-footer campaign-schedule-filer-modal-footer">
+                                <button class="btn btn-text-only" type="button" data-dismiss="modal" onclick="clear_upcoming_schedule_filter()">Clear</button>
+                                <button class="btn btn-primary btn-width-100" type="button" data-dismiss="modal" onclick="apply_upcoming_schedule_filter()">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
+                <div class="modal fade campaign-delete-custom-modal delete-modal-new show" id="campaign_schedule_delete_modal" tabindex="-1" role="dialog" aria-labelledby="whatsapp_config_reset_modal_label">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content campaign-schedule-custom-modal-content">
+                            <div class="modal-body campaign-schedule-custom-modal-body">
+
+                                <div class="campaign-schedule-custom-modal-heading">
+                                    Delete Scheduled Campaign
+                                </div>
+                                <div class="custom-radio-btns-wrapper">
+                                    <div class="custom-radio-btn-container">
+                                        <input type="radio" id="delete-single" name="radio-group-delete" checked>
+                                        <label for="delete-single">This scheduled campaign</label>
+                                    </div>
+                                    <div class="custom-radio-btn-container">
+                                        <input type="radio" id="delete-multiple" name="radio-group-delete">
+                                       
+                                        <label for="delete-multiple"style="display:block;margin-bottom: 4px;">
+                                            This and the following scheduled campaigns
+                                            <span class="campaign-sqs-tooltip" style="margin-left: 4px;" data-toggle="tooltip" data-placement="top" data-original-title="On selecting this option, all the upcoming scheduled campaigns created at the same moment while creating this particular scheduled campaign will get deleted along with this particular scheduled campaign.">
+                                                <svg class="campaign-tooltip-svg" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M9 0C13.9707 0 18 4.0302 18 9C18 13.9698 13.9707 18 9 18C4.0293 18 0 13.9698 0 9C0 4.0302 4.0293 0 9 0ZM9 1.5003C4.8645 1.5003 1.5003 4.8645 1.5003 9C1.5003 13.1355 4.8645 16.4997 9 16.4997C13.1355 16.4997 16.4997 13.1355 16.4997 9C16.4997 4.8645 13.1355 1.5003 9 1.5003ZM9 12.15C9.49706 12.15 9.9 12.5529 9.9 13.05C9.9 13.5471 9.49706 13.95 9 13.95C8.50294 13.95 8.1 13.5471 8.1 13.05C8.1 12.5529 8.50294 12.15 9 12.15ZM9 4.275C10.3669 4.275 11.475 5.3831 11.475 6.75C11.475 7.65968 11.2072 8.16664 10.529 8.87272L10.3773 9.0273C9.81759 9.587 9.675 9.82465 9.675 10.35C9.675 10.7228 9.37279 11.025 9 11.025C8.62721 11.025 8.325 10.7228 8.325 10.35C8.325 9.44032 8.59279 8.93336 9.27103 8.22727L9.4227 8.0727C9.98241 7.513 10.125 7.27535 10.125 6.75C10.125 6.12868 9.62132 5.625 9 5.625C8.41751 5.625 7.93842 6.06769 7.88081 6.63497L7.875 6.75C7.875 7.12279 7.57279 7.425 7.2 7.425C6.82721 7.425 6.525 7.12279 6.525 6.75C6.525 5.3831 7.6331 4.275 9 4.275Z" fill="#737373"></path>
+                                                </svg>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="campaign-delete-modal-note-div">
+                                    <b>Note :</b>  This action can't be undone!
+                                </div>
+
+                            </div>
+                            <div class="modal-footer campaign-schedule-custom-modal-footer">
+                                <button class="btn btn-secondary campaign-delete-modal-cancel-btn" type="button" data-dismiss="modal">Cancel</button>
+                                <button class="btn btn-danger campaign-delete-modal-save-btn" id="delete_schedule_save_btn" onclick="delete_click_handler()">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade campaign-delete-custom-modal delete-modal-new show" id="campaign_multiple_schedule_delete_modal" tabindex="-1" role="dialog" aria-labelledby="whatsapp_config_reset_modal_label">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-sm-12 mb-4">
+                                        <svg width="82" height="82" viewBox="0 0 82 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M40.8391 6.83325C22.0884 6.83325 6.83301 22.1604 6.83301 40.9999C6.83301 59.8394 22.1602 75.1666 40.9997 75.1666C59.8392 75.1666 75.1663 59.8394 75.1663 40.9999C75.1663 22.1604 59.7674 6.83325 40.8391 6.83325ZM44.4163 58.0833H37.583V51.2499H44.4163V58.0833ZM44.4163 44.4166H37.583V23.9166H44.4163V44.4166Z" fill="#E53E3E"></path>
+                                            </svg>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="campaign-delete-modal-heading-text">
+                                            Delete Selected Scheduled Campaigns
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="campaign-delete-modal-content-text">
+                                            This will delete <span id="all_selected_span">all</span> the selected <b id="total_deleting_campaign_selected_on_modal">7</b> scheduled campaign(s). Click on the <b>Delete</b> button below if you wish to continue.
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="campaign-delete-modal-note-div">
+                                            <b>Note :</b>  This action can't be undone!
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer pt-0 pb-4">
+                                <button class="btn btn-secondary campaign-delete-modal-cancel-btn" type="button" data-dismiss="modal">Cancel</button>
+                                <button class="btn btn-success campaign-delete-modal-save-btn" onclick="delete_selected_items()">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade custom_modal" id="filter-schedule_campaign_modal" role="dialog">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <div class="row">
+                                    <div class="col-10">
+                                        <h5 class="modal-title">Apply Filter</h5>
+                                    </div>
+                                    <div class="col-2" style="text-align: right; padding-right: 0">
+                                        <button class="btn" type="button" data-dismiss="modal" style="padding: 0!important">
+                                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M13.4931 0.710017C13.3063 0.522765 13.0526 0.417532 12.7881 0.417532C12.5236 0.417532 12.2699 0.522765 12.0831 0.710017L7.19309 5.59002L2.30309 0.700017C2.11625 0.512765 1.8626 0.407532 1.59809 0.407532C1.33357 0.407532 1.07992 0.512765 0.893086 0.700017C0.503086 1.09002 0.503086 1.72002 0.893086 2.11002L5.78309 7.00002L0.893086 11.89C0.503086 12.28 0.503086 12.91 0.893086 13.3C1.28309 13.69 1.91309 13.69 2.30309 13.3L7.19309 8.41002L12.0831 13.3C12.4731 13.69 13.1031 13.69 13.4931 13.3C13.8831 12.91 13.8831 12.28 13.4931 11.89L8.60309 7.00002L13.4931 2.11002C13.8731 1.73002 13.8731 1.09002 13.4931 0.710017Z" fill="black" fill-opacity="0.54"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-body">
+                                <div class="card campaign-sub-card mt-3 mb-3">
+                                    <div class="card-body">
+                                        <div class="row padding-class">
+                                            <div class="col-6 d-flex align-items-center p-0">
+                                                <span class="sub-card-sub-heading">Start Date</span>
+                                                <div class="input-container">
+                                                    <input type="text" class="campaign-schedule-input-field schedule_datepicker" id="campaign_filter_custom_start_date" autocomplete="off">
+                                                    <div class="icon">
+                                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M5.03644 1.33325C5.31258 1.33325 5.53644 1.55711 5.53644 1.83325V2.54372H10.4635V1.83325C10.4635 1.55711 10.6874 1.33325 10.9635 1.33325C11.2397 1.33325 11.4635 1.55711 11.4635 1.83325V2.54372H12.6666C13.7712 2.54372 14.6666 3.43915 14.6666 4.54372V13.3324C14.6666 14.4369 13.7712 15.3324 12.6666 15.3324H3.33331C2.22874 15.3324 1.33331 14.4369 1.33331 13.3324V4.54373C1.33331 3.43916 2.22874 2.54372 3.33331 2.54372H4.53644V1.83325C4.53644 1.55711 4.7603 1.33325 5.03644 1.33325ZM10.4635 3.54372V4.31993C10.4635 4.59607 10.6874 4.81993 10.9635 4.81993C11.2397 4.81993 11.4635 4.59607 11.4635 4.31993V3.54372H12.6666C13.2189 3.54372 13.6666 3.99144 13.6666 4.54372V5.7819C13.6318 5.76952 13.5942 5.76278 13.5551 5.76278H2.44399C2.40519 5.76278 2.36794 5.76941 2.33331 5.78159V4.54373C2.33331 3.99144 2.78103 3.54372 3.33331 3.54372H4.53644V4.31993C4.53644 4.59607 4.7603 4.81993 5.03644 4.81993C5.31258 4.81993 5.53644 4.59607 5.53644 4.31993V3.54372H10.4635ZM2.33331 6.41063V13.3324C2.33331 13.8846 2.78103 14.3324 3.33331 14.3324H12.6666C13.2189 14.3324 13.6666 13.8846 13.6666 13.3324V6.41033C13.6318 6.42271 13.5942 6.42945 13.5551 6.42945H2.44399C2.40519 6.42945 2.36794 6.42282 2.33331 6.41063ZM3.05597 8.93803C3.05597 8.66189 3.27983 8.43803 3.55597 8.43803H5.03745C5.31359 8.43803 5.53745 8.66189 5.53745 8.93803C5.53745 9.21418 5.31359 9.43803 5.03745 9.43803H3.55597C3.27983 9.43803 3.05597 9.21418 3.05597 8.93803ZM7.25909 8.43803C6.98295 8.43803 6.75909 8.66189 6.75909 8.93803C6.75909 9.21418 6.98295 9.43803 7.25909 9.43803H8.74058C9.01672 9.43803 9.24058 9.21418 9.24058 8.93803C9.24058 8.66189 9.01672 8.43803 8.74058 8.43803H7.25909ZM10.4635 8.93803C10.4635 8.66189 10.6874 8.43803 10.9635 8.43803H12.445C12.7211 8.43803 12.945 8.66189 12.945 8.93803C12.945 9.21418 12.7211 9.43803 12.445 9.43803H10.9635C10.6874 9.43803 10.4635 9.21418 10.4635 8.93803ZM3.55597 11.28C3.27983 11.28 3.05597 11.5038 3.05597 11.78C3.05597 12.0561 3.27983 12.28 3.55597 12.28H5.03745C5.31359 12.28 5.53745 12.0561 5.53745 11.78C5.53745 11.5038 5.31359 11.28 5.03745 11.28H3.55597ZM6.75909 11.78C6.75909 11.5038 6.98295 11.28 7.25909 11.28H8.74058C9.01672 11.28 9.24058 11.5038 9.24058 11.78C9.24058 12.0561 9.01672 12.28 8.74058 12.28H7.25909C6.98295 12.28 6.75909 12.0561 6.75909 11.78ZM10.9635 11.28C10.6874 11.28 10.4635 11.5038 10.4635 11.78C10.4635 12.0561 10.6874 12.28 10.9635 12.28H12.445C12.7211 12.28 12.945 12.0561 12.945 11.78C12.945 11.5038 12.7211 11.28 12.445 11.28H10.9635Z" fill="#525252"/>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6 d-flex align-items-center pl-3 pr-0">
+                                                <span class="sub-card-sub-heading">End Date</span>
+                                                <div class="input-container">
+                                                    <input type="text" class="campaign-schedule-input-field schedule_datepicker" id="campaign_filter_custom_end_date" autocomplete="off">                                                    <div class="icon">
+                                                        <div class="icon">
+                                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M5.03644 1.33325C5.31258 1.33325 5.53644 1.55711 5.53644 1.83325V2.54372H10.4635V1.83325C10.4635 1.55711 10.6874 1.33325 10.9635 1.33325C11.2397 1.33325 11.4635 1.55711 11.4635 1.83325V2.54372H12.6666C13.7712 2.54372 14.6666 3.43915 14.6666 4.54372V13.3324C14.6666 14.4369 13.7712 15.3324 12.6666 15.3324H3.33331C2.22874 15.3324 1.33331 14.4369 1.33331 13.3324V4.54373C1.33331 3.43916 2.22874 2.54372 3.33331 2.54372H4.53644V1.83325C4.53644 1.55711 4.7603 1.33325 5.03644 1.33325ZM10.4635 3.54372V4.31993C10.4635 4.59607 10.6874 4.81993 10.9635 4.81993C11.2397 4.81993 11.4635 4.59607 11.4635 4.31993V3.54372H12.6666C13.2189 3.54372 13.6666 3.99144 13.6666 4.54372V5.7819C13.6318 5.76952 13.5942 5.76278 13.5551 5.76278H2.44399C2.40519 5.76278 2.36794 5.76941 2.33331 5.78159V4.54373C2.33331 3.99144 2.78103 3.54372 3.33331 3.54372H4.53644V4.31993C4.53644 4.59607 4.7603 4.81993 5.03644 4.81993C5.31258 4.81993 5.53644 4.59607 5.53644 4.31993V3.54372H10.4635ZM2.33331 6.41063V13.3324C2.33331 13.8846 2.78103 14.3324 3.33331 14.3324H12.6666C13.2189 14.3324 13.6666 13.8846 13.6666 13.3324V6.41033C13.6318 6.42271 13.5942 6.42945 13.5551 6.42945H2.44399C2.40519 6.42945 2.36794 6.42282 2.33331 6.41063ZM3.05597 8.93803C3.05597 8.66189 3.27983 8.43803 3.55597 8.43803H5.03745C5.31359 8.43803 5.53745 8.66189 5.53745 8.93803C5.53745 9.21418 5.31359 9.43803 5.03745 9.43803H3.55597C3.27983 9.43803 3.05597 9.21418 3.05597 8.93803ZM7.25909 8.43803C6.98295 8.43803 6.75909 8.66189 6.75909 8.93803C6.75909 9.21418 6.98295 9.43803 7.25909 9.43803H8.74058C9.01672 9.43803 9.24058 9.21418 9.24058 8.93803C9.24058 8.66189 9.01672 8.43803 8.74058 8.43803H7.25909ZM10.4635 8.93803C10.4635 8.66189 10.6874 8.43803 10.9635 8.43803H12.445C12.7211 8.43803 12.945 8.66189 12.945 8.93803C12.945 9.21418 12.7211 9.43803 12.445 9.43803H10.9635C10.6874 9.43803 10.4635 9.21418 10.4635 8.93803ZM3.55597 11.28C3.27983 11.28 3.05597 11.5038 3.05597 11.78C3.05597 12.0561 3.27983 12.28 3.55597 12.28H5.03745C5.31359 12.28 5.53745 12.0561 5.53745 11.78C5.53745 11.5038 5.31359 11.28 5.03745 11.28H3.55597ZM6.75909 11.78C6.75909 11.5038 6.98295 11.28 7.25909 11.28H8.74058C9.01672 11.28 9.24058 11.5038 9.24058 11.78C9.24058 12.0561 9.01672 12.28 8.74058 12.28H7.25909C6.98295 12.28 6.75909 12.0561 6.75909 11.78ZM10.9635 11.28C10.6874 11.28 10.4635 11.5038 10.4635 11.78C10.4635 12.0561 10.6874 12.28 10.9635 12.28H12.445C12.7211 12.28 12.945 12.0561 12.945 11.78C12.945 11.5038 12.7211 11.28 12.445 11.28H10.9635Z" fill="#525252"/>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-outline-primary rounded btn-save-outline-primary btn-width-100 rect-border cancel-btn" style="margin: 0 12px !important;" onclick="clear_upcoming_schedule_filter()" data-dismiss="modal">Clear Filter</button>
+                                <button class="btn btn-primary btn-width-100" style="margin-left:12px;"type="button" onclick="apply_upcoming_schedule_filter()" data-dismiss="modal">Apply Filter</button>
+                            </div>
+                        </div>
+                    </div>
+                  </div>
+
+                  <div class="modal fade custom_modal" id="edit-schedule_campaign_modal" role="dialog">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <div class="row">
+                                    <div class="col-10">
+                                        <h5 class="modal-title">Edit Scheduled Campaign - {{campaign_name}}</h5>
+                                    </div>
+                                    <div class="col-2" style="text-align: right; padding-right: 0">
+                                        <button class="btn" type="button" data-dismiss="modal" style="padding: 0!important">
+                                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M13.4931 0.710017C13.3063 0.522765 13.0526 0.417532 12.7881 0.417532C12.5236 0.417532 12.2699 0.522765 12.0831 0.710017L7.19309 5.59002L2.30309 0.700017C2.11625 0.512765 1.8626 0.407532 1.59809 0.407532C1.33357 0.407532 1.07992 0.512765 0.893086 0.700017C0.503086 1.09002 0.503086 1.72002 0.893086 2.11002L5.78309 7.00002L0.893086 11.89C0.503086 12.28 0.503086 12.91 0.893086 13.3C1.28309 13.69 1.91309 13.69 2.30309 13.3L7.19309 8.41002L12.0831 13.3C12.4731 13.69 13.1031 13.69 13.4931 13.3C13.8831 12.91 13.8831 12.28 13.4931 11.89L8.60309 7.00002L13.4931 2.11002C13.8731 1.73002 13.8731 1.09002 13.4931 0.710017Z" fill="black" fill-opacity="0.54"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-body">
+                                <span class="sub-card-heading">Edit Date & Time</span>
+                                <div class="card campaign-sub-card mt-2 mb-3">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-6 d-flex align-items-center pr-0">
+                                                <span class="sub-card-sub-heading">Trigger Date</span>
+                                                <div class="input-container ml-3">
+                                                    <input type="text" class="campaign-schedule-input-field schedule_datepicker" id="edit_campaign_datepicker">
+                                                    <div class="icon">
+                                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M5.03644 1.33325C5.31258 1.33325 5.53644 1.55711 5.53644 1.83325V2.54372H10.4635V1.83325C10.4635 1.55711 10.6874 1.33325 10.9635 1.33325C11.2397 1.33325 11.4635 1.55711 11.4635 1.83325V2.54372H12.6666C13.7712 2.54372 14.6666 3.43915 14.6666 4.54372V13.3324C14.6666 14.4369 13.7712 15.3324 12.6666 15.3324H3.33331C2.22874 15.3324 1.33331 14.4369 1.33331 13.3324V4.54373C1.33331 3.43916 2.22874 2.54372 3.33331 2.54372H4.53644V1.83325C4.53644 1.55711 4.7603 1.33325 5.03644 1.33325ZM10.4635 3.54372V4.31993C10.4635 4.59607 10.6874 4.81993 10.9635 4.81993C11.2397 4.81993 11.4635 4.59607 11.4635 4.31993V3.54372H12.6666C13.2189 3.54372 13.6666 3.99144 13.6666 4.54372V5.7819C13.6318 5.76952 13.5942 5.76278 13.5551 5.76278H2.44399C2.40519 5.76278 2.36794 5.76941 2.33331 5.78159V4.54373C2.33331 3.99144 2.78103 3.54372 3.33331 3.54372H4.53644V4.31993C4.53644 4.59607 4.7603 4.81993 5.03644 4.81993C5.31258 4.81993 5.53644 4.59607 5.53644 4.31993V3.54372H10.4635ZM2.33331 6.41063V13.3324C2.33331 13.8846 2.78103 14.3324 3.33331 14.3324H12.6666C13.2189 14.3324 13.6666 13.8846 13.6666 13.3324V6.41033C13.6318 6.42271 13.5942 6.42945 13.5551 6.42945H2.44399C2.40519 6.42945 2.36794 6.42282 2.33331 6.41063ZM3.05597 8.93803C3.05597 8.66189 3.27983 8.43803 3.55597 8.43803H5.03745C5.31359 8.43803 5.53745 8.66189 5.53745 8.93803C5.53745 9.21418 5.31359 9.43803 5.03745 9.43803H3.55597C3.27983 9.43803 3.05597 9.21418 3.05597 8.93803ZM7.25909 8.43803C6.98295 8.43803 6.75909 8.66189 6.75909 8.93803C6.75909 9.21418 6.98295 9.43803 7.25909 9.43803H8.74058C9.01672 9.43803 9.24058 9.21418 9.24058 8.93803C9.24058 8.66189 9.01672 8.43803 8.74058 8.43803H7.25909ZM10.4635 8.93803C10.4635 8.66189 10.6874 8.43803 10.9635 8.43803H12.445C12.7211 8.43803 12.945 8.66189 12.945 8.93803C12.945 9.21418 12.7211 9.43803 12.445 9.43803H10.9635C10.6874 9.43803 10.4635 9.21418 10.4635 8.93803ZM3.55597 11.28C3.27983 11.28 3.05597 11.5038 3.05597 11.78C3.05597 12.0561 3.27983 12.28 3.55597 12.28H5.03745C5.31359 12.28 5.53745 12.0561 5.53745 11.78C5.53745 11.5038 5.31359 11.28 5.03745 11.28H3.55597ZM6.75909 11.78C6.75909 11.5038 6.98295 11.28 7.25909 11.28H8.74058C9.01672 11.28 9.24058 11.5038 9.24058 11.78C9.24058 12.0561 9.01672 12.28 8.74058 12.28H7.25909C6.98295 12.28 6.75909 12.0561 6.75909 11.78ZM10.9635 11.28C10.6874 11.28 10.4635 11.5038 10.4635 11.78C10.4635 12.0561 10.6874 12.28 10.9635 12.28H12.445C12.7211 12.28 12.945 12.0561 12.945 11.78C12.945 11.5038 12.7211 11.28 12.445 11.28H10.9635Z" fill="#525252"/>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6 d-flex align-items-center">
+                                                <span class="sub-card-sub-heading">Trigger Time</span>
+                                                <div class="input-container ml-3">
+                                                    <input type="text" class="campaign-schedule-input-field custom-timepicker-input edit-campaign-trigger-time" id="edit_campaign_timepicker">
+                                                    <div class="icon">
+                                                        <svg width="15" height="14" viewBox="0 0 15 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M7.50001 12.6666C10.6296 12.6666 13.1667 10.1295 13.1667 6.99992C13.1667 3.87031 10.6296 1.33325 7.50001 1.33325C4.3704 1.33325 1.83334 3.87031 1.83334 6.99992C1.83334 10.1295 4.3704 12.6666 7.50001 12.6666ZM7.50001 13.6666C11.1819 13.6666 14.1667 10.6818 14.1667 6.99992C14.1667 3.31802 11.1819 0.333252 7.50001 0.333252C3.81811 0.333252 0.833344 3.31802 0.833344 6.99992C0.833344 10.6818 3.81811 13.6666 7.50001 13.6666Z" fill="#525252"/>
+                                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M7.5 3.83325C7.77614 3.83325 8 4.05711 8 4.33325V6.73233L9.77735 7.91723C10.0071 8.0704 10.0692 8.38084 9.91603 8.6106C9.76285 8.84037 9.45241 8.90245 9.22265 8.74928L7.37108 7.5149C7.13925 7.36034 7 7.10015 7 6.82152V4.33325C7 4.05711 7.22386 3.83325 7.5 3.83325Z" fill="#525252"/>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="sub-card-heading">Edit Audience Batch</span>
+                                <div class="card campaign-sub-card mt-2">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-12 pr-0">
+                                                <div class="d-flex edit-audience-batch">
+                                                    <span class="sub-card-sub-heading">Audience Batch </span>
+                                                    <div class="audience-batch-dropdown-wrapper">
+                                                            <div class="campaign-select-div-wrapper">
+                                                                <div id="audience_batch_select_dropdown"
+                                                                    class="campaign-select-dropdown whatsapp-multiselect-filter-dropdown audience-batch-dropdown-wrapper">
+                                                                    <select id="audience-batch-select-dropdown" class="form-control campaign-select">
+                                                                        {% for batch_obj in batch_objs %}
+                                                                            <option value="{{batch_obj.pk}}">{{batch_obj.batch_name}}</option>
+                                                                        {% endfor %}
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+
+                                                    <div class="d-flex audience-batch-options ">
+                                                        <div class="custom-radio-btn-container mb-0">
+                                                            <input type="radio" id="edit-single" name="radio-audience-batch-options" checked>
+                                                            <label for="edit-single" class="mb-0">Update Audience Batch for this Scheduled Campaign</label>
+                                                        </div>
+                                                        <div class="custom-radio-btn-container mb-0 ">
+                                                            <input type="radio" id="edit-current-remaining" name="radio-audience-batch-options">
+                                                                <label for="edit-current-remaining" class="mb-0"style="margin-bottom: 2px!important;">Update Audience Batch for this and following Scheduled Campaigns
+                                                                    <span class="campaign-sqs-tooltip" style="margin-left: 4px;" data-toggle="tooltip" data-placement="top" data-original-title="On selecting this option, all the upcoming scheduled campaigns created at the same moment while creating this particular scheduled campaign will get edited along with this particular scheduled campaign.">
+                                                                        <svg class="campaign-tooltip-svg" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                        <path d="M9 0C13.9707 0 18 4.0302 18 9C18 13.9698 13.9707 18 9 18C4.0293 18 0 13.9698 0 9C0 4.0302 4.0293 0 9 0ZM9 1.5003C4.8645 1.5003 1.5003 4.8645 1.5003 9C1.5003 13.1355 4.8645 16.4997 9 16.4997C13.1355 16.4997 16.4997 13.1355 16.4997 9C16.4997 4.8645 13.1355 1.5003 9 1.5003ZM9 12.15C9.49706 12.15 9.9 12.5529 9.9 13.05C9.9 13.5471 9.49706 13.95 9 13.95C8.50294 13.95 8.1 13.5471 8.1 13.05C8.1 12.5529 8.50294 12.15 9 12.15ZM9 4.275C10.3669 4.275 11.475 5.3831 11.475 6.75C11.475 7.65968 11.2072 8.16664 10.529 8.87272L10.3773 9.0273C9.81759 9.587 9.675 9.82465 9.675 10.35C9.675 10.7228 9.37279 11.025 9 11.025C8.62721 11.025 8.325 10.7228 8.325 10.35C8.325 9.44032 8.59279 8.93336 9.27103 8.22727L9.4227 8.0727C9.98241 7.513 10.125 7.27535 10.125 6.75C10.125 6.12868 9.62132 5.625 9 5.625C8.41751 5.625 7.93842 6.06769 7.88081 6.63497L7.875 6.75C7.875 7.12279 7.57279 7.425 7.2 7.425C6.82721 7.425 6.525 7.12279 6.525 6.75C6.525 5.3831 7.6331 4.275 9 4.275Z" fill="#737373"></path>
+                                                                        </svg>
+                                                                    </span>
+                                                              </label>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="audience-batch-options-error-note mt-3" id="edit_modal_error_message" style="display: none;">
+                                <p><span style="font-weight: 700;">Error</span> : <span id="edit_error_message">The selected audience batch has different columns as compared to the previously selected batch. Please select another audience batch with the same columns as the previous audience batch associated with this scheduled campaign.</span></p>
+                            </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-outline-primary rounded btn-save-outline-primary btn-width-100 rect-border cancel-btn" style="margin: 0 12px !important;" data-dismiss="modal">Cancel</button>
+                                <button class="btn btn-primary btn-width-100" style="margin-left: 12px;"type="button" onclick="edit_click_handler()">Save Changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- <div class="modal fade campaign-delete-custom-modal show" id="campaign_schedule_delete_modal" tabindex="-1" role="dialog" aria-labelledby="whatsapp_config_reset_modal_label">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content campaign-schedule-custom-modal-content">
+                            <div class="modal-body campaign-schedule-custom-modal-body">
+
+                                <div class="campaign-schedule-custom-modal-heading">
+                                    Delete Recurring Schedule
+
+                                </div>
+                                <div class="custom-radio-btns-wrapper">
+                                    <div class="custom-radio-btn-container">
+                                        <input type="radio" id="delete-single" name="radio-group-delete" checked>
+                                        <label for="delete-single">Delete this occurence</label>
+                                    </div>
+                                    <div class="custom-radio-btn-container">
+                                        <input type="radio" id="delete-multiple" name="radio-group-delete">
+                                        <label for="delete-multiple">Delete this and other occurences</label>
+                                    </div>
+
+                                    <div class="custom-radio-btn-container">
+                                        <input type="radio" id="delete-all" name="radio-group-delete">
+                                        <label for="delete-all">Delete Complete Schedule</label>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="modal-footer campaign-schedule-custom-modal-footer">
+                                <button class="btn btn-secondary campaign-delete-modal-cancel-btn" type="button" data-dismiss="modal">Cancel</button>
+                                <button class="btn btn-danger campaign-delete-modal-save-btn" id="delete_schedule_save_btn">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
+                <div class="modal fade campaign-delete-custom-modal show" id="campaign_schedule_edit_modal" tabindex="-1" role="dialog" aria-labelledby="whatsapp_config_reset_modal_label">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content campaign-schedule-custom-modal-content">
+                            <div class="modal-body campaign-schedule-custom-modal-body">
+
+                                <div class="campaign-schedule-custom-modal-heading">
+                                    Edit Schedule
+                                </div>
+                                <div class="custom-radio-btns-wrapper">
+                                    <div class="custom-radio-btn-container">
+                                        <input type="radio" id="edit-single" name="radio-group-edit" checked>
+                                        <label for="edit-single">Edit this occurence</label>
+                                    </div>
+                                    <div class="custom-radio-btn-container">
+                                        <input type="radio" id="edit-all" name="radio-group-edit">
+                                        <label for="edit-all">Edit all occurences</label>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            <div class="modal-footer campaign-schedule-custom-modal-footer">
+                                <button class="btn btn-secondary campaign-delete-modal-cancel-btn" type="button" data-dismiss="modal">Cancel</button>
+                                <button class="btn btn-success campaign-delete-modal-save-btn" id="edit_schedule_save_btn">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade campaign-delete-custom-modal show" id="campaign_schedule_custom_modal" tabindex="-1" role="dialog" aria-labelledby="whatsapp_config_reset_modal_label">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content campaign-schedule-custom-modal-content">
+                            <div class="modal-body campaign-schedule-custom-modal-body">
+
+                                <div class="campaign-schedule-custom-modal-heading">
+                                    Custom Recurrence
+
+                                </div>
+                                <div style="padding-left: 22px;">
+                                    <div class="campaign-schedule-custom-modal-subheading">
+                                        Repeat On
+                                    </div>
+                                    <div class="campaign-schedule-custom-day-wrapper">
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" class="checkbox-day" id="checkbox1" name="" value="" checked="">
+
+                                            <label for="checkbox1">
+                                        
+                                                                                <span>M</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" class="checkbox-day" id="checkbox2" name="" value="">
+
+                                            <label for="checkbox2">
+                                           
+                                                                                <span>T</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" class="checkbox-day" id="checkbox3" name="" value="">
+
+                                            <label for="checkbox3">
+                                           
+                                                                                <span>W</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" class="checkbox-day" id="checkbox4" name="" value="">
+
+                                            <label for="checkbox4">
+                                           
+                                                                                <span>T</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" class="checkbox-day" id="checkbox5" name="" value="">
+
+                                            <label for="checkbox5">
+                                           
+                                                                                <span>F</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" class="checkbox-day" id="checkbox6" name="" value="">
+
+                                            <label for="checkbox6">
+                                           
+                                                                                <span>S</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" class="checkbox-day" id="checkbox7" name="" value="">
+
+                                            <label for="checkbox7">
+                                           
+                                                                                <span>S</span></label>
+
+                                        </div>
+                                    </div>
+                                    <div class="campaign-schedule-custom-modal-subheading" style="margin-bottom: 20px;">
+                                        Ends
+                                    </div>
+                                    <div style="position: relative;">
+                                        <div class="custom-radio-btn-container">
+                                            <input type="radio" id="never" name="radio-group1" checked>
+                                            <label for="never">Never</label>
+                                        </div>
+                                        <div class="custom-radio-btn-container">
+                                            <input type="radio" id="custom_schedule_on_radio_btn" name="radio-group1">
+                                            <label for="custom_schedule_on_radio_btn">On</label>
+
+                                        </div>
+                                        <div class="campaign-schedule-input-item custom-campaign-date-card">
+
+                                            <input type="text" class="campaign-schedule-input-field schedule_datepicker" id="custom_modal_datepicker" >
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            <div class="modal-footer campaign-schedule-custom-modal-footer">
+                                <button class="btn btn-secondary campaign-delete-modal-cancel-btn" type="button" data-dismiss="modal" id="custom_modal_cancel_btn" onclick="close_custom_modal()">Cancel</button>
+                                <button class="btn btn-success campaign-delete-modal-save-btn" id="custom_modal_save_btn" onclick="save_custom_modal()">Done</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade campaign-delete-custom-modal show" id="campaign_multiple_schedule_delete_modal" tabindex="-1" role="dialog" aria-labelledby="whatsapp_config_reset_modal_label">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-sm-12 mt-4 mb-4">
+                                        <svg width="82" height="82" viewBox="0 0 82 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M40.8391 6.83325C22.0884 6.83325 6.83301 22.1604 6.83301 40.9999C6.83301 59.8394 22.1602 75.1666 40.9997 75.1666C59.8392 75.1666 75.1663 59.8394 75.1663 40.9999C75.1663 22.1604 59.7674 6.83325 40.8391 6.83325ZM44.4163 58.0833H37.583V51.2499H44.4163V58.0833ZM44.4163 44.4166H37.583V23.9166H44.4163V44.4166Z" fill="#E53E3E"></path>
+                                            </svg>
+                                    </div>
+                                    <div class="col-sm-12 mb-2">
+                                        <div class="campaign-delete-modal-heading-text">
+                                            Delete schedule?
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 mt-1 mb-2 px-5">
+                                        <div class="campaign-delete-modal-content-text">
+                                            This will delete all the selected schedule slots. Do you still want to continue?
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer pt-0 mb-4 pb-4">
+                                <button class="btn btn-secondary campaign-delete-modal-cancel-btn" type="button" data-dismiss="modal">Cancel</button>
+                                <button class="btn btn-success campaign-delete-modal-save-btn" onclick="delete_selected_items()">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade campaign-delete-custom-modal show" id="campaign_schedule_reset_modal" tabindex="-1" role="dialog" aria-labelledby="whatsapp_config_reset_modal_label">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-sm-12 mt-4 mb-4">
+                                        <svg width="82" height="82" viewBox="0 0 82 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M40.8391 6.83325C22.0884 6.83325 6.83301 22.1604 6.83301 40.9999C6.83301 59.8394 22.1602 75.1666 40.9997 75.1666C59.8392 75.1666 75.1663 59.8394 75.1663 40.9999C75.1663 22.1604 59.7674 6.83325 40.8391 6.83325ZM44.4163 58.0833H37.583V51.2499H44.4163V58.0833ZM44.4163 44.4166H37.583V23.9166H44.4163V44.4166Z" fill="#E53E3E"></path>
+                                            </svg>
+                                    </div>
+                                    <div class="col-sm-12 mb-2">
+                                        <div class="campaign-delete-modal-heading-text">
+                                            Reset schedule?
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 mt-1 mb-2 px-5">
+                                        <div class="campaign-delete-modal-content-text">
+                                            This will reset all the scheduled date and time. Do you still want to continue?
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer pt-0 mb-4 pb-4">
+                                <button class="btn btn-secondary campaign-delete-modal-cancel-btn" type="button" data-dismiss="modal">Cancel</button>
+                                <button class="btn btn-success campaign-delete-modal-save-btn" id="reset_modal_save_btn" data-dismiss="modal" onclick="reset_current_wrapper()">Yes, Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade custom_modal" id="cancel_create_campaign_modal" role="dialog">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <div class="row">
+                                    <div class="col-10">
+                                        <h5 class="modal-title">Do you want to leave this page?</h5>
+                                    </div>
+                                    <div class="col-2" style="text-align: right; padding-right: 0">
+                                        <button class="btn" type="button" data-dismiss="modal" style="padding: 0!important">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13.4931 0.710017C13.3063 0.522765 13.0526 0.417532 12.7881 0.417532C12.5236 0.417532 12.2699 0.522765 12.0831 0.710017L7.19309 5.59002L2.30309 0.700017C2.11625 0.512765 1.8626 0.407532 1.59809 0.407532C1.33357 0.407532 1.07992 0.512765 0.893086 0.700017C0.503086 1.09002 0.503086 1.72002 0.893086 2.11002L5.78309 7.00002L0.893086 11.89C0.503086 12.28 0.503086 12.91 0.893086 13.3C1.28309 13.69 1.91309 13.69 2.30309 13.3L7.19309 8.41002L12.0831 13.3C12.4731 13.69 13.1031 13.69 13.4931 13.3C13.8831 12.91 13.8831 12.28 13.4931 11.89L8.60309 7.00002L13.4931 2.11002C13.8731 1.73002 13.8731 1.09002 13.4931 0.710017Z" fill="black" fill-opacity="0.54"/>
+                            </svg>
+                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-body">
+                                <p>Changes you have made may not be saved. Please click "Save as Draft" to save the changes.</p>
+                            </div>
+                            <div class="modal-footer">
+                                <a class="btn btn-danger btn-width-100" href="/campaign/dashboard/?bot_pk=6" style="cursor:pointer">Leave</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+
+<script type="text/javascript">
+    window.CAMPAIGN_NAME = "{{campaign_name}}"
+</script>
+<script src="{% static 'CampaignApp/js/campaign_schedule.js' %}?v={% random_int 1 100 %}"></script>
+<script src="{% static 'CampaignApp/js/timepicker.js' %}"></script>
+
+{% endblock %}

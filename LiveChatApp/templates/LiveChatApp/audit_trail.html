@@ -1,0 +1,605 @@
+{% extends 'LiveChatApp/base.html' %}
+{% block content %}
+{% load static %}
+
+<link href="{% static 'LiveChatApp/css/form_builder.css' %}?v={% random_int 1 100 %}" rel="stylesheet">
+
+<link href="{% static 'LiveChatApp/css/audit_trail.css' %}?v={% random_int 1 100 %}" rel="stylesheet">
+
+<style type="text/css">
+	.easychat-user-message {
+    	background-color: {{admin_config.get_livechat_theme_lighten_one}} !important;
+    }
+  	
+	.easychat-livechat-user-attachment {
+    	background-color: {{admin_config.get_livechat_theme_lighten_one}} !important;
+    }
+  	
+	.easychat-livechat-user-doc-attachment {
+      	background-color: {{admin_config.get_livechat_theme_lighten_one}} !important;
+    }
+
+	{% if audit_obj_list.has_other_pages %}
+	#audit-trail-table_info {
+		position: absolute;
+  	}
+	{% endif %}
+
+  	#exportBtn {
+		background: linear-gradient(90deg, {{ admin_config.get_livechat_theme_lighten_one }} 0%, {{ admin_config.get_livechat_theme_lighten_five }} 100%) !important;
+    	opacity :1 !important;
+  	}
+
+  	.applyfilterBtn, .downloadBtn {
+	  	background: linear-gradient(270deg, {{admin_config.get_livechat_theme_lighten_six}} 0%, {{admin_config.get_livechat_theme_lighten_one}} 100%) !important;
+	  	border: 1px solid {{admin_config.get_livechat_theme_lighten_one}} !important;
+  	}
+
+  	.live-chat-admin-history-table-area table tr td button {
+	  	border: 1px solid {{admin_config.get_livechat_theme_lighten_one}} !important;
+	  	color: {{admin_config.get_livechat_theme_lighten_one}} !important;
+  	}
+
+  	.live-chat-admin-history-table-area table tr td .succes {
+	  	background: {{admin_config.get_livechat_theme_lighten_three}} !important;
+	  	color: {{admin_config.get_livechat_theme_lighten_one}} !important;
+  	}
+
+	{% comment %} 
+  		#live-chat-admin-chat-history {
+			background: {{admin_config.get_livechat_theme_lighten_four}} !important;
+  		} 
+  	{% endcomment %}
+
+  	.active-page {
+		background: {{ admin_config.get_livechat_theme_lighten_three }} !important;
+		border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }} !important;
+	}
+
+	.active-page a {
+		color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+	}
+
+
+	.ui-state-highlight{
+    	background: #ffffff !important;
+    	color: {{admin_config.get_livechat_theme_lighten_one}} !important;
+	}
+
+	.ui-state-active{
+		background: {{admin_config.get_livechat_theme_lighten_one}} !important;
+  		color: #ffffff !important;
+  		border: 1px solid {{admin_config.get_livechat_theme_lighten_one}} !important;
+	}
+
+  #file-upload-progress-bar .ui-widget-header {
+    background: {{ admin_config.get_livechat_theme_lighten_one }};
+    border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }};
+    margin: 0;
+  }
+
+  .tooltip-textarea .tooltiptext::after {
+    border-color: {{ admin_config.get_livechat_theme_lighten_one }} transparent transparent transparent
+  }
+
+	.custom-checkbox-input input:checked~.checkmark {
+	    background-color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+	}
+
+	.custom-checkbox-input  .checkmark{
+	    border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }} !important;
+	}
+
+	.livechat-multiselect-dropdown.livechat-multiselect-filter-dropdown .multiselect-container {
+	    scrollbar-color: {{ admin_config.get_livechat_theme_lighten_one }} #f1f1f1;
+	}
+
+	.livechat-multiselect-dropdown.livechat-multiselect-filter-dropdown ::-webkit-scrollbar-thumb {
+	    background: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+	}
+
+	.bootstrap-select .dropdown-menu .inner::-webkit-scrollbar-thumb{
+        border-radius: 10px;
+        background: {{ admin_config.get_livechat_theme_lighten_six }} !important;
+    }
+	.bootstrap-select .dropdown-menu .inner {
+    scrollbar-color: {{ admin_config.get_livechat_theme_lighten_six }} #f1f1f1;
+}
+
+</style>
+
+<link href="{% static 'LiveChatApp/css/dropdown.css' %}?v={% random_int 1 100 %}" rel="stylesheet">
+ 
+<div class="container-fluid pl-1 pr-2 arange">
+  <div class="row">
+
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 py-2 overflow-hidden-desktop" id="live-chat-admin-chat-history" style="height: calc(100vh - 3.375rem); background: #FAFAFA; overflow-x: hidden; overflow-y: auto; max-width:99.7%; z-index: 10;">
+
+          <div class="live-chat-admin-filter-button ">
+              <div class="row">
+                  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-admin-history-heading">
+
+                      <button class="filter-button" id="filterBtn" data-target="#apply-filter-audit-trail" data-toggle="modal" >Filters
+                          <svg width="16" height="9" viewBox="0 0 16 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <rect width="16" height="9" fill="#E5E5E5"/>
+                              <g clip-path="url(#clip0)">
+                              <rect width="1440" height="660" transform="translate(-174 -97)" fill="white"/>
+                              <rect x="-97" y="-41" width="1363" height="604" fill="#FAFAFA"/>
+                              <rect x="-88" y="-30" width="1345" height="68" fill="white"/>
+                              <rect x="-72.5" y="-13.5" width="103" height="34" rx="4.5" fill="white" stroke="#E6E6E6"/>
+                              <path d="M5.33333 8.35714C5.33333 8.18665 5.40357 8.02313 5.5286 7.90257C5.65362 7.78201 5.82319 7.71429 6 7.71429H10C10.1768 7.71429 10.3464 7.78201 10.4714 7.90257C10.5964 8.02313 10.6667 8.18665 10.6667 8.35714C10.6667 8.52764 10.5964 8.69115 10.4714 8.81171C10.3464 8.93227 10.1768 9 10 9H6C5.82319 9 5.65362 8.93227 5.5286 8.81171C5.40357 8.69115 5.33333 8.52764 5.33333 8.35714ZM2.66667 4.5C2.66667 4.3295 2.7369 4.16599 2.86193 4.04543C2.98695 3.92487 3.15652 3.85714 3.33333 3.85714H12.6667C12.8435 3.85714 13.013 3.92487 13.1381 4.04543C13.2631 4.16599 13.3333 4.3295 13.3333 4.5C13.3333 4.6705 13.2631 4.83401 13.1381 4.95457C13.013 5.07513 12.8435 5.14286 12.6667 5.14286H3.33333C3.15652 5.14286 2.98695 5.07513 2.86193 4.95457C2.7369 4.83401 2.66667 4.6705 2.66667 4.5ZM0 0.642857C0 0.472361 0.070238 0.308848 0.195262 0.188289C0.320287 0.0677295 0.489856 0 0.666667 0H15.3333C15.5101 0 15.6797 0.0677295 15.8047 0.188289C15.9298 0.308848 16 0.472361 16 0.642857C16 0.813353 15.9298 0.976867 15.8047 1.09743C15.6797 1.21798 15.5101 1.28571 15.3333 1.28571H0.666667C0.489856 1.28571 0.320287 1.21798 0.195262 1.09743C0.070238 0.976867 0 0.813353 0 0.642857Z" fill="#868686"/>
+                              </g>
+                              <defs>
+                              <clipPath id="clip0">
+                              <rect width="1440" height="660" fill="white" transform="translate(-174 -97)"/>
+                              </clipPath>
+                              </defs>
+                          </svg>
+                      </button>
+                      <button class="export-button" id="exportBtn" data-target="#modal-mis-filter" data-toggle="modal">Export
+                          <svg width="15" height="11" viewBox="0 0 15 11" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin: -3px 0px 0px 12px;">
+                            <rect width="15" height="11" fill="#E5E5E5"/>
+                            <g clip-path="url(#clip0)">
+                            <rect width="1440" height="660" transform="translate(-290 -95)" fill="white"/>
+                            <rect x="-213" y="-39" width="1363" height="604" fill="#FAFAFA"/>
+                            <rect x="-204" y="-28" width="1345" height="68" fill="white"/>
+                            <rect x="-65" y="-12" width="95" height="35" rx="5" fill="{{admin_config.get_livechat_theme_lighten_one}}"/>
+                            <path d="M11.25 9.58965H1.5V3.24309H3.44625C3.44625 3.24309 3.963 2.61126 5.07375 1.83275H0.75C0.551088 1.83275 0.360322 1.90704 0.21967 2.03929C0.0790176 2.17153 0 2.3509 0 2.53792L0 10.2948C0 10.4819 0.0790176 10.6612 0.21967 10.7935C0.360322 10.9257 0.551088 11 0.75 11H12C12.1989 11 12.3897 10.9257 12.5303 10.7935C12.671 10.6612 12.75 10.4819 12.75 10.2948V7.65325L11.25 8.81326V9.58965ZM10.0208 4.6887V7.19277L15 3.52516L10.0208 0V2.2079C3.975 2.2079 3.975 7.82672 3.975 7.82672C5.6865 5.18373 6.7395 4.6887 10.0208 4.6887Z" fill="white"/>
+                            </g>
+                            <defs>
+                            <clipPath id="clip0">
+                            <rect width="1440" height="660" fill="white" transform="translate(-290 -95)"/>
+                            </clipPath>
+                            </defs>
+                          </svg>
+                      </button>
+
+                      	<div class="search-container" style="margin-right: 2em;">
+                        	<button type="submit">
+                                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<rect width="13" height="13" fill="#E5E5E5"/>
+									<g clip-path="url(#clip0)">
+									<rect width="1440" height="660" transform="translate(-1209 -141)" fill="white"/>
+									<rect x="-962" y="-85" width="1193" height="604" fill="#FAFAFA"/>
+									<rect x="-952" y="-74" width="1174" height="114" fill="white"/>
+									<g filter="url(#filter0_d)">
+									<rect x="-14" y="-10" width="219" height="33" rx="5" fill="white"/>
+									</g>
+									<path d="M5.55942 11.1182C6.79289 11.118 7.99083 10.7051 8.96247 9.94526L12.0174 13L13 12.0174L9.9451 8.96269C10.7054 7.991 11.1185 6.79285 11.1188 5.55912C11.1188 2.49396 8.62474 0 5.55942 0C2.49409 0 0 2.49396 0 5.55912C0 8.62428 2.49409 11.1182 5.55942 11.1182ZM5.55942 1.38978C7.85893 1.38978 9.72898 3.25973 9.72898 5.55912C9.72898 7.85851 7.85893 9.72846 5.55942 9.72846C3.2599 9.72846 1.38985 7.85851 1.38985 5.55912C1.38985 3.25973 3.2599 1.38978 5.55942 1.38978Z" fill="#757575"/>
+									</g>
+									<defs>
+									<filter id="filter0_d" x="-22" y="-18" width="235" height="49" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+									<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+									<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
+									<feOffset/>
+									<feGaussianBlur stdDeviation="4"/>
+									<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.08 0"/>
+									<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+									<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+									</filter>
+									<clipPath id="clip0">
+									<rect width="1440" height="660" fill="white" transform="translate(-1209 -141)"/>
+									</clipPath>
+									</defs>
+                                </svg>
+                            </button>
+                          	<input type="text" placeholder="Search" name="search" id="audit-trail-table-search">
+                      	
+							<button class="customer-details-refresh-button" id="refresh_chat_history_btn" style="right: -1em;">
+								<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M14.7015 5.29286C13.3432 3.93453 11.4182 3.15119 9.30154 3.36786C6.2432 3.67619 3.72654 6.15953 3.38487 9.21786C2.92654 13.2595 6.05154 16.6679 9.9932 16.6679C12.6515 16.6679 14.9349 15.1095 16.0015 12.8679C16.2682 12.3095 15.8682 11.6679 15.2515 11.6679C14.9432 11.6679 14.6515 11.8345 14.5182 12.1095C13.5765 14.1345 11.3182 15.4179 8.85154 14.8679C7.00154 14.4595 5.50987 12.9512 5.1182 11.1012C4.4182 7.86786 6.87654 5.00119 9.9932 5.00119C11.3765 5.00119 12.6099 5.57619 13.5099 6.48453L12.2515 7.74286C11.7265 8.26786 12.0932 9.16786 12.8349 9.16786H15.8265C16.2849 9.16786 16.6599 8.79286 16.6599 8.33453V5.34286C16.6599 4.60119 15.7599 4.22619 15.2349 4.75119L14.7015 5.29286Z" fill="#717171"/>
+								</svg>
+							</button>
+						</div>
+                  </div>
+              </div>
+
+          </div>
+		  
+		<div class="data-loader-div" id="livechat_audit_trail_loader">
+			<div class="loader-custom">
+				<span></span>
+				<div id="loader-inside-div">
+					<div>
+					</div>
+					<div>
+					</div>
+					<div>
+					</div>
+					<div>
+					</div>
+				</div>
+			</div>
+		</div>
+	
+		<div style="display: none;" id="livechat_audit_trail_table_div" class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-admin-history-table-area live-chat-table-parent-div-without-heading-header">
+		
+		</div>
+
+		<div id="livechat_audit_trail_no_data" class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-report-d-interaction-table-area" style="text-align: center; padding: 40px 40px; display: none;">
+			<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<rect width="40" height="40" fill="#E5E5E5"/>
+				<g clip-path="url(#clip0)">
+				<rect width="1440" height="760" transform="translate(-749 -242)" fill="white"/>
+				<rect x="-672" y="-186" width="1363" height="704" fill="#FAFAFA"/>
+				<rect x="-482" y="-47" width="1163" height="142" rx="8" fill="white"/>
+				<g opacity="0.15" clip-path="url(#clip1)">
+				<path d="M19.8234 39.9998C19.605 39.9998 19.3917 39.9132 19.2334 39.7565C19.0367 39.5598 18.95 39.2765 19.005 39.0048L20.1834 33.1132C20.2167 32.9498 20.2934 32.8015 20.4117 32.6865L33.375 19.7232C34.3484 18.7498 35.9367 18.7498 36.91 19.7232L39.2667 22.0798C40.2417 23.0548 40.2417 24.6398 39.2667 25.6148L26.3034 38.5782C26.1884 38.6948 26.04 38.7732 25.8767 38.8065L19.985 39.9848C19.9317 39.9948 19.8767 39.9998 19.8234 39.9998ZM21.77 33.6848L20.8867 38.1032L25.305 37.2198L38.09 24.4348C38.415 24.1098 38.415 23.5815 38.09 23.2565L35.7334 20.8998C35.4084 20.5748 34.88 20.5748 34.555 20.8998L21.77 33.6848ZM25.715 37.9882H25.7317H25.715Z" fill="#757575"/>
+				<path d="M15.8333 35H4.16667C1.86833 35 0 33.1317 0 30.8333V9.16667C0 6.86833 1.86833 5 4.16667 5H7.5C7.96 5 8.33333 5.37333 8.33333 5.83333C8.33333 6.29333 7.96 6.66667 7.5 6.66667H4.16667C2.78833 6.66667 1.66667 7.78833 1.66667 9.16667V30.8333C1.66667 32.2117 2.78833 33.3333 4.16667 33.3333H15.8333C16.2933 33.3333 16.6667 33.7067 16.6667 34.1667C16.6667 34.6267 16.2933 35 15.8333 35Z" fill="#757575"/>
+				<path d="M27.5 20C27.04 20 26.6667 19.6267 26.6667 19.1667V9.16667C26.6667 7.78833 25.545 6.66667 24.1667 6.66667H20.8333C20.3733 6.66667 20 6.29333 20 5.83333C20 5.37333 20.3733 5 20.8333 5H24.1667C26.465 5 28.3333 6.86833 28.3333 9.16667V19.1667C28.3333 19.6267 27.96 20 27.5 20Z" fill="#757575"/>
+				<path d="M19.1667 10H9.16675C7.78841 10 6.66675 8.87833 6.66675 7.5V4.16667C6.66675 3.70667 7.04008 3.33333 7.50008 3.33333H10.0834C10.4701 1.43333 12.1551 0 14.1667 0C16.1784 0 17.8634 1.43333 18.2501 3.33333H20.8334C21.2934 3.33333 21.6667 3.70667 21.6667 4.16667V7.5C21.6667 8.87833 20.5451 10 19.1667 10ZM8.33341 5V7.5C8.33341 7.95833 8.70842 8.33333 9.16675 8.33333H19.1667C19.6251 8.33333 20.0001 7.95833 20.0001 7.5V5H17.5001C17.0401 5 16.6667 4.62667 16.6667 4.16667C16.6667 2.78833 15.5451 1.66667 14.1667 1.66667C12.7884 1.66667 11.6667 2.78833 11.6667 4.16667C11.6667 4.62667 11.2934 5 10.8334 5H8.33341Z" fill="#757575"/>
+				<path d="M22.5 14.9997H5.83333C5.37333 14.9997 5 14.6263 5 14.1663C5 13.7063 5.37333 13.333 5.83333 13.333H22.5C22.96 13.333 23.3333 13.7063 23.3333 14.1663C23.3333 14.6263 22.96 14.9997 22.5 14.9997Z" fill="#757575"/>
+				<path d="M22.5 19.9997H5.83333C5.37333 19.9997 5 19.6263 5 19.1663C5 18.7063 5.37333 18.333 5.83333 18.333H22.5C22.96 18.333 23.3333 18.7063 23.3333 19.1663C23.3333 19.6263 22.96 19.9997 22.5 19.9997Z" fill="#757575"/>
+				<path d="M22.5 24.9997H5.83333C5.37333 24.9997 5 24.6263 5 24.1663C5 23.7063 5.37333 23.333 5.83333 23.333H22.5C22.96 23.333 23.3333 23.7063 23.3333 24.1663C23.3333 24.6263 22.96 24.9997 22.5 24.9997Z" fill="#757575"/>
+				</g>
+				</g>
+				<defs>
+				<clipPath id="clip0">
+				<rect width="1440" height="760" fill="white" transform="translate(-749 -242)"/>
+				</clipPath>
+				<clipPath id="clip1">
+				<rect width="40" height="40" fill="white"/>
+				</clipPath>
+				</defs>
+			</svg>
+			<span style="color: rgba(134, 134, 134, 0.5); font-size:20px;">No data available in table</span>
+		</div>
+
+      </div>
+  </div>
+</div>
+
+<!-- NPS Feedback Modal -->
+
+<div class="modal fade backdrop" id="nps-details" tabindex="-1" role="dialog" aria-labelledby="Admin_chat_history_modal_label" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content"  style="max-height: 300px;" id="nps-details-modal-content">
+			<div class="modal-header">
+				<h6>LiveChat NPS Feedback</h6>
+			</div>
+			<div class="modal-body" id="nps-body" style="padding-bottom: 0.1em;overflow-y: scroll;">
+				<div class="row">
+					<div class="col-4 mb-1" id="livechat_nps_rating">
+						NPS Rating: {{audit_obj.rate_value}}
+					</div>
+					<div class="col-8 mb-1" id="livechat_nps_rating_text">
+						NPS Feedback: {{audit_obj.nps_text_feedback}}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Chat History Modal -->
+
+<div class="modal fade backdrop livechat-chat-history-modal livechat-ongoing-chats-chat-history-modal" id="livechat-chat-details" tabindex="-1" role="dialog" aria-labelledby="Admin_chat_history_modal_label" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<button type="button" data-toggle="tooltip" data-placement="bottom" id="previous_chat_history_btn"  title="" data-original-title="Previous Chat" class="live-chat-history-next-previous-btns live-chat-history-prev-btn">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect width="24" height="24" fill="#EBEBEB"/>
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M15.7071 4.29289C16.0976 4.68342 16.0976 5.31658 15.7071 5.70711L9.41421 12L15.7071 18.2929C16.0976 18.6834 16.0976 19.3166 15.7071 19.7071C15.3166 20.0976 14.6834 20.0976 14.2929 19.7071L7.29289 12.7071C6.90237 12.3166 6.90237 11.6834 7.29289 11.2929L14.2929 4.29289C14.6834 3.90237 15.3166 3.90237 15.7071 4.29289Z" fill="#2D2D2D"/>
+                                    </svg>
+                                    <span>Previous</span>
+                                    
+      </button>
+		<div class="modal-content" style="overflow: hidden;" id="livechat-chat-history-modal-content">
+			<div class="modal-header">
+					<div class="modal-header-name-close-btn">
+							<h6>Chat History</h6>
+							<button type="button" class="close"  data-dismiss="modal" aria-label="Close" style="outline: none;">
+			          <span aria-hidden="true">
+			              <span aria-hidden="true">&times;</span>                                              
+								</span>
+			    		</button>
+	    		 </div>
+	        <div class="livechat-modal-chats-customer-name-div" id="livechat-modal-chats-customer-name-div">
+	          Customer Name
+	        </div>
+			</div>
+
+			<div class="modal-body" style="padding-bottom: 0.1em;">
+				<div id="livechat-chat-messages" class="row" style="margin-left: -18px; margin-right: -18px; border-bottom: 1px solid #e6e6e6; padding-bottom: 5px">
+		
+				</div>
+			</div>
+
+			<div class="modal-footer" style="padding-top: 0.2em; position: relative;">
+				<div style="float: right;">
+				
+						<button id="chat_history_download_btn" class="btn-primary" onclick="download_chat_transcript(this)">Download </button>
+				</div>
+			</div>
+
+		</div>
+
+		<button type="button" data-toggle="tooltip" data-placement="bottom" title="" id="next_chat_history_btn" data-original-title="Next Chat" class="live-chat-history-next-previous-btns live-chat-history-next-btn">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect width="24" height="24" fill="#EBEBEB"/>
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M8.29289 4.29289C7.90237 4.68342 7.90237 5.31658 8.29289 5.70711L14.5858 12L8.29289 18.2929C7.90237 18.6834 7.90237 19.3166 8.29289 19.7071C8.68342 20.0976 9.31658 20.0976 9.70711 19.7071L16.7071 12.7071C17.0976 12.3166 17.0976 11.6834 16.7071 11.2929L9.70711 4.29289C9.31658 3.90237 8.68342 3.90237 8.29289 4.29289Z" fill="#2D2D2D"/>
+                                    </svg>
+                                    <span>Next</span>
+                                    
+                                    
+     </button>
+			
+	</div>
+</div>       
+
+<!-- Filter Modal -->
+
+<div class="modal fade backdrop" id="apply-filter-audit-trail" tabindex="-1" role="dialog" aria-labelledby="Admin_chat_history_filter_modal_label" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h6>Filter</h6>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-12 mb-2">
+						<label>Filter by Agent’s Username</label>
+
+              <div class="livechat-multiselect-dropdown livechat-multiselect-filter-dropdown multiple-agent-select-div">
+                <select id="select-agent-username" name="day" class="form-control select-dropdown-icon" multiple="">
+									{% for audit_obj in agent_list %}
+											<option value="{{ audit_obj }}">{{ audit_obj }}</option>
+									{% endfor %}
+								</select>
+              </div>
+					</div>
+					<div class="col-12 mb-2">
+						<label>Filter by Customer Status</label>
+						<select id="select-chat-status" name="day" class="form-control select-dropdown-icon selectpicker custom-select-field">
+							{% if chat_status == "1" %}
+								<option value="0">Choose one</option>
+								<option value="1" selected>Online</option>
+								<option value="2">Offline</option>
+							{% elif chat_status == "2" %}
+								<option value="0">Choose one</option>
+								<option value="1">Online</option>
+								<option value="2" selected>Offline</option>
+							{% else %}
+								<option value="0" selected>Choose one</option>
+								<option value="1">Online</option>
+								<option value="2">Offline</option>
+							{% endif %}
+						</select>
+					</div>
+					<div class="col-12 mb-2">
+						<label>Filter by Channel</label>
+						<select id="select-channel" name="channel" class="form-control select-dropdown-icon selectpicker custom-select-field">
+							<option value="All">All</option>
+							{% for channel_obj in channel_obj_list %}
+								{% if channel_obj.name == channel_name %}
+									<option value="{{ channel_obj.name }}" selected>{{ channel_obj.name }}</option>
+								{% else %}
+									<option value="{{ channel_obj.name }}">{{ channel_obj.name }}</option>
+								{% endif %}
+							{% endfor %}
+						</select>
+					</div>
+					<div class="col-12 mb-2">
+						<label>Filter by Category</label>
+						<select id="select-category" name="category" class="form-control select-dropdown-icon selectpicker custom-select-field">
+							<option value="0">All</option>
+							{% for category_obj in category_list %}
+								{% if category_obj.pk == selected_category_pk %}
+									<option value="{{ category_obj.pk }}" selected>{{ category_obj.title }}</option>
+								{% else %}
+									<option value="{{ category_obj.pk }}">{{ category_obj.title }}</option>
+								{% endif %}
+							{% endfor %}
+						</select>
+					</div>
+					<div class="col-12 mb-2">
+						<label>Filter by Chat Termination</label>
+						<select id="select-chat-termination" name="chat-termination" class="form-control select-dropdown-icon selectpicker custom-select-field">
+							<option value="All">All</option>
+							<option value="Customer">Customer</option>
+							<option value="Agent">Agent</option>
+							<option value="System">System</option>
+						</select>
+					</div>
+					<div class="col-6">
+						<label>Filter by Date Range</label>
+						<input class="form-control" id="chat-history-default-start-date" type="text" placeholder="Start date" value="{{ start_date|date:" d-m-Y " }}">
+					</div>
+					<div class="col-6">
+						<label style="visibility: hidden;">Filter by Date Range </label>
+						<input class="form-control" id="chat-history-default-end-date" type="text" placeholder="End date" value="{{ end_date|date:" d-m-Y " }}" >
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<div style="float: left;">
+					<button class="resetBtn" type="button" id="reset_audit_trail_filter">Reset</button>
+				</div>
+
+				<div style="float: right;">
+					<button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+					<button class="btn-primary" id="apply_audit_trail_filter_btn" type="button">Apply Filters</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Attachment Preview Modal -->
+
+<div class="modal fade backdrop" id="preview-livechat-customer-attachment-modal" tabindex="-1" role="dialog" aria-labelledby="preview-livechat-customer-attachment_modal_label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style role="document">
+      <div class="modal-content"> 
+        <div class="modal-header">
+          
+            <svg data-dismiss="modal" id="preview-livechat-customer-attachment-cross-button" onclick="close_livechat_attachment_image()" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 1.85364L13.1464 0L7.5 5.64636L1.85364 0L0 1.85364L5.64636 7.5L0 13.1464L1.85364 15L7.5 9.35364L13.1464 15L15 13.1464L9.35364 7.5L15 1.85364Z" fill="white"></path>
+            </svg>
+            
+        </div>
+          <img id="preview-livechat-customer-attachment">
+      </div>
+  </div>
+</div>
+
+<!-- Export Modal -->
+
+<div class="modal fade backdrop" id="modal-mis-filter" tabindex="-1" role="dialog" aria-labelledby="Admin_chat_history_export_modal_label" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h6>Select Date Range</h6>
+			</div>
+			<div class="modal-body">
+        <div class="row">
+					<div class="col-12 mb-2">
+						<label>Report</label>
+							<select class="form-control select-dropdown-icon selectpicker custom-select-field" id="select-chat-history-report-type" onchange="check_select_chat_history_report_type(this)">
+								<option value="0" selected="selected">Select Report</option>
+								<option value="1">Chat History</option>
+								<option value="2">Conversations</option>
+							</select>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-12 mb-2">
+						<label>Range</label>
+							<select id="select-date-range" name="day" class="form-control select-dropdown-icon selectpicker custom-select-field"onchange="check_livechat_audit_date_range(this)">
+								<option value="0" selected="selected">Choose date range</option>
+								<option value="5">Today</option>
+								<option value="1">Last day</option>
+								<option value="2">Last 7 days</option>
+								<option value="3">Last 1 month</option>
+								<option value="4">Custom Range</option>
+							</select>
+					</div>
+				</div>
+				<div class="row" style="display:none;" id="custom-range-filter-date" >
+          <div class="col-12 mb-2">
+              <label class="mb-0">Filter by Date Range</label>
+              <p style="font-size: 10px !important;" id="info-text">Please select a date range upto 30 days <span class="text-danger">*</span></p>
+          </div>
+          <div  style="display: inline-flex;">
+						<div class="col-6 mb-2">
+							<input type="text" class="form-control" id="export-filter-default-start-date" placeholder="Start Date" onchange="check_livechat_audit_custom_date_range(this)">
+						</div>
+						<div class="col-6 mb-2">
+							<input type="text" class="form-control" id="export-filter-default-end-date" placeholder="End Date">
+						</div>
+					</div>
+				</div>
+				<div class="row" style="display:none;" id="custom-range-filter-email" >
+					<div class="col-12 mb-2" >
+						<label>Email ID <span class="text-danger">*</span></label>
+						<input type="text" class ="form-control" placeholder="Enter your email id" id="filter-data-email" value="{{ request.user.email }}">
+					</div>
+					<div class="col-12" id="report-warning-div" style="display: none;">
+						<p id="report-warning-text" style="font-style: normal;font-weight: 500;font-size: 12px;color: #4D4D4D;"></p>
+					  </div>
+				</div>  
+				
+			</div>
+			<div class="modal-footer">
+				<div style="float: right;">
+					<button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+					<button class="btn-primary" id="export-mis-filter" type="button">Export</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>  
+
+<!-- Taggings Modal  -->
+
+<div class="modal fade backdrop chat-history-tagging-modal" id="chat-history-tagging-modal" tabindex="-1" role="dialog" aria-labelledby="Admin_chat_history_modal_label" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h6></h6>
+				<button style="outline: none;" type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body" style="padding-bottom: 0.1em;overflow-y: auto;">
+				<div class="row">
+					<div class="livechat-preview-form-item" id="livechat-dispose-chat-form-data">
+						
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Send Document Modal -->
+<div class="modal fade backdrop show" id="livechat-file-upload-modal" tabindex="-1" aria-labelledby="Admin_manage_user_Uploadexcel_modal_label" aria-modal="true" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6>Attach File</h6>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+
+                    <div class="col-12 mb-4">
+                        <input type="file" id="livechat-chathistory-file-attachment-input" hidden="hidden" onchange="upload_file_attachment_chathistory(this)">
+                        <button type="button" id="custom-button" onclick="attach_file()">Choose File </button>
+                    </div>
+
+                    <div class="live-chat-file-wrapper" id="live_chat_file_wrapper"></div>
+
+                    <div class="col-12" style="margin-top: 1em;">
+                        <p class="upload-message-heading">Message</p>
+                        <textarea class="file-upload-message" id="chathistory-query-file" style="padding: 4px 10px; margin-top: 8px; margin-bottom: 0px; height: 80px;"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div style="float: right;">
+                    <button class="btn-close" type="button" data-dismiss="modal" onclick="reset_file_upload_modal_chathistory()">Cancel</button>
+                    <button class="btn-primary disabled" type="button" id="send_attachment_chathistory" style="pointer-events: none; width: auto; padding: 0px 12px;">Send Attachment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'LiveChatApp/js/bootstrap-multiselect.js' %}"></script>
+<script type="text/javascript">
+
+	window.AGENT_LIST = {{agent_list | safe}}
+  	window.DEFAULT_LIVECHAT_FILTER_START_DATETIME = '{{DEFAULT_LIVECHAT_FILTER_START_DATETIME|date:"d-m-Y"}}'
+  	window.DEFAULT_LIVECHAT_FILTER_END_DATETIME = '{{DEFAULT_LIVECHAT_FILTER_END_DATETIME|date:"d-m-Y"}}'
+  	window.REFRESH_INTERVAL = '{{admin_config.chat_history_refresh_interval}}'
+  	window.SUPERVISOR_NAME = '{{user_obj.user.username}}'
+	window.URL_FILTER_START_DATE = '{{start_date|date:"Y-m-d"}}'
+	window.URL_FILTER_END_DATE = '{{end_date|date:"Y-m-d"}}'
+	window.IS_SPECIAL_CHARACTER_ALLOWED_IN_CHAT = '{{admin_config.is_special_character_allowed_in_chat}}' == 'True' ? true : false;
+	window.IS_SPECIAL_CHARACTER_ALLOWED_IN_FILE_NAME = '{{admin_config.is_special_character_allowed_in_file_name}}' == 'True' ? true : false;
+	window.IS_REPORT_GENERATION_VIA_KAFKA_ENABLED = '{{is_report_generation_via_kafka_enabled}}' == 'True' ? true : false;
+	var start_date = "{{start_date|date:' d-m-Y '}}";
+  	var end_date = "{{end_date|date:' d-m-Y '}}";
+  	var custom_start_date = "{{conversation_report_custom_start_date|date:' d-m-Y '}}";
+ 
+  	$(document).ready(function() {
+  	var currentDate = new Date();
+		var format = {
+			dateFormat: 'dd-mm-yy', 
+			prevText: "Previous",
+			maxDate: currentDate
+		}
+
+		$('#chat-history-default-start-date').datepicker(format).val(start_date.trim());
+		$('#chat-history-default-end-date').datepicker(format).val(end_date.trim());
+		$('#export-filter-default-start-date').datepicker(format).val(start_date.trim());
+		$('#export-filter-default-end-date').datepicker(format).val(end_date.trim());
+		$("#export-filter-default-end-date" ).datepicker({  maxDate: end_date });
+  	});
+
+		function attach_file() {
+		    $('#livechat-chathistory-file-attachment-input').click();
+		}
+
+</script>
+{% endblock %}

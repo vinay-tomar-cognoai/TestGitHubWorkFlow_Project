@@ -1,0 +1,16 @@
+{% extends "admin/change_form.html" %}
+{% block extrahead %}
+  {{ block.super }}
+  {% if change %}
+  <script type="text/javascript">
+    LOGTAILER_URL_GETLOGLINE = '{% url "logtailer_get_log_lines" original.pk %}';
+    LOGTAILER_URL_GETHISTORY = '{% url "logtailer_get_history" original.pk %}';
+  </script>
+  {% endif %}
+{% endblock extrahead %}
+{% block object-tools %}
+	{{block.super}}
+    {% if change %}{% if not is_popup %}
+		{% include "logtailer/log_reader.html" with logfile_id=original.pk %}
+	{% endif %}{% endif %}
+{% endblock %}

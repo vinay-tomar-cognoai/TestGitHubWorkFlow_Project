@@ -1,0 +1,587 @@
+{% extends 'EasyAssistSalesforceApp/console.html' %}
+{% block content %}
+{% load static %}
+<!-- Begin Page Content -->
+<style type="text/css">
+    #easyassist-language-support-list-div .dropdown {
+        width: 100%;
+    }
+
+    #easyassist-product-category-list-div .dropdown {
+        width: 100%;
+    }
+
+    .bootstrap-select button {
+        border-radius: 5px!important;
+        border: 0px solid #2755cb !important;
+        box-shadow: 0 0 1px #000 inset !important;
+        text-align: left;
+        font-size: 1rem!important;
+        width: 100%!important;
+    }
+
+    .bootstrap-select .filter-option {
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    .bootstrap-select .dropdown-item {
+        color: #6e707e!important;
+        font-size: 1rem;
+        background-color: transparent;
+    }
+
+    .bootstrap-select .dropdown-item:hover {
+        background-color: #F8F9F9;
+    }
+</style>
+<div class="container-fluid">
+    <div class="col-md-12 mb">
+        <div class="row">
+            <div class="col-md-12">
+                <svg style="display: block; margin: auto;" width="278" height="38" viewBox="0 0 278 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1.05493" y="0.5" width="275.89" height="37" rx="18.5" fill="white" stroke="#E6E6E6"/>
+                    <!-- <text x="20" y="23" font-family="Silka" font-size="15px" font-weight="500" fill="#2655CB" onclick="show_agent_details('all')" style="cursor: pointer;">Total: {{ total_agent_count }}</text>
+                    <text x="102" y="23" font-family="Silka" font-size="15px" font-weight="500" fill="#38B27F" onclick="show_agent_details('online')" style="cursor: pointer;">Online: {{ active_agent_count }}</text>
+                    <text x="190" y="23" font-family="Silka" font-size="15px" font-weight="500" fill="#858796" onclick="show_agent_details('offline')" style="cursor: pointer;">Offline: {{ offline_agent_count }}</text> -->
+                    <text x="20" y="23" font-family="Silka" font-size="15px" font-weight="500" fill="#2655CB" onclick="show_agent_details('all')" style="cursor: pointer;">Total: 24</text>
+                    <text x="102" y="23" font-family="Silka" font-size="15px" font-weight="500" fill="#38B27F" onclick="show_agent_details('online')" style="cursor: pointer;">Online: 16</text>
+                    <text x="190" y="23" font-family="Silka" font-size="15px" font-weight="500" fill="#858796" onclick="show_agent_details('offline')" style="cursor: pointer;">Offline: 8</text>
+                    <path d="M89.0627 1.42926V36.2807" stroke="#E6E6E6"/>
+                    <path d="M179.59 1.42926V36.2807" stroke="#E6E6E6"/>
+                </svg>
+            </div>
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-sm-3" style="display: flex;">
+                        {% if cobrowse_agent.role == "admin" %}
+                        <button class="btn btn-info mb-2 mr-sm-2" data-toggle="modal" data-target="#add_new_agent_modal">Add User</button>
+                        {% else %}
+                        <button class="btn btn-info mb-2 mr-sm-2" data-toggle="modal" data-target="#add_new_agent_modal">Add Agent</button>
+                        {% endif %}
+                    </div>
+                    <div class="col-sm-9" style="display: flex; justify-content: flex-end;">
+                        <svg style="display:none; cursor:pointer;" onclick="activate_user(this)" id="button-activate-account" width="100" height="35" viewBox="0 0 103 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="1.01562" y="1.00739" width="100" height="35" rx="13.9926" stroke="#00DB3D" stroke-opacity="0.5"/>
+                            <text x="21" y="23" font-family="Silka" font-size="15px" fill="#00DB3D" >Activate</text>
+                        </svg>
+                        <svg style="display:none; cursor:pointer;" onclick="deactivate_user(this)" id="button-deactivate-account" width="100" height="35" viewBox="0 0 103 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="1.01562" y="1.00739" width="100" height="35" rx="13.9926" stroke="#E53E3E" stroke-opacity="0.5"/>
+                            <text x="12" y="23" font-family="Silka" font-size="15px" fill="#E53E3E" >Deactivate</text>
+                        </svg>
+                        <div class="dropdown no-arrow">
+                            <a class="dropdown-toggle" href="javascript:void(0)" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="31" height="32" viewBox="0 0 31 32" fill="none">
+                                    <path d="M17.0449 16C17.0449 15.1716 16.3733 14.5 15.5449 14.5C14.7165 14.5 14.0449 15.1716 14.0449 16C14.0449 16.8284 14.7165 17.5 15.5449 17.5C16.3733 17.5 17.0449 16.8284 17.0449 16Z" fill="#757575"/>
+                                    <path d="M12.0449 16C12.0449 15.1716 11.3733 14.5 10.5449 14.5C9.71649 14.5 9.04492 15.1716 9.04492 16C9.04492 16.8284 9.71649 17.5 10.5449 17.5C11.3733 17.5 12.0449 16.8284 12.0449 16Z" fill="#757575"/>
+                                    <path d="M22.0449 16C22.0449 15.1716 21.3734 14.5 20.5449 14.5C19.7165 14.5 19.0449 15.1716 19.0449 16C19.0449 16.8284 19.7165 17.5 20.5449 17.5C21.3734 17.5 22.0449 16.8284 22.0449 16Z" fill="#757575"/>
+                                    <circle cx="15.5447" cy="16" r="14.5373" stroke="#757575"/>
+                                </svg>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                                <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" data-target="#user_details_upload_modal">Create users via Excel</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="javascript:void(0)" onclick="export_user_excel_details(this)">Export Agent Details</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="/easy-assist-salesforce/sales-ai/access-management/?salesforce_token={{salesforce_token}}">Refresh</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <!-- DataTales Example -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Agents</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Name</th>
+                                        <th>Email ID</th>
+                                        <th>Mobile Number</th>
+                                        <th>Product Category</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ agent.pk }}"></td>
+                                        <td>Neil Dale</td>
+                                        <td>magna.Ut@Nunc.org</td>
+                                        <td> 7182652470</td>
+                                        <td>Home Loan</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ agent.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ agent.pk }}"></td>
+                                        <td>Illana D. French</td>
+                                        <td>lacus@maurisaliquameu.ca</td>
+                                        <td> 8650668021</td>
+                                        <td>Education Loan</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ agent.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ agent.pk }}"></td>
+                                        <td>Cruz A. Gordon</td>
+                                        <td>convallis@enim.co.uk</td>
+                                        <td> 9507974582</td>
+                                        <td>Policy</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ agent.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ agent.pk }}"></td>
+                                        <td>Rahim B. Pittman</td>
+                                        <td>velit.eu.sem@sagittissemper.com</td>
+                                        <td> 9407754669</td>
+                                        <td>Education Loan</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ agent.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ agent.pk }}"></td>
+                                        <td>Clinton Durham</td>
+                                        <td>varius.ultrices.mauris@arcuAliquamultrices.net</td>
+                                        <td>9649957631</td>
+                                        <td>Home Loan</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ agent.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ agent.pk }}"></td>
+                                        <td>Fitzgerald B. Mclean</td>
+                                        <td>quis.massa.Mauris@malesuadaut.org</td>
+                                        <td> 7475672728</td>
+                                        <td>Policy</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ agent.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ agent.pk }}"></td>
+                                        <td>Malachi Hurley</td>
+                                        <td>vulputate@lectus.ca</td>
+                                        <td> 9349987261</td>
+                                        <td>Policy</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ agent.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ agent.pk }}"></td>
+                                        <td>Shana Nunez</td>
+                                        <td>per@Proin.org</td>
+                                        <td> 8901270238</td>
+                                        <td>Home Loan, Education Loan</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ agent.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ agent.pk }}"></td>
+                                        <td>Gabriel Snow</td>
+                                        <td>mi@facilisisnon.edu</td>
+                                        <td> 9781921862</td>
+                                        <td>Policy, Home Loan</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ agent.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ agent.pk }}"></td>
+                                        <td>Tatyana Q. Keller</td>
+                                        <td>luctus.ut@Craseutellus.ca</td>
+                                        <td> 7849254106</td>
+                                        <td>Home Loan</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ agent.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ agent.pk }}"></td>
+                                        <td>Grant Ferguson</td>
+                                        <td>elementum.dui.quis@vestibulummassarutrum.edu</td>
+                                        <td> 7201198741</td>
+                                        <td>Education Loan</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ agent.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ agent.pk }}"></td>
+                                        <td>Fitzgerald B. Mclean</td>
+                                        <td>quis.massa.Mauris@malesuadaut.org</td>
+                                        <td> 7475672728</td>
+                                        <td>Policy</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ agent.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ agent.pk }}"></td>
+                                        <td>Jermaine D. Wade</td>
+                                        <td>facilisis.vitae@egestasAliquam.edu</td>
+                                        <td> 7380404238</td>
+                                        <td>Policy</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ agent.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ agent.pk }}"></td>
+                                        <td>Fitzgerald B. Mclean</td>
+                                        <td>quis.massa.Mauris@malesuadaut.org</td>
+                                        <td> 7475672728</td>
+                                        <td>Policy</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ agent.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ agent.pk }}"></td>
+                                        <td>Hayes Norman</td>
+                                        <td>id.mollis@loremsit.org</td>
+                                        <td> 8829461389</td>
+                                        <td>Education Loan</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ agent.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ agent.pk }}"></td>
+                                        <td>Fitzgerald B. Mclean</td>
+                                        <td>quis.massa.Mauris@malesuadaut.org</td>
+                                        <td> 7475672728</td>
+                                        <td>Policy</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ agent.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ agent.pk }}"></td>
+                                        <td>Sandra Lyons</td>
+                                        <td>Morbi.quis@in.org</td>
+                                        <td> 7218959614</td>
+                                        <td>Home Loan, Education Loan</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ agent.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ agent.pk }}"></td>
+                                        <td>Abel K. Gaines</td>
+                                        <td>est@lectus.com</td>
+                                        <td> 8589164724</td>
+                                        <td>Home Loan</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ agent.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ agent.pk }}"></td>
+                                        <td>Lara F. Curtis</td>
+                                        <td>eget@Donecfringilla.edu</td>
+                                        <td> 9805660554</td>
+                                        <td>Policy</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ agent.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ agent.pk }}"></td>
+                                        <td>Sandra Lyons</td>
+                                        <td>Morbi.quis@in.org</td>
+                                        <td> 7218959614</td>
+                                        <td>Home Loan, Education Loan</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ agent.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ agent.pk }}"></td>
+                                        <td>Connor Gibbs</td>
+                                        <td>lacus.pede.sagittis@Proinvelarcu.org</td>
+                                        <td> 9743472842</td>
+                                        <td>Home Loan, Education Loan</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ agent.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ agent.pk }}"></td>
+                                        <td>Nelle V. Alvarado</td>
+                                        <td>adipiscing.elit.Curabitur@tristiquesenectus.org</td>
+                                        <td> 7461904351</td>
+                                        <td>Policy, Home Loan</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ agent.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ agent.pk }}"></td>
+                                        <td>Maite P. Monroe</td>
+                                        <td>auctor.quis@vel.org</td>
+                                        <td> 9076706193</td>
+                                        <td>Home Loan</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ agent.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <!-- DataTales Example -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Supervisors</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Name</th>
+                                        <th>Email ID</th>
+                                        <th>Mobile Number</th>
+                                        <th>Account Status</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ supervisor.pk }}"></td>
+                                        <td>Brock Hood</td>
+                                        <td>iaculis@ullamcorpernisl.net</td>
+                                        <td>9428585748</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ supervisor.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ supervisor.pk }}"></td>
+                                        <td>Chandler F. Shelton</td>
+                                        <td>luctus.et.ultrices@sagittisNullamvitae.com</td>
+                                        <td>8425748596</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ supervisor.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ supervisor.pk }}"></td>
+                                        <td>Wilma Bird</td>
+                                        <td> Lorem.ipsum@placerateget.org</td>
+                                        <td>7485987458</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ supervisor.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ supervisor.pk }}"></td>
+                                        <td>Clayton Gregory</td>
+                                        <td>mattis.ornare@odioAliquam.co.uk</td>
+                                        <td>9865214785</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ supervisor.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ supervisor.pk }}"></td>
+                                        <td>Hiroko Bradford</td>
+                                        <td>malesuada@Nullamenim.co.uk</td>
+                                        <td>8574968574</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ supervisor.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ supervisor.pk }}"></td>
+                                        <td>Abigail Lynn</td>
+                                        <td>Sed.auctor.odio@ProinvelitSed.edu</td>
+                                        <td>9865748596</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ supervisor.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ supervisor.pk }}"></td>
+                                        <td>Ora F. Myers</td>
+                                        <td>eu.euismod@seddolor.com</td>
+                                        <td>9456874585</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ supervisor.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ supervisor.pk }}"></td>
+                                        <td>Alexander I. Barron</td>
+                                        <td>sit.amet.metus@convallisantelectus.com</td>
+                                        <td>9856748575</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ supervisor.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="user-checkbox-collection" id="checkbox-user-{{ supervisor.pk }}"></td>
+                                        <td>Baxter Gross</td>
+                                        <td>Fusce.mi@liberoProinmi.com</td>
+                                        <td>9856748596</td>
+                                        <td>
+                                            <a class="" href="javascript:void(0)" style="color:#2655CB; text-decoration: underline;" onclick="resend_password(this)" id="resend-password-btn-{{ supervisor.pk }}">Resend Password</a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="add_new_agent_modal" tabindex="-1" role="dialog" aria-labelledby="add_new_agent_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                {% if cobrowse_agent.role == "admin" %}
+                <h5 class="modal-title" id="add_new_agent_modal_modal_label">Add User</h5>
+                {% else %}
+                <h5 class="modal-title" id="add_new_agent_modal_modal_label">Add Agent</h5>
+                {% endif %}
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <form class="form-inline" action="javascript:void(0)">
+                            <div class="col-sm-6">
+                                <label class="sr-only" for="inline-form-input-agent-name">User Name</label>
+                                <input type="text" style="width: 100%;" class="form-control mb-2" id="inline-form-input-agent-name" placeholder="User Name">
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="sr-only" for="inline-form-input-agent-email">User Email</label>
+                                <input type="text" style="width: 100%;" class="form-control mb-2" id="inline-form-input-agent-email" placeholder="User Email">
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="sr-only" for="inline-form-input-agent-mobile">User Mobile No. (optional)</label>
+                                <input type="text" style="width: 100%;" class="form-control mb-2" id="inline-form-input-agent-mobile" placeholder="User Mobile No. (optional)">
+                            </div>
+                            {% if cobrowse_agent.role == "admin" %}
+                                <div class="col-sm-6">
+                                    <select class="custom-select" id="inline-form-input-user-type" onchange="check_selected_user_status(this)" style="width: 100%;">
+                                        <option selected="" value="None">Choose user type...</option>
+                                        <option value="agent">Agent</option>
+                                        <option value="supervisor">Supervisor</option>
+                                    </select>
+                                </div>
+                            {% endif %}
+                            {% if cobrowse_agent.get_access_token_obj.allow_language_support %}
+                                <div class="col-sm-6" id="easyassist-language-support-list-div">
+                                    <select class="selectpicker" multiple data-live-search="true" id="easyassist-language-support-selected">
+                                        {% for language in supported_language_objs %}
+                                            <option value="{{ language.pk }}">{{ language.title }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            {% endif %}
+                            {% if cobrowse_agent.get_access_token_obj.choose_product_category %}
+                                <div class="col-sm-6" id="easyassist-product-category-list-div">
+                                    <select class="selectpicker" multiple data-live-search="true" id="easyassist-product-category-selected">
+                                        {% for category in product_category_objs %}
+                                            <option value="{{ category.pk }}">{{ category.title }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            {% endif %}
+                            <div class="col-sm-6" style="padding-top: 5px;">
+                                <select class="custom-select" id="inline-form-input-agent-support-level" style="width: 100%;">
+                                    <option selected="" value="None">Choose support level</option>
+                                    {% for agent_support_name, agent_support_value in COBROWSING_AGENT_SUPPORT %}
+                                        <option value="{{ agent_support_value }}">{{ agent_support_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-sm-6" id="selected-supervisor-div">
+                                <select class="custom-select" id="inline-form-input-supervisor-pk">
+                                    <option value="{{ cobrowse_agent.pk }}">Select Supervisor</option>
+                                    <option value="{{ cobrowse_agent.pk }}">{{ cobrowse_agent.user.email }}(Self)</option>
+                                    {% for supervisor in supervisors %}
+                                        <option value="{{ supervisor.pk }}">{{ supervisor.user.email }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </form>
+                        <p id="add-new-agent-error"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-success" onclick="add_new_agent(this)">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="user_details_upload_modal" tabindex="-1" role="dialog" aria-labelledby="document_upload_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="document_upload_modal_modal_label">Add Users Via Excel</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <form class="form-inline" action="javascript:void(0)">
+                            <div class="col-sm-12">
+                                <input type="file" id="user_details_upload_input" class="form-control" name="" style="box-shadow:none !important;" multiple>
+                            </div>
+                            <div class="col-sm-12">
+                                <p style="padding-top: 1em;" id="user_details_upload_input_error"></p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; align-items: center; justify-content: space-between;">
+                <button class="btn btn-info" onclick="download_user_details_excel_template(this)" id="user-details-download-template-button">Download template</button>
+                <div>
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <button class="btn btn-success" onclick="upload_user_excel_details()">Upload</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function(){
+        setTimeout(function(){
+            $('.bootstrap-select button').removeClass();
+            $('.bootstrap-select button').addClass('custom-select');
+        }, 1000);
+    });
+    function check_selected_user_status(element){
+        if(element.value=="agent"){
+            document.getElementById("selected-supervisor-div").style.display="block";
+        }else{
+            document.getElementById("selected-supervisor-div").style.display="none";
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,1728 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{ easychat_config_obj.title_text }}</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <link href="{{ easychat_config_obj.tab_logo }}" rel="icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, shrink-to-fit=no">
+    {% if bot_obj.is_custom_css_required %}
+        <link rel="preload stylesheet" as="style" type="text/css" href="/static/EasyChatApp/css/theme2_{{ bot_obj.pk }}.css?v={% random_int 1 100 %}">
+    {% else %}
+        <link rel="preload stylesheet" as="style" type="text/css" href="/static/EasyChatApp/css/theme2.css?v={% random_int 1 100 %}">
+    {% endif %}
+
+    <link rel="preload stylesheet" as="style" type="text/css" href="/static/EasyChatApp/css/phone_widget_themes.css?v={{version}}">
+
+    <!-- link of phone num start -->
+    <link type="text/css" rel="stylesheet" media="screen" href="{% static 'EasyChatApp/css/intlTelInput.css' %}">
+    
+    <!-- <link rel="stylesheet" href="/static/EasyChatApp/css/materialize.min.css"> -->
+ 
+    <link rel="stylesheet" as="style" type="text/css" href="/static/EasyChatApp/css/voip.css?v={{version}}">
+    <link rel="stylesheet" as="style" type="text/css" href="/static/EasyChatApp/css/cobrowsing.css?v={{version}}">
+    <link rel="stylesheet" type="text/css" href="/static/EasyChatApp/css/widgets_chatbot.css?v={{version}}">
+    <link rel="preload stylesheet" as="style" href="https://fonts.googleapis.com/css?family=Source Sans Pro">
+    <link rel="stylesheet" href="/static/EasyChatApp/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link rel="preload stylesheet" as="style" type="text/css" href="https://static.allincall.in/static/EasyChatApp/css/select2.min.css">
+    <link id="font-link" rel="stylesheet" href="https://fonts.googleapis.com/css?family={{bot_obj.font}}">
+    <link id="font-link" rel="stylesheet" href="https://fonts.googleapis.com/css?family={{bot_obj.font}}">
+    <link rel="stylesheet" type="text/css" href="https://static.allincall.in/static/EasyChatApp/css/bootstrap_datepicker.css">
+    <link rel="stylesheet" type="text/css" href="https://static.allincall.in/static/EasyChatApp/css/jquery_datepicker.css">
+    <link rel="stylesheet" type="text/css" href="https://static.allincall.in/static/EasyChatApp/css/jquery_timepicker.css">
+    <link rel="stylesheet" type="text/css" href="/static/EasyChatApp/css/ion_range_slider.css?v={{version}}">
+    <link rel="stylesheet" type="text/css" href="/static/EasyChatApp/css/slider.css?v={{version}}">
+ 
+    <link rel="stylesheet" type="text/css" href="/static/EasyChatApp/css/feedback_form.css?v={{version}}">
+    <link rel="stylesheet" type="text/css" href="/static/EasyChatApp/css/transliteration.css">
+    <link rel="stylesheet" type="text/css" href="/static/EasyChatApp/css/mic_speak_animation.css">
+
+    <!-- v6.1 dev input changes -->
+    <link rel="stylesheet" type="text/css" href="/static/EasyChatApp/css/themes_button_only.css?v={{version}}">
+
+    <!-- <script type="text/javascript" src="js/theme6.js"></script> -->
+
+  
+<!-- 
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animate.css">
+ -->
+    <link rel="stylesheet" href="https://static.allincall.in/static/EasyChatApp/font-awesome-4.7.0/css/font-awesome.min.css">
+
+    <link rel="stylesheet" type="text/css" href="/static/EasyChatApp/css/theme2_static.css?v={{version}}">   
+
+
+</head>
+<style type="text/css">
+
+/*calendar theme*/
+
+/*time picker*/
+.easychat-calendar-div .date-time-picker-btns{
+    border: 1px solid #{{ bot_obj.bot_theme_color  }} !important;
+    color: #{{ bot_obj.bot_theme_color  }};
+
+}
+
+.easychat-mic-speak-animation-wrapper {
+    background-color: #{{ bot_obj.bot_theme_color  }} !important;
+}
+
+.easychat-bot-welcome-banner-wrapper .easychat-carousel-nav .easychat-carousel-indicator.active-slide-indicator {
+    background: #{{ bot_obj.bot_theme_color  }};
+}
+
+.easychat-bot-widget-submit-btn{
+    background: #{{ bot_obj.bot_theme_color  }};
+  }
+
+  .easychat-country-code-submit-btn {
+    background: #{{ bot_obj.bot_theme_color  }};  
+ }
+
+.datetimepicker-selected-time{
+    background: #{{ bot_obj.bot_theme_color  }};
+    border: 2px solid #{{ bot_obj.bot_theme_color  }};
+    padding: 8px;
+    border-radius: 4px;
+    right: 29.5%;
+    position: relative;
+    color: white;
+  }
+
+#custom-timepicker-footer-submit-button:disabled{
+    opacity:0.6;
+    cursor: not-allowed;
+}
+
+#save-demoter-form-submit-button:disabled{
+    opacity:0.6;
+    cursor: not-allowed;
+  }
+
+ .date{
+    color: #{{ bot_obj.bot_theme_color  }};
+  }
+  .easychat-bot-widget-cancel-btn{
+    color: #{{ bot_obj.bot_theme_color  }};
+  }
+.preview-img img{
+    width: 60%;
+    margin-top: 1em;
+    position: relative;
+    margin-bottom: 0.5em;
+    text-align: center;
+    border: 0.471273px solid #{{ bot_obj.bot_theme_color  }};
+    filter: drop-shadow(0px 1.25673px 5.02691px rgba(2, 84, 215, 0.16));
+    border-radius: 5.02691px;
+}
+#disclaimer_popup_modal .disclaimer-popup-heading-container .disclaimer-popup-heading{
+    color: #{{ bot_obj.bot_theme_color  }} ;
+}
+#disclaimer_popup_modal .disclaimer-popup-footer-container .confirm-btn button{
+    background-color: #{{ bot_obj.bot_theme_color  }}; 
+}
+.inputapi-transliterate-indic-suggestion-menuitem-highlight {
+    background-color: #{{ bot_obj.bot_theme_color  }}; 
+}
+
+   .submit-cancel-btns-wrapper .submit-cancel-btns .cancel-btn{
+    cursor: pointer;
+    border: 1px solid #{{ bot_obj.bot_theme_color  }};
+    box-sizing: border-box;
+    border-radius: 4px;
+    padding: 8px;
+    color: #{{ bot_obj.bot_theme_color  }};
+    background-color: #fff;
+    margin-right:5px;
+}
+.submit-cancel-btns-wrapper .submit-cancel-btns .submit-btn{
+    cursor: pointer;
+    border: 1px solid #{{ bot_obj.bot_theme_color  }};
+    box-sizing: border-box;
+    border-radius: 4px;
+    padding: 8px;
+    color: #fff;
+    background-color: #{{ bot_obj.bot_theme_color  }};
+}
+
+     #selected-blue-radio-dropdown{
+  background-color: #{{ bot_obj.bot_theme_color  }} !important;
+  color: white;
+  font-weight: 700;
+}
+
+     .radio-item-active{
+        border: 1px solid #{{ bot_obj.bot_theme_color  }} !important;
+        color: #{{ bot_obj.bot_theme_color  }};
+        }
+        .easychat-form-container .radio-item-active span{
+        color: #{{ bot_obj.bot_theme_color  }} !important;
+        }
+
+    .checkbox-item-active{
+        border: 1px solid #{{ bot_obj.bot_theme_color  }};
+        color: #{{ bot_obj.bot_theme_color  }};
+        }
+
+     * {
+        font-family: "{{bot_obj.font}}" !important;
+        font-size: {{bot_obj.font_size}};
+      }
+      .bot-header,
+      .bot-header span {
+        font-family: "{{bot_obj.font}}" ;
+      }
+
+    .easychat-dragdropafterSelect__XPS{
+        background-color:  #{{ bot_obj.bot_theme_color  }};
+    }
+    #easychat-drag-drop-upload-btn{
+        color:  #{{ bot_obj.bot_theme_color  }} !important;
+    }
+    #user_input_div #user_input::placeholder {
+    color: #{{ svg_icon_color  }};
+    }
+    .easychat-sticky-menu:hover div {
+        color: #{{ bot_obj.bot_theme_color  }} !important;
+    }
+    .easychat-sticky-menu:hover div svg{
+        fill: #{{ bot_obj.bot_theme_color  }} !important;
+    }
+    .easychat-sticky-menu div {
+        color: #000000 !important;
+    }
+    #easychat-footer{
+        background: #fafafa;
+        border-color:#fafafa;
+    }
+    #easychat-restart-div{
+        border-color:{{bot_obj.get_bot_theme_light_color}};
+    }
+    #easychat-bot-close-button{
+        box-shadow: 0px 2px 12px #{{ bot_obj.bot_theme_color  }};
+    }
+
+    .irs--round .irs-bar {
+        background-color: #{{ bot_obj.bot_theme_color}} !important;
+    }
+    
+    .irs--round .irs-handle.state_hover, .irs--round .irs-handle:hover {
+        background-color: #{{ bot_obj.bot_theme_color}} !important;
+    }
+
+    .irs--round .irs-handle {
+       background-color: #{{ bot_obj.bot_theme_color}} !important; 
+    }
+
+    .easychat-bot-range-slider-area input[type="range"]::-webkit-slider-thumb {
+        background: #{{ bot_obj.bot_theme_color}} !important; 
+    }
+
+    #easychat-sticky-intents button {
+        /*border-radius: 90px !important;*/
+        padding: 10px 8px;
+        margin: 0 1px !important;
+        background: transparent !important;
+        border: 1px solid  #{{ svg_icon_color  }} !important;
+        color: #{{ svg_icon_color  }} !important;
+        outline: 0px !important;
+        cursor: pointer !important;
+        transition: 0.2s all ease-in-out;
+        height: 40px !important;
+    }
+
+    #easychat-sticky-intents button.button_sticky:hover {
+        background: #{{ svg_icon_color  }} !important;
+        color: #fff !important;
+    }
+
+    .easychat-sticky-menu .menu-heading:hover {
+        color: #{{ bot_obj.bot_theme_color  }} !important;
+    }
+
+.easychat-sticky-menu-item-text {
+    font-weight: bold;
+    font-size: 14px !important;
+    line-height: 18px;
+    color:  #{{ bot_obj.bot_theme_color  }} !important;
+    padding-left: 1rem;
+    margin: 0;
+    margin-left =0px !important;
+}
+
+.easychat-sticky-menu-item:hover {
+    background: {{bot_obj.get_bot_theme_light_color}};
+    cursor: pointer;
+}
+.autocomplete-items div:hover {
+    background-color: {{bot_obj.get_bot_theme_light_color}};
+}
+.select2-container--default .select2-results__option[aria-selected=true]{
+    background-color: {{bot_obj.get_bot_theme_light_color}};
+}
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #{{ bot_obj.bot_theme_color  }};
+    
+}
+.easychat-form-container .select2-container--default .select2-results__option--selected {
+        background-color: #{{ bot_obj.bot_theme_color  }};
+        color:#ffffff;
+}
+.easychat-form-container .checkbox-item-active span {
+    color: #{{ bot_obj.bot_theme_color  }} !important;
+}
+.datepicker.dropdown-menu{
+    border-color: #{{ bot_obj.bot_theme_color  }} !important;
+    margin-top: 4px;
+}
+.datepicker table{
+    color:  #{{ bot_obj.bot_theme_color  }} !important;
+}
+.ui-timepicker-list li:hover ,li.ui-timepicker-selected{
+    background: #{{ bot_obj.bot_theme_color  }}!important;
+    color: #fff !important
+}
+.datepicker table tr td.active {
+ background-color: #{{ bot_obj.bot_theme_color  }} !important; 
+ background-image: linear-gradient(to bottom,{{bot_obj.get_bot_theme_light_color}}, #{{ bot_obj.bot_theme_color  }}) !important;  
+ border-radius: 4px !important; 
+}
+.datepicker table tr td.active:hover {
+ border-radius: 4px !important; 
+}
+.easychat-datepicker:focus, .easychat-timepicker:focus{
+border-color: #{{ bot_obj.bot_theme_color  }};
+}
+.datepicker-dropdown.datepicker-orient-top:before{
+border-top: 9px solid #{{ bot_obj.bot_theme_color  }} !important;
+}
+.arrow_up,
+.arrow_down {
+    cursor: pointer;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+    /*background: #{{ bot_obj.bot_theme_color  }};*/
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+    box-shadow: 0 0 0px #777 !important;
+    border-radius: 20px;
+}
+
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px #777;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+    border-radius: 10px;
+}
+
+
+    
+    [type="radio"]:checked+span:after,
+    [type="radio"]:checked+span:after {
+        background-color: #{{ svg_icon_color }};
+    }
+    [type="radio"]:checked+span:after,
+    [type="radio"]:checked+span:before,
+    [type="radio"]:checked+span:after {
+        border: 2px solid #{{ svg_icon_color }};
+    }
+    [type="radio"]:not(:checked)+span:before,
+    [type="radio"]:not(:checked)+span:after {
+        border: 2px solid  #C4C4C4;
+    }
+
+    [type="checkbox"]:checked+span:not(.lever):before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20px;
+    margin-top: 3px !important;
+    background: #{{ bot_obj.bot_theme_color  }};
+    background-image: url("data:image/svg+xml,%3Csvg width='13' height='13' viewBox='0 0 22 22' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8.5 16.5858L4.70711 12.7929C4.31658 12.4024 3.68342 12.4024 3.29289 12.7929C2.90237 13.1834 2.90237 13.8166 3.29289 14.2071L7.79289 18.7071C8.18342 19.0976 8.81658 19.0976 9.20711 18.7071L20.2071 7.70711C20.5976 7.31658 20.5976 6.68342 20.2071 6.29289C19.8166 5.90237 19.1834 5.90237 18.7929 6.29289L8.5 16.5858Z' fill='white'/%3E%3C/svg%3E%0A");
+    height: 20px;
+    z-index: 0;
+    border: 2px solid #5a5a5a;
+    margin-top: 0px !important;
+    -webkit-transition: .2s;
+    transition: .2s;
+    transform: rotate(0deg);
+    border: 1px solid #{{ bot_obj.bot_theme_color  }};
+    }
+
+    [type="checkbox"]:not(:checked)+span:before,
+    [type="checkbox"]:not(:checked)+span:after {
+        border: 2px solid  #C4C4C4;
+    }
+
+    [type="checkbox"]+span:not(.lever):before, [type="checkbox"]:not(.filled-in)+span:not(.lever):after {
+        width: 15px !important;
+        height: 15px !important;
+    }
+    [type="checkbox"]+span:not(.lever) {
+        line-height: 18px !important;
+        padding-left: 25px;
+    }
+
+
+    #easychat-end-chat {
+        {% if bot_obj.show_brand_name and not easychat_config_obj.disable_show_brand_name%}
+            padding: 9px 10px 35px 10px !important;
+        {% else %}
+            padding: 5px 10px 15px 10px !important;
+        {% endif %}
+        background: transparent !important;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        color: #808080;
+        display: flex;
+        flex-direction: column;
+        color: black;
+        height: initial;
+        padding-bottom: 40px;
+        box-sizing: border-box;
+    }
+   #livechat-user-upload-attachment-div{
+    background-color: #{{ bot_obj.bot_theme_color  }} !important;
+   }
+   #easychat-drag-drop-alert-msg{
+    color: #fff!important;
+   }
+    #easychat-card-slides-wrapper {
+      -ms-overflow-style: none; 
+      scrollbar-width: none;  
+    }
+    .checkbox-btn-container-item input[type="checkbox"]:checked~label::before {
+            color: #{{ bot_obj.bot_theme_color  }};
+            background-color:  #{{ bot_obj.bot_theme_color  }};
+            border-color:  #{{ bot_obj.bot_theme_color  }};
+        }
+    .checkbox-btn-container-item.border-around {
+        background: {{bot_obj.get_bot_theme_light_color}};
+        border: 1px solid #{{ bot_obj.bot_theme_color  }};
+    }
+    .radio-btn-container-item input[type="radio"]:checked {
+        background-color: #{{ bot_obj.bot_theme_color  }} ;
+        border-color: #{{ bot_obj.bot_theme_color  }} ;
+    }
+    .border-around-radio{
+        background-color: {{bot_obj.get_bot_theme_light_color}} ;
+        border-color: #{{ bot_obj.bot_theme_color  }} ;
+    }
+    #easychat-sticky-end-chat button {
+        /*border-radius: 90px !important;*/
+        padding: 0 4px;
+        margin:0px !important;
+        background: transparent !important;
+        border: 1px solid  #{{ bot_obj.bot_theme_color  }} !important;
+        color: #"{{ bot_obj.bot_theme_color  }}" !important;
+        outline: 0px !important;
+        cursor: pointer !important;
+        transition: 0.2s all ease-in-out;
+        width: auto;
+        height: 33px !important;
+        background: #FFFFFF;
+        border-radius: 5px !important;
+        font-weight: 500;
+        font-size: 13px;
+    }
+#easychat-sticky-end-chat button.button_sticky:hover {
+        border-radius: 5px !important;
+        padding: 0 9px;
+        margin: 0 1px !important;
+        background: #{{ bot_obj.bot_theme_color  }} !important;
+        color: #fff !important;
+    }
+
+    .dropbtn {
+        border: 1px solid #{{ bot_obj.bot_theme_color  }} !important;
+        border-radius: 10px;
+    }
+    #dropdown-arrow {
+        fill: #{{ bot_obj.bot_theme_color  }};
+    }
+    
+    .easychat-widget-dropdown-content a:hover {
+        background-color: {{bot_obj.get_bot_theme_light_color}};
+    }
+
+    .galleryContainer .arrow {
+        border: 2px solid #{{ svg_icon_color }};
+        border-left: none;
+        border-bottom: none;
+    }
+    .galleryContainer .arrow:hover {
+        border: 3px solid #{{ svg_icon_color }};
+        opacity: 0.8;
+        border-left: none;
+        border-bottom: none;    
+    }
+
+    .spinner div {
+        background-color: #{{ bot_obj.bot_theme_color }};
+    }
+
+    .autocomplete-active {
+        background-color: {{bot_obj.get_bot_theme_light_color}} !important;
+        color: #{{ bot_obj.bot_theme_color }} !important;
+    }
+    .autocomplete-items div:hover {
+        color: #{{ bot_obj.bot_theme_color }};
+    }
+
+    
+
+    .easychat-customer-modal-cancel-btn{
+        color: #{{ bot_obj.bot_theme_color }};
+    }
+
+#easychat-footer:hover {
+    border: 2px solid #{{ bot_obj.bot_theme_color }};
+}
+#easychat-footer:focus-within {
+     border: 2px solid #{{ svg_icon_color }};
+}
+{% if bot_obj.show_brand_name and not easychat_config_obj.disable_show_brand_name %}
+    #easychat-footer{
+        bottom: 1.5rem;
+    }
+    #easychat-sticky-intents{
+            margin-bottom: 0.9em !important;
+    }
+{% else %}
+    #easychat-sticky-end-chat {
+        margin-bottom: 3.7em !important;
+        background: #fff !important;
+        padding-top: 2px;
+    }
+    #easychat-sticky{
+        bottom: -0.2rem;
+    }
+    #easychat-sticky-intents{
+        margin-bottom: 0.1em !important;
+    }
+{% endif %}
+.typing-indicator{
+    margin-bottom: 1em;
+}
+#customer_info_form_modal .select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #{{ bot_obj.bot_theme_color }};
+}
+
+
+.feedback-checkbox-container [type="checkbox"].filled-in:checked+span:not(.lever):before {
+        background-image:url("data:image/svg+xml,%3Csvg width='14' height='14' viewBox='0 0 22 22' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8.5 16.5858L4.70711 12.7929C4.31658 12.4024 3.68342 12.4024 3.29289 12.7929C2.90237 13.1834 2.90237 13.8166 3.29289 14.2071L7.79289 18.7071C8.18342 19.0976 8.81658 19.0976 9.20711 18.7071L20.2071 7.70711C20.5976 7.31658 20.5976 6.68342 20.2071 6.29289C19.8166 5.90237 19.1834 5.90237 18.7929 6.29289L8.5 16.5858Z' fill='white'/%3E%3C/svg%3E%0A") !important;
+        transition: unset;
+        .transform: unset !important;
+    }
+
+    #no-thanks-btn , .range-value span , .cancel-btn{
+        color: #{{ bot_obj.bot_theme_color }} !important;
+    }
+
+    .submit-btn , #submit-btn {
+        background: #{{ bot_obj.bot_theme_color }} !important;
+    }
+    .feedback-checkbox-container [type="checkbox"]+span:not(.lever):before {
+        border: 1.5px solid #{{ bot_obj.bot_theme_color }} !important;
+    }
+    .feedback-checkbox-container [type="checkbox"].filled-in:checked+span:not(.lever):before{
+        border: 2px solid #{{ bot_obj.bot_theme_color }} !important;
+        background-color: #{{ bot_obj.bot_theme_color }} !important;
+    }
+
+
+    /* feedback slider div according to different browsers */
+    
+    .feedback-slider-div input[type=range]::-webkit-slider-runnable-track {
+        background: {{bot_obj.get_feedback_slider_colour}};   
+    }
+
+    .feedback-slider-div input[type=range]:focus::-webkit-slider-runnable-track {
+        background: {{bot_obj.get_feedback_slider_colour}};   
+    }
+    .feedback-slider-div input[type=range]::-moz-range-track {
+        background: {{bot_obj.get_feedback_slider_colour}};  
+    }
+    .feedback-slider-div input[type=range]::-ms-track{
+        background: {{bot_obj.get_feedback_slider_colour}};
+    }
+    .feedback-slider-div input[type=range]::-ms-fill-lower {
+        background: {{bot_obj.get_feedback_slider_colour}};
+    }
+    .feedback-slider-div input[type=range]::-ms-fill-upper {
+        background: {{bot_obj.get_feedback_slider_colour}};
+    }
+    .feedback-slider-div input[type=range]:focus::-ms-fill-lower {
+        background: {{bot_obj.get_feedback_slider_colour}};
+    }
+    .feedback-slider-div input[type=range]:focus::-ms-fill-upper {
+        background: {{bot_obj.get_feedback_slider_colour}};
+    }
+
+    .feedback-slider-div input[type=range]::-webkit-slider-thumb {
+        background: {{bot_obj.get_bot_theme_light_color_two}};
+    }
+    .feedback-slider-div input[type=range]::-ms-thumb {
+        background: {{bot_obj.get_bot_theme_light_color_two}};
+    }
+    .feedback-slider-div input[type=range]::-moz-range-thumb {
+        background: {{bot_obj.get_bot_theme_light_color_two}};
+    }
+
+    .form-uploaded-file {
+        border-color: #{{ bot_obj.bot_theme_color }};
+        background-color: #{{ bot_obj.bot_theme_color }};
+    }
+    .feedback-heading-1 {
+        color: #{{ bot_obj.bot_theme_color }};
+    }
+    .transcript-checkbox-input-div input:checked + label:before{
+        border: 2px solid #{{ bot_obj.bot_theme_color }};
+        background: #{{ bot_obj.bot_theme_color }};
+    }
+
+    .selected {
+        background-color: #{{ svg_icon_color }} !important;
+        color: white !important;
+    }
+
+    .dropdown-item.selected:hover {
+        background-color: #{{ svg_icon_color }} !important;
+        color: white !important;
+    }
+
+    /* Logo container css */
+    .logo-container{
+        margin-left: 7px;
+        width: 100px;
+        height: 28px;
+        background-color: transparent;
+        display: flex;
+        align-items: center;
+    }
+    .logo-container img{
+        max-width: 100%;
+        height: 100%;
+        object-fit: contain;
+        
+    }
+
+    @media only screen and (max-width: 780px) {
+    .logo-container{
+        margin-left: 5px;
+        width: 80px;
+        height: 28px;
+    }
+    }
+
+    @media only screen and (max-width: 325px) {
+    .logo-container{
+        margin-left: 0px;
+        width: 59px;
+        height: 16px;
+    }
+    }
+    @media screen and (max-width: 325px){
+    .bot-header span {
+        margin-right: 42px;
+    }
+    }
+    /* logo container css end */
+    
+    .voice-call-resend-btn,
+    .voice-call-connect-btn,
+    .voice-call-accept-btn,
+    .video-call-accept-btn,
+    .video-call-join-now-btn,
+    .cobrowse-session-accept-btn {
+        background-color: #{{ bot_obj.bot_theme_color  }}; 
+        border: 1px solid #{{ bot_obj.bot_theme_color  }};  
+    }
+
+    .easychat-intent-image-div svg,
+    .easychat-intent-text-div svg {
+        fill: #{{ svg_icon_color }} !important;
+    }
+
+    .easychat-image-intent-item:hover .easychat-intent-text-div {
+        color: #{{ svg_icon_color }};
+    }
+    .easychat-choices-wrapper .easychat-choices {
+       background-color: #{{ bot_obj.bot_theme_color}} !important; 
+       color: white !important;
+    }
+
+    @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+        .easychat-intent-text-div span{
+            display: inline-block;
+            max-width: 70px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding-top: 10px !important;
+        }
+    }
+.easychat-active-agent-div .active-agent-profile-image{
+    background: #{{ bot_obj.bot_theme_color  }};
+    border: 1px solid #{{ bot_obj.bot_theme_color  }};
+}
+
+</style>
+
+{% if language_script_type == "rtl" %}
+<body class="language-right-to-left-wrapper">
+{% else %}
+<body>
+{% endif %}
+    <input type='hidden' name='csrfquerytoken' value='{{ query_token_id }}' />
+    
+    <div style="z-index: 997; height: 100%;background-color: #fff;" id="top-container">
+        <div id = "botloader" style="display: flex; background-color: white; align-items: center;justify-content: center;">
+        <img id="loading-image" src="{% static 'LiveChatApp/img/waiting1.gif' %}" style="height: 4em;">
+      </div>
+
+       <div class="timepicker-container" style="display:none;">
+            <div class="custom-timepicker">
+                <div class="custom-timepicker-heading">
+                    <div  id="time-picker-container-custom-timepicker-heading-text" class="custom-timepicker-heading-text">
+                        {% get_utils_data language_template_obj.date_range_picker_text 10 %}
+                    </div>
+                </div>
+                <div class="custom-timepicker-body">
+                    <div class="hr-clock" onclick="handleclickTime()">
+                        <ul>
+                            <li><label for="timepickerhrone">01</label><input id="timepickerhrone" type="radio" name="hrvalue"></input></li>
+                            <li><label for="timepickerhrtwo">02</label><input id="timepickerhrtwo" type="radio" name="hrvalue"></input></li>
+                            <li><label for="timepickerhrthree">03</label><input id="timepickerhrthree" type="radio" name="hrvalue"></input></li>
+                            <li><label for="timepickerhrfour">04</label><input id="timepickerhrfour" type="radio" name="hrvalue"></input></li>
+                            <li><label for="timepickerhrfive">05</label><input id="timepickerhrfive" type="radio" name="hrvalue"></input></li>
+                            <li><label for="timepickerhrsix">06</label><input id="timepickerhrsix" type="radio" name="hrvalue"></input></li>
+                            <li><label for="timepickerhrseven">07</label><input id="timepickerhrseven" type="radio" name="hrvalue"></input></li>
+                            <li><label for="timepickerhreight">08</label><input id="timepickerhreight" type="radio" name="hrvalue"></input></li>
+                            <li><label for="timepickerhrnine">09</label><input id="timepickerhrnine" type="radio" name="hrvalue"></input></li>
+                            <li><label for="timepickerhrten">10</label><input id="timepickerhrten" type="radio" name="hrvalue"></input></li>
+                            <li><label for="timepickerhreleven">11</label><input id="timepickerhreleven" type="radio" name="hrvalue"></input></li>
+                            <li><label for="timepickerhrtwelve">12</label><input id="timepickerhrtwelve" type="radio" name="hrvalue"></input></li>
+                        </ul>
+                    </div>
+                    <div class="min-clock" onclick="handleclickTime()">
+                        <ul>
+                            <li><label for="timepickerminzero">00</label><input id="timepickerminzero" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminone">01</label><input id="timepickerminone" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickermintwo">02</label><input id="timepickermintwo" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminthree">03</label><input id="timepickerminthree" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminfour">04</label><input id="timepickerminfour" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminfive">05</label><input id="timepickerminfive" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminsix">06</label><input id="timepickerminsix" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminseven">07</label><input id="timepickerminseven" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickermineight">08</label><input id="timepickermineight" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminnine">09</label><input id="timepickerminnine" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminten">10</label><input id="timepickerminten" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickermineleven">11</label><input id="timepickermineleven" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickermintwelve">12</label><input id="timepickermintwelve" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminthirteen">13</label><input id="timepickerminthirteen" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminfourteen">14</label><input id="timepickerminfourteen" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminfifteen">15</label><input id="timepickerminfifteen" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminsixteen">16</label><input id="timepickerminsixteen" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminseventeen">17</label><input id="timepickerminseventeen" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickermineighteen">18</label><input id="timepickermineighteen" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminnineteen">19</label><input id="timepickerminnineteen" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickermintwenty">20</label><input id="timepickermintwenty" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickermintwentyone">21</label><input id="timepickermintwentyone" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickermintwentytwo">22</label><input id="timepickermintwentytwo" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickermintwentythree">23</label><input id="timepickermintwentythree" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickermintwentyfour">24</label><input id="timepickermintwentyfour" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickermintwentyfive">25</label><input id="timepickermintwentyfive" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickermintwentysix">26</label><input id="timepickermintwentysix" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickermintwentyseven">27</label><input id="timepickermintwentyseven" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickermintwentyeight">28</label><input id="timepickermintwentyeight" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickermintwentynine">29</label><input id="timepickermintwentynine" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminthirty">30</label><input id="timepickerminthirty" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminthirtyone">31</label><input id="timepickerminthirtyone" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminthirtytwo">32</label><input id="timepickerminthirtytwo" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminthirtythree">33</label><input id="timepickerminthirtythree" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminthirtyfour">34</label><input id="timepickerminthirtyfour" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminthirtyfive">35</label><input id="timepickerminthirtyfive" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminthirtysix">36</label><input id="timepickerminthirtysix" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminthirtyseven">37</label><input id="timepickerminthirtyseven" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminthirtyeight">38</label><input id="timepickerminthirtyeight" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminthirtynine">39</label><input id="timepickerminthirtynine" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminforty">40</label><input id="timepickerminforty" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminfortyone">41</label><input id="timepickerminfortyone" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminfortytwo">42</label><input id="timepickerminfortytwo" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminfortythree">43</label><input id="timepickerminfortythree" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminfortyfour">44</label><input id="timepickerminfortyfour" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminfortyfive">45</label><input id="timepickerminfortyfive" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminfortysix">46</label><input id="timepickerminfortysix" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminfortyseven">47</label><input id="timepickerminfortyseven" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminfortyeight">48</label><input id="timepickerminfortyeight" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminfortynine">49</label><input id="timepickerminfortynine" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminfifty">50</label><input id="timepickerminfifty" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminfiftyone">51</label><input id="timepickerminfiftyone" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminfiftytwo">52</label><input id="timepickerminfiftytwo" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminfiftythree">53</label><input id="timepickerminfiftythree" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminfiftyfour">54</label><input id="timepickerminfiftyfour" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminfiftyfive">55</label><input id="timepickerminfiftyfive" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminfiftysix">56</label><input id="timepickerminfiftysix" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminfiftyseven">57</label><input id="timepickerminfiftyseven" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminfiftyeight">58</label><input id="timepickerminfiftyeight" type="radio" name="minvalue"></input></li>
+                            <li><label for="timepickerminfiftynine">59</label><input id="timepickerminfiftynine" type="radio" name="minvalue"></input></li>
+                        </ul>
+                    </div>
+                    <div class="ampm-clock" onclick="handleclickTime()">
+                        <ul>
+                            <li><label for="timepickerampmAM" style="padding-left: 6px;padding-right: 6px; right: 8%;">AM</label><input type="radio" id="timepickerampmAM" name="ampmvalue"></input></li>
+                            <li><label for="timepickerampmPM" style="padding-left: 6px;padding-right: 6px; right: 8%;">PM</label><input type="radio" id="timepickerampmPM" name="ampmvalue"></input></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="custom-timepicker-footer">
+                    <button id="custom-timepicker-footer-cancel-button" type="submit" class="cancel-btn" onclick="closeTimeModal()">{{language_template_obj.cancel_text}}</button>
+                    <button id="custom-timepicker-footer-submit-button" type="submit" class="submit-btn" disabled onclick="handleSaveTime()">{% get_utils_data language_template_obj.form_widget_error_text 5 %}</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- <div id ="main-container"> -->
+        {% if language_script_type == "rtl" %}
+        <div id="easychat-navbar" class="language-right-to-left-wrapper">
+        {% else %}
+        <div id="easychat-navbar">
+        {% endif %}
+            <div style="width: 100%; display: flex;">
+                <div id="easychat-navbar-wrapper" style="background: #{{ bot_obj.bot_theme_color }} !important;">
+
+                    {% if channel != "Android" and channel != "iOS" %}
+                        {% if bot_obj.bot_logo %}
+                        <div class="logo-container">
+                            <img src="{{ bot_obj.bot_logo }}" alt="company-logo">
+                        </div>
+                        {% endif %}
+                    {% endif %}
+
+                    {% if channel == "Android" or channel == "iOS" %}
+                    <div class="go-back-icon" id="go-back-icon" onclick="open_chat_termination_modal()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7.19702 11.6798C7.1965 11.256 7.37851 10.8526 7.69653 10.5725L14.8383 4.28958C15.3305 3.87657 16.0624 3.93203 16.4867 4.41449C16.9111 4.89696 16.8727 5.62995 16.4002 6.06541L10.155 11.5594C10.1203 11.5898 10.1005 11.6337 10.1005 11.6798C10.1005 11.7259 10.1203 11.7698 10.155 11.8002L16.4002 17.2942C16.729 17.57 16.8825 18.0023 16.8014 18.4237C16.7204 18.8451 16.4174 19.1896 16.0098 19.3238C15.6022 19.458 15.1538 19.3609 14.8383 19.07L7.6991 12.789C7.3803 12.5084 7.19743 12.1044 7.19702 11.6798Z" fill="#white"/>
+                        <mask id="mask0" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="7" y="4" width="10" height="16">
+                        <path d="M7.19702 11.6798C7.1965 11.256 7.37851 10.8526 7.69653 10.5725L14.8383 4.28958C15.3305 3.87657 16.0624 3.93203 16.4867 4.41449C16.9111 4.89696 16.8727 5.62995 16.4002 6.06541L10.155 11.5594C10.1203 11.5898 10.1005 11.6337 10.1005 11.6798C10.1005 11.7259 10.1203 11.7698 10.155 11.8002L16.4002 17.2942C16.729 17.57 16.8825 18.0023 16.8014 18.4237C16.7204 18.8451 16.4174 19.1896 16.0098 19.3238C15.6022 19.458 15.1538 19.3609 14.8383 19.07L7.6991 12.789C7.3803 12.5084 7.19743 12.1044 7.19702 11.6798Z" fill="#white"/>
+                        </mask>
+                        <g mask="url(#mask0)">
+                        </g>
+                    </svg>                        
+                   </div>
+                    {% endif %}
+
+                    {% if channel == "Android"  or channel == "iOS" %}
+                        {% if bot_obj.bot_theme_color.lower == "ffffff" %}
+                        <div style="position: absolute;top: 50%;max-width: 15em;margin: 0;left: 50% !important;transform: translate(-50%, -50%); color: #{{ svg_icon_color }}" class="bot-name-container">
+                        {% else %}
+                        <div style="position: absolute;top: 50%;max-width: 15em;margin: 0;left: 50% !important;transform: translate(-50%, -50%); color: #ffffff" class="bot-name-container">
+                        {% endif %}
+                    {% else %}
+                        {% if bot_obj.bot_theme_color.lower == "ffffff" %}
+                        <div style="position: absolute;top: 50%;max-width: 15em;margin: 0;left: 50%;transform: translate(-50%, -50%); color: #{{ svg_icon_color }}" class="bot-name-container">
+                        {% else %}
+                        <div style="position: absolute;top: 50%;max-width: 15em;margin: 0;left: 50%;transform: translate(-50%, -50%); color: #ffffff" class="bot-name-container">
+                        {% endif %}
+                    {% endif %}
+                        <span class="bot-header" style="position: relative;top: 35%; font-size: 17px;">
+                             <span id="easychat-theme2-bot-name" style=" font-weight: bold; font-size: 17px;">{{ language_template_obj.bot_name }}</span>
+                        </span>
+                    </div>
+
+                    {% if channel != "Android" and channel != "iOS" %}
+
+                    {% if voip_type == 'pip' or voip_type == 'new_tab' %}
+                        <div class="tooltip voip-call-btn" id="voip_call_btn" onclick="send_voip_request_to_agent()" style="cursor: pointer; position: absolute; display: none; justify-content: center; height: 28px;  float: right;  padding: 0.1em; top: 25%;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M11.5317 12.4724C15.5208 16.4604 16.4258 11.8467 18.9656 14.3848C21.4143 16.8328 22.8216 17.3232 19.7192 20.4247C19.3306 20.737 16.8616 24.4943 8.1846 15.8197C-0.493478 7.144 3.26158 4.67244 3.57397 4.28395C6.68387 1.17385 7.16586 2.58938 9.61449 5.03733C12.1544 7.5765 7.54266 8.48441 11.5317 12.4724Z" fill="white"/>
+                            </svg>
+                            <span class="tooltiptextbottom" id="tooltiptext-minimize" style="width: 65px;">{% get_utils_data language_template_obj.livechat_vc_notifications 6 %}</span>
+
+                        </div>
+                    {% else%}
+                        <div class="tooltip voip-call-btn" id="voip_call_btn" onclick="send_voip_request_to_agent()" style="cursor: pointer; position: absolute; display: none; justify-content: center; height: 28px;  float: right;  padding: 0.1em; top: 25%;">
+                            <svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M16 16.7012C16 18.4961 14.5449 19.9512 12.75 19.9512H5.25C3.45507 19.9512 2 18.4961 2 16.7012V8.20117C2 6.40625 3.45507 4.95117 5.25 4.95117H12.75C14.5449 4.95117 16 6.40625 16 8.20117V16.7012ZM21.762 6.34451C21.9156 6.52531 22 6.75485 22 6.99213V17.91C22 18.4622 21.5523 18.91 21 18.91C20.7627 18.91 20.5332 18.8256 20.3524 18.672L17 15.8221V9.07911L20.3524 6.23016C20.7732 5.87249 21.4043 5.92369 21.762 6.34451Z" fill="white"/>
+                            </svg>
+                            <span class="tooltiptextbottom" id="tooltiptext-minimize" style="width: 65px;">{% get_utils_data language_template_obj.livechat_vc_notifications 7 %}</span>
+
+                        </div>
+                    {% endif %}
+
+                    {% endif %}
+                   
+                    {% if is_webview_link == False %}
+                    {% if channel != "Android" and channel != "iOS" %}
+                    <div class="tooltip bot-minimize-button" onclick="minimize_chatbot()" style="cursor: pointer; position: absolute; display: flex; justify-content: center; float: right; top: 23%;">
+                        <svg width="20" height="12" viewBox="0 0 20 12" fill="#{{ svg_icon_color }}" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M1.03725 0.517845C1.10275 0.446263 1.18056 0.389469 1.26623 0.350719C1.3519 0.311969 1.44375 0.292023 1.5365 0.292023C1.62925 0.292023 1.72109 0.311969 1.80676 0.350719C1.89244 0.389469 1.97025 0.446263 2.03575 0.517845L9.99843 9.1991L17.9611 0.517845C18.0267 0.446378 18.1045 0.389688 18.1902 0.35101C18.2758 0.312332 18.3676 0.292425 18.4604 0.292425C18.5531 0.292425 18.6449 0.312332 18.7306 0.35101C18.8162 0.389688 18.8941 0.446378 18.9596 0.517845C19.0252 0.589312 19.0772 0.674156 19.1127 0.767532C19.1482 0.860908 19.1664 0.960988 19.1664 1.06206C19.1664 1.16313 19.1482 1.26321 19.1127 1.35658C19.0772 1.44996 19.0252 1.5348 18.9596 1.60627L10.4977 10.8302C10.4322 10.9018 10.3544 10.9586 10.2687 10.9973C10.183 11.0361 10.0912 11.056 9.99843 11.056C9.90568 11.056 9.81384 11.0361 9.72817 10.9973C9.6425 10.9586 9.56468 10.9018 9.49918 10.8302L1.03725 1.60627C0.971577 1.53487 0.919475 1.45005 0.883926 1.35666C0.848377 1.26328 0.830078 1.16316 0.830078 1.06206C0.830078 0.960952 0.848377 0.86084 0.883926 0.767455C0.919475 0.67407 0.971577 0.589247 1.03725 0.517845Z" fill="#{{ svg_icon_color }}"/>
+                        </svg>
+                        <span class="tooltiptextbottom" id="tooltiptext-minimize">{{language_template_obj.minimize_button_tooltip}}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% endif %}
+                    {% if languages_supported.count != 1 %}
+                        {% if is_webview_link %}
+                        <div class="language-dropdown-container" style="right: 6% !important;">
+                        {% elif channel == "Android" or channel == "iOS" %}
+                        <div class="language-dropdown-container andriod-ios-language-dropdown-container" style="right: 6% !important;">
+                        {% else %}
+                        <div class="language-dropdown-container" style="top: 24%;">
+                        {% endif %}
+                            <div class="bot-language-icon tooltip">
+                                <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M6.69465 10.5679L6.11328 12.3701H7.27603L6.69465 10.5679Z" fill="#{{ svg_icon_color }}"/>
+                                    <path d="M17.9152 2.71875H8.6132V5.62562H10.9387V6.78836H3.38084C2.3925 6.78836 1.63672 7.54415 1.63672 8.53248V14.9276C1.63672 15.9159 2.3925 16.6717 3.38084 16.6717H3.96221V19.6367L7.62486 16.6717H11.5201V12.6021H17.9152C18.9035 12.6021 19.6593 11.8463 19.6593 10.858V4.46287C19.6593 3.47453 18.9035 2.71875 17.9152 2.71875ZM7.91555 14.2881L7.62486 13.3579H5.8226L5.47378 14.2881H4.07849L5.99702 9.11385H7.39231L9.31084 14.2881H7.91555ZM16.7524 9.69523V10.858C15.9966 10.858 15.1827 10.6254 14.4851 10.2766C13.7874 10.6254 12.9735 10.7998 12.1596 10.858L12.1014 9.69523C12.5084 9.69523 12.9154 9.63709 13.3223 9.52082C12.7991 8.99758 12.4503 8.35807 12.2758 7.66042H13.4967C13.6711 8.18366 14.02 8.59062 14.4269 8.93944C15.0664 8.41621 15.4734 7.66042 15.5315 6.78836H12.0433V5.62562H13.7874V4.46287H14.9502V5.62562H16.8687L16.9268 6.20699C16.985 7.42787 16.5199 8.64876 15.6478 9.52082C16.0548 9.63709 16.4036 9.69523 16.7524 9.69523Z" fill="#{{ svg_icon_color }}"/>
+                                    <path d="M8.60997 4.76121H11.0347V7.63708H8.60997V4.76121Z" fill="#{{ svg_icon_color }}"/>
+                                    </svg>
+                                <span class="tooltiptextbottom" id="tooltiptext-language">{% get_utils_data language_template_obj.choose_language 0 %}</span>
+                            </div>
+                            <div id="language_dropdown_content" class="language-dropdown-content">
+                                <div class="language-dropdown-items">
+                                    {% for language in languages_supported.all %}
+                                        {% if language.lang == selected_language %}
+                                            <a class="dropdown-item selected" onclick="update_bot_based_on_selected_language(this)" id="{{language.lang}}">{{language.display}}</a>
+                                        {% else %}
+                                            <a class="dropdown-item" onclick="update_bot_based_on_selected_language(this)" id="{{language.lang}}">{{language.display}}</a>
+                                        {% endif %} 
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <span class="bot-selected-language-animation-text" id="bot-selected-language-animation-text" >{{language_template_obj.language.display}}</span>
+                        </div>
+                    {% endif %}
+                    {% if channel != "Android" and channel != "iOS" %}
+                    <div class="tooltip bot-close-button" onclick="close_chatbot('{{bot_obj.is_nps_required}}')" style="cursor: pointer; position: absolute; justify-content: center; float: right; top: 23%;">
+                        <svg width="15" height="15" viewBox="0 0 15 15" fill="#{{ bot_obj.bot_theme_color }}" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M15 1.85364L13.1464 0L7.5 5.64636L1.85364 0L0 1.85364L5.64636 7.5L0 13.1464L1.85364 15L7.5 9.35364L13.1464 15L15 13.1464L9.35364 7.5L15 1.85364Z" 
+                            fill="#{{ bot_obj.bot_theme_color }}"/>
+                        </svg>
+                        <span class="tooltiptextbottom" id ="tooltiptext-close" >{{language_template_obj.close_button_tooltip}}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="active-voice-call">
+            <div class="voice-call-wrapper-div" id="voice_call_div" style="display: none;">
+                <div id="meet_container" style="display: none;"></div>
+                <div class="agent-name" id="voice_call_agent_name">
+                    Agent 1
+                </div>
+                <div class="time-elapsed" id="voice_call_timer">
+                    00:00
+                </div>
+                <div class="action-btns" id="voice_call_action_btns" style="display: flex;">
+                    <svg onclick="toggle_audio('unmute', 'mute')" class="voice-call-unmute-icon" style="margin-right: 18px;" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="32" height="32" rx="16" fill="white"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M18.6656 15.5557C18.6656 17.0312 17.4745 18.2223 15.999 18.2223C14.5234 18.2223 13.3323 17.0312 13.3323 15.5557V10.2223C13.3323 8.74678 14.5234 7.55566 15.999 7.55566C17.4745 7.55566 18.6656 8.74678 18.6656 10.2223V15.5557ZM20.381 16.3113C20.4522 15.8758 20.8166 15.5558 21.2522 15.5558C21.7944 15.5558 22.2299 16.0358 22.141 16.5691C21.7055 19.2358 19.5722 21.3247 16.8877 21.7069V23.5558C16.8877 24.0447 16.4877 24.4447 15.9988 24.4447C15.5099 24.4447 15.1099 24.0447 15.1099 23.5558V21.7069C12.4255 21.3247 10.2922 19.2358 9.8566 16.5691C9.7766 16.0358 10.2033 15.5558 10.7455 15.5558C11.181 15.5558 11.5455 15.8758 11.6166 16.3113C11.981 18.4002 13.8033 20.0002 15.9988 20.0002C18.1944 20.0002 20.0166 18.4002 20.381 16.3113Z" fill="#475569"/>
+                    </svg>
+                    <svg onclick="toggle_audio('mute', 'unmute')" class="voice-call-mute-icon" style="display: none; margin-right:18px;" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="32" height="32" rx="16" fill="#0254D7"/>
+                        <path d="M8.40559 7.41207C8.13129 7.13777 7.68657 7.13777 7.41227 7.41206C7.13797 7.68636 7.13797 8.13108 7.41226 8.40538L12.8256 13.8188V16.5714C12.8256 18.6403 14.5027 20.3175 16.5716 20.3175C17.3522 20.3175 18.077 20.0787 18.677 19.6703L19.7501 20.7435C18.9293 21.3581 17.9101 21.7222 16.8058 21.7222H16.3375L16.1348 21.7181C13.5134 21.6118 11.4208 19.4531 11.4208 16.8056V16.3373L11.4144 16.242C11.3679 15.8992 11.074 15.6349 10.7184 15.6349C10.3305 15.6349 10.0161 15.9494 10.0161 16.3373V16.8056L10.0199 17.0269C10.1311 20.2594 12.6694 22.8756 15.8693 23.1099L15.8692 25.2341L15.8757 25.3294C15.9222 25.6723 16.216 25.9365 16.5716 25.9365C16.9595 25.9365 17.274 25.622 17.274 25.2341L17.2749 23.1098C18.5851 23.0137 19.7843 22.5183 20.7514 21.7447L24.7375 25.7309C25.0117 26.0052 25.4565 26.0052 25.7308 25.7309C26.0051 25.4566 26.0051 25.0119 25.7308 24.7376L8.40559 7.41207Z" fill="white"/>
+                        <path d="M21.4379 18.4579L22.511 19.5311C22.906 18.7059 23.1272 17.7815 23.1272 16.8056V16.3373L23.1208 16.242C23.0743 15.8992 22.7804 15.6349 22.4248 15.6349C22.0369 15.6349 21.7224 15.9494 21.7224 16.3373V16.8056L21.7183 17.0082C21.6978 17.515 21.6005 18.002 21.4379 18.4579Z" fill="white"/>
+                        <path d="M12.9545 9.97443L20.2522 17.2723C20.2952 17.0452 20.3177 16.811 20.3177 16.5714V10.9524C20.3177 8.8835 18.6405 7.20634 16.5716 7.20634C14.8411 7.20634 13.3846 8.37981 12.9545 9.97443Z" fill="white"/>
+                    </svg>                        
+                    <svg onclick="end_pip_calling()" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="32" height="32" rx="16" fill="#FF0000"/>
+                        <path d="M24.9382 17.3496L24.7675 18.246C24.6075 19.0859 23.8223 19.6499 22.9327 19.564L21.1622 19.393C20.3907 19.3185 19.819 18.755 19.5767 17.955C19.2477 16.8688 19.0362 16.0632 19.0362 16.0632C18.2277 15.7318 17.4294 15.5226 16.3335 15.5226C15.2375 15.5226 14.4548 15.7549 13.6308 16.0632C13.6308 16.0632 13.4099 16.8695 13.0902 17.955C12.8766 18.6804 12.5453 19.3135 11.7898 19.3895L10.0296 19.5663C9.15137 19.6546 8.3093 19.096 8.05963 18.2596L7.79207 17.3632C7.52574 16.4709 7.76341 15.5319 8.41599 14.8981C9.95661 13.4019 12.7287 12.5585 16.3253 12.5539C19.9271 12.5492 22.3722 13.388 24.0675 14.8844C24.7809 15.5141 25.1075 16.4608 24.9382 17.3496Z" fill="white"/>
+                    </svg>                                                        
+                </div>
+            </div>
+        </div>
+        {% if language_script_type == "rtl" %}
+        <div id="easychat-chat-container" class="language-right-to-left-wrapper" style="width:100vw !important; box-sizing: border-box;overscroll-behavior-y: none;" onscroll="show_scroll_image()">
+        {% else %}
+        <div id="easychat-chat-container" style="width:100vw !important; box-sizing: border-box;overscroll-behavior-y: none;" onscroll="show_scroll_image()">
+        {% endif %}
+            <i class="fa fa-chevron-down" aria-hidden="true" id="img-scroll-to-bottom" style="margin-bottom:30px;display:none;z-index:999;color:#{{ bot_obj.bot_theme_color }};" onclick="scroll_to_bottom()"></i>
+            <div id="sound"></div>
+            <div class="easychat-bot-welcome-banner-parent" id="easychat-bot-welcome-banner-parent" style="display: none;"></div>
+        </div>
+        <div id="easychat-end-chat" style = "display:none;">
+        </div> 
+        <div id="easychat-sticky">
+            <div id="easychat-sticky-intents" style="margin-bottom:1em;overflow-x:auto;width:90%;margin-left:20px;">
+
+            </div>
+        </div>
+
+        <!-- v6.1 dev input changes -->
+        {% include "EasyChatApp/theme_footers/theme2_footer.html" %}
+       
+     {% if bot_obj.show_brand_name and not easychat_config_obj.disable_show_brand_name %}
+            <div class="brand-name-section" id="easychat-powered-by-div">
+            <a href="https://www.getcogno.ai/" target="parent" id="easychat-powered-by-div-brand-name">
+                <span id="powered-by-text" style="color: #4D4D4D; font-size: 10px;">{{ language_template_obj.powered_by_text|slice:50 }}</span> <b style="font-size: 11px; color: #4D4D4D;">Cogno AI</b>
+            </a>
+        </div>
+      
+        {% endif %}
+    </div>
+    <!-- </div> -->
+    <div class="easychat-modal modal" onclick="close_preview_image(event)"id="preview-big-image-modal" style="display: none;">
+        <div class="attachment-preview-image-wrapper-div">
+            <svg id="preview-big-image-cross-button" onclick="close_preview_image(event)" width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="38" height="38" rx="19" fill="white"/>
+                <path d="M13.1914 12.9648L24.5939 24.822" stroke="#4D4D4D" stroke-width="1.9762" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M24.5933 12.9648L13.1908 24.822" stroke="#4D4D4D" stroke-width="1.9762" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                
+            <img id="preview-big-image">
+        </div>
+    </div>
+    <!-- Feedback Start-->
+    <div class="easychat-bot-custom-modal" id="feedback_modal" style="display: none;" >
+    <div class="easychat-modal chatbot-feedback-div" >
+        <div class="feedback-heading-container">
+            <p id="csat-form-text-feedback-heading-1" class="feedback-heading-1">{% get_utils_data language_template_obj.csat_form_text 0 %}</p>
+            <p id="csat-form-text-feedback-heading-2" class="feedback-heading-2">{% get_utils_data language_template_obj.csat_form_text 1 %}</p>
+            {% if channel != "Android" and channel != "iOS" %}
+            <div class="feedback-close" onclick="no_feedback_given(this, true)">
+            {% elif channel == "Android" %}
+                <div class="feedback-close" onclick="no_feedback_given(this, true); android.close();">
+            {% elif channel == "iOS" %}
+                <div class="feedback-close" onclick="no_feedback_given(this, true); try {webkit.messageHandlers.close.postMessage('close');} catch(err) {}">
+            {% endif %}
+                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M15 1.85364L13.1464 0L7.5 5.64636L1.85364 0L0 1.85364L5.64636 7.5L0 13.1464L1.85364 15L7.5 9.35364L13.1464 15L15 13.1464L9.35364 7.5L15 1.85364Z" fill="#4d4d4d"/>
+                </svg>
+            </div>
+        </div>
+
+        {% if bot_obj.scale_rating_5 %}
+            <div class="feedback-emoji-div">
+                <div>
+                    <div class="feedback-emoji-img-div">
+                        <img id="angry-emoji-div" class="quarter-rating" onmouseover="feedbackValueFunc(this)" onclick="clicked_on_emoji(this)" style="width: 60px; height: 60px;">
+                        <br>
+                    </div>
+                    <span class="emojis-text emojis-text-alignment5" id="csat-angry-text">{% get_utils_data language_template_obj.csat_emoji_text 0 %}</span>
+                </div>
+                <div>
+                    <div class="feedback-emoji-img-div">
+                        <img id="sad-emoji-div" class="half-rating" onmouseover="feedbackValueFunc(this)" onclick="clicked_on_emoji(this)">
+                        <br>
+                    </div>
+                    <span class="emojis-text emojis-text-alignment5" id="csat-sad-text">{% get_utils_data language_template_obj.csat_emoji_text 1 %}</span>
+                </div> 
+                <div>
+                    <div class="feedback-emoji-img-div">
+                        <img id="unhappy-emoji-div" class="three-quarter-rating" onmouseover="feedbackValueFunc(this)" onclick="clicked_on_emoji(this)">
+                        <br>
+                    </div>
+                    <span class="emojis-text emojis-text-alignment5" id="csat-neutral-text">{% get_utils_data language_template_obj.csat_emoji_text 2 %}</span>
+                </div>
+                <div> 
+                    <div class="feedback-emoji-img-div">
+                        <img id="happy-emoji-div" class="four-quarter-rating" onmouseover="feedbackValueFunc(this)" onclick="clicked_on_emoji(this)">
+                        <br>
+                    </div>
+                    <span class="emojis-text emojis-text-alignment5" id="csat-happy-text">{% get_utils_data language_template_obj.csat_emoji_text 3 %}</span>
+                </div>
+                <div>
+                    <div class="feedback-emoji-img-div">
+                        <img id="inlove-emoji-div" class="full-rating" onmouseover="feedbackValueFunc(this)" onclick="clicked_on_emoji(this)">
+                        <br>
+                    </div>
+                    <span class="emojis-text emojis-text-alignment5" id="csat-very-happy-text">{% get_utils_data language_template_obj.csat_emoji_text 4 %}</span>
+                </div>
+            </div>
+            {% if is_transcript_enabled %}
+            <div class="transcript-checkbox-div feedback-modal-transcript-checkbox-div" id="transcript-checkbox-hide" style="display:none">
+                <div class="transcript-checkbox-input-div">
+                    <input type="checkbox" id="feedback-transcript-checkbox" onchange="check_for_csat_transcript()">
+                    <label for="feedback-transcript-checkbox">{% get_utils_data language_template_obj.livechat_transcript_text 5 %} 
+                    </label>
+                </div>
+            </div>
+            {% endif %}
+        {% else %}
+            <div class="feedback-emoji-div">
+                <div>
+                    <div class="feedback-emoji-img-div">
+                        <img id="angry-emoji-div" class="quarter-rating" onmouseover="feedbackValueFunc(this)" onclick="clicked_on_emoji(this)" style="width: 60px; height: 60px;">
+                        <br>
+                    </div>
+                    <span class="emojis-text emojis-text-alignment4" id="csat-angry-text">{% get_utils_data language_template_obj.csat_emoji_text 0 %}</span>
+                </div>
+                <div>
+                    <div class="feedback-emoji-img-div">
+                        <img id="sad-emoji-div" class="half-rating" onmouseover="feedbackValueFunc(this)" onclick="clicked_on_emoji(this)">
+                        <br>
+                    </div>
+                    <span class="emojis-text emojis-text-alignment4" id="csat-sad-text">{% get_utils_data language_template_obj.csat_emoji_text 1 %}</span>
+                </div>
+                <div>
+                    <div class="feedback-emoji-img-div"> 
+                        <img id="happy-emoji-div" class="three-quarter-rating" onmouseover="feedbackValueFunc(this)" onclick="clicked_on_emoji(this)">
+                        <br>
+                    </div>
+                    <span class="emojis-text emojis-text-alignment4" id="csat-happy-text">{% get_utils_data language_template_obj.csat_emoji_text 3 %}</span>
+                </div>
+                <div> 
+                    <div class="feedback-emoji-img-div">
+                        <img id="inlove-emoji-div" class="full-rating" onmouseover="feedbackValueFunc(this)" onclick="clicked_on_emoji(this)">
+                        <br>
+                    </div>
+                    <span class="emojis-text emojis-text-alignment4" id="csat-very-happy-text">{% get_utils_data language_template_obj.csat_emoji_text 4 %}</span>
+                </div>
+            </div>
+            {% if is_transcript_enabled %}
+            <div class="transcript-checkbox-div feedback-modal-transcript-checkbox-div" id="transcript-checkbox-hide" style="display:none">
+                <div class="transcript-checkbox-input-div">
+                    <input type="checkbox" id="feedback-transcript-checkbox" onchange="check_for_csat_transcript()">
+                    <label for="feedback-transcript-checkbox">{% get_utils_data language_template_obj.livechat_transcript_text 5 %} 
+                    </label>
+                </div>
+            </div>
+            {% endif %}
+        {% endif %}
+    </div>
+    </div>
+    <!-- Feedback End -->
+
+        <!-- Feedback second start -->
+    <div class="easychat-bot-custom-modal" id="feedback_form_demoter" style="display: none;" >
+    <div class="easychat-modal feedback-form-container" id="easychat-csat-form-container" style="display: block;position: fixed;height: 70vh;overflow-y: auto; overflow-x: hidden;">
+
+        <div class="row" style="margin-top: -8px;">
+            
+            <div id="csat-form-text-value-feedback-text" class="value-feedback-text">
+                {% get_utils_data language_template_obj.csat_form_text 2 %}
+            </div>
+            <div class="complete-form-text" id="complete_form_text">
+                {% get_utils_data language_template_obj.csat_form_text 3 %}
+            </div>
+            <div id="csat_modal_feedback-checkbox-container" class="feedback-checkbox-container">
+                {% for items in csat_required_checkboxes %}
+                {% if forloop.last %}
+                        <label>
+                            <input type="checkbox" class="filled-in" id="other-choice-opt" onclick="handle_csat_choices()">
+                            <span for="checkbox" class="feedback_demoter_checkbox_value">{{items}}
+                        </label>
+                        {% else %}
+                        <label>
+                            <input type="checkbox" class="filled-in" id="csat-choice-opt" onclick="handle_csat_choices()">
+                            <span for="checkbox" class="feedback_demoter_checkbox_value">{{items}}</label>
+                        </label>
+                {% endif %}
+                {% endfor %}
+            </div>
+            <div class="text-area-feedback" id="other-text-area" style="display:none">
+                <textarea style="resize: none;" placeholder="{% get_utils_data language_template_obj.csat_form_text 4 %}" id="demoter_feedback_text_area"></textarea>
+            </div>
+            {% if collect_phone_number or collect_email_id %}
+                {% if mark_all_fields_mandatory %}
+                    <div id="csat-form-text-contact-details-text" class="contact-details-text">
+                        {% get_utils_data language_template_obj.csat_form_text 5 %} <span style="color:red"><strong> ({{mandatory}}) </strong></span>
+                    </div>
+                {% else %}
+                    <div id="csat-form-text-contact-details-text" class="contact-details-text">
+                        {% get_utils_data language_template_obj.csat_form_text 5 %}
+                    </div>
+                {% endif %}
+            {% endif %}
+            {% if collect_phone_number %}
+            <div class="easychat-form-div easychat-csat-form-div">
+                <div class="easychat-country-code-dropdown-wrapper">
+                    <input type="text" id="easychat-customer-phone-csat-form" class = "easychat-customer-input easychat-phone-input" placeholder="Enter Phone Number" autocomplete="off"/>
+                    <div class="country-code-error-message-div" id="easychat-customer-phone-csat-form-phone-error-div" style="display: block;"></div>
+                </div>
+            </div>
+            {% endif %}
+            {% if collect_email_id %}
+            <div class="col s12" style="padding: 0px !important;">
+                <div class="enter-detail-div">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15.8333 3.33337H4.16666C3.50362 3.33337 2.86773 3.59677 2.39889 4.06561C1.93005 4.53445 1.66666 5.17033 1.66666 5.83337V14.1667C1.66666 14.8297 1.93005 15.4656 2.39889 15.9345C2.86773 16.4033 3.50362 16.6667 4.16666 16.6667H15.8333C16.4964 16.6667 17.1322 16.4033 17.6011 15.9345C18.0699 15.4656 18.3333 14.8297 18.3333 14.1667V5.83337C18.3333 5.17033 18.0699 4.53445 17.6011 4.06561C17.1322 3.59677 16.4964 3.33337 15.8333 3.33337ZM15.275 5.00004L9.99999 8.95837L4.72499 5.00004H15.275ZM15.8333 15H4.16666C3.94564 15 3.73368 14.9122 3.5774 14.756C3.42112 14.5997 3.33332 14.3877 3.33332 14.1667V6.04171L9.49999 10.6667C9.64424 10.7749 9.81968 10.8334 9.99999 10.8334C10.1803 10.8334 10.3557 10.7749 10.5 10.6667L16.6667 6.04171V14.1667C16.6667 14.3877 16.5789 14.5997 16.4226 14.756C16.2663 14.9122 16.0543 15 15.8333 15Z" fill="#757575"/>
+                        </svg>
+                    <input type="email" placeholder="{% get_utils_data language_template_obj.csat_form_text 7 %}" id="feedback_email_id" value="" style="outline: none; width: 100%;">
+                </div>
+            </div>
+            {% endif %}
+            <div class="col s12 feedback-submit-btn" style="padding-bottom: 10px !important;">
+                {% if channel != "Android" and channel != "iOS" %}
+                <button id="no-feedback-given-cancel-button" class="cancel-btn" onclick="no_feedback_given(this, true);" style="cursor: pointer;">{{language_template_obj.cancel_text}}</button>
+                {% elif channel == "Android" %}
+                <button id="no-feedback-given-cancel-button" class="cancel-btn" onclick="no_feedback_given(this, true); android.close()" style="cursor: pointer;">{{language_template_obj.cancel_text}}</button>
+                {% elif channel == "iOS" %}
+                <button id="no-feedback-given-cancel-button" class="cancel-btn" onclick="no_feedback_given(this, true); try {webkit.messageHandlers.close.postMessage('close');} catch(err) {}" style="cursor: pointer;">{{language_template_obj.cancel_text}}</button>
+                {% endif %}
+                <button id="save-demoter-form-submit-button" class="submit-btn" onclick="save_demoter_form();submit_transcript()" disabled>{% get_utils_data language_template_obj.submit_text 0 %}</button>
+
+
+            </div>
+
+        </div>
+    </div>
+    </div>
+
+    <!-- Feedback second end -->
+
+    <!-- Feedback promoter start -->
+    <div class="easychat-bot-custom-modal" id="feedback_form_promoter" style="display: none;" >
+    <div class="easychat-modal feedback-form-container" style="display: block;position: fixed;height: 52vh;overflow-y: auto; margin-top: 30% !important;">
+
+        <div class="row" style="margin-top: -8px;">
+            
+            <div id="promoter-form-value-feedback-text" class="value-feedback-text">
+                {% get_utils_data language_template_obj.csat_form_text 2 %}
+            </div>
+
+            <div class="text-area-feedback">
+                <textarea style="resize: none;" placeholder="{% get_utils_data language_template_obj.csat_form_text 8 %}" id="promoter_feedback_text_area"></textarea>
+            </div>
+            
+            <div class="col s12 feedback-submit-btn" style="padding-bottom: 10px !important;">
+                {% if channel != "Android" and channel != "iOS" %}
+                <button id="promoter-form-no-feedback-cancel-button" class="cancel-btn" onclick="no_feedback_given(this, true)" style="cursor: pointer;">{{language_template_obj.cancel_text}}</button>
+                {% elif channel == "Android" %}
+                <button  id="promoter-form-no-feedback-cancel-button" class="cancel-btn" onclick="no_feedback_given(this, true); android.close()" style="cursor: pointer;">{{language_template_obj.cancel_text}}</button>
+                {% elif channel == "iOS" %}
+                <button  id="promoter-form-no-feedback-cancel-button" class="cancel-btn" onclick="no_feedback_given(this, true); try {webkit.messageHandlers.close.postMessage('close');} catch(err) {}" style="cursor: pointer;">{{language_template_obj.cancel_text}}</button>
+                {% endif %}
+                <button  id="promoter-form-feedback-submit-button" class="submit-btn" style="cursor: pointer;" onclick="save_promoter_form();submit_transcript()">{% get_utils_data language_template_obj.submit_text 0 %}</button>
+            </div>
+
+        </div>
+    </div>
+    </div>
+
+
+    <!-- Feedback promoter end -->
+
+
+    <!-- The Modal -->
+    <div id="modal-create-issue" class="easychat-modal">
+        <!-- Modal content -->
+        <div class="easychat-modal-content">
+            <a onclick="clear_modal_fields()"><span class="easychat-close" id="span-easychat-close">&times;</span></a>
+            <div class="row" style="text-align: left;">
+                <div class="col s12">
+                    <p id="create-issue-error-message" style="color:red;"></p>
+                </div>
+                <div class="col s12">
+                    <p>Name<sup class="red-text">*</sup></p>
+                    <input id="new-issue-name" placeholder="Your name" style="width:90%;">
+                </div>
+                <div class="col s12">
+                    <p>Phone Number<sup class="red-text">*</sup></p>
+                    <input id="new-issue-phone" placeholder="Your 10 digits valid phone number" style="width:90%;">
+                </div>
+                <div class="col s12">
+                    <p>Issue Description<sup class="red-text">*</sup></p>
+                    <textarea id="new-issue-issue" placeholder="Write briefly..." style="margin: 0px; width: 310px; height: 68px;"></textarea>
+                </div>
+                <div class="col s12">
+                    <p>Priority<sup class="red-text">*</sup></p>
+                    <select id="ticket-priority" style="width:90%;">
+                        <option value="1">Low</option>
+                        <option value="2">Medium</option>
+                        <option value="3">High</option>
+                        <option value="4">Urgent</option>
+                    </select>
+                </div>
+                <div class="col s12">
+                    <p>Category<sup class="red-text">*</sup></p>
+                    <select id="ticket-category" style="width:90%;">
+                        <option value="">Choose the following</option>
+                        {% for category_obj in category_objs %}
+                        <option value="{{ category_obj.pk }}">{{ category_obj.ticket_category }}</option>
+                        {% endfor %}
+                    </select>
+                    <br><br>
+                </div>
+                <!-- <button onclick="create_issue(this)" class="easychat-modal-button">Submit</button> -->
+                <div id="create_issue_submit_button">
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- The Modal -->
+    <div id="modal-schedule-meeting" class="easychat-modal">
+        <!-- Modal content -->
+        <div class="easychat-modal-content">
+            <a onclick="clear_modal_fields()"><span class="easychat-close" id="span-easychat-schedule-close">&times;</span></a>
+            <div class="row">
+                <div class="col s12">
+                    <p id="schedule-error-message" style="color:red;"></p>
+                </div>
+                <div class="col s12">
+                    <p>Name<sup class="red-text">*</sup></p>
+                    <input id="new-meeting-name" placeholder="Your name" style="width:90%;">
+                </div>
+                <div class="col s12">
+                    <p>Phone Number<sup class="red-text">*</sup></p>
+                    <input id="new-meeting-phone" placeholder="Your 10 digits valid phone number" style="width:90%;">
+                </div>
+                <div class="col s12">
+                    <p>Meeting Date<sup class="red-text">*</sup></p>
+                    <input id="new-meeting-date" type="date" style="width:90%;">
+                </div>
+                <div class="col s12">
+                    <p>Meeting Time<sup class="red-text">*</sup></p>
+                    <input id="new-meeting-time" type="time" style="width:90%;">
+                </div>
+                <div class="col s12">
+                    <p>Pincode <sup><label> (optional)</label></sup></p>
+                    <input id="new-meeting-pincode" type="number" placeholder="Your valid pincode">
+                </div>
+                <div class="col s12">
+                    <p>Issue<sup class="red-text">*</sup></p>
+                    <textarea id="new-meeting-issue" placeholder="Write briefly..." style="margin: 0px; height: 59px; width: 321px;"></textarea><br><br>
+                </div>
+                <!-- <button onclick="schedule_meeting(this)" class="easychat-modal-button">Submit</button> -->
+                <div id="schedule_meeting_submit_button">
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- The Modal -->
+    <div id="modal-check-ticket-status" class="easychat-modal">
+        <!-- Modal content -->
+        <div class="easychat-modal-content">
+            <a onclick="clear_modal_fields()"><span class="easychat-close" id="span-easychat-ticket-close">&times;</span></a>
+            <div class="row">
+                <div class="col s12">
+                    <p id="ticket-status-error-message" style="color:red;"></p>
+                </div>
+                <div class="col s12">
+                    <p>Ticket ID<sup class="red-text">*</sup></p>
+                    <input id="check-ticket-id" placeholder="Your ticket id." style="width:90%;">
+                    <br><br>
+                </div>
+                <!-- <button onclick="check_ticket_status(this)" class="easychat-modal-button">Check Status</button> -->
+                <div id="check_ticket_status_submit_button">
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- The Modal -->
+    <div id="modal-check-meeting-status" class="easychat-modal">
+        <!-- Modal content -->
+        <div class="easychat-modal-content">
+            <a onclick="clear_modal_fields()"><span class="easychat-close" id="span-easychat-meeting-close">&times;</span></a>
+            <div class="row">
+                <div class="col s12">
+                    <p id="meeting-status-error-message" style="color:red;"></p>
+                </div>
+                <div class="col s12">
+                    <p>Meeting ID<sup class="red-text">*</sup></p>
+                    <input id="check-meeting-id" placeholder="Your meeting id." style="width:90%;">
+                    <br><br>
+                </div>
+                <!-- <button onclick="check_meeting_status(this)" class="easychat-modal-button">Check Status</button> -->
+                <div id="check_meeting_status_submit_button">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--  Submit form confirmation modal -->
+    <div class="easychat-modal" id="submit-form-confirmation-modal" style="align-items: center; justify-content: center;">
+        <div class="easychat-modal-content" style="width: 75%;">
+            <div class="col s12">
+                <p style="margin: 20px 10px 0px 10px;" id="form-submit-confirmation-text">Are you sure you want to submit these details?</p>
+            </div>
+            <div class="col s12 right">
+                <input type = "button" value = "No" class = "easychat-customer-modal-cancel-btn" onclick="cancel_form_submission()" style = "float: right;" id="form-submit-confirmation-no">
+                <input id="form-submit-confirmation-yes" class="livechat-modal-submit-btn" style="background-color:#{{ bot_obj.bot_theme_color  }} ; float: right; padding: 0px;"onclick="submit_form_widget()" type="submit" value="Yes">
+            </div>
+        </div>
+    </div>
+
+    <!-- hindi disclaimer modal  -->
+    <div class="easychat-modal chatbot-disclaimer-popup-div" id="disclaimer_popup_modal">
+        <div class="disclaimer-popup-heading-container">
+            <p id="disclaimer-modal-container-heading" class="disclaimer-popup-heading">Disclaimer</p>
+            <div class="popup-close" onclick="close_language_disclaimer_modal()">
+                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M15 1.85364L13.1464 0L7.5 5.64636L1.85364 0L0 1.85364L5.64636 7.5L0 13.1464L1.85364 15L7.5 9.35364L13.1464 15L15 13.1464L9.35364 7.5L15 1.85364Z" fill="#4d4d4d"/>
+                </svg>
+            </div>
+        </div>
+        <div class="disclaimer-popup-body-container">
+            <p id="disclaimer-modal-popup-text" class="disclaimer-popup-content"></p>
+        </div>
+        <div class="disclaimer-popup-footer-container">
+            <div class="confirm-btn">
+                <button id="disclaimer-modal-confirm-button" onclick="confirm_update_language_selected_for_phonetic_languages()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+     <!-- chat termination modal -->
+     <div class="easychat-bot-custom-modal termination-confirmation-modal"style="display:none;">
+        <div class="termination-confirmation-modal-content">
+
+        
+        <div class="termination-confirmation-modal-container">
+            <div class="termination-icon">
+                <svg width="83" height="82" viewBox="0 0 83 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M41.3395 6.83336C22.5888 6.83336 7.33337 22.1605 7.33337 41C7.33337 59.8395 22.6605 75.1667 41.5 75.1667C60.3395 75.1667 75.6667 59.8395 75.6667 41C75.6667 22.1605 60.2678 6.83336 41.3395 6.83336ZM44.9167 58.0834H38.0834V51.25H44.9167V58.0834ZM44.9167 44.4167H38.0834V23.9167H44.9167V44.4167Z" fill="#DB2A2A"/>
+                </svg>                    
+            </div>
+            <button class="chat-termination-modal-close-btn" onclick="close_termination_modal();">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M3.09044 2.89234C3.39297 2.60141 3.87407 2.61081 4.16501 2.91335L12.935 12.0331C13.226 12.3356 13.2166 12.8167 12.914 13.1077C12.6115 13.3986 12.1304 13.3892 11.8395 13.0867L3.06943 3.96691C2.7785 3.66437 2.7879 3.18327 3.09044 2.89234Z" fill="#262626"/>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12.9126 2.89276C13.2154 3.18393 13.2252 3.66502 12.9345 3.96731L4.16444 13.0871C3.87374 13.3894 3.39264 13.3984 3.08986 13.1072C2.78709 12.8161 2.7773 12.335 3.068 12.0327L11.838 2.91291C12.1287 2.61062 12.6098 2.60159 12.9126 2.89276Z" fill="#262626"/>
+                    </svg>
+                    
+            </button>
+            <div id="termination-confirmation-modal-end-chat" class="termination-confirmation-text">
+                {% get_utils_data language_template_obj.end_chat 0 %}
+            </div>
+            <div class="termination-buttons" >
+                {% if channel == "Android" %}
+                    <button class="termination-no-btn" onclick="close_termination_modal(true);">{% get_utils_data language_template_obj.end_chat 1 %}</button>
+                {% elif channel == "iOS" %}
+                    <button class="termination-no-btn" onclick="close_termination_modal(true);">{% get_utils_data language_template_obj.end_chat 1 %}</button>
+                {% endif %}
+                
+                {% if bot_obj.is_nps_required == True %}
+                <button class="termination-yes-btn" onclick="close_chatbot('{{bot_obj.is_nps_required}}');close_termination_modal();">{% get_utils_data language_template_obj.end_chat 2 %}</button>
+                {% else %}
+                    {% if channel == "Android" %}
+                        <button class="termination-yes-btn" onclick="close_chatbot('{{bot_obj.is_nps_required}}');close_termination_modal();android.close()">{% get_utils_data language_template_obj.end_chat 2 %}</button>
+                    {% elif channel == "iOS" %}
+                        <button class="termination-yes-btn" onclick="close_chatbot('{{bot_obj.is_nps_required}}');close_termination_modal(); try {webkit.messageHandlers.close.postMessage('close');} catch(err) {}">{% get_utils_data language_template_obj.end_chat 2 %}</button>
+                    {% endif %}
+                    
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+    </div>
+    <!-- chat termination modal end -->
+
+    <!-- VoIP Initiated Modal -->
+
+    <div class="easychat-modal voice-call-initiated-modal" id="voice_call_initiated_modal">
+        <div class="voice-call-modal-header">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M11.5317 12.4724C15.5208 16.4604 16.4258 11.8467 18.9656 14.3848C21.4143 16.8328 22.8216 17.3232 19.7192 20.4247C19.3306 20.737 16.8616 24.4943 8.1846 15.8197C-0.493478 7.144 3.26158 4.67244 3.57397 4.28395C6.68387 1.17385 7.16586 2.58938 9.61449 5.03733C12.1544 7.5765 7.54266 8.48441 11.5317 12.4724Z" fill="#0254D7"/>
+            </svg>
+            <span>{% get_utils_data language_template_obj.livechat_vc_notifications 6 %}</span>
+        </div>
+        <div class="voice-call-modal-body">
+            <span>{% get_utils_data language_template_obj.livechat_vc_notifications 8 %}</span>
+        </div>
+        <div class="voice-call-modal-footer">
+            <button class="voice-call-reject-btn" onclick="manage_voip_request(false)">{% get_utils_data language_template_obj.livechat_vc_notifications 15 %}</button>
+            <button class="voice-call-accept-btn" onclick="manage_voip_request(true)">{% get_utils_data language_template_obj.livechat_vc_notifications 16 %}</button>
+        </div>
+    </div>
+
+
+<!-- VC Initiated Modal -->
+
+<div class="easychat-modal voice-call-initiated-modal" id="video_call_initiated_modal">
+    <div class="voice-call-modal-header">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16 16.7012C16 18.4961 14.5449 19.9512 12.75 19.9512H5.25C3.45507 19.9512 2 18.4961 2 16.7012V8.20117C2 6.40625 3.45507 4.95117 5.25 4.95117H12.75C14.5449 4.95117 16 6.40625 16 8.20117V16.7012ZM21.762 6.34451C21.9156 6.52531 22 6.75485 22 6.99213V17.91C22 18.4622 21.5523 18.91 21 18.91C20.7627 18.91 20.5332 18.8256 20.3524 18.672L17 15.8221V9.07911L20.3524 6.23016C20.7732 5.87249 21.4043 5.92369 21.762 6.34451Z" fill="#0254D7"/>
+        </svg>
+        <span>{% get_utils_data language_template_obj.livechat_vc_notifications 7 %}</span>
+    </div>
+    <div class="voice-call-modal-body">
+        <span>{% get_utils_data language_template_obj.livechat_vc_notifications 9 %}</span>
+    </div>
+    <div class="voice-call-modal-footer">
+        <button class="video-call-reject-btn" onclick="manage_vc_request(false)">{% get_utils_data language_template_obj.livechat_vc_notifications 15 %}</button>
+        <button class="video-call-accept-btn" onclick="manage_vc_request(true)">{% get_utils_data language_template_obj.livechat_vc_notifications 16 %}</button>
+    </div>
+</div>
+
+    <!-- Agent Accepted VC Meet Modal -->
+
+    <div class="easychat-modal call-success-request-modal" id="agent_accepted_vc_meet_popup" style="display: none;"> 
+        <div class="call-success-request-modal-body">
+            <span>{% get_utils_data language_template_obj.livechat_vc_notifications 20 %}</span>
+        </div>
+    </div>
+        
+    <!-- Agent Cancelled Meet Modal -->
+
+<div class="easychat-modal call-success-request-modal" id="agent_cancelled_meet_popup" style="display: none;"> 
+    <div class="call-success-request-modal-body">
+        <span>{% get_utils_data language_template_obj.livechat_vc_notifications 10 %}</span>
+    </div>
+</div>
+
+<!-- Request Sent Modal -->
+
+<div class="easychat-modal call-success-request-modal" id="success_request_popup" style="display: none;"> 
+    <div class="call-success-request-modal-body">
+        <span>{% get_utils_data language_template_obj.livechat_vc_notifications 11 %}</span>
+    </div>
+</div>
+
+<!-- End Ongoing Call Modal -->
+
+<div class="easychat-modal call-success-request-modal" id="end_ongoing_call_popup" style="display: none;"> 
+    <div class="call-success-request-modal-body">
+        <span>{% get_utils_data language_template_obj.livechat_vc_notifications 12 %}</span>
+    </div>
+</div>
+
+<!-- VoIP Connect Modal -->
+
+<div class="easychat-modal voice-call-initiated-modal" id="voice_call_connect_modal">
+    <div class="voice-call-modal-header">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M11.5317 12.4724C15.5208 16.4604 16.4258 11.8467 18.9656 14.3848C21.4143 16.8328 22.8216 17.3232 19.7192 20.4247C19.3306 20.737 16.8616 24.4943 8.1846 15.8197C-0.493478 7.144 3.26158 4.67244 3.57397 4.28395C6.68387 1.17385 7.16586 2.58938 9.61449 5.03733C12.1544 7.5765 7.54266 8.48441 11.5317 12.4724Z" fill="#10B981"/>
+        </svg>
+        <span>{% get_utils_data language_template_obj.livechat_vc_notifications 6 %}</span>
+    </div>
+    <div class="voice-call-modal-body">
+        <span id="voip_connect_modal_text">Punit has accepted the voice call request</span>
+    </div>
+    <div class="voice-call-modal-footer">
+        <button class="voice-call-connect-btn" id="voice_call_connect_btn" onclick="connect_voip_call_by_customer(this)">{% get_utils_data language_template_obj.livechat_vc_notifications 17 %}</button>
+    </div>
+</div>
+
+<!-- VoIP Rejected Modal -->
+
+<div class="easychat-modal voice-call-initiated-modal" id="voice_call_rejected_modal">
+    <div class="voice-call-modal-header">
+        {% if voip_type != 'video_call' %}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M11.5317 12.4724C15.5208 16.4604 16.4258 11.8467 18.9656 14.3848C21.4143 16.8328 22.8216 17.3232 19.7192 20.4247C19.3306 20.737 16.8616 24.4943 8.1846 15.8197C-0.493478 7.144 3.26158 4.67244 3.57397 4.28395C6.68387 1.17385 7.16586 2.58938 9.61449 5.03733C12.1544 7.5765 7.54266 8.48441 11.5317 12.4724Z" fill="#FF0000"/>
+            </svg>
+        {% else %}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 16.7012C16 18.4961 14.5449 19.9512 12.75 19.9512H5.25C3.45507 19.9512 2 18.4961 2 16.7012V8.20117C2 6.40625 3.45507 4.95117 5.25 4.95117H12.75C14.5449 4.95117 16 6.40625 16 8.20117V16.7012ZM21.762 6.34451C21.9156 6.52531 22 6.75485 22 6.99213V17.91C22 18.4622 21.5523 18.91 21 18.91C20.7627 18.91 20.5332 18.8256 20.3524 18.672L17 15.8221V9.07911L20.3524 6.23016C20.7732 5.87249 21.4043 5.92369 21.762 6.34451Z" fill="#FF0000"/>
+            </svg>
+        {% endif %}
+        <span id="voice_call_rejected_modal_header">{% get_utils_data language_template_obj.livechat_vc_notifications 6 %}</span>
+    </div>
+    <div class="voice-call-modal-body">
+        <span id="voip_rejected_modal_text">Punit has rejected the voice call request</span>
+    </div>
+    <div class="voice-call-modal-footer">
+        <button class="voice-call-ok-btn" onclick="handle_voice_call_rejected()">{% get_utils_data language_template_obj.livechat_vc_notifications 18 %}</button>
+        <button class="voice-call-resend-btn" onclick="send_voip_request_to_agent()">{% get_utils_data language_template_obj.livechat_vc_notifications 19 %}</button>
+    </div>
+</div>
+
+<!-- Cobrowsing Request Modal -->
+
+<div class="easychat-modal easychat-ccobrowse-session-modal" id="cobrowsing_requested_modal" style="display: none;">
+    <div class=" cobrowse-session-initiated-modal" id="video_call_initiated_modal">
+        <div class="cobrowse-session-modal-header">
+            <svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M3 6.70162C3 4.93352 4.43352 3.5 6.2016 3.5H17.7984C19.5665 3.5 21 4.93352 21 6.70162V18.2984C21 20.0665 19.5665 21.5 17.7984 21.5H6.2016C4.43352 21.5 3 20.0665 3 18.2984V6.70162ZM8.27439 14.7795H13.2746C14.4342 14.7795 15.3746 15.7198 15.3746 16.8795C15.3746 18.0394 14.4342 18.9795 13.2746 18.9795H8.27439C7.11473 18.9795 6.17441 18.0394 6.17441 16.8795C6.17441 15.7198 7.11473 14.7795 8.27439 14.7795ZM7.05664 12.9256C7.25267 13.0002 7.24646 13.2757 7.0473 13.3415L6.54189 13.5086L7.00605 13.9827C7.10641 14.0851 7.1035 14.2484 6.99962 14.3474C6.89567 14.4463 6.73014 14.4435 6.62977 14.341L6.13468 13.8354L5.85862 14.2632C5.75235 14.4278 5.49767 14.3859 5.45148 14.196L5.04666 12.5328C5.00451 12.3596 5.17677 12.2109 5.34536 12.275L7.05664 12.9256ZM12.3543 8.29934H17.3544C18.5141 8.29934 19.4544 9.23967 19.4544 10.3994C19.4544 11.5592 18.5141 12.4993 17.3544 12.4993H12.3543C11.1946 12.4993 10.2542 11.5592 10.2542 10.3994C10.2542 9.23967 11.1946 8.29934 12.3543 8.29934ZM11.1365 6.44548C11.3325 6.51999 11.3263 6.79556 11.1271 6.86138L10.6217 7.02844L11.0859 7.50252C11.1863 7.60497 11.1833 7.76829 11.0795 7.86729C10.9755 7.96619 10.81 7.96337 10.7096 7.86086L10.2145 7.35521L9.93846 7.78303C9.83217 7.94765 9.57749 7.90572 9.53132 7.71589L9.12647 6.05267C9.08434 5.87948 9.25661 5.73076 9.42517 5.79481L11.1365 6.44548Z" fill="#{{ bot_obj.bot_theme_color  }}"></path>
+            </svg>
+            <span>{% get_utils_data language_template_obj.livechat_cb_notifications 0 %}</span>
+        </div>
+        <div class="cobrowse-session-modal-body">
+            <span>{{cobrowsing_request_text}}</span>
+        </div>
+        <div class="cobrowse-session-modal-footer">
+            <button class="cobrowse-session-reject-btn" onclick="manage_cobrowsing_request('rejected')">{% get_utils_data language_template_obj.livechat_vc_notifications 15 %}</button>
+            <button class="cobrowse-session-accept-btn" onclick="manage_cobrowsing_request('accepted')">{% get_utils_data language_template_obj.livechat_vc_notifications 16 %}</button>
+        </div>
+    </div>
+</div>
+
+<!-- End Ongoing Cobrowsing Modal -->
+
+<div class="easychat-modal call-success-request-modal" id="end_ongoing_cobrowsing_popup" style="display: none;"> 
+    <div class="call-success-request-modal-body">
+        <span>{% get_utils_data language_template_obj.livechat_cb_notifications 3 %}</span>
+    </div>
+</div>
+
+    <script type="text/javascript" src="{% static 'EasyChatApp/js/jquery.min.js' %}"></script>
+    <script defer type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/select2.min.js"></script>
+    <script defer type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/bootstrap_datepicker.js"></script>   
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/jquery-ui.min.js"></script>
+
+    <script defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBAHTtk1lkVvIl1X_i7_1aIK9RCrhqGEpQ&libraries=places"></script>
+    <script type="text/javascript" src="/static/EasyChatApp/js/easychat-crypto.js"></script>
+    <script type="text/javascript" src="/static/EasyChatApp/js/json2.js"></script>
+
+ <!-- Circle Progress JS -->
+    <script type="text/javascript" src='/static/EasyChatApp/js/jquery/jquery-circle-progress.min.js'></script>
+    <script type="text/javascript">
+        window.SELECTED_LANGUAGE = '{{selected_language}}'
+        window.localStorage['selected_language'] = '{{selected_language}}'
+        window.is_csat_form_required_for_channel = "{{is_nps_required}}"
+        window.IS_TEXTFIELD_INPUT_ENABLED =  {{bot_channel_obj.is_textfield_input_enabled|yesno:"true,false"}}
+
+    </script>
+    <script type="text/javascript" src='/static/EasyChatApp/js/bot_suggestion.js?v={{version}}'></script>
+    {% if bot_obj.is_custom_js_required %}
+        <script type="text/javascript" src='/static/EasyChatApp/js/theme3_{{ bot_obj.pk }}.js?v={{version}}'></script>
+    {% else %}
+        <script type="text/javascript" src='/static/EasyChatApp/js/theme3.js?v={% random_int 1 100 %}'></script>
+    {% endif %}
+    <script type="text/javascript" src='/static/EasyChatApp/js/bot_utils.js?v={{version}}'></script>
+
+    {% if bot_info_obj.livechat_provider == 'ameyo_fusion' %}
+        <script type="text/javascript" src='/static/EasyChatApp/js/livechat_fusion.js?v={{version}}'></script>
+    {% else %}
+        <script type="text/javascript" src='/static/EasyChatApp/js/livechat.js?v={{version}}'></script>
+    {% endif %}
+
+    <script defer type="text/javascript" src='/static/EasyChatApp/js/livechat_vc.js?v={{version}}'></script>
+    <script defer type="text/javascript" src='/static/EasyChatApp/js/voip.js?v={{version}}'></script>
+    <script defer type="text/javascript" src='/static/EasyChatApp/js/cobrowsing.js?v={{version}}'></script>
+    <script defer type="text/javascript" src='/static/EasyChatApp/js/join_meeting_pip.js?v={{version}}'></script>
+    
+    {% if voip_type != 'none' %}
+    <script type="text/javascript" src="https://{{meeting_domain}}/external_api.js"></script>
+    {% endif %}
+
+    <!-- v6.1 dev input changes -->
+    <script type="text/javascript" type="module" src='/static/EasyChatApp/js/no_input_action_menu_opener.js?v={{version}}'></script>
+    <script type="text/javascript" src='/static/EasyChatApp/js/all_widgets_submit_reset.js?v={% random_int 1 100 %}'></script>
+
+    <script src="{% static 'EasyChatApp/js/FuzzySearch.js' %}"></script>
+    <script src="{% static 'EasyChatApp/js/ion_range_slider.js' %}"></script>
+    <script type="text/javascript">
+        // Create Issue Modal
+        var modal_create_issue = document.getElementById("modal-create-issue");
+        var modal_create_close_button = document.getElementById("span-easychat-close");
+        modal_create_close_button.onclick = function(e) {
+            modal_create_issue.style.display = "none";
+        }
+        // Schedule Meeting
+        var modal_schedule_meeting = document.getElementById("modal-schedule-meeting");
+        var modal_schedule_meeting_button = document.getElementById("span-easychat-schedule-close");
+        modal_schedule_meeting_button.onclick = function(e) {
+            modal_schedule_meeting.style.display = "none";
+        }
+
+        // Check Ticket Status
+        var modal_check_ticket_status = document.getElementById("modal-check-ticket-status");
+        var modal_check_ticket_status_button = document.getElementById("span-easychat-ticket-close");
+        modal_check_ticket_status_button.onclick = function(e) {
+            modal_check_ticket_status.style.display = "none";
+        }
+
+        // Check Meeting Status
+        var modal_check_meeting_status = document.getElementById("modal-check-meeting-status");
+        var modal_check_meeting_status_button = document.getElementById("span-easychat-meeting-close");
+        modal_check_meeting_status_button.onclick = function(e) {
+            modal_check_meeting_status.style.display = "none";
+        };
+
+        window.BOT_THEME_COLOR = "#{{ bot_obj.bot_theme_color  }}";
+        window.BOT_ID = "{{bot_obj.pk}}";
+        window.BOT_LAST_UPDATED_TIME = "{{bot_obj.last_bot_updated_datetime|date:'Y-m-d H:i:s'}}";
+        window.SUGGESTION_CHUNK_LIMIT_AND_TOTAL_NO_CHUNKS = "{{suggestion_chunk_limit_and_total_no_chunks}}"
+        window.EASYCHAT_BOT_THEME = "{{ bot_obj.default_theme.name }}";
+        window.BOT_THEME_COLOR_LIGHT = find_light_color(BOT_THEME_COLOR, 70);
+        window.BOT_USER_ID_EXPIRATION = parseInt("{{ bot_obj.bot_userid_cookie_timeout }}")
+        window.IS_PHONETIC_TYPING_ENABLED = "{{is_web_bot_phonetic_typing_enabled}}"
+        window.IS_VOIP_FROM_CUSTOMER_END_ENABLED = '{{is_voip_from_customer_end_enabled}}' == 'True' ? true : false;
+        window.VOIP_TYPE = '{{voip_type}}';
+        window.MEETING_DOMAIN = '{{meeting_domain}}';
+        window.IS_TEXTFIELD_INPUT_ENABLED =  {{bot_channel_obj.is_textfield_input_enabled|yesno:"true,false"}};
+        window.SHOW_WELCOME_MSG_ON_END_CHAT = "{{bot_info_obj.show_welcome_msg_on_end_chat}}" == "False" ? false: true
+        window.IS_TRANSCRIPT_ENABLED = '{{is_transcript_enabled}}' == 'True' ? true : false;
+
+        function find_light_color(color, percent) {
+            var R = parseInt(color.substring(1,3),16);
+            var G = parseInt(color.substring(3,5),16);
+            var B = parseInt(color.substring(5,7),16);
+
+            R = parseInt(R * (100 + percent) / 100);
+            G = parseInt(G * (100 + percent) / 100);
+            B = parseInt(B * (100 + percent) / 100);
+
+            R = (R<255)?R:255;  
+            G = (G<255)?G:255;  
+            B = (B<255)?B:255;  
+
+            var RR = ((R.toString(16).length==1)?"0"+R.toString(16):R.toString(16));
+            var GG = ((G.toString(16).length==1)?"0"+G.toString(16):G.toString(16));
+            var BB = ((B.toString(16).length==1)?"0"+B.toString(16):B.toString(16));
+
+            return "#"+RR+GG+BB;
+        }
+    </script>
+     {% if request.user.enable_s3_bucket %}
+
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/record_rtc.js"></script>
+
+    {% else %}
+
+    <script type="text/javascript" src="{% static 'EasyChatApp/js/record_rtc.js' %}"></script>
+
+    {% endif %}
+    
+    <script>
+        $("#easychat-mic-div").css("display","flex");
+    </script>
+    <script>
+        $("#easychat-mic-disable").click(
+            function(){
+                $("#easychat-mic-div").css("display","flex");
+        });
+    </script>
+    <script type="text/javascript">
+        if ("{{ bot_obj.show_brand_name }}" == "True" && "{{ easychat_config_obj.disable_show_brand_name }}" == "False") {
+            document.getElementById("easychat-sticky-intents").style.marginBottom = '1em';
+            document.getElementById("easychat-sticky").style.cssText = 'padding: 10px 10px 68px 10px !important';
+        } else {
+            document.getElementById("easychat-sticky-intents").style.marginBottom = '0';
+            document.getElementById('easychat-footer').style.paddingBottom = '0px';
+        }
+    </script>
+    <script>
+        {% if bot_obj.is_enable_gradient %}
+        $("#easychat-navbar-wrapper").css('background', 'linear-gradient(270deg,' + BOT_THEME_COLOR + ' 0%, ' + BOT_THEME_COLOR_LIGHT + ' 100%)');
+        {% endif %}
+    </script>
+    <script>
+        const $language_dropdownOrigin = $('.bot-language-icon');
+        const $language_dropdownTrigger = $('.bot-language-icon');
+        const $language_dropdown = $('#language_dropdown_content');
+        const $language_dropdownItem = $('.dropdown-item');
+
+
+        $language_dropdownTrigger.on('click', function() {
+            $(this).closest('.language-dropdown-container').find('#language_dropdown_content').toggleClass('is-active');
+        });
+
+        $('html').click(function() {
+            $language_dropdown.removeClass('is-active');
+        });
+
+        $language_dropdownOrigin.click(function(e) {
+            e.stopPropagation();
+        });
+    </script>
+    <script type="text/javascript" src="{% static 'EasyChatApp/js/transliteration_google_js_api.js' %}"></script>
+    <script type="text/javascript" src="{% static 'EasyChatApp/js/transliteration_api.js' %}"></script>
+
+    <!-- link of phone num start -->    
+    <script src="{% static 'EasyChatApp/js/intlTelInput.js' %}?v={% random_int 1 100 %}"></script>  
+    <script src="{% static 'EasyChatApp/js/phone_widget_utils.js' %}?v={% random_int 1 100 %}"></script>  
+
+
+</body>
+
+</html>

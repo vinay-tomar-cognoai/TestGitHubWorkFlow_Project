@@ -1,0 +1,163 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="robots" content="noindex,nofollow,noimageindex" />
+    <meta name="googlebot" content="noindex,nofollow" />
+    <meta name="googlebot-news" content="noindex,nofollow" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title class="site-title">Cogno AI</title>
+
+    
+    {% if request.user.enable_s3_bucket %}
+
+      <link
+      rel="shortcut icon"
+      type="image/png"
+      href="https://static.allincall.in/static/EasyChatApp/img/favicon.svg"
+    />
+    <link
+      href="https://static.allincall.in/static/EasyChatApp/css/materialize.css"
+      type="text/css"
+      rel="stylesheet"
+      media="screen,projection"
+    />
+    <!--   <link href="{% static 'EasyChatApp/img/companie/static/EasyChatApp/css/style2.css" type="text/css" rel="stylesheet" media="screen,projection"/> -->
+    <script
+      type="text/javascript"
+      src="/static/EasyChatApp/js/easychat-crypto.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://static.allincall.in/static/EasyChatApp/js/jquery.min.js"
+    ></script>
+
+
+    {% else %}
+
+    <link
+      rel="shortcut icon"
+      type="image/png"
+      href="{% static 'EasyChatApp/img/favicon.svg' %}"
+    />
+    <link
+      href="{% static 'EasyChatApp/css/materialize.css' %}"
+      type="text/css"
+      rel="stylesheet"
+      media="screen,projection"
+    />
+    <!--   <link href="{% static 'EasyChatApp/img/companie/static/EasyChatApp/css/style2.css" type="text/css" rel="stylesheet" media="screen,projection"/> -->
+    <script
+      type="text/javascript"
+      src="{% static 'EasyChatApp/js/easychat-crypto.js' %}"
+    ></script>
+    <script
+      type="text/javascript"
+      src="{% static 'EasyChatApp/js/jquery.min.js' %}"
+    ></script>
+
+    {% endif %}
+
+
+    <link rel="stylesheet" href="{% static 'EasyChatApp/css/login.css' %}?v={% random_int 1 100 %}" />
+  
+  </head>
+
+  <style>
+    html, body {
+      background: #{{ config_obj.secondary_color }};
+    }
+
+    #resend_button {
+      border: 1px solid #{{ config_obj.secondary_color }} !important;
+      color: #{{ config_obj.secondary_color }} !important;
+    }
+  </style>
+
+  <body>
+    {% csrf_token %}
+    <input
+    type="hidden"
+    name="easychataccesstoken"
+    value="{{ easychat_access_token.token }}"
+    />
+    <div class="row">
+      <div class="col s4">
+      </div>
+
+      <div class="col s4" id="email-notif-div">
+        <div class="row">
+          <div class="col s4"></div>
+          <div class="col s4 center" style="margin-top: 1em;">
+        <svg width="78" height="70" viewBox="0 0 39 39" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M38.3638 15.7448V37.0975C38.3677 37.6301 38.1425 38.1388 37.7455 38.4939L37.6894 38.55C37.347 38.8419 36.9114 39.0015 36.4614 38.9999H2.53922C2.09244 38.9998 1.66036 38.8403 1.32067 38.55C1.29751 38.5364 1.27822 38.5171 1.26459 38.4939C0.86462 38.14 0.635826 37.6315 0.63631 37.0975V15.7448C0.631871 15.2701 0.813535 14.8125 1.1424 14.4702C1.27645 14.3119 1.43753 14.1786 1.61799 14.0764C1.89956 13.9223 2.21543 13.8417 2.53639 13.8419H36.461C36.9934 13.8515 37.4999 14.0743 37.8669 14.4602C38.1858 14.8121 38.363 15.2699 38.3638 15.7448Z" fill="#{{ config_obj.secondary_color }}"/>
+          <path d="M37.8687 14.4583C37.735 14.6234 19.51 29.1172 19.51 29.1172L1.14136 14.4745L1.14943 14.4669V14.4588L18.4699 0.368734C19.0744 -0.122911 19.941 -0.122911 20.5455 0.368734L37.8687 14.4583Z" fill="#{{ config_obj.secondary_color }}"/>
+          <path d="M33.994 4.63354V17.5788L19.5083 29.1172L5.0144 17.5631V4.63354H33.994Z" fill="#EEEFEE"/>
+          <path d="M37.7432 38.4929C37.7269 38.5133 37.7083 38.5318 37.688 38.5481L21.3706 27.6633L22.864 26.4604L37.7432 38.4929Z" fill="#{{ config_obj.secondary_color }}"/>
+          <path d="M17.6372 27.6553L1.31985 38.5467C1.29588 38.535 1.27643 38.5156 1.26465 38.4915L16.1361 26.4447L17.6372 27.6553Z" fill="#{{ config_obj.secondary_color }}"/>
+          <path d="M8.22461 8.03131H30.7748V9.00968H8.22461V8.03131Z" fill="#DBD8DD"/>
+          <path d="M8.22461 11.8049H30.7748V12.7832H8.22461V11.8049Z" fill="#DBD8DD"/>
+          <path d="M8.22461 15.5789H30.7748V16.5572H8.22461V15.5789Z" fill="#DBD8DD"/>
+          <path d="M12.012 19.3524H26.9881V20.3307H12.012V19.3524Z" fill="#DBD8DD"/>
+</svg>
+</div>
+<div class="col s3"></div>
+</div>
+            <div class="row">
+              <div class="col s12 center">
+  <p style="font-family: Silka;font-style: normal;font-weight: bold;font-size: 15px;line-height: 18px;letter-spacing: 0.025em;color: #{{ config_obj.secondary_color }};">Please check your mail</p>
+  <p style="font-family: Silka;font-style: normal;font-weight: 500;font-size: 14px;line-height: 17px;letter-spacing: 0.025em;color: #4D4D4D;">We have sent a password setup link to your email.</p>
+            </div>
+
+            <div class="row">
+              <div class="col s12 center">
+              <div class="gy-center">
+                <a
+                  class="btn-small long-btn"
+                  style="font-weight: 500 !important; border-radius: 4px !important;"
+                  href="javascript:void(0)"
+                  id="resend_button"
+                  onclick = resend_sign_up_function("{{token}}")
+                  >Resend Link</a
+                >
+              </div>
+              <p style="color: #7B7A7B;margin-bottom: -15px;">Back to<a href="/chat/login" class="login-link" style="color:#039be5;"> Log In</a></p>
+            </div>
+
+
+      </div> 
+
+      <div class="col s3">
+      </div>   
+
+
+    </div>
+    
+
+    <script type="text/javascript">
+      if (navigator.userAgent.indexOf("MSIE") > -1 || navigator.userAgent.indexOf("Trident/") > -1) {
+              alert("Please switch to Google Chrome for better experience. If you are using Chrome make sure it is updated with the latest version. Thank you!")
+              window.location = "/"
+      }
+    </script>
+    <script type="text/javascript" src="{% static 'EasyChatApp/js/materialize.js' %}"></script>
+   {% if request.user.enable_s3_bucket %}
+       <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/select2.min.js">
+    </script>
+
+    {% else %}
+
+    <script type="text/javascript" src="{% static 'EasyChatApp/js/select2.min.js' %}">
+    </script>
+    {% endif %}
+    <script type="text/javascript" src="{% static 'EasyChatApp/js/security_checks.js' %}?v={% random_int 1 100 %}"></script>
+    <script type="text/javascript" src="{% static 'EasyChatApp/js/console.js' %}?v={% random_int 1 100 %}"></script> 
+    <script type="text/javascript">
+      function hide_forgot_password_modal(){
+        document.querySelector(".forgot-pass-back").style.display="none";
+      }
+      window.history.replaceState(null, null, window.location.pathname + window.location.search.split('?')[0])
+    </script>   
+  </body>
+</html>

@@ -1,0 +1,252 @@
+{% extends 'EasyChatApp/console.html' %}
+{% block consolecontent %}
+{% load custom_filters %}
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'EasyChatApp/css/form_assist.css' %}">
+
+{% if form_assist_bot_objs %}
+
+<div class="row" style="margin-left:2%;">
+
+    <!-- <div class="col s12">
+      <div class="input-field col s4">
+        <select id="select-intent-filter-form-assist-bot-list">
+              <option value="">---Choose bot---</option>
+          {% for form_assist_bot_obj in form_assist_bot_objs %}
+              {% if form_assist_bot_obj == bot_obj %}
+                <option value="{{ form_assist_bot_obj.pk }}" selected>{{ form_assist_bot_obj.name }}</option>
+              {% else %}
+                <option value="{{ form_assist_bot_obj.pk }}">{{ form_assist_bot_obj.name }}</option>
+              {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+    </div> -->
+
+      <div class="col s12">
+        {% if bot_obj %}
+          <a class="waves-effect btn easychat-button modal-trigger right" href="#form_assist_add_new_tag_modal"><i class="material-icons inline-icon">add_circle_outline</i> Add New Tag</a>
+        {% endif %}
+      </div>
+</div>
+
+
+
+<div class="col s12 center" id="manage-intent-preloader" style="display:none;">
+  <div class="preloader-wrapper big active">
+    <div class="spinner-layer spinner-blue-only">
+      <div class="circle-clipper left">
+        <div class="circle"></div>
+      </div><div class="gap-patch">
+        <div class="circle"></div>
+      </div><div class="circle-clipper right">
+        <div class="circle"></div>
+      </div>
+    </div>
+  </div>      
+</div>
+
+<div class="col s12" style="margin-left:1%;" id="div-intent-list-container">
+   
+    {% if bot_obj %}
+
+
+      {% if form_assist_objs %}
+
+        <table>
+          <thead>
+            <tr>
+              <th><b>Tag ID</b></th>
+              <th><b>Intent</b></th>
+              <th>Pop up Time</th>
+              <th><b>Edit</b></th>
+              <th class="center" style="width:10%;"><strong><span style="color: black;"><b>Delete</b></span></strong></th>
+            </tr>
+            
+          </thead>
+          <tbody>
+            
+            {% for form_assist_obj in form_assist_objs %}
+
+              <tr>
+                <td>{{ form_assist_obj.tag_id }}</td>
+                <td>
+                    <div class="chip"><a target="_blank" href="/chat/edit-intent/?intent_pk={{ form_assist_obj.intent.pk }}">{{ form_assist_obj.intent.name }}</a></div>
+                </td>
+                <td> {{ form_assist_obj.popup_timer|get_mm_ss_time }} </td>
+                <td>
+                  <a onclick="open_form_assist_edit_tag_modal('{{ form_assist_obj.pk }}')" class="modal-trigger green-text text-darken-2 form-assist-edit-tag-btn"><i class="material-icons">edit</i></a>
+                </td>
+                <td style="width:10%;" class="center">
+                  <a class="red-text text-darken-3 modal-trigger" href="#delete-tag-modal-{{ form_assist_obj.pk }}"><i class="material-icons">delete</i></a>
+                </td>
+              </tr>
+
+              <!-- Modal Structure for delete tag -->
+
+                <div id="delete-tag-modal-{{ form_assist_obj.pk }}" class="modal easychat-custom-modals-wrapper form-assist-delete-tag-modal">
+                  <div class="modal-content">
+                    <div class="row" style="margin-bottom: 12px !important;">
+                      <div class="modal-overflow-content-div">
+                        <div class="termination-confirmation-modal-container">
+                          <div class="termination-icon">
+                            <svg width="83" height="82" viewBox="0 0 83 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M41.3395 6.83336C22.5888 6.83336 7.33337 22.1605 7.33337 41C7.33337 59.8395 22.6605 75.1667 41.5 75.1667C60.3395 75.1667 75.6667 59.8395 75.6667 41C75.6667 22.1605 60.2678 6.83336 41.3395 6.83336ZM44.9167 58.0834H38.0834V51.25H44.9167V58.0834ZM44.9167 44.4167H38.0834V23.9167H44.9167V44.4167Z" fill="#DB2A2A"></path>
+                            </svg>
+                          </div>
+                          <div class="termination-confirmation-text">
+                              Are you sure you want to delete this tag ?
+                          </div>
+                          <div class="termination-buttons">
+                            <button class="termination-no-btn modal-close" onclick="do_not_delete_form_assist_tag()">Cancel</button>
+                            <button class="termination-yes-btn modal-close" onclick="delete_form_assist_tag('{{ form_assist_obj.pk }}', '{{ bot_obj.pk }}')">Delete</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+
+              <!-- Modal Structure for edit tag -->
+
+              <div id="edit-new-tag-modal-{{ form_assist_obj.pk }}" class="modal easychat-custom-modals-wrapper form-assist-edit-tag-modal">
+                  <div class="modal-content">
+                      <div class="row" style="margin-bottom: 12px !important;">
+                          <div class="modal-header">
+                              <div class="modal-heading-text-div">Edit Form Assist tag</div>
+                              <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                                  <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z" fill="black" fill-opacity="0.54"></path>
+                                  </svg>
+                              </a>
+                          </div>
+
+                          <div class="modal-overflow-content-div">
+                              <div class="col s12 easychat-custom-modal-heading-content">
+                                  <p>Tag Id <sup><i class="material-icons inline-icon tooltipped" data-tooltip="Focussing on any field where the Chatbot JS is embedded a Tag ID will be displayed in the console window after clicking on Inspect. Paste the Tag ID here.">help</i></sup></p>
+                                  <input type="text" placeholder="Eg. 5289f5adeb527a6ea2a14a3f892416c2" id="form-assist-tag-id-{{ form_assist_obj.pk }}" value="{{ form_assist_obj.tag_id }}" class="form-assist-edit-tag-input" form_assist="{{ form_assist_obj.pk }}">
+                              </div>
+                              <div class="col s12 easychat-custom-modal-heading-content">
+                                  <p style="margin-bottom: 12px !important;">Select Intent <b style="color: red;">*</b></p>
+                                  <select id="form-assist-intent-{{ form_assist_obj.pk }}" name="easychat-form-assist-select-intent-dropdown" class="easychat_form_assist_select_intent_dropdown form-assist-edit-tag-input" form_assist="{{ form_assist_obj.pk }}">
+                                      <option value="none" selected disabled hidden>
+                                          Select Intent
+                                      </option>
+                                      {% for intent_master_obj in intent_master_objs %}
+                                        {% if intent_master_obj == form_assist_obj.intent %}
+                                        <option value="{{ intent_master_obj.pk }}" selected>{{ intent_master_obj.name }}</option>
+                                        {% else %}
+                                        <option value="{{ intent_master_obj.pk }}">{{ intent_master_obj.name }}</option>
+                                        {% endif %}
+                                      {% endfor %}
+                                  </select>
+                              </div>
+                              <div class="col s12 easychat-custom-modal-heading-content easychat-custom-modal-sub-heading-content">
+                                  <p>Form Assist auto pop up timer (secs) <sup><i class="material-icons inline-icon tooltipped" data-tooltip="When the user is focussed on any field and not active on that page.">help</i></sup></p>
+                                  <input type="number" value="{{ form_assist_obj.popup_timer }}" id="form-assist-popup-timer-{{ form_assist_obj.pk }}" class="form-assist-edit-tag-input" form_assist="{{ form_assist_obj.pk }}">
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                      <a style="opacity: 1; pointer-events: auto;" class="btn filter-modal-footer-btn modal-trigger" id="form-assist-edit-tag-save-btn-{{ form_assist_obj.pk }}" onclick="edit_save_form_assist_tag('{{ bot_obj.pk }}', '{{ form_assist_obj.pk }}')">Save</a>
+                  </div>
+              </div>
+
+            {% endfor %}
+
+
+          </tbody>
+        </table>
+
+      {% else %}
+
+        <div class="col s12" style="padding:1em;">
+          <div class="row">
+            <div class="col s12">
+              <p class="center easychat-no-data-table-text-container">
+                  <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M19.8229 39.9998C19.6045 39.9998 19.3912 39.9132 19.2329 39.7565C19.0362 39.5598 18.9495 39.2765 19.0045 39.0048L20.1829 33.1132C20.2162 32.9498 20.2929 32.8015 20.4112 32.6865L33.3745 19.7232C34.3479 18.7498 35.9362 18.7498 36.9095 19.7232L39.2662 22.0798C40.2412 23.0548 40.2412 24.6398 39.2662 25.6148L26.3029 38.5782C26.1879 38.6948 26.0395 38.7732 25.8762 38.8065L19.9845 39.9848C19.9312 39.9948 19.8762 39.9998 19.8229 39.9998ZM21.7695 33.6848L20.8862 38.1032L25.3045 37.2198L38.0895 24.4348C38.4145 24.1098 38.4145 23.5815 38.0895 23.2565L35.7329 20.8998C35.4079 20.5748 34.8795 20.5748 34.5545 20.8998L21.7695 33.6848ZM25.7145 37.9882H25.7312H25.7145Z" fill="#7B7A7B"/>
+                      <path d="M15.8333 35H4.16667C1.86833 35 0 33.1317 0 30.8333V9.16667C0 6.86833 1.86833 5 4.16667 5H7.5C7.96 5 8.33333 5.37333 8.33333 5.83333C8.33333 6.29333 7.96 6.66667 7.5 6.66667H4.16667C2.78833 6.66667 1.66667 7.78833 1.66667 9.16667V30.8333C1.66667 32.2117 2.78833 33.3333 4.16667 33.3333H15.8333C16.2933 33.3333 16.6667 33.7067 16.6667 34.1667C16.6667 34.6267 16.2933 35 15.8333 35Z" fill="#7B7A7B"/>
+                      <path d="M27.5 20C27.04 20 26.6667 19.6267 26.6667 19.1667V9.16667C26.6667 7.78833 25.545 6.66667 24.1667 6.66667H20.8333C20.3733 6.66667 20 6.29333 20 5.83333C20 5.37333 20.3733 5 20.8333 5H24.1667C26.465 5 28.3333 6.86833 28.3333 9.16667V19.1667C28.3333 19.6267 27.96 20 27.5 20Z" fill="#7B7A7B"/>
+                      <path d="M19.166 10H9.16602C7.78768 10 6.66602 8.87833 6.66602 7.5V4.16667C6.66602 3.70667 7.03935 3.33333 7.49935 3.33333H10.0827C10.4694 1.43333 12.1544 0 14.166 0C16.1777 0 17.8627 1.43333 18.2494 3.33333H20.8327C21.2927 3.33333 21.666 3.70667 21.666 4.16667V7.5C21.666 8.87833 20.5444 10 19.166 10ZM8.33268 5V7.5C8.33268 7.95833 8.70769 8.33333 9.16602 8.33333H19.166C19.6244 8.33333 19.9994 7.95833 19.9994 7.5V5H17.4994C17.0394 5 16.666 4.62667 16.666 4.16667C16.666 2.78833 15.5444 1.66667 14.166 1.66667C12.7877 1.66667 11.666 2.78833 11.666 4.16667C11.666 4.62667 11.2927 5 10.8327 5H8.33268Z" fill="#7B7A7B"/>
+                      <path d="M22.5 14.9997H5.83333C5.37333 14.9997 5 14.6263 5 14.1663C5 13.7063 5.37333 13.333 5.83333 13.333H22.5C22.96 13.333 23.3333 13.7063 23.3333 14.1663C23.3333 14.6263 22.96 14.9997 22.5 14.9997Z" fill="#7B7A7B"/>
+                      <path d="M22.5 19.9997H5.83333C5.37333 19.9997 5 19.6263 5 19.1663C5 18.7063 5.37333 18.333 5.83333 18.333H22.5C22.96 18.333 23.3333 18.7063 23.3333 19.1663C23.3333 19.6263 22.96 19.9997 22.5 19.9997Z" fill="#7B7A7B"/>
+                      <path d="M22.5 24.9997H5.83333C5.37333 24.9997 5 24.6263 5 24.1663C5 23.7063 5.37333 23.333 5.83333 23.333H22.5C22.96 23.333 23.3333 23.7063 23.3333 24.1663C23.3333 24.6263 22.96 24.9997 22.5 24.9997Z" fill="#7B7A7B"/>
+                  </svg> No existing tags found. Kindly create one
+              </p>
+            </div>
+          </div>
+        </div>
+
+      {% endif %}
+
+    {% else %}
+
+        <p class="center green lighten-1" style="padding: 1em;">Kindly choose the bot</p>
+
+    {% endif %}
+
+</div>
+
+<!-- Form Assist Add New Tag Modal -->
+<div id="form_assist_add_new_tag_modal" class="modal easychat-custom-modals-wrapper">
+    <div class="modal-content">
+        <div class="row" style="margin-bottom: 12px !important;">
+            <div class="modal-header">
+                <div class="modal-heading-text-div">Add new Form Assist tag</div>
+                <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                    <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z" fill="black" fill-opacity="0.54"></path>
+                    </svg>
+                </a>
+            </div>
+
+            <div class="modal-overflow-content-div">
+                <div class="col s12 easychat-custom-modal-heading-content">
+                    <p>Tag Id <sup><i class="material-icons inline-icon tooltipped" data-tooltip="Focussing on any field where the Chatbot JS is embedded a Tag ID will be displayed in the console window after clicking on Inspect. Paste the Tag ID here.">help</i></sup></p>
+                    <input class="form-assist-add-tag-input" type="text" placeholder="Eg. 5289f5adeb527a6ea2a14a3f892416c2" id="form-assist-tag-id">
+                </div>
+                <div class="col s12 easychat-custom-modal-heading-content">
+                    <p style="margin-bottom: 12px !important;">Select Intent <b style="color: red;">*</b></p>
+                    <select id="form-assist-intent" name="easychat-form-assist-select-intent-dropdown" class="easychat_form_assist_select_intent_dropdown form-assist-add-tag-input">
+                        <option value="none" selected disabled hidden>
+                            Select Intent
+                        </option>
+                        {% for intent_master_obj in intent_master_objs %}
+                          <option value="{{ intent_master_obj.pk }}">{{ intent_master_obj.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col s12 easychat-custom-modal-heading-content easychat-custom-modal-sub-heading-content">
+                    <p>Form Assist auto pop up timer (secs) <sup><i class="material-icons inline-icon tooltipped" data-tooltip="When the user is focussed on any field and not active on that page.">help</i></sup></p>
+                    <input class="form-assist-add-tag-input" type="number" value="5" id="form-assist-popup-timer">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a style="opacity: 0.5; pointer-events: none;" class="btn filter-modal-footer-btn modal-trigger" onclick="save_form_assist_tag('{{ bot_obj.pk }}')" id="form-assist-tag-save-btn">Save</a>
+    </div>
+</div>
+
+
+{% else %}
+
+  <p class="green center lighten-3" style="padding:1em;">No existing form assist bots found. Kindly create one.</p>
+
+{% endif %}
+
+<script type="text/javascript">
+    $(document).ready(function(e){
+      $("#form-assist-intent").select2({
+        dropdownParent: $("#add-new-tag-modal"),
+        width:"100%",        
+      });
+    });
+
+</script>
+
+{% endblock %}

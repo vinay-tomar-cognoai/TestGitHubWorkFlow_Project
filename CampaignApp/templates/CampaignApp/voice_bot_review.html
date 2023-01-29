@@ -1,0 +1,186 @@
+{% extends 'CampaignApp/campaign_base.html' %}
+{% block content %}
+{% load static %}
+<style>
+@media only screen and (min-width: 768px) {
+    .schedule-campaign-container {
+        padding-right: 1.5rem!important;
+    }
+}
+</style>
+
+
+<script type="text/javascript" src="{% static 'CampaignApp/js/jquery-ui.min.js' %}"></script>
+
+<div class="container-fluid" style="display: flex; flex-flow: column; height: 88vh; justify-content: space-between; overflow-y: scroll;">
+
+
+    <div class="card shadow mb-4" id="campaign-review-card">
+        <div class="card-header py-3" style=" border-top: 1px solid #f1f1f1 !important;">
+            <div class="d-flex align-items-center">
+                <a href="/campaign/voice-bot/settings/?bot_pk={{bot_pk}}&campaign_id={{campaign_id}}">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12.6594 6.1708H3.35107L7.41774 2.10413C7.74274 1.77913 7.74274 1.2458 7.41774 0.920801C7.26205 0.764757 7.05067 0.677063 6.83024 0.677063C6.60981 0.677063 6.39843 0.764757 6.24274 0.920801L0.751074 6.41247C0.426074 6.73747 0.426074 7.26247 0.751074 7.58747L6.24274 13.0791C6.56774 13.4041 7.09274 13.4041 7.41774 13.0791C7.74274 12.7541 7.74274 12.2291 7.41774 11.9041L3.35107 7.83747H12.6594C13.1177 7.83747 13.4927 7.46247 13.4927 7.00413C13.4927 6.5458 13.1177 6.1708 12.6594 6.1708Z" fill="black" fill-opacity="0.54"></path>
+                    </svg>
+                </a>
+                <svg class="ml-4" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_59_757)">
+                        <path d="M4.5433 13.5458H3.77637V12.1219C3.77683 11.7218 3.93413 11.3382 4.21376 11.0553C4.49338 10.7724 4.87249 10.6133 5.26791 10.6128H8.76365C8.95578 10.6126 9.13997 10.5353 9.27582 10.3978C9.41166 10.2603 9.48807 10.0739 9.48826 9.87951V8.97943H10.2552V9.87951C10.2547 10.2797 10.0975 10.6633 9.81785 10.9463C9.53823 11.2293 9.15911 11.3885 8.76365 11.389H5.26791C5.07584 11.3892 4.89169 11.4665 4.75585 11.6039C4.62001 11.7413 4.54357 11.9276 4.5433 12.122V13.5458Z" fill="#88CFFD"></path>
+                        <path d="M15.9666 13.5457H15.1997V12.1219C15.1995 11.9276 15.1231 11.7413 14.9873 11.6039C14.8515 11.4665 14.6675 11.3892 14.4755 11.3889H10.9793C10.5839 11.3884 10.2048 11.2292 9.92528 10.9462C9.64573 10.6632 9.48853 10.2796 9.48816 9.87945V8.97937H10.2551V9.87945C10.2553 10.0738 10.3316 10.2602 10.4674 10.3976C10.6031 10.5351 10.7873 10.6125 10.9793 10.6128H14.4754C14.8708 10.6132 15.2499 10.7724 15.5294 11.0553C15.809 11.3382 15.9662 11.7218 15.9666 12.1219L15.9666 13.5457Z" fill="#88CFFD"></path>
+                        <path d="M10.2551 8.45605H9.48816V13.5458H10.2551V8.45605Z" fill="#88CFFD"></path>
+                        <path d="M4.5433 13.404H3.77637V18.4937H4.5433V13.404Z" fill="#88CFFD"></path>
+                        <path d="M15.9663 13.404H15.1993V18.4937H15.9663V13.404Z" fill="#88CFFD"></path>
+                        <path d="M10.2551 1.26642H9.48816V8.01568H10.2551V1.26642Z" fill="#88CFFD"></path>
+                        <path d="M2.12441 8.82929C1.68098 8.82795 1.25619 8.64868 0.943227 8.33081C0.63026 8.01294 0.454673 7.58244 0.454987 7.13374L0.448247 6.5539C0.44681 5.5245 0.746202 4.51765 1.30877 3.65998C1.87134 2.80231 2.67197 2.1321 3.60996 1.73365C5.59175 0.888234 7.72071 0.452698 9.87141 0.452698C12.0221 0.452698 14.1511 0.888234 16.1328 1.73365C17.0701 2.13168 17.8702 2.80111 18.4327 3.65785C18.9952 4.51459 19.2949 5.52042 19.2942 6.54898L19.2893 7.1364C19.2868 7.58389 19.1099 8.0123 18.7969 8.32846C18.4839 8.64463 18.0602 8.82298 17.618 8.82475H17.6161C17.4854 8.82571 17.355 8.81172 17.2274 8.78307L14.3309 8.04291C13.9386 7.94233 13.5909 7.71208 13.3427 7.3887C13.0945 7.06533 12.9602 6.66735 12.961 6.25792L12.9625 5.41734C12.9616 5.39379 12.9537 5.37106 12.9399 5.35208C12.9261 5.33311 12.9069 5.31874 12.885 5.31084C10.9473 4.54175 8.79463 4.53864 6.8548 5.30213C6.83255 5.31127 6.81352 5.32695 6.80017 5.34715C6.78682 5.36735 6.77976 5.39114 6.77991 5.41544L6.78478 6.2526C6.78598 6.66224 6.65187 7.06054 6.40375 7.38423C6.15563 7.70791 5.80773 7.93841 5.41532 8.03911L2.52547 8.78079C2.39438 8.81284 2.26002 8.82912 2.12516 8.8293L2.12441 8.82929Z" fill="#0098FF"></path>
+                        <g filter="url(#filter0_d_59_757)">
+                            <path d="M9.87142 0.840736C11.971 0.840706 14.0494 1.266 15.9841 2.09156C16.8511 2.46097 17.5912 3.08091 18.1119 3.87381C18.6325 4.66672 18.9104 5.59737 18.911 6.54933L18.9059 7.13276C18.9052 7.47835 18.7692 7.80957 18.5277 8.05396C18.2863 8.29835 17.959 8.43602 17.6175 8.43683L17.6008 8.43702C17.5034 8.43693 17.4064 8.42593 17.3114 8.40424L14.425 7.66677C14.1158 7.587 13.8417 7.40522 13.646 7.15017C13.4504 6.89512 13.3443 6.58135 13.3446 6.25846L13.3462 5.41807C13.3451 5.31547 13.3134 5.21562 13.2551 5.13164C13.1969 5.04766 13.1149 4.98349 13.0199 4.94757C10.994 4.14447 8.74375 4.14203 6.71622 4.94075C6.62143 4.97817 6.5401 5.04385 6.48303 5.12909C6.42596 5.21433 6.39582 5.31511 6.39661 5.41807L6.40172 6.25486C6.40201 6.57777 6.29592 6.89157 6.10024 7.14665C5.90456 7.40173 5.63044 7.58354 5.32122 7.66333L2.43144 8.40423C2.33203 8.42866 2.23009 8.441 2.12778 8.44099H2.12546C1.95618 8.44071 1.78861 8.4067 1.63233 8.34088C1.47604 8.27507 1.3341 8.17875 1.21461 8.05743C1.09511 7.93611 1.0004 7.79215 0.935887 7.63379C0.871374 7.47542 0.83832 7.30575 0.838612 7.13446L0.831872 6.54932C0.83242 5.59736 1.11039 4.66671 1.631 3.87381C2.15161 3.0809 2.89174 2.46096 3.75878 2.09155C5.69342 1.266 7.7718 0.840706 9.87142 0.840736ZM9.87142 0.064585C7.66922 0.062185 5.48907 0.508324 3.46084 1.37643C2.45399 1.80386 1.59446 2.5229 0.990255 3.44317C0.386049 4.36344 0.0641267 5.44389 0.064943 6.54875L0.0717318 7.14355C0.073453 7.69355 0.290356 8.22046 0.674998 8.60906C1.05964 8.99765 1.58071 9.21629 2.12424 9.21714C2.28875 9.21738 2.45269 9.19766 2.61256 9.1584L5.50956 8.41579C5.98444 8.29375 6.40549 8.01485 6.70602 7.62328C7.00654 7.23172 7.16935 6.74987 7.16865 6.25409L7.16467 5.59921C8.91413 4.95664 10.8316 4.95986 12.579 5.60831L12.5777 6.25693C12.5767 6.75261 12.7393 7.23443 13.0397 7.62604C13.34 8.01765 13.7609 8.29665 14.2356 8.41883L17.1237 9.1567L17.1331 9.15917L17.1426 9.16142C17.293 9.19573 17.4467 9.21309 17.6008 9.21315H17.6058L17.6275 9.21296C18.1702 9.20879 18.6894 8.98819 19.0723 8.59904C19.4552 8.2099 19.6711 7.68362 19.6729 7.13445L19.6779 6.55612C19.6798 5.45002 19.3584 4.36805 18.7541 3.44635C18.1498 2.52465 17.2895 1.8044 16.2817 1.37622C14.2535 0.508232 12.0735 0.0621646 9.87142 0.064585Z" fill="white"></path>
+                        </g>
+                        <path d="M8.68912 7.07764H11.054C11.1897 7.07764 11.3197 7.13215 11.4156 7.2292C11.5115 7.32624 11.5654 7.45786 11.5654 7.5951V9.31712C11.5654 9.45437 11.5115 9.58599 11.4156 9.68303C11.3197 9.78007 11.1897 9.83459 11.054 9.83459H8.68911C8.55349 9.83459 8.42342 9.78007 8.32751 9.68303C8.23161 9.58599 8.17773 9.45437 8.17773 9.31713V7.5951C8.17773 7.45786 8.23161 7.32624 8.32752 7.2292C8.42342 7.13216 8.55349 7.07764 8.68912 7.07764Z" fill="#AFDEFD"></path>
+                        <path d="M2.97733 12.1671H5.34183C5.40899 12.1671 5.47549 12.1805 5.53753 12.2065C5.59957 12.2325 5.65595 12.2706 5.70343 12.3187C5.75092 12.3667 5.78859 12.4238 5.81429 12.4866C5.83999 12.5493 5.85321 12.6166 5.85321 12.6846V14.4066C5.85321 14.5438 5.79934 14.6755 5.70343 14.7725C5.60753 14.8696 5.47746 14.9241 5.34183 14.9241H2.97733C2.8417 14.9241 2.71163 14.8696 2.61572 14.7725C2.51982 14.6755 2.46594 14.5438 2.46594 14.4066V12.6846C2.46594 12.5473 2.51982 12.4157 2.61572 12.3187C2.71163 12.2216 2.8417 12.1671 2.97733 12.1671Z" fill="#AFDEFD"></path>
+                        <path d="M2.97733 16.9205H5.34183C5.40899 16.9205 5.47549 16.9339 5.53753 16.9599C5.59957 16.9859 5.65595 17.024 5.70343 17.0721C5.75092 17.1201 5.78859 17.1772 5.81429 17.24C5.83999 17.3028 5.85321 17.37 5.85321 17.438V19.16C5.85321 19.2973 5.79934 19.4289 5.70343 19.5259C5.60753 19.623 5.47746 19.6775 5.34183 19.6775H2.97733C2.8417 19.6775 2.71163 19.623 2.61572 19.5259C2.51982 19.4289 2.46594 19.2973 2.46594 19.16V17.438C2.46594 17.3008 2.51982 17.1691 2.61572 17.0721C2.71163 16.9751 2.8417 16.9205 2.97733 16.9205Z" fill="#AFDEFD"></path>
+                        <path d="M11.054 12.1671H8.68912C8.40669 12.1671 8.17773 12.3988 8.17773 12.6846V14.4066C8.17773 14.6924 8.40669 14.9241 8.68912 14.9241H11.054C11.3365 14.9241 11.5654 14.6924 11.5654 14.4066V12.6846C11.5654 12.3988 11.3365 12.1671 11.054 12.1671Z" fill="#AFDEFD"></path>
+                        <path d="M14.505 12.1671H16.8695C17.0052 12.1671 17.1352 12.2216 17.2311 12.3187C17.327 12.4157 17.3809 12.5473 17.3809 12.6846V14.4066C17.3809 14.5438 17.327 14.6755 17.2311 14.7725C17.1352 14.8696 17.0052 14.9241 16.8695 14.9241H14.505C14.3694 14.9241 14.2393 14.8696 14.1434 14.7725C14.0475 14.6755 13.9937 14.5438 13.9937 14.4066V12.6846C13.9937 12.6166 14.0069 12.5493 14.0326 12.4866C14.0583 12.4238 14.0959 12.3667 14.1434 12.3187C14.1909 12.2706 14.2473 12.2325 14.3093 12.2065C14.3714 12.1805 14.4379 12.1671 14.505 12.1671Z" fill="#AFDEFD"></path>
+                        <path d="M14.505 16.9205H16.8695C17.0052 16.9205 17.1352 16.9751 17.2311 17.0721C17.327 17.1691 17.3809 17.3008 17.3809 17.438V19.16C17.3809 19.2973 17.327 19.4289 17.2311 19.5259C17.1352 19.623 17.0052 19.6775 16.8695 19.6775H14.505C14.3694 19.6775 14.2393 19.623 14.1434 19.5259C14.0475 19.4289 13.9937 19.2973 13.9937 19.16V17.438C13.9937 17.37 14.0069 17.3028 14.0326 17.24C14.0583 17.1772 14.0959 17.1201 14.1434 17.0721C14.1909 17.024 14.2473 16.9859 14.3093 16.9599C14.3714 16.9339 14.4379 16.9205 14.505 16.9205Z" fill="#AFDEFD"></path>
+                    </g>
+                    <defs>
+                        <filter id="filter0_d_59_757" x="-0.967317" y="-0.709618" width="21.6774" height="11.2171" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                            <feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood>
+                            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix>
+                            <feOffset dy="0.258065"></feOffset>
+                            <feGaussianBlur stdDeviation="0.516129"></feGaussianBlur>
+                            <feComposite in2="hardAlpha" operator="out"></feComposite>
+                            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"></feColorMatrix>
+                            <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_59_757"></feBlend>
+                            <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_59_757" result="shape"></feBlend>
+                        </filter>
+                        <clipPath id="clip0_59_757">
+                            <rect width="19.6129" height="19.6129" fill="white" transform="translate(0.0645752 0.0645142)"></rect>
+                        </clipPath>
+                    </defs>
+                </svg>
+
+                <h5 class="font-weight-bold">Review</h5>
+            </div>
+            <div class="campaign-review-sub-heading">
+                <span>Review your campaign</span>
+            </div>
+        </div>
+            <div class="card-body">
+                <div class="col-md-12 px-0">
+                    <div class="campaign-name">
+                        <h5 class="mx-0">Campaign name: <span class="font-weight-bold">{{campaign_obj.name}}</span></h5>
+                    </div>
+                    <div class="card campaign-sub-card mb-4 mt-3 w-75" id="audience-details-div">
+                        <div class="card-body">
+                            <span class="campaign_sub_heading_label mx-0">Audience</span>
+
+                            <div class="card mt-4">
+                                <div class="card-body inner-card">
+                                    <div class="row">
+                                        <div class="col-md-5 col-sm-12 py-2 batch-name-after">
+                                            <p class="campaign_text mb-0">Batch Name : <span class="review-card-value" style="font-weight: 600; display: inline;">{{campaign_obj.batch.batch_name}}</span></p>
+                                        </div>
+                                        <div class="col-md-5 col-sm-12  py-2 pl-5">
+                                            <p class="campaign_text mb-0">Total Contacts: <span class="review-card-value" style="font-weight: 600; display: inline;">{{campaign_obj.batch.total_audience}}</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card campaign-sub-card mb-4 mt-3 w-75" id="trigger-setting-details-div">
+                        <div class="card-body">
+                            <span class="campaign_sub_heading_label mx-0">Trigger Settings</span>
+
+                            <div class="card mt-4">
+                                <div class="card-body  inner-card">
+                                    <div class="row">
+                                        <div class="col-5 batch-name-after pr-0">
+                                            <p class="py-0 mb-2">Caller ID: <span class="review-card-value" style="font-weight: 600; display: inline;">{{trigger_setting.caller_id}}</span></p>
+                                            <p class="py-0 mb-2">App ID: <span class="review-card-value" style="font-weight: 600; display: inline;">{{app_id}}</span></p>
+                                            <p class="py-0 mb-2">Account SID: <span class="review-card-value" style="font-weight: 600; display: inline;">{{sid}}</span></p>
+                                            <p class="py-0 mb-2">Start Date &amp; Time: <span class="review-card-value" style="font-weight: 600; display: inline;">{{trigger_setting.start_date}} - {{trigger_setting.start_time}}</span></p>
+                                            <p class="py-0 mb-2">End Date &amp; Time: <span class="review-card-value" style="font-weight: 600; display: inline;">{{trigger_setting.end_date}} - {{trigger_setting.end_time}}</span></p>
+                                        </div>
+                                        <div class="col-5 pl-5">
+                                            <p class="py-0 mb-2" style="text-transform: capitalize;">Retry Mechanism : <span class="review-card-value" style="font-weight: 600; display: inline;">{{trigger_setting.retry_mechanism}}</span></p>
+                                            <p class="py-0 mb-2">Number of Retries : <span class="review-card-value" style="font-weight: 600; display: inline;">{{trigger_setting.no_of_retries}}</span></p>
+                                            <p class="py-0 mb-2">Retry Intervals (mins) : <span class="review-card-value" style="font-weight: 600; display: inline;">{{trigger_setting.retry_interval}}</span></p>
+                                            <p class="py-0 mb-2">On Status: 
+                                                <span class="review-card-value" id="on_status_values" style="font-weight: 600; display: inline;">
+
+                                                </span>
+                                            </p>
+                                            
+                                        </div>
+                                    
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+    <footer id="campaign-footer" class="sticky-footer bg-white" style="margin-left: -1.5rem; margin-right: -1.5rem;">
+        <p class="save-campaign-error" id="save-campaign-error-message"></p>
+
+        <div class="card m-auto w-100" id="footer-buttons">
+            <div class="card-body py-2">
+                <div class="d-flex justify-content-end" style="gap: 1em;">
+                    <button class="btn btn-outline-secondary rounded btn-width-100 rect-border" data-toggle="modal" data-target="#cancel_create_campaign_modal">Cancel</button>
+                    <button id="send-campaign-button" class="btn btn-primary rounded btn-next-primary btn-width-100 rect-border" onclick="start_voice_bot_campaign();">Start</button>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+</div>
+
+<div class="modal fade custom_modal" id="cancel_create_campaign_modal" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row">
+                    <div class="col-10">
+                        <h5 class="modal-title">Do you want to leave this page?</h5>
+                    </div>
+                    <div class="col-2" style="text-align: right; padding-right: 0">
+                        <button class="btn" type="button" data-dismiss="modal" style="padding: 0!important">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13.4931 0.710017C13.3063 0.522765 13.0526 0.417532 12.7881 0.417532C12.5236 0.417532 12.2699 0.522765 12.0831 0.710017L7.19309 5.59002L2.30309 0.700017C2.11625 0.512765 1.8626 0.407532 1.59809 0.407532C1.33357 0.407532 1.07992 0.512765 0.893086 0.700017C0.503086 1.09002 0.503086 1.72002 0.893086 2.11002L5.78309 7.00002L0.893086 11.89C0.503086 12.28 0.503086 12.91 0.893086 13.3C1.28309 13.69 1.91309 13.69 2.30309 13.3L7.19309 8.41002L12.0831 13.3C12.4731 13.69 13.1031 13.69 13.4931 13.3C13.8831 12.91 13.8831 12.28 13.4931 11.89L8.60309 7.00002L13.4931 2.11002C13.8731 1.73002 13.8731 1.09002 13.4931 0.710017Z" fill="black" fill-opacity="0.54"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <hr />
+            </div>
+            <div class="modal-body">
+                <p>Changes you have made may not be saved. Please click "Save as Draft" to save the changes.</p>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-danger btn-width-100" href="/campaign/dashboard/?bot_pk={{ selected_bot_obj.pk }}" style="cursor:pointer">Leave</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    window.CAMPAIGN_NAME = "{{campaign_name}}";
+    var CAMPAIGN_CHANNEL = "{{channel}}";
+
+    var on_status = {{trigger_setting.on_status|safe}};
+
+    var status_str = '';
+    for (var i=0; i<on_status.length; ++i) {
+        status_str += on_status[i];
+
+        if (i < on_status.length - 1) {
+            status_str += ', ';
+        }
+    }
+
+    document.getElementById('on_status_values').innerHTML = status_str;
+</script>
+
+{% endblock %}

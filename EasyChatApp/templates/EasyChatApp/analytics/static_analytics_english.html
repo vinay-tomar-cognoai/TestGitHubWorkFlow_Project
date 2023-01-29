@@ -1,0 +1,1821 @@
+{% extends 'EasyChatApp/console.html' %}
+{% block consolecontent %}
+{% load static %}
+
+<!-- <link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/analyticsChanges.css' %}?v={% random_int 1 100 %}"> -->
+
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/revised_analytics.css' %}?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/apexcharts.css' %}">
+<script type="text/javascript" src="{% static 'EasyChatApp/js/apexcharts.js' %}"></script>
+<script type="text/javascript" src="{% static 'EasyChatApp/js/apexcharts.min.js' %}"></script>
+
+<div class="easychat-analytics-content-wrapper">
+  <img src="{% static 'EasyChatApp/images/combined_page_loader.gif' %}" id="combine_loader" alt="Page Loader" style="display: none; height: 100vh; width: 100vw">
+  <div class="easychat-tab-pane-wrapper">
+    <div class="easychat-tab-pane-item">
+      <a class="easychat-tab-pane-item-btn active-page"
+        href="/chat/revised-analytics/?bot_id={{ selected_bot_obj.pk }}&selected_language=en"> Combined Analytics </a>
+    </div>
+    <div class="easychat-tab-pane-item">
+      <a class="easychat-tab-pane-item-btn"
+        href="/chat/conversion-analytics/?bot_id={{ selected_bot_obj.pk }}&selected_language=en"> Conversion Analytics
+      </a>
+    </div>
+  </div>
+  <div class="easychat-analytics-buttons-wrapper">
+    <div class="easychat-analytics-botname-div">
+      {{ selected_bot_obj.name }} Analytics
+    </div>
+    <div class="easychat-analytics-btn-container">
+      <div id="edit-intent-custom-drp-down"
+        class="easychat-console-custom-dropdown easychat-console-custom-dropdown-lang">
+        <div id="easychat-console-lang-dropdown" class="easychat-console-select-drop" style="display: none;">
+          <span data-value="en">English</span>
+          <span data-value="hi">Hindi</span>
+        </div>
+      </div>
+
+      <a href="#" class="easychat-btns-custom black-text" onclick="capture_screenshot(this, '{{selected_bot_obj.name}}')">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M14.375 6.87759C14.375 7.56938 13.8142 8.13018 13.1224 8.13018C12.4306 8.13018 11.8698 7.56938 11.8698 6.87759C11.8698 6.1858 12.4306 5.625 13.1224 5.625C13.8142 5.625 14.375 6.1858 14.375 6.87759Z"
+            fill="white" />
+          <path
+            d="M2.5 5.625C2.5 3.89911 3.89911 2.5 5.625 2.5H14.375C16.1009 2.5 17.5 3.89911 17.5 5.625V14.375C17.5 16.1009 16.1009 17.5 14.375 17.5H5.625C3.89911 17.5 2.5 16.1009 2.5 14.375V5.625ZM5.625 3.75C4.58947 3.75 3.75 4.58947 3.75 5.625V14.375C3.75 14.6645 3.8156 14.9386 3.93275 15.1834L8.49745 10.6187C9.32731 9.78887 10.6728 9.78887 11.5026 10.6187L16.0673 15.1834C16.1844 14.9386 16.25 14.6645 16.25 14.375V5.625C16.25 4.58947 15.4105 3.75 14.375 3.75H5.625ZM15.1834 16.0673L10.6188 11.5026C10.2771 11.1609 9.72304 11.1609 9.38133 11.5026L4.81666 16.0673C5.06142 16.1844 5.33555 16.25 5.625 16.25H14.375C14.6645 16.25 14.9386 16.1844 15.1834 16.0673Z"
+            fill="white" />
+        </svg>
+
+
+        <span>Export as image</span></a>
+
+    </div>
+
+  </div>
+
+  {% include "EasyChatApp/analytics/quick_stats.html" %}
+  <div id="capture-html-to-canvas">
+  <div class="row" style="margin-bottom: 0px;">
+    <div id="default-channel-for-analytics" style="display: none;">All</div>
+    <div id="default-category-for-analytics" style="display: none;">All</div>
+    <div id="default-language-for-analytics" style="display: none;">All</div>
+    {% include "EasyChatApp/analytics/session_analytics.html" %}
+    {% include "EasyChatApp/analytics/message_analytics.html" %}
+  </div>
+
+  <div class="row" style="margin-bottom: 0px;">
+    {% include "EasyChatApp/analytics/user_analytics.html" %}
+    {% include "EasyChatApp/analytics/channel_usage_analytics.html" %}
+  </div>
+
+  <div class="row" style="margin-bottom: 0px;">
+    {% include "EasyChatApp/analytics/hour_wise_analytics.html" %}
+  </div>
+
+  <div class="row" style="margin-bottom: 0px;">
+    {% include "EasyChatApp/analytics/most_frequent_questions.html" %}
+    {% include "EasyChatApp/analytics/least_frequent_questions.html" %}
+    {% include "EasyChatApp/analytics/unanswered_questions.html" %}
+  </div>
+
+  <div class="row" style="margin-bottom: 0px;">
+    {% include "EasyChatApp/analytics/wordcloud_analytics.html" %}
+    {% include "EasyChatApp/analytics/category_usage_analytics.html" %}
+  </div>
+
+  <div class="row" style="margin-bottom: 0px;">
+    {% include "EasyChatApp/analytics/intuitive_questions.html" %}
+    {% include "EasyChatApp/analytics/intent_wise_chartflow.html" %}
+    {% include "EasyChatApp/analytics/category_most_frequent.html" %}
+  </div>
+
+  <div class="row" style="margin-bottom: 0px;" id="revised-analytics-row-6">
+    {% include "EasyChatApp/analytics/form_assist_analytics.html" %}
+    {% include "EasyChatApp/analytics/form_assist_intents.html" %}
+    {% include "EasyChatApp/analytics/nudge_analytics.html" %}
+  </div>
+
+  <!-- device bifurcation graph row -->
+  <div class="row" style="margin-bottom: 0px;">
+    {% include "EasyChatApp/analytics/device_specific_analytics.html" %}
+  </div>
+  <div class="row" style="margin-bottom: 0px;">
+    {% include "EasyChatApp/analytics/whatsapp_catalogue_analytics.html" %}
+  </div>
+</div>
+
+</div>
+<div id="modal-analytics-filter-excel" class="modal easychat-custom-modals-container">
+  <div class="modal-content">
+    <div class="row" style="margin-bottom: 12px !important;">
+      <div class="modal-header">
+        <div class="modal-heading-text-div">Analytics Export</div>
+        <a href="javascript:void(0)" class="modal-close-btn modal-close">
+          <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473
+                          6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347
+                          19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z"
+              fill="black" fill-opacity="0.54" />
+          </svg>
+
+        </a>
+      </div>
+      <div class="modal-overflow-content-div">
+        <div class="col s12 analytics-filter-select-area">
+          <div class="filter-heading">
+            Select Date Range
+          </div>
+          <label>
+            <input type="radio" name="analytics-export-filter" value="1" checked onclick="show_custom_date_export();"/>
+            <div class="filter-box">
+              <span>Last Day</span>
+            </div>
+          </label>
+          <label>
+            <input type="radio" name="analytics-export-filter" value="2" onclick="show_custom_date_export();">
+            <div class=" filter-box">
+              <span>Last 7 Days</span>
+            </div>
+          </label>
+          <label>
+            <input type="radio" name="analytics-export-filter" value="3" onclick="show_custom_date_export();">
+            <div class=" filter-box">
+              <span>Last 1 Month</span>
+            </div>
+          </label>
+          <label>
+            <input type="radio" name="analytics-export-filter" id="analytics_filter_custom_date_btn_export" value="4"
+              onclick="show_custom_date_export();">
+            <div class=" filter-box">
+              <span>Custom Date</span>
+            </div>
+          </label>
+        </div>
+        <div class="col s11 analytics-custom-date-select-area" id="custom-range-filter-analytics"
+          style="display: none;">
+          <div class="col s6" style="padding-left: 2px; font-weight: 600;color: #4d4d4d; font-size: 14px;">
+            Start Date
+            <input type="date" class="analytics-start-date" id="startdate"
+              value='{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}'
+              placeholder="Enter start date"
+              style="border: 2px solid #F6F6F6 !important; border-radius:4px !important;">
+          </div>
+          <div class="col s6" style="font-weight: 600; padding-right: 0px !important;color: #4d4d4d; font-size: 14px;">
+            End Date
+            <input type="date" class="analytics-end-date" id="enddate"
+              value='{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}'
+              placeholder="Enter end date" style="border: 2px solid #F6F6F6 !important; border-radius:4px !important;">
+          </div>
+          <div class="col s12" style="font-weight: 600; padding: 0px !important;color: #4d4d4d; font-size: 14px;">
+            Email ID <span style="color: red;">*</span>
+            <input type="email" id="filter-data-email-analytics" value="{{ request.user.username }}"
+              style="border: 2px solid #F6F6F6 !important; border-radius:4px !important; width: 95.5% !important;">
+            <span>
+              <div class="analytics-email-note-export">Note: You will receive the message history data dump on the above
+                email ID within 24 hours.</div>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <a href="javascript:void(0)" class="modal-close btn filter-modal-footer-btn"
+      id="export-analytics-filter">Export</a>
+  </div>
+
+</div>
+<div id="modal-filter-custom-date" class="modal easychat-custom-modals-container">
+
+  <div class="modal-content">
+      <div class="row" style="margin-bottom: 12px !important;">
+          <div class="modal-header">
+              <div class="modal-heading-text-div">Filter - Custom Date</div>
+              <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                  <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path
+                          d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473
+                          6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347
+                          19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z"
+                          fill="black" fill-opacity="0.54" />
+                  </svg>
+              </a>
+          </div>
+
+          <div class="modal-overflow-content-div">
+              <div class="col s11 analytics-custom-date-select-area">
+                  <div class="col s6" style="padding-left: 2px; font-weight: 600;color: #4d4d4d; font-size: 14px;">
+                      Start Date
+                      <input type="date" class="message-default-start-date" value='{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}'
+                          id="filter-custom-start-date"
+                          placeholder="Enter start date"
+                          style="border: 2px solid #F6F6F6 !important; border-radius:4px !important;">
+                  </div>
+                  <div class="col s6"
+                      style="font-weight: 600; padding-right: 0px !important;color: #4d4d4d; font-size: 14px;">
+                      End Date
+                      <input type="date" class="message-default-end-date" value='{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}'
+                          id="filter-custom-end-date"
+                          placeholder="Enter end date"
+                          style="border: 2px solid #F6F6F6 !important; border-radius:4px !important;">
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  <div class="modal-footer">
+      <a href="javascript:void(0)" class="modal-close btn filter-modal-footer-btn"
+          onclick="apply_custom_date()">Apply</a>
+  </div>
+</div>
+
+        <script type="text/javascript" src="https://easychat-dev.allincall.in/static/EasyChatApp/js/html2canvas.min.js">
+        </script>
+        <script type="text/javascript" src="https://easychat-dev.allincall.in/static/EasyChatApp/js/jspdf.debug.js">
+        </script>
+        <script type="text/javascript" src="{% static 'EasyChatApp/js/static_revised_analytics.js' %}">
+        </script>
+        <script type="text/javascript" src="https://easychat-dev.allincall.in/static/EasyChatApp/js/wordcloud2.js">
+        </script>
+        <script type="text/javascript">
+          $("#device-specific-analytics-wrapper").css("width", "100%");
+          var total_messages_list = [1750, 2500, 1815, 2580, 2012, 2409, 6120]
+          var total_answered_messages_list = [1450, 2105, 1720, 2180, 1750, 2280, 6021]
+          var total_unanswered_messages_list = [300, 495, 95, 400, 332, 129, 500]
+          var predicted_messages_no_list = [2025, 2800, 2270, 2980, 2462, 2800, 6300]
+          var average_messages = [2000, 2000, 2000, 2000, 2000, 2000, 2000]
+          var false_positive_messages_list = [500, 600, 150, 800, 700, 110, 1300]
+
+          $(".easychat-analytics-card-filter-btn").css("pointer-events", "none")
+          $("#open-wordcloud-full-window").css("pointer-events", "auto")
+          // Searches
+          document.getElementById("most_frequent_search").setAttribute("onkeyup", "intent_search(document.querySelectorAll('#most-frequenct-intents li'), document.querySelector('#most_frequent_search'), document.querySelector('#no-frequent-questions-div'))")
+          document.getElementById("least_frequent_search").setAttribute("onkeyup", "intent_search(document.querySelectorAll('#least-frequent-intents li'), document.querySelector('#least_frequent_search'), document.querySelector('#no-least-frequent-div'))")
+          document.getElementById("unanswered_question_search").setAttribute("onkeyup", "intent_search(document.querySelectorAll('#recently-unanswered-messages li'), document.querySelector('#unanswered_question_search'), document.querySelector('#no-unanswered-questions-div'))")
+          document.getElementById("intuitive_questions_search").setAttribute("onkeyup", "intent_search(document.querySelectorAll('#intuitive-questions-analytics-chart li'), document.querySelector('#intuitive_questions_search'), document.querySelector('#no-intuitive_questions_div'))")
+          document.getElementById("intent_chartflow_search").setAttribute("onkeyup", "intent_search(document.querySelectorAll('#flow-analytics-chart li'), document.querySelector('#intent_chartflow_search'), document.querySelector('#no-flow-analytics-div'))")
+          document.getElementById("category-most-frequent-search").setAttribute("onkeyup", "intent_search(document.querySelectorAll('#category-wise-most-frequenct-intents li'), document.querySelector('#category-most-frequent-search'), document.querySelector('#no-category-most-frequent-div'))")
+          document.getElementById("form_assist_intents_search").setAttribute("onkeyup", "intent_search(document.querySelectorAll('#form-assist-intent-used li'), document.querySelector('#form_assist_intents_search'), document.querySelector('#no-form-assist-intents-div'))")
+          document.getElementById("user_nudge_analytics_search").setAttribute("onkeyup", "intent_search(document.querySelectorAll('#user-nudge-analytics-chart li'), document.querySelector('#user_nudge_analytics_search'), document.querySelector('#no-nudge-analytics-div'))")
+
+          // Basic Analytics
+          document.getElementById("bot-no-messages-today").innerHTML = "6120";
+          document.getElementById("bot-no-users-today").innerHTML = "2311";
+          document.getElementById("bot-no-answered-query").innerHTML = "6021";
+          document.getElementById("bot-nps-score").innerHTML = "74"
+          document.getElementById("redirect-to-csat-analytics").href = "/chat/nps-analytics/?bot_pk=" + get_url_vars()["bot_id"] + "&page=1"
+
+          // Message Analytics
+          label_list = "{{label_list}}"
+          label_list = label_list.replace(/&#x27;/g, '').replace(/&#39;/g, '').replace('[', '').replace(']', '').split(', ')
+          start_date = label_list[0].split("-");
+          start_date = start_date.reverse().join("/")
+          end_date = label_list.at(-1).split("-");
+          end_date = end_date.reverse().join("/")
+          label = "Number of messages";
+          $("#message-analytics-range").html(`<span>Range: </span> ${start_date} - ${end_date}`)
+
+          var options = {
+            series: [{
+                    name: "Total",
+                    data: total_messages_list
+                },
+                {
+                    name: "Answered",
+                    data: total_answered_messages_list
+                },
+                {
+                    name: "Unanswered",
+                    data: total_unanswered_messages_list
+                },
+                {
+                    name: "Projected",
+                    data: predicted_messages_no_list
+                },
+                {
+                    name: "Average Messages",
+                    data: average_messages
+                },
+                {
+                    name: "False Positive",
+                    data: false_positive_messages_list
+                }
+            ],
+            colors: ['#3751FF', '#10B981', '#E53E3E', '#37D4F6', '#9B51E0', '#FCD34D'],
+            chart: {
+                height: 350,
+                type: 'line',
+                zoom: {
+                    enabled: false
+                },
+                toolbar: {
+                    show: false,
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                width: 2,
+                curve: "smooth",
+            },
+            title: {
+                show: false
+            },
+            grid: {
+                show: true,
+                borderColor: '#f1f1f1',
+                strokeDashArray: 0,
+                position: 'back',
+                xaxis: {
+                    lines: {
+                        show: true
+                    }
+                },
+                yaxis: {
+                    lines: {
+                        show: true
+                    },
+                },
+                row: {
+                    colors: '#f1f1f1',
+                    opacity: 0
+                },
+                column: {
+                    colors: '#f1f1f1',
+                    opacity: 0
+                },
+                padding: {
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    left: 10
+                },
+            },
+        
+            xaxis: {
+                categories: label_list,
+                type: label_list.length > 3 ? "datetime" : "date"
+            },
+            yaxis: {
+                style: {
+                    marginRighnt: '20px',
+                }
+            }
+          };
+
+          message_analytics_card = new ApexCharts(document.querySelector("#message-analytics-graph"), options);
+          message_analytics_card.render();
+
+          // Hour-wise analytics
+          $("#hour-wise-analytics-range").html(`<span>Range: </span> ${end_date}`)
+          var options = {
+            series: [{
+                    name: "Total number of users",
+                    data: [10, 20, 13, 51, 4, 14, 69, 91, 48, 10, 20, 13, 51, 2, 1, 69, 27, 48, 10, 20, 13, 5, 7, 9]
+                },
+                {
+                    name: "Total number of messages",
+                    data: [12, 181, 33, 85, 19, 10, 88, 91, 58, 12, 181, 33, 85, 19, 10, 88, 91, 58, 12, 181, 33, 85, 19, 10]
+                }
+            ],
+            colors: ['#3751FF', '#10B981'],
+            chart: {
+                height: 350,
+                type: 'line',
+                zoom: {
+                    enabled: false
+                },
+                toolbar: {
+                    show: false,
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                width: 2,
+                curve: "smooth",
+            },
+            title: {
+                show: false
+            },
+            grid: {
+                show: true,
+                borderColor: '#f1f1f1',
+                strokeDashArray: 0,
+                position: 'back',
+                xaxis: {
+                    lines: {
+                        show: true
+                    }
+                },
+                yaxis: {
+                    lines: {
+                        show: false
+                    },
+                },
+                row: {
+                    colors: '#f1f1f1',
+                    opacity: 0
+                },
+                column: {
+                    colors: '#f1f1f1',
+                    opacity: 0
+                },
+                padding: {
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    left: 10
+                },
+            },
+        
+            xaxis: {
+                type: 'time',
+                categories: ['01', '02', '03', '04', '05', '06', '07', '08', '09','10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24'],
+            },
+            yaxis: {
+                style: {
+                    marginRighnt: '20px',
+                }
+            }
+        };
+        
+        hourwise_analytics_card = new ApexCharts(document.querySelector("#hour-wise-analytics-graph"), options);
+        hourwise_analytics_card.render();
+
+          // User Analytics
+          no_users_list = [932, 884, 1007, 1010, 987, 1290, 1480];
+          average_users = [800, 700, 800, 871, 678, 992, 1231]
+          no_of_sessions_list = [1184, 1050, 1190, 1200, 1123, 1432, 1623]
+
+          label = "Number of users";
+          $("#user-analytics-range").html(`<span>Range: </span> ${start_date} - ${end_date}`)
+
+          var options = {
+            series: [{
+                    name: "Number of total users",
+                    data: no_users_list
+                },
+                {
+                    name: "Number of unique sessions",
+                    data: no_of_sessions_list
+                },
+                {
+                    name: "Average Number of users",
+                    data: average_users
+                }
+            ],
+            colors: ['#3751FF', '#37D4F6', '#FF9040'],
+            chart: {
+                height: 350,
+                type: 'line',
+                zoom: {
+                    enabled: false
+                },
+                toolbar: {
+                    show: false,
+                }
+            },
+            grid: {
+                show: true,
+                borderColor: '#f1f1f1',
+                strokeDashArray: 0,
+                position: 'back',
+                xaxis: {
+                    lines: {
+                        show: true
+                    }
+                },
+                yaxis: {
+                    lines: {
+                        show: true
+                    },
+                },
+                row: {
+                    colors: '#C4C4C4',
+                    opacity: 0
+                },
+                column: {
+                    colors: '#C4C4C4',
+                    opacity: 0
+                },
+                padding: {
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    left: 10
+                },
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                width: 2,
+                curve: "smooth",
+            },
+            title: {
+                enabled: false
+            },
+            xaxis: {
+                categories: label_list,
+                type: label_list.length > 3 ? "datetime" : "date"
+            }
+          };
+        
+          user_analytics_card = new ApexCharts(document.querySelector("#user_analytics_graph"), options);
+          user_analytics_card.render();
+
+          // Channel Analtics
+          var channel_dict = {
+            "Web": 9584,
+            "Facebook": 797,
+            "GoogleHome": 958,
+            "Alexa": 3195,
+            "WhatsApp": 0,
+            "Android": 0,
+            "Microsoft": 0,
+            "Telegram": 0,
+            "GoogleMyBussiness": 0
+          }
+          var channel_list = Object.keys(channel_dict);
+          const message_count_list = Object.values(channel_dict);
+          const channel_color_dict = getColorlistforchannel(channel_list)
+
+          $("#channel-analytics-range").html(`<span>Range: </span> ${start_date} - ${end_date}`)
+
+          var options = {
+            series: message_count_list,
+            labels: channel_list,
+            colors: Object.values(channel_color_dict),
+        
+            chart: {
+                width: '100%',
+                height: '75%',
+                type: 'donut',
+            },
+        
+            dataLabels: {
+                enabled: false
+            },
+            responsive: [{
+                breakpoint: 480,
+                options: {
+                    chart: {
+                        width: 200
+                    },
+                    legend: {
+                        show: false
+                    }
+                }
+            }],
+            legend: {
+                position: 'right',
+                offsetY: 0,
+                height: 230,
+                show: false,
+        
+            }
+          };
+          
+          channel_usage_analytics_card = new ApexCharts(document.querySelector("#channel_usage_analytics_graph"), options);
+          channel_usage_analytics_card.render();
+          create_channel_analytics_options()
+
+          function getColorlistforchannel(channels) {
+
+            const default_list = ['#007AFF', '#54CC61', '#34ABDF', '#FF7B45', '#A4C639', '#EFCA00', '#4165BD', '#4CAF50', '#8E24AA', '#00CAFF', '#26A5D0', '#0E8F82', '#2580E3', '#000000', '#6264A7', '#3573a6']
+            const color_list = []
+            for (var i = 0; i < channels.length; i++) {
+                if (i < 16) {
+                    color_list[channels[i]] = default_list[i]
+                } else {
+                    color_list[channels[i]] = getRandomColor();
+                }
+            }
+            return color_list
+          }
+
+          function create_channel_analytics_options() {
+            let option_html = ""
+            for (const channel of channel_list) {
+                option_html += `
+                <li class="graph-legend-item-div">
+                    <div class="easychat-user-custom-checkbox-div">
+                        <input class="user-chat-history-checkbox" type="checkbox" id="${channel}_channel"
+                            value="${channel}" checked>
+                        <label for="${channel}_channel">
+                            <span>${channel}</span>
+                        </label>
+                    </div>
+                </li>
+                `
+                $(`<style>.easychat-user-custom-checkbox-div #${channel}_channel:checked~label::before{background-color: ${channel_color_dict[channel]}; border-color: ${channel_color_dict[channel]};}</style>`).appendTo('head');
+            }
+            option_html += `
+                <div class="graph-legend-noresult-found" id="graph_legend_noresult_found"
+                    style="display: none;">No result found</div>
+            `
+            $("#channel_analytics_options").html(option_html)
+          }
+
+          function update_channel_analytics() {
+            channel_usage_analytics_card && channel_usage_analytics_card.destroy()
+
+            const checked_channels = $("#channel_analytics_options input:checked")
+
+            let channel_list = [];
+            let message_count_list = [];
+            let color_list = []
+
+            for (const elm of checked_channels) {
+                const channel = elm.value
+                channel_list.push(channel);
+                message_count_list.push(channel_dict[channel]);
+                color_list.push(channel_color_dict[channel])
+            }
+
+            var options = {
+                series: message_count_list,
+                labels: channel_list,
+                colors: color_list,
+            
+                chart: {
+                    width: '100%',
+                    height: '75%',
+                    type: 'donut',
+                },
+            
+                dataLabels: {
+                    enabled: false
+                },
+                responsive: [{
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: 200
+                        },
+                        legend: {
+                            show: false
+                        }
+                    }
+                }],
+                legend: {
+                    position: 'right',
+                    offsetY: 0,
+                    height: 230,
+                    show: false,
+            
+                }
+            };
+            
+            channel_usage_analytics_card = new ApexCharts(document.querySelector("#channel_usage_analytics_graph"), options);
+            channel_usage_analytics_card.render();
+          }
+
+          // Device Specific Analytics
+          
+          $("#device-analytics-range").html(`<span>Range: </span> ${start_date} - ${end_date}`)
+
+          var options = {
+                series: [{
+                        name: "Mobile Users",
+                        data: [10, 20, 139, 51, 42, 140, 69, 91, 148]
+                    },
+                    {
+                        name: "Desktop Users",
+                        data: [12, 181, 33, 85, 19, 10, 88, 91, 58]
+                    },
+                    {
+                        name: "Queries asked(Mobile)",
+                        data: [15, 21, 88, 5, 52, 58, 50, 71, 120]
+                    },
+                    {
+                        name: "Queries asked(Desktop)",
+                        data: [20, 42, 51, 5, 32, 162, 89, 191, 118]
+                    },
+                    {
+                        name: "Queries answered(Mobile)",
+                        data: [5, 11, 10, 5, 28, 50, 10, 100, 79]
+                    },
+                    {
+                        name: "Queries answered(Desktop) ",
+                        data: [91, 4, 36, 17, 74, 40, 167, 23, 30]
+                    },
+                    {
+                        name: "Queries unanswered (Mobile) ",
+                        data: [93, 31, 65, 12, 45, 70, 120, 71, 70]
+                    },
+                    {
+                        name: "Queries unanswered (Desktop)",
+                        data: [9, 41, 35, 15, 79, 20, 190, 51, 20]
+                    }
+                ],
+                colors: ['#3751FF', '#FF9040', '#37D4F6', '#9B51E0', '#A70303', '#DAC400', '#45FB18', '#37AB00'],
+                chart: {
+                    height: 390,
+                    type: 'line',
+                    zoom: {
+                        enabled: false
+                    },
+                    toolbar: {
+                        show: false,
+                    }
+                },
+                legend: {
+                    show:true,
+                    position: 'bottom',
+                    floating: false,
+                    verticalAlign: 'bottom',
+                    align:'center',
+                    horizontalAlign: 'center', 
+                    offsetX: 0,
+                    offsetY:10,
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    width: 2,
+                    curve: "smooth",
+                },
+                title: {
+                    show: false
+                },
+
+                grid: {
+                    show: true,
+                    borderColor: '#f1f1f1',
+                    strokeDashArray: 0,
+                    position: 'back',
+                    xaxis: {
+                        lines: {
+                            show: true
+                        }
+                    },
+                    yaxis: {
+                        lines: {
+                            show: true
+                        },
+                    },
+                    row: {
+                        colors: '#f1f1f1',
+                        opacity: 0
+                    },
+                    column: {
+                        colors: '#f1f1f1',
+                        opacity: 0
+                    },
+                    padding: {
+                        top: 0,
+                        right: 0,
+                        bottom: 0,
+                        left: 20
+                    },
+                },
+
+                xaxis: {
+                    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+                },
+                yaxis: {
+                    style: {
+                        marginRighnt: '20px',
+                    }
+                },
+
+            };
+
+            var device_specific_analytics_card = new ApexCharts(document.querySelector("#device-specific-analytics-graph"), options);
+            device_specific_analytics_card.render();
+            
+            // Whatsapp Catalogue Analytics
+            $("#catalogue_analytics_range").html(`<span>Range: </span> ${start_date} - ${end_date}`)
+
+            let total_carts = [30, 40, 43, 32, 23, 15, 12]
+            let total_purchased_carts = [20, 26, 43, 27, 20, 9, 8]
+            let total_conversion_ratio = [66.66, 60, 100, 84.37, 86.85, 75, 50]
+            var options = {
+                series: [                            
+                    {
+                        name: "Cart",
+                        data: total_carts
+                    },
+                    {
+                        name: "Purchased",
+                        data: total_purchased_carts
+                    },
+                    {
+                        name: "Conversion Ratio",
+                        data: total_conversion_ratio
+                    }
+                ],
+                colors: ['#0254D7', '#10B981', '#F5C828'],
+                chart: {
+                    height: 390,
+                    type: 'line',
+                    zoom: {
+                        enabled: false
+                    },
+                    toolbar: {
+                        show: false,
+                    }
+                },
+                legend: {
+                    show: true,
+                    position: 'bottom',
+                    floating: false,
+                    verticalAlign: 'bottom',
+                    align: 'center',
+                    horizontalAlign: 'center',
+                    offsetX: 0,
+                    offsetY: 10,
+                },
+                tooltip: {
+                    enabled: true,
+                    y: {
+                        formatter: function (value, opts) {
+                            if (opts.seriesIndex != 2) return value;
+                            return value + '%'
+                        },
+                    },
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    width: 2,
+                    curve: "smooth",
+                },
+                title: {
+                    show: false
+                },
+                grid: {
+                    show: true,
+                    borderColor: '#f1f1f1',
+                    strokeDashArray: 0,
+                    position: 'back',
+                    xaxis: {
+                        lines: {
+                            show: true
+                        }
+                    },
+                    yaxis: {
+                        lines: {
+                            show: true
+                        },
+                    },
+                    row: {
+                        colors: '#f1f1f1',
+                        opacity: 0
+                    },
+                    column: {
+                        colors: '#f1f1f1',
+                        opacity: 0
+                    },
+                    padding: {
+                        top: 0,
+                        right: 0,
+                        bottom: 0,
+                        left: 20
+                    },
+                },
+                xaxis: {
+                    categories: label_list,
+                    type: label_list.length > 3 ? "datetime" : "date"
+                },
+            };
+
+            let whatsapp_catalogue_analytics_card = new ApexCharts(document.querySelector("#whatsapp_catalogue_graph"), options);
+            whatsapp_catalogue_analytics_card.render();
+
+          // Word Cloud Analytics
+          var canvas_small = document.getElementById("word_cloud_small_loading_data"),
+          word_array = [{
+            "word": "bank",
+            "freq": 1
+          }, {
+            "word": "atm",
+            "freq": 1
+          }, {
+            "word": "credit",
+            "freq": 1
+          }, {
+            "word": "credit-card",
+            "freq": 1
+          }, {
+            "word": "card",
+            "freq": 1
+          }, {
+            "word": "debit",
+            "freq": 2
+          }, {
+            "word": "debit-card",
+            "freq": 1
+          }, {
+            "word": "cheque",
+            "freq": 1
+          }, {
+            "word": "pan card",
+            "freq": 1
+          }, {
+            "word": "aadhar",
+            "freq": 1
+          }, {
+            "word": "demat",
+            "freq": 1
+          }, {
+            "word": "COVID",
+            "freq": 1
+          }, {
+            "word": "tenure",
+            "freq": 1
+          }, ]
+          make_wordcloud(word_array)
+          document.getElementById("wordcloud-time-range").innerHTML = `<span>Range :</span> ${start_date} - ${end_date}`;
+          document.getElementById("wordcloud-big-time-range").innerHTML = `<span>(Range: </span>${start_date} - ${end_date})`;
+
+          function make_wordcloud(data_list) {
+            if (data_list.length == 0) {
+              $("#word_cloud_small_no_data").css('display', 'flex');
+              $("#word_cloud_small").hide()
+              $("#open-modal-wordcloud-full-window").hide()
+              // $("#word_cloud_small_loading_data").hide()
+              return
+            }
+            // $("#word_cloud_small_loading_data").hide()
+            $("#word_cloud_small_no_data").hide()
+            $("#word_cloud_small").show()
+            $("#open-modal-wordcloud-full-window").show()
+            list = [];
+            for (var i in data_list) {
+              list.push([data_list[i]["word"], data_list[i]["freq"]])
+
+            }
+            const wordCanvas = $('#word_cloud_small');
+            wordCanvas.attr('width', '800').attr('height', '400');
+            WordCloud.minFontSize = "15px"
+            WordCloud(document.getElementById('word_cloud_small'), {
+              list: list,
+              gridSize: 16,
+              weightFactor: 32,
+              fontFamily: 'Silka, Helvetica, sans-serif',
+              fontWeight: '500',
+              color: '#1E293B',
+              // rotateRatio: 0.5,
+              // rotationSteps: 2,
+              backgroundColor: '#F8FDFD'
+            });
+            WordCloud(document.getElementById('word_cloud_big'), {
+              list: list,
+              gridSize: 16,
+              weightFactor: 32,
+              rotateRatio: 0.5,
+              rotationSteps: 2,
+              fontFamily: 'Silka, Helvetica, sans-serif',
+              color: '#1E293B',
+              hover: window.drawBox,
+              hover: function (bigitem) {
+                  try {
+                      document.getElementById("wordcloud-big-freq-info").innerHTML = `<div><span>Word: </span>${bigitem[0]}<br><span>Freq: </span>${bigitem[1]}</div>`;
+                      $("#wordcloud-big-freq-info").show()
+                  } catch (err) {
+                      document.getElementById("wordcloud-big-freq-info").innerHTML = "<div><span>Word: </span><br><span>Freq: </span></div>";
+                  }
+              },
+              backgroundColor: 'transparent'
+            });
+          }
+
+          // Category Analytics
+          var category_dict = {
+            'Credit Card': 231,
+            'Savings Account': 432,
+            'Fixed Deposit': 378,
+            'Demat Account': 193,
+            'Debit Card': 204
+          }
+          var category_list = Object.keys(category_dict);
+          category_message_count_list = Object.values(category_dict);
+          var category_analytics_colors = getColorlistforcategory(category_list)
+
+          $("#category-analytics-date-range").html(`<span>Range :</span> ${start_date} - ${end_date}`)
+
+          var options = {
+            series: category_message_count_list,
+            labels: category_list,
+            colors: Object.values(category_analytics_colors),
+        
+            chart: {
+                width: '100%',
+                height: '75%',
+                type: 'donut',
+            },
+            dataLabels: {
+                enabled: false
+            },
+            responsive: [{
+                breakpoint: 480,
+                options: {
+                    chart: {
+                        width: 200
+                    },
+                    legend: {
+                        show: false
+                    }
+                }
+            }],
+            legend: {
+                position: 'right',
+                offsetY: 0,
+                height: 230,
+                show: false,
+            }
+          };
+          
+          category_usage_analytics_card = new ApexCharts(document.querySelector("#category_usage_analytics_graph"), options);
+          category_usage_analytics_card.render();
+
+          create_category_usage_options(category_list)
+
+          function getRandomColor() {
+
+          var letters = '0123456789ABCDEF';
+          var color = '#';
+          for (var i = 0; i < 6; i++) {
+              color += letters[Math.floor(Math.random() * 16)];
+          }
+          return color;
+          }
+
+          function getColorlistforcategory(categories) {
+
+          const default_list = ["#334BCA", "#7E73CC", "#bc5090", "#ff6361", "#ffa600"]
+          const color_list = []
+          for (var i = 0; i < categories.length; i++) {
+              if (i < 5) {
+                  color_list[categories[i]] = default_list[i]
+              } else {
+                  color_list[categories[i]] = getRandomColor();
+              }
+          }
+          return color_list
+          }
+
+          function update_category_analytics() {
+            category_usage_analytics_card && category_usage_analytics_card.destroy()
+
+            const checked_categories = $("#category-usage-options input:checked")
+
+            let category_list = [];
+            let message_count_list = [];
+            let color_list = []
+
+            for (const elm of checked_categories) {
+                const category = elm.value
+                category_list.push(category);
+                message_count_list.push(category_dict[category]);
+                color_list.push(category_analytics_colors[category])
+            }
+
+            var options = {
+                series: message_count_list,
+                labels: category_list,
+                colors: color_list,
+            
+                chart: {
+                    width: '100%',
+                    height: '75%',
+                    type: 'donut',
+                },
+            
+                dataLabels: {
+                    enabled: false
+                },
+                responsive: [{
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: 200
+                        },
+                        legend: {
+                            show: false
+                        }
+                    }
+                }],
+                legend: {
+                    position: 'right',
+                    offsetY: 0,
+                    height: 230,
+                    show: false,
+            
+                }
+            };
+            
+            channel_usage_analytics_card = new ApexCharts(document.querySelector("#category_usage_analytics_graph"), options);
+            channel_usage_analytics_card.render();
+          }
+
+          function create_category_usage_options(category_list) {
+            let option_html = ""
+            var i = 0;
+            for (const category of category_list) {
+                i += 1
+                option_html += `
+                <li class="graph-legend-item-div">
+                    <div class="easychat-user-custom-checkbox-div">
+
+                        <input class="user-chat-history-checkbox" type="checkbox" id="category_${i}"
+                            value="${category}" checked>
+
+                        <label for="category_${i}">
+                            <span>${category.substring(0, 25)}</span>
+                        </label>
+                    </div>
+                </li>
+                `
+                $(`<style>.easychat-user-custom-checkbox-div #category_${i}:checked~label::before{background-color: ${category_analytics_colors[category]}; border-color: ${category_analytics_colors[category]};}</style>`).appendTo('head');
+            }
+            option_html += `
+                <div class="graph-legend-noresult-found" id="graph_legend_noresult_found_category"
+                    style="display: none;">No result found</div>
+            `
+            $("#category-usage-options").html(option_html)
+          }
+
+          // Session Analytics
+          document.getElementById("ave-no-of-messages-per-session").innerHTML = "&nbsp;" + "30";
+          document.getElementById("ave-session-time").innerHTML = "&nbsp;" + "7 min."
+          document.getElementById("no-of-likes").innerHTML = "&nbsp;" + "945";
+          document.getElementById("no-of-unique-sessions").innerHTML = "&nbsp;" + "2634";
+          document.getElementById("bot-accuracy-value").innerHTML = "93.08%"
+
+          // Most Frequent Questions
+          const most_frequent_intents = [
+            "How do I block my Credit Card?", 
+            "How can I get my Account Statement?", 
+            "Can I redeem my FD before the original term?",
+            "What is the tenure of Fixed Deposit?",
+            "How do I pay my credit card bill?"
+          ]
+          const most_frequent_frequencies = [48474, 45627, 41236, 32564, 30216]
+          intent_html = ""
+          for (i = 0; i < 5; i++) {
+            let most_frequent_intent = most_frequent_intents[i]
+            let most_frequent_frequency = most_frequent_frequencies[i]
+
+            intent_html += `
+                <li class="easychat-session-analytics-item intent-list-item">
+                    <div class="easychat-analytics-data-card-content-div">
+                        <div class="easychat-analytics-data-card-icon-wrapper">
+                            <div class="easychat-analytics-card-item-color-div"></div>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <rect width="24" height="24" rx="4" fill="#EFF2F5" />
+                            </svg>
+                        </div>
+                        <div class="easychat-analytics-data-card-item-text">
+                            ${most_frequent_intent}
+                        </div>
+                    </div>
+                    <div class="easychat-analytics-data-card-value">
+                        ${most_frequent_frequency}
+                    </div>
+                </li>
+            `
+          }
+          document.getElementById("most-frequenct-intents").innerHTML = intent_html;
+          $("#most_frequent_left").hide()
+          $("#most_frequent_right").hide()
+
+          // Least Frequent Questions
+          intent_html = ""
+          const least_frequent_intents = [
+            "What is 'Standing Instruction' given in the account opening form?", 
+            "What is the procedure to replace a damaged Debit Card?", 
+            "What is Demat?",
+            "What is the tenure?",
+            "How do I pay my credit card bill?"
+          ]
+          const least_frequent_frequencies = [43, 38, 41236, 32564, 30216]
+          for (i = 0; i < 5; i++) {
+            let least_frequent_intent = least_frequent_intents[i]
+            let least_frequent_frequency = least_frequent_frequencies[i]
+
+            intent_html += `
+                <li class="easychat-session-analytics-item intent-list-item">
+                    <div class="easychat-analytics-data-card-content-div">
+                        <div class="easychat-analytics-data-card-icon-wrapper">
+                            <div class="easychat-analytics-card-item-color-div"></div>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <rect width="24" height="24" rx="4" fill="#EFF2F5" />
+                            </svg>
+                        </div>
+                        <div class="easychat-analytics-data-card-item-text">
+                            ${least_frequent_intent}
+                        </div>
+                    </div>
+                    <div class="easychat-analytics-data-card-value">
+                        ${least_frequent_frequency}
+                    </div>
+                </li>
+            `
+          }
+          document.getElementById("least-frequent-intents").innerHTML = intent_html;
+          $("#least_frequent_left").hide()
+          $("#least_frequent_right").hide()
+
+          // Unanswered Questions
+          intent_html = ""
+          unanswered_message_intents = [
+            "I want to lumpsum",
+            "What do I look like",
+            "Who are we?",
+            "Why am I here?",
+            "Can you dance?",
+          ]
+          unanswered_message_frequencies = [27, 24, 23, 19, 12]
+
+          for (i = 0; i < 5; i++) {
+            let unanswered_intent_name = unanswered_message_intents[i]
+            let unanswered_intent_frequency = unanswered_message_frequencies[i]
+
+            intent_html += `
+              <li class="easychat-session-analytics-item intent-list-item">
+                  <div class="easychat-analytics-data-card-content-div">
+                      <div class="easychat-analytics-data-card-icon-wrapper">
+                          <div class="easychat-analytics-card-item-color-div"></div>
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                              xmlns="http://www.w3.org/2000/svg">
+                              <rect width="24" height="24" rx="4" fill="#EFF2F5" />
+                          </svg>
+                      </div>
+                      <div class="easychat-analytics-data-card-item-text">
+                          ${unanswered_intent_name}
+                      </div>
+                  </div>
+                  <div class="easychat-analytics-data-card-value">
+                      ${unanswered_intent_frequency}
+                  </div>
+              </li>
+              `
+            }
+
+          document.getElementById("recently-unanswered-messages").innerHTML = intent_html;
+          $("#unanswered-questions-left").css("display", "none")
+          $("#unanswered-questions-right").css("display", "none")
+
+          // Intuitive Questions
+          intent_html = ""
+          intuitive_message_intents = ["talk to whatsapptest", "end chat", "upi"]
+          intuitive_message_freq = [1, 3, 1]
+          list_of_intents_per_query = [[
+            {name: "Contact Customer Care", resolved: false, deleted: false},
+            {name: "test childs", resolved: false, deleted: false},
+            {name: "Test Intent", resolved: false, deleted: false},
+            ],
+            [
+              {name: "Chat with an expert", resolved: true, deleted: false},
+            ],
+            [
+              {name: "What is UPI How do I use it", resolved: false, deleted: true},
+            ]
+          ]
+          for (i = 0; i < 3; i++) {
+            var list_and_html = intuitive_intents_html_compriser(list_of_intents_per_query[i])
+            var temp_list = list_and_html[0]
+            var temp_html = list_and_html[1]
+
+            intent_html += `
+                <li class="easychat-session-analytics-item intent-list-item">
+                    <div class="easychat-analytics-data-card-content-div">
+                        <div class="easychat-analytics-data-card-icon-wrapper">
+                            <div class="easychat-analytics-card-item-color-div"></div>
+                            <a href="#" class="easychat-analytics-card-question-intent-btn">
+                                ${temp_list.length}
+                            </a>
+                            <ul class="easychat-analytics-data-card-intent-list">
+                                ${temp_html}
+                            </ul>
+                        </div>
+                        <div class="easychat-analytics-data-card-item-text">
+                            ${intuitive_message_intents[i]}
+                        </div>
+                    </div>
+                    <div class="easychat-analytics-data-card-value">
+                        ${intuitive_message_freq[i]}
+                    </div>
+                </li>
+            `
+          }
+          intent_html += '<li class="easychat-session-analytics-item"></li>\
+            <li class="easychat-session-analytics-item"></li>'
+          
+          document.getElementById("intuitive-questions-analytics-chart").innerHTML = intent_html;
+          $(".easychat-analytics-card-question-intent-btn").click(function(e) {
+              e.stopPropagation();
+              $(".easychat-analytics-data-card-intent-list").hide();
+              $(this).siblings(".easychat-analytics-data-card-intent-list").show();
+          });
+          $("#intuitive-questions-left").hide()
+          $("#intuitive-questions-right").hide()
+
+          function intuitive_intents_html_compriser(list_of_intents_per_query) {
+
+            var temp_html = ""
+            var temp_list = []
+            list_of_intents_per_query.forEach(function (itm, index) {
+                var intent_name = itm["name"]
+                if (!temp_list.includes(intent_name)) {
+                    temp_list.push(intent_name)
+                    if (itm["resolved"] == "false") {
+                        if (itm["deleted"] == "true")
+                            temp_html += '<a><li class="easychat-analytics-data-card-intent-list-item">' + intent_name + '</li></a>'
+                        else
+                            temp_html += '<a>\
+                            <li class="easychat-analytics-data-card-intent-list-item">' + intent_name + '</li></a>'
+
+                    } else {
+                        temp_html += '<a title="This is already resolved"><li class="easychat-analytics-data-card-intent-list-item">' + intent_name + '<div style="display: flex;align-items: center;" >\
+                            <svg width="12" height="12" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">\
+                            <path d="M5.00016 0.833344C2.70433 0.833344 0.833496 2.70418 0.833496 5.00001C0.833496 7.29584 2.70433 9.16668 5.00016 9.16668C7.296 9.16668 9.16683 7.29584 9.16683 5.00001C9.16683 2.70418 7.296 0.833344 5.00016 0.833344ZM6.99183 4.04168L4.62933 6.40418C4.571 6.46251 4.49183 6.49584 4.4085 6.49584C4.32516 6.49584 4.246 6.46251 4.18766 6.40418L3.0085 5.22501C2.88766 5.10418 2.88766 4.90418 3.0085 4.78334C3.12933 4.66251 3.32933 4.66251 3.45016 4.78334L4.4085 5.74168L6.55016 3.60001C6.671 3.47918 6.871 3.47918 6.99183 3.60001C7.11266 3.72084 7.11266 3.91668 6.99183 4.04168Z" fill="#25B139"/>\
+                            </svg>\
+                            <span style="color: #25B139; font-size: 11px;">\
+                            This is already resolved\
+                            </span>\
+                        </div>\
+                        </li></a>'
+                    }
+                }
+            });
+            return [temp_list, temp_html]
+            }
+
+          // Intent wise chartflow
+          intent_html = ""
+          flow_analytics_intents = ["Payment", "Buy Health Insurance", "test childs", "Raise an issue", "recommend"]
+          flow_analytics_frequencies = [33, 5, 4, 2, 2]
+
+          for (i = 0; i < 5; i++) {
+            let flow_analytics_intent;
+            let flow_analytics_frequency;
+            flow_analytics_intent = flow_analytics_intents[i]
+            flow_analytics_frequency = flow_analytics_frequencies[i]
+            intent_html += `
+                <a>
+                <li class="easychat-session-analytics-item intent-list-item">
+                    <div class="easychat-analytics-data-card-content-div">
+                        <div class="easychat-analytics-data-card-icon-wrapper">
+                            <div class="easychat-analytics-card-item-color-div"></div>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <rect width="24" height="24" rx="4" fill="#EFF2F5" />
+                            </svg>
+                        </div>
+                        <div class="easychat-analytics-data-card-item-text">
+                            ${flow_analytics_intent}
+                        </div>
+                    </div>
+                    <div class="easychat-analytics-data-card-value">
+                        ${flow_analytics_frequency}
+                    </div>
+                </li>
+                </a>
+            `
+          }
+
+          document.getElementById("flow-analytics-chart").innerHTML = intent_html;
+          $("#flow-analytics-left").hide()
+          $("#flow-analytics-right").hide()
+
+          // Category Most Frequent Questions
+          intent_html = ""
+          var category_current_page = 0
+          const categories = ["Credit Card", "Savings Account", "Fixed Deposit"]
+          const category_most_frequent_intents = [
+            ["What do I do if my Credit Card is blocked?", "How can I block my Credit Card?"],
+            ["How do I get my Account Statment?", "How will the cheque book reach me?"],
+            ["What is the tenure of Fixed Deposit?", "Can I redeem my FD before the original term?"]
+          ]
+          const category_most_frequent_frequencies = [
+            [3041, 1428],
+            [3836, 2756],
+            [2900, 1671]
+          ]
+
+          function create_category_most_html(index, category_most_frequent_intents, category_most_frequent_frequencies, categories) {
+            $("#no-category-most-frequent-div").hide()
+            intent_html = ""
+            if (index == 0) {
+              $("#category-most-frequent-left").hide()
+            }
+            else if (index == 2) {
+              $("#category-most-frequent-right").hide()
+            }
+            else {
+              $("#category-most-frequent-left").show()
+              $("#category-most-frequent-right").show()
+            }
+
+            $("#category-most-frequent-name").html("( Category: " + categories[index].substring(0, 25) + " )")
+
+            for (i = 0; i < 5; i++) {
+              let category_most_frequent_intent;
+              let category_most_frequent_frequency;
+              if (i >= category_most_frequent_intents.length-1) {
+                  intent_html += '<li class="easychat-session-analytics-item"></li>'
+                  continue
+              }
+              category_most_frequent_intent = category_most_frequent_intents[index][i]
+              category_most_frequent_frequency = category_most_frequent_frequencies[index][i]
+
+              intent_html += `
+                <li class="easychat-session-analytics-item intent-list-item">
+                    <div class="easychat-analytics-data-card-content-div">
+                        <div class="easychat-analytics-data-card-icon-wrapper">
+                            <div class="easychat-analytics-card-item-color-div"></div>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <rect width="24" height="24" rx="4" fill="#EFF2F5" />
+                            </svg>
+                        </div>
+                        <div class="easychat-analytics-data-card-item-text">
+                            ${category_most_frequent_intent}
+                        </div>
+                    </div>
+                    <div class="easychat-analytics-data-card-value">
+                        ${category_most_frequent_frequency}
+                    </div>
+                </li>
+              `
+            }
+            document.getElementById("category-wise-most-frequenct-intents").innerHTML = intent_html;
+          }
+
+          create_category_most_html(category_current_page, category_most_frequent_intents, category_most_frequent_frequencies, categories)
+          function load_next_category_wise_most_frequenct_intent() {
+            category_current_page += 1
+            create_category_most_html(category_current_page, category_most_frequent_intents, category_most_frequent_frequencies, categories)
+          }
+          function load_previous_category_wise_most_frequenct_intent() {
+            category_current_page -= 1
+            create_category_most_html(category_current_page, category_most_frequent_intents, category_most_frequent_frequencies, categories)
+          }
+
+          // Form Assist Analytics
+          $("#empty-search").hide()
+          $("#num-users-assisted").html("210")
+          $("#num-user-helpful").html("173")
+          $("#assisted-percentage").html("86.5")
+          intent_html = ""
+
+          form_intent_names = [
+            "PAN NUMBER",
+            "AADHAR NUMBER",
+            "IFSC CODE",
+            "RM Code",
+            "DOB"
+          ]
+          intents_user_assisted = [102, 94, 248, 342, 34]
+
+          for (i = 0; i < 5; i++) {
+            if (i >= form_intent_names.length) {
+                intent_html += '<li class="easychat-session-analytics-item"></li>'
+                continue
+            }
+            form_intent_name = form_intent_names[i]
+            intent_user_assisted = intents_user_assisted[i]
+
+            intent_html += `
+                <li class="easychat-session-analytics-item intent-list-item">
+                    <div class="easychat-analytics-data-card-content-div">
+                        <div class="easychat-analytics-data-card-icon-wrapper">
+                        <div class="easychat-analytics-card-item-color-div"></div>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <rect width="24" height="24" rx="4" fill="#EFF2F5" />
+                        </svg>
+                        </div>
+                        <div>
+                            <div class="easychat-analytics-data-card-item-text">
+                                ${form_intent_name}
+                            </div>
+                            <div class="easychat-analytics-form-assist-value-div"><span>${intent_user_assisted}</span> mes</div>
+                        </div>
+                    </div>
+                </li>
+            `
+          }
+
+          document.getElementById("form-assist-intent-used").innerHTML = intent_html
+          $("#form-assist-intents-left").hide()
+          $("#form-assist-intents-right").hide()
+
+          // User Nudge Analytics
+          intent_html = ""
+          const nudge_analytics_intents = ["Greeting bubble", "Chat with an expert"]
+          const nudge_analytics_frequencies = [3, 2]
+          for (var i = 0; i < 5; i++) {
+            if (i >= nudge_analytics_intents.length) {
+              intent_html += '<li class="easychat-session-analytics-item"></li>'
+                continue
+            }
+            intent_html += `
+                <li class="easychat-session-analytics-item analytics-card-green-li">
+                    <div class="easychat-analytics-data-card-content-div">
+                        <div class="easychat-analytics-data-card-icon-wrapper">
+                            <div class="easychat-analytics-card-item-color-div"></div>
+                            <span href="#" class="easychat-analytics-card-question-intent-btn">
+                                ${nudge_analytics_frequencies[i]}
+                            </span>
+                        </div>
+                        <div class="easychat-analytics-data-card-item-text">
+                            ${nudge_analytics_intents[i]}
+                        </div>
+                    </div>
+                    <div class="easychat-analytics-data-card-value ${i == 0 ? "type-active" : "type-inactive"}">
+                        ${i == 0 ? "Active" : "Inactive"}
+                    </div>
+                </li>
+            `
+          }
+          document.getElementById("user-nudge-analytics-chart").innerHTML = intent_html;
+          $("#nudge-analytics-left").hide()
+          $("#nudge-analytics-right").hide()
+
+          async function capture_screenshot(element, bot_name) {
+
+            element.style.display = "none";
+            M.toast({
+                "html": "Exporting"
+            });
+            const canvas_ele = document.getElementById("capture-html-to-canvas");
+            canvas_ele.style.backgroundColor = "#edf1f7";
+
+            html2canvas(canvas_ele,{
+                scale: 2, background: '#FFFFFF',
+                height: canvas_ele.scrollHeight
+                })
+            .then(function (canvas) {
+                var a = document.createElement('a');
+                // toDataURL defaults to png, so we need to request a jpeg, then convert for file download.
+                a.href = canvas.toDataURL("image/jpeg");
+                a.download = bot_name + '_screenshot.jpg';
+                a.click();
+                canvas_ele.style.backgroundColor = "transparent";
+            });
+
+            element.style.display = "flex";
+          }
+
+          function get_url_vars() {
+              var vars = {};
+              var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (m, key, value) {
+                  vars[key] = value;
+              });
+              return vars;
+          }
+
+          function intent_search(elm, search, no_div) {
+            search_text = $(search).val()
+            single_elm = false
+            for (const node of $(elm)) {
+              if (!$(node).text().toLocaleLowerCase().match(search_text.toLocaleLowerCase())) {
+                $(node).hide()
+              } else {
+                single_elm = true
+                $(node).show()
+              }
+            }
+            if (single_elm) {
+              $(no_div).hide()
+            } else {
+              $(no_div).show()
+            }
+          }
+
+          function download_easychat_nps_excel(){
+              bot_pk = get_selected_bot_id();
+              var json_string = JSON.stringify({
+                  bot_pk: bot_pk
+              });
+              json_string = EncryptVariable(json_string);
+              json_string = encodeURIComponent(json_string);
+              var xhttp = new XMLHttpRequest();
+              var params = 'json_string='+json_string
+              xhttp.open("POST", "/chat/export-easychat-nps-excel/", true);
+              xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+              xhttp.onreadystatechange = function() {
+                  if (this.readyState == 4 && this.status == 200) {
+                      response = JSON.parse(this.responseText);
+                      response = custom_decrypt(response)
+                      response = JSON.parse(response);
+                      var file_url = response["file_url"];
+                      if(response["status"]==200 && response["file_url"] != null){
+                          window.open(file_url);
+                      }else{
+                          M.toast({
+                              "html": "Internal server error please report error."
+                          });
+                      }
+                  }
+              }
+              xhttp.send(params);
+          }
+
+
+          function channel_usage_legends_search() {
+            var input, filter, searchValue, i, txtValue;
+            input = document.getElementById("channel_usage_graph_legend_search");
+            filter = input.value.toUpperCase();
+            searchValue = document.querySelectorAll('.channel-usage-legend-wrapper .graph-legend-item-div span');
+            let count = 0
+            for (i = 0; i < searchValue.length; i++) {
+
+                txtValue = searchValue[i].textContent || searchValue[i].innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    searchValue[i].parentElement.parentElement.parentElement.style.display = "";
+
+                    count++;
+
+                } else {
+                    searchValue[i].parentElement.parentElement.parentElement.style.display = "none";
+                }
+            }
+            if (count == 0) {
+
+                document.getElementById('graph_legend_noresult_found').style.display = "block";
+            } else {
+                document.getElementById('graph_legend_noresult_found').style.display = "none";
+            }
+        }
+
+        function category_wise_legends_search() {
+            var input, filter, searchValue, i, txtValue;
+            input = document.getElementById("category_wise_graph_legend_search");
+            filter = input.value.toUpperCase();
+            searchValue = document.querySelectorAll('.category-wise-legend-wrapper .graph-legend-item-div span');
+            let count = 0
+            for (i = 0; i < searchValue.length; i++) {
+
+                txtValue = searchValue[i].textContent || searchValue[i].innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    searchValue[i].parentElement.parentElement.parentElement.style.display = "";
+
+                    count++;
+
+                } else {
+                    searchValue[i].parentElement.parentElement.parentElement.style.display = "none";
+                }
+            }
+            if (count == 0) {
+
+                document.getElementById('graph_legend_noresult_found_category').style.display = "block";
+            } else {
+                document.getElementById('graph_legend_noresult_found_category').style.display = "none";
+            }
+        }
+
+        $(".easychat-analytics-no-data-found-wrapper").css("height", "300px")
+        $(".easychat-analytics-card-question-intent-btn").click(function(e) {
+            e.stopPropagation();
+            $(".easychat-analytics-data-card-intent-list").hide();
+            $(this).siblings(".easychat-analytics-data-card-intent-list").show();
+        });
+
+        $('body').click(function() {
+
+            $(".easychat-analytics-data-card-intent-list").hide();
+
+        });
+          function export_most_frequent_questions(){
+              bot_pk = get_selected_bot_id();
+              var json_string = JSON.stringify({
+                  bot_pk: bot_pk,
+                  reverse: true,
+              });
+              json_string = EncryptVariable(json_string);
+              json_string = encodeURIComponent(json_string);
+              var xhttp = new XMLHttpRequest();
+              var params = 'json_string='+json_string
+              xhttp.open("POST", "/chat/export-frequent-intent/", true);
+              xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+              xhttp.onreadystatechange = function() {
+                  if (this.readyState == 4 && this.status == 200) {
+                      response = JSON.parse(this.responseText);
+                      response = custom_decrypt(response)
+                      response = JSON.parse(response);
+                      var file_url = response["file_url"];
+                      if(response["status"]==200 && response["file_url"] != null){
+                          window.open(file_url);
+                      }else{
+                          M.toast({
+                              "html": "Internal server error please report error."
+                          });
+                      }
+                  }
+              }
+              xhttp.send(params);
+          }
+
+
+          function export_least_frequent_questions(){
+              bot_pk = get_selected_bot_id();
+              var json_string = JSON.stringify({
+                  bot_pk: bot_pk,
+                  reverse: false,
+              });
+              json_string = EncryptVariable(json_string);
+              json_string = encodeURIComponent(json_string);
+              var xhttp = new XMLHttpRequest();
+              var params = 'json_string='+json_string
+              xhttp.open("POST", "/chat/export-frequent-intent/", true);
+              xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+              xhttp.onreadystatechange = function() {
+                  if (this.readyState == 4 && this.status == 200) {
+                      response = JSON.parse(this.responseText);
+                      response = custom_decrypt(response)
+                      response = JSON.parse(response);
+                      var file_url = response["file_url"];
+                      if(response["status"]==200 && response["file_url"] != null){
+                          window.open(file_url);
+                      }else{
+                          M.toast({
+                              "html": "Internal server error please report error."
+                          });
+                      }
+                  }
+              }
+              xhttp.send(params);
+          }
+
+
+          function export_most_used_form_assist_intent(){
+              bot_pk = get_selected_bot_id();
+              var json_string = JSON.stringify({
+                  bot_pk: bot_pk
+              });
+              json_string = EncryptVariable(json_string);
+              json_string = encodeURIComponent(json_string);
+              var xhttp = new XMLHttpRequest();
+              var params = 'json_string='+json_string
+              xhttp.open("POST", "/chat/export-form-assist-intent/", true);
+              xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+              xhttp.onreadystatechange = function() {
+                  if (this.readyState == 4 && this.status == 200) {
+                      response = JSON.parse(this.responseText);
+                      response = custom_decrypt(response)
+                      response = JSON.parse(response);
+                      var file_url = response["file_url"];
+                      if(response["status"]==200 && response["file_url"] != null){
+                          window.open(file_url);
+                      }else{
+                          M.toast({
+                              "html": "Internal server error please report error."
+                          });
+                      }
+                  }
+              }
+              xhttp.send(params);
+          }
+
+          function export_unanswered_questions(){
+              bot_pk = get_selected_bot_id();
+              var json_string = JSON.stringify({
+                  bot_pk: bot_pk,
+                  reverse: false,
+              });
+              json_string = EncryptVariable(json_string);
+              json_string = encodeURIComponent(json_string);
+              var xhttp = new XMLHttpRequest();
+              var params = 'json_string='+json_string
+              xhttp.open("POST", "/chat/export-unanswered-intent/", true);
+              xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+              xhttp.onreadystatechange = function() {
+                  if (this.readyState == 4 && this.status == 200) {
+                      response = JSON.parse(this.responseText);
+                      response = custom_decrypt(response)
+                      response = JSON.parse(response);
+                      var file_url = response["file_url"];
+                      if(response["status"]==200 && response["file_url"] != null){
+                          window.open(file_url);
+                      }else{
+                          M.toast({
+                              "html": "Internal server error please report error."
+                          });
+                      }
+                  }
+              }
+              xhttp.send(params);
+          }
+
+
+
+          function get_selected_bot_id() {
+            bot_pk = $("#selected-bot-for-analytics").val();
+            return bot_pk;
+          }
+        </script>
+
+{% endblock %}

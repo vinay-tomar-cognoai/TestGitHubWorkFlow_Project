@@ -1,0 +1,485 @@
+{% extends 'LiveChatApp/base.html' %}
+{% block content %}
+{% load static %}
+<style type="text/css">
+.dataTables_filter {
+   display: none;
+}
+
+.chat_history_btn {
+      background: {{admin_config.get_livechat_theme_lighten_one}} !important;
+    }
+
+.live-chat-agent-message-wrapper {
+  width: 59% !important;
+  margin-left: 42.5% !important;
+}
+.ui-state-default{
+  background: #f6f6f6 !important;
+  color: #454545 !important;
+  border: 1px solid #c5c5c5 !important;
+}
+.ui-state-highlight{
+    background: #ffffff !important;
+    color: {{admin_config.get_livechat_theme_lighten_one}} !important;
+}
+.ui-state-active{
+  background: {{admin_config.get_livechat_theme_lighten_one}} !important;
+  color: #ffffff !important;
+  border: 1px solid {{admin_config.get_livechat_theme_lighten_one}} !important;
+}
+.live-chat-report-d-interaction-table-area{
+    margin-left: 7px;
+  }
+  .live-chat-client-message-wrapper{
+    margin-left: -1.7%;
+
+    width: 65%;
+}
+
+  }
+</style>
+<link href="{% static 'LiveChatApp/css/archive_customer.css' %}?v={% random_int 1 100 %}" rel="stylesheet">
+<script type="text/javascript" src="{% static 'LiveChatApp/js/archive_customer.js' %}?v={% random_int 1 100 %}"></script>
+<link href="{% static 'LiveChatApp/css/agent_chatbot_audit.css' %}?v={% random_int 1 100 %}" rel="stylesheet">
+
+<!-- <link href="{% static 'LiveChatApp/css/style1.css' %}" rel="stylesheet"> -->
+
+<style type="text/css">
+  .easychat-user-message {
+    background-color: {
+        {
+        admin_config.get_livechat_theme_lighten_one
+      }
+    }
+
+     !important;
+  }
+
+  .easychat-livechat-user-attachment {
+    background-color: {
+        {
+        admin_config.get_livechat_theme_lighten_one
+      }
+    }
+
+     !important;
+  }
+
+  .easychat-livechat-user-doc-attachment {
+    background-color: {
+        {
+        admin_config.get_livechat_theme_lighten_one
+      }
+    }
+
+     !important;
+  }
+
+  #archive-customer-table_info {
+    font-size: 13px;
+    margin-top: 60px;
+    color: #4D4D4D;
+    width: 50%;
+    padding-left: 10px;
+    display: inline-block;
+    
+    bottom: 2px;
+  }
+  @media only screen and (max-width: 769px) {
+    #archive-customer-table_info {
+      display: none;
+    }
+  }
+  .chat-history-btn {
+    background: linear-gradient(90deg, {{ admin_config.get_livechat_theme_lighten_one }} 0%, {{ admin_config.get_livechat_theme_lighten_five }} 100%) !important;
+  }
+  .livechat-nps-btn {
+    color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+    border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }} !important;
+    background: white !important;
+    box-shadow: none !important;
+  }
+  .modal-backdrop {
+		display: none !important;
+	}
+	.backdrop {
+		background-color: rgba(0, 0, 0, 0.5);
+  }
+  .active-page {
+		background: {{ admin_config.get_livechat_theme_lighten_three }} !important;
+		border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }} !important;
+}
+.active-page a {
+	color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+}
+@media only screen and (max-width: 769px) {
+  #live-chat-archived-setting {
+    z-index: 1 !important;
+  }
+  
+}
+@media only screen and (min-width: 770px) {
+      #live-chat-archived-setting {
+        overflow-y: auto; 
+        overflow-x: hidden; 
+        max-width: 99.5%; 
+        height: calc(100vh - 4.375rem);
+      }
+      #agent-chat-history-modal-content{
+        height: 425px;
+      }
+      .ui-datepicker-calendar tr th{
+    /* need this css for only this page */
+            top: unset;
+      }
+  }
+  @supports (-webkit-touch-callout: none) {
+   /* CSS specific to iOS devices */ 
+     @media only screen and (max-width: 769px) {
+          .modal-content{
+              margin-top: 5em;
+          }
+          #live-chat-archived-setting{
+            height: 76vh;
+          }
+          _::-webkit-full-page-media, _:future, :root #agent-chat-history-modal-content{
+            top:0px !important;
+            }
+          
+      }
+  }
+
+  @media only screen and (max-width: 1041px) {
+    .search-container {
+      width: 250px;
+    } 
+    
+
+  }
+
+  @media only screen and (max-width: 830px) {
+    #archive-default-end-date {
+      margin-right: 0px;
+    }
+
+    #submit-filter {
+      margin-left: 0px;
+      width: 90px;
+    }
+  }
+
+.live-chat-setting-archived-heading .live-chat-archived-date {
+  flex-direction: row;
+  display: flex;
+  justify-content: space-between;
+}
+@media only screen and (max-width: 900px){
+  .live-chat-setting-archived-heading .live-chat-archived-date {
+      width: 100%;
+      padding-left: 0px;
+      padding-right: 0px;
+      display: flex;
+      justify-content: space-between;
+      row-gap: 12px;
+      flex-direction: column !important;
+  }
+}
+   
+   _::-webkit-full-page-media, _:future, :root #agent-chat-history-modal-content{
+                top:35px;
+      }
+   _::-webkit-full-page-media, _:future, :root #nps-details-modal-content{
+                top:130px;
+      }
+    _::-webkit-full-page-media, _:future, :root .live-chat-archived-chats-area{
+                min-height:70vh;
+      }
+    
+  #archive-customer-table_wrapper{
+    overflow-x: auto;
+  }
+
+</style>
+
+<div class="container-fluid pl-1  pr-2 arange ">
+  <div class="row">
+<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 py-2 overflow-hidden-desktop" id="live-chat-archived-setting"
+  style="background: #FAFAFA; z-index: 10;">
+
+  <div class="live-chat-setting-archived-heading ">
+
+    <div class="row">
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-archived-date">
+        <div>
+          <input type="text" class="form-control" id="archive-default-start-date" name="start" placeholder="Start Date" autocomplete="off">
+
+          <input type="text" class="form-control" id="archive-default-end-date" name="end" placeholder="End Date" autocomplete="off">
+
+          <button class="filter-apply-button" id="submit-filter" onclick="archive_submit_filter()">Apply</button>
+        </div>
+        <div class="search-container">
+            <button type="submit">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="13" height="13" fill="#E5E5E5"/>
+                  <g clip-path="url(#clip0)">
+                  <rect width="1440" height="660" transform="translate(-1209 -141)" fill="white"/>
+                  <rect x="-962" y="-85" width="1193" height="604" fill="#FAFAFA"/>
+                  <rect x="-952" y="-74" width="1174" height="114" fill="white"/>
+                  <g filter="url(#filter0_d)">
+                  <rect x="-14" y="-10" width="219" height="33" rx="5" fill="white"/>
+                  </g>
+                  <path d="M5.55942 11.1182C6.79289 11.118 7.99083 10.7051 8.96247 9.94526L12.0174 13L13 12.0174L9.9451 8.96269C10.7054 7.991 11.1185 6.79285 11.1188 5.55912C11.1188 2.49396 8.62474 0 5.55942 0C2.49409 0 0 2.49396 0 5.55912C0 8.62428 2.49409 11.1182 5.55942 11.1182ZM5.55942 1.38978C7.85893 1.38978 9.72898 3.25973 9.72898 5.55912C9.72898 7.85851 7.85893 9.72846 5.55942 9.72846C3.2599 9.72846 1.38985 7.85851 1.38985 5.55912C1.38985 3.25973 3.2599 1.38978 5.55942 1.38978Z" fill="#757575"/>
+                  </g>
+                  <defs>
+                  <filter id="filter0_d" x="-22" y="-18" width="235" height="49" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                  <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                  <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
+                  <feOffset/>
+                  <feGaussianBlur stdDeviation="4"/>
+                  <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.08 0"/>
+                  <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+                  <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+                  </filter>
+                  <clipPath id="clip0">
+                  <rect width="1440" height="660" fill="white" transform="translate(-1209 -141)"/>
+                  </clipPath>
+                  </defs>
+              </svg>
+            </button>
+            <input type="text" placeholder="Search" name="search" id="archive-customer-table-search">
+        </div>
+
+
+      </div>
+    </div>
+
+  </div>
+  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-archived-chats-area ">
+    <div class="live-chat-setting-archived-filter-btnMobile ">
+      <button class="filter-button-archive-mobile" data-toggle="modal" data-target="#agent-archive-mobileRes-filter-Modal">Filters
+
+          <svg width="16" height="9" viewBox="0 0 16 9" fill="none" xmlns="http://www.w3.org/2000/svg" id="live-chat-filter-icon">
+              <rect width="16" height="9" fill="#E5E5E5"/>
+              <g clip-path="url(#clip0)">
+              <rect width="1440" height="660" transform="translate(-174 -97)" fill="white"/>
+              <rect x="-97" y="-41" width="1363" height="604" fill="#FAFAFA"/>
+              <rect x="-88" y="-30" width="1345" height="68" fill="white"/>
+              <rect x="-72.5" y="-13.5" width="103" height="34" rx="4.5" fill="white" stroke="#E6E6E6"/>
+              <path d="M5.33333 8.35714C5.33333 8.18665 5.40357 8.02313 5.5286 7.90257C5.65362 7.78201 5.82319 7.71429 6 7.71429H10C10.1768 7.71429 10.3464 7.78201 10.4714 7.90257C10.5964 8.02313 10.6667 8.18665 10.6667 8.35714C10.6667 8.52764 10.5964 8.69115 10.4714 8.81171C10.3464 8.93227 10.1768 9 10 9H6C5.82319 9 5.65362 8.93227 5.5286 8.81171C5.40357 8.69115 5.33333 8.52764 5.33333 8.35714ZM2.66667 4.5C2.66667 4.3295 2.7369 4.16599 2.86193 4.04543C2.98695 3.92487 3.15652 3.85714 3.33333 3.85714H12.6667C12.8435 3.85714 13.013 3.92487 13.1381 4.04543C13.2631 4.16599 13.3333 4.3295 13.3333 4.5C13.3333 4.6705 13.2631 4.83401 13.1381 4.95457C13.013 5.07513 12.8435 5.14286 12.6667 5.14286H3.33333C3.15652 5.14286 2.98695 5.07513 2.86193 4.95457C2.7369 4.83401 2.66667 4.6705 2.66667 4.5ZM0 0.642857C0 0.472361 0.070238 0.308848 0.195262 0.188289C0.320287 0.0677295 0.489856 0 0.666667 0H15.3333C15.5101 0 15.6797 0.0677295 15.8047 0.188289C15.9298 0.308848 16 0.472361 16 0.642857C16 0.813353 15.9298 0.976867 15.8047 1.09743C15.6797 1.21798 15.5101 1.28571 15.3333 1.28571H0.666667C0.489856 1.28571 0.320287 1.21798 0.195262 1.09743C0.070238 0.976867 0 0.813353 0 0.642857Z" fill="#868686"/>
+              </g>
+              <defs>
+              <clipPath id="clip0">
+              <rect width="1440" height="660" fill="white" transform="translate(-174 -97)"/>
+              </clipPath>
+              </defs>
+          </svg>
+          
+      </button>
+    </div>
+
+    <div class="data-loader-div" id="livechat_archive_customer_loader">
+      <div class="loader-custom">
+        <span></span>
+        <div id="loader-inside-div">
+          <div>
+          </div>
+          <div>
+          </div>
+          <div>
+          </div>
+          <div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: none;" id="livechat_archive_customer_table_div" class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-archive-chat-table-area live-chat-table-parent-div-without-heading-header">
+    
+    </div>
+
+      <div id="livechat_archive_customer_no_data" class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-report-d-interaction-table-area" style="text-align: center; padding: 40px 40px; display: none;">
+    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="40" height="40" fill="#E5E5E5"/>
+      <g clip-path="url(#clip0)">
+      <rect width="1440" height="760" transform="translate(-749 -242)" fill="white"/>
+      <rect x="-672" y="-186" width="1363" height="704" fill="#FAFAFA"/>
+      <rect x="-482" y="-47" width="1163" height="142" rx="8" fill="white"/>
+      <g opacity="0.15" clip-path="url(#clip1)">
+      <path d="M19.8234 39.9998C19.605 39.9998 19.3917 39.9132 19.2334 39.7565C19.0367 39.5598 18.95 39.2765 19.005 39.0048L20.1834 33.1132C20.2167 32.9498 20.2934 32.8015 20.4117 32.6865L33.375 19.7232C34.3484 18.7498 35.9367 18.7498 36.91 19.7232L39.2667 22.0798C40.2417 23.0548 40.2417 24.6398 39.2667 25.6148L26.3034 38.5782C26.1884 38.6948 26.04 38.7732 25.8767 38.8065L19.985 39.9848C19.9317 39.9948 19.8767 39.9998 19.8234 39.9998ZM21.77 33.6848L20.8867 38.1032L25.305 37.2198L38.09 24.4348C38.415 24.1098 38.415 23.5815 38.09 23.2565L35.7334 20.8998C35.4084 20.5748 34.88 20.5748 34.555 20.8998L21.77 33.6848ZM25.715 37.9882H25.7317H25.715Z" fill="#757575"/>
+      <path d="M15.8333 35H4.16667C1.86833 35 0 33.1317 0 30.8333V9.16667C0 6.86833 1.86833 5 4.16667 5H7.5C7.96 5 8.33333 5.37333 8.33333 5.83333C8.33333 6.29333 7.96 6.66667 7.5 6.66667H4.16667C2.78833 6.66667 1.66667 7.78833 1.66667 9.16667V30.8333C1.66667 32.2117 2.78833 33.3333 4.16667 33.3333H15.8333C16.2933 33.3333 16.6667 33.7067 16.6667 34.1667C16.6667 34.6267 16.2933 35 15.8333 35Z" fill="#757575"/>
+      <path d="M27.5 20C27.04 20 26.6667 19.6267 26.6667 19.1667V9.16667C26.6667 7.78833 25.545 6.66667 24.1667 6.66667H20.8333C20.3733 6.66667 20 6.29333 20 5.83333C20 5.37333 20.3733 5 20.8333 5H24.1667C26.465 5 28.3333 6.86833 28.3333 9.16667V19.1667C28.3333 19.6267 27.96 20 27.5 20Z" fill="#757575"/>
+      <path d="M19.1667 10H9.16675C7.78841 10 6.66675 8.87833 6.66675 7.5V4.16667C6.66675 3.70667 7.04008 3.33333 7.50008 3.33333H10.0834C10.4701 1.43333 12.1551 0 14.1667 0C16.1784 0 17.8634 1.43333 18.2501 3.33333H20.8334C21.2934 3.33333 21.6667 3.70667 21.6667 4.16667V7.5C21.6667 8.87833 20.5451 10 19.1667 10ZM8.33341 5V7.5C8.33341 7.95833 8.70842 8.33333 9.16675 8.33333H19.1667C19.6251 8.33333 20.0001 7.95833 20.0001 7.5V5H17.5001C17.0401 5 16.6667 4.62667 16.6667 4.16667C16.6667 2.78833 15.5451 1.66667 14.1667 1.66667C12.7884 1.66667 11.6667 2.78833 11.6667 4.16667C11.6667 4.62667 11.2934 5 10.8334 5H8.33341Z" fill="#757575"/>
+      <path d="M22.5 14.9997H5.83333C5.37333 14.9997 5 14.6263 5 14.1663C5 13.7063 5.37333 13.333 5.83333 13.333H22.5C22.96 13.333 23.3333 13.7063 23.3333 14.1663C23.3333 14.6263 22.96 14.9997 22.5 14.9997Z" fill="#757575"/>
+      <path d="M22.5 19.9997H5.83333C5.37333 19.9997 5 19.6263 5 19.1663C5 18.7063 5.37333 18.333 5.83333 18.333H22.5C22.96 18.333 23.3333 18.7063 23.3333 19.1663C23.3333 19.6263 22.96 19.9997 22.5 19.9997Z" fill="#757575"/>
+      <path d="M22.5 24.9997H5.83333C5.37333 24.9997 5 24.6263 5 24.1663C5 23.7063 5.37333 23.333 5.83333 23.333H22.5C22.96 23.333 23.3333 23.7063 23.3333 24.1663C23.3333 24.6263 22.96 24.9997 22.5 24.9997Z" fill="#757575"/>
+      </g>
+      </g>
+      <defs>
+      <clipPath id="clip0">
+      <rect width="1440" height="760" fill="white" transform="translate(-749 -242)"/>
+      </clipPath>
+      <clipPath id="clip1">
+      <rect width="40" height="40" fill="white"/>
+      </clipPath>
+      </defs>
+    </svg>
+    <span style="color: rgba(134, 134, 134, 0.5); font-size:20px;">No data available in table</span>
+  </div>
+
+    <!-- NPS Feedback Modal -->
+
+<div class="modal fade backdrop" id="nps-details" tabindex="-1" role="dialog" aria-labelledby="Admin_chat_history_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content"  style="max-height: 300px;" id="nps-details-modal-content">
+      <div class="modal-header">
+        <h6>LiveChat NPS Feedback</h6>
+      </div>
+      <div class="modal-body" id="nps-body" style="padding-bottom: 0.1em;overflow-y: scroll;">
+        <div class="row">
+          <div class="col-4 mb-1" id="livechat_nps_rating">
+            NPS Rating: {{audit_obj.rate_value}}
+          </div>
+          <div class="col-8 mb-1" id="livechat_nps_rating_text">
+            NPS Feedback: {{audit_obj.nps_text_feedback}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Chat History Modal -->
+
+<div class="modal fade backdrop livechat-chat-history-modal livechat-ongoing-chats-chat-history-modal" id="livechat-chat-details" tabindex="-1" role="dialog" aria-labelledby="Admin_chat_history_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <button type="button" data-toggle="tooltip" data-placement="bottom" id="previous_chat_history_btn"  title="" data-original-title="Previous Chat" class="live-chat-history-next-previous-btns live-chat-history-prev-btn">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect width="24" height="24" fill="#EBEBEB"/>
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M15.7071 4.29289C16.0976 4.68342 16.0976 5.31658 15.7071 5.70711L9.41421 12L15.7071 18.2929C16.0976 18.6834 16.0976 19.3166 15.7071 19.7071C15.3166 20.0976 14.6834 20.0976 14.2929 19.7071L7.29289 12.7071C6.90237 12.3166 6.90237 11.6834 7.29289 11.2929L14.2929 4.29289C14.6834 3.90237 15.3166 3.90237 15.7071 4.29289Z" fill="#2D2D2D"/>
+                                    </svg>
+                                    <span>Previous</span>
+                                    
+      </button>
+    <div class="modal-content" style="overflow: hidden;" id="agent-chat-history-modal-content">
+      <div class="modal-header">
+          <div class="modal-header-name-close-btn">
+              <h6>Chat History</h6>
+              <button type="button" class="close"  data-dismiss="modal" aria-label="Close" style="outline: none;">
+                <span aria-hidden="true">
+                    <span aria-hidden="true">&times;</span>                                              
+                </span>
+              </button>
+           </div>
+          <div class="livechat-modal-chats-customer-name-div" id="livechat-modal-chats-customer-name-div">
+            Customer Name
+          </div>
+      </div>
+
+      <div class="modal-body" style="padding-bottom: 0.1em;">
+        <div id="livechat-chat-messages" class="row" style="margin-left: -18px; margin-right: -18px; border-bottom: 1px solid #e6e6e6; padding-bottom: 5px">
+    
+        </div>
+      </div>
+
+      <div class="modal-footer" style="padding-top: 0.2em; position: relative;">
+        <div style="float: right;">      
+            <button id="chat_history_download_btn" class="btn-primary" onclick="download_chat_transcript(this)">Download </button>
+        </div>
+      </div>
+
+    </div>
+
+    <button type="button" data-toggle="tooltip" data-placement="bottom" title="" id="next_chat_history_btn" data-original-title="Next Chat" class="live-chat-history-next-previous-btns live-chat-history-next-btn">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect width="24" height="24" fill="#EBEBEB"/>
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M8.29289 4.29289C7.90237 4.68342 7.90237 5.31658 8.29289 5.70711L14.5858 12L8.29289 18.2929C7.90237 18.6834 7.90237 19.3166 8.29289 19.7071C8.68342 20.0976 9.31658 20.0976 9.70711 19.7071L16.7071 12.7071C17.0976 12.3166 17.0976 11.6834 16.7071 11.2929L9.70711 4.29289C9.31658 3.90237 8.68342 3.90237 8.29289 4.29289Z" fill="#2D2D2D"/>
+                                    </svg>
+                                    <span>Next</span>
+                                    
+                                    
+     </button>
+      
+    </div>
+  </div> 
+
+  </div>
+
+</div>
+</div>
+</div>
+
+<div class="modal fade backdrop" id="agent-archive-mobileRes-filter-Modal" tabindex="-1" role="dialog" aria-labelledby="Agent_archive_mobileRes_filter_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h6>Filter</h6>
+          </div>
+          <div class="modal-body">
+              <div class="row">
+                  <div class="col-12 mb-2">
+                      <label>Start date</label>
+                      <input type="text" class="form-control" id="archive-default-start-date-mobile" name="start" placeholder="Start Date">
+                  </div>
+                  <div class="col-12 mb-2">
+                      <label>End date </label>
+                      <input type="text" class="form-control" id="archive-default-end-date-mobile" name="end" placeholder="End Date">
+                  </div>
+
+              </div>
+          </div>
+          <div class="modal-footer">
+
+
+              <div style="float: right;">
+                  <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                  <button class="btn-primary" type="button" onclick="archive_submit_filter()">Apply </button>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+<div class="modal fade backdrop" id="preview-livechat-customer-attachment-modal" tabindex="-1" role="dialog" aria-labelledby="preview-livechat-customer-attachment_modal_label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style role="document">
+      <div class="modal-content"> 
+        <div class="modal-header">
+          
+            <svg data-dismiss="modal" id="preview-livechat-customer-attachment-cross-button" onclick="close_livechat_attachment_image()" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 1.85364L13.1464 0L7.5 5.64636L1.85364 0L0 1.85364L5.64636 7.5L0 13.1464L1.85364 15L7.5 9.35364L13.1464 15L15 13.1464L9.35364 7.5L15 1.85364Z" fill="white"></path>
+            </svg>
+           
+       </div>
+         <img id="preview-livechat-customer-attachment">
+      </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  /* $(function() {
+            $("#datepicker").datepicker();
+        });
+        $(function() {
+            $("#datepickers").datepicker();
+  });   */
+  
+  window.CURRENT_STATUS = '{{user_obj.current_status}}'
+  window.agent_username = '{{user_obj.user.username}}'
+  
+  $(document).ready(function() {
+    
+    var start_date = "{{start_date|date:" d-m-Y "}}";
+    var end_date = "{{end_date|date:" d-m-Y "}}";
+    var currentDate = new Date();
+    $('#archive-default-start-date').datepicker({ dateFormat: 'dd-mm-yy', prevText: "Previous",maxDate: currentDate }).val(start_date.trim());
+    $('#archive-default-end-date').datepicker({ dateFormat: 'dd-mm-yy', prevText: "Previous",maxDate: currentDate }).val(end_date.trim());
+    $('#archive-default-start-date-mobile').datepicker({ dateFormat: 'dd-mm-yy', prevText: "Previous",maxDate: currentDate }).val(start_date.trim());
+    $('#archive-default-end-date-mobile').datepicker({ dateFormat: 'dd-mm-yy', prevText: "Previous",maxDate: currentDate }).val(end_date.trim());
+   
+    var today = new Date().toISOString().slice(0,10);
+    document.getElementById("archive-default-start-date").max = today;
+    document.getElementById("archive-default-end-date").max = today;
+});
+</script>
+
+{% endblock %}

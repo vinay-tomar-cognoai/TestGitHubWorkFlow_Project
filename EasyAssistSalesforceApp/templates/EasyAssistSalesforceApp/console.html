@@ -1,0 +1,734 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  
+  <link rel="shortcut icon" type="image/x-icon" href="{% static 'EasyAssistSalesforceApp/img/cobrowseLogoShort.svg' %}">
+
+  <title>Cogno Cobrowse </title>
+
+  <!-- Custom fonts for this template-->
+  <link href="{% static 'EasyAssistSalesforceApp/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+
+  <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'EasyAssistSalesforceApp/css/bootstrap-select.css' %}" />
+  <!-- Custom styles for this template-->
+
+  <link href="{% static 'EasyAssistSalesforceApp/css/sb-admin-2.min.css' %}" rel="stylesheet">
+
+  <link href="{% static 'EasyAssistSalesforceApp/vendor/datatables/dataTables.bootstrap4.min.css' %}" rel="stylesheet">
+
+  <link rel="stylesheet" type="text/css" href="{% static 'EasyAssistSalesforceApp/css/console.css' %}">
+
+  <link rel="stylesheet" type="text/css" href="{% static 'EasyAssistSalesforceApp/css/cobrowse_changes.css' %}">
+
+  <link rel="stylesheet" type="text/css" href="{% static 'EasyAssistSalesforceApp/css/cobrowse_responsive.css' %}">
+
+  <script type="text/javascript" src="{% static 'EasyAssistSalesforceApp/js/jquery.min.js' %}"></script>
+
+  <script src="{% static 'EasyAssistSalesforceApp/vendor/chart.js/Chart.min.js' %}"></script>
+  <style>
+
+.sidebar::-webkit-scrollbar {
+    display: none;
+}
+
+#accordionSidebar{
+      overflow-y: auto;
+      overflow-x: hidden;
+      top: 0;
+      bottom: 0;
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;
+}
+@media only screen and (min-width: 760px) {
+    #accordionSidebar{
+      position: fixed;
+      overflow-y: auto;
+      overflow-x: hidden;
+      z-index: 99999;
+      top: 0;
+      bottom: 0;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    #content-wrapper{
+      margin-left: 220px;
+      height:100vh;
+    }
+  }
+
+  </style>
+  <style>
+    {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+
+    :root {
+      --color_rgba_3: rgba({{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.red }}, {{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.green }}, {{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.blue }}, 0.03);
+
+      --color_rgba_5: rgba({{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.red }}, {{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.green }}, {{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.blue }}, 0.05);
+
+      --color_rgba_8: rgba({{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.red }}, {{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.green }}, {{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.blue }}, 0.08);
+
+      --color_rgba_10: rgba({{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.red }}, {{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.green }}, {{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.blue }}, 0.1);
+
+      --color_rgba_80: rgba({{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.red }}, {{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.green }}, {{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.blue }}, 0.8);
+
+      --color_rgb: {{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.rgb }};
+
+      --color_text: #4A4A4A;
+    }
+
+    #content {
+      background: var(--color_rgba_3) !important;
+    }
+
+    .sticky-footer {
+      background: var(--color_rgba_3) !important;
+    }
+
+    .card-header {
+      background: var(--color_rgba_3) !important;
+    }
+
+    .btn-primary, .btn-info {
+      background: var(--color_rgb) !important;
+    }
+
+    .btn-primary:hover,
+    .btn-info:hover {
+      color: #FFFFFF!important;
+      background: var(--color_rgb) !important;
+    }
+
+    .modal .btn-primary {
+      background: var(--color_rgb) !important;
+    }
+
+    .modal .btn-primary:hover {
+      background: var(--color_rgb) !important;
+    }
+
+    th {
+      color: var(--color_text) !important;
+      background: var(--color_rgba_8) !important;
+    }
+
+    .sidebar-dark .nav-item.active .nav-link {
+      background-color: var(--color_rgba_10) !important;
+    }
+
+    .sidebar-dark .nav-item .nav-link:hover {
+      background: var(--color_rgba_10) !important;
+    }
+
+    input:checked + .easyassist-switch-slider {
+      background: var(--color_rgb) !important;
+    }
+
+    .text-primary {
+      color: var(--color_text) !important;
+    }
+
+    .page-item.active .page-link {
+      background: var(--color_rgb) !important;
+      border-color: var(--color_rgb) !important;
+    }
+
+    .btn-tab {
+      color: var(--color_rgb) !important;
+    }
+
+    .btn-tab-active {
+      background: var(--color_rgba_3) !important;
+      border: 1px solid var(--color_rgb) !important;
+    }
+
+    .nav-pills .nav-link.active {
+      color: var(--color_rgb) !important;
+      border: 1px solid var(--color_rgb) !important;
+      background: var(--color_rgba_10) !important;
+    }
+
+    a {
+      color: var(--color_text);
+    }
+
+    a:hover {
+      color: var(--color_rgb) !important;
+    }
+
+    .modal-title {
+      color: var(--color_text)!important;
+    }
+    .input-group-text {
+      background: var(--color_rgba_5) !important;
+    }
+
+    .form-control:disabled, .form-control[readonly] {
+      background-color: var(--color_rgba_3) !important;
+    }
+
+    .cobrowsing_count_bubble {
+      background: var(--color_rgb) !important;
+    }
+
+    .card-cobrowse {
+      background: linear-gradient(180deg, var(--color_rgba_80), var(--color_rgb))!important;
+    }
+
+    .icon-cobrowse {
+      background: var(--color_rgb) !important;
+    }
+
+    .sidebar-dark #sidebarToggle {
+      color: #FFFFFF!important;
+      background: var(--color_rgba_10) !important;
+    }
+
+    .btn-danger:hover {
+      color: #FFFFFF!important;
+    }
+
+    .bg-primary {
+       background: var(--color_rgb)!important;
+    }
+    {% endif %}
+  </style>
+</head>
+
+
+<body id="page-top">
+  {% csrf_token %}
+  <!-- Page Wrapper -->
+  <div id="wrapper">
+
+    <!-- Sidebar -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion toggled" id="accordionSidebar">
+
+      <!-- Sidebar - Brand -->
+      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/" style="height:3.75rem !important;">
+          <div class="sidebar-brand-icon rotate-n-15"></div>
+          {% if cobrowse_agent.get_access_token_obj.source_easyassist_cobrowse_logo %}
+          <img id="cobrowseLogoImage" src="/{{ cobrowse_agent.get_access_token_obj.source_easyassist_cobrowse_logo }}" alt="Cogno CoBrowse" max-width = "90px" height = "50px" />
+          <img id="cobrowseLogoSmall" src="/{{ cobrowse_agent.get_access_token_obj.source_easyassist_cobrowse_logo }}" alt="Cogno CoBrowse" max-width = "90px" height = "50px" />
+          {% else %}
+          <img id="cobrowseLogoImage" src="{% static 'EasyAssistSalesforceApp/img/cobrowseLogo.svg' %}" id="sales-ai-logo" alt="Cogno CoBrowse" max-width = "90px" height = "50px"/>
+          <img id="cobrowseLogoSmall" src="{% static 'EasyAssistSalesforceApp/img/cobrowseLogoShort.svg' %}" id="sales-ai-logo" alt="Cogno CoBrowse" />
+          {% endif %}
+      </a>
+      <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3"
+        amino-styles="margin: 5px 0 10px 0 !important;">
+        <i class="fa fa-bars"></i>
+      </button>
+
+      <!-- Divider -->
+      <hr class="sidebar-divider my-0">
+
+      <!-- Nav Item - Dashboard -->
+      <li class="nav-item active nav-item-menu">
+          <a class="nav-link" href="/easy-assist-salesforce/sales-ai/dashboard/?salesforce_token={{salesforce_token}}">
+            <svg
+              width="26"
+              height="26"
+              viewBox="0 0 26 26"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M3.79167 15.1667L14.625 15.1678C15.4692 15.1678 16.1638 15.8126 16.2426 16.6363L16.25 16.7928V18.9583C16.2489 22.75 12.2243 23.8333 9.20834 23.8333C6.25936 23.8333 2.34509 22.7976 2.17258 19.2071L2.16667 18.9583V16.7917C2.16667 15.9474 2.81154 15.2529 3.63525 15.1741L3.79167 15.1667ZM16.7787 15.1667H22.2083C23.0526 15.1667 23.7471 15.8106 23.8259 16.6351L23.8333 16.7917V18.4167C23.8323 21.7338 20.7372 22.75 18.4167 22.75C17.68 22.75 16.8664 22.646 16.0983 22.4012C16.8055 21.5884 17.2642 20.556 17.3262 19.2617L17.3333 18.9583V16.7917C17.3333 16.2561 17.1716 15.7612 16.9011 15.3417L16.7787 15.1667H22.2083H16.7787ZM9.20834 3.25C11.9004 3.25 14.0833 5.43292 14.0833 8.125C14.0833 10.8171 11.9004 13 9.20834 13C6.51626 13 4.33334 10.8171 4.33334 8.125C4.33334 5.43292 6.51626 3.25 9.20834 3.25ZM18.9583 5.41667C21.0524 5.41667 22.75 7.11425 22.75 9.20833C22.75 11.3024 21.0524 13 18.9583 13C16.8643 13 15.1667 11.3024 15.1667 9.20833C15.1667 7.11425 16.8643 5.41667 18.9583 5.41667Z"
+                fill="#7B7B7B"
+              />
+            </svg>
+
+            &nbsp;
+            <span>Active Customers</span>
+            <div class="cobrowsing_count_bubble_wrapper">
+              <div id="total_cobrowsing_count" class="cobrowsing_count_bubble" style="display: none;"></div>
+            </div>
+          </a>
+      </li>
+
+      <!-- Nav Item - Dashboard -->
+      <li class="nav-item nav-item-menu">
+        {% if cobrowse_agent.get_access_token_obj.allow_video_meeting_only == False %}
+          <a class="nav-link" href="/easy-assist-salesforce/sales-ai/support-history/?salesforce_token={{salesforce_token}}">
+        {% else %}
+           <a class="nav-link" href="/easy-assist-salesforce/sales-ai/meeting-audit-trail/?salesforce_token={{salesforce_token}}">
+        {% endif %}
+            <svg
+              width="26"
+              height="26"
+              viewBox="0 0 26 26"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M13.8125 4.875C18.7485 4.875 22.75 8.87645 22.75 13.8125C22.75 18.7485 18.7485 22.75 13.8125 22.75C12.115 22.75 10.4851 22.275 9.07624 21.3931C8.50243 21.0339 7.97097 20.6106 7.49236 20.1319C7.01302 19.6525 6.58915 19.1201 6.22969 18.5453C5.34919 17.1372 4.875 15.5086 4.875 13.8125C4.875 13.5404 4.88719 13.2696 4.91143 13.0007C4.96068 12.4545 5.44342 12.0516 5.98965 12.1009C6.53588 12.1501 6.93877 12.6329 6.88952 13.1791C6.87062 13.3887 6.86111 13.5999 6.86111 13.8125C6.86111 15.1334 7.2292 16.3976 7.91367 17.4922C8.19343 17.9396 8.5235 18.3542 8.89684 18.7276C9.26961 19.1004 9.68345 19.4301 10.13 19.7096C11.2253 20.3952 12.4904 20.7639 13.8125 20.7639C17.6516 20.7639 20.7639 17.6516 20.7639 13.8125C20.7639 9.97335 17.6516 6.86111 13.8125 6.86111C11.9541 6.86111 10.2219 7.59538 8.94449 8.84925L10.3345 8.85061C10.883 8.85061 11.3276 9.29522 11.3276 9.84367C11.3276 10.3529 10.9442 10.7727 10.4503 10.83L10.3345 10.8367H6.36092C5.85164 10.8367 5.43191 10.4534 5.37454 9.95948L5.36786 9.84367V5.87154C5.36786 5.32309 5.81247 4.87849 6.36092 4.87849C6.87019 4.87849 7.28993 5.26185 7.34729 5.75573L7.35397 5.87154L7.35355 7.63416C9.01217 5.89942 11.3255 4.875 13.8125 4.875ZM13.0677 8.84722C13.4446 8.84722 13.7564 9.1276 13.8057 9.49099L13.8125 9.59201V13.8125H16.0469C16.458 13.8125 16.7917 14.1462 16.7917 14.5573C16.7917 14.9342 16.5113 15.2459 16.1479 15.2953L16.0469 15.3021H13.0677C12.6908 15.3021 12.3791 15.0217 12.3297 14.6583L12.3229 14.5573V9.59201C12.3229 9.18089 12.6566 8.84722 13.0677 8.84722Z"
+                fill="#7B7B7B"
+              />
+            </svg>
+
+            &nbsp;
+            <span>Support History</span>
+        </a>  
+      </li>
+
+      {% if cobrowse_agent.role == 'agent' or cobrowse_agent.role == 'supervisor' %}
+        {% if cobrowse_agent.get_access_token_obj.allow_generate_meeting %}
+        <li class="nav-item nav-item-menu">
+            <a class="nav-link" href="/easy-assist-salesforce/sales-ai/sales-meetings/?salesforce_token={{salesforce_token}}">
+              <svg width="26"  height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M24 23h-24v-21h24v21zm-20-1v-4h-3v4h3zm15 0v-19h-14v19h14zm4 0v-4h-3v4h3zm-6-9.5l-9 5v-10l9 5zm3 .5v4h3v-4h-3zm-16 4v-4h-3v4h3zm5-1.2l5.941-3.3-5.941-3.3v6.6zm11-7.8v4h3v-4h-3zm-16 4v-4h-3v4h3zm16-9v4h3v-4h-3zm-16 4v-4h-3v4h3z" fill="#7B7B7B"/>
+              </svg>
+
+              &nbsp;
+              <span>Meetings</span>
+              <div class="cobrowsing_count_bubble_wrapper">
+                <div id="total_video_meeting_count" class="cobrowsing_count_bubble" style="display: none;"></div>
+              </div>
+          </a>
+        </li>
+        {% endif %}
+      {% endif %}
+
+      <!-- Nav Item - Dashboard -->
+      <li class="nav-item nav-item-submenu" style="flex-direction: column;">
+          <a class="nav-link collapsed text-truncate" href="#submenu1" data-toggle="collapse" data-target="#submenu1">
+            <svg  width="26"  height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20.5155 4.875C21.7496 4.875 22.75 5.87524 22.75 7.10909V20.5159C22.75 21.7498 21.7496 22.75 20.5155 22.75H7.10952C5.87543 22.75 4.875 21.7498 4.875 20.5159V7.10909C4.875 5.87524 5.87543 4.875 7.10952 4.875H20.5155ZM11.6399 9.78934L10.0939 13.3153H8.5992C8.18784 13.3153 7.85436 13.6488 7.85436 14.06C7.85436 14.4713 8.18784 14.8047 8.5992 14.8047H10.5807C10.8764 14.8047 11.1441 14.6298 11.2628 14.359L12.291 12.014L14.6113 17.8073C14.8501 18.4035 15.6812 18.4382 15.9688 17.8639L17.5008 14.8047H19.027C19.4383 14.8047 19.7718 14.4713 19.7718 14.06C19.7718 13.6488 19.4383 13.3153 19.027 13.3153H17.0408C16.7588 13.3153 16.501 13.4745 16.3748 13.7266L15.3784 15.7161L13.0135 9.81148C12.768 9.19844 11.9051 9.18453 11.6399 9.78934Z"
+                fill="#7B7B7B"/>
+            </svg>
+
+            &nbsp;
+            <span>Analytics</span>
+          </a>
+
+          <div class="collapse" id="submenu1" aria-expanded="false">
+              <ul class="flex-column" style="padding: 0;">
+                  {% if cobrowse_agent.get_access_token_obj.allow_video_meeting_only == False %}
+                  <li class="nav-item nav-item-menu">
+                    <a class="nav-link nav-link-sub-menu" href="/easy-assist-salesforce/sales-ai/analytics/?salesforce_token={{salesforce_token}}" style="padding-left: 0!important;">
+                      <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 2H2V28C2 28.5304 2.21071 29.0391 2.58579 29.4142C2.96086 29.7893 3.46957 30 4 30H30V28H4V2Z" fill="#7B7B7B"/>
+                        <path d="M19 21L19 19L14.414 19L21 12.414L19.586 11L13 17.586L13 13L11 13L11 21L19 21Z" fill="#7B7B7B"/>
+                      </svg>
+                      <span>Inbound</span>
+                    </a>
+                  </li>
+
+                  {% if cobrowse_agent.get_access_token_obj.lead_generation %}
+                  <li class="nav-item nav-item-menu">
+                    <a class="nav-link nav-link-sub-menu" href="/easy-assist-salesforce/sales-ai/analytics-outbound/?salesforce_token={{salesforce_token}}" style="padding-left: 0!important;">
+                      <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 2H2V28C2 28.5304 2.21071 29.0391 2.58579 29.4142C2.96086 29.7893 3.46957 30 4 30H30V28H4V2Z" fill="#7B7B7B"/>
+                        <path d="M12 10V12H16.586L10 18.586L11.414 20L18 13.414V18H20V10H12Z" fill="#7B7B7B"/>
+                      </svg>
+                      <span>Outbound</span>
+                      </a>
+                  </li>
+                  {% endif %}
+                  {% endif %}
+                  {% if cobrowse_agent.get_access_token_obj.allow_generate_meeting %}
+                  <li class="nav-item nav-item-menu">
+                    <a class="nav-link nav-link-sub-menu" href="/easy-assist-salesforce/sales-ai/cogno-meet-analytics/?salesforce_token={{salesforce_token}}" style="padding-left: 0!important;">
+                      <svg width="19" height="17" viewBox="0 0 20 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11.75 0C13.5449 0 15 1.55208 15 3.46667V3.6512L18.8639 1.17866C19.3638 0.858521 20 1.2426 20 1.86454V14.1333C20 14.7552 19.364 15.1393 18.8641 14.8193L15 12.3467V12.5333C15 14.4479 13.5449 16 11.75 16H3.25C1.45507 16 0 14.4479 0 12.5333V3.46667C0 1.55208 1.45507 0 3.25 0H11.75ZM11.75 1.6H3.25C2.2835 1.6 1.5 2.43574 1.5 3.46667V12.5333C1.5 13.5643 2.2835 14.4 3.25 14.4H11.75C12.7165 14.4 13.5 13.5643 13.5 12.5333V3.46667C13.5 2.43574 12.7165 1.6 11.75 1.6ZM18.5 3.27797L15 5.51946V10.4804L18.5 12.7204V3.27797Z" fill="#7B7B7B"/>
+                      </svg>
+                      <span>Video Meeting</span>
+                    </a>
+                  </li>
+                  {% endif %}
+              </ul>
+          </div>
+      </li>
+
+      {% if cobrowse_agent.role != "agent" %}
+      <li class="nav-item nav-item-menu">
+        <a class="nav-link" href="/easy-assist-salesforce/sales-ai/access-management/?salesforce_token={{salesforce_token}}">
+
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M18.9583 13C22.249 13 24.9167 15.6676 24.9167 18.9583C24.9167 22.249 22.249 24.9166 18.9583 24.9166C15.6676 24.9166 13 22.249 13 18.9583C13 15.6676 15.6676 13 18.9583 13ZM13.0241 15.1659C12.3231 16.2605 11.9167 17.5619 11.9167 18.9583C11.9167 20.7245 12.5669 22.3388 13.6411 23.5749C12.7792 23.7484 11.8423 23.8344 10.8333 23.8344C7.12728 23.8344 4.39408 22.6729 2.7234 20.3282C2.36378 19.8235 2.1705 19.2192 2.1705 18.5995V17.6028C2.1705 16.2573 3.26126 15.1665 4.60679 15.1665L13.0241 15.1659ZM18.9583 14.625L18.861 14.6337C18.6399 14.6738 18.4655 14.8482 18.4254 15.0693L18.4167 15.1666L18.4156 18.4166H15.1667L15.0693 18.4253C14.8482 18.4655 14.6739 18.6398 14.6337 18.8609L14.625 18.9583L14.6337 19.0557C14.6739 19.2768 14.8482 19.4511 15.0693 19.4912L15.1667 19.5H18.4156L18.4167 22.75L18.4254 22.8473C18.4655 23.0684 18.6399 23.2428 18.861 23.2829L18.9583 23.2916L19.0557 23.2829C19.2768 23.2428 19.4511 23.0684 19.4913 22.8473L19.5 22.75L19.4989 19.5H22.75L22.8474 19.4912C23.0685 19.4511 23.2428 19.2768 23.2829 19.0557L23.2917 18.9583L23.2829 18.8609C23.2428 18.6398 23.0685 18.4655 22.8474 18.4253L22.75 18.4166H19.4989L19.5 15.1666L19.4913 15.0693C19.4511 14.8482 19.2768 14.6738 19.0557 14.6337L18.9583 14.625ZM10.8333 2.17163C13.8249 2.17163 16.25 4.59676 16.25 7.5883C16.25 10.5798 13.8249 13.005 10.8333 13.005C7.84179 13.005 5.41667 10.5798 5.41667 7.5883C5.41667 4.59676 7.84179 2.17163 10.8333 2.17163Z"
+              fill="#7B7B7B" />
+          </svg>
+
+          &nbsp;<span>Agent Management</span>
+        </a>
+      </li>
+      {% endif %}
+
+      {% if cobrowse_agent.role == "admin" %}
+      <li class="nav-item nav-item-menu">
+        <a class="nav-link" href="/easy-assist-salesforce/sales-ai/audit-trail/?salesforce_token={{salesforce_token}}">
+
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M15.1008 5.41629L20.5835 10.899L19.9192 11.5643C18.9769 11.0965 17.915 10.8334 16.7917 10.8334C12.9027 10.8334 9.75 13.9861 9.75 17.8751C9.75 18.9983 10.013 20.0601 10.4807 21.0023L9.81717 21.6653C9.51723 21.9652 9.14419 22.1817 8.73495 22.2933L3.19295 23.8048C2.58642 23.9702 2.02988 23.4137 2.1953 22.8071L3.70675 17.2651C3.81836 16.8559 4.03484 16.4829 4.33479 16.1829L15.1008 5.41629ZM16.7917 11.9168C17.1092 11.9168 17.4207 11.9433 17.7242 11.9945L17.912 12.7702C18.1925 13.9335 19.363 14.649 20.5262 14.3685L20.6322 14.3401L21.2833 14.1463C21.6761 14.6522 21.9907 15.2259 22.2081 15.8477L21.7236 16.3138C20.9067 17.0998 20.84 18.3722 21.5407 19.2371L21.6938 19.4071L22.2081 19.9025C21.9909 20.5239 21.6766 21.0972 21.2842 21.6028L20.6322 21.4101C19.4846 21.071 18.2794 21.7265 17.9404 22.874L17.912 22.98L17.7242 23.7557C17.4207 23.8068 17.1092 23.8334 16.7917 23.8334C16.4738 23.8334 16.162 23.8068 15.8582 23.7555L15.6714 22.98C15.3908 21.8167 14.2204 21.1011 13.0571 21.3817L12.9512 21.4101L12.2992 21.6028C11.9068 21.0972 11.5925 20.5239 11.3752 19.9025L11.8597 19.4364C12.722 18.6067 12.7484 17.2351 11.9187 16.3728L11.8597 16.3138L11.3752 15.8477C11.5925 15.2263 11.9068 14.653 12.2992 14.1474L12.9512 14.3401C14.0988 14.6791 15.3039 14.0237 15.643 12.8761L15.6714 12.7702L15.8582 11.9946C16.162 11.9434 16.4738 11.9168 16.7917 11.9168ZM16.7917 16.2501C15.9243 16.2501 15.2212 16.9776 15.2212 17.8751C15.2212 18.7725 15.9243 19.5001 16.7917 19.5001C17.659 19.5001 18.3621 18.7725 18.3621 17.8751C18.3621 16.9776 17.659 16.2501 16.7917 16.2501ZM22.7829 3.21723C24.2968 4.73114 24.2968 7.18569 22.7829 8.69961L21.7319 9.74962L16.2491 4.26795L17.3005 3.21723C18.8144 1.70331 21.2689 1.70331 22.7829 3.21723Z"
+              fill="#7B7B7B" />
+          </svg>
+
+          &nbsp;<span>Audit Trail</span></a>
+      </li>
+      {% endif %}
+
+      {% if cobrowse_agent.role != "agent" %}
+      <li class="nav-item nav-item-menu">
+        <a class="nav-link" href="/easy-assist-salesforce/sales-ai/customer-support-documents/?salesforce_token={{salesforce_token}}">
+
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M20.6607 17.1786C22.5839 17.1786 24.1428 18.7376 24.1428 20.6608C24.1428 22.5219 22.6827 24.042 20.8485 24.1381L20.6638 24.1429L19.7353 24.1472C19.3507 24.149 19.0375 23.8385 19.0357 23.4539C19.0341 23.1013 19.2948 22.8088 19.6344 22.7611L19.729 22.7543L20.6607 22.7501C21.8145 22.7501 22.75 21.8146 22.75 20.6608C22.75 19.5549 21.8909 18.6499 20.8037 18.5763L20.6607 18.5715H19.7321C19.3475 18.5715 19.0357 18.2597 19.0357 17.8751C19.0357 17.5225 19.2977 17.2311 19.6376 17.185L19.7321 17.1786H20.6607ZM16.4821 17.1786C16.8667 17.1786 17.1785 17.4905 17.1785 17.8751C17.1785 18.2276 16.9165 18.519 16.5766 18.5652L16.4821 18.5715H15.5535C14.3997 18.5715 13.4643 19.5069 13.4643 20.6608C13.4643 21.7666 14.3234 22.6717 15.4105 22.7452L15.5535 22.7501H16.4821C16.8667 22.7501 17.1785 23.0619 17.1785 23.4465C17.1785 23.7991 16.9165 24.0905 16.5766 24.1366L16.4821 24.1429H15.5535C13.6304 24.1429 12.0714 22.5839 12.0714 20.6608C12.0714 18.7996 13.5315 17.2796 15.3686 17.1835L15.5535 17.1786H16.4821ZM22.0535 6.03578C23.1091 6.03578 23.9818 6.81854 24.1229 7.83524L24.138 7.98202L24.1428 8.12507L24.1436 17.9542C23.3366 16.9172 22.0766 16.2501 20.6607 16.2501H15.5535C13.1175 16.2501 11.1428 18.2248 11.1428 20.6608C11.1428 21.235 11.2526 21.7837 11.4522 22.2869L3.9464 22.2858C2.8406 22.2858 1.93545 21.4267 1.86194 20.3395L1.85712 20.1965V9.74914L9.47781 9.75007L9.66027 9.74208C10.023 9.71033 10.3712 9.58423 10.6701 9.37651L10.8153 9.26582L14.6909 6.03578H22.0535ZM20.6607 19.9644C21.0453 19.9644 21.3571 20.2762 21.3571 20.6608C21.3571 21.0134 21.0951 21.3047 20.7552 21.3509L20.6607 21.3572H15.5535C15.1689 21.3572 14.8571 21.0454 14.8571 20.6608C14.8571 20.3082 15.1192 20.0168 15.459 19.9707L15.5535 19.9644H20.6607ZM9.47781 3.71436C9.90551 3.71436 10.3213 3.84555 10.6701 4.08797L10.8153 4.19861L12.7678 5.825L9.92371 8.1958L9.84487 8.25264C9.7626 8.30365 9.67058 8.33697 9.57475 8.35043L9.47781 8.35721L1.85712 8.35628V5.80364C1.85712 4.69784 2.71619 3.79269 3.80336 3.71917L3.9464 3.71436H9.47781Z"
+              fill="#7B7B7B" />
+          </svg>
+
+          &nbsp;<span style="margin-top: 5px;">Documents</span>
+        </a>
+      </li>
+
+      {% endif %}
+
+      {% if cobrowse_agent.get_access_token_obj.enable_video_conferencing_form == True %}
+      {% if cobrowse_agent.role != "agent" %}
+      {% if cobrowse_agent.get_access_token_obj.allow_generate_meeting or cobrowse_agent.get_access_token_obj.allow_cobrowsing_meeting %}
+      <li class="nav-item nav-item-menu">
+        <a class="nav-link" href="/easy-assist-salesforce/sales-ai/cobrowse-video-conferencing-form/?salesforce_token={{salesforce_token}}">
+
+          <svg width="26" height="26" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11.6666 7H3.88881C3.74147 7 3.60016 6.93854 3.49597 6.82915C3.39178 6.71975 3.33325 6.57138 3.33325 6.41667V4.08333C3.33325 3.92862 3.39178 3.78025 3.49597 3.67085C3.60016 3.56146 3.74147 3.5 3.88881 3.5H11.6666C11.8139 3.5 11.9552 3.56146 12.0594 3.67085C12.1636 3.78025 12.2221 3.92862 12.2221 4.08333V6.41667C12.2221 6.57138 12.1636 6.71975 12.0594 6.82915C11.9552 6.93854 11.8139 7 11.6666 7ZM4.44436 5.83333H11.111V4.63167H4.44436V5.83333Z" fill="#7B7B7B"/>
+            <path d="M11.6666 8.21333H3.88881C3.74147 8.21333 3.60016 8.27479 3.49597 8.38419C3.39178 8.49358 3.33325 8.64196 3.33325 8.79667V11.0833C3.33325 11.238 3.39178 11.3864 3.49597 11.4958C3.60016 11.6052 3.74147 11.6667 3.88881 11.6667H10.1999L12.2221 9.50833V8.79667C12.2221 8.64196 12.1636 8.49358 12.0594 8.38419C11.9552 8.27479 11.8139 8.21333 11.6666 8.21333ZM11.111 10.5H4.44436V9.33333H11.111V10.5Z" fill="#7B7B7B"/>
+            <path d="M6.14442 18.3808V18.3458L6.3222 17.535H2.2222V2.33334H13.3333V8.3125L14.4444 7.21V1.75001C14.4444 1.5953 14.3859 1.44692 14.2817 1.33753C14.1775 1.22813 14.0362 1.16667 13.8889 1.16667H1.66664C1.5193 1.16667 1.37799 1.22813 1.2738 1.33753C1.16962 1.44692 1.11108 1.5953 1.11108 1.75001V18.0833C1.11108 18.238 1.16962 18.3864 1.2738 18.4958C1.37799 18.6052 1.5193 18.6667 1.66664 18.6667H6.11108C6.11566 18.5707 6.1268 18.4752 6.14442 18.3808Z" fill="#7B7B7B"/>
+            <path d="M12.2222 11.1825L11.7888 11.6433C11.8963 11.6201 11.9949 11.5639 12.072 11.4819C12.1491 11.3998 12.2014 11.2957 12.2222 11.1825Z" fill="#7B7B7B"/>
+            <path d="M3.33325 15.715C3.33325 15.8697 3.39178 16.0181 3.49597 16.1275C3.60016 16.2369 3.74146 16.2983 3.88881 16.2983H6.5777L6.74436 15.54L6.81659 15.2192V15.19H4.44436V14H7.96659L9.0777 12.8333H3.88881C3.74146 12.8333 3.60016 12.8948 3.49597 13.0042C3.39178 13.1136 3.33325 13.262 3.33325 13.4167V15.715Z" fill="#7B7B7B"/>
+            <path d="M18.6055 9.72416L16.7332 7.75833C16.6502 7.67085 16.5514 7.60144 16.4428 7.55408C16.3341 7.50672 16.2176 7.48235 16.0999 7.48235C15.9822 7.48235 15.8657 7.50672 15.7571 7.55408C15.6484 7.60144 15.5497 7.67085 15.4666 7.75833L7.84991 15.8025L7.22213 18.6083C7.19863 18.7294 7.1981 18.8541 7.22058 18.9754C7.24305 19.0966 7.28809 19.212 7.35312 19.315C7.41814 19.418 7.50187 19.5064 7.59951 19.5754C7.69716 19.6443 7.80679 19.6923 7.92213 19.7167C7.97939 19.7227 8.03709 19.7227 8.09435 19.7167C8.16242 19.7283 8.23184 19.7283 8.29991 19.7167L10.9944 19.0925L18.6055 11.0833C18.6886 10.9966 18.7546 10.8934 18.7996 10.7798C18.8447 10.6662 18.8678 10.5443 18.8678 10.4212C18.8678 10.2982 18.8447 10.1763 18.7996 10.0627C18.7546 9.94906 18.6886 9.84591 18.6055 9.75916V9.72416ZM10.4277 18.0308L8.39435 18.5033L8.8888 16.3858L14.5999 10.325L16.1666 11.97L10.4277 18.0308ZM16.7944 11.3108L15.2277 9.66583L16.111 8.75L17.6888 10.4067L16.7944 11.3108Z" fill="#7B7B7B"/>
+          </svg>
+
+          &nbsp;<span style="margin-top: 5px;">Forms</span>
+        </a>
+      </li>
+
+      {% endif %}
+      {% endif %}
+      {% endif %}
+
+      <!-- Nav Item - Dashboard -->
+      <li class="nav-item nav-item-menu">
+        <a class="nav-link" href="/easy-assist-salesforce/sales-ai/settings/?salesforce_token={{salesforce_token}}">
+            <svg
+              width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10.0425 14.9906C11.4411 14.9906 12.613 15.9441 12.921 17.2253L21.4175 17.225C21.7945 17.225 22.1 17.5251 22.1 17.8953C22.1 18.2347 21.8433 18.5151 21.5101 18.5595L21.4175 18.5656L12.9207 18.5662C12.6124 19.847 11.4408 20.8 10.0425 20.8C8.64426 20.8 7.47263 19.847 7.16431 18.5662L4.58252 18.5656C4.20559 18.5656 3.90002 18.2655 3.90002 17.8953C3.90002 17.556 4.15678 17.2755 4.48991 17.2311L4.58252 17.225L7.16409 17.2253C7.47209 15.9441 8.64393 14.9906 10.0425 14.9906ZM15.9575 6.5C17.3561 6.5 18.528 7.45347 18.836 8.73468L21.4175 8.73438C21.7945 8.73438 22.1 9.03448 22.1 9.40469C22.1 9.74404 21.8433 10.0245 21.5101 10.0689L21.4175 10.075L18.8357 10.0756C18.5274 11.3564 17.3558 12.3094 15.9575 12.3094C14.5593 12.3094 13.3876 11.3564 13.0793 10.0756L4.58252 10.075C4.20559 10.075 3.90002 9.77489 3.90002 9.40469C3.90002 9.06533 4.15678 8.78488 4.48991 8.74049L4.58252 8.73438L13.0791 8.73468C13.3871 7.45347 14.5589 6.5 15.9575 6.5Z"
+                fill="#656565"
+              />
+            </svg>
+
+            &nbsp;
+            <span>Settings</span>
+          </a>
+      </li>
+
+      <!-- Divider -->
+      <hr class="sidebar-divider">
+
+      <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle" onclick="change_sales_logo_property()"></button>
+      </div>
+
+    </ul>
+    <!-- End of Sidebar -->
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+      <!-- Main Content -->
+      <div id="content">
+
+        <!-- Topbar -->
+        <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+          <!-- Sidebar Toggle (Topbar) -->
+          <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+            <i class="fa fa-bars"></i>
+          </button>
+
+          <!-- Topbar Search -->
+          <!-- <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+            <div class="input-group">
+              <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+              <div class="input-group-append">
+                <button class="btn btn-primary" type="button">
+                  <i class="fas fa-search fa-sm"></i>
+                </button>
+              </div>
+            </div>
+          </form> -->
+
+          <!-- Topbar Navbar -->
+          <ul class="navbar-nav ml-auto">
+
+            <!-- Nav Item - Search Dropdown (Visible Only XS) -->
+            <li class="nav-item dropdown no-arrow d-sm-none">
+              <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-search fa-fw"></i>
+              </a>
+              <!-- Dropdown - Messages -->
+              <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in" aria-labelledby="searchDropdown">
+                <form class="form-inline mr-auto w-100 navbar-search">
+                  <div class="input-group">
+                    <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+                    <div class="input-group-append">
+                      <button class="btn btn-primary" type="button">
+                        <i class="fas fa-search fa-sm"></i>
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </li>
+
+            {% if cobrowse_agent.get_access_token_obj.allow_connect_with_virtual_agent_code and cobrowse_agent.virtual_agent_code %}
+                <li style="margin-right: 11em;">Your virtual agent code: {{ cobrowse_agent.virtual_agent_code }}</li>
+            {% endif %}
+
+            {% if cobrowse_agent.is_switch_allowed %}
+
+              {% if cobrowse_agent.role == "agent" %}
+                <li>Admin&nbsp;&nbsp;<label class="easyassist-switch" data-toggle="tooltip" title="Switch to admin role"><input type="checkbox" id="checkbox-mark-as-agent-admin" onclick="check_and_mark_agent_as_admin(this)" checked><span class="easyassist-switch-slider round"></span></label>&nbsp;&nbsp;Agent
+                </li>
+              {% else %}
+                <li>Admin&nbsp;&nbsp;<label class="easyassist-switch" data-toggle="tooltip" title="Switch to agent role"><input type="checkbox" id="checkbox-mark-as-agent-admin" onclick="check_and_mark_agent_as_admin(this)"><span class="easyassist-switch-slider round"></span></label>&nbsp;&nbsp;Agent
+                </li>
+              {% endif %}
+
+              <div class="topbar-divider d-none d-sm-block"></div>
+
+            {% endif %}
+
+            {% if cobrowse_agent.role == "agent" %}
+
+              {% if cobrowse_agent.is_active %}
+                <li>You are online now&nbsp;&nbsp;<label class="easyassist-switch" data-toggle="tooltip" title="Mark as Offline"><input type="checkbox" id="checkbox-mark-as-active" onclick="check_and_mark_agent_active_status(this)" checked><span class="easyassist-switch-slider round"></span></label>
+                </li>
+              {% else %}
+                <li>You are offline now&nbsp;&nbsp;<label class="easyassist-switch" data-toggle="tooltip" title="Mark as online"><input type="checkbox" id="checkbox-mark-as-active" onclick="check_and_mark_agent_active_status(this)"><span class="easyassist-switch-slider round"></span></label>
+                </li>
+              {% endif %}
+
+              <div class="topbar-divider d-none d-sm-block"></div>
+
+            {% endif %}
+
+            <!-- Nav Item - User Information -->
+            <li class="nav-item dropdown no-arrow">
+              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ request.user.username }}</span>
+                {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color == None %}
+                <img class="img-profile rounded-circle" src="/static/EasyAssistSalesforceApp/img/personImg.svg">
+                {% else %}
+                <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M18 36C27.9412 36 36 27.9412 36 18C36 8.05884 27.9412 0 18 0C8.05884 0 0 8.05884 0 18C0 27.9412 8.05884 36 18 36ZM26 22.2468C26 21.0044 24.9932 19.9973 23.7511 19.9973H12.2489C11.0068 19.9973 10 21.0044 10 22.2468V23.1667C10 23.739 10.1785 24.2969 10.5104 24.7629C12.0526 26.9277 14.5757 28 17.9967 28C21.4171 28 23.9414 26.9282 25.4874 24.7644C25.8208 24.2979 26 23.7388 26 23.1653V22.2468ZM22.9968 13.001C22.9968 10.239 20.7582 8 17.9967 8C15.2352 8 12.9966 10.239 12.9966 13.001C12.9966 15.7627 15.2352 18.0017 17.9967 18.0017C20.7582 18.0017 22.9968 15.7627 22.9968 13.001Z" fill="url(#paint0_linear)"/>
+                  <defs>
+                    <linearGradient id="paint0_linear" x1="18" y1="0" x2="18" y2="36" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="{{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.hex }}"/>
+                    <stop offset="1" stop-color="{{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.hex }}"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+                {% endif %}
+              </a>
+              <!-- Dropdown - User Information -->
+              <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                <a class="dropdown-item" href="/easy-assist-salesforce/sales-ai/settings/?salesforce_token={{salesforce_token}}">
+                  <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
+                  Settings
+                </a>
+                <a class="dropdown-item" href="/easy-assist-salesforce/sales-ai/support-history/?salesforce_token={{salesforce_token}}">
+                  <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
+                  Support History
+                </a>
+                <div class="dropdown-divider"></div>
+                <!-- <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" data-target="#logoutModal">
+                  <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                  Logout
+                </a> -->
+              </div>
+            </li>
+
+          </ul>
+
+        </nav>
+        <!-- End of Topbar -->
+
+        {% block content %}
+
+        {% endblock %}
+
+
+      </div>
+      <!-- End of Main Content -->
+
+      <!-- Footer -->
+      <footer class="sticky-footer bg-white">
+        <div class="container my-auto" style="display: inline-table;">
+          <div class="copyright text-center my-auto">
+              <span style="float: left;">Version: {{ cobrowse_agent.get_easychat_version }}</span>
+              <span>Copyright &copy; AllinCall Research and Solutions Pvt Ltd.&nbsp;&nbsp;<i class="fas fa-info-circle" onclick="show_cobrowsing_feedback_module(this)" style="cursor:pointer;"></i></span>
+          </div>
+        </div>
+      </footer>
+      <!-- End of Footer -->
+
+    </div>
+    <!-- End of Content Wrapper -->
+
+  </div>
+  <!-- End of Page Wrapper -->
+
+  <!-- Scroll to Top Button-->
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
+
+  <!-- Logout Modal-->
+  <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+        </div>
+        <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+          <a class="btn btn-primary" href="/easy-assist-salesforce/logout/?salesforce_token={{salesforce_token}}">Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Logout Modal-->
+  <div class="modal fade" id="cobrowsing_feedback_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Cobrowsing Feedback</h5>
+        </div>
+        <div class="modal-body">
+            <div class="row" style="padding:1em;">
+                <h6>Leave product feedback or share your ideas!</h6><br><br>
+                <textarea class="form-control" id="cobrowsing-feedback-textarea" style="resize:none;height:6em;width:-webkit-fill-available;overflow-y:scroll;"></textarea>
+                <div class="col-md-6">
+                    <br>Category*:
+                    <select class="form-control" id="cobrowsing-feedback-category" style="margin-top:0.5em;">
+                        <option value="None" selected="">---select---</option>
+                        <option value="Issue">Issue</option>
+                        <option value="Suggestion">Suggestion</option>
+                        <option value="Feature Proposal">Feature Proposal</option>
+                    </select>                  
+                </div>
+                <div class="col-md-6">
+                    <br>Priority*:
+                    <select class="form-control" id="cobrowsing-feedback-priority" style="margin-top:0.5em;">
+                        <option value="None" selected="">---select---</option>
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                        <option value="Critical">Critical</option>
+                    </select>                  
+                </div>
+
+                <div class="col-md-12">
+                  <br>
+                  <input type="file" id="cobrowsing-feedback-file" style="box-shadow:none !important;">
+                  <p style="padding-top: 1em;" id="cobrowsing-feedback-error"></p>
+                </div>
+
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+          <button class="btn btn-primary" onclick="capture_cobrowsing_general_feedback(this)">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="easyassist-snackbar"></div>
+  <script type="text/javascript">
+    function show_easyassist_toast(message){
+        var element = document.getElementById("easyassist-snackbar");
+        element.innerHTML = message;
+        element.className = "show";
+        setTimeout(function(){ element.className = element.className.replace("show", ""); }, 5000);
+    }
+  </script>
+  <script type="text/javascript">
+  window.WEBSOCKET_TOKEN = '{{ cobrowse_agent.user.username }}';
+  window.SALESFORCE_TOKEN = '{{ salesforce_token }}';
+  </script>
+  <script src="{% static 'EasyAssistSalesforceApp/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'EasyAssistSalesforceApp/js/bootstrap-select.min.js' %}"></script>
+
+  <script src="{% static 'EasyAssistSalesforceApp/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <!-- Core plugin JavaScript-->
+  <script src="{% static 'EasyAssistSalesforceApp/vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+  <!-- Custom scripts for all pages-->
+  <script src="{% static 'EasyAssistSalesforceApp/js/sb-admin-2.min.js' %}"></script>
+  <script src="{% static 'EasyAssistSalesforceApp/js/crypto-js.min.js' %}"></script>
+  <script src="/static/EasyAssistSalesforceApp/vendor/datatables/jquery.dataTables.min.js"></script>
+  <script src="/static/EasyAssistSalesforceApp/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+  <script src="{% static 'EasyAssistSalesforceApp/js/encrypt.js' %}"></script>
+  <script src="{% static 'EasyAssistSalesforceApp/js/admin-app.js' %}"></script>
+
+  <script type="text/javascript">
+
+        if(get_cookie("sales-ai-accordion-sidebar")==""){
+            document.getElementById("accordionSidebar").classList.remove("toggled");
+        }else if(get_cookie("sales-ai-accordion-sidebar")=="toggled"){
+            document.getElementById("accordionSidebar").classList.add("toggled");
+        }
+
+        nav_items = document.getElementsByClassName("nav-item-menu");
+
+        for(var index=0; index< nav_items.length; index++){
+            nav_items[index].classList.remove("active");
+        }
+
+        for(var index=0; index< nav_items.length; index++){
+            if(nav_items[index].children[0].pathname==window.location.pathname){
+                nav_items[index].classList.add("active");
+
+                if($(nav_items[index]).closest('.nav-item-submenu')) {
+                  $(nav_items[index]).closest('.collapse').collapse();
+                }
+            }
+        }
+
+        function change_sales_logo_property(){
+            var sales_logo = document.getElementById("sales-ai-logo");          
+            if(document.getElementById("accordionSidebar").getAttribute("class").indexOf("toggled")!=-1){
+              set_cookie("sales-ai-accordion-sidebar", "");
+              if (window.matchMedia("(min-width: 720px)")){ 
+                  $('#accordianSidebar').css({"position": "fixed"});
+                  $('#content-wrapper').css({"margin-left": "220px"});
+
+              }
+            }else{
+              set_cookie("sales-ai-accordion-sidebar", "toggled");
+            }
+        }
+
+        function show_cobrowsing_feedback_module(element){
+            $("#cobrowsing_feedback_modal").modal("show");
+        }
+
+  </script>
+
+</body>
+</html>
+

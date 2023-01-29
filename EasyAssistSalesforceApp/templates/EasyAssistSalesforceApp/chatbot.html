@@ -1,0 +1,372 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>EasyChat</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link href="/static/EasyChatApp/img/favicon.svg" rel="icon">
+      <link rel="stylesheet" type="text/css" href="{% static 'EasyAssistSalesforceApp/css/theme2.css' %}">
+      <!-- <link rel="stylesheet" type="text/css" href="{% static 'EasyAssistSalesforceApp/css/chatbot.css' %}"> -->
+      <link rel="stylesheet" type="text/css" href="/static/EasyChatApp/css/widgets_chatbot.css?v=1.1">
+      <link rel="stylesheet" href="/static/EasyChatApp/font-awesome-4.7.0/css/font-awesome.min.css">
+      <script type="text/javascript" src="{% static 'EasyAssistSalesforceApp/js/jquery.min.js' %}"></script>
+      <style>
+        .custom-file-upload:hover{
+          background-color: {{ floating_button_bg_color }};
+        }
+        .easychat-modal-button:hover{
+          background-color: {{ floating_button_bg_color }};
+        }
+      </style>
+   </head>
+   <body>
+    {% csrf_token %}
+    <div style="z-index: 997;">
+
+      <div id="easychat-navbar">
+        <div>
+          <div id="easychat-navbar-wrapper" style = "background-color: {{floating_button_bg_color}}">
+            <span style="color:white;position: relative;top: 17px;"><strong>LiveChat Assistance</strong>
+            </span>
+            <i style="display:none;position: absolute;right: 10%;cursor:pointer;color: white;padding: .2em;top: 0.8em;font-size: 18px;" onclick="minimize_chatbot()" class="fa fa-chevron-down" aria-hidden="true" ></i>
+            <i style="position: absolute;right: 3%;cursor: pointer;color:white;padding: .2em;top: 0.7em;font-size: 20px;" onclick="close_chatbot('{{bot_obj.is_nps_required}}')" class="fa fa-times" aria-hidden="true"></i>
+          </div>
+        </div>
+      </div>
+
+      <div id="easychat-chat-container" style="width:99vw; background-image: url('/static/EasyChatApp/icons/chatWallpaper.svg');background-size: cover;" onscroll="show_scroll_image()">
+          <i class="fa fa-chevron-down" aria-hidden="true" id="img-scroll-to-bottom" style="display:none;z-index:999;" onclick="scroll_to_bottom()"></i>
+      </div>
+    <!-- Footer bar START -->
+    <div id="easychat-footer" style="display: block;">
+      <div style="display: block;">
+
+        {% if not access_token.allow_only_support_documents %}
+          {% if access_token.share_document_from_livechat %}
+          <div align="center" class="tooltip" style="display:inline-block;">
+            <i class="fa fa-paperclip fa-2x" aria-hidden="true" style="cursor:pointer; color: #808080;" onclick="show_upload_attachment_modal(this)"></i>
+          </div>
+          {% endif %}
+        {% endif %}
+
+        <div style="width:70%; display:inline-block;">
+          <input type="text" id="user_input" autocomplete="off" 
+          placeholder="Type your message and hit enter" value="" />
+          <input type="text" id="audio_interim_input" autocomplete="off" 
+          placeholder="Type your message and hit enter" value="" style="display:none;" />
+        </div>
+        <div align="center" id="easychat-query-submit-div" onclick="send_message()"  style="display:inline-block; padding:0 10px; float:right;"> 
+          <i class="fa fa-telegram fa-2x" aria-hidden="true" id="img-submit-query" style="cursor:pointer;"></i>
+        </div>
+        <div align="center" id="easychat-mic-div" onclick="activate_mic()"  style="display:none;padding:0 10px; float:right;">
+          <i class="fa fa-microphone fa-2x" aria-hidden="true" id="img-mic" style="cursor:pointer;"></i>
+        </div>
+        <div align="center" id="easychat-mic-disable" style="display:none;" onclick="deactivate_mic()" style="display:inline-block;">
+          <img src="/static/EasyAssistSalesforceApp/img/cancel.svg">
+        </div>
+      </div>
+      <div id="easychat-powered-by-div"> 
+          <!-- <div>
+            <h6 id="easychat-connect-with-agent" onclick="show_connect_with_agent_options()">Connect with agent</h6>
+          </div>
+          <div style="display: inline-block;float: right;">
+          </div> -->
+
+          <h6> <span id="easychat-powered-by-div-logo">⚡</span> by </h6>
+          <h6 id="easychat-powered-by-div-brand-name">AllinCall</h6>            
+
+      </div>
+    </div>
+    <!-- Footer bar End -->
+  </div>
+    <div id="feedback_modal" class="easychat-modal">
+      <div class="easychat-modal-content" style="margin: 25% auto;">
+        <span class="easychat-close" id="span-easychat-close-feedback" onclick="close_feedback_modal()">&times;</span>
+          <h3 id="model-feedback-header" style="margin: 1em 0em 2em 3.6em;font-size: 1.4em;">Rate Your Experience!</h3>
+
+          <div id="rating-bar-container__XqPZ" class="rating-bar-container" zqpk="false" onmouseout="changeColorRatingzBarAll(this)">
+              <button id="rating-bar-button__01" onmouseover="changeColorRatingvBar(this)" onmouseout="changeColorRatingzBar(this)" onclick="setValuetoSome(this)" value="1">1</button><button id="rating-bar-button__02" onclick="setValuetoSome(this)" onmouseover="changeColorRatingvBar(this)" onmouseout="changeColorRatingzBar(this)" value="2">2</button><button id="rating-bar-button__03" onmouseover="changeColorRatingvBar(this)" onclick="setValuetoSome(this)" onmouseout="changeColorRatingzBar(this)" value="3">3</button><button id="rating-bar-button__04" onclick="setValuetoSome(this)" onmouseover="changeColorRatingvBar(this)" onmouseout="changeColorRatingzBar(this)" value="4">4</button><button id="rating-bar-button__05" onmouseover="changeColorRatingvBar(this)" onclick="setValuetoSome(this)" onmouseout="changeColorRatingzBar(this)" value="5">5</button><button id="rating-bar-button__06" onclick="setValuetoSome(this)" onmouseover="changeColorRatingvBar(this)" onmouseout="changeColorRatingzBar(this)" value="6">6</button><button id="rating-bar-button__07" onmouseover="changeColorRatingvBar(this)" onclick="setValuetoSome(this)" onmouseout="changeColorRatingzBar(this)" value="7">7</button><button id="rating-bar-button__08" onclick="setValuetoSome(this)" onmouseover="changeColorRatingvBar(this)" onmouseout="changeColorRatingzBar(this)" value="8">8</button><button id="rating-bar-button__09" onmouseover="changeColorRatingvBar(this)" onclick="setValuetoSome(this)" onmouseout="changeColorRatingzBar(this)" value="9">9</button><button id="rating-bar-button__10" onclick="setValuetoSome(this)" onmouseover="changeColorRatingvBar(this)" onmouseout="changeColorRatingzBar(this)" value="10">10</button>
+          </div>
+
+          <div class="easychat-rating-circular-bar" id="easychat-rating-circular-bar__xyzw">
+            <svg viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="47"  />
+              <circle cx="60" cy="60" r="47" class="circle-value" onclick="feedback_modal(this);" onmouseover="change_content(this);" value=0 id="value-00" />
+              <circle cx="60" cy="60" r="47" class="circle-value" onclick="feedback_modal(this);" onmouseover="change_content(this);" value=1 id="value-01" />
+              <circle cx="60" cy="60" r="47" class="circle-value" onclick="feedback_modal(this);" onmouseover="change_content(this);" value=2 id="value-02" />
+              <circle cx="60" cy="60" r="47" class="circle-value" onclick="feedback_modal(this);" onmouseover="change_content(this);" value=3 id="value-03" />
+              <circle cx="60" cy="60" r="47" class="circle-value" onclick="feedback_modal(this);" onmouseover="change_content(this);" value=4 id="value-04" />
+              <circle cx="60" cy="60" r="47" class="circle-value" onclick="feedback_modal(this);" onmouseover="change_content(this);" value=5 id="value-05" />
+              <circle cx="60" cy="60" r="47" class="circle-value" onclick="feedback_modal(this);" onmouseover="change_content(this);" value=6 id="value-06" />
+              <circle cx="60" cy="60" r="47" class="circle-value" onclick="feedback_modal(this);" onmouseover="change_content(this);" value=7 id="value-07" />
+              <circle cx="60" cy="60" r="47" class="circle-value" onclick="feedback_modal(this);" onmouseover="change_content(this);" value=8 id="value-08" />
+              <circle cx="60" cy="60" r="47" class="circle-value" onclick="feedback_modal(this);" onmouseover="change_content(this);" value=9 id="value-09" />
+              <circle cx="60" cy="60" r="47" class="circle-value" onclick="feedback_modal(this);" onmouseover="change_content(this);" value=10 id="value-10" />
+            </svg>
+            <span class="circle-indicator" id="circle-indicator-0"  onclick="feedback_modal(this);" onmouseover="change_content(this);" value=0>0</span>
+            <span class="circle-indicator" id="circle-indicator-1"  onclick="feedback_modal(this);" onmouseover="change_content(this);" value=1>1</span>
+            <span class="circle-indicator" id="circle-indicator-2" onclick="feedback_modal(this);" onmouseover="change_content(this);" value=2>2</span>
+            <span class="circle-indicator" id="circle-indicator-3" onclick="feedback_modal(this);" onmouseover="change_content(this);" value=3>3</span>
+            <span class="circle-indicator" id="circle-indicator-4" onclick="feedback_modal(this);" onmouseover="change_content(this);" value=4>4</span>
+            <span class="circle-indicator" id="circle-indicator-5" onclick="feedback_modal(this);" onmouseover="change_content(this);" value=5>5</span>
+            <span class="circle-indicator" id="circle-indicator-6" onclick="feedback_modal(this);" onmouseover="change_content(this);" value=6>6</span>
+            <span class="circle-indicator" id="circle-indicator-7" onclick="feedback_modal(this);" onmouseover="change_content(this);" value=7>7</span>
+            <span class="circle-indicator" id="circle-indicator-8" onclick="feedback_modal(this);" onmouseover="change_content(this);" value=8>8</span>
+            <span class="circle-indicator" id="circle-indicator-9" onclick="feedback_modal(this);" onmouseover="change_content(this);" value=9>9</span>
+            <span class="circle-indicator" id="circle-indicator-10" onclick="feedback_modal(this);" onmouseover="change_content(this);" value=10>10</span>
+            <div id="easychat-rating-circular-bar-content">
+              <!-- <img id="easychat-rating-circular-bar-content-img" src="javascript:void(0)"> -->
+             </div>
+          </div>
+          <a onclick="no_feedback_given(this, true)" id="easychat-exit-app-feedback" href="" style="color: #9e9e9e;display: inline-block;text-decoration: none;padding: 0.3em 1em 0.3em 1em;border: 0.1em solid #9e9e9e;border-radius: 0.5em;margin: 1em 0em 0em 9em;">End Chat</a>
+          <div id="chatbot_feedback_comment_box" style="display: none;height: 8em;">
+            <textarea  placeholder="Please share your valuable feedback here... (optional)" col="30" id="chatbot-comment-box" style="color: rgb(158, 158, 158);resize:none;height: 4em;width: 98%;border-radius: 0.5em; font-family: silka"></textarea>
+            <!-- <a  id="no-feedback-given" onclick="no_feedback_given(this)" href="" style="color: #9e9e9e; display: inline-block;text-decoration: none;padding: 0.3em 1em 0.3em 1em;border: 0.1em solid #9e9e9e;border-radius: 0.5em;margin-top: 0.75em;" >No thanks</a> -->
+            <input id="submit-feedback" style="background-color: green;float: right;border-radius: 0.5em;margin-top:0.75em;padding: 0.3em 1em;font-size: 14px;" onclick="submit_feedback()" type="submit">
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- The Modal -->
+    <div id="modal-create-issue" class="easychat-modal">
+      <!-- Modal content -->
+            <div class="easychat-modal-content">
+               <span class="easychat-close" id="span-easychat-close">&times;</span>
+                <div class="row">
+                  <div class="col s12">
+                        <p id="create-issue-error-message" style="color:red;"></p><hr>
+                    </div>
+                    <div class="col s12">
+                        <p>Name<sup class="red-text">*</sup></p>
+                        <input id="new-issue-name" placeholder="Your name" style="width:90%;">
+                    </div>
+                    <div class="col s12">
+                        <p>Phone Number<sup class="red-text">*</sup></p>
+                        <input id="new-issue-phone" placeholder="Your 10 digits valid phone number" style="width:90%;">
+                    </div>
+                    <div class="col s12">
+                        <p>Issue Description<sup class="red-text">*</sup></p>
+                        <textarea id="new-issue-issue" placeholder="Write briefly..." style="margin: 0px; width: 350px; height: 68px;"></textarea>
+                    </div>
+                    <div class="col s12">
+                      <p>Priority<sup class="red-text">*</sup></p>
+                      <select id="ticket-priority" style="width:90%;">
+                        <option value="1">Low</option>
+                        <option value="2">Medium</option>
+                        <option value="3">High</option>
+                        <option value="4">Urgent</option>
+                      </select>
+                    </div>
+
+                    <div class="col s12">
+                        <p>Category<sup class="red-text">*</sup></p>
+                        <select id="ticket-category" style="width:90%;">
+                          <option value="">Choose the following</option>
+                          {% for category_obj in category_objs %}
+                            <option value="{{ category_obj.pk }}">{{ category_obj.ticket_category }}</option>
+                          {% endfor %}
+                      </select>
+                      <br><br>
+                    </div>
+                    <button onclick="create_issue(this)" class="easychat-modal-button">Submit</button>
+                </div>
+            </div>
+        </div>
+
+
+    <!-- The Modal -->
+    <div id="modal-schedule-meeting" class="easychat-modal">
+      <!-- Modal content -->
+        <div class="easychat-modal-content">
+            <span class="easychat-close" id="span-easychat-schedule-close">&times;</span>
+            <div class="row">
+                <div class="col s12">
+                    <p id="schedule-error-message" style="color:red;"></p><hr>
+                </div>
+                <div class="col s12">
+                    <p>Name<sup class="red-text">*</sup></p>
+                    <input id="new-meeting-name" placeholder="Your name" style="width:90%;">
+                </div>
+                <div class="col s12">
+                    <p>Phone Number<sup class="red-text">*</sup></p>
+                    <input id="new-meeting-phone" placeholder="Your 10 digits valid phone number" style="width:90%;">
+                </div>
+                <div class="col s12">
+                    <p>Meeting Date<sup class="red-text">*</sup></p>
+                    <input id="new-meeting-date" type="date" style="width:90%;">
+                </div>
+                <div class="col s12">
+                    <p>Meeting Time<sup class="red-text">*</sup></p>
+                    <input id="new-meeting-time" type="time" style="width:90%;">
+                </div>
+                <div class="col s12">
+                    <p>Pincode <sup><label> (optional)</label></sup></p>
+                    <input id="new-meeting-pincode" type="number" placeholder="Your valid pincode">
+                </div>
+                <div class="col s12">
+                    <p>Issue<sup class="red-text">*</sup></p>
+                    <textarea id="new-meeting-issue" placeholder="Write briefly..." style="margin: 0px; height: 59px; width: 321px;"></textarea><br><br>
+                </div>
+                   <button onclick="schedule_meeting(this)" class="easychat-modal-button">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- The Modal -->
+    <div id="modal-check-ticket-status" class="easychat-modal">
+      <!-- Modal content -->
+        <div class="easychat-modal-content">
+            <span class="easychat-close" id="span-easychat-ticket-close">&times;</span>
+            <div class="row">
+                <div class="col s12">
+                    <p id="ticket-status-error-message" style="color:red;"></p><hr>
+                </div>
+                <div class="col s12">
+                    <p>Ticket ID<sup class="red-text">*</sup></p>
+                    <input id="check-ticket-id" placeholder="Your ticket id." style="width:90%;">
+                    <br><br>
+                </div>
+                <button onclick="check_ticket_status(this)" class="easychat-modal-button">Check Status</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- The Modal -->
+    <div id="modal-check-meeting-status" class="easychat-modal">
+      <!-- Modal content -->
+        <div class="easychat-modal-content">
+            <span class="easychat-close" id="span-easychat-meeting-close">&times;</span>
+            <div class="row">
+                <div class="col s12">
+                    <p id="meeting-status-error-message" style="color:red;"></p><hr>
+                </div>
+                <div class="col s12">
+                    <p>Meeting ID<sup class="red-text">*</sup></p>
+                    <input id="check-meeting-id" placeholder="Your meeting id." style="width:90%;">
+                    <br><br>
+                </div>
+                <button onclick="check_meeting_status(this)" class="easychat-modal-button">Check Status</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- The Modal -->
+    <div id="modal-connect-with-agent" class="easychat-modal">
+      <!-- Modal content -->
+        <div class="easychat-modal-content">
+            <h4>Screenshare with Agent<span class="easychat-close" id="span-easychat-connect-agent-close">&times;</span></h4>
+            <div class="row">
+                <div class="col s12">
+                    <p id="connect-agent-status-error-message" style="color:red;"></p><hr>
+                </div>
+                <div class="col s12">
+                    <div class="col s12">
+                        <p>Name<sup class="red-text">*</sup></p>
+                        <input id="connect-agent-name" placeholder="Your name" style="width:90%;" autocomplete="off">
+                    </div>
+                    <div class="col s12">
+                        <p>Phone Number<sup class="red-text">*</sup></p>
+                        <input id="connect-agent-phone" placeholder="Your 10 digits valid phone number" style="width:90%;" autocomplete="off">
+                        <br><br>
+                    </div>
+                    <p style="font-size:0.9em;">By clicking on 'Connect with agent', you allow to screenshare with our agent. All the personal information with get masked.</p>
+                </div>
+                <button onclick="screenshare_with_agent(this)" class="easychat-modal-button">Connect with agent</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- The Modal -->
+    <div id="modal-send-attachement-modal" class="easychat-modal">
+      <!-- Modal content -->
+      <div class="easychat-modal-content">
+        <span class="easychat-close" id="span-easychat-send-attachment-close">×</span>
+            <h3 class="easychat-modal-content-header">Send document to client </h3>
+            <div class="row">
+                <div class="col s12">
+                    <label for="file-attachment" class="custom-file-upload" style = "border: 1px solid {{floating_button_bg_color}}">
+                        Choose File
+                    </label>
+                    <input type="file" class="file_attachment" id="file-attachment" onchange="check_file_selection(this)">
+                    <p id="send-document-error"></p>
+                    <br>
+                    <h3 class="easychat-modal-content-header">Message </h3>
+                    <textarea class="attachment_message" id="attachment-message" style="margin: 0px;width: 355px;height: 70px;overflow-y: scroll; padding:0.5em;resize: none;" placeholder="Type here..."></textarea><br><br>
+                </div>
+                <button class="easychat-modal-button" id="send-document-button" onclick="append_attachment_send_message(this)" style="display:none;border: 1px solid {{floating_button_bg_color}}">Send document</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="{% static 'EasyAssistSalesforceApp/js/crypto-js.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'EasyAssistSalesforceApp/js/json2.js' %}"></script>
+    <script type="text/javascript" src="{% static 'EasyAssistSalesforceApp/js/encrypt.js' %}"></script>
+    <script type="text/javascript" src="{% static 'EasyAssistSalesforceApp/js/chatbot.js' %}"></script>
+    <script type="text/javascript">
+        window.BOT_THEME_COLOR = "{{ access_token.floating_button_bg_color }}";
+        window.BOT_MESSAGE_COLOR = "";
+        window.USER_MESSAGE_COLOR = "white";
+        window.DEFAULT_ICON_COLOR = "{{ access_token.floating_button_bg_color }}";
+        window.SALESFORCE_TOKEN = "{{salesforce_token}}";
+        window.agent_to_customer_cobrowsing = "{{ access_token.allow_agent_to_customer_cobrowsing }}";
+        // Create Issue Modal
+        var modal_create_issue = document.getElementById("modal-create-issue");
+        var modal_create_close_button = document.getElementById("span-easychat-close");
+        modal_create_close_button.onclick = function(e){
+            modal_create_issue.style.display="none";
+        }
+        // Schedule Meeting
+        var modal_schedule_meeting = document.getElementById("modal-schedule-meeting");
+        var modal_schedule_meeting_button = document.getElementById("span-easychat-schedule-close");
+        modal_schedule_meeting_button.onclick = function(e){
+            modal_schedule_meeting.style.display="none";
+        }
+
+        // Check Ticket Status
+        var modal_check_ticket_status = document.getElementById("modal-check-ticket-status");
+        var modal_check_ticket_status_button = document.getElementById("span-easychat-ticket-close");
+        modal_check_ticket_status_button.onclick = function(e){
+            modal_check_ticket_status.style.display="none";
+        }
+
+        // Check Meeting Status
+        var modal_check_meeting_status = document.getElementById("modal-check-meeting-status");
+        var modal_check_meeting_status_button = document.getElementById("span-easychat-meeting-close");
+        modal_check_meeting_status_button.onclick = function(e){
+            modal_check_meeting_status.style.display="none";
+        };
+
+        var modal_connect_with_agent = document.getElementById("modal-connect-with-agent");
+
+        function show_connect_with_agent_modal(){
+            modal_connect_with_agent.style.display = "block";
+        }
+
+        function show_connect_with_agent_options(){
+            append_bot_text_response("Sure, kindly select one of the following.", false);
+            append_connect_with_agent();
+            // modal_connect_with_agent.style.display = "block";
+        }
+
+        document.getElementById("span-easychat-connect-agent-close").onclick = function(e){
+            modal_connect_with_agent.style.display = "none";
+        };
+
+        window.EASYCHAT_EASYASSIST_ENABLED = "{{ bot_obj.is_easy_assist_allowed }}";
+        window.EASYCHAT_LIVECHAT_ENABLED = "{{ bot_obj.is_livechat_enabled }}";
+
+        function show_upload_attachment_modal(element){
+            document.getElementById("attachment-message").value = "";
+            document.getElementById("file-attachment").value = "";
+            document.getElementById("send-document-error").innerHTML = "";
+            document.getElementById("modal-send-attachement-modal").style.display = "block";
+            document.getElementById("send-document-button").style.display = "none";
+        }
+
+    </script>
+   </body>
+</html>

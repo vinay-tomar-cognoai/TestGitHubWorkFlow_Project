@@ -1,0 +1,38 @@
+{% load static  %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cobrowsing | Alert</title>
+    <link rel="stylesheet" href="{% static 'EasyAssistApp/css/session_alerts.css' %}"/>
+    {% if cobrowse_config_obj.cobrowsing_favicon %}
+        <link rel="shortcut icon" type="image/x-icon" href="{{ cobrowse_config_obj.cobrowsing_favicon }}">
+    {% endif %}
+</head>
+
+<body style="padding: 20px;">
+
+    <div class="gy-center">
+        <div class="gy-alert gy-center gy-alerts-bajaj">
+            <div>
+                <img src="{% static 'EasyAssistApp/img/alert.svg' %}" alt="alert" class="gy-alerts-icon-left">
+            </div>
+            <div class="alert-body">
+                <div class="gy-alerts-body"><b>You are trying to access a session that is currently active on another device.</b></div>
+                <div class="gy-alerts-body">We have sent a request, seeking permission to discontinue that session and continue it on this device</div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="{% static 'EasyAssistApp/js/crypto-js.min.js' %}"></script>
+    <script src="{% static 'EasyAssistApp/js/encrypt.js' %}"></script>
+    <script type="text/javascript">
+        window.COBROWSING_CLIENT = "client";
+        window.COBROWSING_ID = "{{ session_id }}";
+        window.CLIENT_IP_ADDRESS = "{{ client_ip_address }}";
+    </script>
+    <script src="{% static 'EasyAssistApp/js/session_validation.js' %}"></script>
+</html>

@@ -1,0 +1,160 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+
+
+    <link href="{% static 'EasyChatApp/img/favicon.svg' %}" rel="icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+ <link rel="shortcut icon" type="image/png" href="{% static 'EasyChatApp/img/favicon.svg' %}"/>
+  <link href="{% static 'EasyChatApp/css/material_icons.css' %}" 
+  rel="stylesheet">
+  {% if request.user.enable_s3_bucket %}
+     <link href="https://static.allincall.in/static/EasyChatApp/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  {% else %}
+     <link href="{% static 'EasyChatApp/css/materialize.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  {% endif %}
+  <link href="{% static 'EasyChatApp/css/materialize.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="{% static 'EasyChatApp/css/changes.css' %}?v={% random_int 1 100 %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  {% if request.user.enable_s3_bucket %}
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/jquery.min.js"></script>
+  {% else %}
+    <script type="text/javascript" src="{% static 'EasyChatApp/js/jquery.min.js' %}"></script>
+  {% endif %}
+
+
+<title>EasyChat</title>
+
+</head>
+
+<link rel="stylesheet" type="text/css" href="/static/EasyChatApp/css/easychat_datacollect_form.css?v={% random_int 1 100 %}">
+
+<body>
+  <div class="container">
+    <!-- {% ifequal bot_image_url "" %} -->
+    <!-- <img src="/static/EasyChatApp/img/popup-3.svg" style="width:4em; margin:0 20%"> -->
+    <!-- {% else %} -->
+    <!-- <img src="{{bot_image_url}}" style="width:4em; margin:0 20%"> -->
+    <!-- {% endifequal %} -->
+    <p style="font-size: 3em; margin:10px 0"> Bot Data Collection Form  </p>
+    {% if form_ui_data%}
+    {% for form_ui_obj in form_ui_data %}
+    <div class="row">
+      <div class="input-field col s6">
+    {% ifequal form_ui_obj.input_type "data-entry-form-input-text" %}
+        <input class= "data-collect-form-input-field" id="input_{{forloop.counter}}" type="text">
+        {% if form_ui_obj.input_is_necessary %}
+          <label for="input_{{forloop.counter}}" id="input_{{forloop.counter}}_name">{{form_ui_obj.input_name}}<span style="color: red">*</span></label>
+        {% else %}
+          <label for="input_{{forloop.counter}}" id="input_{{forloop.counter}}_name">{{form_ui_obj.input_name}} (optional)</label>
+        {% endif %}
+    {% endifequal %}
+    {% ifequal form_ui_obj.input_type "data-entry-form-input-number" %}
+        <input class= "data-collect-form-input-field" id="input_{{forloop.counter}}" type="number">
+        {% if form_ui_obj.input_is_necessary %}
+          <label id="input_{{forloop.counter}}_name" for="input_{{forloop.counter}}">{{form_ui_obj.input_name}}<span style="color: red">*</span></label>
+        {% else %}
+          <label id="input_{{forloop.counter}}_name" for="input_{{forloop.counter}}">{{form_ui_obj.input_name}} (optional) </label>
+        {% endif %}
+    {% endifequal %}
+    {% ifequal form_ui_obj.input_type "data-entry-form-input-dropdown" %}
+        {% if form_ui_obj.input_is_necessary %}
+          <p id="input_{{forloop.counter}}_name" >{{form_ui_obj.input_name }}<span style="color: red">*</span></p>
+        {% else %}
+          <p id="input_{{forloop.counter}}_name" >{{form_ui_obj.input_name }} (optional) </p>
+        {% endif %}
+        <select class= "data-collect-form-input-field" id="input_{{forloop.counter}}">
+          <option value="None"> Select Option</option>
+          {% for dropdown_name in form_ui_obj.dropdown_options %}
+            <option value="{{dropdown_name}}">{{dropdown_name}}</option>
+          {% endfor %}
+        </select>
+    {% endifequal %}
+      </div>
+    </div>
+    {% endfor %}
+    <a id="submit-data-form" href="javascript:void(0)" class="modal-close btn green lighten-2 black-text">Submit</a>
+    {% else %}
+    No Form Data
+    {% endif%}
+
+  </div>
+</body>
+<script type="text/javascript" src="{% static 'EasyChatApp/js/materialize.js' %}"></script>
+<script type="text/javascript">
+$('select').formSelect();
+function get_url_vars() {
+	var vars = {};
+	var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+	  vars[key] = value;
+	});
+	return vars;
+}
+
+$(document).on("click","#submit-data-form", function(e){
+  url_parameters = get_url_vars();
+   bot_id=url_parameters["id"];
+   if (bot_id == null){
+   alert("No Bot ID Found!!!", 2000);
+   return
+   }
+  {% for form_ui_obj in form_ui_data %}
+  input_{{forloop.counter}} = $("#input_{{forloop.counter}}").val();
+   {% if form_ui_obj.input_is_necessary %}
+    {% ifequal form_ui_obj.input_type "data-entry-form-input-dropdown" %}
+    if (input_{{forloop.counter}}.trim()=="None"){
+     alert("Please Select Valid Option for {{form_ui_obj.input_name}}", 2000);
+     return
+     }
+    {% else %}
+    if (input_{{forloop.counter}}.trim()==""){
+     alert("Empty {{form_ui_obj.input_name}}", 2000);
+     return
+     }
+    {% endifequal %}
+    {% else %}
+      if (input_{{forloop.counter}}.trim()==""){
+        input_{{forloop.counter}} = "--"
+     }
+   {% endif %}
+  {% endfor %}
+
+  elements = $(".data-collect-form-input-field")
+  collect_form_data = {}
+  for (var i = 0; i < elements.length; i++) {
+    collect_form_data[elements[i].id] = {}
+    collect_form_data[elements[i].id]['value'] = elements[i].value
+    collect_form_data[elements[i].id]['name'] = $("#"+elements[i].id+"_name").html().replace("<span style=\"color: red\">*</span>", "");
+  }
+
+  json_string = JSON.stringify({
+    bot_id: bot_id,
+    collect_form_data: collect_form_data,
+  })
+
+  var response = $.ajax({
+      url: '/save-collect-form-data/',
+      type: "POST",
+      async: false,
+      data:{
+          json_string: json_string,
+      },
+      success: function(response){
+        if(response["status"]==200){
+          alert("Response Submitted!!!", 2000);
+          location.reload();
+          elements = $(".data-collect-form-input-field")
+            for (var i = 0; i < elements.length; i++) {
+              elements[i].value =""
+            }       
+        }else{
+          alert("Error", 2000);;
+        }
+      }
+  }).responseJSON;
+
+  return response;
+});
+</script>
+</html>

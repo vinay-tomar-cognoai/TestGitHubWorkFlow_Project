@@ -1,0 +1,766 @@
+{% extends 'EasyChatApp/console.html' %}
+{% block consolecontent %}
+{% load static %}
+<link rel="stylesheet" type="text/css"
+    href="{% static 'EasyChatApp/css/changes_placement.css' %}?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/voice_channel.css' %}?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/web_channel.css' %}?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/ion.rangeSlider.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/font-awesome-5.13.0.all.min.css' %}">
+<script type="text/javascript" src="{% static 'EasyChatApp/js/ion.rangeSlider.min.js' %}"></script>
+<style>
+
+</style>
+<div style="padding: 1em;">
+    <div class="row">
+        <div class="col s12 center-align white z-depth-1" style="padding: 1em;">
+            Voice
+        </div>
+    </div>
+    <div class="row">
+        <div class="col s8" style="display: flex; align-items: center;">
+        <a class="btn white transparent-btn black-text" id="channel-back-btn" href="/chat/channels/edit/{{ bot_id }}/"><i
+                class="material-icons inline-icon" style="background-color: transparent;">arrow_back</i> Back</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="input-field col s4">
+            <h6>Welcome Message</h6>
+            <div class="divider"></div>
+            <textarea id="welcome-message"
+                class="materialize-textarea voice-textarea">{{ bot_channel_obj.welcome_message }}</textarea>
+        </div>
+        <div class="input-field col s4">
+            <h6>Failure Message</h6>
+            <div class="divider"></div>
+            <textarea id="failure-message"
+                class="materialize-textarea voice-textarea">{{ bot_channel_obj.failure_message }}</textarea>
+        </div>
+
+        <div class="input-field col s4">
+            <h6>Authentication Message</h6>
+            <div class="divider"></div>
+            <textarea id="authentication-message" class="materialize-textarea white voice-textarea"
+                style="padding:1em;">{{ bot_channel_obj.authentication_message }}</textarea>
+        </div>
+        <div class="col s12">
+            <div class="row">
+                <ul class="collapsible">
+                    <li>
+                        <div style="display: flex; flex-direction: column;">
+                            <div class="collapsible-header"> Campaign Settings</div>
+                        </div>
+                        <div class="collapsible-body">
+                            <div class="row sticky-intent-display-format-div" id="sticky-intent-display">
+                            </div>
+                            <div class="row" id="channel-sticky-intents">
+                                <div class="col s12">
+                                    <table id="easychat-web-campaign-table" style="box-shadow: none !important;">
+                                        <tbody style="box-shadow: none !important;">
+                                            <tr>
+                                                <td >
+                                                    <p class="vertical_align">Enter API Key</p>
+                                                </td>
+                                                <td >
+                                                    <div class=" campaign_settings_inputs margin-left_input">
+                                                        <input id="api-key-field" class="form-control" type="password" name="api_key" id="api_key"placeholder="Enter API Key" value="{{ voicebot_config_obj.api_key }}">
+                                                        <span toggle="#api-key-field" class="fa fa-fw fa-eye field-icon toggle-password-key eye_icon"></span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <p class="vertical_align">Enter API Token </p>
+                                                </td>
+                                                <td>
+                                                    <div class=" campaign_settings_inputs margin-left_input">
+                                                          <input id="api-token-field" type="password" class="form-control" name="password" placeholder="Enter API Token" value="{{ voicebot_config_obj.api_token }}">
+                                                         <span toggle="#api-token-field" class="fa fa-fw fa-eye field-icon toggle-password eye_icon"></span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="Subdomain">Select Subdomain<sup>
+                                                    <i class="material-icons inline-icon tooltipped"
+                                                        data-position="top"
+                                                        data-tooltip="It is the region of your account where the Mumbai cluster is @api.in.exotel.com and the Singapore cluster is @api.exotel.com.">help</i>
+                                                </sup></td>
+                                                <td>
+                                                    <div class="voicebot-dropdown-parent margin-left" style="border-radius: 0px!important;" id="select-box-voice">
+                                                        <select id="voice_bot_subdomain_select" class="drop_box_voice">
+                                                                {% for value, subdomain in voice_bot_subdomains %}
+                                                                    {% if value == voicebot_config_obj.api_subdomain %}
+                                                                    <option value="{{ value }}" selected>@{{ subdomain }}</option>
+                                                                    {% else %}
+                                                                    <option value="{{ value }}">@{{ subdomain }}</option>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr style="border-bottom:2px solid #CBCACA!important;">
+                                                <td >
+                                                    <p class="vertical_align">Account SID </p>
+                                                </td>
+                                                <td style="padding-bottom: 30px!important;">
+                                                    <div class=" campaign_settings_inputs margin-left_input">
+                                                          <input class="sid" type="text" class="fix_height" name="api_key" id="account_sid" placeholder="Account SID" value="{{ voicebot_config_obj.api_sid }}">
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="caller_id">Caller ID</td>
+                                                <td>
+                                                    <div class="caller-id-wrapper margin-left">
+                                                    <div class="easychat-caller-id-dropdown-wrapper">
+                                                        <input id="voicebot_caller_id_input_div" onkeyup="search_for_callers(event)" onkeydown="only_numeric_for_caller_id(event)" type="text" placeholder="Click here to check the Caller ID list">
+                                                        <span class="voicebot-caller-id-dropdown-icon " id="voicebot_caller_id_dropdown_icon">
+                                                            <svg width="18" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M11.916 17.2719C11.4922 17.2724 11.0888 17.0904 10.8087 16.7723L4.52577 9.6306C4.11276 9.13839 4.16822 8.40649 4.65068 7.98214C5.13315 7.55779 5.86614 7.5962 6.3016 8.06866L11.7956 14.3138C11.826 14.3485 11.8699 14.3684 11.916 14.3684C11.9621 14.3684 12.006 14.3485 12.0364 14.3138L17.5304 8.06866C17.8062 7.73992 18.2385 7.58638 18.6599 7.66744C19.0813 7.74851 19.4258 8.05147 19.56 8.45909C19.6942 8.86671 19.597 9.31504 19.3062 9.6306L13.0252 16.7698C12.7446 17.0886 12.3406 17.2714 11.916 17.2719Z" fill="#2D2D2D"/>
+                                                                </svg>
+                                                                
+                                                           </span>
+                                                           <ul class="voicebot-caller-id-items-container" id="voicebot_event_caller_id_container">
+                                                            {% for voice_bot_caller_obj in voice_bot_caller_objs %}
+                                                            <li class="voicebot-caller-id-item" search-value="{{ voice_bot_caller_obj.caller_id }}|{{ voice_bot_caller_obj.app_id }}" id="voice_bot_caller_id_{{ voice_bot_caller_obj.pk }}">
+                                                                <div class="voicebot-caller-id-item-text call_id_num">{{ voice_bot_caller_obj.caller_id }}</div>
+                                                                <div class="voicebot-caller-id-item-text app_id">App ID: {{ voice_bot_caller_obj.app_id }}</div>
+                                                                <a class="modal-trigger voicebot-caller-id-cross-icon" onclick="open_delete_caller_modal('{{ voice_bot_caller_obj.pk }}')">
+                                                                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                        <path d="M3.40088 3.05899L12.2881 12.3006" stroke="#FF281A" stroke-width="1.54026" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                        <path d="M12.2881 3.05899L3.4009 12.3006" stroke="#FF281A" stroke-width="1.54026" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                    </svg>
+                                                                </a>
+                                                            </li>
+                                                            {% endfor %}
+                                                          </ul>
+                                                    </div>
+                                                    <a class="add_id modal-trigger"href="#add_caller_id">
+                                                        <svg width="13" height="12" viewBox="0 0 13 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M9.5 6.5H7V9C7 9.275 6.775 9.5 6.5 9.5C6.225 9.5 6 9.275 6 9V6.5H3.5C3.225 6.5 3 6.275 3 6C3 5.725 3.225 5.5 3.5 5.5H6V3C6 2.725 6.225 2.5 6.5 2.5C6.775 2.5 7 2.725 7 3V5.5H9.5C9.775 5.5 10 5.725 10 6C10 6.275 9.775 6.5 9.5 6.5Z" fill="white" stroke="white" stroke-width="1.5"/>
+                                                        </svg>
+                                                        Add ID
+                                                    </a>
+                                                </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                         
+                        </div>
+                    </li>
+                </ul>
+                <ul class="collapsible">
+                    <li>
+                        <div style="display: flex; flex-direction: column;">
+                            <div class="collapsible-header">Text to Speech Settings</div>
+                        </div>
+                        <div class="collapsible-body">
+
+                            <div class="row sticky-intent-display-format-div" id="sticky-intent-display">
+                            </div>
+                            <div class="row" id="channel-sticky-intents">
+                                <div class="col s10">
+                                    <table id="easychat-web-channel-table" style="box-shadow: none !important;">
+                                        <tbody style="box-shadow: none !important;">
+                                            <tr>
+                                                <td>
+                                                    <p>Provider</p>
+                                                    <img src="" id="uploaded-bot-welcome-image"
+                                                        style="max-height:10em;">
+                                                    <a id="remove-bot-welcome-image" style="display: none;"><i
+                                                            class="material-icons red-text text-darken-3">delete</i></a>
+                                                </td>
+                                                <td id="gy-btn-outline">
+                                                    <div style="border-radius: 0px!important;">
+                                                        <select id="voice_provider">
+                                                            <option value="Microsoft" selected>Microsoft</option>
+                                                            <option value="Google">Google</option>
+                                                            <option value="AwsPolly">AWS Polly</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <p>Language </p>
+                                                    <img src="" id="uploaded-bot-welcome-image"
+                                                        style="max-height:10em;">
+                                                    <a id="remove-bot-welcome-image" style="display: none;"><i
+                                                            class="material-icons red-text text-darken-3">delete</i></a>
+                                                </td>
+                                                <td id="gy-btn-outline">
+                                                    <div style="border-radius: 0px!important;">
+                                                        <select id="voice_channel_language">
+                                                            <option value="en-IN" selected>English (India)</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <p>Voice Type </p>
+                                                    <img src="" id="uploaded-bot-welcome-image"
+                                                        style="max-height:10em;">
+                                                    <a id="remove-bot-welcome-image" style="display: none;"><i
+                                                            class="material-icons red-text text-darken-3">delete</i></a>
+                                                </td>
+                                                <td id="gy-btn-outline" class="toggle-disable">
+                                                    <div style="border-radius: 0px!important;">
+                                                        <select id="voice_type">
+                                                            <option value="general" selected>General</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <p>Voice Name</p>
+                                                    <img src="" id="uploaded-bot-welcome-image"
+                                                        style="max-height:10em;">
+                                                    <a id="remove-bot-welcome-image" style="display: none;"><i
+                                                            class="material-icons red-text text-darken-3">delete</i></a>
+                                                </td>
+                                                <td id="gy-btn-outline">
+                                                    <div style="border-radius: 0px!important;">
+                                                        <select id="voice_name">
+                                                            <option value="NeerjaNeural" disabled selected>Neerja
+                                                                (Neural)</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr id="easychat_threshold_value_range_container">
+                                                <td style="padding-bottom:2px!important">Speaking Speed<sup>
+                                                        <i class="material-icons inline-icon tooltipped"
+                                                            data-position="top"
+                                                            data-tooltip="Choose the Speed using the slider where the default speed is MS - 1, Google - 1, and Polly - 100. The speed increases from left to right.">help</i>
+                                                    </sup></td>
+                                                <td style="padding-bottom:2px!important">
+                                                    <div class="row pb-0 mb-0">
+                                                        <div class=" col easychat-bot-range-slider-area"
+                                                            style="padding: 0px!important;">
+                                                            <input type="range" id="speaking_speed_slider">
+                                                        </div>
+
+                                                        <div class="col " style="padding: 0px!important;">
+                                                            <input type="number" class="slider-btn"
+                                                                id="speaking_speed_value" step='any'>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr id="easychat_threshold_value_range_container">
+                                                <td style="padding-bottom:2px!important">Pitch<sup>
+                                                        <i class="material-icons inline-icon tooltipped"
+                                                            data-position="top" data-tooltip="Choose the Pitch using the slider where the default pitch value is MS - 1, Google - 0, and Polly - 0. The pitch increases from left to right.
+                                                            ">help</i>
+                                                    </sup></td>
+                                                <td style="padding-bottom:2px!important">
+                                                    <div class="row pb-0 mb-0">
+                                                        <div class=" col easychat-bot-range-slider-area"
+                                                            style="padding: 0px!important;">
+                                                            <input type="range" id="pitch_value_slider">
+                                                        </div>
+
+                                                        <div class="col " style="padding: 0px!important;">
+                                                            <input type="number" class="slider-btn" id="pitch_value"
+                                                                step='any'>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <p>ASR Provider</p>
+                                                    <img src="" id="uploaded-bot-welcome-image"
+                                                        style="max-height:10em;">
+                                                    <a id="remove-bot-welcome-image" style="display: none;"><i
+                                                            class="material-icons red-text text-darken-3">delete</i></a>
+                                                </td>
+                                                <td id="gy-btn-outline">
+                                                    <div style="border-radius: 0px!important;">
+                                                        <select id="voice_asr_provider">
+                                                            <option value="Google" selected>Google</option>
+                                                            <option value="Ameyo">Ameyo</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <a class="btn white transparent-btn black-text blue-btn" id="reset_voice_modulation">Reset to
+                                Default</a>
+                        </div>
+                    </li>
+                </ul>
+
+                <ul class="collapsible" id="voice_event_settings">
+                    <li>
+                        <div style="display: flex; flex-direction: column;">
+                            <div class="collapsible-header">Voice Event Settings</div>
+                        </div>
+                        <div class="collapsible-body">
+
+                            <div class="row sticky-intent-display-format-div" id="sticky-intent-display">
+                            </div>
+                            <div class="row">
+                                <div class="col s12" id="voice_events_table_wrapper">
+                                    <table id="easychat-voice-event-channel-table" style="box-shadow: none !important;">
+                                        <tbody style="box-shadow: none !important;">
+                                            <tr>
+                                                <td style="padding-bottom:25px!important;padding-top: 2%!important;"id="event_heading">Silence Detection<sup>
+                                                    <i class="material-icons inline-icon tooltipped"
+                                                        data-position="top"
+                                                        data-tooltip="The Silence Detection triggers when the bot does not receive any response from the end-user within 6 seconds or more.">help</i>
+                                                </sup> 
+                                               </td>
+                                               
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-bottom: 35px!important;"class="sub-heading">Threshold Count <sup>
+                                                    <i class="material-icons inline-icon tooltipped"
+                                                        data-position="top"
+                                                        data-tooltip="The maximum number of times a bot will retry asking for a reply by sending the Follow Up Response.">help</i>
+                                                </sup></td>
+                                                <td id="gy-btn-outline">
+                                                 
+                                                    <div class="voicebot-dropdown-parent" style="border-radius: 0px!important;" id="select-box-voice">
+                                                        <select id="silence_threshold_count" class="drop_box_voice">
+                                                            {% for i in threshold_range %}
+                                                                {% if i == voicebot_config_obj.silence_threshold_count %}
+                                                                <option value="{{ i }}" selected>{{ i }}</option>
+                                                                {% else %}
+                                                                <option value="{{ i }}">{{ i }}</option>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-bottom: 95px!important;"class="sub-heading">Follow Up Response <span style="color: red;">* </span><sup>
+                                                    <i class="material-icons inline-icon tooltipped"
+                                                        data-position="top"
+                                                        data-tooltip="The response sent to the end-user repetitively asking for a reply until it reaches the Threshold Count.">help</i>
+                                                </sup></td>
+                                                <td id="gy-btn-outline">
+                                                    <div style="border-radius: 0px!important;" class="focus">
+                                                      <textarea id="silence_response" class="voice_text_area" type="text" placeholder="Enter your response here">{{ voicebot_config_obj.silence_response }}</textarea>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr style="border-bottom:2px solid #CBCACA!important;">
+                                                <td style="padding-bottom: 95px!important"class="sub-heading">Termination Response <span style="color: red;"> * </span><sup>
+                                                    <i class="material-icons inline-icon tooltipped"
+                                                        data-position="top"
+                                                        data-tooltip="The response sent to the end-user before disconnecting the call after reaching the Threshold Count.">help</i>
+                                                </sup></td>
+                                                <td id="gy-btn-outline"style="padding-bottom: 22px!important;" >
+                                                    <div style="border-radius: 0px!important;" class="focus">
+                                                      <textarea id="silence_termination_response" class="voice_text_area"type="text"placeholder="Enter your response here">{{ voicebot_config_obj.silence_termination_response }}</textarea>
+                                                    </div>
+                                                </td>
+                                               
+                                            </tr>
+                                           
+                                            <tr>
+                                                <td style="padding:20px 0px 20px 20px!important;"id="event_heading">Repeat Detection<sup>
+                                                    <i class="material-icons inline-icon tooltipped"
+                                                        data-position="top"
+                                                        data-tooltip="Repeat Detection triggers when a user asks the bot to repeat the response. The bot will repeat based on the Threshold set for Loop Detection and if the user's query is present in the Variations list.">help</i>
+                                                </sup> 
+                                               </td>
+                                               
+                                            </tr>
+                                           
+                                            <tr style="border-bottom:2px solid #CBCACA!important;">
+                                                <td style="padding:20px 0px 60px 21px!important;"id="event_heading"class="sub-heading">Variations<sup>
+                                                    <i class="material-icons inline-icon tooltipped"
+                                                        data-position="top"
+                                                        data-tooltip="The list of all the phrases which will trigger the Repeat Event.  Any changes made to the list will be applicable to all the Bots.">help</i>
+                                                </sup> 
+                                               </td>
+                                                <td style="padding-bottom: 30px!important;">
+                                               <div class="easychat-add-variation-dropdown-wrapper">
+                                                   <input id="voicebot_variation_input_div" type="text" placeholder="Click here to view or add a new variation by hitting 'Enter'">
+                                                   <span class="voicebot-variation-dropdown-icon " id="voicebot_variation_dropdown_icon">
+                                                    <svg width="18" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M11.916 17.2719C11.4922 17.2724 11.0888 17.0904 10.8087 16.7723L4.52577 9.6306C4.11276 9.13839 4.16822 8.40649 4.65068 7.98214C5.13315 7.55779 5.86614 7.5962 6.3016 8.06866L11.7956 14.3138C11.826 14.3485 11.8699 14.3684 11.916 14.3684C11.9621 14.3684 12.006 14.3485 12.0364 14.3138L17.5304 8.06866C17.8062 7.73992 18.2385 7.58638 18.6599 7.66744C19.0813 7.74851 19.4258 8.05147 19.56 8.45909C19.6942 8.86671 19.597 9.31504 19.3062 9.6306L13.0252 16.7698C12.7446 17.0886 12.3406 17.2714 11.916 17.2719Z" fill="#2D2D2D"/>
+                                                        </svg>
+                                                        
+                                                   </span>
+                                                   <ul class="voicebot-variation-items-container" id="voicebot_event_variation_container">
+                                                       {% for i, repeat_variation in repeat_variations_list %}
+                                                       <li class="voicebot-variation-item" id="repeat_variation_{{ i }}">
+                                                           <div class="voicebot-variation-item-text">{{ repeat_variation }}</div>
+                                                           <a class="modal-trigger" onclick="open_delete_variations_model('{{ i }}')">
+                                                            <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M11.0166 8.38202L10.7916 13.632M8.2416 13.632L8.0166 8.38202M5.0166 5.38202L5.64214 14.7651C5.71218 15.8157 6.58478 16.632 7.63771 16.632H11.3955C12.4484 16.632 13.321 15.8157 13.3911 14.7651L14.0166 5.38202M5.0166 5.38202H7.2666M5.0166 5.38202H3.5166M14.0166 5.38202H15.5166M14.0166 5.38202H11.7666M11.7666 5.38202V5.13202C11.7666 4.02745 10.8712 3.13202 9.7666 3.13202H9.2666C8.16203 3.13202 7.2666 4.02745 7.2666 5.13202V5.38202M11.7666 5.38202H7.2666" stroke="#FF281A" stroke-width="1.38624" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            </svg>
+                                                           </a>
+                                                       </li>
+                                                       {% endfor %}
+                                                   </ul>
+                                               </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:20px 0px 25px 20px!important;" id="event_heading">Loop Detection<sup>
+                                                    <i class="material-icons inline-icon tooltipped"
+                                                        data-position="top"
+                                                        data-tooltip="Loop Detection triggers when the bot repeats the same response and runs in a loop. The Repeat event is also counted as a loop.">help</i>
+                                                </sup> 
+                                               </td>
+                                               
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-bottom:35px!important"class="sub-heading">Threshold Count <sup>
+                                                    <i class="material-icons inline-icon tooltipped"
+                                                        data-position="top"
+                                                        data-tooltip="
+                                                        The maximum number of times the bot will repeat the same response again in a loop. Applied for both Repeat and Loop Detection.">help</i>
+                                                </sup></td>
+                                                <td id="gy-btn-outline">
+                                                    <div class="voicebot-dropdown-parent" style="border-radius: 0px!important; width: 82%;">
+                                                        <select id="loop_threshold_count">
+                                                            {% for i in threshold_range %}
+                                                                {% if i == voicebot_config_obj.loop_threshold_count %}
+                                                                <option value="{{ i }}" selected>{{ i }}</option>
+                                                                {% else %}
+                                                                <option value="{{ i }}">{{ i }}</option>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr id="easychat_voice_inputs">
+                                                <td style="margin-bottom:6px!important;margin-top:10px!important;"class="sub-heading">Agent Handover<sup>
+                                                        <i class="material-icons inline-icon tooltipped"
+                                                            data-position="top" data-tooltip="Select 'Yes' if you want to connect an assistant to the end-user when stuck in a loop or else select 'No' to disconnect the call.">help</i>
+                                                    </sup></td>
+                                                <td style="padding-top: 30px!important;">
+                                                    <div class="row">
+                                                        <div class="col s12 easychat-response-order-select" style="display: flex; margin-left: -11.2%;">
+                                                            <div style="display: flex; align-items: center;" class="easychat-voice-radio-btn">
+                                                                {% if voicebot_config_obj.is_agent_handover %}
+                                                                    <input type="radio" onchange="change_loop_response_wrapper()" class="easychat-response-order-radio" name="sticky button display format" id="enable_agent_handover" style="height: 1.3rem !important;" value="yes" checked>
+                                                                {% else %}
+                                                                    <input type="radio" onchange="change_loop_response_wrapper()" class="easychat-response-order-radio" name="sticky button display format" id="enable_agent_handover" style="height: 1.3rem !important;" value="yes" >
+                                                                {% endif %}
+                                                                    <p style="padding-right: 15px;">Yes</p>
+                                                            </div>
+                                                            <div style="display: flex; align-items: center;" class="easychat-voice-radio-btn">
+                                                                {% if voicebot_config_obj.is_agent_handover %}
+                                                                    <input type="radio" onchange="change_loop_response_wrapper()" class="easychat-response-order-radio" name="sticky button display format" id="disable_agent_handover" style="height: 1.3rem !important;" value="no">
+                                                                {% else %}
+                                                                    <input type="radio" onchange="change_loop_response_wrapper()" class="easychat-response-order-radio" name="sticky button display format" id="disable_agent_handover" style="height: 1.3rem !important;" value="no"checked="">
+                                                                {% endif %}
+                                                                    <p>No</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                            {% if voicebot_config_obj.is_agent_handover %}
+                                            <tr class="yes" id="loop_handover_wrapper">
+                                            {% else %}
+                                            <tr class="yes" id="loop_handover_wrapper" style="display: none;">
+                                            {% endif %}
+                                                <td style="padding-bottom: 85px!important"class="sub-heading">Handover Response <span style="color: red;"> * </span><sup>
+                                                    <i class="material-icons inline-icon tooltipped"
+                                                        data-position="top"
+                                                        data-tooltip="The response sent to the end-user before handing them over to the assistant after reaching the Threshold Count.">help</i>
+                                                </sup></td>
+                                                <td id="gy-btn-outline" >
+                                                    <div style="border-radius: 0px!important;" class="focus">
+                                                      <textarea id="loop_handover_response" class="voice_text_area "type="text"placeholder="Enter your response here">{{ voicebot_config_obj.loop_handover_response }}</textarea>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% if voicebot_config_obj.is_agent_handover %}
+                                            <tr  class="no" id="loop_termination_wrapper" style="display: none;">
+                                            {% else %}
+                                            <tr  class="no" id="loop_termination_wrapper">
+                                            {% endif %}
+                                                <td style="padding-bottom: 85px!important"class="sub-heading">Termination Response <span style="color: red;"> * </span><sup>
+                                                    <i class="material-icons inline-icon tooltipped"
+                                                        data-position="top"
+                                                        data-tooltip="The response sent to the end-user before disconnecting the call after reaching the Threshold Count.">help</i>
+                                                </sup></td>
+                                                <td id="gy-btn-outline" >
+                                                    <div style="border-radius: 0px!important;" class="focus">
+                                                      <textarea id="loop_termination_response" class="voice_text_area " type="text"placeholder="Enter your response here">{{ voicebot_config_obj.loop_termination_response }}</textarea>                                                      
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                           
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <ul class="collapsible" id="voice_language_settings">
+                    <li>
+                        <div style="display: flex; flex-direction: column;">
+                            <div class="collapsible-header">Language Settings</div>
+                        </div>
+                        <div class="collapsible-body">
+
+                            <div class="row sticky-intent-display-format-div" id="sticky-intent-display">
+                            </div>
+                            <div class="row">
+                                <div class="col s12" id="voice_events_table_wrapper">
+                                    <table id="easychat-language-settings-table" style="box-shadow: none !important;">
+                                        <tbody style="box-shadow: none !important;">
+                                      
+                                            <tr >
+                                                <td style="padding-bottom: 40px!important;padding-top: 1%!important;height: 40px;vertical-align: top;">Language <span style="color: red;"> * </span><sup>
+                                                    <i class="material-icons inline-icon tooltipped"
+                                                        data-position="top"
+                                                        data-tooltip="We only support English & Hindi as of now, so make sure the same languages are configured on the chatbot.">help</i>
+                                                </sup></td>
+                                                <td >
+                                                    <div class="container " id="language_select_box">
+                                                        <div class="select-box">
+                                                            <div id="language-box-options-container" class="options-container">
+                                                                <label for="lang-en">
+                                                                    <div class="option">
+                                                                        <input type="checkbox" style="width: 10% !important; height: 0.8rem !important;" disabled checked class="item-checkbox" value="en" id="lang-en" name="English">
+                                                                        <label for="English">English</label>
+                                                                    </div>
+                                                                </label>
+                                                                <label for="lang-hi">
+                                                                    <div class="option">
+                                                                        <label for="Hindi">Hindi</label>
+                                                                        {% if "hi" in languages_supported %}
+                                                                        <input type="checkbox" checked style="width: 10% !important; height: 0.8rem !important" class="item-checkbox" value="hi" id="lang-hi" name="Hindi">
+                                                                        {% else %}
+                                                                        <input type="checkbox" style="width: 10% !important; height: 0.8rem !important" class="item-checkbox" value="hi" id="lang-hi" name="Hindi">
+                                                                        {% endif %}
+                                                                    </div>
+                                                                </label>
+                                                                <div class='no-elem'>No such Language found</div>
+                                                            </div>
+                                                            <div id="selected-language-chips-wrapper" class="wrapper-box">
+                                                            <div class="box">
+                    
+                                                                <div class="selected" style="max-height: 74px;overflow: auto; border: none;" >                                        
+                                                                  
+                                                                    <span class="tag">
+                                                                        <span class="language-chip-display-name"> English</span>
+                                                                    </span>
+
+                                                                    {% if "hi" in languages_supported %} 
+                                                                    <span class="tag">
+                                                                        <span class="language-chip-display-name"> Hindi</span>
+                                                                    </span>
+                                                                    {% endif %}
+
+                                                                </div>
+                                                                
+                                                            </div>
+                                                            <div id="language-dropdown-arrow" class="arrow">
+                                                                <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M0.200408 0.739665C0.48226 0.436132 0.956809 0.418556 1.26034 0.700408L5 4.22652L8.73967 0.700408C9.0432 0.418556 9.51775 0.436132 9.7996 0.739665C10.0815 1.0432 10.0639 1.51775 9.76034 1.7996L5.51034 5.7996C5.22258 6.0668 4.77743 6.0668 4.48967 5.7996L0.239665 1.7996C-0.0638681 1.51775 -0.081444 1.0432 0.200408 0.739665Z" fill="#909090"/>
+                                                                </svg>
+                                                            </div>
+                                                            </div>
+                                                        
+                                                            <div id="language-options-search-box" class="search-box" style="display: none;">
+                                                                <input type="text" placeholder="&nbsp; &nbsp; &nbsp; Search Language">
+                                                            </div>
+                                                            
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                               
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-bottom: 95px!important;padding-top: 1%!important;">Fallback Response <span style="color: red;"> * </span>
+                                                    <sup>
+                                                        <i class="material-icons inline-icon tooltipped" data-position="top" data-tooltip="The bot will reply with a fallback response when it detects a user query in any other language than English or Hindi before disconnecting the call.">help</i>
+                                                    </sup>
+                                                </td>
+                                                <td id="gy-btn-outline1" style="padding-bottom: 22px!important;padding-right:20px!important" >
+                                                    <div style="border-radius: 0px!important; margin-left: -11.5%;" class="focus">
+                                                      <textarea id="fallback_response" class="voice_text_area voice_text_area1" type="text" placeholder="Enter your response here">{{ voicebot_config_obj.fallback_response }}</textarea>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <div class="progress" id="easychat_ms_teams_channel_preloader" style="display: none;">
+                    <div class="indeterminate"></div>
+                </div>
+                <a class="btn green lighten-2" style="background-color: #82C784; margin-left: 0.2em;"
+                    id="save-voice-channel">Save</a>
+            </div>
+        </div>
+
+        <!-- Voicebot delete modal -->
+        <div id="easychat_voicebot_variation_delete_modal" class="modal easychat-custom-modals-wrapper easychat-custom-delete-modal " tabindex="0">
+            <div class="modal-content">
+                <div class="row" style="margin-bottom: 0px !important;">
+                    <div class="modal-overflow-content-div">
+                        <div class="termination-confirmation-modal-container">
+                            <div class="termination-icon">
+                                <svg width="83" height="82" viewBox="0 0 83 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M41.3395 6.83336C22.5888 6.83336 7.33337 22.1605 7.33337 41C7.33337 59.8395 22.6605 75.1667 41.5 75.1667C60.3395 75.1667 75.6667 59.8395 75.6667 41C75.6667 22.1605 60.2678 6.83336 41.3395 6.83336ZM44.9167 58.0834H38.0834V51.25H44.9167V58.0834ZM44.9167 44.4167H38.0834V23.9167H44.9167V44.4167Z" fill="#DB2A2A"></path>
+                                </svg>
+                            </div>
+                            <div class="termination-confirmation-heading-text">
+                                Delete Variation?
+                            </div>
+                            <div class="termination-confirmation-text">
+                                This will delete the selected Variation from all the Bots. Do you still want to continue?
+                            </div>
+                            <div class="termination-buttons">
+                                <button class="termination-no-btn modal-close">Cancel</button>
+                                <button  class="termination-yes-btn" id="delete-variation">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--voicebot add caller id  Modal Structure -->
+        <div id="add_caller_id" class="modal">
+            <div class="modal-content">
+                <div class="row" style="margin-bottom: 12px !important;">
+                    <div class="modal-header">
+                        <h6>Add Call Details
+                            <p> Enter a valid Exophone Caller ID with the assigned App ID and click on Save.</p>
+                        </h6>
+                        <a href="javascript:void(0)" class="modal-close-btn modal-close" onclick="close_add_voice_caller_modal()">
+                            <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z" fill="black" fill-opacity="0.54"></path>
+                            </svg>
+                        </a>
+                    </div>
+                    <div class="modal-overflow-content-div" style="margin: 0;">
+                        <div id='select-action-type' class="row">
+                            <div class="sub-heading"style="margin-top: 20px;">
+                                Caller ID <span style="color: #FF0000;">*</span>
+                                <sup>
+                                    <i class="material-icons inline-icon tooltipped"
+                                        data-position="top"
+                                        data-tooltip="Add the Exophone number you want to use for calling the users.">help</i>
+                                </sup>
+                            </div>
+                            <input 
+                            class="add_call_details_input"  
+                            type="text" name="api_id" 
+                            id="add_call_id" 
+                            onkeyup="is_add_call_details_empty(event)"
+                            onkeydown="only_numeric_for_caller_id(event)"
+                            placeholder="Enter Caller ID ">
+                            <p id="caller-id-err" class="error_msg_text">The Caller ID  already exist in the list, please enter new values.</p>
+                            <div id="action-type-container"></div>
+                        </div>
+                        <div class="row" id="upload-image-section">
+                            <div class="sub-heading">
+                                App ID 
+                                <span style="color: #FF0000;">*</span>
+                                <sup>
+                                    <i class="material-icons inline-icon tooltipped"
+                                        data-position="top"
+                                        data-tooltip="It is the identiﬁer of the flow (or applet) that you want to connect once the user picks up the call.">help</i>
+                                </sup>
+                            </div>
+                            <!-- class = error_msg -->
+                            <input 
+                            class="add_call_details_input"   
+                            type="text" name="api_id" 
+                            id="add_app_id" 
+                            onkeyup="is_add_call_details_empty(event)" 
+                            onkeydown="only_numeric_for_app_id(event)"
+                            placeholder="Enter App ID ">
+                            <p id="app-id-err" class="error_msg_text">The App ID  already exist in the list, please enter new values.</p>
+                            <p id="caller-app-err" class="error_msg_text">The Caller ID and App ID  already exist in the list, please enter new values.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a class="btn filter-modal-footer-btn" id="save_call_id" disabled onclick="save_voice_caller()">Save</a>
+            </div>
+        </div>
+
+        <!-- Voicebot call id delete modal -->
+        <div id="easychat_voicebot_call_id_delete_modal" class="modal easychat-custom-modals-wrapper easychat-custom-delete-modal " tabindex="0">
+            <div class="modal-content">
+                <div class="row" style="margin-bottom: 0px !important;">
+                    <div class="modal-overflow-content-div">
+                        <div class="termination-confirmation-modal-container">
+                            <div class="termination-icon">
+                                <svg width="83" height="82" viewBox="0 0 83 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M41.3395 6.83336C22.5888 6.83336 7.33337 22.1605 7.33337 41C7.33337 59.8395 22.6605 75.1667 41.5 75.1667C60.3395 75.1667 75.6667 59.8395 75.6667 41C75.6667 22.1605 60.2678 6.83336 41.3395 6.83336ZM44.9167 58.0834H38.0834V51.25H44.9167V58.0834ZM44.9167 44.4167H38.0834V23.9167H44.9167V44.4167Z" fill="#DB2A2A"></path>
+                                </svg>
+                            </div>
+                            <div class="termination-confirmation-heading-text">
+                                Delete Call Details?
+                            </div>
+                            <div class="termination-confirmation-text">
+                                This will delete the selected Call details. Do you still want to continue?
+                            </div>
+                            <div class="termination-buttons">
+                                <button onclick="close_delete_caller_modal()" class="termination-no-btn">Cancel</button>
+                                <button id="delete-caller-button" class="termination-yes-btn">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+
+            $(".voice-textarea").trumbowyg({
+                tagsToKeep: [],
+                allowTagsFromPaste: {
+                    allowedTags: ['h4', 'p', 'br']
+                },
+                minimalLinks: true,
+                btns: [
+                    // ['viewHTML'],
+                    ['strong', 'em'],
+                    ['emoji'],
+                    ['link'],
+                    ['unorderedList', 'orderedList'],
+                    ['underline'],
+                    ['justifyLeft'], ['justifyCenter'], ['justifyRight'], ['justifyFull'],
+                ],
+            })
+            var voice_modulation_details = '{{ voice_modulation_details | escapejs }}'
+            voice_modulation_details = JSON.parse(voice_modulation_details)
+            var default_voice_modulation = '{{ default_voice_modulation | escapejs }}'
+            default_voice_modulation = JSON.parse(default_voice_modulation)
+            repeat_variations_list = '{{ repeat_variations_json | escapejs }}';
+            repeat_variations_list = JSON.parse(repeat_variations_list);
+            repeat_variations_count = repeat_variations_list.length;
+        </script>
+        <script>
+            if (document.referrer.match("/chat/bots/$")) {
+                $("#channel-back-btn")[0].href = document.referrer
+            }
+        </script>
+        {% endblock %}

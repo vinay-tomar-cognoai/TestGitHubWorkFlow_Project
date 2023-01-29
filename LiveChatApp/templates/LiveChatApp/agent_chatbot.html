@@ -1,0 +1,344 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>LiveChat</title>
+      <meta name="robots" content="noindex" />
+      <meta name="googlebot" content="noindex" />
+      <meta name="googlebot-news" content="noindex" />
+      
+      <link href="/static/LiveChatApp/css/select2.min.css" rel="stylesheet"/>
+
+      {% if request.user.enable_s3_bucket %}
+
+      <link href="https://static.allincall.in/static/LiveChatApp/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+
+      {% else %}
+      <link href="{% static 'LiveChatApp/css/materialize.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+
+      {% endif %}
+
+      <link href="{% static 'LiveChatApp/css/material_icons.css' %}" rel="stylesheet">
+
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+      <link href="{% static 'LiveChatApp/css/changes.css' %}?v={% random_int 1 100 %}" rel="stylesheet">
+      <link href="{% static 'LiveChatApp/css/agent_chatbot.css' %}?v={% random_int 1 100 %}" rel="stylesheet">
+      <link href="{% static 'LiveChatApp/css/style1.css' %}?v={% random_int 1 100 %}" rel="stylesheet">
+      <link id="font-link" rel="stylesheet" href="https://fonts.googleapis.com/css?family=DM+Sans">
+
+      {% if request.user.enable_s3_bucket %}
+       <script type="text/javascript" src="{https://static.allincall.in/static/LiveChatApp/js/jquery-3.3.1.min.js"></script>
+
+      {% else %}
+      <script type="text/javascript" src="{% static 'LiveChatApp/js/jquery-3.3.1.min.js' %}"></script>
+
+      {% endif %}
+     
+      <script src="{% static 'LiveChatApp/js/materialize.js' %}"></script>
+      {% if request.user.enable_s3_bucket %}
+        <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/crypto-js.min.js"></script>
+        <script type="text/javascript" src="https://static.allincall.in/static/LiveChatApp/js/select2.min.js"></script>
+
+      {% else %}
+        <script type="text/javascript" src="{% static 'EasyChatApp/js/crypto-js.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'LiveChatApp/js/select2.min.js' %}"></script>
+
+      {% endif %}
+      
+      <script type="text/javascript" src="{% static 'LiveChatApp/js/agent_chatbox.js' %}?v={% random_int 1 100 %}"></script>
+
+       <style>
+
+        .easychat-user-message {
+            background-color: {{admin_config.get_livechat_theme_lighten_one}} !important;
+        }
+
+        .livechat-transfer-chat {
+            background-color: transparent !important;
+            color: {{admin_config.get_livechat_theme_lighten_one}} !important;
+            border: 1px solid {{admin_config.get_livechat_theme_lighten_one}} !important;
+        }
+        .transparent-btn {
+            border-color: {{admin_config.get_livechat_theme_lighten_one}} !important;
+            color: {{admin_config.get_livechat_theme_lighten_one}} !important;
+            background: transparent !important;
+        }
+        .transparent-btn:hover {
+            border-color: {{admin_config.get_livechat_theme_lighten_one}} !important;
+            color: {{admin_config.get_livechat_theme_lighten_one}} !important;
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+        .easychat-livechat-user-attachment {
+          background-color: {{admin_config.get_livechat_theme_lighten_one}} !important;
+        }
+        .select2-container--default .select2-results__option[aria-selected="true"] {
+          background: {{admin_config.get_livechat_theme_lighten_one}} !important;
+        }
+        .select2-results__option {
+          color: {{admin_config.get_livechat_theme_lighten_one}} !important;
+        }
+
+        .select2-results__option,
+        .select2-container--default .select2-results__option--highlighted[aria-selected="true"] {
+          color: {{admin_config.get_livechat_theme_lighten_one}} !important;
+        }
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: {{admin_config.get_livechat_theme_lighten_one}} !important;
+            color: #f4f6fe !important;
+        }
+        .easychat-livechat-user-doc-attachment {
+          background-color: {{admin_config.get_livechat_theme_lighten_one}} !important;
+        }
+        #end-chat-btn {
+          background-color: {{admin_config.get_livechat_theme_lighten_one}} !important;
+        }
+        
+        #query:focus {
+          box-shadow: none !important;
+          border-bottom: 1px solid {{admin_config.get_livechat_theme_lighten_one}} !important;
+          border-top: none !important;
+          border-right: none !important;
+          border-left: none !important;
+          border-radius: 0px;
+        }
+      </style>
+
+   </head>
+   <body style="overflow-y: hidden;">
+
+       <div class="row" id="header-content" style="border-bottom: 1px solid #e6e6e6; background-color: #fff;height: 4.18em;border-collapse: collapse;margin-bottom: 0px;">
+        <div class="col s6">
+        <div class="row">
+          <!--<div class="col s10" style="padding-bottom: 1em;padding-left: 1em;">
+           <h8 style="color: black;"><br><b>Name</b> : <a href="#livechat-customer-details" class="modal-trigger">{{ username_display }}</a></h8>
+          </div>-->
+          <div class="col s2" id="typing-text"></div>
+        </div>
+          
+        </div>
+        <div class="col s6 right" id="hamburger-menu" style="display: none;">
+          <a id="mobile-switch" class='dropdown-trigger right' href='#' data-target='dropdown2'>
+            <i class="material-icons" style="color: black; background-color: white; font-size: 2rem; margin-top: 0.4em;">more_vert</i>
+          </a>
+        </div>
+
+        <div class="col s6 right" id="desktop-menu" style="padding: 1em;">
+          <a href="#end-chat-session" id="end-chat-btn" class="btn red darken-3 modal-trigger right" style="margin-left: 1em;">End Chat</a>
+          <a href="javascript:void(0)" class="btn modal-trigger right livechat-transfer-chat" onclick="transfer_chat_modal_open()" style="margin-left: 1em;">Transfer Chat</a>
+        </div>
+
+       </div>
+       
+       <div class="scrollbar row" id="style-2" style="display:block;position: absolute;">
+        <p id="livechat-chat-loader" style="margin: 30% auto; text-align: center; width: 50%;">Loading chats...</p>
+         <div class="row">
+           <div class="new-chat-form-launcher disabled" data-radium="true" style="width: 100%;background-color:white; box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.15);">
+              <div id="submit" class="send-button">
+                 <i id="submit-response" title="Send" onclick="send_message_to_user('{{ session_id }}')">
+                  <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path id="fill-submit-btn" opacity="0.5" d="M24.434 11.5702L1.54457 0.11003C1.36517 0.0201892 1.16366 -0.015808 0.9643 0.00637277C0.764942 0.0285535 0.576238 0.107966 0.420907 0.235049C0.272568 0.359541 0.161847 0.522997 0.101194 0.707045C0.0405401 0.891092 0.0323576 1.08843 0.0775663 1.27688L2.8347 11.4556H14.6019V13.5392H2.8347L0.0359493 23.6867C-0.00647262 23.844 -0.0114246 24.0092 0.0214918 24.1688C0.0544081 24.3285 0.124274 24.4781 0.225472 24.6058C0.32667 24.7335 0.456376 24.8356 0.604161 24.904C0.751946 24.9723 0.913686 25.005 1.07638 24.9994C1.23925 24.9984 1.39961 24.9591 1.54457 24.8848L24.434 13.4246C24.6044 13.3372 24.7474 13.2044 24.8473 13.0408C24.9472 12.8772 25 12.6891 25 12.4974C25 12.3057 24.9472 12.1176 24.8473 11.954C24.7474 11.7904 24.6044 11.6576 24.434 11.5702Z" fill="{{admin_config.get_livechat_theme_lighten_five}}"/>
+                  </svg>
+                </i>
+              </div>
+
+              <div class="input-container" style="width: 80%;" data-radium="true">
+                <div>
+                  <input class="chat-input" id="query" type="text" placeholder="Type '/'(without quotes) for canned messages"
+                    style="border:none; width: 91% !important" autocomplete="off">
+                </div>
+                <div class="fixed-action-btn"
+                  style="right: 3em;bottom: -9px;padding-top: 5px;background-color: transparent !important;">
+                  <a class="btn-floating btn-large gray" style="background-color: transparent;border: none;box-shadow: none; right"
+                    onclick="activate_mic()" id="livechat-mic">
+                    <!-- <i class="material-icons" aria-hidden="true" style="color: gray;line-height: 51px;"id="img-mic">mic</i> -->
+                    <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path id="btn-mic-up"
+                        d="M18.9688 10.9375V13.2812C18.9688 14.7317 18.3926 16.1227 17.367 17.1482C16.3414 18.1738 14.9504 18.75 13.5 18.75C12.0496 18.75 10.6586 18.1738 9.63301 17.1482C8.60742 16.1227 8.03125 14.7317 8.03125 13.2812V10.9375H6.46875V13.2812C6.46957 15.0102 7.10739 16.6782 8.26033 17.9667C9.41327 19.2551 11.0005 20.0735 12.7188 20.2656V21.875H9.59375V23.4375H17.4062V21.875H14.2812V20.2656C15.9995 20.0735 17.5867 19.2551 18.7397 17.9667C19.8926 16.6782 20.5304 15.0102 20.5312 13.2812V10.9375H18.9688Z"
+                        fill="gray" />
+                      <path id="btn-mic-down"
+                        d="M13.5 17.1875C14.536 17.1875 15.5296 16.7759 16.2621 16.0434C16.9947 15.3108 17.4062 14.3173 17.4062 13.2812V5.46875C17.4062 4.43275 16.9947 3.43918 16.2621 2.70661C15.5296 1.97405 14.536 1.5625 13.5 1.5625C12.464 1.5625 11.4704 1.97405 10.7379 2.70661C10.0053 3.43918 9.59375 4.43275 9.59375 5.46875V13.2812C9.59375 14.3173 10.0053 15.3108 10.7379 16.0434C11.4704 16.7759 12.464 17.1875 13.5 17.1875ZM11.1562 5.46875C11.1562 4.84715 11.4032 4.25101 11.8427 3.81147C12.2823 3.37193 12.8784 3.125 13.5 3.125C14.1216 3.125 14.7177 3.37193 15.1573 3.81147C15.5968 4.25101 15.8438 4.84715 15.8438 5.46875V13.2812C15.8438 13.9029 15.5968 14.499 15.1573 14.9385C14.7177 15.3781 14.1216 15.625 13.5 15.625C12.8784 15.625 12.2823 15.3781 11.8427 14.9385C11.4032 14.499 11.1562 13.9029 11.1562 13.2812V5.46875Z"
+                        fill="gray" />
+                    </svg>
+                  </a>
+                </div>
+                <div class="fixed-action-btn" style="right: 6em;bottom: -9px;padding-top: 5px;background-color: transparent !important;">
+
+                  <a class="btn-floating btn-large gray" style="background-color: transparent;border: none;box-shadow: none;">
+                    <!-- <i class="large material-icons" style="color: gray;line-height: 51px;transform: rotate(-45deg);">attach_file</i> -->
+                    <svg width="14" height="25" viewBox="0 0 14 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12.0909 5.68182L12.0909 18.75C12.0909 21.2614 9.81273 23.2955 7 23.2955C4.18727 23.2955 1.90909 21.2614 1.90909 18.75L1.90909 4.54545C1.90909 3.792 2.24432 3.0694 2.84102 2.53663C3.43773 2.00385 4.24704 1.70455 5.09091 1.70455C5.93478 1.70455 6.74409 2.00385 7.34079 2.53663C7.9375 3.0694 8.27273 3.792 8.27273 4.54545L8.27273 16.4773C8.27273 17.1023 7.7 17.6136 7 17.6136C6.3 17.6136 5.72727 17.1023 5.72727 16.4773L5.72727 5.68182H3.81818L3.81818 16.4773C3.81818 17.2307 4.15341 17.9533 4.75011 18.4861C5.34682 19.0189 6.15613 19.3182 7 19.3182C7.84387 19.3182 8.65318 19.0189 9.24989 18.4861C9.84659 17.9533 10.1818 17.2307 10.1818 16.4773L10.1818 4.54545C10.1818 2.03409 7.90364 0 5.09091 0C2.27818 0 0 2.03409 0 4.54545L0 18.75C0 22.2045 3.13091 25 7 25C10.8691 25 14 22.2045 14 18.75L14 5.68182H12.0909Z" fill="gray"/>
+                    </svg>                          
+                  </a>
+                  
+                  <ul>
+                    <li><a class="btn-floating green" onclick="document.getElementById('easychat-livechat-file-attchment-input').click()"><i class="material-icons">image</i></a><input onchange="add_file_with_input_modal(this)" id="easychat-livechat-file-attchment-input" style="display: none;" type="file" accept="image/*,video/mp4,video/3gpp,video/quicktime"></li>
+                    <li><a class="btn-floating purple" onclick="document.getElementById('easychat-livechat-file-attchment-input-doc').click()"><i class="material-icons">picture_as_pdf</i></a><input onchange="add_doc_file_with_input_modal(this)" id="easychat-livechat-file-attchment-input-doc" style="display: none;" type="file" accept=".pdf ,.doc,.docx,.txt"></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+         </div>
+         <div id="easychat-livechat-file-attachment-div" class="easychat-modal" style="display: none;overflow:hidden;">
+          <div class="easychat-modal-content" style="height: 30em;margin: 3em auto 0em auto !important;position: relative;">
+            <div style="height: 11%;"><span class="easychat-close" onclick="close_file_attachment_modal()">&times;</span></div>
+            <div id="easychat-livechat-attached-content" class="easychat-livechat-content">
+
+            </div>
+            <div class="easychat-livechat-inupt-div">
+              <div class="easychat-livechat-user-input">
+                <input id="query-file" type="text" placeholder="add your message" style="border:none;padding: 0px 11px;width: 96%" autocomplete="off">
+              </div>
+
+              <div id="submit-file" class="easychat-livechat-send-button" style="margin-top:10px ;margin-left:8px">
+
+              <i id="submit-response" title="Send" onclick="send_message_to_user_with_file('{{ user_id }}')">
+                    
+                    <svg width="50" height="50" viewBox="0 0 25 25" style ="cursor: pointer;"fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M13.683 6.4793L0.864958 0.0616166C0.764494 0.011306 0.651648 -0.00885246 0.540008 0.00356875C0.428368 0.01599 0.322693 0.0604612 0.235708 0.131628C0.152638 0.201343 0.0906346 0.292879 0.0566685 0.395945C0.0227024 0.499011 0.0181203 0.609522 0.0434371 0.715053L1.58743 6.41512L8.17708 6.41512V7.58197L1.58743 7.58197L0.0201316 13.2645C-0.00362467 13.3527 -0.00639775 13.4451 0.0120354 13.5345C0.0304685 13.6239 0.0695937 13.7078 0.126265 13.7793C0.182935 13.8508 0.255571 13.908 0.33833 13.9462C0.42109 13.9845 0.511664 14.0028 0.602771 13.9997C0.693978 13.9991 0.783784 13.9771 0.864958 13.9355L13.683 7.51779C13.7785 7.46883 13.8586 7.39445 13.9145 7.30283C13.9704 7.21122 14 7.10592 14 6.99855C14 6.89117 13.9704 6.78587 13.9145 6.69426C13.8586 6.60264 13.7785 6.52826 13.683 6.4793Z" fill="{{admin_config.get_livechat_theme_lighten_one}}"/>
+                      </svg>
+                </i>
+
+
+                </div>
+
+            </div>
+          </div>
+        </div>
+
+      <!-- Customer detail modal -->
+      <div id="livechat-customer-details" class="modal">
+          <div class="modal-content">
+              <div class="row">
+                <h4><center><u>Customer Details</u>
+                    <a href="javascript:void(0)" class="modal-close right black-text"><i class="material-icons black-text">close</i></a></center></h4>
+
+                    <div class="input-field col s6">
+                      <b>Name: </b> {{username_display}}
+                    </div>
+                    <div class="input-field col s6">
+                      <b>Email ID: </b> {{ livechat_cust_obj.email }}
+                    </div>
+                    <div class="input-field col s6">
+                      <b>Phone: </b> {{ livechat_cust_obj.phone }}
+                    </div>
+                    <div class="input-field col s6">
+                      <b>Bot ID: </b> {{livechat_cust_obj.bot.pk}}
+                    </div>
+                    <div class="input-field col s6">
+                      <b>Bot name: </b> {{livechat_cust_obj.get_bot_name}}
+                    </div>
+              </div>
+          </div>
+      </div>
+      <!-- Keyword warning modal -->
+      <div id="keyword_warning_modal" class="modal">
+          <div class="modal-content">
+              <div class="row">
+                  <div class="col s12" id="keyword_warning_div">
+                  </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+              <a href="javascript:void(0)" class="btn modal-close right transparent-btn">Close</a>
+          </div>
+      </div>
+
+      <!-- End chat modal -->
+      <div id="end-chat-session" class="modal">
+          <div class="modal-content">
+              <div class="row">
+                  <div class="col s12">
+                    <h5>Are you sure, you want to end this chat?</h5>
+                  </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+              <a href="javascript:void(0)" class="waves-effect waves-green btn red darken-3 modal-close right" style="margin-left: 2em;margin-right: 0.5em;" onclick="mark_chat_session_expired()">End Chat</a>
+              <a href="javascript:void(0)" class="btn modal-close right transparent-btn">Cancel</a>
+          </div>
+      </div>
+
+      <!-- End chat modal -->
+      <div id="transfer-chat" class="easychat-modal" style="position: fixed;">
+          <div class="easychat-modal-content" id= "modal-content-category-switch-selected" style="height: 32vh;width: 50%;">
+            <div style="display: inline-block;float: right; width: 100%;">
+              <span class="easychat-close" id="span-easychat-close-feedback" style="line-height: 0px;" onclick="transfer_chat_modal_close()">&times;</span>
+            </div>
+              {% if config_obj.category_enabled %}
+                <div class="col s12" id="category-switch-selected-div">
+                  <p>Choose category<sup style="color:red;">*</sup></p>
+                    <div class="input-field col s12">
+                      <select class = "browser-default" id="category-switch-selected">
+                        <option value="" selected>Choose one</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col s12" id="list-of-all-agents-div" style="display: none;">
+                  <p>Choose agent<sup style="color:red;">*</sup></p>
+                    <div class="input-field col s12">
+                      <select class = "browser-default" id="list-of-all-agents">
+                        <option value="" selected>Choose one</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col s12" id="preloader-transfer-chat-bot" style="display:none;">
+                    <div class="progress">
+                        <div class="indeterminate black-text purple lighten-4"></div>
+                    </div>
+                </div>
+                <a onclick="transfer_chat_to_another_agent()" id="transfer-chat-submit" class="waves-effect waves-light btn green lighten-2" href="javascript:void(0)" style="color: black; display:none; margin:4% 1% 1% 35%;">Submit</a>
+              {% else %}
+                <div class="col s12" id="list-of-all-agents-div">
+                  <p>Choose agent<sup style="color:red;">*</sup></p>
+                    <div class="input-field col s12">
+                      <select class = "browser-default" id="list-of-all-agents">
+                        <option value="" selected>Choose one</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col s12" id="preloader-transfer-chat-bot" style="display: none;">
+                    <div class="progress">
+                        <div class="indeterminate black-text purple lighten-4"></div>
+                    </div>
+                </div>
+                <a onclick="transfer_chat_to_another_agent()" id="transfer-chat-submit" class="waves-effect waves-light btn green lighten-2" href="javascript:void(0)" style="color: black; margin:4% 1% 1% 35%;">Submit</a>
+              {% endif %}
+          </div>
+      </div>
+
+
+      <ul id='dropdown2' class='dropdown-content'>
+        <li><a href="#" id="sidenav-btn3" class="darken-3 modal-trigger right" style="margin-right: 1em; color: black;" onclick="close_chat_modal()">Minimize</a></li>
+        <li><a href="javascript:void(0)" id="sidenav-btn2" class="modal-trigger right" onclick="transfer_chat_modal_open()" style="color: black;">Transfer Chat</a></li>
+        <li><a href="#end-chat-session" id="sidenav-btn1" class="darken-3 modal-trigger right" style="margin-right: 1em; color: red;">End Chat</a></li>
+      </ul>
+
+      <script type="text/javascript">
+      
+        window.CATEGORY_ENABLED = '{{config_obj.category_enabled}}'
+        window.CHANNEL = '{{livechat_cust_obj.channel.name}}'
+        window.BLACKLISTED_KEYWORD = {{blacklisted_keyword|safe}}
+        window.BOT_ID = {{livechat_cust_obj.bot.pk}}
+        window.LIVECHAT_SESSION_ID = "{{livechat_cust_obj.session_id}}"
+        window.EASYCHAT_USER_ID = "{{livechat_cust_obj.easychat_user_id}}"
+        window.LIVECHAT_THEME_COLOR = '{{admin_config.get_livechat_theme_lighten_one}}'
+        window.LIVECHAT_THEME_COLOR_LIGHT = '{{admin_config.get_livechat_theme_lighten_five}}'
+        window.LIVECHAT_THEME_COLOR_LIGHT_ONE = '{{admin_config.get_livechat_theme_lighten_one}}'
+
+        function close_chat_modal() {
+          $('#main-console-container-mobile', parent.document).removeClass('livechat-agent-modal');
+          $('#main-console-container-mobile', parent.document).hide();
+        }
+       $(function() {
+        query.value = localStorage.getItem(EASYCHAT_USER_ID);
+        query.oninput = () => {
+          localStorage.setItem(EASYCHAT_USER_ID, query.value)
+        };
+       });
+       </script>
+   </body>
+</html>

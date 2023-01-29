@@ -1,0 +1,306 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Automation Testing Console | Home</title>
+  <link rel="stylesheet" href="{% static 'TestingApp/css/bootstrap.min.css' %}" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" href="{% static 'TestingApp/css/font-awesome.min.css' %}">
+  <style>
+  /* width */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+  }
+   
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #888; 
+  }
+
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555; 
+  }
+  </style>
+
+</head>
+<body style="background-color: #f3f6ff !important">
+    <nav class="navbar navbar-dark bg-dark">
+    <!-- Navbar content -->
+    </nav>
+
+    <nav class="navbar navbar-dark bg-primary">
+    <!-- Navbar content -->
+    </nav>
+
+    <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
+        <a class="navbar-brand" href="#">Automated QA Testing Tool</a>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#create-new-bot-modal">Test new bot</button>
+        <button type="button" class="btn btn-primary" onclick="window.location='/chat/bots/'">Go back to bots</button>
+    </nav>
+
+
+<!-- Modal -->
+<div class="modal fade" id="create-new-bot-modal" tabindex="-1" role="dialog" aria-labelledby="create-new-bot-modalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="create-new-bot-modalLabel">Create New Testing Bot</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          <form action="/automation/create-new/" method="POST" onsubmit="return validate_bot_details_form(true)">
+            {% csrf_token %}
+
+            <div class="form-row">
+                <div class="col">
+                  <input type="text" class="form-control" placeholder="Bot ID" name="new-bot-id" id="new_bot_id">
+                </div>
+                <div class="col">
+                  <input type="text" class="form-control" placeholder="Bot Name" name="new-bot-name" id="new_bot_name">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="col">
+                  <br>
+                  <input type="text" class="form-control" placeholder="Hosted domain. ex. https://easychat-dev.allincall.in" name="new-bot-hosted-domain" id="new_bot_hosted_domain">
+                  <br>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <br><br>
+                <button type="submit" class="btn btn-primary">Create</button>              
+            </div>
+
+          </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="padding:1em;">
+
+  <div class="row">
+  
+    <div class="col-8">
+
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">Bot ID</th>
+            <th scope="col">Created at</th>
+            <th scope="col">Bot Name</th>
+            <th scope="col">Bot Console</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for bot_obj in bots %}
+          <tr>
+            <th scope="row">{{ bot_obj.bot_id }}</th>
+            <td>{{ bot_obj.created_at }}</td>
+            <td>{{ bot_obj.bot_name }}</td>
+            <td><a href="{{ bot_obj.bot_domain }}" target="_blank"><u>{{ bot_obj.bot_domain }}</u></a></td>
+            <td><u><a style="color:orange;" href="javascript:void(0)" data-toggle="modal" data-target="#edit-bot-modal-{{ bot_obj.pk }}" title="Edit"><i class="fa fa-edit"></i></a></u>&nbsp;&nbsp;&nbsp;&nbsp;<u><a style="color:red;" href="/automation/test/{{ bot_obj.pk }}/" data-toggle="modal" data-target="#delete-bot-modal-{{ bot_obj.pk }}"><i class="fa fa-trash"></i></a></u>&nbsp;&nbsp;&nbsp;&nbsp;<u><a href="/automation/test/{{ bot_obj.pk }}/">start testing</a></u></td>
+          </tr>
+
+<!-- New Modal Start -->
+<div class="modal fade" id="edit-bot-modal-{{ bot_obj.pk }}" tabindex="-1" role="dialog" aria-labelledby="create-new-bot-modalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="create-new-bot-modalLabel">Edit Testing Bot</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          <form action="/automation/edit-bot-details/{{ bot_obj.pk }}/" method="POST" onsubmit="return validate_bot_details_form()">
+            {% csrf_token %}
+
+            <div class="form-row">
+                <div class="col">
+                  <input type="text" class="form-control" id="edit_form_bot_id" placeholder="Bot ID" name="edit-bot-id-{{ bot_obj.pk }}" value="{{ bot_obj.bot_id }}">
+                </div>
+                <div class="col">
+                  <input type="text" class="form-control" id="edit_form_bot_name" maxlength="18" placeholder="Bot Name" name="edit-bot-name-{{ bot_obj.pk }}" value="{{ bot_obj.bot_name }}">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="col">
+                  <br>
+                  <input type="text" class="form-control" id="edit_form_url" placeholder="Hosted domain. ex. https://easychat-dev.allincall.in" name="edit-bot-hosted-domain-{{ bot_obj.pk }}" value="{{ bot_obj.bot_domain }}">
+                  <br>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <br><br>
+                <button type="submit" class="btn btn-primary">Save changes</button>
+            </div>
+
+          </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- New Modal End -->
+
+
+
+
+<!-- Delete Modal Start -->
+<div class="modal fade" id="delete-bot-modal-{{ bot_obj.pk }}" tabindex="-1" role="dialog" aria-labelledby="create-new-bot-modalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="create-new-bot-modalLabel">Delete Testing Bot</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          <form action="/automation/delete-bot-details/{{ bot_obj.pk }}/" method="POST">
+            {% csrf_token %}
+
+            <h5>Are you sure, you want to delete <b>{{ bot_obj.bot_name }}</b> testing bot?</h5><br>
+
+            <div class="form-row">
+                <br><br>
+                <button type="submit" class="btn btn-danger">Yes, I want to delete the bot.</button>
+            </div>
+
+          </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Delete Modal End -->
+
+
+          {% endfor %}
+        </tbody>
+      </table>
+      
+    </div>
+
+    <div class="col-4">
+
+      <h6><b>Tips <i class="fa fa-question-circle"></i></b></h6>
+
+      <hr>
+
+      <ul>
+        <li><i>This tool will help to automated testing of conversational flows. Following are the step perform automated testing of conversational flows using this tool.</i></li>
+        <li><i>Click on "Test new bot" button and create new test bot by providing bot id, bot name, and remote hosted bot url.</i></li>
+        <li><i>Click on "start testing" button, create, and upload testcases file into csv format and tool will run automated test for you. Testcase file should be in the required format and template file has been shared as well.</i></li>
+      </ul>
+     
+    </div>
+
+  </div>
+  
+</div>
+
+
+</body>
+<script type="text/javascript">
+  function validate_bot_details_form(is_create_bot_form = false) {
+    if(is_create_bot_form){
+      var bot_id = document.getElementById('new_bot_id').value
+      var bot_name = document.getElementById('new_bot_name').value
+      var hosted_domain = document.getElementById('new_bot_hosted_domain').value
+    } else {
+      var bot_id = document.getElementById('edit_form_bot_id').value
+      var bot_name = document.getElementById('edit_form_bot_name').value
+      var hosted_domain = document.getElementById('edit_form_url').value
+    }
+
+    hosted_domain = stripHTML(hosted_domain)
+
+    if (!check_if_num(bot_id)) {
+      alert("Invalid Bot Id")
+      return false;
+    }
+
+
+    if (bot_name == "") {
+
+        alert("Bot Name cannot be empty")
+        return false;
+    }
+    if (bot_name.trim() == "") {
+
+        alert("Invalid Bot Name(Only A-Z, a-z, 0-9, ?, !, & are allowed)")
+        return false;
+    }
+    if (bot_name.length > 18) {
+  
+        alert("Bot name can't be more than 18 characters")
+        return false;
+    }
+
+    var format = /[`@#$%^*()_+\-=\[\]{};':"\\|,.<>\/~]/;
+    if (format.test(bot_name.trim())) {
+
+        alert("Invalid Bot Name(Only A-Z, a-z, 0-9, ?, !, & are allowed)")
+        return false;
+    }
+
+    var format = /[a-zA-Z0-9]/;
+    if (!format.test(bot_name.trim())) {
+
+        alert("Invalid Bot Name(Bot Name must contain at least one alphanumeric character)")
+        return false;
+    }
+
+
+    if (isValidURL(hosted_domain) == "") {
+      alert("Invalid Domain Name")
+      return false
+    }
+
+    
+  }
+
+  function stripHTML(htmlString) {
+    return htmlString.replace(/(<([^>]+)[><])/ig, ' ');
+  }
+
+  function isValidURL(url) {
+    var https_pattern = /^https:\/\/?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/;
+    var http_pattern = /^http:\/\/?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/;
+    if (https_pattern.test(url) || http_pattern.test(url)) {
+        return true;
+    }
+    // files stored in data drive have the url of the form :
+    // /chat/download-file
+    if (url.indexOf('download-file') != -1) {
+        return true;
+    }
+    return false;
+}
+
+
+  function check_if_num(htmlString) {
+    var isnum = /^\d+$/.test(htmlString);
+    if (!isnum) {
+        return false
+    } 
+    return true
+  }
+</script>
+<script src="{% static 'TestingApp/js/jquery-3.2.1.slim.min.js' %}"></script>
+<script src="{% static 'TestingApp/js/popper.min.js' %}"></script>
+<script src="{% static 'TestingApp/js/bootstrap.min.js' %}"></script>
+</html>

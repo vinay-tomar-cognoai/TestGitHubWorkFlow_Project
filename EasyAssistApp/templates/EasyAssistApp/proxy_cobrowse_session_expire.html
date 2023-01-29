@@ -1,0 +1,113 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        
+        
+        {% if cobrowse_config_obj.cobrowsing_favicon %}
+          <link rel="shortcut icon" type="image/x-icon" href="{{ cobrowse_config_obj.cobrowsing_favicon }}">
+        {% else %}        
+            {% if access_token and enable_s3_bucket %}
+            <link rel="shortcut icon" type="image/x-icon" href="https://static.allincall.in/static/EasyAssistApp/img/cobrowseLogoShort.svg">
+            {% else %}
+            <link rel="shortcut icon" type="image/x-icon" href="{% static 'EasyAssistApp/img/cobrowseLogoShort.svg' %}">
+            {% endif %}
+        {% endif %}
+      
+        <title>{{ cobrowse_config_obj.cobrowsing_title_text }}</title>
+      
+        <link
+          href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+          rel="stylesheet">
+      
+      
+        <!-- Custom fonts for this template-->
+        <link href="https://static.allincall.in/static/EasyAssistApp/vendor/fontawesome-free/css/all.min.css" rel="stylesheet"
+          type="text/css">
+      
+        <link rel="stylesheet" href="https://static.allincall.in/static/EasyAssistApp/css/bootstrap-select.css" />
+        <!-- Custom styles for this template-->
+      
+        <link href="https://easychat-dev.allincall.in/static/EasyAssistApp/css/sb-admin-2.min.css" rel="stylesheet">
+      
+        <link href="https://easychat-dev.allincall.in/static/EasyAssistApp/vendor/datatables/dataTables.bootstrap4.min.css"
+          rel="stylesheet">
+      
+        <script type="text/javascript"
+          src="https://easychat-dev.allincall.in/static/EasyAssistApp/vendor/jquery/jquery.min.js"></script>
+      
+        <script src="https://easychat-dev.allincall.in/static/EasyAssistApp/vendor/chart.js/Chart.min.js"></script>
+      
+        <link rel="stylesheet" type="text/css"
+          href="https://easychat-dev.allincall.in/static/EasyAssistApp/css/bootstrap-datepicker.min.css">
+      
+        <link rel="stylesheet" type="text/css"
+          href="https://easychat-dev.allincall.in/static/EasyAssistApp/css/bootstrap-multiselect.css">
+
+        {% if easyassist_font_family != 'Silka' %}
+          <link rel="stylesheet" href="https://fonts.googleapis.com/css?family={{easyassist_font_family}}">
+        {% endif %}
+
+        <style>
+          {% if easyassist_font_family == 'Silka' %}
+            *{
+              font-family: Silka, sans-serif !important;
+            }
+          {% else %}
+            *{
+              font-family: {{easyassist_font_family}} !important;
+            }
+          {% endif %}
+          
+          .link-expire-container {
+            width: 100vw;
+            height: 100vh;
+          }
+
+          .link-expire-heading{
+            padding: 8px 8px;
+            background: #F6F6F6;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 20px;
+            line-height: 150%;
+            color: #000000;
+          }
+
+          img{
+            width: 30vh;
+            height: 10vh;
+          }
+
+        </style>
+</head>
+<style>
+
+</style>
+<body>
+    <div class="link-expire-container d-flex flex-column justify-content-center align-items-center">
+      {% if cobrowse_config_obj.cobrowsing_logo %}
+      <img src="{{ cobrowse_config_obj.cobrowsing_logo }}" alt="Logo"/>
+      {% else %}    
+          {% if logo %}
+            <img src="/{{ logo }}" alt="Cogno CoBrowse"/>
+          {% else %}
+            {% if access_token and enable_s3_bucket %}
+              <img src="https://static.allincall.in/static/EasyAssistApp/img/cobrowseLogo.svg" alt="Cogno CoBrowse"/>
+            {% else %}
+              <img src="{% static 'EasyAssistApp/img/cobrowseLogo.svg' %}" alt="Cogno CoBrowse"/>
+            {% endif %}
+          {% endif %}
+      {% endif %}
+        <div class="link-expire-heading mt-4">
+            Co-browsing link has expired
+        </div>
+    </div>
+</body>
+</html>

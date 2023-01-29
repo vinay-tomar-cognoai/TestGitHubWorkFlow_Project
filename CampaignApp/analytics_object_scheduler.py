@@ -1,0 +1,5 @@
+from CampaignApp.utils import update_inprogress_campaigns_analytics, update_schedule_status
+
+update_inprogress_campaigns_analytics()
+
+update_schedule_status()

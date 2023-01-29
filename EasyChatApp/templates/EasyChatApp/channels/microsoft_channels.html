@@ -1,0 +1,95 @@
+{% extends 'EasyChatApp/console.html' %}
+{% block consolecontent %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/changes_placement.css' %}?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/common_integrated_channel.css' %}?v={% random_int 1 100 %}">
+<div style="padding: 1em;">
+<div class="row">
+    {% include "EasyChatApp/channels/channel_components/channel_integration_document_button.html" with channel_doc_download_link="https://drive.google.com/uc?export=download&id=1J1W9ylKi8K6_r5nMGvTAAP29mvQSCNm4" channel_name="Microsoft Teams" %}
+</div>
+{% include "EasyChatApp/channels/channel_components/language_dropdown_go_back.html" %}
+<div class="row">
+    {% include "EasyChatApp/channels/channel_components/custom_message.html" with area="microsoft-textarea" %}
+<div class="col s12">
+    <div class="row">
+        {% if selected_language == "en" %}
+        {% include "EasyChatApp/channels/channel_components/language_specific.html" %}
+        <ul class="collapsible">
+            <li>
+                <div class="collapsible-header">Microsoft Teams Configurations</div>
+                <div class="collapsible-body">
+                    <div class="row" id="channel-initial-messages">
+                        <div class="input-field col s12">
+                            {% if ms_team_app_code %}
+                            <input type="text" id="ms_team_app_code" value="{{ms_team_app_code}}">
+                            <label for="ms_team_app_password">App ID*</label>
+                            {% else %}
+                            <input type="text" id="ms_team_app_code" value="">
+                            <label for="ms_team_app_password">App ID*</label>
+                            {% endif %}
+                        </div>
+                        <div class="input-field col s12">
+                            {% if ms_team_app_password %}
+                            <input type="text" id="ms_team_app_password" value="{{ms_team_app_password}}">
+                            <label for="ms_team_app_password">App Password*</label>
+                            {% else %}
+                            <input type="text" id="ms_team_app_password" value="">
+                            <label for="ms_team_app_password">App Password*</label>
+                            {% endif %}
+                        </div>
+                        {% if ms_team_app_code and ms_team_app_password %}
+                        <div class="col s12">
+                            <a class="waves-effect waves-light btn modal-trigger easychat-button" onclick="ms_teams_download_config_file()">Download Config</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <ul class="collapsible" style="display: none;">
+            <li>
+                <div class="collapsible-header">Deploy links</div>
+                <div class="collapsible-body">
+                    <div class="row" id="facebook-deploy">
+                        <div class="input-field col s12">
+                            <input type="text" value='https://{{ request.META.HTTP_HOST }}/chat/webhook/microsoft-teams/?id={{selected_bot_obj.pk}}' id="facebook-deploy-link" readonly style="width:96%;border: 0.1em solid black;padding:1em;font-family: Consolas, monaco, monospace;word-wrap: break-word;background-color:white;">
+                            <button onclick="copyToClipboard('facebook-deploy-link')">Copy Script</button>
+                            <br><br><br>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        {% endif %}
+        <div class="progress" id="easychat_ms_teams_channel_preloader" style="display: none;">
+            <div class="indeterminate"></div>
+        </div>
+        {% if selected_language == "en" %}
+        <a class="btn green lighten-2 " style="background-color: #82C784; margin-left: 0.2em"id="save-ms-teams-channel">Save</a>
+        {% else %}
+        <a class="btn green lighten-2" style="background-color: #82C784; margin-left: 0.2em;" id="save-ms-teams-channel-for-non-primary-language">Save</a>
+        {% endif %}
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $(".microsoft-textarea").trumbowyg({
+                    tagsToKeep: [],
+                    allowTagsFromPaste: {
+                        allowedTags: ['h4', 'p', 'br']
+                    },
+                    minimalLinks: true,
+                    btns: [
+                        // ['viewHTML'],
+                        ['strong', 'em'], 
+                        ['emoji'],
+                        ['link'],
+                        ['unorderedList', 'orderedList'],
+                        ['underline'],
+                        ['justifyLeft'], ['justifyCenter'], ['justifyRight'], ['justifyFull'],
+                    ],
+  })
+  $(".integration-document-btn").hide();
+</script>
+{% endblock %}

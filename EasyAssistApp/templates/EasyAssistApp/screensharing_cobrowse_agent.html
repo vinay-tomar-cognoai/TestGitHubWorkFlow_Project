@@ -1,0 +1,902 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Agent | Cobrowsing</title>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        {% if cobrowse_config_obj.cobrowsing_favicon %}
+            <link rel="shortcut icon" type="image/x-icon" href="{{ cobrowse_config_obj.cobrowsing_favicon }}">
+        {% else %}
+            {% if request.user.enable_s3_bucket %}
+            <link rel="shortcut icon" type="image/x-icon" href="https://static.allincall.in/static/EasyAssistApp/img/cobrowseLogoShort.svg">
+            {% else %}
+            <link rel="shortcut icon" type="image/x-icon" href="{% static 'EasyAssistApp/img/cobrowseLogoShort.svg' %}">
+            {% endif %}
+        {% endif %}
+
+        {% if request.user.enable_s3_bucket %}
+        <link href="https://static.allincall.in/static/EasyAssistApp/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+        <link href="https://static.allincall.in/static/EasyAssistApp/css/sb-admin-2.min.css" rel="stylesheet">
+        <script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/vendor/jquery/jquery.min.js"></script>
+        <script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/bootstrap-multiselect.js"></script>
+        <link rel="stylesheet" href="https://static.allincall.in/static/EasyAssistApp/css/bootstrap-multiselect.css">
+        {% else %}
+        <link href="{% static 'EasyAssistApp/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+        <link href="{% static 'EasyAssistApp/css/sb-admin-2.min.css' %}" rel="stylesheet">
+        <script type="text/javascript" src="{% static 'EasyAssistApp/vendor/jquery/jquery.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'EasyAssistApp/js/bootstrap-multiselect.js' %}"></script>
+        <link rel="stylesheet" href="{% static 'EasyAssistApp/css/bootstrap-multiselect.css' %}">
+        {% endif %}
+        {% if DEVELOPMENT %}
+        <link rel="stylesheet" type="text/css" href="{% static 'EasyAssistApp/css/agent.css' %}">
+        {% else %}
+        <link rel="stylesheet" type="text/css" href="/static/EasyAssistApp/css/{{access_token}}/agent.css">
+        {% endif %}
+        <script type="text/javascript" src="https://{{easyassist_access_token.meeting_host_url}}/external_api.js"></script>
+        <style>
+            svg + label{
+                background-color: {{ floating_button_bg_color }} !important;
+            }
+            .easyassist-custom-dropdown-container li.easyassist-option-selected {
+                background: {{ floating_button_bg_color }} !important;
+            }
+            .modal-footer .btn-primary {
+                background: {{ floating_button_bg_color }} !important;
+                border-color: {{ floating_button_bg_color }} !important;
+            }
+            .modal-footer .btn-primary {
+                background: {{ floating_button_bg_color }} !important;
+                border-color: {{ floating_button_bg_color }} !important;
+            }
+            .modal-footer .btn-primary:hover {
+                background: {{ floating_button_bg_color }} !important;
+            }
+            .modal-footer .btn-secondary {
+                color: {{ floating_button_bg_color }} !important;
+            }
+            .predefined-remarks-button {
+                border-radius: 100px;
+                font-size: 14px;
+                line-height: 14px;
+                box-shadow: none !important;
+                color: {{ floating_button_bg_color }} !important;
+                height: 30px;
+            }
+            .predefined-remarks-button-clicked {
+                background-color: {{ floating_button_bg_color }}!important;
+                color: #fff !important;
+            }
+            #frames-container {
+                display: block!important;
+            }
+            .checkbox-btn-container-item input[type="checkbox"]:checked~label::before {
+                color: {{ floating_button_bg_color }}!important;
+                background-color: {{ floating_button_bg_color }}!important;
+                border-color: {{ floating_button_bg_color }}!important;
+            }
+            .easyassist-custom-dropdown-container li:hover {
+                background:  {{ floating_button_bg_color }} !important;
+            }
+
+            {% if easyassist_font_family == 'Silka' %}
+                * {
+                    font-family: Silka, sans-serif !important;
+                }
+            {% else %}
+                * {
+                    font-family: {{easyassist_font_family}} !important;
+                }
+            {% endif %}
+        </style>
+
+        {% if easyassist_font_family != 'Silka' %}
+            <link rel="stylesheet" href="https://fonts.googleapis.com/css?family={{easyassist_font_family}}">
+        {% endif %}
+    </head>
+
+    <body style="margin: unset;" oncontextmenu="return false">
+        <input type = "hidden" value = {{agent_name}} id = "agent_name">
+        {% csrf_token %}
+        <div class="easyassist-custom-nav-bar_wrapper">
+            <div id="mySidenav" class="easyassist-custom-nav-bar">
+                <a href="javascript:void(0)" class="closebtn" onclick="closeNav()" onmouseover="easyassistChangeTooltipShow(this)" onmouseout="easyassistChangeTooltipHide(this)">
+                    <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11.6044 8L6.76923 3L1.93407 8L-4.37114e-08 7L6.76923 -2.95892e-07L13.5385 7L11.6044 8Z" fill="{{floating_button_bg_color}}"/>
+                    </svg>
+                    <label>
+                        <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M-2.62268e-07 6L7.5 0.803848L7.5 11.1962L-2.62268e-07 6Z" fill="{{ floating_button_bg_color }}"/>
+                        </svg>
+                        <span>Minimise</span>
+                    </label>
+                </a>
+                {% if enable_screenshot_agent %}
+                <a href="javascript:void(0)" data-toggle="modal" data-target="#capture_screenshot_confirm_modal" onclick="hide_cobrowsing_modals(this)" onmouseover="easyassistChangeTooltipShow(this)" onmouseout="easyassistChangeTooltipHide(this)">
+                    <svg width="19" height="20" viewBox="0 0 19 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.9972 6.32756V3.13421C17.9972 2.57182 17.7742 2.03237 17.3771 1.63411C16.9801 1.23584 16.4413 1.01125 15.8789 1.00956L12.6855 1" stroke="{{floating_button_bg_color}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M17.9972 12.7015V15.8885C17.9972 16.4519 17.7733 16.9924 17.3749 17.3908C16.9764 17.7893 16.436 18.0131 15.8725 18.0131H12.6855" stroke="{{floating_button_bg_color}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M6.31162 1L3.11828 1.00956C2.55589 1.01125 2.01711 1.23584 1.62004 1.63411C1.22297 2.03237 0.999997 2.57182 1 3.13421V6.32756" stroke="{{floating_button_bg_color}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M6.31162 18.0131H3.12465C2.56116 18.0131 2.02074 17.7893 1.6223 17.3908C1.22385 16.9924 1 16.4519 1 15.8885V12.7015" stroke="{{floating_button_bg_color}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M10.5557 4.50183C10.9945 4.50183 11.4004 4.73023 11.6227 5.10213L12.0707 5.85176H13.2096C14.1968 5.85176 14.9971 6.63841 14.9971 7.6088V12.7448C14.9971 13.7152 14.1968 14.5018 13.2096 14.5018H5.78457C4.79736 14.5018 3.99707 13.7152 3.99707 12.7448V7.6088C3.99707 6.63841 4.79736 5.85176 5.78457 5.85176H6.9288L7.40982 5.08174C7.63491 4.72141 8.03421 4.50183 8.46438 4.50183H10.5557ZM9.49707 7.47365C8.13017 7.47365 7.02207 8.56286 7.02207 9.90648C7.02207 11.2501 8.13017 12.3393 9.49707 12.3393C10.864 12.3393 11.9721 11.2501 11.9721 9.90648C11.9721 8.56286 10.864 7.47365 9.49707 7.47365ZM9.49707 8.28459C10.4083 8.28459 11.1471 9.01074 11.1471 9.90648C11.1471 10.8022 10.4083 11.5284 9.49707 11.5284C8.5858 11.5284 7.84707 10.8022 7.84707 9.90648C7.84707 9.01074 8.5858 8.28459 9.49707 8.28459Z" fill="{{floating_button_bg_color}}"/>
+                    </svg>
+                    <label>
+                        <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M-2.62268e-07 6L7.5 0.803848L7.5 11.1962L-2.62268e-07 6Z" fill="{{ floating_button_bg_color }}"/>
+                        </svg>
+                        <span>Capture Screenshot</span>
+                    </label>
+                </a>
+                <a href="javascript:void(0)" data-toggle="modal" data-target="#captured_information_modal" onclick="fetch_cobrowsing_meta_information();hide_cobrowsing_modals(this)" 
+                    onmouseover="easyassistChangeTooltipShow(this)" onmouseout="easyassistChangeTooltipHide(this)">
+                    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M9.62372 3.6659C9.44222 4.10083 9.31086 4.56187 9.2367 5.04183L5.72917 5.04175C4.84321 5.04175 4.125 5.75996 4.125 6.64592V12.8334H8.25C8.59806 12.8334 8.8857 13.0921 8.93122 13.4276L8.9375 13.5209C8.9375 14.66 9.86095 15.5834 11 15.5834C12.1391 15.5834 13.0625 14.66 13.0625 13.5209C13.0625 13.1412 13.3703 12.8334 13.75 12.8334H17.875L17.876 11.245C18.381 10.9817 18.8436 10.6481 19.2507 10.2572L19.25 17.1876C19.25 18.8329 17.9162 20.1667 16.2708 20.1667H5.72917C4.08381 20.1667 2.75 18.8329 2.75 17.1876V6.64592C2.75 5.00056 4.08381 3.66675 5.72917 3.66675L9.62372 3.6659ZM15.125 0.916748C17.9095 0.916748 20.1667 3.17398 20.1667 5.95842C20.1667 8.74285 17.9095 11.0001 15.125 11.0001C12.3405 11.0001 10.0833 8.74285 10.0833 5.95842C10.0833 3.17398 12.3405 0.916748 15.125 0.916748ZM15.3227 3.28962L15.2592 3.34266L15.2062 3.40613C15.098 3.56243 15.098 3.77106 15.2062 3.92737L15.2592 3.99084L16.7677 5.50008H11.9167L11.8343 5.50747C11.6472 5.54142 11.4997 5.68894 11.4658 5.87603L11.4583 5.95842L11.4658 6.04081C11.4997 6.22789 11.6472 6.37541 11.8343 6.40936L11.9167 6.41675H16.7677L15.2592 7.92599L15.2062 7.98946C15.0825 8.1681 15.1002 8.41507 15.2592 8.57417C15.4183 8.73328 15.6653 8.75095 15.8439 8.62721L15.9075 8.57417L18.2371 6.23892L18.2674 6.19533L18.2987 6.13354L18.3181 6.07589L18.3314 6.00085L18.3333 5.95842L18.3308 5.90947L18.3181 5.84095L18.2905 5.76463L18.2519 5.69748L18.2101 5.64571L15.9075 3.34266L15.8439 3.28962C15.6877 3.18135 15.479 3.18135 15.3227 3.28962Z" fill="{{floating_button_bg_color}}" />
+                    </svg>
+                    <label>
+                        <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M-2.62268e-07 6L7.5 0.803848L7.5 11.1962L-2.62268e-07 6Z" fill="{{ floating_button_bg_color }}"/>
+                        </svg>
+                        <span>View ScreenShot</span>
+                    </label>
+                </a>
+                {% endif %}
+                {% if enable_invite_agent_in_cobrowsing and is_admin_agent %}
+                {% if allow_language_support %}
+                <a href="javascript:void(0)" data-toggle="modal" data-target="#askfor_support_modal" onclick="hide_cobrowsing_modals(this)" onmouseover="easyassistChangeTooltipShow(this)" onmouseout="easyassistChangeTooltipHide(this)">
+                    <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7 0C4.79086 0 3 1.79086 3 4C3 6.20914 4.79086 8 7 8C9.20914 8 11 6.20914 11 4C11 1.79086 9.20914 0 7 0Z" fill="{{floating_button_bg_color}}"/>
+                        <path d="M2.00873 9C0.903151 9 0 9.88687 0 11C0 12.6912 0.83281 13.9663 2.13499 14.7966C3.41697 15.614 5.14526 16 7 16C7.41085 16 7.8155 15.9811 8.21047 15.9427C7.45316 15.0003 7 13.8031 7 12.5C7 11.1704 7.47182 9.95094 8.25716 9L2.00873 9Z" fill="{{floating_button_bg_color}}"/>
+                        <path d="M17 12.5C17 14.9853 14.9853 17 12.5 17C10.0147 17 8 14.9853 8 12.5C8 10.0147 10.0147 8 12.5 8C14.9853 8 17 10.0147 17 12.5ZM14.8532 12.854L14.8557 12.8514C14.9026 12.804 14.938 12.7495 14.9621 12.6914C14.9861 12.6333 14.9996 12.5697 15 12.503L15 12.5L15 12.497C14.9996 12.4303 14.9861 12.3667 14.9621 12.3086C14.9377 12.2496 14.9015 12.1944 14.8536 12.1464L12.8536 10.1464C12.6583 9.95118 12.3417 9.95118 12.1464 10.1464C11.9512 10.3417 11.9512 10.6583 12.1464 10.8536L13.2929 12H10.5C10.2239 12 10 12.2239 10 12.5C10 12.7761 10.2239 13 10.5 13H13.2929L12.1464 14.1464C11.9512 14.3417 11.9512 14.6583 12.1464 14.8536C12.3417 15.0488 12.6583 15.0488 12.8536 14.8536L14.8532 12.854Z" fill="{{floating_button_bg_color}}"/>
+                    </svg>
+                    <label>
+                        <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M-2.62268e-07 6L7.5 0.803848L7.5 11.1962L-2.62268e-07 6Z" fill="{{ floating_button_bg_color }}"/>
+                        </svg>
+                        <span>Invite an Agent</span>
+                    </label>
+                </a>
+                {% else %}
+                <a href="javascript:void(0)" data-toggle="modal" data-target="#askfor_support_modal" onclick="get_list_of_support_agents();hide_cobrowsing_modals(this)" onmouseover="easyassistChangeTooltipShow(this)" onmouseout="easyassistChangeTooltipHide(this)">
+                    <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7 0C4.79086 0 3 1.79086 3 4C3 6.20914 4.79086 8 7 8C9.20914 8 11 6.20914 11 4C11 1.79086 9.20914 0 7 0Z" fill="{{floating_button_bg_color}}"/>
+                        <path d="M2.00873 9C0.903151 9 0 9.88687 0 11C0 12.6912 0.83281 13.9663 2.13499 14.7966C3.41697 15.614 5.14526 16 7 16C7.41085 16 7.8155 15.9811 8.21047 15.9427C7.45316 15.0003 7 13.8031 7 12.5C7 11.1704 7.47182 9.95094 8.25716 9L2.00873 9Z" fill="{{floating_button_bg_color}}"/>
+                        <path d="M17 12.5C17 14.9853 14.9853 17 12.5 17C10.0147 17 8 14.9853 8 12.5C8 10.0147 10.0147 8 12.5 8C14.9853 8 17 10.0147 17 12.5ZM14.8532 12.854L14.8557 12.8514C14.9026 12.804 14.938 12.7495 14.9621 12.6914C14.9861 12.6333 14.9996 12.5697 15 12.503L15 12.5L15 12.497C14.9996 12.4303 14.9861 12.3667 14.9621 12.3086C14.9377 12.2496 14.9015 12.1944 14.8536 12.1464L12.8536 10.1464C12.6583 9.95118 12.3417 9.95118 12.1464 10.1464C11.9512 10.3417 11.9512 10.6583 12.1464 10.8536L13.2929 12H10.5C10.2239 12 10 12.2239 10 12.5C10 12.7761 10.2239 13 10.5 13H13.2929L12.1464 14.1464C11.9512 14.3417 11.9512 14.6583 12.1464 14.8536C12.3417 15.0488 12.6583 15.0488 12.8536 14.8536L14.8532 12.854Z" fill="{{floating_button_bg_color}}"/>
+                    </svg>
+                    <label>
+                        <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M-2.62268e-07 6L7.5 0.803848L7.5 11.1962L-2.62268e-07 6Z" fill="{{ floating_button_bg_color }}"/>
+                        </svg>
+                        <span>Invite an Agent</span>
+                    </label>
+                </a>
+                {% endif %}
+                {% endif %}
+
+                {% if enable_chat_functionality %}
+                <a href="javascript:void(0)" onclick="hide_cobrowsing_modals(this);open_livechat_agent_window()" onmouseover="easyassistChangeTooltipShow(this)" onmouseout="easyassistChangeTooltipHide(this)">
+                    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M11 1.83325C16.0625 1.83325 20.1666 5.93731 20.1666 10.9999C20.1666 16.0625 16.0625 20.1666 11 20.1666C9.49628 20.1666 8.04388 19.8035 6.74278 19.12L2.80991 20.1439C2.39349 20.2525 1.96797 20.0028 1.85951 19.5863C1.82597 19.4576 1.82596 19.3224 1.85948 19.1936L2.8828 15.2626C2.19741 13.9602 1.83331 12.5058 1.83331 10.9999C1.83331 5.93731 5.93737 1.83325 11 1.83325ZM12.1474 11.9166H8.02081L7.92752 11.9228C7.59195 11.9684 7.33331 12.256 7.33331 12.6041C7.33331 12.9521 7.59195 13.2398 7.92752 13.2854L8.02081 13.2916H12.1474L12.2407 13.2854C12.5763 13.2398 12.8349 12.9521 12.8349 12.6041C12.8349 12.256 12.5763 11.9684 12.2407 11.9228L12.1474 11.9166ZM13.9791 8.70825H8.02081L7.92752 8.71453C7.59195 8.76005 7.33331 9.04769 7.33331 9.39575C7.33331 9.74381 7.59195 10.0315 7.92752 10.077L8.02081 10.0833H13.9791L14.0725 10.077C14.408 10.0315 14.6666 9.74381 14.6666 9.39575C14.6666 9.04769 14.408 8.76005 14.0725 8.71453L13.9791 8.70825Z" fill="{{floating_button_bg_color}}" />
+                    </svg>
+                    <label>
+                        <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M-2.62268e-07 6L7.5 0.803848L7.5 11.1962L-2.62268e-07 6Z" fill="{{ floating_button_bg_color }}"/>
+                        </svg>
+                        <span>Chat with Customer</span>
+                    </label>
+                </a>
+                {% endif %}
+
+                {% if allow_support_documents %}
+                <a href="javascript:void(0)" data-toggle="modal" data-target="#support_material_modal" onmouseover="easyassistChangeTooltipShow(this)" onmouseout="easyassistChangeTooltipHide(this)" onclick="get_support_material();hide_cobrowsing_modals(this)">
+                    <svg width="15" height="18" viewBox="0 0 15 18" fill="none" xmlns="http://www.w3.org/2000/svg" >
+                        <path d="M7.5 0V6C7.5 6.82843 8.17157 7.5 9 7.5H15V16.5C15 17.3284 14.3284 18 13.5 18H1.5C0.671573 18 0 17.3284 0 16.5V1.5C0 0.671573 0.671573 0 1.5 0H7.5Z" fill="{{floating_button_bg_color}}"/>
+                        <path d="M8.625 0.375V6C8.625 6.20711 8.79289 6.375 9 6.375H14.625L8.625 0.375Z" fill="{{floating_button_bg_color}}"/>
+                    </svg>
+                    <label>
+                        <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M-2.62268e-07 6L7.5 0.803848L7.5 11.1962L-2.62268e-07 6Z" fill="{{ floating_button_bg_color }}"/>
+                        </svg>
+                        <span>Documents</span>
+                    </label>
+                </a>
+                {% endif %}
+
+                {% if allow_screen_recording %}
+                <a href="javascript:void(0)" onclick="start_screen_recording(this)" onmouseover="easyassistChangeTooltipShow(this)" onmouseout="easyassistChangeTooltipHide(this)" style="height: 33px;width: 34px;" id="start-screen-recording-btn">
+                    <svg id="start-recording-svg-id" class="start-recording-svg" width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8.5 17C13.1944 17 17 13.1944 17 8.5C17 3.80558 13.1944 0 8.5 0C3.80558 0 0 3.80558 0 8.5C0 13.1944 3.80558 17 8.5 17Z" fill="{{floating_button_bg_color}}"></path>
+                        <path d="M8.5 12C9.42826 12 10.3185 11.6313 10.9749 10.9749C11.6313 10.3185 12 9.42826 12 8.5C12 7.57174 11.6313 6.6815 10.9749 6.02513C10.3185 5.36875 9.42826 5 8.5 5C7.57174 5 6.6815 5.36875 6.02513 6.02513C5.36875 6.6815 5 7.57174 5 8.5C5 9.42826 5.36875 10.3185 6.02513 10.9749C6.6815 11.6313 7.57174 12 8.5 12Z" fill="white"></path>
+                    </svg>
+                    <svg id="stop-recording-svg-id" class="stop-recording-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 96 100" fill="{{floating_button_bg_color}}">
+                        <g>
+                            <path d="M48,8.5C26.22,8.5,8.5,26.22,8.5,48c0,21.779,17.72,39.5,39.5,39.5c21.779,0,39.5-17.721,39.5-39.5   C87.5,26.22,69.779,8.5,48,8.5z M61,61H35V35h26V61z"/>
+                            <rect x="40.5" y="40.5" width="15" height="15"/>
+                        </g>
+                    </svg>
+                    <label>
+                        <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M-2.62268e-07 6L7.5 0.803848L7.5 11.1962L-2.62268e-07 6Z" fill="{{ floating_button_bg_color }}"/>
+                        </svg>
+                        <span id="screen-recording-tooltip">Start screen recording</span>
+                    </label>
+                    <div class="stop-recording-div-toast" id="stop-recording-div-toast">
+                        <button onclick="stop_screen_recording(event);" id="stop-recording-btn">
+                        Stop Recording
+                        </button>
+                    </div>
+                </a>
+                {% endif %}
+                <hr style="color: black;width: 30px;">
+                <a href="javascript:void(0)" onclick="hide_cobrowsing_modals(this);"  onmouseover="easyassistChangeTooltipShow(this)" onmouseout="easyassistChangeTooltipHide(this)">
+                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"
+                        onclick="open_close_session_modal()">
+                        <path d="M2.00029 0.317885L7.50014 5.8172L13 0.334549C13.1083 0.224379 13.2382 0.137874 13.3817 0.0805049C13.5251 0.0231361 13.6789 -0.0038486 13.8333 0.00125733C14.1363 0.0208622 14.4218 0.150057 14.6364 0.364719C14.8511 0.579381 14.9803 0.864835 14.9999 1.16778C15.0014 1.31673 14.9727 1.46444 14.9154 1.60194C14.8581 1.73944 14.7734 1.86387 14.6666 1.96768L9.15009 7.50032L14.6666 13.033C14.8833 13.2429 15.0033 13.5329 14.9999 13.8329C14.9803 14.1358 14.8511 14.4213 14.6364 14.6359C14.4218 14.8506 14.1363 14.9798 13.8333 14.9994C13.6789 15.0045 13.5251 14.9775 13.3817 14.9201C13.2382 14.8628 13.1083 14.7763 13 14.6661L7.50014 9.18345L2.01695 14.6661C1.90867 14.7763 1.7787 14.8628 1.63526 14.9201C1.49182 14.9775 1.33804 15.0045 1.18364 14.9994C0.875017 14.9833 0.583284 14.8535 0.364758 14.635C0.146231 14.4165 0.0164056 14.1248 0.00034112 13.8162C-0.00116684 13.6673 0.0276004 13.5195 0.0848979 13.382C0.142195 13.2445 0.226829 13.1201 0.333665 13.0163L5.85018 7.50032L0.316999 1.96768C0.213171 1.86247 0.131618 1.73741 0.0772107 1.59997C0.0228039 1.46253 -0.00333999 1.31554 0.00034112 1.16778C0.0199479 0.864835 0.149156 0.579381 0.363839 0.364719C0.578521 0.150057 0.864002 0.0208622 1.16698 0.00125733C1.32018 -0.00601838 1.47323 0.0183407 1.6166 0.0728159C1.75997 0.127291 1.89058 0.210715 2.00029 0.317885Z" fill="{{floating_button_bg_color}}"/>
+                    </svg>
+                    <label>
+                        <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M-2.62268e-07 6L7.5 0.803848L7.5 11.1962L-2.62268e-07 6Z" fill="{{ floating_button_bg_color }}"/>
+                        </svg>
+                        {% if is_admin_agent %}
+                        <span>End Session</span>
+                        {% else %}
+                        <span>Leave Session</span>
+                        {% endif %}
+                    </label>
+                </a>
+            </div>
+            <div id="maximise-button" class="inner" style="display:none;">
+                <div id="minimize-button" class="easyassist-custom-nav-bar">
+                    <a href="javascript:void(0)" class="closebtn" onclick="openNav()"  onmouseover="easyassistChangeTooltipShow(this)" onmouseout="easyassistChangeTooltipHide(this)">
+                        <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1.93418 -5.07244e-07L6.76934 5L11.6045 -8.45407e-08L13.5386 1L6.76934 8L0.000113444 0.999999L1.93418 -5.07244e-07Z" fill="{{ floating_button_bg_color }}"/>
+                        </svg>
+                        <label>
+                            <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M-2.62268e-07 6L7.5 0.803848L7.5 11.1962L-2.62268e-07 6Z" fill="{{ floating_button_bg_color }}"/>
+                            </svg>
+                            <span>Maximise</span>
+                        </label>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <span id="easyassist-snackbar"></span>
+
+        <div class="gy-loader" id="easyassist-loader">
+            <div class="loading-image">
+                {% if request.user.enable_s3_bucket %}
+                <img src="https://static.allincall.in/static/EasyAssistApp/img/loadingImage.svg" alt="Loading Image" width="220px">
+                {% else %}
+                <img src="{% static 'EasyAssistApp/img/loadingImage.svg' %}" alt="Loading Image" width="220px">
+                {% endif %}
+            </div>
+            <div>
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+            </div>
+            <br>
+            <br>
+            <div class="loading-message">
+                Loading Customer Experiences at Scale.
+            </div>
+        </div>
+        <div id="transaction-payment-loader" style="display: none;top: 45%;left: 45%;position: fixed;z-index: 2147483647;color: black;">
+            <p>Redirected to Payment Page...</p>
+        </div>
+        <div id="frames-container">
+        </div>
+        <!-- LiveChat Iframe Starts -->
+        <iframe title="CoBrowsing LiveChat" id="allincall-chat-box" src="" style="display: none; bottom: 1em; right: 2em; animation-name: bottom-left-right-anime;" allow="microphone *"></iframe>
+        <!-- LiveChat Iframe Ends -->
+        {% if easyassist_access_token.allow_screen_sharing_cobrowse %}
+        {% if DEVELOPMENT %}
+        <img alt="Cursor" src="/static/EasyAssistApp/img/Client_cursor.svg" style="display:none;z-index: 2147483647;top: 0%;right: 0%;position: absolute;width: 80px;" id="client-mouse-pointer">
+        {% else %}
+        <img alt="Cursor" src="/static/EasyAssistApp/img/{{access_token}}/Client_cursor.svg" style="display:none;z-index: 2147483647;top: 0%;right: 0%;position: absolute;width: 80px;" id="client-mouse-pointer">
+        {% endif %}
+        {% else %}
+        {% if DEVELOPMENT %}
+        <img alt="Cursor" src="/static/EasyAssistApp/img/Client_cursor.svg" style="z-index: 2147483647;top: 0%;right: 0%;position: absolute;width: 80px;" id="client-mouse-pointer">
+        {% else %}
+        <img alt="Cursor" src="/static/EasyAssistApp/img/{{access_token}}/Client_cursor.svg" style="z-index: 2147483647;top: 0%;right: 0%;position: absolute;width: 80px;" id="client-mouse-pointer">
+        {% endif %}
+        {% endif %}
+        <div class="modal fade" id="capture_screenshot_confirm_modal" tabindex="-1" role="dialog" aria-labelledby="capture_client_screenshot_modal_label" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="capture_client_screenshot_modal_label">Ready to capture client screenshot?</h5>
+                        <span class="modal-text">Select "capture" below to capture a screenshot.</span>
+                    </div>
+                    <div class="modal-body mt-4"></div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                        <a class="btn btn-primary" href="javascript:void(0)" onclick="capture_client_screenshot_confirm()" data-dismiss="modal">Capture</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="capture_pageshot_confirm_modal" tabindex="-1" role="dialog" aria-labelledby="capture_client_pageshot_modal_label" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="capture_client_pageshot_modal_label">Ready to capture screenshot?</h5>
+                        <span class="modal-text">Select "capture" below to capture a screenshot.</span>
+                    </div>
+                    <div class="modal-body mt-4"></div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                        <a class="btn btn-primary" href="javascript:void(0)" onclick="capture_client_pageshot_confirm()" data-dismiss="modal">Capture</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="request_for_edit_access_modal" tabindex="-1" role="dialog" aria-labelledby="request_for_edit_access_label" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Request for edit access?</h5>
+                        <span class="modal-text">Are you sure, you want to request client for providing you edit access?</span>
+                    </div>
+                    <div class="modal-body mt-4"></div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                        <button class="btn btn-primary" onclick="capture_request_edit_access()" data-dismiss="modal">Request</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="captured_information_modal" tabindex="-1" role="dialog" aria-labelledby="captured_information_modal_label" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="captured_information_modal_label">Captured Screenshots</h5>
+                        <span class="modal-text" id="captured_information_modal_info"></span>
+                    </div>
+                    <div class="modal-body mt-2">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="table-responsive">
+                                    <table class="table table-borderless">
+                                        <thead id="meta_information_head">
+                                            <tr>
+                                                <th scope="col">Name</th>
+                                                <th scope="col">Time</th>
+                                                <th scope="col" style="text-align: center;">Download</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="meta_information_body">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" type="button" data-dismiss="modal" id="meta_information_button">Done</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="close_session_modal" tabindex="-1" role="dialog" aria-labelledby="close_session_modal_label" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="close_session_modal_label">Ready to end the session?</h5>
+                    </div>
+                    <div class="modal-body mt-3">
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="checkbox-btn-container-item">
+                                    <input type="checkbox" id="mask-successfull-cobrowsing-session" checked>
+                                    <label for="mask-successfull-cobrowsing-session"><span>{{ lead_conversion_checkbox_text }}</span></label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label for="close-session-remarks">
+                                {% if not predefined_remarks_optional %}
+                                    Remarks<sup style="color:red">*</sup>
+                                {% else %}
+                                    Remarks
+                                {% endif %}
+                                </label>
+                                <div class="row">
+                                    {% if enable_predefined_remarks %}
+                                        <div class="col-12 mt-2">
+                                            <div>
+                                                <select id="close-session-remarks" onchange="show_comments_textbox(this)">
+                                                    {% for predefined_remark in predefined_remarks %}
+                                                        <option value="{{ predefined_remark.remark }}">{{ predefined_remark.remark }}</option>
+                                                    {% endfor %}
+                                                    <option value="others">Others</option>
+                                                </select>
+                                            </div>
+                                            <span class="close-session-error" id="close-session-remarks-error" style="margin-left: 1em;"></span>
+                                        </div>
+
+                                        {% if enable_predefined_subremarks %}
+                                            <div class="col-12 mt-2 subremarks-container" style="display: none;">
+                                                <label for="close-session-subremarks" class='mt-3'>
+                                                    Sub-Remarks
+                                                    {%if not predefined_remarks_optional %}
+                                                        <sup style='color: red;'>*</sup>
+                                                    {% endif %}
+                                                </label>
+                                                <div>
+                                                    <select id="close-session-subremarks" onchange="show_comments_textbox(this)">
+                                                        <option value="None">None</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
+                                        <div class="col-12 mt-4">
+                                            <label for="close-session-remarks-text">Comments</label>
+                                            <textarea class="form-control close-session-remarks-text" id="close-session-remarks-text" placeholder="" disabled></textarea>
+                                            <span class="close-session-error" id="close-session-text-error"></span>
+                                        </div>
+                                    {% elif enable_predefined_remarks_with_buttons %}
+                                        <div class="col-12 mt-2">
+                                            <textarea class="form-control close-session-remarks-text" rows="1" id="close-session-remarks-text" placeholder="Remarks"></textarea>
+                                            <span class="close-session-error" id="close-session-text-error"></span>
+                                        </div>
+                                        <label class="col-12 mt-3">Suggestions</label>
+                                        <div class="col-12">
+                                            <ul id="predefined-remarks-buttons-list">
+                                                {% for predefined_remark in predefined_remarks_with_buttons %}
+                                                    <li class="predefined-remarks-list-item">
+                                                        <button class="btn predefined-remarks-button" onclick="set_remarks_in_textbox(this)">{{predefined_remark}}</button>
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% else %}
+                                        <div class="col-12 mt-2">
+                                            <textarea class="form-control close-session-remarks-text" id="close-session-remarks-text" placeholder="Remarks"></textarea>
+                                            <span class="close-session-error" id="close-session-text-error"></span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-12 mt-4">
+                                <span class="modal-end-session-text">Select End Session below if you want to close session.</span>
+                            </div>
+                            <div class="col-sm-12 mt-4" style="display: none;">
+                                <label for="mask-test-cobrowsing-session">Mark as Test Lead.</label>
+                                <input id="mask-test-cobrowsing-session" type="checkbox"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-dismiss="modal" id="end_session_cancel_btn"onclick="gain_focus()">Cancel</button>
+                        <a class="btn btn-primary" href="javascript:void(0)" onclick="close_agent_confirm_session(this)">End Session</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="support_material_modal" tabindex="-1" role="dialog" aria-labelledby="support_material_modal_label" aria-hidden="true">
+            Action
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="support_material_modal_label">Support Document</h5>
+                        <span class="modal-text" id="support_material_modal_info"></span>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="table-responsive">
+                                    <table id="support_material_table" class="table table-borderless">
+                                        <thead id="support_material_table_head">
+                                            <tr>
+                                                <th scope="col">Document</th>
+                                                <th scope="col">Your Message</th>
+                                                <th scope="col">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="support_material_table_body"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" type="button" data-dismiss="modal" id="support_material_modal_button">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if allow_cobrowsing_meeting %}
+        <div class="modal fade" id="request_meeting_modal" tabindex="-1" role="dialog" aria-labelledby="request_meeting_modal_label" aria-hidden="true">
+            Action
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="support_material_modal_label">Connect with the Customer on Video Call</h5>
+                        <span class="modal-text">A request will be sent to the customer and you will be connected with him/her on virtual meeting</span>
+                    </div>
+                    <div class="modal-body mt-4">
+                        <div class="small" id="request_meeting_error" style="color:green;"></div>
+                    </div>
+                    <div id="request_meeting_button" class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                        <button class="btn btn-primary" id="request_button" type="button" onclick="request_for_meeting('{{ session_id }}')">Request</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        <div class="modal fade" id="check_for_internet_modal" tabindex="-1" role="dialog" aria-labelledby="close_session_modal_label" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="close_session_modal_label">Weak connection detected</h5>
+                        <span class="modal-text"> The quality and user experience of the session may be effected due to low bandwidth.</span>
+                    </div>
+                    <div class="modal-body mt-4">
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" type="button" data-dismiss="modal">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="askfor_support_modal" tabindex="-1" role="dialog" aria-labelledby="close_session_modal_label" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="close_session_modal_label">Invite an Agent to this session</h5>
+                    </div>
+                    <div class="modal-body mt-4">
+                        <div class="row">
+                            {% if allow_language_support %}
+                            <div class="col-12 mb-4" id="all-supported-language-div">
+                                <label style="margin-left: 1em;">Select language</label>
+                                <div>
+                                    <select id="easyassist-language-support-selected" onchange="get_list_of_support_agents()">
+                                        <option value="-1" selected>Select language</option>
+                                        {% for language in supported_language_objs %}
+                                        <option value="{{ language.pk }}">{{ language.title }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% if choose_product_category %}
+                            <div class="col-12 mb-4" id="all-product-category-div">
+                                <label style="margin-left: 1em;">Select product category</label>
+                                <div>
+                                    <select id="easyassist-product-category-selected" onchange="get_list_of_support_agents()">
+                                        <option value="-1" selected>Select product category</option>
+                                        {% for category in product_category_objs %}
+                                        <option value="{{ category.pk }}">{{ category.title }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            {% endif %}
+                            <p style="margin-left: 24px; display:none; color: red;margin-top: -12px;" id="support-agent-error"></p>
+                            <div class="col-12" id="support-agent-container-id" style="display:none;">
+                                <div class="support-agent-container">
+                                    <div class="input-group support-agent-search-input-group">
+                                        <div class="input-group-prepend">
+                                            <button class="input-group-text support-agent-search-btn" id="basic-addon2">
+                                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M7.19498 13.4365C8.61823 13.4362 10.0005 12.9597 11.1216 12.083L14.6465 15.6077L15.7803 14.474L12.2554 10.9493C13.1326 9.82811 13.6094 8.44563 13.6097 7.0221C13.6097 3.48537 10.7319 0.607727 7.19498 0.607727C3.65807 0.607727 0.780273 3.48537 0.780273 7.0221C0.780273 10.5588 3.65807 13.4365 7.19498 13.4365ZM7.19498 2.21132C9.84827 2.21132 12.006 4.36895 12.006 7.0221C12.006 9.67524 9.84827 11.8329 7.19498 11.8329C4.5417 11.8329 2.38395 9.67524 2.38395 7.0221C2.38395 4.36895 4.5417 2.21132 7.19498 2.21132Z" fill="#757575"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                        <input type="text" class="form-control" placeholder="Search Agent" aria-label="agent_name" aria-describedby="basic-addon2" id="support-agent-search-input" autocomplete="off">
+                                    </div>
+                                    <div class="support-agent-list-container justify-content-center" id="div-support-agents-container">
+                                        <li class="justify-content-center">
+                                            <div class="support-agent-custom-text">
+                                                No agents
+                                            </div>
+                                        </li>
+                                    </div>
+                                </div>
+                                <p style="color:red;" id="share-session-error"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" type="button" data-dismiss="modal" id="support-agent-button">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="easyassist_function_fail_modal" tabindex="-1" role="dialog" aria-labelledby="easyassist_function_fail_modal_label" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <span class="modal-text" id="easyassist_function_fail_code"> Ooops! </span>
+                        <span class="modal-text" id="easyassist_function_fail_message"> OK </span>
+                    </div>
+                    <div class="modal-body mt-1">
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                        <button class="btn btn-primary" type="button" data-dismiss="modal" onclick="window.location.reload()">Refresh</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if request.user.enable_s3_bucket %}
+            <script src="https://static.allincall.in/static/EasyAssistApp/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+            <script src="https://static.allincall.in/static/EasyAssistApp/vendor/jquery-easing/jquery.easing.min.js"></script>
+            <script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/sb-admin-2.min.js"></script>
+            <script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/crypto-js.min.js"></script>
+            <script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/lz-string.min.js"></script>
+        {% else %}
+            <script src="{% static 'EasyAssistApp/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+            <script src="{% static 'EasyAssistApp/vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+            <script type="text/javascript" src="{% static 'EasyAssistApp/js/sb-admin-2.min.js' %}"></script>
+            <script type="text/javascript" src="{% static 'EasyAssistApp/js/crypto-js.min.js' %}"></script>
+            <script type="text/javascript" src="{% static 'EasyAssistApp/js/lz-string.min.js' %}"></script>
+        {% endif %}
+        <script type="text/javascript" src="{% static 'EasyAssistApp/js/validations.js' %}"></script>
+        <script type="text/javascript" src="{% static 'EasyAssistApp/js/encrypt.js' %}"></script>
+
+        {% if enable_optimized_cobrowsing %}
+            {% if DEVELOPMENT %}
+                <script type="text/javascript" src="/static/EasyAssistApp/js/agent.socket_optimized.js"></script>
+            {% else %}
+                <script type="text/javascript" src="/static/EasyAssistApp/js/{{access_token}}/agent.socket_optimized.js"></script>
+            {% endif %}
+            {% else %}
+            
+            {% if DEVELOPMENT %}
+                <script type="text/javascript" src="/static/EasyAssistApp/js/agent.socket.js"></script>
+            {% else %}
+                <script type="text/javascript" src="/static/EasyAssistApp/js/{{access_token}}/agent.socket.js"></script>
+            {% endif %}
+        {% endif %}
+
+        <script type="text/javascript">
+            window.COBROWSE_SESSION_ID = "{{ session_id }}";
+            window.ALLOW_LANGUAGE_SUPPORT = '{{allow_language_support}}';
+            window.CHOOSE_PRODUCT_CATEGORY = '{{choose_product_category}}';
+            window.ALLOW_SCREENSHARING_COBROWSE = '{{easyassist_access_token.allow_screen_sharing_cobrowse}}'
+            window.FLOATING_BUTTON_BG_COLOR = "{{floating_button_bg_color}}";
+            window.ENABLE_VOIP_WITH_VIDEO_CALLING = false;
+            window.ENABLE_VOIP_CALLING = false;
+            window.VOIP_DECLINE_MEETING_MESSAGE = "";
+            window.ALLOW_VIDEO_MEETING_ONLY = false;
+            window.is_pop_up = false;
+            window.AGENT_UNIQUE_ID = "{{ agent_unique_id }}";
+            window.ENABLE_AUTO_CALLING = false;
+            window.IS_ADMIN_AGENT = "{{is_admin_agent}}";
+            window.ENABLE_PREDEFINED_REMARKS = "{{ enable_predefined_remarks }}";
+            window.ENABLE_PREDEFINED_SUBREMARKS = "{{ enable_predefined_subremarks }}";
+            window.ENABLE_REMARKS_WITH_BUTTON = "{{ enable_predefined_remarks_with_buttons }}";
+            window.ENABLE_PREDEFINED_REMARKS_WITH_BUTTONS = "{{ enable_predefined_remarks_with_buttons }}";
+            window.PREDEFINED_REMARKS_OPTIONAL = "{{predefined_remarks_optional}}";
+            window.IS_MOBILE = "False";
+            window.ENABLE_LOW_BANDWIDTH_COBROWSING = "{{ enable_low_bandwidth_cobrowsing }}";
+            window.LOW_BANDWIDTH_COBROWSING_THRESHOLD = parseInt("{{ low_bandwidth_cobrowsing_threshold }}");
+            window.AGENT_NAME = "{{ agent_name }}";
+            window.CLIENT_NAME = "{{ client_name }}";
+            window.AGENT_JOINED_FIRST_TIME = "{{ agent_joined_first_time }}";
+            window.AGENT_CONNECT_MESSAGE = "{{voip_decline_meeting_message}}";
+            window.ENABLE_AGENT_CONNECT_MESSAGE = "{{enable_agent_connect_message}}";
+            window.AGENT_USERNAME = "{{ request.user.username }}";
+        </script>
+
+        <script type="text/javascript">
+            function easyassistChangeTooltipShow(el) {
+                el.querySelector('label').style.display = "inline-block"
+            }
+
+            function easyassistChangeTooltipHide(el) {
+                el.querySelector('label').style.display = "none"
+            }
+
+            $(document).ready(function() {
+                $("#multiple-support-agent").multiselect({
+                    includeSelectAllOption: true,
+                });
+
+                if (document.getElementById("easyassist-language-support-selected")) {
+                    new EasyassistCustomSelect("#easyassist-language-support-selected", null, FLOATING_BUTTON_BG_COLOR);
+                }
+
+                if (document.getElementById("easyassist-product-category-selected")) {
+                    new EasyassistCustomSelect("#easyassist-product-category-selected", null, FLOATING_BUTTON_BG_COLOR);
+                }
+
+                if (document.getElementById("close-session-subremarks")) {
+                    $('#close-session-subremarks')[0].selectedIndex = -1;
+                    new EasyassistCustomSelect("#close-session-subremarks", "Select One", FLOATING_BUTTON_BG_COLOR);
+
+                    document.getElementById("close-session-remarks").addEventListener('change', function() {
+                        var val = this.value;
+                        var close_session_subremarks = $('#close-session-subremarks')[0];
+                        var predefined_remarks = {{ predefined_remarks | safe}};
+                        var subremark_list = [];
+                        for (var idx = 0; idx < predefined_remarks.length; idx++) {
+                            if (predefined_remarks[idx].remark == val) {
+                                subremark_list = predefined_remarks[idx].subremark;
+                                break;
+                            }
+                        }
+
+                        var option_html = `<option value="None">None</option>`;
+                        for (var idx = 0; idx < subremark_list.length; idx++) {
+                            var ele = subremark_list[idx].remark;
+                            option_html += `<option value="${ele}">${ele}</option>`;
+                        }
+
+                        close_session_subremarks.innerHTML = option_html;
+                        close_session_subremarks.selectedIndex = -1;
+                        close_session_subremarks.reinitialize();
+                        close_session_subremarks.closest(".subremarks-container").style.display = "";
+                    });
+                }
+
+                if (document.getElementById("close-session-remarks")) {
+                    $('#close-session-remarks')[0].selectedIndex = -1;
+                    new EasyassistCustomSelect("#close-session-remarks", "Select One", FLOATING_BUTTON_BG_COLOR);
+                }
+
+                $('#support-agent-search-input').keyup(function(e) {
+                    var search_text = e.target.value.toLowerCase();
+
+                    if (search_text) {
+                        $('#div-support-agents-container').find('li').each(function(idx, li_element) {
+                            var agent_name = $(li_element).find('.support-agent-text').text().toLowerCase();
+                            if (agent_name.indexOf(search_text) > -1) {
+                                $(li_element).show();
+                            } else {
+                                $(li_element).hide();
+                            }
+                        });
+                    } else {
+                        $('#div-support-agents-container').find('li').each(function(idx, li_element) {
+                            $(li_element).show();
+                        });
+                    }
+                });
+            });
+
+            function show_easyassist_toast(message) {
+                var x = document.getElementById("easyassist-snackbar");
+                x.innerHTML = message;
+                x.className = "show";
+                setTimeout(function() {
+                    x.className = x.className.replace("show", "");
+                }, parseInt('{{ toast_timeout }}'));
+            }
+
+            function hide_cobrowsing_modals(element) {
+                var crr_modal = element.getAttribute("data-target");
+                var modals = [
+                    "#capture_pageshot_confirm_modal",
+                    "#capture_pageshot_confirm_modal",
+                    "#request_for_edit_access_modal",
+                    "#captured_information_modal",
+                    "#support_material_modal",
+                    "#request_meeting_modal",
+                    "#check_for_internet_modal",
+                    "#askfor_support_modal",
+                    "#close_session_modal",
+                    "#check_for_internet_modal"
+                ];
+
+                for (var modal_index = 0; modal_index < modals.length; modal_index++) {
+                    if (modals[modal_index] != crr_modal) {
+                        try {
+                            $(modals[modal_index]).modal("hide");
+                        } catch (err) {}
+                    }
+                }
+            }
+
+            function get_color_with_alpha(color, alpha) {
+                var R = parseInt(color.substring(1, 3), 16);
+                var G = parseInt(color.substring(3, 5), 16);
+                var B = parseInt(color.substring(5, 7), 16);
+
+                return 'rgba(' + R + ', ' + G + ', ' + B + ', ' + alpha + ')';
+            }
+
+            function set_remarks_in_textbox(element) {
+                document.getElementById('close-session-remarks-text').value = element.innerHTML;
+                $(".predefined-remarks-button").removeClass('predefined-remarks-button-clicked');
+                element.classList.add('predefined-remarks-button-clicked');
+                document.getElementById("close-session-text-error").style.display = "none";
+            }
+
+            function show_comments_textbox(element) {
+                document.getElementById("close-session-remarks-text").value = '';
+                document.getElementById("close-session-remarks-error").style.display = "none";
+                document.getElementById("close-session-text-error").style.display = "none";
+                document.getElementById("close-session-remarks-text").removeAttribute("disabled");
+
+                setTimeout(function() {
+                    document.getElementById("close-session-remarks-text").focus();
+                }, 100);
+            }
+
+            $(document).ready(function() {
+                $('.predefined-remarks-button').css('background', get_color_with_alpha(FLOATING_BUTTON_BG_COLOR, 0.07));
+
+                if (document.getElementById("close-session-remarks-text")) {
+                    if (ENABLE_REMARKS_WITH_BUTTON == "True") {
+                        document.getElementById("close-session-remarks-text").addEventListener("keyup", function(event) {
+                            var input_text = event.target.value;
+                            var predefined_remarks_list = document.getElementById("predefined-remarks-buttons-list").children;
+                            for (var idx = 0; idx < predefined_remarks_list.length; idx++) {
+                                var predefined_remarks = predefined_remarks_list[idx];
+                                var button_element = predefined_remarks.getElementsByTagName("button")[0];
+                                if (button_element.innerHTML.toLowerCase().indexOf(input_text.toLowerCase()) >= 0) {
+                                    predefined_remarks.style.display = "inline-block";
+                                } else {
+                                    predefined_remarks.style.display = "none";
+                                }
+                                button_element.classList.remove("predefined-remarks-button-clicked")
+                            }
+                        });
+                    }
+                }
+            });
+        </script>
+        <script type="text/javascript">
+            setTimeout(function() {
+                start_screensharing_cobrowse();
+            }, 1000);
+
+            function start_screensharing_cobrowse() {
+
+                try {
+                    domain = "{{easyassist_access_token.meeting_host_url}}";
+
+                    options = {
+                        roomName: '{{easyassist_session_id}}',
+                        configOverwrite: {
+                            startWithVideoMuted: true,
+                            startWithAudioMuted: true,
+                            startSilent: true,
+                            disableDeepLinking: true,
+                            remoteVideoMenu: {
+                                disableKick: true,
+                            }
+                        },
+                        parentNode: document.querySelector('#frames-container'),
+                        userInfo: {
+                            displayName: "Agent"
+                        },
+                        interfaceConfigOverwrite: {
+                            MOBILE_APP_PROMO: true,
+                            TOOLBAR_BUTTONS: [],
+
+                        }
+                    };
+                    jitsi_meet_api = new JitsiMeetExternalAPI(domain, options);
+                    jitsi_meet_api.executeCommand('subject', "Cobrowse Meeting");
+
+                    let iframe = jitsi_meet_api.getIFrame();
+
+                    iframe.onload = function() {
+                        setTimeout(init, 2000);
+                    }
+                } catch (err) {
+                    console.log(err);
+                    easyassist_show_function_fail_modal(code = 611);
+                }
+            }
+
+            function init() {
+                document.getElementById("easyassist-loader").style.display = "none";
+            }
+        </script>
+    </body>
+</html>

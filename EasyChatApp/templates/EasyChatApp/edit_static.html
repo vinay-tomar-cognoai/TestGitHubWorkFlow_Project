@@ -1,0 +1,198 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex" />
+  <meta name="googlebot" content="noindex" />
+  <meta name="googlebot-news" content="noindex" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+  <title>EasyChat</title>
+
+  <link rel="shortcut icon" type="image/png" href="{% static 'EasyChatApp/img/favicon.svg' %}"/>
+  <link href="{% static 'EasyChatApp/css/material_icons.css' %}" rel="stylesheet">
+
+  {% if request.user.enable_s3_bucket %}
+
+    <link href="https://static.allincall.in/static/EasyChatApp/css/select2.min.css" rel="stylesheet"/>
+    <link href="https://static.allincall.in/static/EasyChatApp/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+    
+  {% else %}
+
+    <link href="{% static 'EasyChatApp/css/select2.min.css' %}" rel="stylesheet"/>
+    <link href="{% static 'EasyChatApp/css/materialize.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+
+  {% endif %}
+
+
+
+  <link href="{% static 'EasyChatApp/css/style3.css' %}?v={% random_int 1 100 %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="{% static 'EasyChatApp/css/Treant.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <!-- <link href="{% static 'EasyChatApp/css/jquery.dataTables.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/> -->
+  
+  {% if request.user.enable_s3_bucket %} 
+        <link href="https://static.allincall.in/static/EasyChatApp/css/style.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>    
+       <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/jquery.min.js"></script>
+      <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/select2.min.js' %}"></script>
+
+  {% else %}
+  <link href="{% static 'EasyChatApp/css/style.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/jquery.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/select2.min.js' %}"></script>
+  {% endif %}
+
+ <!--css containing editor_common_utils and editor_custom_js and editor_code-->
+<link rel="stylesheet" type="text/css" href="/static/EasyChatApp/css/chatbot_custom_js.css?v={% random_int 1 100 %}" media="screen">
+
+</head>
+
+<body class="grey lighten-4">
+
+  {% csrf_token %}
+
+  <div class="navbar-fixed">
+
+    <nav class="white lighten-1" role="navigation">
+      <div class="nav-wrapper">
+        <a href="#" class="brand-logo red-text">
+
+          <div class="row">
+
+            <div class="col center-align purple darken-3" style="width: 4.16%;">
+              <br>
+              <a href="/chat/home/" class="white-text tooltipped" data-position="right" data-tooltip="Home">
+                <i class="material-icons" id="home-button">home</i>
+              </a>
+            </div>
+
+            <div class="col s6">
+              <div class="row" id="show-global-search" style="display:none;">
+                <div class="input-field col s10">
+                  <i class="material-icons prefix">search</i>
+                  <input id="global_search" type="text" class="validate" autocomplete="on">
+                  <label for="global_search"></label>
+                </div>
+              </div>
+            </div>
+
+            <div class="col s5">
+              <div class="col s2 right">
+                <!-- <a href="/chat/logout/" class="black-text" data-position="bottom" title="Logout"><i class="material-icons">exit_to_app</i></a> -->
+                <form action="/chat/logout/" method="POST" id ="logout-api" class="nav-link">
+                    {% csrf_token %}  
+                    <input type="submit" value="">
+                    <div class="logout-api-div-class">
+                      <i class="material-icons">exit_to_app</i>
+                    </div>
+                    
+                </form>
+              </div>
+              <div class="col s2 right">
+                <a href="javascript:void(0)" class="black-text" data-position="bottom" title="{{ request.user.username }}"><i class="material-icons">person</i></a>               
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+    </nav>
+
+    
+  </div>
+
+
+  <div class="row">
+    <div class="col s-half" style="position: fixed;">
+      <div class="row">
+        <div class="col s12 center-align" style="height: 100vh; background-color: #3A3F51;">
+          <br>
+        </div>
+      </div>
+    </div>
+
+    <div class="col s-eleven-half offset-s-half">
+
+        <div class="row" style="padding:1em;">
+		<div class="col s6">
+			<input type="text" name="static-filename" id="static-filename" placeholder="EasyChatApp/static/EasyChatApp/js/init.js">                        
+        	</div>
+                <div class="col s6">
+                        <a class="btn orange darken-3 white-text" disabled id="load-script-btn" onclick="load_edit_static_content(this)">Load Script</a>
+                        <a class="btn green darken-3 white-text" disabled id="save-script-btn" onclick="save_edit_static_content(this)">Save Script</a>
+                </div>
+                <div class="col s12">
+			<div id="editor-code">function foo(items) {
+    				var x = "All this is syntax highlighted";
+    				return x;
+			}</div>
+                </div>
+        </div>
+
+    </div>
+
+  </div>
+
+
+<div class="easychat-footer">
+    <a href="javascript:void(0)" target="_blank">Privacy Policy</a>
+    <a href="javascript:void(0)" target="_blank">Term of Use</a>
+    <span> © 2017 - {% now "Y" %}, Cogno AI or its affiliates. All rights reserved.</span>
+</div>
+
+
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/materialize.js' %}"></script>
+  <!-- <script type="text/javascript" src="{% static 'EasyChatApp/js/canvasjs.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/jquery.dataTables.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/analytics.js' %}"></script> -->
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/security_checks.js' %}?v={% random_int 1 100 %}"></script>
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/console.js' %}?v={% random_int 1 100 %}"></script>
+  {% if request.user.enable_s3_bucket %}
+
+    <script src="https://static.allincall.in/static/EasyChatApp/js/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/static/EasyChatApp/js/easychat-crypto.js" type="text/javascript"></script>
+
+  {% else %}    
+
+    <script src="{% static 'EasyChatApp/js/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+    <script src="{% static 'EasyChatApp/js/crypto-js.min.js' %}" type="text/javascript"></script>
+
+  {% endif %}
+
+ 
+  <script>
+      var editor = ace.edit("editor-code");
+      editor.setTheme("ace/theme/monokai");
+      editor.session.setMode("ace/mode/javascript");
+
+      function enable_load_script(element){
+          $("#load-script-btn").removeAttr("disabled", "disabled");          
+      }
+
+      function disable_load_script(element){
+          $("#load-script-btn").attr("disabled", "disabled");
+      }
+
+      function enable_save_script(element){
+          $("#save-script-btn").removeAttr("disabled", "disabled");
+      }
+
+      function disable_save_script(element){ 
+          $("#save-script-btn").attr("disabled", "disabled");
+      }
+
+      input_filename_element = document.getElementById("static-filename");
+
+      input_filename_element.onkeyup = function(e){
+          value = input_filename_element.value;
+          if(value==""){
+              disable_load_script(this);
+              disable_save_script(this);
+          }else{
+              enable_load_script(this);
+          }
+      };
+
+  </script>
+
+</body>
+</html>

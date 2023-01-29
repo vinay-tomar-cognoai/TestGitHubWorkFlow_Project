@@ -1,0 +1,199 @@
+{% extends 'EasyAssistSalesforceApp/console.html' %}
+{% block content %}
+{% load static %}
+
+<style type="text/css" media="screen">
+    #editor-code { 
+        width:100%;
+        height:10em;
+        overflow:auto;
+    }
+    #easyassist-language-support-list-div .dropdown {
+        width: 100%;
+    }
+
+    .bootstrap-select button {
+        border-radius: 5px!important;
+        border: 0px solid #2755cb !important;
+        box-shadow: 0 0 1px #000 inset !important;
+        text-align: left;
+        font-size: 1rem!important;
+        width: 100%!important;
+    }
+
+    .bootstrap-select .filter-option {
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    .bootstrap-select .dropdown-item {
+        color: #6e707e!important;
+        font-size: 1rem;
+        background-color: transparent;
+    }
+
+    .bootstrap-select .dropdown-item:hover {
+        background-color: #F8F9F9;
+    }
+</style>
+
+<!-- Begin Page Content -->
+<div class="container-fluid">
+
+    <div class="col-md-12 mb">
+
+        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-home" aria-selected="true">Profile</a>
+            </li>
+            {% if cobrowse_agent.get_access_token_obj.allow_language_support or cobrowse_agent.get_access_token_obj.choose_product_category %}
+                <li class="nav-item">
+                    <a class="nav-link" id="pills-advanced-settings-tab" data-toggle="pill" href="#pills-advanced-settings" role="tab" aria-controls="pills-advanced-settings" aria-selected="false">Advanced Settings</a>
+                </li>
+            {% endif %}
+        </ul>
+
+        <div class="tab-content" id="pills-tabContent">
+
+            <div class="tab-pane fade show active" id="pills-profile" role="tabpanel" aria-labelledby="pills-home-tab">
+
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <div class="input-group input-group-sm mb-3">
+                          <div class="input-group-prepend">
+                              <span class="input-group-text" id="inputGroup-sizing-sm">Email</span>
+                          </div>
+                          <input type="text" class="form-control" aria-describedby="inputGroup-sizing-sm" value="{{ cobrowse_agent.user.email }}" disabled>
+                        </div>
+
+                        <div class="input-group input-group-sm mb-3">
+                          <div class="input-group-prepend">
+                               <span class="input-group-text" id="inputGroup-sizing-sm">Name</span>
+                          </div>
+                          <input type="text" class="form-control" aria-describedby="inputGroup-sizing-sm" value="{{ cobrowse_agent.user.first_name }}" id="agent-name">
+                        </div>
+
+                        <div class="input-group input-group-sm mb-3">
+                          <div class="input-group-prepend">
+                               <span class="input-group-text" id="inputGroup-sizing-sm">Mobile No.</span>
+                          </div>
+                          <input type="text" class="form-control" aria-describedby="inputGroup-sizing-sm" value="{{ cobrowse_agent.mobile_number }}" id="agent-mobile-number">
+                        </div>
+
+
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                 <span class="input-group-text" id="inputGroup-sizing-sm">Support Level</span>
+                            </div>
+                            <input type="text" class="form-control" aria-describedby="inputGroup-sizing-sm" value="{{ cobrowse_agent.support_level }}" id="agent-support-level">
+                          </div>
+
+                        <div class="input-group input-group-sm mb-3">
+                            <button type="button" class="btn btn-info" onclick="show_change_password(this)">Change password</button>
+                        </div>
+
+                        <div class="input-group input-group-sm mb-3">
+                            <p style="color:green;" id="save-details-error"></p>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6" style="display:none;" id="change-password-div">
+
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Old password</span>
+                            </div>
+                            <input type="password" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="old-password" value="">
+                        </div>
+
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                 <span class="input-group-text" id="inputGroup-sizing-sm">New password</span>
+                            </div>
+                            <input type="password" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="new-password"
+                            value="">
+                        </div>
+
+                        <p>*Please leave this fields empty if you do not want to change password</p>
+
+                    </div>
+
+                    <div class="col-md-12">
+                        <button type="button" class="btn btn-success" onclick="save_agent_details(this)">Save</button>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="tab-pane fade" id="pills-advanced-settings" role="tabpanel" aria-labelledby="pills-advanced-settings-tab">
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-borderless gy-settings-table">
+                            <tbody>
+                                {% if cobrowse_agent.get_access_token_obj.allow_language_support %}
+                                <tr>
+                                    <th scope="row">Preferred language</th>
+                                    <td style="vertical-align: inherit;">
+                                        <select class="selectpicker" multiple data-live-search="true" id="easyassist-language-support-selected">
+                                        {% for language in supported_language %}
+                                            {% if language.is_selected %}
+                                                <option value="{{language.key}}" selected>{{language.value}}</option>
+                                            {% else %}
+                                                <option value="{{language.key}}">{{language.value}}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                        </select>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                {% if cobrowse_agent.get_access_token_obj.choose_product_category %}
+                                <tr>
+                                    <th scope="row">Product Category</th>
+                                    <td style="vertical-align: inherit;">
+                                        <select class="selectpicker" multiple data-live-search="true" id="easyassist-product-category-selected">
+                                        {% for product in product_category %}
+                                            {% if product.is_selected %}
+                                                <option value="{{product.key}}" selected>{{product.value}}</option>
+                                            {% else %}
+                                                <option value="{{product.key}}">{{product.value}}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                        </select>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                        <p id="save-cobrowsing-agent-details-error"></p>
+                    </div>
+
+                    <div class="col-md-12">
+                      <button type="button" class="btn btn-success float-right" onclick="save_cobrowse_agent_details(this)">Save</button>
+                      <br><br>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        setTimeout(function(){
+            $('.bootstrap-select button').removeClass();
+            $('.bootstrap-select button').addClass('custom-select');
+        }, 1000);
+    });
+    function show_change_password(element){
+        document.getElementById("change-password-div").style.display="block";
+    }  
+</script>
+
+{% endblock %}

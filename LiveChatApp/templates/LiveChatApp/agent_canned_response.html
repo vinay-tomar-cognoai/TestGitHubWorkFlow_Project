@@ -1,0 +1,473 @@
+{% extends 'LiveChatApp/agent_console_settings.html' %}
+{% block consolecontent %}
+{% load static %}
+
+<style type="text/css">
+
+  .upload-excel-button, .upload-excel-button-mobile-responsive{
+	  border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }} !important;
+	  color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+   }
+ 
+#custom-button{
+	border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }} !important;
+	color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+}
+#download_create_canned_response_template{
+	color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+}
+.active-page {
+	background: {{ admin_config.get_livechat_theme_lighten_three }} !important;
+	border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }} !important;
+}
+.active-page a {
+	color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+}
+  .live-chat-setting-canned-response-heading .live-chat-canned-response-popup .open-button,
+  .canned-response-model .form-popup .form-container .addBtn,
+  .delete-canned-response-modal .form-popup .form-container .addBtn {
+	  background: linear-gradient(90deg, {{admin_config.get_livechat_theme_lighten_six}} 0%, {{ admin_config.get_livechat_theme_lighten_one }} 100%);
+  }
+
+  .canned-response-model .form-popup .form-container .addBtn,
+  .live-chat-canned-response-area table .checkmark,
+  .delete-canned-response-modal .form-popup .form-container .addBtn {
+	  border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }};
+  }
+
+  .live-chat-canned-response-area table .cam input:checked~.checkmark {
+	  background-color: {{ admin_config.get_livechat_theme_lighten_one }};
+  }
+  
+  th {
+	  max-width: 250px !important;
+  }
+</style>
+ <link href="{% static 'LiveChatApp/css/agent_canned_response.css' %}?v={% random_int 1 100 %}" type="text/css" rel="stylesheet"/>
+
+
+<div class="col-xl-10 col-lg-10 col-md-9 col-sm-12 col-12 py-2 overflow-hidden-desktop" id="live-chat-setting-content-cr" style="background: #FAFAFA; z-index: 10;">
+
+	<div class="live-chat-calender-heading-mobile">
+        <svg width="25" height="21" viewBox="0 0 25 21" fill="none" xmlns="http://www.w3.org/2000/svg" class="back-arrow-div" id="live-chat-active-customers-opener-setting" onclick="go_back_mobile()">
+            <path d="M25 9.1376H5.19713L12.3832 1.92643L10.4635 0L0 10.5L10.4635 21L12.3832 19.0736L5.19713 11.8624H25V9.1376Z" fill="#757575"/>
+        </svg>
+		<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M12.9184 2.1587L12.9219 2.246L12.9231 2.33333V10.3026C12.9231 11.7498 11.7498 12.9231 10.3026 12.9231H2.33333C2.27478 12.9231 2.21661 12.9214 2.15887 12.9182C2.5723 13.5683 3.29984 14 4.12821 14H10.3026C12.3446 14 14 12.3446 14 10.3026V4.12821C14 3.30015 13.5687 2.57284 12.9184 2.1587ZM2.33333 0C1.04467 0 0 1.04467 0 2.33333V9.87179C0 11.1605 1.04467 12.2051 2.33333 12.2051H9.87179C11.1605 12.2051 12.2051 11.1605 12.2051 9.87179V2.33333C12.2051 1.04467 11.1605 0 9.87179 0H2.33333ZM1.07692 3.94872H11.1282V9.87179C11.1282 10.5657 10.5657 11.1282 9.87179 11.1282H2.33333C1.63944 11.1282 1.07692 10.5657 1.07692 9.87179V3.94872ZM2.33333 1.07692H9.87179C10.5657 1.07692 11.1282 1.63944 11.1282 2.33333V2.87179H1.07692V2.33333C1.07692 1.63944 1.63944 1.07692 2.33333 1.07692Z" fill="#4D4D4D"/>
+		</svg>				
+		<span>Canned Response</span>
+	</div>
+	<div class="live-chat-setting-canned-response-heading ">
+		<div class="row icon-canned-response-mobile">
+			<img src="{% static 'LiveChatApp/img/mobile-back.svg' %}" class="back-arrow-div" id="live-chat-active-customers-opener-setting" onclick="go_back_mobile()">
+			<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M12.9184 2.1587L12.9219 2.246L12.9231 2.33333V10.3026C12.9231 11.7498 11.7498 12.9231 10.3026 12.9231H2.33333C2.27478 12.9231 2.21661 12.9214 2.15887 12.9182C2.5723 13.5683 3.29984 14 4.12821 14H10.3026C12.3446 14 14 12.3446 14 10.3026V4.12821C14 3.30015 13.5687 2.57284 12.9184 2.1587ZM2.33333 0C1.04467 0 0 1.04467 0 2.33333V9.87179C0 11.1605 1.04467 12.2051 2.33333 12.2051H9.87179C11.1605 12.2051 12.2051 11.1605 12.2051 9.87179V2.33333C12.2051 1.04467 11.1605 0 9.87179 0H2.33333ZM1.07692 3.94872H11.1282V9.87179C11.1282 10.5657 10.5657 11.1282 9.87179 11.1282H2.33333C1.63944 11.1282 1.07692 10.5657 1.07692 9.87179V3.94872ZM2.33333 1.07692H9.87179C10.5657 1.07692 11.1282 1.63944 11.1282 2.33333V2.87179H1.07692V2.33333C1.07692 1.63944 1.63944 1.07692 2.33333 1.07692Z" fill="#4D4D4D"/>
+			</svg>				
+			<span>Canned Response</span>
+		</div>
+		<div class="row">
+			<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-canned-response-popup">
+				<div class="d-none d-md-block">
+
+					<button class="open-button" id="canned-add-btn" data-toggle="modal" data-target="#modal-add-canned-response">Add New</button>
+					<button class="upload-excel-button" id="uploadexcelBtn" data-toggle="modal" data-target="#create-canned-response-using-excel-modal">Upload Excel</button>
+					<button class="delete-button" id="canned-delete-btn" data-toggle="modal" data-target="#delete_selected_canned_modal">Delete</button>
+				</div>
+				<div class="search-container">
+					
+						<button type="submit">
+                            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="13" height="13" fill="#E5E5E5"/>
+                                <g clip-path="url(#clip0)">
+                                <rect width="1440" height="660" transform="translate(-1209 -141)" fill="white"/>
+                                <rect x="-962" y="-85" width="1193" height="604" fill="#FAFAFA"/>
+                                <rect x="-952" y="-74" width="1174" height="114" fill="white"/>
+                                <g filter="url(#filter0_d)">
+                                <rect x="-14" y="-10" width="219" height="33" rx="5" fill="white"/>
+                                </g>
+                                <path d="M5.55942 11.1182C6.79289 11.118 7.99083 10.7051 8.96247 9.94526L12.0174 13L13 12.0174L9.9451 8.96269C10.7054 7.991 11.1185 6.79285 11.1188 5.55912C11.1188 2.49396 8.62474 0 5.55942 0C2.49409 0 0 2.49396 0 5.55912C0 8.62428 2.49409 11.1182 5.55942 11.1182ZM5.55942 1.38978C7.85893 1.38978 9.72898 3.25973 9.72898 5.55912C9.72898 7.85851 7.85893 9.72846 5.55942 9.72846C3.2599 9.72846 1.38985 7.85851 1.38985 5.55912C1.38985 3.25973 3.2599 1.38978 5.55942 1.38978Z" fill="#757575"/>
+                                </g>
+                                <defs>
+                                <filter id="filter0_d" x="-22" y="-18" width="235" height="49" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                                <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                                <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
+                                <feOffset/>
+                                <feGaussianBlur stdDeviation="4"/>
+                                <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.08 0"/>
+                                <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+                                <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+                                </filter>
+                                <clipPath id="clip0">
+                                <rect width="1440" height="660" fill="white" transform="translate(-1209 -141)"/>
+                                </clipPath>
+                                </defs>
+                            </svg>
+						</button>
+						<input type="text" placeholder="Search" name="search" id="canned-response-table-search">
+				</div>
+
+
+			</div>
+		</div>
+
+	</div>
+	<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-canned-response-area live-chat-table-parent-div">
+		<div class="live-chat-setting-archived-filter-btnMobile ">
+			<button style="margin-right: 10%;" class="open-button-mobile-responsive" id="canned-mobile-add-btn" data-toggle="modal" data-target="#modal-add-canned-response">Add New</button>
+			<button class="upload-excel-button-mobile-responsive" id="uploadexcelBtn" data-toggle="modal" data-target="#create-canned-response-using-excel-modal">Upload Excel</button>
+			<button class="delete-button-mobile-responsive" id="canned-mobile-delete-btn" data-toggle="modal" data-target="#delete_selected_canned_modal" >Delete</button>
+		</div>
+		{% if canned_response_list %}
+		<table role="table" id="canned-response-table" class="display">
+			<thead role="rowgroup">
+				<tr role="row">
+					<th role="columnheader">
+						<label class="cam">
+							<input type="checkbox" class="canned-all-checkbox" id="select-all-canned">
+							<span class="checkmark"></span>
+						</label>
+						Keyword
+					</th>
+					<th role="columnheader">Canned Response</th>
+					<th role="columnheader">Visibility</th>
+					<th role="columnheader"> </th>
+
+
+				</tr>
+			</thead>
+			<tbody role="rowgroup">
+				{% for canned_response in canned_response_list %}
+					<tr role="row" id="canned_response-{{ canned_response.pk }}" data-keyword="{{ canned_response.keyword }}" data-value="{{ canned_response.response }}">
+						<td role="cell" style="display: flex; width: 15em;">
+							<label class="cam">
+								{% if user_obj.is_allow_toggle %}
+								<input type="checkbox" class="canned-checkbox" id="canned-id-{{ canned_response.pk }}">
+									<span class="checkmark"></span>
+								{% elif canned_response.status == "private" %}
+								<input type="checkbox" class="canned-checkbox" id="canned-id-{{ canned_response.pk }}">
+									<span class="checkmark"></span>
+								
+								{% endif %}
+							</label> <p style="margin:0; word-break: break-all;">{{ canned_response.keyword }}</p>
+						</td>
+						<td role="cell" style="word-break: break-all;">{{ canned_response.response }} </td>
+						<td role="cell">{{ canned_response.status }}</td>
+						<td class="show-on-hover" role="cell" style="width: 10em;">
+							{% if user_obj.is_allow_toggle %}
+							<svg width="33" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" style="padding-right: 15px;" data-toggle="modal" data-target="#modal-edit-canned-response-{{canned_response.pk}}">
+								<path d="M17.0604 0.939564C18.3132 2.19232 18.3132 4.22343 17.0604 5.47618L6.33146 16.2052C6.08325 16.4534 5.77457 16.6325 5.43593 16.7249L0.849981 17.9756C0.348084 18.1124 -0.112448 17.6519 0.0244331 17.15L1.27515 12.5641C1.3675 12.2254 1.54664 11.9167 1.79484 11.6685L12.5238 0.939564C13.7766 -0.313188 15.8077 -0.313188 17.0604 0.939564ZM11.6547 3.7104L2.74567 12.6194C2.66293 12.7021 2.60322 12.805 2.57244 12.9179L1.6313 16.3687L5.08212 15.4276C5.195 15.3968 5.2979 15.3371 5.38063 15.2543L14.2894 6.34506L11.6547 3.7104ZM13.4746 1.89039L12.6049 2.75927L15.2396 5.39482L16.1096 4.52535C16.8372 3.79773 16.8372 2.61802 16.1096 1.89039C15.382 1.16277 14.2023 1.16277 13.4746 1.89039Z" fill="#0254D7"/>
+							</svg>
+
+							<svg width="16" height="18" viewBox="0 0 16 18" fill="none" xmlns="http://www.w3.org/2000/svg" data-toggle="modal" data-target="#modal-delete-canned-response-{{ canned_response.pk }}">
+								<path d="M8 0C9.60341 0 10.913 1.19168 10.9958 2.69116L11 2.84211H15.4C15.7314 2.84211 16 3.0966 16 3.41053C16 3.6983 15.7743 3.93612 15.4814 3.97376L15.4 3.97895H14.5528L13.5769 15.3876C13.4506 16.8633 12.1496 18 10.5867 18H5.41328C3.85044 18 2.5494 16.8633 2.42309 15.3876L1.4464 3.97895H0.6C0.296243 3.97895 0.0452071 3.7651 0.00547714 3.48766L0 3.41053C0 3.12276 0.225723 2.88493 0.518584 2.84729L0.6 2.84211H5C5 1.27245 6.34315 0 8 0ZM13.3494 3.97895H2.65062L3.61917 15.2957C3.69495 16.1812 4.47557 16.8632 5.41328 16.8632H10.5867C11.5244 16.8632 12.305 16.1812 12.3808 15.2957L13.3494 3.97895ZM6.2 6.82105C6.50376 6.82105 6.75479 7.0349 6.79452 7.31234L6.8 7.38947V13.4526C6.8 13.7666 6.53137 14.0211 6.2 14.0211C5.89624 14.0211 5.64521 13.8072 5.60548 13.5298L5.6 13.4526V7.38947C5.6 7.07554 5.86863 6.82105 6.2 6.82105ZM9.8 6.82105C10.1038 6.82105 10.3548 7.0349 10.3945 7.31234L10.4 7.38947V13.4526C10.4 13.7666 10.1314 14.0211 9.8 14.0211C9.49624 14.0211 9.24521 13.8072 9.20548 13.5298L9.2 13.4526V7.38947C9.2 7.07554 9.46863 6.82105 9.8 6.82105ZM8 1.13684C7.04731 1.13684 6.26748 1.83802 6.20415 2.72535L6.2 2.84211H9.8L9.79585 2.72535C9.73252 1.83802 8.95269 1.13684 8 1.13684Z" fill="#EE2525"/>
+							</svg>
+
+							{% elif canned_response.status == "private" %}
+							<svg width="33" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" style="padding-right: 15px;" data-toggle="modal" data-target="#modal-edit-canned-response-{{canned_response.pk}}">
+								<path d="M17.0604 0.939564C18.3132 2.19232 18.3132 4.22343 17.0604 5.47618L6.33146 16.2052C6.08325 16.4534 5.77457 16.6325 5.43593 16.7249L0.849981 17.9756C0.348084 18.1124 -0.112448 17.6519 0.0244331 17.15L1.27515 12.5641C1.3675 12.2254 1.54664 11.9167 1.79484 11.6685L12.5238 0.939564C13.7766 -0.313188 15.8077 -0.313188 17.0604 0.939564ZM11.6547 3.7104L2.74567 12.6194C2.66293 12.7021 2.60322 12.805 2.57244 12.9179L1.6313 16.3687L5.08212 15.4276C5.195 15.3968 5.2979 15.3371 5.38063 15.2543L14.2894 6.34506L11.6547 3.7104ZM13.4746 1.89039L12.6049 2.75927L15.2396 5.39482L16.1096 4.52535C16.8372 3.79773 16.8372 2.61802 16.1096 1.89039C15.382 1.16277 14.2023 1.16277 13.4746 1.89039Z" fill="#0254D7"/>
+							</svg>
+
+							<svg width="16" height="18" viewBox="0 0 16 18" fill="none" xmlns="http://www.w3.org/2000/svg" data-toggle="modal" data-target="#modal-delete-canned-response-{{ canned_response.pk }}">
+								<path d="M8 0C9.60341 0 10.913 1.19168 10.9958 2.69116L11 2.84211H15.4C15.7314 2.84211 16 3.0966 16 3.41053C16 3.6983 15.7743 3.93612 15.4814 3.97376L15.4 3.97895H14.5528L13.5769 15.3876C13.4506 16.8633 12.1496 18 10.5867 18H5.41328C3.85044 18 2.5494 16.8633 2.42309 15.3876L1.4464 3.97895H0.6C0.296243 3.97895 0.0452071 3.7651 0.00547714 3.48766L0 3.41053C0 3.12276 0.225723 2.88493 0.518584 2.84729L0.6 2.84211H5C5 1.27245 6.34315 0 8 0ZM13.3494 3.97895H2.65062L3.61917 15.2957C3.69495 16.1812 4.47557 16.8632 5.41328 16.8632H10.5867C11.5244 16.8632 12.305 16.1812 12.3808 15.2957L13.3494 3.97895ZM6.2 6.82105C6.50376 6.82105 6.75479 7.0349 6.79452 7.31234L6.8 7.38947V13.4526C6.8 13.7666 6.53137 14.0211 6.2 14.0211C5.89624 14.0211 5.64521 13.8072 5.60548 13.5298L5.6 13.4526V7.38947C5.6 7.07554 5.86863 6.82105 6.2 6.82105ZM9.8 6.82105C10.1038 6.82105 10.3548 7.0349 10.3945 7.31234L10.4 7.38947V13.4526C10.4 13.7666 10.1314 14.0211 9.8 14.0211C9.49624 14.0211 9.24521 13.8072 9.20548 13.5298L9.2 13.4526V7.38947C9.2 7.07554 9.46863 6.82105 9.8 6.82105ZM8 1.13684C7.04731 1.13684 6.26748 1.83802 6.20415 2.72535L6.2 2.84211H9.8L9.79585 2.72535C9.73252 1.83802 8.95269 1.13684 8 1.13684Z" fill="#EE2525"/>
+							</svg>
+							
+							{% endif %}
+						</td>
+					</tr>
+
+					<div class="modal fade backdrop" id="modal-edit-canned-response-{{canned_response.pk}}"  tabindex="-1" role="dialog" aria-labelledby="admin_canned_response_modal_label" aria-hidden="true">
+						<div class="modal-dialog" role="document">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h6>Edit Canned Response</h6>
+								</div>
+								<div class="modal-body">
+									<div class="row">
+					
+										<div class="col-6 mb-4">
+											<label>Keyword</label>
+											<input class="form-control show-char-count" type="text" id="canned-keyword-{{canned_response.pk}}" maxlength="{{ character_limit_small_text }}" value="{{canned_response.keyword}}">
+											<div class="livechat-char-count">
+												<p id="canned-keyword-{{canned_response.pk}}-char-count">{{ canned_response.keyword | length}}</p>
+												<p>/{{ character_limit_small_text }}</p>
+											</div>
+										</div>
+										<div class="col-6 mb-4">
+											<label>Canned Response</label>
+											<input class="form-control show-char-count" type="text" id="canned-response-{{canned_response.pk}}" maxlength="{{ character_limit_large_text }}" value="{{canned_response.response}}">
+											<div class="livechat-char-count">
+												<p id="canned-response-{{canned_response.pk}}-char-count">{{ canned_response.response | length}}</p>
+												<p>/{{ character_limit_large_text }}</p>
+											</div>
+										</div>
+										<div class="col-12">
+											<h5 style="font-size: 12px;">Visibilty: {{canned_response.status}}</h5>
+										</div>
+										<input hidden value="{{canned_response.status}}" id="canned-status-{{canned_response.pk}}">
+                                        <div class="col-12" id="error-div-edit-{{canned_response.pk}}" style="display: none; padding: 13px; font-size: 14px; margin-bottom: -20px;">
+											<span class="red-text">Note:</span>&nbsp;
+											<span id="special-character-error-edit-{{canned_response.pk}}" class="red-text"></span>
+										</div>
+									</div>
+								</div>
+								<div class="modal-footer">
+									<div style="float: right;">
+										<button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+										<button class="btn-primary" type="button" onclick="edit_canned_response('{{canned_response.pk}}')">Save</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+	
+					<div class="modal fade backdrop" id="modal-delete-canned-response-{{ canned_response.pk }}" tabindex="-1" role="dialog" aria-labelledby="admin_delete_canned_response_modal_label" aria-hidden="true">
+						<div class="modal-dialog" role="document">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h6>Delete Canned Response</h6>
+								</div>
+								<div class="modal-body">
+									<div class="row">
+										<div class="col-12 mb-4">
+											<input id="delete-canned-response-{{ canned_response.pk }}" value="{{ canned_response.pk }}" hidden>
+											<h5 style="font-weight: 500; font-size: 13px; color: #4D4D4D;"> Are you sure you want to delete this canned response?</h5>
+										</div>
+					
+									</div>
+								</div>
+								<div class="modal-footer">
+									<div style="float: right;">
+										<button class="btn-primary" type="button" onclick="delete_canned_agent('{{ canned_response.pk }}')">Yes</button>
+										<button class="btn-close" type="button" data-dismiss="modal">No</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				{% endfor %}
+			</tbody>
+		</table>
+
+		<div class="container-fluid">
+			<div class="pagination-div">
+				{% if canned_response_list.has_other_pages %}
+				<ul class="pagination-content">
+						{% for i in canned_response_list.paginator.page_range %}
+							{% if canned_response_list.number == i %}
+								{% if i == 1 %}
+									<li class="active-page"><a style="color: #0254D7;" href="?page={{ i }}">{{ i }}</a></li>
+								{% elif i == canned_response_list.paginator.num_pages %}
+									<li class="active-page" style="border-radius: 0 6px 6px 0;"><a style="color: #0254D7;" href="?page={{ i }}">{{ i }}</a></li>
+								{% else %}
+									<li class="active-page" style="border-radius: 0px;"><a style="color: #0254D7;" href="?page={{ i }}">{{ i }}</a></li>
+								{% endif %}
+							{% elif i > canned_response_list.number|add:'-5' and i < canned_response_list.number|add:'5' %}
+								{% if i == 1 %}
+									<li style="border-radius: 6px 0 0 6px; border-left: 1px solid #e6e6e6;"><a href="?page={{ i }}">{{ i }}</a></li>
+								{% elif i == calendar_objs.paginator.num_pages %}
+									<li style="border-radius: 0 6px 6px 0;"><a href="?page={{ i }}">{{ i }}</a></li>
+								{% else %}
+									<li><a href="?page={{ i }}">{{ i }}</a></li>
+								{% endif %}
+							{% endif %}
+						{% endfor %}
+				</ul>
+				{% endif %}
+
+			</div>
+		</div>
+		{% endif %}
+	</div>
+
+	{% if not canned_response_list %}
+	<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-report-d-interaction-table-area" style="text-align: center; padding: 40px 40px; width: 100%;">
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="40" height="40" fill="#E5E5E5"/>
+                <g clip-path="url(#clip0)">
+                <rect width="1440" height="760" transform="translate(-749 -242)" fill="white"/>
+                <rect x="-672" y="-186" width="1363" height="704" fill="#FAFAFA"/>
+                <rect x="-482" y="-47" width="1163" height="142" rx="8" fill="white"/>
+                <g opacity="0.15" clip-path="url(#clip1)">
+                <path d="M19.8234 39.9998C19.605 39.9998 19.3917 39.9132 19.2334 39.7565C19.0367 39.5598 18.95 39.2765 19.005 39.0048L20.1834 33.1132C20.2167 32.9498 20.2934 32.8015 20.4117 32.6865L33.375 19.7232C34.3484 18.7498 35.9367 18.7498 36.91 19.7232L39.2667 22.0798C40.2417 23.0548 40.2417 24.6398 39.2667 25.6148L26.3034 38.5782C26.1884 38.6948 26.04 38.7732 25.8767 38.8065L19.985 39.9848C19.9317 39.9948 19.8767 39.9998 19.8234 39.9998ZM21.77 33.6848L20.8867 38.1032L25.305 37.2198L38.09 24.4348C38.415 24.1098 38.415 23.5815 38.09 23.2565L35.7334 20.8998C35.4084 20.5748 34.88 20.5748 34.555 20.8998L21.77 33.6848ZM25.715 37.9882H25.7317H25.715Z" fill="#757575"/>
+                <path d="M15.8333 35H4.16667C1.86833 35 0 33.1317 0 30.8333V9.16667C0 6.86833 1.86833 5 4.16667 5H7.5C7.96 5 8.33333 5.37333 8.33333 5.83333C8.33333 6.29333 7.96 6.66667 7.5 6.66667H4.16667C2.78833 6.66667 1.66667 7.78833 1.66667 9.16667V30.8333C1.66667 32.2117 2.78833 33.3333 4.16667 33.3333H15.8333C16.2933 33.3333 16.6667 33.7067 16.6667 34.1667C16.6667 34.6267 16.2933 35 15.8333 35Z" fill="#757575"/>
+                <path d="M27.5 20C27.04 20 26.6667 19.6267 26.6667 19.1667V9.16667C26.6667 7.78833 25.545 6.66667 24.1667 6.66667H20.8333C20.3733 6.66667 20 6.29333 20 5.83333C20 5.37333 20.3733 5 20.8333 5H24.1667C26.465 5 28.3333 6.86833 28.3333 9.16667V19.1667C28.3333 19.6267 27.96 20 27.5 20Z" fill="#757575"/>
+                <path d="M19.1667 10H9.16675C7.78841 10 6.66675 8.87833 6.66675 7.5V4.16667C6.66675 3.70667 7.04008 3.33333 7.50008 3.33333H10.0834C10.4701 1.43333 12.1551 0 14.1667 0C16.1784 0 17.8634 1.43333 18.2501 3.33333H20.8334C21.2934 3.33333 21.6667 3.70667 21.6667 4.16667V7.5C21.6667 8.87833 20.5451 10 19.1667 10ZM8.33341 5V7.5C8.33341 7.95833 8.70842 8.33333 9.16675 8.33333H19.1667C19.6251 8.33333 20.0001 7.95833 20.0001 7.5V5H17.5001C17.0401 5 16.6667 4.62667 16.6667 4.16667C16.6667 2.78833 15.5451 1.66667 14.1667 1.66667C12.7884 1.66667 11.6667 2.78833 11.6667 4.16667C11.6667 4.62667 11.2934 5 10.8334 5H8.33341Z" fill="#757575"/>
+                <path d="M22.5 14.9997H5.83333C5.37333 14.9997 5 14.6263 5 14.1663C5 13.7063 5.37333 13.333 5.83333 13.333H22.5C22.96 13.333 23.3333 13.7063 23.3333 14.1663C23.3333 14.6263 22.96 14.9997 22.5 14.9997Z" fill="#757575"/>
+                <path d="M22.5 19.9997H5.83333C5.37333 19.9997 5 19.6263 5 19.1663C5 18.7063 5.37333 18.333 5.83333 18.333H22.5C22.96 18.333 23.3333 18.7063 23.3333 19.1663C23.3333 19.6263 22.96 19.9997 22.5 19.9997Z" fill="#757575"/>
+                <path d="M22.5 24.9997H5.83333C5.37333 24.9997 5 24.6263 5 24.1663C5 23.7063 5.37333 23.333 5.83333 23.333H22.5C22.96 23.333 23.3333 23.7063 23.3333 24.1663C23.3333 24.6263 22.96 24.9997 22.5 24.9997Z" fill="#757575"/>
+                </g>
+                </g>
+                <defs>
+                <clipPath id="clip0">
+                <rect width="1440" height="760" fill="white" transform="translate(-749 -242)"/>
+                </clipPath>
+                <clipPath id="clip1">
+                <rect width="40" height="40" fill="white"/>
+                </clipPath>
+                </defs>
+            </svg>
+		<span style="color: rgba(134, 134, 134, 0.5); font-size:20px;">No data available</span>
+	</div>
+	{% endif %}
+	
+</div>
+
+<div class="modal fade backdrop" id="modal-add-canned-response" tabindex="-1" role="dialog" aria-labelledby="agent_canned_response_modal_label" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h6>Add Canned Response</h6>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+
+					<div class="col-6 mb-4">
+						<label>Keyword</label>
+						<input class="form-control show-char-count" type="text" placeholder="Enter Keyword" maxlength="{{ character_limit_small_text }}" id="canned-keyword">
+						<div class="livechat-char-count">
+							<p id="canned-keyword-char-count">0</p>
+							<p>/{{ character_limit_small_text }}</p>
+						</div>
+					</div>
+					<div class="col-6 mb-4">
+						<label>Canned Response</label>
+						<input class="form-control show-char-count" type="text" placeholder="Enter canned response" maxlength="{{ character_limit_large_text }}" id="canned-response">
+						<div class="livechat-char-count">
+							<p id="canned-response-char-count">0</p>
+							<p>/{{ character_limit_large_text }}</p>
+						</div>	
+					</div>
+					<div class="col-12">
+						<p style="font-size: 12px;">Visibilty: Private</p>
+					</div>
+					<div class="col-12" id="error-div" style="display: none; padding: 13px; font-size: 14px; margin-top: 10px; margin-bottom: -20px;">
+						<span class="red-text">Note:</span>&nbsp;
+						<span id="special-character-error" class="red-text"></span>
+					</div>
+					<input hidden value="private" id="canned-status">
+				</div>
+			</div>
+			<div class="modal-footer">
+				<div style="float: right;">
+					<button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+					<button class="btn-primary" type="button" onclick="create_canned_response(this)">Add</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade backdrop" id="delete_selected_canned_modal" tabindex="-1" role="dialog" aria-labelledby="admin_delete_canned_response_modal_label" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h6>Delete Canned Response</h6>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-12 mb-4">
+						<p style="font-weight: 500; font-size: 13px; color: #4D4D4D;"> Are you sure you want to delete selected canned response(s)?</p>
+					</div>
+
+				</div>
+			</div>
+			<div class="modal-footer">
+				<div style="float: right;">
+					<button class="btn-primary" type="button" onclick="delete_canned_response()">Yes</button>
+					<button class="btn-close" type="button" data-dismiss="modal">No</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade backdrop" id="create-canned-response-using-excel-modal" tabindex="-1" aria-labelledby="Admin_manage_user_Uploadexcel_modal_label" aria-modal="true" role="dialog">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h6>Add Canned Response Via Excel</h6>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-12 mb-4 upload-excel-div">
+                                            <input type="file" id="real-file" hidden="hidden">
+                                            <button type="button" id="custom-button">Choose File </button>
+                                            <span id="custom-text">No file chosen</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12" id="error-div-excel" style="display: none; padding-left: 20px; margin-top: -5px; font-size: 14px;">
+									<span class="red-text">Note:</span>&nbsp;
+									<span id="special-character-error-excel" class="red-text"></span>
+								</div>
+                                <div class="modal-footer">
+
+                                    <button class="download-template-Btn" id="download_create_canned_response_template" type="button" data-dismiss="modal">Download Template</button>
+                                    <div style="float: right;">
+                                        <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                                        <button class="btn-primary" type="button" id="submit_canned_response_excel">Upload</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+	<script type="text/javascript">
+    	$(document).ready(function() {
+	        $('#canned-response-table').DataTable({
+              "language": {
+                "info": "Showing _START_ to _END_ entries out of {{ total_canned_response }}",
+                "infoEmpty": "No records available",
+                "infoFiltered": "(filtered from _MAX_ total records)",
+              },
+              "bPaginate": false,
+              "ordering": false,
+			  "drawCallback": function( settings ) {
+					if(settings.aiDisplay.length == 0){
+						$("#canned-response-table thead th .cam").hide();
+					}
+					else{
+						$("#canned-response-table thead th .cam").show();
+					}
+				},
+              "infoCallback": function( settings, start, end, max, total, pre ) {
+                  if (settings.oPreviousSearch["sSearch"] != ""){
+                      return pre;
+                  }
+                  end = ({{ start_point }} - 1) + end;
+                  start = ({{ start_point }} - 1) + start;
+                  return "Showing " + start + " to " + end + " entries out of {{ total_canned_response }}" ;
+                }
+		  });
+		  
+		var table = $('#canned-response-table').DataTable();
+
+		function check_file_name(file_name) {
+			const special_char_regex = /[-'/`~!#*$@%+=,^&(){}[\]|;:<>"?\\]/g;
+			file_name = file_name.replace(special_char_regex, '_');
+			file_name = file_name.replaceAll(" ","");
+			return file_name;
+		}
+
+		$('#canned-response-table-search').keyup(function() {
+			let value = this.value;
+			table.search(value).draw();
+		})
+
+		try {
+			document.getElementsByClassName('dataTables_empty')[0].innerHTML = 'No canned response till now.';
+		} catch (err) {}
+
+		$('#custom-button').on("click",function () {
+        $('#real-file').click();
+      })
+      $('#real-file').change(function(){
+          var choosen_file= document.querySelector('#real-file').files[0].name;
+		  choosen_file = check_file_name(choosen_file);
+          document.querySelector('#custom-text').innerHTML=choosen_file;
+          
+      })
+	    });
+	   window.CURRENT_STATUS = '{{user_obj.current_status}}'
+	   window.DISALLOWED_CHARACTERS = {{disallowed_list_of_chars | safe}}
+    </script>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends 'EasyChatApp/base.html' %}
+{% block content %}
+{% load static %}
+<div class="add-scrolling">
+<div class="row">
+
+  <!-- <div class="col s1" id="main-console-sidenav">
+
+  </div> -->
+    <div class="col s12" id="main-console-container">
+        <div class="row" id="user-details-content">
+
+            <div class="col s12 z-depth-1 white" style="margin-top:1em;">
+                <p>Messages from {{ user_id }}</p>
+            </div>
+
+            <div class="col s12 z-depth-1 white" style="margin-top:1em;">
+                <table class="striped highlight responsive-table" 
+                style="table-layout: fixed; width: 100%">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>User Query</th>
+                            <th>Bot Response</th>
+                            <th>Intent Recognized</th>
+                            <th>Channel</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for message_history in message_history_list %}
+                            <tr>
+                                <td>{{ message_history.date }}</td>
+                                <td>{{ message_history.get_message_received }}</td>
+                                <td style="word-wrap: break-word">{{ message_history.get_bot_response }}</td>
+                                <td>{{ message_history.get_intent_obj.name }}</td>
+                                <td>{{ message_history.get_channel_name }}</td>
+                            </tr>
+                        {% endfor %}
+                    <tbody>
+                </tbody>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="col s12 right-align">
+        {% if message_history_list.has_other_pages %}
+          <ul class="pagination">
+            {% if message_history_list.has_previous %}
+              <li><a href="?page={{ message_history_list.previous_page_number }}"><i class="material-icons">chevron_left</i></a></li>
+            {% else %}
+              <li class="disabled"><i class="material-icons">chevron_left</i></li>
+            {% endif %}
+            {% for i in message_history_list.paginator.page_range %}
+              {% if message_history_list.number == i %}
+                <li class="active purple darken-3"><a href="?page={{ i }}">{{ i }}</a></li>
+              {% else %}
+                <li><a href="?page={{ i }}">{{ i }}</a></li>
+              {% endif %}
+            {% endfor %}
+            {% if message_history_list.has_next %}
+              <li><a href="?page={{ message_history_list.next_page_number }}"><i class="material-icons">chevron_right</i></a></li>
+            {% else %}
+              <li class="disabled"><i class="material-icons">chevron_right</i></li>
+            {% endif %}
+          </ul>          
+        {% endif %}
+    </div>
+
+</div>
+</div>
+
+{% endblock %}

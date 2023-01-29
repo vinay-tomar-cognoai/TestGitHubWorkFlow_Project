@@ -1,0 +1,54 @@
+{% extends 'EasyChatApp/edit_sign_in_processor.html' %}
+{% block processorcontent %}
+{% load static %}
+
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<div style="display: none;" id = "easychat_post_processor">
+
+	</div>
+	<script>
+
+window.SYSTEM_COMMANDS = {{ system_commands | safe }}
+
+$("#add_enter_api_url").keypress(function(e) {
+        var keycode = (e.keyCode ? e.keyCode : e.which);
+        if (keycode == '13') {
+            value = $("#add_enter_api_url").val();
+            add_api_url(value);
+            $("#add_enter_api_url").val("");
+        }
+    });
+
+	$(document).on("click", ".delete-button-api-url", function(e) {
+	    e.preventDefault();
+	    element = "#" + this.id;
+	    $(element).remove();
+	    $(element).remove();
+	});
+	var coll = document.getElementsByClassName("easychat_processor_collapsible");
+	var i;
+
+	for (i = 0; i < coll.length; i++) {
+	  coll[i].addEventListener("click", function() {
+	    this.classList.toggle("active");
+	    var content = this.nextElementSibling;
+	    if (content.style.maxHeight){
+	      content.style.maxHeight = null;
+	      setTimeout( function(){set_attributes(content)}, 360);
+	    } else {
+	      content.style.maxHeight = content.scrollHeight + "px";
+	      content.style.border = "1px solid black";
+	      content.style.borderRadius = "0.5em";
+	      content.style.padding = "4%";
+	      content.style.overflow = "scroll";
+	    } 
+	  });
+	}
+	function set_attributes(content){
+
+		content.style.border = "unset";
+		content.style.borderRadius = "0";
+		content.style.padding = "0";
+	}
+	</script>
+{% endblock %}

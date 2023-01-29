@@ -1,0 +1,85 @@
+<div class="outer-intent-container">
+    <ul class="collapsible">
+        <li>
+            <div class="collapsible-header">Add Language to your Channel&nbsp;&nbsp;&nbsp;
+
+            </div>
+            <div class="collapsible-body" id="add-language-colapsible-body">
+                <span style="color: #6C7A93;">(*English language is supported by default)</span>
+                <hr class="dashed-line" />
+                
+                <div class="row" id="select-channel-language-supported-container">
+                  <div class="input-field col s12" style="display: grid;margin:30px 0px 20px 20px;">
+
+                    <div class="row" class="intent-container" >
+                        <div class="col s4" style="width: 31% !important; ">
+                            <span class="choose_language" >
+                                &#160;&#160;&#160;Choose Language </span>
+                        </div>
+                        <div class=" col s4 easychat-initial-questions-dropdown">
+                            <select name="basic[]" multiple id="multiple-select-viber-language-message-list">
+                              {% for lan_obj in master_languages %}
+                                {% if lan_obj in bot_channel_obj.languages_supported.all %}
+                                  <option class="item-checkbox" value="{{ lan_obj.lang }}" id="{{lan_obj.name_in_english}}-{{ lan_obj.lang }}" selected>{{lan_obj.name_in_english}}</option>
+                                {% else %}
+                                <option class="item-checkbox" value="{{ lan_obj.lang }}" id="{{lan_obj.name_in_english}}-{{ lan_obj.lang }}" >{{lan_obj.name_in_english}}</option>
+                                {% endif %}
+                              {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col s4 preview-container" id="language_container" style="min-height: 100px; padding: 8px; max-height: 250px; display: block;">
+
+                        </div>
+                    </div>
+
+                  </div>
+                    {% if bot_channel_obj.languages_supported.count != 1%}
+                    <div class="col s12" style="display: grid;grid-template-columns: 2fr 5fr; align-items: center; justify-content: space-between; margin-bottom: 20px; margin-left: 50px;margin-top: 30px;" id="bot_language_auto_detection_div">
+                    {% else %}
+                    <div class="col s12" style="display: none;grid-template-columns: 2fr 5fr; align-items: center; justify-content: space-between; margin-bottom: 20px; margin-left: 50px;margin-top: 30px;" id="bot_language_auto_detection_div">
+                    {% endif %}
+                    <div class="row-title" >
+                    Enable bot language auto detection.<br/><span style="color: #4D4D4D;"></span>
+                    </div>
+
+                    <div class="row-content"  style="padding-left: 10px; margin-top: 5px;">
+                      {% if bot_channel_obj.languages_supported.count != 1%}
+                            {% if bot_channel_obj.is_language_auto_detection_enabled %}
+                                    <input type="checkbox" name="" id="is_language_auto_detection_enabled" style="position:relative;opacity:1;width: unset !important;margin-top: 0 !important;height: 1.4rem !important;pointer-events: auto;cursor: pointer;" checked>
+                            {% else %}
+                                    <input type="checkbox" name="" id="is_language_auto_detection_enabled" style="position:relative;opacity:1;width: unset !important;margin-top: 0 !important;height: 1.4rem !important;pointer-events: auto;cursor: pointer;">
+                            {% endif %}
+                        {% else %}
+                                <input type="checkbox" name="" id="is_language_auto_detection_enabled" style="position:relative;opacity:1;width: unset !important;margin-top: 0 !important;height: 1.4rem !important;pointer-events: auto;cursor: pointer;" disabled>
+                      {% endif %}
+                    </div>
+                  </div>
+                        {% if bot_channel_obj.languages_supported.count != 1 %}
+                        <div class="col s12" id="enable_choose_language_welcome_response_toogle_div" style="display: grid;grid-template-columns: 2fr 5fr;margin-left: 50px !important;margin-bottom: 20px;">
+                        {% else %}
+                        <div class="col s12" id="enable_choose_language_welcome_response_toogle_div" style="display: none;grid-template-columns: 2fr 5fr;margin-left: 50px !important;margin-bottom: 20px;">
+                        {% endif %}
+                            <div class="row-title">
+                            Enable choose a language menu for customers with the welcome message.<br/><span style="color: #4D4D4D;"></span>
+                            </div>
+
+                            <div class="row-content"  style="padding-left: 10px;">
+                                {% if bot_channel_obj.languages_supported.count != 1%}
+                                    {% if bot_channel_obj.is_enable_choose_language_flow_enabled_for_welcome_response %}
+                                        <input type="checkbox" style="position:relative;opacity:1;width: unset !important;margin-top: 0 !important;height: 1.4rem !important;pointer-events: auto;cursor: pointer;" name="" id="is_enable_choose_language_flow_enabled_for_welcome_response" checked>
+                                    {% else %}
+                                        <input type="checkbox" style="position:relative;opacity:1;width: unset !important;margin-top: 0 !important;height: 1.4rem !important;pointer-events: auto;cursor: pointer;" name="" id="is_enable_choose_language_flow_enabled_for_welcome_response" >
+                                    {% endif %}
+                                {% else %}
+                                  <input type="checkbox" style="position:relative;opacity:1;width: unset !important;margin-top: 0 !important;height: 1.4rem !important;pointer-events: auto;cursor: pointer;" name="" id="is_enable_choose_language_flow_enabled_for_welcome_response" disabled>
+                                {% endif %}
+                            </div>
+                        </div>
+
+
+                </div>    
+
+            
+        </li>
+    </ul>
+</div>

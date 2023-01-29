@@ -1,0 +1,669 @@
+{% extends 'CampaignApp/console.html' %}
+
+{% block content %}
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'CampaignApp/css/whatsapp_campaign_details.css' %}">
+<div class="container-fluid">
+    <div class="card shadow campaign-report-table-card mb-0">
+        <div class="card-header campaign-report-card-header">
+            <div class="row">
+                <div class="col-7 whatsapp_history_heading">
+                    <h6 class="heading-text-primary">
+                        WhatsApp Campaign Reports
+                    </h6>
+                </div>
+                <div class="col-5 campaign-date-range-heading-div" id="whatsapp-campaign-date-range">
+                    <div class="campaign-heading-date-range">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="custom-btn-row dataTables_wrapper">
+                <div class="custom-filter-container ">
+                    <div id="campaign_whatsapp_report_table_filter" class="whatsapp_history_search_bar_div">
+                        <input type="search" class="whatsapp_history_search_bar" id="whatsapp-history-search-bar" placeholder="Phone Number or Recipient ID"autocomplete="off">
+                        <button class="search-btn" disabled id="whatsapp-details-search-button" style="background: #F6F6F6;"
+                            onclick="apply_search_on_whatsapp_history()"><svg width="15" height="14" viewBox="0 0 15 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M10.1334 8.37866L12.9268 11.1728C13.1355 11.3818 13.1355 11.7204 12.9268 11.9294C12.7164 12.1347 12.3808 12.1347 12.1704 11.9294L9.37701 9.13528C7.71386 10.4008 5.35483 10.1609 3.98028 8.58656C2.60573 7.01218 2.68578 4.64173 4.16341 3.16371C5.64105 1.6857 8.01089 1.60563 9.58487 2.98053C11.1588 4.35543 11.3986 6.71508 10.1334 8.37866ZM6.98669 3.09773C5.39172 3.09773 4.09875 4.39104 4.09875 5.98642C4.10063 7.58101 5.3925 8.87322 6.98669 8.8751C8.58166 8.8751 9.87463 7.58179 9.87463 5.98642C9.87463 4.39104 8.58166 3.09773 6.98669 3.09773Z" fill="#2D2D2D"/>
+                                </svg></button>
+                    </div>
+                </div>
+                <div class="campaign-report-table-length">
+                    <label for="">Show</label>
+                    <select name='length_change' id='number_of_pages' class="form-control selectpicker">
+                        <option value='10'>10</option>
+                        <option value='25'>25</option>
+                        <option value='50'>50</option>
+                        <option value='100'>100</option>
+                    </select>
+                </div>
+                <div class="campaign-select-div-wrapper">
+                    <div id="whatsapp_campaigns_dropdown" 
+                        class="campaign-select-dropdown whatsapp-multiselect-filter-dropdown whatsapp-campaign-select">
+                        <select id="select-whatsapp-campaign-reports" class="form-control">
+
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <button class="btn btn-primary custom_filter_btn" data-toggle="modal"
+                        data-target="#campaign_custom_filter_modal">
+                        <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M2.65894 5.14844C2.17569 5.14844 1.78394 5.54019 1.78394 6.02344C1.78394 6.50669 2.17569 6.89844 2.65894 6.89844V5.14844ZM16.6589 6.89844C17.1422 6.89844 17.5339 6.50669 17.5339 6.02344C17.5339 5.54019 17.1422 5.14844 16.6589 5.14844V6.89844ZM2.65894 6.89844L16.6589 6.89844V5.14844L2.65894 5.14844V6.89844Z"
+                                fill="#FAFAFA" />
+                            <path
+                                d="M4.40894 8.64844C3.92569 8.64844 3.53394 9.04019 3.53394 9.52344C3.53394 10.0067 3.92569 10.3984 4.40894 10.3984V8.64844ZM14.9089 10.3984C15.3922 10.3984 15.7839 10.0067 15.7839 9.52344C15.7839 9.04019 15.3922 8.64844 14.9089 8.64844V10.3984ZM4.40894 10.3984L14.9089 10.3984V8.64844L4.40894 8.64844V10.3984Z"
+                                fill="#FAFAFA" />
+                            <path
+                                d="M7.03394 12.1484C6.55069 12.1484 6.15894 12.5402 6.15894 13.0234C6.15894 13.5067 6.55069 13.8984 7.03394 13.8984V12.1484ZM12.2839 13.8984C12.7672 13.8984 13.1589 13.5067 13.1589 13.0234C13.1589 12.5402 12.7672 12.1484 12.2839 12.1484V13.8984ZM7.03394 13.8984L12.2839 13.8984V12.1484L7.03394 12.1484V13.8984Z"
+                                fill="#FAFAFA" />
+                        </svg>
+                        <span>Filter</span>
+                    </button>
+                </div>
+                <div>
+                    <button class="btn btn-primary custom_export_btn" data-toggle="modal"
+                        onclick="open_whatsapp_export_modal()">
+                        <svg width="16" height="11" viewBox="0 0 16 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M12 9.58965H2.25V3.24309H4.19625C4.19625 3.24309 4.713 2.61126 5.82375 1.83275H1.5C1.30109 1.83275 1.11032 1.90704 0.96967 2.03929C0.829018 2.17153 0.75 2.3509 0.75 2.53792L0.75 10.2948C0.75 10.4819 0.829018 10.6612 0.96967 10.7935C1.11032 10.9257 1.30109 11 1.5 11H12.75C12.9489 11 13.1397 10.9257 13.2803 10.7935C13.421 10.6612 13.5 10.4819 13.5 10.2948V7.65325L12 8.81326V9.58965ZM10.7708 4.6887V7.19277L15.75 3.52516L10.7708 0V2.2079C4.725 2.2079 4.725 7.82672 4.725 7.82672C6.4365 5.18373 7.4895 4.6887 10.7708 4.6887Z"
+                                fill="white"></path>
+                        </svg>
+                        <span>Export</span>
+
+                    </button>
+                </div>
+                <div>
+                    <button class="btn btn-primary custom_metadata_btn" data-toggle="modal" data-target="#campaign_meta_data_table"
+                        onclick="disable_content_refresh()">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M10.8631 7.5507L5.76432 12.6507C5.49075 12.9242 5.14798 13.1183 4.77265 13.2121L2.8165 13.7012C2.50383 13.7793 2.22061 13.4961 2.29878 13.1834L2.78782 11.2273C2.88165 10.852 3.07573 10.5092 3.34929 10.2356L8.44804 5.13567L10.8631 7.5507ZM12.0712 3.92876C12.7381 4.59565 12.7381 5.67689 12.0712 6.34379L11.4668 6.94694L9.0518 4.53191L9.65616 3.92876C10.3231 3.26187 11.4043 3.26187 12.0712 3.92876Z"
+                                fill="white"></path>
+                        </svg>
+
+                        <span>Edit Table</span>
+                    </button>
+                </div>
+
+            </div>
+            <div class="camapign-status-card-reload-btn-div" style="">
+                <div class="camapign-status-messages-submitted">
+                <div class="total-messages-submitted mb-0">
+                    <h1 class="total-messages-submitted-heading">Total Messages Submitted -<span data-toggle="tooltip" data-placement="top" title="" data-original-title="Total number of messages submitted to WhatsApp. This count includes the Campaign Messages and Test Messages.">
+                        <svg class="campaign-tooltip-svg" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 0C13.9707 0 18 4.0302 18 9C18 13.9698 13.9707 18 9 18C4.0293 18 0 13.9698 0 9C0 4.0302 4.0293 0 9 0ZM9 1.5003C4.8645 1.5003 1.5003 4.8645 1.5003 9C1.5003 13.1355 4.8645 16.4997 9 16.4997C13.1355 16.4997 16.4997 13.1355 16.4997 9C16.4997 4.8645 13.1355 1.5003 9 1.5003ZM9 12.15C9.49706 12.15 9.9 12.5529 9.9 13.05C9.9 13.5471 9.49706 13.95 9 13.95C8.50294 13.95 8.1 13.5471 8.1 13.05C8.1 12.5529 8.50294 12.15 9 12.15ZM9 4.275C10.3669 4.275 11.475 5.3831 11.475 6.75C11.475 7.65968 11.2072 8.16664 10.529 8.87272L10.3773 9.0273C9.81759 9.587 9.675 9.82465 9.675 10.35C9.675 10.7228 9.37279 11.025 9 11.025C8.62721 11.025 8.325 10.7228 8.325 10.35C8.325 9.44032 8.59279 8.93336 9.27103 8.22727L9.4227 8.0727C9.98241 7.513 10.125 7.27535 10.125 6.75C10.125 6.12868 9.62132 5.625 9 5.625C8.41751 5.625 7.93842 6.06769 7.88081 6.63497L7.875 6.75C7.875 7.12279 7.57279 7.425 7.2 7.425C6.82721 7.425 6.525 7.12279 6.525 6.75C6.525 5.3831 7.6331 4.275 9 4.275Z" fill="#737373"></path>
+                        </svg>      
+                    </span></h1>
+                    <span class="total-messages-submitted-count"id="total_processed_value">{{total_processed}}</span>
+                </div>
+                <div class="campaign-reload-btn-div" id="whatsapp_campaign-reload-btn" title="Refresh data" onclick="reload_whatsapp_audience_page()">
+                    <svg class="whatsapp_campaign-reload-svg" width="15" height="14" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10.5099 1.06616V3.06784C10.5099 3.38053 10.2488 3.634 9.92665 3.634H7.8643C7.54215 3.634 7.28099 3.38053 7.28099 3.06784C7.28099 2.75516 7.54215 2.50168 7.8643 2.50168L8.34374 2.50109C6.7755 1.59063 4.71349 1.79099 3.36257 3.10218C1.76798 4.64988 1.76798 7.1592 3.36257 8.70687C4.95716 10.2545 7.5425 10.2545 9.13705 8.70687C10.1077 7.7649 10.5138 6.43493 10.2589 5.15067C10.198 4.84363 10.405 4.54677 10.7214 4.48762C11.0377 4.42847 11.3435 4.62942 11.4045 4.93645C11.7319 6.58588 11.2092 8.29708 9.96205 9.50758C7.91183 11.4975 4.58782 11.4975 2.53763 9.50758C0.487455 7.51769 0.487455 4.29141 2.53763 2.30151C4.39242 0.501274 7.28978 0.329697 9.34334 1.78677V1.06616C9.34334 0.753481 9.60447 0.5 9.92665 0.5C10.2488 0.5 10.5099 0.753481 10.5099 1.06616Z" fill="black"/>
+                        </svg>  
+                </div>
+                </div>
+                <div>
+                    <div style="display: flex;">
+                        <div class="campaign-messages-status-header">
+                            Campaign Messages
+                        </div>
+                        <div class="campaign-status-percent-div">
+                            <div class="status-percent-card-div" data-toggle="tooltip" data-placement="top" data-original-title="This is the number of messages sent to the audience batch file. This count does not include the Test Messages sent.">
+                                <div class="status-icon-div">
+                                    <svg width="34" height="35" viewBox="0 0 34 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <mask id="path-1-inside-1_77_10032" fill="white">
+                                        <path d="M31.5344 17.6382C31.5344 25.589 25.089 32.0343 17.1383 32.0343C9.18754 32.0343 2.74219 25.589 2.74219 17.6382C2.74219 9.68748 9.18754 3.24213 17.1383 3.24213C25.089 3.24213 31.5344 9.68748 31.5344 17.6382ZM3.84242 17.6382C3.84242 24.9813 9.79518 30.9341 17.1383 30.9341C24.4814 30.9341 30.4341 24.9813 30.4341 17.6382C30.4341 10.2951 24.4814 4.34236 17.1383 4.34236C9.79518 4.34236 3.84242 10.2951 3.84242 17.6382Z"/>
+                                        </mask>
+                                        <path d="M31.5344 17.6382C31.5344 25.589 25.089 32.0343 17.1383 32.0343C9.18754 32.0343 2.74219 25.589 2.74219 17.6382C2.74219 9.68748 9.18754 3.24213 17.1383 3.24213C25.089 3.24213 31.5344 9.68748 31.5344 17.6382ZM3.84242 17.6382C3.84242 24.9813 9.79518 30.9341 17.1383 30.9341C24.4814 30.9341 30.4341 24.9813 30.4341 17.6382C30.4341 10.2951 24.4814 4.34236 17.1383 4.34236C9.79518 4.34236 3.84242 10.2951 3.84242 17.6382Z" stroke="#00ACC1" stroke-width="1.84405" mask="url(#path-1-inside-1_77_10032)"/>
+                                        <path d="M20.5589 15.0728V14.0854C20.5589 13.8987 20.474 13.7221 20.3282 13.6055L18.5893 12.2143C18.4803 12.1271 18.3449 12.0796 18.2053 12.0796H12.4789C12.1395 12.0796 11.8643 12.3548 11.8643 12.6943V22.5827C11.8643 22.9222 12.1395 23.1974 12.4789 23.1974H19.9442C20.2837 23.1974 20.5589 22.9222 20.5589 22.5827V22.1996" stroke="#00ACC1" stroke-width="0.614685" stroke-linecap="round"/>
+                                        <circle cx="18.8488" cy="18.6359" r="3.15805" stroke="#00ACC1" stroke-width="0.614685"/>
+                                        <path d="M17.5654 19.0636L18.4206 19.7762L19.9885 17.6382" stroke="#00ACC1" stroke-width="0.614685" stroke-linecap="round"/>
+                                        <path d="M13.1475 13.7897H15.2855" stroke="#00ACC1" stroke-width="0.614685" stroke-linecap="round"/>
+                                        <path d="M13.0049 14.9301H13.575" stroke="#00ACC1" stroke-width="0.614685" stroke-linecap="round"/>
+                                        <path d="M14.7157 14.9301H14.4307" stroke="#00ACC1" stroke-width="0.614685" stroke-linecap="round"/>
+                                        <path d="M18.1357 12.0794V13.1751C18.1357 13.5146 18.4109 13.7898 18.7504 13.7898H19.276" stroke="#00ACC1" stroke-width="0.614685" stroke-linecap="round"/>
+                                        <circle cx="17.1384" cy="17.6382" r="13.2683" fill="#00ACC1" fill-opacity="0.1"/>
+                                        </svg>
+
+
+                                </div>
+                                <div class="status-detail-content-div">
+                                    <p class="campaign-status">
+                                        Sent
+                                    </p>
+                                    <p class="campaign-total-percent">
+                                        <span class="total" id="total_sent_value">{{total_sent}}</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="status-percent-card-div" data-toggle="tooltip" data-placement="top" data-original-title="Total number of messages that failed to reach the users. This count does not include the Test Messages failed.">
+                                <div class="status-icon-div">
+                                    <svg width="34" height="35" viewBox="0 0 34 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <mask id="path-1-inside-1_10_5670" fill="white">
+                    <path d="M31.1807 17.8309C31.1807 25.6641 24.8306 32.0141 16.9974 32.0141C9.16423 32.0141 2.81416 25.6641 2.81416 17.8309C2.81416 9.99768 9.16423 3.64761 16.9974 3.64761C24.8306 3.64761 31.1807 9.99768 31.1807 17.8309ZM3.89813 17.8309C3.89813 25.0654 9.76288 30.9302 16.9974 30.9302C24.232 30.9302 30.0967 25.0654 30.0967 17.8309C30.0967 10.5963 24.232 4.73158 16.9974 4.73158C9.76288 4.73158 3.89813 10.5963 3.89813 17.8309Z"></path>
+                </mask>
+                <path d="M31.1807 17.8309C31.1807 25.6641 24.8306 32.0141 16.9974 32.0141C9.16423 32.0141 2.81416 25.6641 2.81416 17.8309C2.81416 9.99768 9.16423 3.64761 16.9974 3.64761C24.8306 3.64761 31.1807 9.99768 31.1807 17.8309ZM3.89813 17.8309C3.89813 25.0654 9.76288 30.9302 16.9974 30.9302C24.232 30.9302 30.0967 25.0654 30.0967 17.8309C30.0967 10.5963 24.232 4.73158 16.9974 4.73158C9.76288 4.73158 3.89813 10.5963 3.89813 17.8309Z" stroke="#D54F4E" stroke-width="1.60808" mask="url(#path-1-inside-1_10_5670)"></path>
+                <path d="M20.3675 15.3034V14.3306C20.3675 14.1467 20.2839 13.9727 20.1402 13.8577L18.427 12.4871C18.3196 12.4012 18.1862 12.3544 18.0487 12.3544H12.407C12.0725 12.3544 11.8014 12.6256 11.8014 12.96V22.7022C11.8014 23.0367 12.0725 23.3078 12.407 23.3078H19.7619C20.0964 23.3078 20.3675 23.0367 20.3675 22.7022V22.3248" stroke="#D54F4E" stroke-width="0.605597" stroke-linecap="round"></path>
+                <circle cx="18.6823" cy="18.8138" r="3.11137" stroke="#D54F4E" stroke-width="0.605597"></circle>
+                <path d="M13.0658 14.0393H15.1722" stroke="#D54F4E" stroke-width="0.605597" stroke-linecap="round"></path>
+                <path d="M12.9252 15.1628H13.4869" stroke="#D54F4E" stroke-width="0.605597" stroke-linecap="round"></path>
+                <path d="M14.6102 15.1628H14.3294" stroke="#D54F4E" stroke-width="0.605597" stroke-linecap="round"></path>
+                <path d="M17.9804 12.3542V13.4338C17.9804 13.7683 18.2516 14.0394 18.586 14.0394H19.1038" stroke="#D54F4E" stroke-width="0.605597" stroke-linecap="round"></path>
+                <circle cx="17" cy="17.8335" r="13.1301" fill="#D54F4E" fill-opacity="0.1"></circle>
+                <path d="M17.6889 17.5173L19.498 19.7284M19.498 17.5173L17.6889 19.7284" stroke="#D54F4E" stroke-width="0.40202" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+
+                                </div>
+                                <div class="status-detail-content-div">
+                                    <p class="campaign-status">
+                                        Failed
+                                    </p>
+                                    <p class="campaign-total-percent">
+                                        <span class="total" id="total_failed_value">{{total_failed}}</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="status-percent-card-div" data-toggle="tooltip" data-placement="top" data-original-title="This is the number of messages delivered to the audience batch file. ">
+                                <div class="status-icon-div">
+                                    <svg width="34" height="35" viewBox="0 0 34 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <mask id="path-1-inside-1_10_5614" fill="white">
+                    <path d="M31.5343 17.9717C31.5343 25.9224 25.0889 32.3678 17.1382 32.3678C9.18745 32.3678 2.7421 25.9224 2.7421 17.9717C2.7421 10.0209 9.18745 3.57558 17.1382 3.57558C25.0889 3.57558 31.5343 10.0209 31.5343 17.9717ZM3.84233 17.9717C3.84233 25.3148 9.79509 31.2675 17.1382 31.2675C24.4813 31.2675 30.4341 25.3148 30.4341 17.9717C30.4341 10.6286 24.4813 4.67581 17.1382 4.67581C9.79509 4.67581 3.84233 10.6286 3.84233 17.9717Z"></path>
+                </mask>
+                <path d="M31.5343 17.9717C31.5343 25.9224 25.0889 32.3678 17.1382 32.3678C9.18745 32.3678 2.7421 25.9224 2.7421 17.9717C2.7421 10.0209 9.18745 3.57558 17.1382 3.57558C25.0889 3.57558 31.5343 10.0209 31.5343 17.9717ZM3.84233 17.9717C3.84233 25.3148 9.79509 31.2675 17.1382 31.2675C24.4813 31.2675 30.4341 25.3148 30.4341 17.9717C30.4341 10.6286 24.4813 4.67581 17.1382 4.67581C9.79509 4.67581 3.84233 10.6286 3.84233 17.9717Z" stroke="#6BCF70" stroke-width="1.84405" mask="url(#path-1-inside-1_10_5614)"></path>
+                <path d="M20.559 15.4063V14.4189C20.559 14.2322 20.4741 14.0555 20.3283 13.9389L18.5893 12.5477C18.4803 12.4605 18.3449 12.413 18.2053 12.413H12.479C12.1395 12.413 11.8643 12.6882 11.8643 13.0277V22.9161C11.8643 23.2556 12.1395 23.5308 12.479 23.5308H19.9443C20.2838 23.5308 20.559 23.2556 20.559 22.9161V22.5331" stroke="#6BCF70" stroke-width="0.614685" stroke-linecap="round"></path>
+                <circle cx="18.8484" cy="18.9693" r="3.15805" stroke="#6BCF70" stroke-width="0.614685"></circle>
+                <path d="M13.1474 14.1231H15.2854" stroke="#6BCF70" stroke-width="0.614685" stroke-linecap="round"></path>
+                <path d="M13.0048 15.2635H13.575" stroke="#6BCF70" stroke-width="0.614685" stroke-linecap="round"></path>
+                <path d="M14.7152 15.2635H14.4301" stroke="#6BCF70" stroke-width="0.614685" stroke-linecap="round"></path>
+                <path d="M18.1359 12.4128V13.5086C18.1359 13.848 18.4111 14.1233 18.7506 14.1233H19.2762" stroke="#6BCF70" stroke-width="0.614685" stroke-linecap="round"></path>
+                <g clip-path="url(#clip0_10_5614)">
+                    <path d="M19.9143 17.5387C19.8893 17.5189 19.8606 17.5042 19.8298 17.4956C19.7991 17.4869 19.7669 17.4844 19.7352 17.4882C19.7035 17.492 19.6729 17.5021 19.6451 17.5178C19.6173 17.5336 19.5929 17.5546 19.5733 17.5798L17.8802 19.7567L17.0506 18.7456C17.0311 18.7197 17.0067 18.698 16.9786 18.6817C16.9506 18.6655 16.9196 18.655 16.8875 18.651C16.8553 18.6469 16.8227 18.6493 16.7915 18.6581C16.7603 18.6669 16.7312 18.6819 16.706 18.7022C16.6807 18.7224 16.6597 18.7476 16.6443 18.7761C16.6289 18.8046 16.6194 18.8359 16.6164 18.8682C16.6134 18.9004 16.6168 18.933 16.6266 18.9638C16.6363 18.9947 16.6522 19.0233 16.6733 19.048L17.6819 20.3009C17.7046 20.3289 17.7334 20.3515 17.766 20.367C17.7987 20.3825 17.8344 20.3905 17.8705 20.3904C17.9089 20.3921 17.9471 20.3846 17.982 20.3687C18.0169 20.3527 18.0475 20.3286 18.0713 20.2985L19.9651 17.8798C19.9844 17.8541 19.9984 17.8249 20.0063 17.7938C20.0142 17.7627 20.0159 17.7303 20.0111 17.6986C20.0064 17.6669 19.9954 17.6364 19.9788 17.6089C19.9622 17.5815 19.9403 17.5576 19.9143 17.5387ZM21.1237 17.5387C21.0986 17.5189 21.0699 17.5042 21.0392 17.4956C21.0084 17.4869 20.9763 17.4844 20.9446 17.4882C20.9129 17.492 20.8822 17.5021 20.8544 17.5178C20.8266 17.5336 20.8022 17.5546 20.7826 17.5798L19.0895 19.7567L18.942 19.5753L18.6372 19.9671L18.9033 20.2985C18.9261 20.3265 18.9548 20.3491 18.9875 20.3646C19.0201 20.3801 19.0558 20.3881 19.092 20.3879C19.1283 20.3878 19.1641 20.3794 19.1968 20.3635C19.2294 20.3476 19.2581 20.3245 19.2806 20.296L21.1745 17.8773C21.1934 17.8518 21.2071 17.8227 21.2148 17.7919C21.2225 17.761 21.224 17.7289 21.2193 17.6975C21.2146 17.666 21.2037 17.6358 21.1873 17.6086C21.1709 17.5813 21.1493 17.5576 21.1237 17.5387Z" fill="#6BCF70"></path>
+                    <path d="M18.0011 19.1955L18.3131 18.8037L18.2647 18.7457C18.2456 18.7192 18.2214 18.6969 18.1934 18.6801C18.1655 18.6632 18.1344 18.6522 18.1021 18.6477C18.0698 18.6432 18.0369 18.6452 18.0054 18.6538C17.9739 18.6623 17.9445 18.6771 17.9189 18.6973C17.894 18.7173 17.8734 18.7419 17.8581 18.7699C17.8428 18.7979 17.8332 18.8286 17.8298 18.8603C17.8264 18.892 17.8294 18.924 17.8384 18.9546C17.8475 18.9851 17.8625 19.0136 17.8826 19.0383L18.0011 19.1955Z" fill="#6BCF70"></path>
+                </g>
+                <circle cx="17.1382" cy="17.9717" r="13.2683" fill="#6BCF70" fill-opacity="0.1"></circle>
+                <defs>
+                    <clipPath id="clip0_10_5614">
+                        <rect width="5.80488" height="5.80488" fill="white" transform="translate(15.8943 16.0367)"></rect>
+                    </clipPath>
+                </defs>
+            </svg>
+
+                                </div>
+                                <div class="status-detail-content-div">
+                                    <p class="campaign-status">
+                                        Delivered
+                                    </p>
+                                    <p class="campaign-total-percent">
+                                        <span class="total" id="total_delivered_value">{{total_delivered}}</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="status-percent-card-div" data-toggle="tooltip" data-placement="top" data-original-title='Total number of messages that have been read by people in the audience batch file. Note that if the user has disabled "Read Receipts", their count will be excluded.'>
+                                <div class="status-icon-div">
+                                    <svg width="33" height="34" viewBox="0 0 33 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <mask id="path-1-inside-1_10_5642" fill="white">
+                    <path d="M30.6068 17.4676C30.6068 25.1845 24.351 31.4403 16.6341 31.4403C8.91722 31.4403 2.66144 25.1845 2.66144 17.4676C2.66144 9.75072 8.91722 3.49493 16.6341 3.49493C24.351 3.49493 30.6068 9.75072 30.6068 17.4676ZM3.72931 17.4676C3.72931 24.5947 9.50699 30.3724 16.6341 30.3724C23.7612 30.3724 29.5389 24.5947 29.5389 17.4676C29.5389 10.3405 23.7612 4.56281 16.6341 4.56281C9.50699 4.56281 3.72931 10.3405 3.72931 17.4676Z"></path>
+                </mask>
+                <path d="M30.6068 17.4676C30.6068 25.1845 24.351 31.4403 16.6341 31.4403C8.91722 31.4403 2.66144 25.1845 2.66144 17.4676C2.66144 9.75072 8.91722 3.49493 16.6341 3.49493C24.351 3.49493 30.6068 9.75072 30.6068 17.4676ZM3.72931 17.4676C3.72931 24.5947 9.50699 30.3724 16.6341 30.3724C23.7612 30.3724 29.5389 24.5947 29.5389 17.4676C29.5389 10.3405 23.7612 4.56281 16.6341 4.56281C9.50699 4.56281 3.72931 10.3405 3.72931 17.4676Z" stroke="#4A92DC" stroke-width="1.78982" mask="url(#path-1-inside-1_10_5642)"></path>
+                <path d="M19.9543 14.9777V14.0193C19.9543 13.8381 19.8719 13.6667 19.7304 13.5535L18.0426 12.2032C17.9368 12.1186 17.8053 12.0725 17.6699 12.0725H12.112C11.7825 12.0725 11.5154 12.3396 11.5154 12.6691V22.2666C11.5154 22.5961 11.7825 22.8632 12.112 22.8632H19.3577C19.6872 22.8632 19.9543 22.5961 19.9543 22.2666V21.8948" stroke="#4A92DC" stroke-width="0.596606" stroke-linecap="round"></path>
+                <circle cx="18.294" cy="18.4359" r="3.06517" stroke="#4A92DC" stroke-width="0.596606"></circle>
+                <path d="M12.7607 13.7323H14.8358" stroke="#4A92DC" stroke-width="0.596606" stroke-linecap="round"></path>
+                <path d="M12.6223 14.8391H13.1757" stroke="#4A92DC" stroke-width="0.596606" stroke-linecap="round"></path>
+                <path d="M14.2824 14.8391H14.0057" stroke="#4A92DC" stroke-width="0.596606" stroke-linecap="round"></path>
+                <path d="M17.6025 12.0723V13.1358C17.6025 13.4653 17.8696 13.7324 18.1991 13.7324H18.7093" stroke="#4A92DC" stroke-width="0.596606" stroke-linecap="round"></path>
+                <g clip-path="url(#clip0_10_5642)">
+                    <path d="M19.3286 17.0474C19.3043 17.0281 19.2764 17.0139 19.2466 17.0055C19.2167 16.9971 19.1855 16.9947 19.1548 16.9984C19.124 17.0021 19.0943 17.0119 19.0673 17.0271C19.0403 17.0424 19.0166 17.0628 18.9976 17.0873L17.3543 19.2001L16.5491 18.2188C16.5302 18.1937 16.5064 18.1726 16.4792 18.1568C16.452 18.141 16.422 18.1308 16.3908 18.1269C16.3596 18.123 16.3279 18.1254 16.2976 18.1339C16.2674 18.1424 16.2391 18.157 16.2146 18.1766C16.19 18.1963 16.1697 18.2207 16.1548 18.2484C16.1398 18.276 16.1306 18.3064 16.1277 18.3377C16.1247 18.369 16.1281 18.4006 16.1375 18.4306C16.147 18.4606 16.1624 18.4884 16.1828 18.5123L17.1618 19.7283C17.1839 19.7555 17.2118 19.7775 17.2435 19.7925C17.2752 19.8075 17.3098 19.8153 17.3449 19.8152C17.3821 19.8168 17.4192 19.8096 17.4531 19.7941C17.487 19.7786 17.5167 19.7552 17.5397 19.726L19.3779 17.3784C19.3966 17.3535 19.4102 17.3252 19.4179 17.295C19.4256 17.2648 19.4272 17.2334 19.4226 17.2026C19.418 17.1718 19.4073 17.1422 19.3912 17.1155C19.375 17.0889 19.3538 17.0657 19.3286 17.0474ZM20.5024 17.0474C20.4781 17.0281 20.4502 17.0139 20.4204 17.0055C20.3905 16.9971 20.3593 16.9947 20.3285 16.9984C20.2978 17.0021 20.268 17.0119 20.2411 17.0271C20.2141 17.0424 20.1904 17.0628 20.1714 17.0873L18.5281 19.2001L18.3849 19.024L18.0891 19.4043L18.3473 19.726C18.3694 19.7532 18.3973 19.7751 18.429 19.7902C18.4607 19.8052 18.4953 19.8129 18.5304 19.8128C18.5657 19.8127 18.6004 19.8045 18.6321 19.7891C18.6638 19.7737 18.6917 19.7513 18.7135 19.7236L20.5517 17.376C20.57 17.3512 20.5833 17.3231 20.5908 17.2931C20.5983 17.2632 20.5998 17.232 20.5952 17.2015C20.5906 17.171 20.58 17.1416 20.5641 17.1152C20.5482 17.0888 20.5272 17.0657 20.5024 17.0474Z" fill="#4A92DC"></path>
+                    <path d="M17.4716 18.6555L17.7745 18.2752L17.7275 18.2188C17.709 18.1932 17.6854 18.1715 17.6583 18.1552C17.6312 18.1388 17.601 18.1281 17.5697 18.1237C17.5383 18.1194 17.5064 18.1214 17.4758 18.1296C17.4453 18.1379 17.4167 18.1523 17.3918 18.1719C17.3677 18.1913 17.3476 18.2152 17.3328 18.2424C17.318 18.2695 17.3087 18.2993 17.3054 18.3301C17.3021 18.3608 17.305 18.3919 17.3137 18.4216C17.3225 18.4512 17.3371 18.4789 17.3566 18.5029L17.4716 18.6555Z" fill="#4A92DC"></path>
+                </g>
+                <ellipse cx="16.6342" cy="17.6018" rx="12.878" ry="13.0122" fill="#4A92DC" fill-opacity="0.1"></ellipse>
+                <defs>
+                    <clipPath id="clip0_10_5642">
+                        <rect width="5.63415" height="5.63415" fill="white" transform="translate(15.4268 15.5896)"></rect>
+                    </clipPath>
+                </defs>
+            </svg>
+
+                                </div>
+                                <div class="status-detail-content-div">
+                                    <p class="campaign-status">
+                                        Read
+                                    </p>
+                                    <p class="campaign-total-percent">
+                                        <span class="total" id="total_read_value">{{total_read}}</span>
+                                    </p>
+                                </div>
+                            </div>
+                          
+                            <div class="status-percent-card-div" data-toggle="tooltip" data-placement="top" data-original-title="This is the number of messages replied by recipients in the audience batch file by clicking on the quick reply buttons.">
+                                <div class="status-icon-div">
+                                    <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <mask id="path-1-inside-1_270_7536" fill="white">
+                    <path d="M31.5343 17.1382C31.5343 25.089 25.0889 31.5343 17.1382 31.5343C9.18746 31.5343 2.7421 25.089 2.7421 17.1382C2.7421 9.18746 9.18746 2.74211 17.1382 2.74211C25.0889 2.74211 31.5343 9.18746 31.5343 17.1382ZM3.84234 17.1382C3.84234 24.4813 9.7951 30.4341 17.1382 30.4341C24.4813 30.4341 30.4341 24.4813 30.4341 17.1382C30.4341 9.79511 24.4813 3.84234 17.1382 3.84234C9.7951 3.84234 3.84234 9.79511 3.84234 17.1382Z"></path>
+                </mask>
+                <path d="M31.5343 17.1382C31.5343 25.089 25.0889 31.5343 17.1382 31.5343C9.18746 31.5343 2.7421 25.089 2.7421 17.1382C2.7421 9.18746 9.18746 2.74211 17.1382 2.74211C25.0889 2.74211 31.5343 9.18746 31.5343 17.1382ZM3.84234 17.1382C3.84234 24.4813 9.7951 30.4341 17.1382 30.4341C24.4813 30.4341 30.4341 24.4813 30.4341 17.1382C30.4341 9.79511 24.4813 3.84234 17.1382 3.84234C9.7951 3.84234 3.84234 9.79511 3.84234 17.1382Z" stroke="#F5C828" stroke-width="1.84405" mask="url(#path-1-inside-1_270_7536)"></path>
+                <path d="M20.559 14.5728V13.5854C20.559 13.3987 20.4741 13.2221 20.3283 13.1054L18.5893 11.7143C18.4803 11.6271 18.3449 11.5796 18.2053 11.5796H12.479C12.1395 11.5796 11.8643 11.8548 11.8643 12.1942V22.0827C11.8643 22.4221 12.1395 22.6973 12.479 22.6973H19.9443C20.2838 22.6973 20.559 22.4221 20.559 22.0827V21.6996" stroke="#F5C828" stroke-width="0.614685" stroke-linecap="round"></path>
+                <circle cx="18.8484" cy="18.1359" r="3.15805" stroke="#F5C828" stroke-width="0.614685"></circle>
+                <path d="M13.1474 13.2897H15.2854" stroke="#F5C828" stroke-width="0.614685" stroke-linecap="round"></path>
+                <path d="M13.0049 14.4301H13.575" stroke="#F5C828" stroke-width="0.614685" stroke-linecap="round"></path>
+                <path d="M14.7152 14.4301H14.4301" stroke="#F5C828" stroke-width="0.614685" stroke-linecap="round"></path>
+                <path d="M18.1359 11.5794V12.6751C18.1359 13.0146 18.4111 13.2898 18.7506 13.2898H19.2762" stroke="#F5C828" stroke-width="0.614685" stroke-linecap="round"></path>
+                <path d="M30.4065 17.1382C30.4065 24.4661 24.4661 30.4065 17.1382 30.4065C9.81035 30.4065 3.86993 24.4661 3.86993 17.1382C3.86993 9.81035 9.81035 3.86993 17.1382 3.86993C24.4661 3.86993 30.4065 9.81035 30.4065 17.1382Z" fill="#FFE458" fill-opacity="0.1"></path>
+                <g clip-path="url(#clip0_270_7536)">
+                    <path d="M18.2041 18.313L17.699 17.0142C17.6638 16.9238 17.752 16.8374 17.8392 16.8681L17.8529 16.874L20.5318 18.2132C20.6089 18.2517 20.6137 18.3573 20.5462 18.4043L20.5318 18.4128L17.8529 19.7521C17.7662 19.7954 17.6719 19.7157 17.6944 19.626L17.699 19.6118L18.2041 18.313ZM18.0119 17.203L18.4002 18.2013L19.3866 18.2014C19.4431 18.2014 19.4898 18.2434 19.4972 18.2979L19.4982 18.313C19.4982 18.3695 19.4562 18.4162 19.4017 18.4236L19.3866 18.4246L18.4002 18.4245L18.0119 19.423L20.2323 18.313L18.0119 17.203Z" fill="#F5C828" stroke="#F5C828" stroke-width="0.138211"></path>
+                </g>
+                <defs>
+                    <clipPath id="clip0_270_7536">
+                        <rect width="3.31707" height="3.31707" fill="white" transform="translate(17.4146 16.5854)"></rect>
+                    </clipPath>
+                </defs>
+            </svg>
+
+                                </div>
+                                <div class="status-detail-content-div">
+                                    <p class="campaign-status">
+                                        Replied
+                                    </p>
+                                    <p class="campaign-total-percent">
+                                        <span class="total" id="total_replied_value">{{total_replied}}</span>
+                                    </p>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <div style="display: flex;">
+                        <div class="campaign-messages-status-header">
+                            Test Messages
+                        </div>
+                        <div class="campaign-status-percent-div">
+
+
+                            <div class="status-percent-card-div" data-toggle="tooltip" data-placement="top" data-original-title="Total number of messages sent as a part of the Test Campaign.">
+                                <div class="status-icon-div">
+                                    <svg width="34" height="35" viewBox="0 0 34 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <mask id="path-1-inside-1_77_10032" fill="white">
+                                        <path d="M31.5344 17.6382C31.5344 25.589 25.089 32.0343 17.1383 32.0343C9.18754 32.0343 2.74219 25.589 2.74219 17.6382C2.74219 9.68748 9.18754 3.24213 17.1383 3.24213C25.089 3.24213 31.5344 9.68748 31.5344 17.6382ZM3.84242 17.6382C3.84242 24.9813 9.79518 30.9341 17.1383 30.9341C24.4814 30.9341 30.4341 24.9813 30.4341 17.6382C30.4341 10.2951 24.4814 4.34236 17.1383 4.34236C9.79518 4.34236 3.84242 10.2951 3.84242 17.6382Z"/>
+                                        </mask>
+                                        <path d="M31.5344 17.6382C31.5344 25.589 25.089 32.0343 17.1383 32.0343C9.18754 32.0343 2.74219 25.589 2.74219 17.6382C2.74219 9.68748 9.18754 3.24213 17.1383 3.24213C25.089 3.24213 31.5344 9.68748 31.5344 17.6382ZM3.84242 17.6382C3.84242 24.9813 9.79518 30.9341 17.1383 30.9341C24.4814 30.9341 30.4341 24.9813 30.4341 17.6382C30.4341 10.2951 24.4814 4.34236 17.1383 4.34236C9.79518 4.34236 3.84242 10.2951 3.84242 17.6382Z" stroke="#00ACC1" stroke-width="1.84405" mask="url(#path-1-inside-1_77_10032)"/>
+                                        <path d="M20.5589 15.0728V14.0854C20.5589 13.8987 20.474 13.7221 20.3282 13.6055L18.5893 12.2143C18.4803 12.1271 18.3449 12.0796 18.2053 12.0796H12.4789C12.1395 12.0796 11.8643 12.3548 11.8643 12.6943V22.5827C11.8643 22.9222 12.1395 23.1974 12.4789 23.1974H19.9442C20.2837 23.1974 20.5589 22.9222 20.5589 22.5827V22.1996" stroke="#00ACC1" stroke-width="0.614685" stroke-linecap="round"/>
+                                        <circle cx="18.8488" cy="18.6359" r="3.15805" stroke="#00ACC1" stroke-width="0.614685"/>
+                                        <path d="M17.5654 19.0636L18.4206 19.7762L19.9885 17.6382" stroke="#00ACC1" stroke-width="0.614685" stroke-linecap="round"/>
+                                        <path d="M13.1475 13.7897H15.2855" stroke="#00ACC1" stroke-width="0.614685" stroke-linecap="round"/>
+                                        <path d="M13.0049 14.9301H13.575" stroke="#00ACC1" stroke-width="0.614685" stroke-linecap="round"/>
+                                        <path d="M14.7157 14.9301H14.4307" stroke="#00ACC1" stroke-width="0.614685" stroke-linecap="round"/>
+                                        <path d="M18.1357 12.0794V13.1751C18.1357 13.5146 18.4109 13.7898 18.7504 13.7898H19.276" stroke="#00ACC1" stroke-width="0.614685" stroke-linecap="round"/>
+                                        <circle cx="17.1384" cy="17.6382" r="13.2683" fill="#00ACC1" fill-opacity="0.1"/>
+                                        </svg>
+
+
+                                </div>
+                                <div class="status-detail-content-div">
+                                    <p class="campaign-status">
+                                        Sent
+                                    </p>
+                                    <p class="campaign-total-percent">
+                                        <span class="total" id="total_test_sent_value">{{total_test_sent}}</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="status-percent-card-div" data-toggle="tooltip" data-placement="top" data-original-title="Total number of messages that failed to reach the users as a part of the Test Campaign.">
+                                <div class="status-icon-div">
+                                    <svg width="34" height="35" viewBox="0 0 34 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <mask id="path-1-inside-1_10_5670" fill="white">
+                <path d="M31.1807 17.8309C31.1807 25.6641 24.8306 32.0141 16.9974 32.0141C9.16423 32.0141 2.81416 25.6641 2.81416 17.8309C2.81416 9.99768 9.16423 3.64761 16.9974 3.64761C24.8306 3.64761 31.1807 9.99768 31.1807 17.8309ZM3.89813 17.8309C3.89813 25.0654 9.76288 30.9302 16.9974 30.9302C24.232 30.9302 30.0967 25.0654 30.0967 17.8309C30.0967 10.5963 24.232 4.73158 16.9974 4.73158C9.76288 4.73158 3.89813 10.5963 3.89813 17.8309Z"></path>
+            </mask>
+            <path d="M31.1807 17.8309C31.1807 25.6641 24.8306 32.0141 16.9974 32.0141C9.16423 32.0141 2.81416 25.6641 2.81416 17.8309C2.81416 9.99768 9.16423 3.64761 16.9974 3.64761C24.8306 3.64761 31.1807 9.99768 31.1807 17.8309ZM3.89813 17.8309C3.89813 25.0654 9.76288 30.9302 16.9974 30.9302C24.232 30.9302 30.0967 25.0654 30.0967 17.8309C30.0967 10.5963 24.232 4.73158 16.9974 4.73158C9.76288 4.73158 3.89813 10.5963 3.89813 17.8309Z" stroke="#D54F4E" stroke-width="1.60808" mask="url(#path-1-inside-1_10_5670)"></path>
+            <path d="M20.3675 15.3034V14.3306C20.3675 14.1467 20.2839 13.9727 20.1402 13.8577L18.427 12.4871C18.3196 12.4012 18.1862 12.3544 18.0487 12.3544H12.407C12.0725 12.3544 11.8014 12.6256 11.8014 12.96V22.7022C11.8014 23.0367 12.0725 23.3078 12.407 23.3078H19.7619C20.0964 23.3078 20.3675 23.0367 20.3675 22.7022V22.3248" stroke="#D54F4E" stroke-width="0.605597" stroke-linecap="round"></path>
+            <circle cx="18.6823" cy="18.8138" r="3.11137" stroke="#D54F4E" stroke-width="0.605597"></circle>
+            <path d="M13.0658 14.0393H15.1722" stroke="#D54F4E" stroke-width="0.605597" stroke-linecap="round"></path>
+            <path d="M12.9252 15.1628H13.4869" stroke="#D54F4E" stroke-width="0.605597" stroke-linecap="round"></path>
+            <path d="M14.6102 15.1628H14.3294" stroke="#D54F4E" stroke-width="0.605597" stroke-linecap="round"></path>
+            <path d="M17.9804 12.3542V13.4338C17.9804 13.7683 18.2516 14.0394 18.586 14.0394H19.1038" stroke="#D54F4E" stroke-width="0.605597" stroke-linecap="round"></path>
+            <circle cx="17" cy="17.8335" r="13.1301" fill="#D54F4E" fill-opacity="0.1"></circle>
+            <path d="M17.6889 17.5173L19.498 19.7284M19.498 17.5173L17.6889 19.7284" stroke="#D54F4E" stroke-width="0.40202" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+
+                                </div>
+                                <div class="status-detail-content-div">
+                                    <p class="campaign-status">
+                                        Failed
+                                    </p>
+                                    <p class="campaign-total-percent">
+                                        <span class="total" id="total_test_failed_value">{{total_test_failed}}</span>
+                                    </p>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                </div>
+               
+            </div>
+
+
+            <div class="table-responsive avtive-customer-table" id="campaign_dashboard_table">
+                <div id="whatsapp_campaign_table_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12" id="whatsapp_history_table_container">
+                            <table class="table table-bordered dataTable no-footer JPadding JColResizer campaign-user-specific-report-table"
+                                id="whatsapp_history_table" width="100%" cellspacing="0" role="grid"
+                                style="width: 100%;"></table>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-5"></div>
+                        <div class="col-sm-12 col-md-7"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-3 campaign-report-table-pagination-div" id="whatsapp_history_table_pagination_div">
+                <div class="col-md-6 col-sm-12 show-pagination-entry-container dataTables_info"
+                    filter_default_text="Showing 1 to 10 of 10 entries">Showing 1 to 10 of 10 entries</div>
+                <div class="col-md-6 col-sm-12">
+                    <div class="d-flex justify-content-end">
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination">
+                                <li class="page-item disabled">
+                                    <a class="page-link previous_button" href="javascript:void(0)"
+                                        aria-label="Previous">
+                                        <span aria-hidden="true">Previous</span>
+                                        <span class="sr-only">Previous</span>
+                                    </a>
+                                </li>
+                                <li class="active purple darken-3 page-item"><a data-page="1" href="javascript:void(0)"
+                                        class="page-link">1</a></li>
+                                <li class="page-item disabled"><a class="page-link next_button"
+                                        href="javascript:void(0)" aria-label="Previous"><span
+                                            aria-hidden="true">Next</span><span class="sr-only">Next</span></a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <div class="data-not-found-wrapper" id="no-data-loader">
+                <div id="no_data_found_img">
+                    <div>
+                        <img id="no_data_image_loader" src="/static/EasyChatApp/images/bots_loading.gif"> 
+                        <div class="linear-activity">
+                            <div class="indeterminate"></div>
+                        </div>
+                        <div id="no_data_found_text">Fetching Data. Please Wait!</div>
+                    </div>
+                </div>
+            </div>
+            <div id="table_no_data_found" class="table-no-data-found-div-wrapper">
+                <div class="no-data-svg-text-div">
+                    <svg class="no-data-svg" width="121" height="85" viewBox="0 0 121 85" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g clip-path="url(#clip0_1_1896)">
+                        <path d="M106.903 84.5572H14.0485L27.4747 8.41204H120.329L106.903 84.5572Z" fill="#F2F8FF"/>
+                        <path d="M59.2541 0.526333H28.8651L27.4747 8.41205H59.9962L59.2541 0.526333Z" fill="#F2F8FF"/>
+                        <path d="M59.9962 8.41205H27.4747L28.8651 0.526333H59.2541L59.9962 8.41205Z" fill="#E1E7EF"/>
+                        <path d="M106.903 84.5572H14.0484L27.4747 8.41204H120.329L118.929 16.3514L115.8 34.0995L106.903 84.5572Z" fill="#E1E7EF"/>
+                        <path d="M106.767 84.5572H13.712L0.5 11.1765H93.5548L106.767 84.5572Z" fill="#F1F5F9"/>
+                        <path d="M36.6133 52.167C36.6133 54.3031 34.8817 56.0348 32.7456 56.0348C30.6095 56.0348 28.8779 54.3031 28.8779 52.167C28.8779 50.0309 30.6095 48.2993 32.7456 48.2993C34.8817 48.2993 36.6133 50.0309 36.6133 52.167Z" fill="#17282F"/>
+                        <path d="M67.1889 52.167C67.1889 54.3031 65.4569 56.0348 63.3208 56.0348C61.1851 56.0348 59.4531 54.3031 59.4531 52.167C59.4531 50.0309 61.1851 48.2993 63.3208 48.2993C65.4569 48.2993 67.1889 50.0309 67.1889 52.167Z" fill="#17282F"/>
+                        <path d="M53.5886 56.6522L53.3762 56.2472C53.357 56.2106 51.3589 52.5175 47.3385 52.5175C43.6719 52.5175 42.7781 55.9948 42.7418 56.143L42.6333 56.5861L41.7464 56.3718L41.8531 55.9281C41.8635 55.8851 42.9426 51.6032 47.3385 51.6032C51.9212 51.6032 54.0957 55.6505 54.1859 55.823L54.3983 56.2277L53.5886 56.6522Z" fill="#17282F"/>
+                        </g>
+                        <defs>
+                        <clipPath id="clip0_1_1896">
+                        <rect width="120" height="84.1143" fill="white" transform="translate(0.5 0.442841)"/>
+                        </clipPath>
+                        </defs>
+                    </svg>
+                    <p class="no-data-text">No Data Found</p>
+                        
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade custom_modal" id="campaign_custom_filter_modal" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row">
+                    <div class="col-10">
+                        <h5 class="modal-title">Filter Data</h5>
+                    </div>
+                    <div class="col-2" style="text-align: right; padding-right: 10px;">
+                        <button class="btn" type="button" data-dismiss="modal" style="padding: 0!important">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M13.4931 0.710017C13.3063 0.522765 13.0526 0.417532 12.7881 0.417532C12.5236 0.417532 12.2699 0.522765 12.0831 0.710017L7.19309 5.59002L2.30309 0.700017C2.11625 0.512765 1.8626 0.407532 1.59809 0.407532C1.33357 0.407532 1.07992 0.512765 0.893086 0.700017C0.503086 1.09002 0.503086 1.72002 0.893086 2.11002L5.78309 7.00002L0.893086 11.89C0.503086 12.28 0.503086 12.91 0.893086 13.3C1.28309 13.69 1.91309 13.69 2.30309 13.3L7.19309 8.41002L12.0831 13.3C12.4731 13.69 13.1031 13.69 13.4931 13.3C13.8831 12.91 13.8831 12.28 13.4931 11.89L8.60309 7.00002L13.4931 2.11002C13.8731 1.73002 13.8731 1.09002 13.4931 0.710017Z"
+                                    fill="black" fill-opacity="0.54" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+               
+            </div>
+
+            <div class="modal-body">
+                <!-- <div class="col-sm-12 campaign-filter-select-area">
+                    <div class="filter-heading">
+                        Select Date Range
+                    </div>
+                    <label>
+                        <input type="radio" name="whatsapp-history-date-filter" id="whatsapp_report_day" value="1"
+                            onclick="show_custom_date_user_filter(this);">
+                        <div class="filter-box">
+                            <span>Last Day</span>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="whatsapp-history-date-filter" id="whatsapp_report_week" value="2"
+                            onclick="show_custom_date_user_filter(this);">
+                        <div class=" filter-box">
+                            <span>Last 7 Days</span>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="whatsapp-history-date-filter" id="whatsapp_report_month" value="3"
+                            onclick="show_custom_date_user_filter(this);">
+                        <div class=" filter-box">
+                            <span>Last Month</span>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="whatsapp-history-date-filter" id="whatsapp_report_beg" value="4"
+                            onclick="show_custom_date_user_filter(this);">
+                        <div class=" filter-box">
+                            <span>From Beginning</span>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="whatsapp-history-date-filter" id="whatsapp_report_custom_date_btn"
+                            value="5" onclick="show_custom_date_user_filter(this);">
+                        <div class=" filter-box">
+                            <span>Custom Date</span>
+                        </div>
+                    </label>
+                </div> -->
+
+                <div class="col-sm-12 campaign-filter-status-select-area">
+                    <div class="filter-heading">
+                        Select Status
+                    </div>
+                    <label for="campaign-filter-status">
+                        <input type="checkbox" id="campaign-filter-status" value="Success"
+                            class="campaign-filter-status-success">
+                        <div class="status-box">
+                            <span>Success</span>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="checkbox" id="campaign-filter-status" value="Failed"
+                            class="campaign-filter-status-failed">
+                        <div class=" status-box">
+                            <span>Failed</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="col-sm-12 campaign-filter-status-select-area">
+                    <div class="filter-heading">
+                        Select Message Type
+                    </div>
+                    <label>
+                        <input type="checkbox" id="test-message-status" value="campaign_message"
+                            class="campaign-filter-send-campaign">
+                        <div class="status-box">
+                            <span>Campaign Message</span>
+                        </div>
+                    </label>
+                                    <label>
+                        <input type="checkbox" id="test-message-status" value="test_message"
+                            class="campaign-filter-test-campaign">
+                        <div class="status-box">
+                            <span>Test Message</span>
+                        </div>
+                    </label>
+                </div>
+
+
+                <div class="col-sm-12 campaign-filter-select-div campaign-filter-field pl-0" id="quick_reply_container">
+                    <div class="filter-heading">
+                        Quick Reply
+                    </div>
+                    <div id="quick_reply_multiselect_div"
+                        class="campaign-multiselect-dropdown whatsapp-multiselect-filter-dropdown whatsapp-campaign-select">
+                        <select id="select-quick-reply" multiple="multiple" class="form-control">
+
+                        </select>
+                    </div>
+                    <div class="template-name-chips-div">
+
+                    </div>
+                </div>
+
+                <div class="col-sm-12 campaign-filter-select-div campaign-filter-field pl-0"
+                    id="template_name_container">
+                    <div class="filter-heading">
+                        Template Name
+                    </div>
+                    <div id="template_name_multiselect_div"
+                        class="campaign-multiselect-dropdown whatsapp-multiselect-filter-dropdown whatsapp-campaign-select">
+                        <select id="select-template-name" multiple="" class="form-control">
+
+                        </select>
+                    </div>
+                    <div class="template-name-chips-div">
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-text-only" type="button" data-dismiss="modal"
+                    onclick="clear_whatsapp_audience_filter()">Clear Filter</button>
+                <button class="btn btn-primary btn-width-100" type="button"
+                    onclick="apply_whatsapp_audience_filter()">Apply Filter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade custom_modal campaign-tms-new-modal" id="campaign_meta_data_table" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row">
+                    <div class="col-10">
+                        <h5 class="modal-title">Edit Table Columns</h5>
+                    </div>
+                    <div class="col-2" style="text-align: right; padding-right: 10px;">
+                        <button class="btn" type="button" data-dismiss="modal" style="padding: 0!important">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M13.4931 0.710017C13.3063 0.522765 13.0526 0.417532 12.7881 0.417532C12.5236 0.417532 12.2699 0.522765 12.0831 0.710017L7.19309 5.59002L2.30309 0.700017C2.11625 0.512765 1.8626 0.407532 1.59809 0.407532C1.33357 0.407532 1.07992 0.512765 0.893086 0.700017C0.503086 1.09002 0.503086 1.72002 0.893086 2.11002L5.78309 7.00002L0.893086 11.89C0.503086 12.28 0.503086 12.91 0.893086 13.3C1.28309 13.69 1.91309 13.69 2.30309 13.3L7.19309 8.41002L12.0831 13.3C12.4731 13.69 13.1031 13.69 13.4931 13.3C13.8831 12.91 13.8831 12.28 13.4931 11.89L8.60309 7.00002L13.4931 2.11002C13.8731 1.73002 13.8731 1.09002 13.4931 0.710017Z"
+                                    fill="black" fill-opacity="0.54" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+               
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="tms-noselect" id="lead_data_table_meta_div">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary btn-width-100" type="button" data-dismiss="modal"
+                    onclick="save_whatsapp_campaign_details_table_metadata()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade custom_modal campaign-export-new-modal" id="campaign_multi_export_modal" tabindex="-1"
+    role="dialog" aria-labelledby="client_location_details_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row">
+                    <div class="col-10">
+                        <h5 class="modal-title">Export Campaign Report</h5>
+                    </div>
+                    <div class="col-2" style="text-align: right; padding-right: 10px;">
+                        <button class="btn" type="button" data-dismiss="modal" style="padding: 0!important">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M13.4931 0.710017C13.3063 0.522765 13.0526 0.417532 12.7881 0.417532C12.5236 0.417532 12.2699 0.522765 12.0831 0.710017L7.19309 5.59002L2.30309 0.700017C2.11625 0.512765 1.8626 0.407532 1.59809 0.407532C1.33357 0.407532 1.07992 0.512765 0.893086 0.700017C0.503086 1.09002 0.503086 1.72002 0.893086 2.11002L5.78309 7.00002L0.893086 11.89C0.503086 12.28 0.503086 12.91 0.893086 13.3C1.28309 13.69 1.91309 13.69 2.30309 13.3L7.19309 8.41002L12.0831 13.3C12.4731 13.69 13.1031 13.69 13.4931 13.3C13.8831 12.91 13.8831 12.28 13.4931 11.89L8.60309 7.00002L13.4931 2.11002C13.8731 1.73002 13.8731 1.09002 13.4931 0.710017Z"
+                                    fill="black" fill-opacity="0.54" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+               
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12 p-0">
+
+                        <div class="col-sm-12 export-campaign-email-id-input-div" id="email-id-div-2">
+                            <h6>Email ID <span style="color: #FF0000;">*</span></h6>
+                            <input class="form-control" id="filter-data-email-2" value="{{ request.user.email }}"autocomplete="off">
+                            <div class="mt-1 text-right" id="general-error-message-2"
+                                style="color: red;font-size: 12px;letter-spacing: 0.25px;">
+                            </div>
+                            <p class="mt-4">Note: You will receive the campaign report data based on the campaign
+                                name and current filter selected on the above Email ID within 24 hours</p>
+                        </div>
+
+                    </div>
+                </div>
+               
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary btn-width-100" type="button"
+                    onclick="export_whatsapp_campaign_reports_request(this)">Export</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+</html>
+
+{% endblock %}

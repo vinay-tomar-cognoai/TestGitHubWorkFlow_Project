@@ -1,0 +1,452 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en" style="overflow-x: hidden;">
+<head>
+  <meta name="robots" content="noindex,nofollow,noimageindex" />
+  <meta name="googlebot" content="noindex,nofollow" />
+  <meta name="googlebot-news" content="noindex,nofollow" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+
+  <title>{{ easychat_config_obj.title_text }}</title>
+
+  {% if easychat_config_obj.tab_logo %}
+    <link rel="shortcut icon" type="image/png" href="{{ easychat_config_obj.tab_logo }}"/>
+
+  {% else %}
+    {% if request.user.enable_s3_bucket %}
+    <link rel="shortcut icon" type="image/png" href="https://static.allincall.in/static/EasyChatApp/img/favicon.svg"/>
+
+    {% else %}
+      <link rel="shortcut icon" type="image/png" href="{% static 'EasyChatApp/img/favicon.svg' %}"/>
+
+    {% endif %}
+  {% endif %}
+
+  {% if request.user.enable_s3_bucket %}
+    <link href="https://static.allincall.in/static/EasyChatApp/css/select2.min.css" rel="stylesheet"/>
+    <link href="https://static.allincall.in/static/EasyChatApp/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="https://static.allincall.in/static/EasyChatApp/css/jquery.dataTables.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="https://static.allincall.in/static/EasyChatApp/css/style.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="https://static.allincall.in/static/EasyChatApp/css/cropper.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="https://static.allincall.in/static/EasyChatApp/css/jquery-ui.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/jquery.min.js"></script>
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/jstree.min.js"></script>
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/jscolor.js"></script>
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/select2.min.js"></script>
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/cropper.min.js"></script>
+  {% else %}
+    <link href="{% static 'EasyChatApp/css/select2.min.css' %}" rel="stylesheet"/>
+    <link href="{% static 'EasyChatApp/css/materialize.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="{% static 'EasyChatApp/css/jquery.dataTables.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="{% static 'EasyChatApp/css/style.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="{% static 'EasyChatApp/css/cropper.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="{% static 'EasyChatApp/css/jquery-ui.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <script type="text/javascript" src="{% static 'EasyChatApp/js/jquery.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'EasyChatApp/js/jstree.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'EasyChatApp/js/jscolor.js' %}"></script>
+    <script type="text/javascript" src="{% static 'EasyChatApp/js/select2.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'EasyChatApp/js/cropper.min.js' %}"></script>
+  {% endif %}
+
+ 
+  <link href="{% static 'EasyChatApp/css/material_icons.css' %}" rel="stylesheet">
+
+  <link href="{% static 'EasyChatApp/css/sidenav.css' %}" rel="stylesheet">
+
+  <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> -->
+
+  <link href="{% static 'EasyChatApp/css/style3.css' %}?v={% random_int 1 100 %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="{% static 'EasyChatApp/css/Treant.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/> 
+  <link href="{% static 'EasyChatApp/css/changes.css' %}?v={% random_int 1 100 %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <!-- <link href="{% static 'EasyChatApp/css/cropper.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="{% static 'EasyChatApp/css/jquery-ui.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/jquery.min.js' %}"></script> -->
+  
+  <!-- <script type="text/javascript" src="https://www.chartjs.org/dist/2.9.3/Chart.min.js"></script> -->
+
+    <!-- trumbowyg changes -->
+<link rel="stylesheet" href="{% static 'EasyChatApp/trumbowyg/dist/ui/trumbowyg.min.css' %}">
+<link rel="stylesheet" href="{% static 'EasyChatApp/trumbowyg/dist/plugins/emoji/ui/trumbowyg.emoji.css' %}">
+
+<script type="text/javascript" src="{% static 'EasyChatApp/trumbowyg/dist/trumbowyg.min.js' %}"></script>
+<script src="{% static 'EasyChatApp/trumbowyg/dist/plugins/emoji/trumbowyg.emoji.js' %}"></script>
+  
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/materialize.js' %}"></script>
+  {% if request.user.get_ms_integration_url != "" %}
+  <script type="text/javascript" src="{{request.user.get_ms_integration_url}}webresources/Widget/msdyn_ciLibrary.js" data-crmurl="{{request.user.get_ms_integration_url}}" data-cifid="CIFMainLibrary">
+  </script>
+  {% endif %}
+  
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/base.css' %}?v={% random_int 1 100 %}">
+
+<!-- <link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/hamburger.css' %}?v={% random_int 1 100 %}"> -->
+
+</head>
+<body class="grey lighten-4 easychat-body">
+  <div onclick="toggleText()" id="background-color-theme" style="display: none;"></div>
+  {% csrf_token %}
+  <div class="col s12 easychat-build-bot-toast-div" id="easychat-build-bot-toast-div" style="display: none;">
+    <div class="build-bot-message">
+        To merge your recent changes click here ...
+    </div>
+    <a href="javascript:void(0)" class="build-bot-button" onclick="build_bot(this)" id="build-bot-toast-btn">Build Bot </a>
+
+    <a href="javascript:void(0)" class="build-bot-cross-button" onclick="build_bot(this)" id="build-bot-cancel-btn">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12.2 3.80664C12.0754 3.6818 11.9063 3.61165 11.73 3.61165C11.5536 3.61165 11.3845 3.6818 11.26 3.80664L7.99998 7.05997L4.73998 3.79997C4.61543 3.67514 4.44633 3.60498 4.26998 3.60498C4.09364 3.60498 3.92453 3.67514 3.79998 3.79997C3.53998 4.05997 3.53998 4.47997 3.79998 4.73997L7.05998 7.99997L3.79998 11.26C3.53998 11.52 3.53998 11.94 3.79998 12.2C4.05998 12.46 4.47998 12.46 4.73998 12.2L7.99998 8.93997L11.26 12.2C11.52 12.46 11.94 12.46 12.2 12.2C12.46 11.94 12.46 11.52 12.2 11.26L8.93998 7.99997L12.2 4.73997C12.4533 4.48664 12.4533 4.05997 12.2 3.80664Z" fill="black"></path>
+      </svg>
+    </a>
+
+  </div>
+
+  <div class="navbar-fixed">
+
+    {% comment %} Warning message for Ad blocker {% endcomment %}
+<div class=" col s3 push-s1 d-flex row" id="warning-msg" style="display:none"> 
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 3C16.9707 3 21 7.0302 21 12C21 16.9698 16.9707 21 12 21C7.0293 21 3 16.9698 3 12C3 7.0302 7.0293 3 12 3ZM12.0016 14.7034C11.5052 14.7034 11.1028 15.1058 11.1028 15.6021C11.1028 16.0985 11.5052 16.5009 12.0016 16.5009C12.498 16.5009 12.9004 16.0985 12.9004 15.6021C12.9004 15.1058 12.498 14.7034 12.0016 14.7034ZM11.9997 7.5C11.5381 7.50017 11.1578 7.84774 11.106 8.29536L11.1 8.40032L11.1016 12.9011L11.1077 13.0061C11.1599 13.4537 11.5404 13.801 12.0019 13.8008C12.4635 13.8006 12.8438 13.4531 12.8956 13.0054L12.9016 12.9005L12.9 8.39968L12.8939 8.29472C12.8418 7.84713 12.4612 7.49983 11.9997 7.5Z" fill="#F5C828"/>
+  </svg>
+   <p>The system might face some issues while loading analytics if any external ad blocker is used.</p>      
+  </div>
+
+  {% block navbar %}
+    <nav class="white-new lighten-1" role="navigation">
+      <div id="easychat_language_config_success_toast_container" style="display: none;">
+
+          <svg width="27" height="22" viewBox="0 0 27 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20.8917 11C20.8917 16.5228 16.4388 21 10.9458 21C5.4529 21 1 16.5228 1 11C1 5.47715 5.4529 1 10.9458 1C13.3195 1 15.4989 1.83604 17.2088 3.23122" stroke="#25B139" stroke-width="2" stroke-linecap="round"/>
+              <path d="M9.3877 10.7328L13.0726 14.4378L24.9998 2.44586" stroke="#25B139" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          <span id="easychat-navbar-toast-message" >
+                  This language is now available for usage in this bot. <br>
+                  Please note that languages added to the bot are also added to all <br> available channels of this bot. <br>
+                  To make changes for any channels, visit the specific channel page.
+
+          </span>
+
+          <div class="easychat-language-config-success-toast-cross-icon" onclick="handle_toast_close()">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2.39705 2.55379L2.46967 2.46967C2.73594 2.2034 3.1526 2.1792 3.44621 2.39705L3.53033 2.46967L8 6.939L12.4697 2.46967C12.7626 2.17678 13.2374 2.17678 13.5303 2.46967C13.8232 2.76256 13.8232 3.23744 13.5303 3.53033L9.061 8L13.5303 12.4697C13.7966 12.7359 13.8208 13.1526 13.6029 13.4462L13.5303 13.5303C13.2641 13.7966 12.8474 13.8208 12.5538 13.6029L12.4697 13.5303L8 9.061L3.53033 13.5303C3.23744 13.8232 2.76256 13.8232 2.46967 13.5303C2.17678 13.2374 2.17678 12.7626 2.46967 12.4697L6.939 8L2.46967 3.53033C2.2034 3.26406 2.1792 2.8474 2.39705 2.55379L2.46967 2.46967L2.39705 2.55379Z" fill="#212121"/>
+            </svg>
+          </div>
+      </div>
+      <div id="easychat_language_config_success_toast_container_category" style="display: none;">
+
+        <svg width="27" height="22" viewBox="0 0 27 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20.8917 11C20.8917 16.5228 16.4388 21 10.9458 21C5.4529 21 1 16.5228 1 11C1 5.47715 5.4529 1 10.9458 1C13.3195 1 15.4989 1.83604 17.2088 3.23122" stroke="#25B139" stroke-width="2" stroke-linecap="round"/>
+            <path d="M9.3877 10.7328L13.0726 14.4378L24.9998 2.44586" stroke="#25B139" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        <span id="easychat-navbar-toast-message">
+              New category saved successfully! <br>
+              Please refresh the edit intent page to see the newly added category.
+        </span>
+
+        <div class="easychat-language-config-success-toast-cross-icon" onclick="handle_toast_close()">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2.39705 2.55379L2.46967 2.46967C2.73594 2.2034 3.1526 2.1792 3.44621 2.39705L3.53033 2.46967L8 6.939L12.4697 2.46967C12.7626 2.17678 13.2374 2.17678 13.5303 2.46967C13.8232 2.76256 13.8232 3.23744 13.5303 3.53033L9.061 8L13.5303 12.4697C13.7966 12.7359 13.8208 13.1526 13.6029 13.4462L13.5303 13.5303C13.2641 13.7966 12.8474 13.8208 12.5538 13.6029L12.4697 13.5303L8 9.061L3.53033 13.5303C3.23744 13.8232 2.76256 13.8232 2.46967 13.5303C2.17678 13.2374 2.17678 12.7626 2.46967 12.4697L6.939 8L2.46967 3.53033C2.2034 3.26406 2.1792 2.8474 2.39705 2.55379L2.46967 2.46967L2.39705 2.55379Z" fill="#212121"/>
+          </svg>
+        </div>
+    </div>
+      <div class="nav-wrapper" style="background: #fff">
+        <a href="#" class="brand-logo red-text">
+          
+          <div class="row" id="{{ request.path }}">
+            {% if expanded_logo  %}
+              {% include "EasyChatApp/sidenavbar/chat_bot_logo_expanded.html" %}
+            {% else %}
+              {% include "EasyChatApp/sidenavbar/chat_bot_logo.html" %}
+            {% endif %}
+            
+            {% if "/edit-intent/" not in request.path %}
+            <div data-html2canvas-ignore class="col center-align purple darken-3" style="width: 4.16%; display: flex; justify-content: center; align-items: center; height: 60px; background: #fff !important;">
+              <br>
+
+                <!-- <a href="/chat/home/" class="white-text tooltipped" data-position="right" data-tooltip="Home">
+                  <i class="material-icons" id="home-button">home</i>
+                </a> -->
+
+            </div>
+            {% endif %}
+
+              <div id="translation_api_toast_container" style="display: none;">
+                <div class="translation_api_svg" ><svg width="23" height="24" viewBox="0 0 23 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11.0188 4.24392C11.9539 3.74607 13.1212 4.03535 13.6947 4.88383L13.7692 5.00297L20.7466 17.1125C20.9128 17.401 21 17.7253 21 18.055C21 19.0844 20.168 19.9271 19.1152 19.9955L18.9766 20H5.02374C4.68083 20 4.34356 19.9162 4.04357 19.7565C3.10847 19.2588 2.74423 18.1542 3.18807 17.2366L3.25363 17.1127L10.2291 5.00317C10.413 4.68387 10.6867 4.42076 11.0188 4.24392ZM12.0008 15.6717C11.5048 15.6717 11.1027 16.0583 11.1027 16.5351C11.1027 17.0118 11.5048 17.3984 12.0008 17.3984C12.4968 17.3984 12.8989 17.0118 12.8989 16.5351C12.8989 16.0583 12.4968 15.6717 12.0008 15.6717ZM11.9989 8.75285C11.5377 8.75301 11.1577 9.08686 11.1059 9.51681L11.0999 9.61762L11.1015 13.9407L11.1076 14.0415C11.1597 14.4714 11.54 14.805 12.0011 14.8048C12.4623 14.8047 12.8423 14.4708 12.8941 14.0409L12.9001 13.9401L12.8985 9.617L12.8924 9.51619C12.8403 9.08628 12.46 8.75269 11.9989 8.75285Z" fill="#FF281A"/>
+                </svg>
+               </div>
+                <div><p>Translation API failed, hence displaying the data in English.</p></div>
+            </div>
+
+
+
+            <div class="col s6" style="height: 64px;">
+              <div class="row" id="show-global-search" style="display: none;">
+                <div class="input-field col s10">
+                  <i class="material-icons prefix">search</i>
+                  <input id="global_search" type="text" class="validate" autocomplete="on" >
+                  <label for="global_search"></label>
+                </div>
+              </div>
+            </div>
+
+
+
+            <ul id="dropdown1" class="dropdown-content">
+              <li>
+                <form action="/chat/logout/" method="POST" id ="logout-api" class="nav-link">
+                    {% csrf_token %}  
+                    <input type="submit" value="">
+                    <div class="logout-api-div-class">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg> 
+                      <span>Logout</span>
+                    </div>
+                    
+                </form>
+                <!-- <a href="/chat/logout/">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg> Logout
+                </a> -->
+              </li>
+            </ul>
+            <div id="easychat-user-profile-section">
+              <a class="dropdown-trigger" href="javascript:void(0)" data-target="dropdown1">
+                <span class="easychat-profile-username">
+                  {{ request.user.username }}
+                </span>
+
+                <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M18 36C27.9412 36 36 27.9412 36 18C36 8.05884 27.9412 0 18 0C8.05884 0 0 8.05884 0 18C0 27.9412 8.05884 36 18 36ZM26 22.2468C26 21.0044 24.9932 19.9973 23.7511 19.9973H12.2489C11.0068 19.9973 10 21.0044 10 22.2468V23.1667C10 23.739 10.1785 24.2969 10.5104 24.7629C12.0526 26.9277 14.5757 28 17.9967 28C21.4171 28 23.9414 26.9282 25.4874 24.7644C25.8208 24.2979 26 23.7388 26 23.1653V22.2468ZM22.9968 13.001C22.9968 10.239 20.7582 8 17.9967 8C15.2352 8 12.9966 10.239 12.9966 13.001C12.9966 15.7627 15.2352 18.0017 17.9967 18.0017C20.7582 18.0017 22.9968 15.7627 22.9968 13.001Z" fill="#2755CB"></path>
+                <defs>
+                  <linearGradient id="paint0_linear" x1="18" y1="0" x2="18" y2="36" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#2755cb"></stop>
+                  <stop offset="1" stop-color="#2755cb"></stop>
+                  </linearGradient>
+                </defs>
+              </svg>
+              </a>
+            </div>
+          </div>
+        </a>
+      </div>
+    </nav>
+  {% endblock %}
+
+    
+  </div>
+
+
+    <div >
+        {% block content %}
+        {% endblock %}
+    </div>
+
+
+{% if developer_config_obj.enable_footer_over_entire_console %}
+<div data-html2canvas-ignore class="easychat-footer">
+
+    <span class="left">Version: {{ request.session.EASYCHAT_VERSION }}</span>
+    <span class="left">Date of Release: {{ request.session.EASYCHAT_DATE_OF_RELEASE }}</span>
+    <!-- <a href="https://docs.google.com/spreadsheets/d/1wcKi4E38DW99npqyCVwSWOUEEvJqpJLeGDcT-UrMRUc/edit?usp=sharing" target="_blank"> <i class="material-icons tiny" id="home-button">feedback</i></a> -->
+
+    <span> © 2017 - {% now "Y" %}, Cogno AI or its affiliates. All rights reserved.</span>
+</div>
+{% endif %}
+
+<!-- Build bot modal -->
+
+<div id="easychat-build-bot-modal" class="modal easychat-custom-modals-container" tabindex="0" style="z-index: 1003; display: none; opacity: 0; top: 4%; transform: scaleX(0.8) scaleY(0.8);">
+  <div class="modal-content">
+      <div class="row" style="margin-bottom: 12px !important;">
+          <div class="modal-header">
+              <div class="modal-heading-text-div">Build Bot</div>
+
+          </div>
+          <div class="modal-overflow-content-div">
+
+              <div style="margin-top: 24px;">
+                  <ol id="build-bot-points" style="margin: 0px; padding: 0;">
+                      <li class="build-bot-processes">
+                          <div class="build-bot-process">1. Updating Version Of Files</div>
+                          <div class="build-bot-process-loader" id="build-bot-process-loader-one"></div>
+                      </li>
+                      <li class="build-bot-processes">
+                          <div class="build-bot-process">2. Adding translation-based training questions in available languages</div>
+                          <div class="build-bot-process-loader" id="build-bot-process-loader-two"></div>
+                      </li>
+                      <li class="build-bot-processes">
+                          <div class="build-bot-process">3. Syncing Word Mappers With Intents</div>
+                          <div class="build-bot-process-loader" id="build-bot-process-loader-three"></div>
+                      </li>
+                      <li class="build-bot-processes">
+                        <div class="build-bot-process">4. Training Spell Checker And Word Splitter</div>
+                        <div class="build-bot-process-loader" id="build-bot-process-loader-four"></div>
+                      </li>
+                      <li class="build-bot-processes">
+                          <div class="build-bot-process">5. Loading Suggestions And Word Mappers</div>
+                          <div class="build-bot-process-loader" id="build-bot-process-loader-five"></div>
+                      </li>
+                  </ol>
+                  <div style="font-size: 25px; color: #4d4d4d; display: none;" id="bot-built-success">
+                      <p>Bot Built Successfully!</p>
+                  </div>
+                  <div style="font-size: 25px; color: #4d4d4d; display: none;" id="bot-built-failed">
+                      <p>Bot Built Failed!</p>
+                  </div>
+
+
+              </div>
+
+          </div>
+      </div>
+  </div>
+  <div class="modal-footer">
+      <a class="build-bot-modal-close-btn modal-close">Close</a>
+  </div>
+
+</div>
+
+<!-- Lnaguage change loader modal -->
+<div id="modal-language-change-loader" class="modal" >
+    <div class="modal-content">
+        <img id="language-change-loader-gif" style="width: 220px;height: 135px;" src="{% static '/EasyChatApp/img/language_change_loader.gif' %}">
+        <div id="language-loader-inner-text" style="color: #2755CB;font-weight:500;"> Loading Languages</div>
+    </div>
+</div>
+
+<!-- Build bot modal -->
+
+ {% if show_bot_icon_and_link %}
+        <img src="/static/EasyChatApp/img/Vector.png" id="bot_image_new"></img>
+        <br/>
+        <br/>
+        <div id="bot_name_new">Hi, I am <a href="/chat/bot/?id={{selected_bot_obj.pk}}" target="_blank">{{selected_bot_obj.name}}</a>!</div>
+{% endif %}
+
+ {% if SHOW_CONSOLE_LOGS == False %}
+ <script type="text/javascript" src="{% static 'EasyChatApp/js/console_logger.js' %}"></script>
+ {% endif %}
+  
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/easychat-crypto.js' %}?v={% random_int 1 100 %}"></script>
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/canvasjs.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/jquery.dataTables.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/analytics.js' %}?v={% random_int 1 100 %}"></script>
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/jquery-ui.min.js' %}"></script>
+  <script  type="text/javascript" src="{% static 'EasyChatApp/js/utils.js' %}?v={% random_int 1 100 %}"></script>
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/security_checks.js' %}?v={% random_int 1 100 %}"></script>
+  {% if request.path not in "/chat/edit-intent/ /chat/edit-tree/ /chat/edit-intent-multilingual/ /chat/edit-tree-multilingual/ /chat/create-intent/" %}
+  <script  type="text/javascript" src="{% static 'EasyChatApp/js/console_custom_dropdown.js' %}?v={% random_int 1 100 %}"></script>
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/console.js' %}?v={% random_int 1 100 %}"></script>
+  {% elif request.COOKIES.edit_intent_ui == "old" %}
+  <script  type="text/javascript" src="{% static 'EasyChatApp/js/console_custom_dropdown_old.js' %}?v={% random_int 1 100 %}"></script>
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/console_old.js' %}?v={% random_int 1 100 %}"></script>
+  {% else %}
+  <script  type="text/javascript" src="{% static 'EasyChatApp/js/console_custom_dropdown.js' %}?v={% random_int 1 100 %}"></script>
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/console.js' %}?v={% random_int 1 100 %}"></script>
+  {% endif %}
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/sidenav.js' %}?v={% random_int 1 100 %}"></script>
+  <!-- <script src="{% static 'EasyChatApp/js/bot_configuration.js' %}?v={% random_int 1 100 %}"></script> -->
+  {% if request.path == "/chat/whatsapp-history/" %}
+    <script  type="text/javascript" src="{% static 'EasyChatApp/js/whatsapp_history.js' %}?v={% random_int 1 100 %}"></script>
+  {% endif %}
+
+  {% if request.path == "/chat/channels/android/" %}
+    <script  type="text/javascript" src="{% static 'EasyChatApp/js/android_console.js' %}?v={% random_int 1 100 %}"></script>
+  {% endif %}
+
+  {% if request.path == "/chat/channels/twitter/" %}
+    <script  type="text/javascript" src="{% static 'EasyChatApp/js/twitter_console.js' %}?v={% random_int 1 100 %}"></script>
+  {% endif %}
+
+  {% if request.path == "/chat/channels/ios/" %}
+    <script  type="text/javascript" src="{% static 'EasyChatApp/js/ios_console.js' %}?v={% random_int 1 100 %}"></script>
+  {% endif %}
+
+  {% if request.path == "/chat/channels/microsoft-teams/" %}
+    <script  type="text/javascript" src="{% static 'EasyChatApp/js/microsoft_console.js' %}?v={% random_int 1 100 %}"></script>
+  {% endif %}
+
+  {% if request.path == "/chat/channels/voice/" %}
+    <script  type="text/javascript" src="{% static 'EasyChatApp/js/voice_channel_console.js' %}?v={% random_int 1 100 %}"></script>
+  {% endif %}
+
+  {% if request.path == "/chat/channels/whatsapp/" %}
+    <script  type="text/javascript" src="{% static 'EasyChatApp/js/whatsapp_channel.js' %}?v={% random_int 1 100 %}"></script>
+  {% endif %}
+
+  {% if request.path == "/chat/channels/whatsapp/catalogue-manager/" %}
+    <script  type="text/javascript" src="{% static 'EasyChatApp/js/whatsapp_catalogue.js' %}?v={% random_int 1 100 %}"></script>
+  {% endif %}
+
+  {% if request.path == "/chat/channels/viber/" %}
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/viber_console.js' %}?v={% random_int 1 100 %}"></script>
+  {% endif %}
+
+  {% if request.path == "/chat/test-chatbot/" %}
+    <script  type="text/javascript" src="{% static 'EasyChatApp/js/automated_testing.js' %}?v={% random_int 1 100 %}"></script>
+  {% endif %}
+  
+<script type="text/javascript">
+    $("#home-button").click(function() {
+      if ($("#panel").is(":visible") == true) {
+        $("#panel").hide(100);  
+      } else {
+        $("#panel").show(100);
+      }
+    });
+
+  $(document).on('contextmenu', '.collapsible_custom', function(e){
+      e.preventDefault();
+      var d = document.getElementById('menu-div');
+      d.style.position = "absolute";
+      d.style.left = e.pageX - 200 + 'px';
+      d.style.top = e.pageY + 'px';
+      pk_list = this.id.split("_");
+      global_select_tree_name = $(this).text().trim()
+      global_select_intent_id = pk_list[0];
+      global_select_parent_id = pk_list[1];
+      global_select_tree_id = pk_list[2];
+      var tree_name = document.getElementById(this.id+"_tree_name_container").getAttribute("value");
+      document.getElementById("modal_tree_name").value = tree_name;
+      $("#menu-div").show();
+      return false;
+  });
+
+  $(document).ready(function() {
+        $('.modal').modal();
+        $('.modal').on('shown.bs.modal', function(e)
+    { 
+      $('#modal-general-feedback').find('input:text, input:file, input:password, select, textarea').val('');
+        $(this).removeData();
+    }) ;
+  });
+
+  </script>
+
+  {% if request.user.get_ms_integration_url != "" %}
+
+  <script>
+    function successCallback(response) {
+      console.log(response)
+    }
+
+    function errorCallback(err) {
+      console.log(err);
+    }
+
+    setTimeout(function () {
+        var outer_width = window.outerWidth
+        var screen_width = (outer_width * 0.9 )
+
+        var set_wid = Microsoft.CIFramework.setWidth(screen_width).then(successCallback, errorCallback);
+    }, 200);
+  </script>
+
+  {% endif %}
+
+</body>
+</html>

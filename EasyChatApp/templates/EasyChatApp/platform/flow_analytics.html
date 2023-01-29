@@ -1,0 +1,463 @@
+{% extends 'EasyChatApp/base.html' %}
+{% block content %}
+{% load static %}
+
+<link href="{% static 'EasyChatApp/css/bootstrapcombined.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+<link href="{% static 'EasyChatApp/css/materialize.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+<link href="{% static 'EasyChatApp/css/style3.css' %}?v={% random_int 1 100 %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+<link href="{% static 'EasyChatApp/css/style.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+<link href="{% static 'EasyChatApp/css/changes.css' %}?v={% random_int 1 100 %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="{% static 'EasyChatApp/js/flow_analytics_d3.js' %}?v={% random_int 1 100 %}"></script>
+    <style>
+        .node {
+            cursor: pointer;
+        }
+        
+        .node text {
+            font-family: Silka, sans-serif;
+            fill: #fff;
+        }
+        
+        .link {
+            fill: none;
+            stroke: #ccc;
+            stroke-width: 2.5px;
+        }
+        
+        body {
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <div id="body">
+         {% csrf_token %}
+      {% csrf_token %}
+      <div class="col s6" style="margin-left: 10px;margin-top: 10px !important;">
+         <a class="btn white transparent-btn black-text left" href="/chat/revised-analytics/?bot_id={{bot_id}}"><i class="material-icons inline-icon">arrow_back</i> Back</a>
+      <a class="btn left white black-text" style="margin-left:0.5em;" onclick = "download_flow_analytics('{{intent_id}}','{{start_date}}','{{end_date}}')" >Download Excel</a>
+      <a href="#modal-flow-analytics-filter" class="btn left white black-text modal-trigger tooltipped" data-tooltip="Filter Data" style="margin-left:0.5em;">Apply Filter</a>
+<!--       <a class="btn left white black-text modal-trigger" style="margin-left:0.5em;" href="#modal-message-history-filter" >Apply Date Filter</a> -->
+    </div>
+
+      </div>
+    </div>
+
+<div id="modal-flow-analytics-filter" class="modal">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <div class="row" style="margin-bottom: 0">
+                    <h6 style="margin-left:2%" class="left"> Apply Filter </h6>
+                    <h6 class="right black-text" style="margin-right:2%"><a href="javascript:void(0)" onclick="reset_flow_analytics_filter('{{intent_id}}','{{ DEFAULT_ANALYTICS_START_DATETIME|date:'Y-m-d' }}','{{ DEFAULT_ANALYTICS_END_DATETIME|date:'Y-m-d' }}','{{bot_id}}')" class="black-text"><u>RESET FILTER</u></a></h6>
+                </div>
+                <hr>
+            </div>
+            <div class="col s12"> 
+                <div class="col s4">
+                    <br>
+                    <select id="check-flow-analytics-filter-select" onchange="check_flow_analytics_filter()">   
+                        <option value="">Select the filter</option>
+                        <option value="1">Filter by Channel</option>
+                        <option value="2">Filter by Date</option>
+                    </select>
+                </div>    
+                <div class="col s4" id="div-flow-analytics-channels" style="display: none;">
+                    <br>
+                    <select id="select-flow-analytics-channels-filter">
+                        <!-- <option value="">Choose from the following</option> -->
+                            <option value="All">All</option>
+                            {% for bot_channel_obj in bot_channel_objs %}
+                              <option value="{{bot_channel_obj.channel.name}}">{{bot_channel_obj.channel.name}}</option>
+                            {% endfor %} 
+                    </select>
+                </div>
+                <div class="col s4" id="div-flow-analytics-date" style="display: none;">
+                    <br>
+                    <select id="modal-message-default-settings-type-flow">
+                      <option value="">Select any one</option>
+                      <option value="last_month">Last Month</option>
+                      <option value="last_3_months">Last 3 Months</option>
+                      <option value="since_go_live">Since Go Live Date</option>
+                      <option value="custom_date">Custom Date</option>
+                    </select>
+                </div>
+                <div id="modal-message-default-settings-custom-flow" class="col s8" style="display: none;">
+                      <br>
+                      <div class="col s6">
+                        Start Date
+                        <input type="date" class="message-default-start-date-flow" value="{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}" value_last_month="{{ LAST_MONTH_START_DATETIME|date:"Y-m-d" }}" value_last3="{{ LAST3_MONTH_START_DATETIME|date:"Y-m-d" }}" value_golive="{{ go_live_date|date:"Y-m-d" }}">
+                      </div>
+                      <div class="col s6">
+                        End Date
+                        <input type="date" class="message-default-end-date-flow" value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" value_last_month="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" value_last3="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" value_golive="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}">
+                      </div>    
+                    </div>
+                <div class="col s4">
+                    <br>
+                    <a class="black-text" onclick="add_flow_analytics_filter_option()"><i class="material-icons">add</i></a>
+                </div>
+            
+                <div class="row">
+                    <div class="col s12" id="add-flow-analytics-filter-buttons">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <a href="javascript:void(0)" class="btn transparent-btn white black-text modal-close">Cancel</a>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+      <button class="btn green lighten-2 black-text modal-close" onclick="load_flow_analytics('{{intent_id}}','{{bot_id}}')">Submit</button>
+    </div>
+</div>
+
+</body>
+<script>
+    window.filter_values = '{{filter_values}}';
+    window.date_filter = "{{date_filter}}";
+    window.channel_filter = "{{channel_filter}}";
+    var margin = {
+            top: 20,
+            right: 120,
+            bottom: 20,
+            left: 120
+        },
+        width = 400 - margin.right - margin.left,
+        height = 800 - margin.top - margin.bottom;
+
+    var root = JSON.parse("{{ flow_tree_data | escapejs }}")
+    var i = 0,
+        duration = 750;
+
+
+    var tree = d3.layout.tree().nodeSize([width, height]);
+    var diagonal = d3.svg.diagonal()
+
+    .projection(function(d) {
+        return [d.x + width / 2 - 10, d.y + 20];
+    });
+
+    var svg = d3.select("#body").append("svg").attr("width", 1500).attr("height", "80vh")
+        .call(zm = d3.behavior.zoom().scaleExtent([0.05, 3]).on("zoom", redraw))
+        .append("g")
+        .attr("transform", "translate(" + 700 + "," + 50 + ")");
+
+    //necessary so that zoom knows where to zoom and unzoom from
+    zm.translate([700, 50]);
+
+
+
+    root.x0 = 0;
+    root.y0 = height / 2;
+
+    function collapse(d) {
+        if (d.children) {
+            d._children = d.children;
+            d._children.forEach(collapse);
+            d.children = null;
+        }
+    }
+
+    root.children.forEach(collapse);
+    update(root);
+
+
+    function update(source) {
+
+        // Compute the new tree layout.
+        var nodes = tree.nodes(root).reverse(),
+            links = tree.links(nodes);
+
+        // Normalize for fixed-depth.
+        nodes.forEach(function(d) {
+            d.y = d.depth * 180;
+        });
+
+        // Update the nodes…
+        var node = svg.selectAll("g.node")
+            .data(nodes, function(d) {
+                return d.id || (d.id = ++i);
+            });
+
+        // Enter any new nodes at the parent's previous position.
+        var nodeEnter = node.enter().append("g")
+            .attr("class", "node")
+            .attr("r", 10)
+            .attr("transform", function(d) {
+                return "translate(" + source.x0 + "," + source.y0 + ")";
+            })
+            .on("click", click);
+
+
+
+        var gradient = svg.append("svg:defs")
+            .append("svg:linearGradient")
+            .attr("id", "gradient")
+            .attr("x1", "10.56%")
+            .attr("y1", "10.56%")
+            .attr("x2", "91.27%")
+            .attr("y2", "91.27%")
+            .attr("spreadMethod", "pad");
+
+        // Define the gradient colors
+        gradient.append("svg:stop")
+            .attr("offset", "10.56%")
+            .attr("stop-color", "#0041A8")
+            .attr("stop-opacity", 1);
+
+        gradient.append("svg:stop")
+            .attr("offset", "91.27%")
+            .attr("stop-color", "#4A90FF")
+            .attr("stop-opacity", 1);
+
+        nodeEnter.append("rect")
+            .attr("x", function(d) {
+                return d.children || d._children ? 0 : 0;
+            })
+            .attr("y", function(d) {
+                return d.children || d._children ? 15 : 15;
+            })
+            .attr("width", 10)
+            .attr("height", 10)
+            .attr("rx", 10)
+            .attr("ry", 10)
+
+
+        .style("fill", function(d) {
+            return d._children ? "url(#gradient)" : "#525252";
+        });
+
+        nodeEnter.append("text")
+            .attr("x", 75)
+            .attr("dy", ".35em")
+            .attr("text-anchor", "middle")
+            .attr("font-size", 15)
+
+
+        .text(function(d) {
+
+
+            return d.name + '&&&$$$' + d.size + ' Visits';
+        })
+
+        .style("fill-opacity", 1e-6)
+            .each(function(d) {
+                calculateTextWrap(this, d);
+            });
+
+
+
+        // Transition nodes to their new position.
+        var nodeUpdate = node.transition()
+            .duration(duration)
+            .attr("transform", function(d) {
+                return "translate(" + d.x + "," + d.y + ")";
+            });
+
+        nodeUpdate.select("rect")
+            .attr("x", function(d) {
+                return d.children || d._children ? 0 : 0;
+            })
+            .attr("y", function(d) {
+                return d.children || d._children ? -15 : -15;
+            })
+            .attr("width", 150)
+            .attr("height", function(d) {
+                return d.rectHeight
+            })
+
+        .attr("rx", 10)
+            .attr("ry", 10)
+
+        .style("fill", function(d) {
+            return d._children ? "url(#gradient)" : "#525252";
+        });
+
+        // calculateTextWrap(d3.selectAll('text'), 130);
+        nodeUpdate.select("text")
+            .style("fill-opacity", 1)
+
+
+        // Transition exiting nodes to the parent's new position.
+        var nodeExit = node.exit().transition()
+            .duration(duration)
+            .attr("transform", function(d) {
+                return "translate(" + source.x + "," + source.y + ")";
+            })
+            .remove();
+
+        nodeExit.select("rect")
+            .attr("x", function(d) {
+                return d.children || d._children ? 0 : 0;
+            })
+            .attr("y", function(d) {
+                return d.children || d._children ? 15 : 15;
+            })
+            .attr("rx", 10)
+            .attr("ry", 10)
+            .attr("width", 10)
+            .attr("height", 10);
+
+
+        nodeExit.select("text")
+            .style("fill-opacity", 1e-6)
+            .attr("text-anchor", "middle");
+
+
+
+
+        function calculateTextWrap(element, data) {
+            var text = d3.select(element);
+            if (text.node().getComputedTextLength() < 220) {
+
+
+                var x_coor = 0
+                if (text.node().getComputedTextLength() < 150) {
+                    x_coor = 60
+                } else {
+                    x_coor = 45
+                }
+
+
+                var visit_node = text.text().split("&&&$$$")[1]
+
+                var words = text.text().split("&&&$$$")[0].split(/(\s+)/).reverse(),
+                    word,
+                    line = [],
+                    lineNumber = 0,
+                    lineHeight = 1, // ems
+                    y = text.attr("y"),
+                    dy = parseFloat(text.attr("dy")),
+                    tspan = text.text(null).append("tspan").attr("text-anchor", "start").attr("x", x_coor).attr("y", y).attr("dy", dy + "em");
+
+                while (word = words.pop()) {
+                    line.push(word);
+                    tspan.text(line.join(""));
+                    if (tspan.node().getComputedTextLength() > 150) {
+                        lineNumber++;
+                        line.pop();
+                        tspan.text(line.join(""));
+                        line = [word];
+                        tspan = text.append("tspan").attr("text-anchor", "start").attr("x", 40).attr("y", y).attr("dy", lineHeight + dy + "em").text(word).style("font-size", "15");
+                    }
+                }
+            } else {
+                // console.log(text.node().getBBox().width)
+                var visit_node = text.text().split("&&&$$$")[1]
+
+                var words = text.text().split("&&&$$$")[0].split(/(\s+)/).reverse(),
+                    word,
+                    line = [],
+                    lineNumber = 0,
+                    lineHeight = 1, // ems
+                    y = text.attr("y"),
+                    dy = parseFloat(text.attr("dy")),
+                    tspan = text.text(null).append("tspan").attr("text-anchor", "start").attr("x", 5).attr("y", y).attr("dy", dy + "em");
+
+                while (word = words.pop()) {
+                    line.push(word);
+                    tspan.text(line.join(""));
+                    if (tspan.node().getComputedTextLength() > 150) {
+                        lineNumber++;
+                        line.pop();
+                        tspan.text(line.join(""));
+                        line = [word];
+                        tspan = text.append("tspan").attr("text-anchor", "start").attr("x", 5).attr("y", y).attr("dy", lineHeight + dy + "em").text(word).style("font-size", "15");
+                    }
+                }
+            }
+            tspan = text.append("tspan").attr("text-anchor", "start").attr("x", 53).attr("y", y).attr("dy", lineHeight + dy + "em").text(visit_node).style("font-size", "12");
+            var rectHeight = text.node().getBBox().height;
+            if (rectHeight < 40) rectHeight = 40;
+            data.rectHeight = rectHeight + 16;
+        }
+
+        // Update the links…
+        var link = svg.selectAll("path.link")
+
+        .data(links, function(d) {
+            return d.target.id;
+        });
+
+
+
+
+
+        // Enter any new links at the parent's previous position.
+        link.enter().insert("path", "g")
+            .attr("class", "link")
+
+
+        .attr("d", function(d) {
+            var o = {
+                x: source.x0,
+                y: source.y0
+            };
+            return diagonal({
+                source: o,
+                target: o
+            });
+        });
+
+        // Transition links to their new position.
+        link.transition()
+            .duration(duration)
+            .attr("d", diagonal);
+
+        // Transition exiting nodes to the parent's new position.
+        link.exit().transition()
+            .duration(duration)
+            .attr("d", function(d) {
+                var o = {
+                    x: source.x,
+                    y: source.y
+                };
+                return diagonal({
+                    source: o,
+                    target: o
+                });
+            })
+            .remove();
+
+        // Stash the old positions for transition.
+        nodes.forEach(function(d) {
+            d.x0 = d.x;
+            d.y0 = d.y;
+        });
+    }
+
+    // Toggle children on click.
+    function click(d) {
+        if (d.children) {
+            d._children = d.children;
+            d.children = null;
+        } else {
+            d.children = d._children;
+            d._children = null;
+        }
+        update(d);
+    }
+
+    //Redraw for zoom
+    function redraw() {
+
+        svg.attr("transform",
+            "translate(" + d3.event.translate + ")" +
+            " scale(" + d3.event.scale + ")");
+    }
+</script>
+
+
+</html>
+{% endblock %}

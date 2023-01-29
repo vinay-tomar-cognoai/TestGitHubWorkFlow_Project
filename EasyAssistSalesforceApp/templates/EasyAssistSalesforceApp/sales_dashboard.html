@@ -1,0 +1,470 @@
+{% extends 'EasyAssistSalesforceApp/console.html' %}
+
+{% block content %}
+{% load static %}
+
+<style>
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+#active_users_table .dataTables_filter {
+  display: none;
+}
+</style>
+
+<!-- Begin Page Content -->
+<div class="container-fluid">
+  <!-- Page Heading -->
+  <!-- DataTales Example -->
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <div class="row">
+            <div class="col-sm-6" style="display: flex;">
+              <h6 class="m-0 font-weight-bold text-primary">Customers Requiring Support</h6>
+            </div>
+            <div class="col-sm-6" style="display: flex; justify-content: flex-end;">
+              {% if cobrowse_agent.role == "agent" %}
+                {% if cobrowse_agent.get_access_token_obj.allow_connect_with_drop_link == True %}
+                  <button class="btn btn-info float-right" style="margin-right: 10px;" data-toggle="modal" data-target="#generate_drop_link_modal">Generate Drop Link</button>
+                {% endif %}
+                {% if cobrowse_agent.get_access_token_obj.lead_generation == True %}
+                <button class="btn btn-info float-right" data-toggle="modal" data-target="#search_lead_modal">Search Lead</button>
+                {% endif %}
+              {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive" id="active_users_table">
+        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+          <thead>
+            <tr>
+              <th>Customer Details</th>
+              <th>Product</th>
+              {% if cobrowse_agent.get_access_token_obj.choose_product_category %}
+                <th>Category</th>
+              {% endif %}
+              {% if cobrowse_agent.role != "agent" %}
+                <th>Request DateTime</th>
+                <th>Start DateTime</th>
+              {% endif %}
+              <th>Status</th>
+              <th>Time duration</th>
+              {% if cobrowse_agent.role != "agent" %}
+                <th>Agent</th>
+              {% endif %}
+              {% if cobrowse_agent.role == "admin" %}
+                <th>Notify</th>
+              {% endif %}
+              {% if cobrowse_agent.role == "agent" %}
+                <th>Connect/Archive</th>
+              {% endif %}
+              {% if cobrowse_agent.role == "agent" %}
+                <th style="text-align: center;">Transfer Session</th>
+              {% endif %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for cobrowse_io_obj in cobrowse_io_objs %}
+
+                <tr id="easy-assist-{{cobrowse_io_obj.session_id}}">
+
+                  <!-- Customer Details -->
+                  {% if cobrowse_io_obj.is_lead %}
+                  <td id="easy-assist-{{cobrowse_io_obj.session_id}}-customer-details">{{ cobrowse_io_obj.get_sync_data|safe }}</td>
+                  {% else %}
+                  <td id="easy-assist-{{cobrowse_io_obj.session_id}}-customer-details">Name: {{ cobrowse_io_obj.full_name }}
+                      <br> Mobile Number: {{ cobrowse_io_obj.mobile_number }}</td>
+                  {% endif %}
+                  <!-- Product -->
+                  <td id="easy-assist-{{cobrowse_io_obj.session_id}}-product"><a href="{{ cobrowse_io_obj.product_url }}" target="_blank">{{ cobrowse_io_obj.product_name|slice:":40" }}...</a></td>
+                  <!-- Category -->
+                  {% if cobrowse_agent.get_access_token_obj.choose_product_category %}
+                    <td id="easy-assist-{{cobrowse_io_obj.session_id}}-product-category">{{ cobrowse_io_obj.product_category.title }}</td>
+                  {% endif %}
+                  {% if cobrowse_agent.role != "agent" %}
+                    <!-- Request DateTime -->
+                    <td id="easy-assist-{{cobrowse_io_obj.session_id}}-request-datetime">{{ cobrowse_io_obj.request_datetime }}</td>
+                    <!-- Start DateTime -->
+                    <td id="easy-assist-{{cobrowse_io_obj.session_id}}-start-datetime">{{ cobrowse_io_obj.cobrowsing_start_datetime }}</td>
+                  {% endif %}
+                  <!-- Status -->
+                  {% if cobrowse_io_obj.cobrowsing_start_datetime == None %}
+                    {% if not cobrowse_io_obj.is_active %}
+                      <td id="easy-assist-{{cobrowse_io_obj.session_id}}-status"><button class="btn btn-info mb-2 mr-sm-2" data-toggle="modal" data-target="#remark_modal" onclick="load_remarks('{{cobrowse_io_obj.agent_comments}}', '{{cobrowse_io_obj.last_update_datetime}}')">Remarks</button></td>
+                    {% else %}
+                      <td id="easy-assist-{{cobrowse_io_obj.session_id}}-status" class="text-warning">Request in Queue</td>
+                    {% endif %}
+                  {% elif cobrowse_io_obj.is_active_timer and cobrowse_io_obj.is_active %}
+                    <td id="easy-assist-{{cobrowse_io_obj.session_id}}-status" class="text-success">Connected</td>
+                  {% else %}
+                    <td id="easy-assist-{{cobrowse_io_obj.session_id}}-status" class="text-danger">Inactive</td>
+                    <!-- <td id="easy-assist-{{cobrowse_io_obj.session_id}}-status"><button class="btn btn-info mb-2 mr-sm-2" data-toggle="modal" data-target="#remark_modal" onclick="load_remarks('{{cobrowse_io_obj.agent_comments}}', '{{cobrowse_io_obj.last_update_datetime}}')">Remarks</button></td> -->
+                  {% endif %}
+                  <!-- Time Duration -->
+                  <td id="easy-assist-{{cobrowse_io_obj.session_id}}-time-duration">{{ cobrowse_io_obj.total_time_spent }}</td>
+                  <!-- Agent -->
+                  {% if cobrowse_agent.role != "agent" %}
+                    <td id="easy-assist-{{cobrowse_io_obj.session_id}}-agent">{{ cobrowse_io_obj.agent.user.username }}</td>
+                  {% endif %}
+                  <!-- Notify -->
+                  {% if cobrowse_agent.role == "admin" %}
+                    <td id="easy-assist-{{cobrowse_io_obj.session_id}}-notify">
+                      <button class="btn btn-info" style="background-color: #17a673 !important; color: white;" onclick="notify_agent('{{cobrowse_io_obj.session_id}}')">
+                                      {{ cobrowse_io_obj.agent_notified_count }}
+                      </button>
+                    </td>
+                  {% endif %}
+
+                  <!-- Connect/Archive -->
+                  {% if cobrowse_agent.role == "agent" %}
+                    {% if cobrowse_io_obj.is_active and cobrowse_io_obj.is_active_timer %}
+                        {% if cobrowse_io_obj.share_client_session %}
+                          <td id="easy-assist-{{cobrowse_io_obj.session_id}}-connect">
+                                <a href="/easy-assist-salesforce/customer/{{ cobrowse_io_obj.pk }}?salesforce_token={{salesforce_token}}"><button type="button" class="btn btn-success btn-sm">Connect</button></a>
+                          </td>
+                        {% else %}
+                          {% if cobrowse_io_obj.allow_agent_cobrowse == "true" %}
+                            <td id="easy-assist-{{cobrowse_io_obj.session_id}}-connect">
+                                  <a href="/easy-assist-salesforce/agent/{{ cobrowse_io_obj.pk }}?salesforce_token={{salesforce_token}}"><button type="button" class="btn btn-success btn-sm">Connect</button></a>
+                            </td>
+                          {% else %}
+                            <td id="easy-assist-{{cobrowse_io_obj.session_id}}-connect">
+                              {% if access_token_obj.allow_video_meeting_only %}
+                                {% if cobrowse_agent.is_active %}
+                                  <a href="javascript:void(0)"><button type="button" class="btn btn-primary btn-sm" onclick="request_for_inbound_cobrowsing('{{ cobrowse_io_obj.pk }}', '{{ cobrowse_io_obj.mobile_number }}')">Request for meeting</button></a>
+                                {% else %}
+                                  <a href="javascript:void(0)"><button type="button" class="btn btn-primary btn-sm" onclick="request_for_inbound_cobrowsing('{{ cobrowse_io_obj.pk }}', '{{ cobrowse_io_obj.mobile_number }}')" disabled>Request for meeting</button></a>
+                                {% endif %}
+                              {% else %}
+                                {% if cobrowse_agent.is_active %}
+                                  <a href="javascript:void(0)"><button type="button" class="btn btn-primary btn-sm" onclick="request_for_inbound_cobrowsing('{{ cobrowse_io_obj.pk }}', '{{ cobrowse_io_obj.mobile_number }}')">Request for cobrowsing</button></a>
+                                {% else %}
+                                  <a href="javascript:void(0)"><button type="button" class="btn btn-primary btn-sm" onclick="request_for_inbound_cobrowsing('{{ cobrowse_io_obj.pk }}', '{{ cobrowse_io_obj.mobile_number }}')" disabled>Request for cobrowsing</button></a>
+                                {% endif %}
+                              {% endif %}
+                            </td>
+                          {% endif %}
+                        {% endif %}
+                    {% else %}
+                      <td id="easy-assist-{{cobrowse_io_obj.session_id}}-connect"><a href="#" class="btn btn-danger btn-icon-split" data-toggle="modal" data-target="#archive-client-{{ cobrowse_io_obj.pk }}"><span class="icon text-white-50"><i class="fas fa-trash"></i></span><span class="text">Archive</span></a></td>
+                    {% endif %}
+                  {% endif %}
+                  <!-- Transfer Session -->
+                  {% if cobrowse_agent.role == "agent" %}
+                  <td id="easy-assist-{{cobrowse_io_obj.session_id}}-transfer" style="text-align: center;">
+                      {% if cobrowse_io_obj.is_active and cobrowse_io_obj.is_active_timer %}
+                        <a data-toggle="modal" data-target="#assign_session-{{ cobrowse_io_obj.pk }}" style="cursor: pointer;"><i class="fas fa-fw fa-users"></i></a>
+                      {% else %}
+                        <a data-toggle="tooltip" title="Session has expired"><i class="fas fa-fw fa-users"></i></a>
+                      {% endif %}
+                  </td>
+                  {% endif %}
+                </tr>
+
+                <!-- Logout Modal-->
+                <div class="modal fade" id="archive-client-{{ cobrowse_io_obj.pk }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Archive Lead</h5>
+                      </div>
+                      <div class="modal-body">Select <b>"Archive"</b> below if you are ready to delete selected lead?</div>
+                      <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                        <a class="btn btn-danger" href="/easy-assist-salesforce/archive/{{ cobrowse_io_obj.pk }}?salesforce_token={{salesforce_token}}" style="color: white !important;">Archive</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+<!-- /.container-fluid -->
+
+
+<div class="modal fade" id="search_lead_modal" tabindex="-1" role="dialog" aria-labelledby="search_lead_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="search_lead_modal_label">Ready to search for captured lead?</h5>
+      </div>
+      <div class="modal-body">
+          <div class="row">
+              <div class="col-sm-9">
+                {% if cobrowse_agent.get_access_token_obj.search_lead_label_text %}
+                <label>{{ cobrowse_agent.get_access_token_obj.search_lead_label_text }}</label>
+                {% endif %}
+                <input type="text" name="search-primary-value" class="form-control" id="search-primary-value" placeholder="Search...">
+                <p id="search-primary-value-error"></p>
+              </div>
+              <div class="col-sm-12" id="running-session-details"></div>
+              <!-- <div class="col-sm-12">
+                <p>Select "Search" below if you want to search for captured client lead?</p>
+              </div> -->
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <button id="search_lead_button" class="btn btn-info" onclick="search_for_captured_lead()"><i class="fas fa-fw fa-search"></i> Search</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="generate_drop_link_modal" tabindex="-1" role="dialog" aria-labelledby="generate_drop_link_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="generate_drop_link_modal_label">Generate a Drop Link for Cobrowsing</h5>
+          </div>
+          <div class="modal-body">
+              <div class="row">
+                  <div class="col-md-12">
+                      <div class="input-group input-group-sm mb-3">
+                          <div class="input-group-prepend">
+                              <span class="input-group-text" id="inputGroup-sizing-sm">Website Link</span>
+                          </div>
+                          <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="client-page-link" autocomplete="off">
+                      </div>
+                      <div class="input-group input-group-sm mb-3">
+                          <div class="input-group-prepend">
+                              <span class="input-group-text" id="inputGroup-sizing-sm">Customer Name</span>
+                          </div>
+                          <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="customer-name" autocomplete="off">
+                      </div>
+                      <div class="input-group input-group-sm mb-3">
+                          <div class="input-group-prepend">
+                              <span class="input-group-text" id="inputGroup-sizing-sm">Customer Mobile Number</span>
+                          </div>
+                          <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="customer-mobile-number" autocomplete="off">
+                      </div>
+                      <div class="input-group input-group-sm mb-3">
+                          <div class="input-group-prepend">
+                              <span class="input-group-text" id="inputGroup-sizing-sm">Customer Email (optional)</span>
+                          </div>
+                          <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="customer-email-id" autocomplete="off">
+                      </div>
+                      <p>On clicking "Generate Link", a unique drop link will be generated which can be shared with the Customer for Cobrowsing. Drop link will be sent to the Customer via Email, if provided.</p>
+                      <div id="generate-drop-link-data-div" style="display: none;">
+                          <div class="tab-content" id="pills-tabContent">
+                              <div class="tab-pane fade show active" id="pills-drop-link" role="tabpanel" aria-labelledby="pills-drop-tab" style="padding:1em 1em 0em 1em;">
+                                  <div class="">
+                                      <div class="input-group input-group-sm mb-3">
+                                          <input type="text" value="" class="form-control" id="drop-link" readonly>
+                                      </div>
+                                      <div class="input-group input-group-sm mb-3">
+                                          <button class="btn" data-clipboard-target="#drop-link" title="Copy Link"><i class="fas fa-fw fa-copy"></i></button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <p style="color:green;" id="generate-drop-link-error"></p>
+                  </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+            <div id="generate-drop-link-before">
+              <button class="btn btn-secondary" type="button" data-dismiss="modal" onclick="refresh_page();">Cancel</button>
+              <button class="btn btn-success" onclick="generate_drop_link(this)"><i class="fas fa-fw fa-check"></i>Generate Link</button>
+            </div>
+              <div id="generate-drop-link-after">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal" onclick="refresh_page();">Ok</button>
+              </div>
+
+
+          </div>
+      </div>
+  </div>
+</div>
+
+<div class="modal fade" id="remark_modal" tabindex="-1" role="dialog" aria-labelledby="document_upload_modal_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+      </div>
+      <div class="modal-body">
+          <div class="row">
+              <div class="col-sm-12">
+                <table class="table table-borderless" style="max-height: 305px;overflow-y: scroll;">
+                    <thead>
+                        <tr>
+                            <th>Datetime</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody >
+                      <tr>
+                        <th id="updated_date_time" style="background-color: white !important;"></th>
+                        <th id="easy_assist_remarks" style="background-color: white !important;"></th>
+                      </tr>
+                    </tbody>
+                </table>
+              </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="request_for_inbound_cobrowsing_modal" tabindex="-1" role="dialog" aria-labelledby="request_for_inbound_cobrowsing_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="inbound_cobrowsing_modal_title">Request for initiating co-browsing?</h5>
+      </div>
+      <div class="modal-body">
+          <div class="row">
+              <div class="col-sm-12" id="inbound-running-session-details"></div>
+          </div>
+      </div>
+      <div class="modal-footer"  id="inbound-session-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% for cobrowse_io_obj in cobrowse_io_objs %}
+<div class="modal fade" id="assign_session-{{ cobrowse_io_obj.pk }}" tabindex="-1" role="dialog" aria-labelledby="assign_session_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assign_session_label">Transfer Session To Another Agent</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <select id="select-assign-agent-{{ cobrowse_io_obj.pk }}" class="form-control" style="width:50%;">
+                          <option value="">Select Agent</option>
+                            {% for agent_obj in agent_objs %}
+                            <option value="{{ agent_obj.pk }}">{{ agent_obj.user.username }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-12" >
+                      <span id="assign-session-error" style="display: none; color:red; padding-top: 1em"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-success" onclick="assign_cobrowsing_session_to_another_agent(this, '{{ cobrowse_io_obj.pk }}')">Transfer</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBAHTtk1lkVvIl1X_i7_1aIK9RCrhqGEpQ&libraries=places"></script>
+<script type="text/javascript">
+  window.EASYASSIST_AGENT_ROLE = '{{cobrowse_agent.role}}';
+  window.onload = function(){
+    $("#dataTable").DataTable({
+      "ordering": false
+    });
+    if(window.navigator.geolocation) {
+          window.navigator.geolocation.getCurrentPosition(accept_location_request, cancel_location_request);
+    }
+  };
+
+  function load_remarks(e, el){
+    document.getElementById("easy_assist_remarks").innerHTML = e;
+    document.getElementById("updated_date_time").innerHTML = el;
+  }
+  function show_video_conferencing_details(){
+      document.getElementById("video-conferencing-data-div").style.display = "block";
+  }
+
+  function hide_video_conferencing_details(){
+      document.getElementById("video-conferencing-data-div").style.display = "none";
+  }
+
+  function open_video_conferencing_link(element){
+     value = document.getElementById("video-conferencing-link").value;
+     if(value!="" && value!=undefined && value!=null){
+         window.open(value, "_blank");
+     }
+  }
+
+  function generate_cobrowsing_link(){
+     product_url = document.getElementById("product-page-url").value;
+     if(product_url!=null && product_url!=undefined && product_url!=""){
+         session_id = document.getElementById("product-page-url").getAttribute("cobrowse-session");
+         product_url = product_url + "#ea_id="+session_id;
+         document.getElementById("generated-cobrowsing-link").value = product_url;
+         show_generated_cobrowsing_link_details();
+     }
+  }
+
+  function show_generated_cobrowsing_link_details(){
+      document.getElementById("generated-cobrowsing-link-div").style.display = "block";
+      console.log("show details");
+  }
+
+  function hide_generated_cobrowsing_link_details(){
+      document.getElementById("generated-cobrowsing-link-div").style.display = "none";
+  }
+
+</script>
+
+<script type="text/javascript" src="{% static 'EasyAssistSalesforceApp/js/clipboard.min.js' %}">
+</script>
+<script type="text/javascript">
+  var clipboard = new ClipboardJS('.btn');
+
+  clipboard.on('success', function(e) {
+      e.clearSelection();
+      show_easyassist_toast("Link has been copied successfully.");
+  });
+
+  clipboard.on('error', function(e) {
+    show_easyassist_toast("Oop! Unable to copy the link. Please try again.");
+  });
+
+  function refresh_page(){
+    window.location.reload();
+  }
+</script>
+
+<script type="text/javascript">
+    function notify_agent(session_id){
+        request_params = {
+          "session_id": session_id
+        };
+        json_params = JSON.stringify(request_params);
+        encrypted_data = custom_encrypt(json_params);
+        encrypted_data = {
+          "Request": encrypted_data
+        };
+        const params = JSON.stringify(encrypted_data);
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "/easy-assist-salesforce/agent/set-notification-for-agent/?salesforce_token={{salesforce_token}}", true);
+        xhttp.setRequestHeader('Content-Type', 'application/json');
+        xhttp.setRequestHeader('X-CSRFToken', get_csrfmiddlewaretoken());
+        xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            response = JSON.parse(this.responseText);
+            response = custom_decrypt(response.Response);
+            response = JSON.parse(response);
+            if (response.status == 200) {
+              window.location.reload();
+            }
+          }
+        }
+        xhttp.send(params);
+    }
+</script>
+
+{% endblock %}

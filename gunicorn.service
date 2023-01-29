@@ -1,0 +1,18 @@
+ 
+# [EasyChat] Gunicorn App Server Configuration
+# Please check path where gunicorn is installed (sudo find / -name gunicorn)
+# Change WorkingDirectory Path
+# Make sure whitenoise is commented in wsgi.py file
+
+[Unit]
+Description=gunicorn daemon
+After=network.target
+
+[Service]
+User=root
+Group=root
+WorkingDirectory=/home/ubuntu/EasyChat/
+ExecStart=/home/ubuntu/venv/bin/gunicorn --access-logfile /home/ubuntu/gunicorn/gunicorn.log --workers=4 --preload --log-level debug --limit-request-line 4094 --limit-request-fields 100 --limit-request-field_size 8190 --max-requests 0 --max-requests-jitter 0 --timeout 30 --graceful-timeout 30 --bind unix:/home/ubuntu/EasyChat/bot.sock EasyChat.wsgi:application
+
+[Install]
+WantedBy=multi-user.target

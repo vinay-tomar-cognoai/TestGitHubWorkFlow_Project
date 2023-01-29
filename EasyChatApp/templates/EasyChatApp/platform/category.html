@@ -1,0 +1,370 @@
+{% extends 'EasyChatApp/console.html' %}
+{% block consolecontent %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="/static/EasyChatApp/css/category.css">
+
+{% if bot_objs %}
+
+<div class="easychat-content-wrapper" id="easychat-content-wrapper">
+  <div style="padding-bottom: 50px;">
+
+
+    <div class="easychat-analytics-custom-table-wrapper">
+
+          <div class="container-fluid">
+              <div class="card shadow mb-4">
+                  <div class="card-header ppy-3" style="min-height: 60px;">
+                      <div class="row" style="margin-top: 0;">
+
+                          <div>
+                              <div class="m-0 font-weight-bold text-primary heading-text-primary">Manage Categories</div>
+
+                              <div class="easychat-text-primary-subheading">You can create categories, under which you can add and edit intents from Manage Intents section </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="card-body">
+                      <div class="custom-btn-row">
+                          <div class="custom-filter-container">
+                              <div class="form_assist_search_bar_div">
+                                  <span class="form_assist_search_icon"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M10.7571 8.89195L14.6355 12.7714C14.9252 13.0616 14.9252 13.5317 14.6355 13.8219C14.3434 14.1069 13.8773 14.1069 13.5852 13.8219L9.70681 9.94247C7.39764 11.6996 4.12229 11.3665 2.21383 9.18062C0.305363 6.9947 0.416511 3.70349 2.4681 1.65138C4.51969 -0.40074 7.81004 -0.511917 9.9954 1.39704C12.1808 3.30599 12.5137 6.58219 10.7571 8.89195ZM6.388 1.55974C4.1735 1.55974 2.3783 3.3554 2.3783 5.57047C2.38091 7.78445 4.17459 9.57859 6.388 9.58121C8.6025 9.58121 10.3977 7.78554 10.3977 5.57047C10.3977 3.3554 8.6025 1.55974 6.388 1.55974Z" fill="#7B7A7B"/>
+                                                        </svg>
+                                                        </span>
+                                  <input type="text" onkeyup="search_from_category_table()" id="category-search-bar" placeholder="Search">
+                              </div>
+                          </div>
+                          <div class="easychat-table-record-manage-dropdown-div" id="easychat_form_assist_table_row_drop_container">
+                              <p>Show&nbsp;</p>
+                              <div id="easychat_form_assist_table_row_dropdown_div">
+                                  <select name="easychat_form_assist_table_row_dropdown" id="easychat_form_assist_table_row_dropdown" data-minimum-results-for-search="Infinity" onchange="handle_count(this)">
+                                                     
+                                        {% with '10 25 50 75 100' as list %}
+                                        {% for page_option in list.split %}
+                                        {% if page_option == category_objs.paginator.per_page|slugify %}
+                                        <option value="{{page_option}}" selected="" data-select2-id="select2-data-7-ljef">{{page_option}}</option>
+                                        {% else %}
+                                        <option value="{{page_option}}">{{page_option}}</option>
+                                        {% endif %}
+                                        {% endfor %}
+                                        {% endwith %}
+
+                                    </select>
+
+                              </div>
+                              <p>&nbsp; Entries</p>
+                          </div>
+                          <div>
+                              <a class="waves-effect btn easychat-button modal-trigger right" href="#add-new-category-modal">
+                                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                      <path d="M11.9997 8.66665H8.66634V12C8.66634 12.3666 8.36634 12.6666 7.99967 12.6666C7.63301 12.6666 7.33301 12.3666 7.33301 12V8.66665H3.99967C3.63301 8.66665 3.33301 8.36665 3.33301 7.99998C3.33301 7.63331 3.63301 7.33331 3.99967 7.33331H7.33301V3.99998C7.33301 3.63331 7.63301 3.33331 7.99967 3.33331C8.36634 3.33331 8.66634 3.63331 8.66634 3.99998V7.33331H11.9997C12.3663 7.33331 12.6663 7.63331 12.6663 7.99998C12.6663 8.36665 12.3663 8.66665 11.9997 8.66665Z" fill="white" stroke="black" stroke-width="0.0666667"/>
+                                      </svg>
+
+                                  <span>Add New Category</span>
+                              </a>
+                          </div>
+
+                      </div>
+                  </div>
+                  <div class="easychat-analytics-custom-table-parent-container">
+
+                    <div class="table-responsive">
+                        <table width="100%" id="category-table">
+
+                            <thead>
+                                <tr role="row">
+                                    <th name="Tag_ID" data-orderable="false" tabindex="0" rowspan="1" colspan="1" class="sorting_disabled" aria-controls="search_table" aria-label="Tag ID">Category Name</th>
+
+                                    <th name="Action" data-orderable="false" tabindex="0" rowspan="1" colspan="1" class="sorting_disabled" aria-controls="search_table" aria-label="Action" style="width:170px ;">Action</th>
+
+                                </tr>
+                            </thead>
+                            <tbody id="category-list-div">
+                              {% for category_bot_obj in category_objs %}
+                                <tr role="row">
+                                    <td>{{ category_bot_obj.name }}</td>
+                                    <td>
+                                        <div style="display:flex ; align-items:center; column-gap:16px;">
+                                            <a href="#edit-new-category-modal-{{ category_bot_obj.pk }}" class="modal-trigger">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M20.0604 3.93956C21.3132 5.19232 21.3132 7.22343 20.0604 8.47618L9.33146 19.2052C9.08325 19.4534 8.77457 19.6325 8.43593 19.7249L3.84998 20.9756C3.34808 21.1124 2.88755 20.6519 3.02443 20.15L4.27515 15.5641C4.3675 15.2254 4.54664 14.9167 4.79484 14.6685L15.5238 3.93956C16.7766 2.68681 18.8077 2.68681 20.0604 3.93956ZM14.6547 6.7104L5.74567 15.6194C5.66293 15.7021 5.60322 15.805 5.57244 15.9179L4.6313 19.3687L8.08212 18.4276C8.195 18.3968 8.2979 18.3371 8.38063 18.2543L17.2894 9.34506L14.6547 6.7104ZM16.4746 4.89039L15.6049 5.75927L18.2396 8.39482L19.1096 7.52535C19.8372 6.79773 19.8372 5.61802 19.1096 4.89039C18.382 4.16277 17.2023 4.16277 16.4746 4.89039Z" fill="#10B981"/>
+                                                    </svg>
+
+
+                                            </a>
+                                            <a href="#delete-category-modal-{{ category_bot_obj.pk }}" class="modal-trigger">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M8.68496 5L8.90729 3.99953C8.95613 3.90991 9.04318 3.78264 9.15843 3.67636C9.29663 3.54892 9.41989 3.5 9.52778 3.5H13.9722C13.9717 3.5 13.9718 3.50001 13.9725 3.50006C13.977 3.50039 14.0054 3.5025 14.0525 3.51574C14.1039 3.53019 14.1667 3.55496 14.2329 3.59437C14.3487 3.66337 14.4841 3.78228 14.5915 3.99424L14.815 5H8.68496ZM7.73522 6.5C7.74557 6.50022 7.75589 6.50021 7.76618 6.5H15.7338C15.7441 6.50021 15.7544 6.50022 15.7648 6.5H19.75C20.1642 6.5 20.5 6.16421 20.5 5.75C20.5 5.33579 20.1642 5 19.75 5H16.3516L16.0377 3.5873L16.0214 3.51401L15.9909 3.4454C15.4966 2.33321 14.5169 2 13.9722 2H9.52778C8.92456 2 8.45522 2.28441 8.14157 2.57364C7.83144 2.85962 7.6194 3.19719 7.50909 3.4454L7.47859 3.51401L7.4623 3.5873L7.14837 5H3.75C3.33579 5 3 5.33579 3 5.75C3 6.16421 3.33579 6.5 3.75 6.5H7.73522ZM4.64938 7.50678C5.05985 7.45121 5.43765 7.73891 5.49322 8.14938L6.9866 19.1805C7.05465 19.4179 7.20807 19.7696 7.44162 20.0534C7.68271 20.3464 7.94767 20.5 8.25 20.5H15.75C15.8356 20.5 16.0219 20.4595 16.1792 20.3145C16.3144 20.1899 16.5 19.9223 16.5 19.33V19.2795L16.5068 19.2294L18.0068 8.14938C18.0623 7.73891 18.4401 7.45121 18.8506 7.50678C19.2611 7.56235 19.5488 7.94015 19.4932 8.35062L17.9997 19.383C17.9881 20.2997 17.6764 20.9746 17.1958 21.4175C16.7281 21.8485 16.1644 22 15.75 22H8.25C7.35233 22 6.70062 21.5136 6.28338 21.0066C5.8719 20.5065 5.62925 19.9224 5.52421 19.519L5.51283 19.4753L5.50678 19.4306L4.00678 8.35062C3.95121 7.94015 4.23891 7.56235 4.64938 7.50678Z" fill="#E10E00"/>
+                                                    </svg>
+                                            </a>
+                                        </div>
+
+                                    </td>
+                                </tr>
+                                <!-- Modal Structure for edit category -->
+                                <div id="edit-new-category-modal-{{ category_bot_obj.pk }}" class="modal easychat-custom-modals-container" tabindex="0">
+                                  <div class="modal-content">
+                                      <div class="row" style="margin-bottom: 12px !important;">
+          
+                                          <div class="modal-header" style="width: 100%">
+                                              <div class="modal-heading-text-div">Edit category</div>
+                                              <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                                                  <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                      <path d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z" fill="black" fill-opacity="0.54"></path>
+                                                  </svg>
+          
+                                              </a>
+                                          </div>
+                                          <div class="modal-overflow-content-div">
+                                              <div class="manage-category-input-wrapper">
+                                                  <input type="text" class="show-char-count" id="category-id-{{ category_bot_obj.pk }}" autocomplete="off" placeholder="Enter category name here" maxlength="{{character_limit_small_text}}" style="height:40px !important; border: 1px solid #dadada !important; border-radius:4px !important; width: 100% !important; box-sizing: border-box;" value="{{ category_bot_obj.name }}" >
+                                                  <div class="easychat-char-count">
+                                                    <p id="category-id-{{ category_bot_obj.pk }}-char-count">{{ category_bot_obj.name | length}}</p>
+                                                    <p>/{{character_limit_small_text}}</p>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <div class="modal-footer">
+                                      <a onclick="save_category('{{ bot_obj.pk }}', '{{ category_bot_obj.pk }}',true)" class="modal-close btn filter-modal-footer-btn">Save</a>
+                                  </div>
+                                </div>
+
+                                    <!-- Modal Structure for delete category -->
+                                    <div id="delete-category-modal-{{ category_bot_obj.pk }}" class="modal easychat-custom-modals-wrapper easychat-custom-delete-modal" tabindex="0" style="z-index: 1003; display: none; opacity: 0; top: 4%; transform: scaleX(0.8) scaleY(0.8);">
+                                        <div class="modal-content">
+                                            <div style="margin-bottom: 0px !important;">
+                                                <div class="modal-overflow-content-div">
+                                                    <div class="termination-confirmation-modal-container">
+                                                        <div class="termination-icon">
+                                                            <svg width="83" height="82" viewBox="0 0 83 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M41.3395 6.83336C22.5888 6.83336 7.33337 22.1605 7.33337 41C7.33337 59.8395 22.6605 75.1667 41.5 75.1667C60.3395 75.1667 75.6667 59.8395 75.6667 41C75.6667 22.1605 60.2678 6.83336 41.3395 6.83336ZM44.9167 58.0834H38.0834V51.25H44.9167V58.0834ZM44.9167 44.4167H38.0834V23.9167H44.9167V44.4167Z" fill="#DB2A2A"></path>
+                                                            </svg>
+                                                        </div>
+                                                        <div class="termination-confirmation-heading-text">
+                                                            Are you sure you want to delete this Category?
+                                                        </div>
+                
+                                                        <div class="termination-buttons">
+                                                            <button class="termination-no-btn modal-close" onclick="delete_category()" >Cancel</button>
+                                                            <button class="termination-yes-btn" onclick="delete_category('{{ category_bot_obj.pk }}', '{{ bot_obj.pk }}')">Delete</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                    <tr  role = "row" id="category-list-div-no-items" style="display: none; justify-content: center">
+                                        <td colspan="2">
+                                            <div class="easychat-categories-no-data-found-wrapper" style="height: 250px;">
+                                                {% include "EasyChatApp/analytics/no_data_1.html" %}
+                                        </td>
+                                    </tr>
+                                    {% if category_objs|length < 1 %}
+                                    <tr role = "row" id="category-list-div-no-items" style="display: flex; justify-content: center">
+                                        <td style="width:100%">
+                                            <div class="easychat-categories-no-data-found-wrapper" style="height: 250px;">
+                                                {% include "EasyChatApp/analytics/no_data_1.html" %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                            <tbody id="category-list-div-no-items" style="display: none">
+                                    <tr role="row">
+                                        <td >
+                                            <div class="easychat-categories-no-data-found-wrapper" style="height: 250px;">
+                                                {% include "EasyChatApp/analytics/no_data_1.html" %}
+                                        </td>
+                                    </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% if category_objs|length %}
+                <div class="row mt-3" id="form_assist_table_pagination_div">
+                    <div class="col-md-6 col-sm-12 entries" id="table_page_info">
+                        Showing {{category_objs.start_index}} to {{category_objs.end_index}} of {{category_objs.paginator.count}} entries</div>
+                    <div class="col-md-6 col-sm-12">
+                        <div class="d-flex justify-content-end">
+                            <nav aria-label="Page navigation example" style="box-shadow: none;">
+                                <ul class="pagination" style="margin-right: 16px;">
+                                    {% if category_objs.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link previous_button" aria-label="Previous"
+                                            onclick="redirect_to_page('{{category_objs.previous_page_number}}')">
+                                            <span aria-hidden="true">
+                                                                  Previous
+                                                                </span>
+                                        </a>
+                                    </li>
+                                    {% else %}
+                                    <li class="page-item disabled">
+                                        <a class="page-link previous_button" aria-label="Previous" style="pointer-events: none;">
+                                            <span aria-hidden="true">
+                                                                  Previous
+                                                                </span>
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                    {% for page in category_objs.paginator.page_range %}
+                                    {% if category_objs.number|add:"-4" < page and page < category_objs.number %}
+                                    <li class="page-item">
+                                        <a data-page="{{page}}" onclick="redirect_to_page('{{page}}')" class="page-link">
+                                            {{page}}
+                                        </a>
+                                    </li>
+                                    {% elif page == category_objs.number %}
+                                    <li class="page-item">
+                                        <a data-page="{{page}}" class="active page-link">
+                                        {{page}}
+                                        </a>
+                                    </li>
+                                    {% elif category_objs.number < page and page < category_objs.number|add:"4" %}
+                                    <li class="page-item">
+                                        <a data-page="{{page}}" class="page-link" onclick="redirect_to_page('{{page}}')">
+                                        {{page}}
+                                        </a>
+                                    </li>
+                                    {% elif page == category_objs.paginator.num_pages %}
+                                    <li class="page-item">
+                                        <a data-page="{{page}}" class="page-link" onclick="redirect_to_page('{{page}}')">
+                                        {{page}}
+                                        </a>
+                                    </li>
+                                    {% elif page == category_objs.number|add:'4' %}
+                                    <li class="page-item">
+                                        <a style="pointer-events: none;" class="page-link">
+                                        ...
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                    {% endfor %}
+                                    {% if category_objs.has_next %}
+                                    <li class="page-item" style="border-right: none;">
+                                        <a class="page-link next_button" onclick="redirect_to_page('{{category_objs.next_page_number}}')"
+                                        class="page-link" aria-label="Next" style="pointer-events: all;">
+                                        <span aria-hidden="true">
+                                            Next
+                                        </span>
+                                        </a>
+                                    </li>
+                                    {% else %}
+                                    <li class="page-item disabled" style="border-right: none;">
+                                        <a class="page-link" aria-label="Next" style="pointer-events: none;">
+                                        <span aria-hidden="true">
+                                            Next
+                                        </span>
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<!-- Modal Structure for add new category -->
+
+<div id="add-new-category-modal" class="modal easychat-custom-modals-container" tabindex="0">
+  <div class="modal-content">
+      <div class="row" style="margin-bottom: 12px !important;">
+
+          <div class="modal-header">
+              <div class="modal-heading-text-div">Add new category</div>
+              <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                  <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z" fill="black" fill-opacity="0.54"></path>
+                  </svg>
+
+              </a>
+          </div>
+          <div class="modal-overflow-content-div">
+
+              <div class="manage-category-input-wrapper">
+                  <input type="text" class="show-char-count" id="category-id" autocomplete="off" placeholder="Enter category name here" maxlength="{{character_limit_small_text}}" style="height:40px !important; border: 1px solid #dadada !important; border-radius:4px !important; width: 100% !important; box-sizing: border-box;">
+                  <div class="easychat-char-count">
+                    <p id="category-id-char-count">0</p>
+                    <p>/{{character_limit_small_text}}</p>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  <div class="modal-footer">
+      <a onclick="save_category('{{ bot_obj.pk }}','')" class="modal-close btn filter-modal-footer-btn">Save</a>
+  </div>
+</div>
+
+<script type="text/javascript">
+  window.NEED_TO_BUILD = "{{ bot_obj.need_to_build }}";
+  $('.show-char-count').on('keypress', function (event) {
+
+    var regex = new RegExp("^[a-zA-Z0-9!?& ]+$"); // your regex
+    var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+
+    if (!regex.test(key)) {
+
+      event.preventDefault();
+      return false;
+    
+    }
+
+  });
+
+  $('.show-char-count').on('paste', function (event) {
+
+    var format = /[`@#$%^*()_+\-=\[\]{};':"\\|,.<>\/~]/;
+    var pastedData = event.originalEvent.clipboardData.getData('text');
+
+    if(format.test(pastedData.trim())) {
+
+      event.preventDefault();
+      return false;
+
+    }
+
+  });
+
+  function redirect_to_page(page) {
+    search_params = window.location.search.replace('?', '')
+    search_params_list = search_params.split('&');
+    upadted_search_params = '?';
+    for (var index = 0; index < search_params_list.length; index++) {
+      if (search_params_list[index].split('=')[0] == "page") {
+        if (search_params_list.length == 1) {
+          upadted_search_params += "page=" + page;
+        }
+        else {
+          upadted_search_params += "&page=" + page;
+        }
+
+      }
+      else {
+
+        if (upadted_search_params.length == 1) {
+          upadted_search_params += search_params_list[index]
+        }
+        else {
+          upadted_search_params += '&' + search_params_list[index]
+        }
+      }
+    }
+    window.location = window.location.pathname + upadted_search_params;
+    
+  }
+
+  function handle_count() {
+    window.location.href = "/chat/categories/?bot_pk={{bot_id}}&page=1&count=" + $("#easychat_form_assist_table_row_dropdown").val()
+  }
+
+</script>
+
+{% endblock %}

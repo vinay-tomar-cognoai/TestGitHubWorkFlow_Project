@@ -1,0 +1,1260 @@
+{% extends 'EasyAssistApp/console.html' %} {% block content %} {% load static %}
+
+<style type="text/css">
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #f3f6ff !important;
+}
+
+.shadow {
+    /* box-shadow: 0 1px 0 rgba(0, 6, 85, 0.05), 0 10px 7px rgba(0, 30, 65, 0.06), 0 7px 70px rgba(68, 93, 184, 0.205) !important; */
+    box-shadow: 0px 0px 25px 0px rgba(0,0,0,0.15);
+}
+
+#export-unique-customer-modal .heading-text, #export-repeated-customer-modal .heading-text{
+    color: #4d4d4d;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 24px;
+}
+#export-email-input,#export-email-input-repeated{
+    width: 100% !important;
+    height: 41px;
+    border: 1px solid #DADADA!important;
+    box-sizing: border-box;
+    border-radius: 8px;
+    outline: none;
+    margin-top: 16px !important;
+}
+.note-text-div p{
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    color: #7B7A7B;
+}
+
+.error-text-div p{
+    color: #10B981;
+}
+
+.icon-cobrowse {
+    background-color: rgba(116, 170, 252, 0.5);
+    height: 39px;
+    width: 39px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    position: absolute;
+    left: 15px;
+    top: 10px;
+    transition: all 0.2s ease;
+}
+
+.icon-cobrowse svg {
+    width: 24px;
+    height: 24px;
+}
+
+.icon-download {
+    background-color: rgba(116, 170, 252, 0.5);
+    height: 30px;
+    width: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    transition: all 0.2s ease;
+}
+
+.stats-cobrowse {
+    color: white;
+    text-align: center;
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 95%;
+}
+
+.stats-cobrowse-text {
+    font-size: 15px;
+    margin-left: -4px;
+}
+
+.card-cobrowse:hover .icon-cobrowse {
+    top: 5px;
+    transition: all 0.2s ease;
+}
+
+.text-cobrowse {
+    text-align: center;
+    margin-top: 6px;
+    color: white !important;
+    font-weight: 400 !important;
+    letter-spacing: -0.04em;
+    font-size: 13px;
+    margin-bottom: 16px !important;
+
+}
+
+.card-cobrowse {
+    border-radius: 8px !important;
+    background: linear-gradient(180deg, #0254D7 0%, #013E9F 100%);
+    width: 93%;
+    height: 78% !important;
+    margin: auto;
+
+}
+
+@media only screen and (max-width: 600px) {
+  .chart-area {
+    height: 20rem;
+    width: 35rem;
+  }
+
+  .card-body-sm {
+    overflow: auto;
+  }
+}
+
+.card-collection {
+    margin-left: 3.5em !important;
+    margin-right: 3.5em !important;
+}
+
+@media only screen and (max-width: 769px) {
+    .card-collection {
+        margin-left: 1em !important;
+        margin-right: 1em !important;
+    }
+}
+
+.get-analytics {
+    margin-bottom: 10px;
+    padding: 15px 26px;
+    vertical-align: middle;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+
+.get-analytics-btn {
+    width: 100%;
+    height: 35px;
+    border-radius: 30px;
+    font-family: Silka;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 15px;
+    text-align: center;
+    color: #FFFFFF;
+}
+
+.button-dropdown {
+    width: 210px;
+    background-color: #fff;
+    font-family: Silka;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 13px;
+    color: #7a7a7a;
+    display: flex;
+    justify-content: space-between;
+}
+
+.button-dropdown:hover {
+    transform: none;
+}
+
+.button-dropdown::after {
+    border: none!important;
+    content: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.41 0L6 4.58L10.59 0L12 1.41L6 7.41L0 1.41L1.41 0Z' fill='black'/%3E%3C/svg%3E");
+}
+
+.dropdown-item {
+    color: #7a7a7a;
+}
+
+.dropdown-item:hover {
+    background-color: var(--color_rgba_10) !important;
+    color:  #7a7a7a !important;
+}
+
+#visited-title-select-option {
+    height: 35px;
+    border: 1px solid #E6E6E6;
+    box-sizing: border-box;
+    border-radius: 30px;
+    outline: none!important;
+    box-shadow: none!important;
+
+    font-family: Silka;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 14px;
+    text-align: center;
+
+    color: #4D4D4D;
+}
+
+@media only screen and (max-width: 769px) {
+    .card-body {
+        padding: 1.25rem!important;
+    }
+
+    .flex-column-sm {
+        flex-direction: column!important;
+        margin: 23px!important;
+        gap: 10px;
+    }
+
+    .h1-order-sm {
+        order: 2;
+        font-size: 1.55rem!important;
+        text-align: center;
+    }
+
+    .get-analytics-btn {
+        margin-left: 0!important;
+    }
+
+    .card-cobrowse .no-gutters {
+        padding-left: 25px!important;
+    }
+
+    .button-dropdown {
+        margin-top: 0!important;
+    }
+}
+
+.analytics-btn-wrapper {
+    display: flex;
+    padding: 0!important;
+}
+
+.filter-container,
+.analytics-btn-wrapper button {
+    width: 100%;
+}
+
+.analytic-calendar-div {
+    display: flex;
+    gap: 10px;
+    padding: 0px;
+    justify-content: space-between;
+}
+
+.analytic-dropdown-wrapper,
+.analytics-btn-wrapper {
+    gap: 10px;
+}
+
+@media (max-width: 1100px){
+    .filter-container {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .analytic-dropdown-wrapper,
+    .analytics-btn-wrapper{
+        flex-direction: column;
+        justify-content: space-between !important;
+        padding: 0;
+    }
+
+    .analytics-btn-wrapper button {
+        margin: 0 !important;
+    }
+
+    .filter-container div {
+        max-width: 100%;
+    }
+
+    .analytic-calendar-div {
+        justify-content: space-between !important;
+    }
+
+    .analytics-btn-wrapper button {
+        max-width: 100% !important;
+    }
+}
+
+
+</style>
+
+<link rel="stylesheet" type="text/css" href="{% static 'EasyAssistApp/css/skeleton_loader.css' %}">
+
+<div class="container-fluid">
+    <div class="row rectangle-btn-parent" style="margin: 0px 0px 10px 0px;">
+        {% if cobrowse_agent.role != "agent" and access_token_obj.enable_inbound == True and access_token_obj.lead_generation == True %}
+        <div class="col-md pd-l ">
+            <a class="rectangle-btn" href="/easy-assist/sales-ai/general-analytics/"> General Analytics 
+                <span data-toggle="tooltip" data-placement="top" title="" data-original-title="A comparison between the two approaches (Inbound and Outbound) is done to get a generalized idea about the approach used more."><i class="fas fa-info-circle"></i></span>
+            </a>
+        </div>
+        {% endif %}
+
+        {% if access_token_obj.allow_video_meeting_only == False and access_token_obj.enable_inbound == True %}
+        <div class="col-md pd-l">
+            <a class="rectangle-btn " href="/easy-assist/sales-ai/analytics/"> Inbound Analytics
+                <span data-toggle="tooltip" data-placement="top" title="" data-original-title="Analytics for incoming requests."><i class="fas fa-info-circle"></i></span>
+            </a>
+        </div>
+        {% endif %}
+
+        {% if access_token_obj.lead_generation %}
+        <div class="col-md pd-l">
+            <a class="rectangle-btn " href="/easy-assist/sales-ai/analytics-outbound/"> Outbound Analytics 
+                <span data-toggle="tooltip" data-placement="top" title="" data-original-title="Analytics for outgoing requests."><i class="fas fa-info-circle"></i></span>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if access_token_obj.enable_inbound == True or access_token_obj.lead_generation == True %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow get-analytics">
+                    <div class="row filter-container justify-content-between" >
+                        <div class="col-md-4 col-sm-12 p-0 analytic-dropdown-wrapper d-flex align-items-center">
+                            {% if access_token_obj.get_proxy_config_obj.enable_proxy_cobrowsing %}
+                                    <select id="outbound-proxy-select-option" class="form-control" onclick="load_outbound_analytics()">
+                                        <option value="search-lead">Search Lead </option>
+                                        <option value="proxy-cobrowsing">Outbound Proxy</option>
+                                    </select>
+                            {% endif %}
+                                <select id="visited-title-select-option" class="form-control">
+                                    <option value="none">No visited pages</option>
+                                </select>
+                        </div>
+                        
+                        
+                      <div class="col-md-3 col-sm-12 p-0 analytic-calendar-div align-items-center" >
+                              <input class="form-control datepicker easyassist-date-picker" data-date-format="dd/mm/yyyy" placeholder="Start Date" id="start-date" autocomplete="off" value="{{ datetime_start|date:'d/m/Y' }}">
+                              To
+                              <input class="form-control datepicker easyassist-date-picker" data-date-format="dd/mm/yyyy" placeholder="End Date" id="end-date" autocomplete="off" value="{{ datetime_end|date:'d/m/Y' }}">
+                      </div>
+
+                        <div class="col-md-4 col-sm-12 p-0 mt-1 mb-1 analytics-btn-wrapper">
+                            <button class="btn btn-primary" onclick="load_outbound_analytics()">Get Analytics</button>
+                            {% if cobrowse_agent.role == "admin" or cobrowse_agent.role == "supervisor" or cobrowse_agent.role == "admin_ally" %}                            
+                                <button class="btn btn-primary" data-toggle="modal" data-target="#modal-mis-filter">  Export
+                            </button>
+                            {% endif %}
+                            
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+    <!-- Content Row -->
+    <div class="row">
+        <div class="card shadow" style="margin: 12px;margin-bottom: 20px !important; padding-top: 3.37em;" id="search-lead-div">
+            <div class="row card-collection">
+                {% if cobrowse_agent.role == "admin" %}
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card border-left-info shadow h-100 py-2 card-cobrowse" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Count of total number of leads captured.">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="col-auto">
+                                        <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="div-total-sr-lead-captured">
+                                            ...
+                                        </div>
+                                    </div>
+                                    <div class="mb-1 text-cobrowse" style="color: #806ef3;">
+                                        Captured Leads
+                                    </div>
+                                </div>
+                                <div class="icon-cobrowse">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M15.7503 4.97729C16.5647 6.11748 17.7049 8.98424 15.7503 11.3298" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                                        <path d="M17.7049 4C18.6822 5.14019 20.0504 8.39786 17.7049 12.3071" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M10.8638 11.8184C13.0228 11.8184 14.773 10.0682 14.773 7.90921C14.773 5.75021 13.0228 4 10.8638 4C8.70481 4 6.9546 5.75021 6.9546 7.90921C6.9546 10.0682 8.70481 11.8184 10.8638 11.8184ZM5.02726 20.6142C4.87177 18.8373 5.30713 15.1768 8.29243 14.7504H13.4234C14.6673 14.7504 17.0618 15.9231 16.6886 20.6142H5.02726Z" fill="white"/>
+                                        <path d="M8.29243 14.7504V14.0004H8.23913L8.18637 14.0079L8.29243 14.7504ZM5.02726 20.6142L4.28011 20.6796L4.34002 21.3642H5.02726V20.6142ZM16.6886 20.6142V21.3642H17.3813L17.4362 20.6737L16.6886 20.6142ZM14.023 7.90921C14.023 9.654 12.6086 11.0684 10.8638 11.0684V12.5684C13.437 12.5684 15.523 10.4824 15.523 7.90921H14.023ZM10.8638 4.75C12.6086 4.75 14.023 6.16443 14.023 7.90921H15.523C15.523 5.336 13.437 3.25 10.8638 3.25V4.75ZM7.7046 7.90921C7.7046 6.16443 9.11903 4.75 10.8638 4.75V3.25C8.2906 3.25 6.2046 5.336 6.2046 7.90921H7.7046ZM10.8638 11.0684C9.11903 11.0684 7.7046 9.654 7.7046 7.90921H6.2046C6.2046 10.4824 8.2906 12.5684 10.8638 12.5684V11.0684ZM8.18637 14.0079C6.33654 14.2722 5.30608 15.5579 4.78296 16.9042C4.26745 18.231 4.19548 19.7124 4.28011 20.6796L5.7744 20.5488C5.70355 19.7391 5.77151 18.5017 6.18114 17.4475C6.58315 16.4128 7.26302 15.655 8.39849 15.4928L8.18637 14.0079ZM13.4234 14.0004H8.29243V15.5004H13.4234V14.0004ZM17.4362 20.6737C17.633 18.2005 17.1089 16.5249 16.2468 15.4531C15.3895 14.3871 14.2602 14.0004 13.4234 14.0004V15.5004C13.8305 15.5004 14.5204 15.7 15.078 16.3932C15.6308 17.0805 16.1174 18.3368 15.941 20.5547L17.4362 20.6737ZM5.02726 21.3642H16.6886V19.8642H5.02726V21.3642Z" fill="white"/>
+                                    </svg>                                                                      
+                                </div>
+                                <div class="icon-download" id="outbound-capture-leads-download-icon" style="cursor: pointer; display: none;" data-toggle="tooltip" data-placement="top" title onclick="download_outbound_capture_leads()" data-original-title="Export Customer Details">
+                                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="15pt" height="15pt" viewBox="0 0 15 15" version="1.1">
+                                        <g id="surface1">
+                                        <path style=" stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1;" d="M 11.207031 6.835938 C 11.132812 6.667969 10.964844 6.5625 10.78125 6.5625 L 8.90625 6.5625 L 8.90625 0.46875 C 8.90625 0.210938 8.695312 0 8.4375 0 L 6.5625 0 C 6.304688 0 6.09375 0.210938 6.09375 0.46875 L 6.09375 6.5625 L 4.21875 6.5625 C 4.035156 6.5625 3.867188 6.671875 3.792969 6.835938 C 3.714844 7.003906 3.746094 7.199219 3.867188 7.339844 L 7.148438 11.089844 C 7.238281 11.191406 7.363281 11.25 7.5 11.25 C 7.636719 11.25 7.761719 11.191406 7.851562 11.089844 L 11.132812 7.339844 C 11.253906 7.203125 11.285156 7.003906 11.207031 6.835938 Z M 11.207031 6.835938 "/>
+                                        <path style=" stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1;" d="M 12.65625 10.3125 L 12.65625 13.125 L 2.34375 13.125 L 2.34375 10.3125 L 0.46875 10.3125 L 0.46875 14.0625 C 0.46875 14.582031 0.890625 15 1.40625 15 L 13.59375 15 C 14.113281 15 14.53125 14.582031 14.53125 14.0625 L 14.53125 10.3125 Z M 12.65625 10.3125 "/>
+                                        </g>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card border-left-info shadow h-100 py-2 card-cobrowse" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Leads Searched by the Agent using a unique identifier to initiate a Cobrowsing Session.">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="col-auto">
+                                        <div class="h5 mb-0 font-weight-bold stats-cobrowse">
+                                            <span id="div-total-sr">...</span>              
+                                        </div>
+                                    </div>
+                                    <div class="mb-1 text-cobrowse" style="color: #806ef3;">
+                                        Leads Searched
+                                    </div>
+                                </div>
+                                <div class="icon-cobrowse">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M15.918 6.93442C15.918 9.10735 14.1565 10.8688 11.9836 10.8688C9.81063 10.8688 8.04913 9.10735 8.04913 6.93442C8.04913 4.7615 9.81063 3 11.9836 3C14.1565 3 15.918 4.7615 15.918 6.93442Z" fill="white"/>
+                                        <path d="M15.168 6.93442C15.168 8.69313 13.7423 10.1188 11.9836 10.1188V11.6188C14.5707 11.6188 16.668 9.52156 16.668 6.93442H15.168ZM11.9836 10.1188C10.2248 10.1188 8.79913 8.69313 8.79913 6.93442H7.29913C7.29913 9.52156 9.39642 11.6188 11.9836 11.6188V10.1188ZM8.79913 6.93442C8.79913 5.17572 10.2248 3.75 11.9836 3.75V2.25C9.39642 2.25 7.29913 4.34729 7.29913 6.93442H8.79913ZM11.9836 3.75C13.7423 3.75 15.168 5.17572 15.168 6.93442H16.668C16.668 4.34729 14.5707 2.25 11.9836 2.25V3.75Z" fill="white"/>
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M4 19.5982C4 18.5162 4.87708 17.6392 5.95901 17.6392C7.04095 17.6392 7.91803 18.5162 7.91803 19.5982C7.91803 20.6801 7.04095 21.5572 5.95901 21.5572C4.87708 21.5572 4 20.6801 4 19.5982ZM5.95901 16.6392C4.3248 16.6392 3 17.964 3 19.5982C3 21.2324 4.3248 22.5572 5.95901 22.5572C7.59323 22.5572 8.91803 21.2324 8.91803 19.5982C8.91803 17.964 7.59323 16.6392 5.95901 16.6392ZM8.77158 21.7036C8.57632 21.5084 8.25974 21.5084 8.06448 21.7036C7.86921 21.8989 7.86921 22.2155 8.06448 22.4107L9.29398 23.6403C9.48925 23.8355 9.80583 23.8355 10.0011 23.6403C10.1964 23.445 10.1964 23.1284 10.0011 22.9331L8.77158 21.7036Z" fill="white"/>
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M7.04547 15.3251C7.55407 14.5591 8.30611 13.9755 9.39559 13.8198H14.5597C15.8116 13.8198 18.2215 15.0002 17.8459 19.7215H10.1885C10.2369 19.4831 10.2623 19.2364 10.2623 18.9837C10.2623 17.1064 8.85982 15.5567 7.04547 15.3251Z" fill="white"/>
+                                        <path d="M9.39559 13.8198V13.0698H9.34229L9.28952 13.0774L9.39559 13.8198ZM7.04547 15.3251L6.42066 14.9102L5.75275 15.9161L6.9505 16.069L7.04547 15.3251ZM17.8459 19.7215V20.4715H18.5386L18.5935 19.7809L17.8459 19.7215ZM10.1885 19.7215L9.45347 19.5722L9.27093 20.4715H10.1885V19.7215ZM9.28952 13.0774C7.95755 13.2676 7.0292 13.9937 6.42066 14.9102L7.67028 15.7399C8.07895 15.1244 8.65467 14.6833 9.50165 14.5623L9.28952 13.0774ZM14.5597 13.0698H9.39559V14.5698H14.5597V13.0698ZM18.5935 19.7809C18.7915 17.2927 18.2642 15.6076 17.3975 14.5301C16.5356 13.4585 15.4005 13.0698 14.5597 13.0698V14.5698C14.9708 14.5698 15.6666 14.7713 16.2287 15.4702C16.7861 16.1632 17.2759 17.4289 17.0983 19.662L18.5935 19.7809ZM10.1885 20.4715H17.8459V18.9715H10.1885V20.4715ZM9.51228 18.9837C9.51228 19.186 9.49195 19.3827 9.45347 19.5722L10.9235 19.8707C10.9818 19.5835 11.0123 19.2868 11.0123 18.9837H9.51228ZM6.9505 16.069C8.39517 16.2534 9.51228 17.4887 9.51228 18.9837H11.0123C11.0123 16.7241 9.32446 14.8599 7.14044 14.5811L6.9505 16.069Z" fill="white"/>
+                                    </svg>                                        
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-md-6 mb-4 ">
+                    <div class="card border-left-warning shadow h-100 py-2 card-cobrowse " data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Count of Cobrowsing sessions attended by the agents.">
+                        <div class="card-body">
+                            <div class="col mr-2">
+                                <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="div-total-sr-attended">
+                                    ...</div>
+                                <div class=" mb-1 text-cobrowse" style="color: #16A1AA;">
+                                    Cobrowsing
+                                    Request Attended</div>
+                            </div>
+                            <div class="icon-cobrowse">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" fill="white"/>
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M6.02789 20C5.8688 18.1818 6.31426 14.4364 9.36889 14H14.6191C15.316 14 16.3659 14.3598 17.1106 15.4735C15.8543 16.148 15 17.4742 15 19C15 19.3453 15.0438 19.6804 15.126 20H6.02789Z" fill="white"/>
+                                    <path d="M9.36889 14V13.25H9.3156L9.26283 13.2575L9.36889 14ZM6.02789 20L5.28075 20.0654L5.34065 20.75H6.02789V20ZM17.1106 15.4735L17.4654 16.1343L18.1934 15.7434L17.7341 15.0566L17.1106 15.4735ZM15.126 20V20.75H16.0935L15.8523 19.8131L15.126 20ZM9.26283 13.2575C7.37834 13.5267 6.32802 14.8362 5.79416 16.2102C5.26791 17.5646 5.19431 19.0776 5.28075 20.0654L6.77504 19.9346C6.70238 19.1043 6.77197 17.8354 7.19233 16.7534C7.60509 15.6911 8.30482 14.9096 9.47496 14.7425L9.26283 13.2575ZM14.6191 13.25H9.36889V14.75H14.6191V13.25ZM17.7341 15.0566C16.8421 13.7226 15.5514 13.25 14.6191 13.25V14.75C15.0805 14.75 15.8898 14.997 16.4872 15.8904L17.7341 15.0566ZM15.75 19C15.75 17.7613 16.4427 16.6833 17.4654 16.1343L16.7559 14.8127C15.2659 15.6126 14.25 17.1871 14.25 19H15.75ZM15.8523 19.8131C15.7857 19.554 15.75 19.2817 15.75 19H14.25C14.25 19.4089 14.3018 19.8068 14.3997 20.1869L15.8523 19.8131ZM6.02789 20.75H15.126V19.25H6.02789V20.75Z" fill="white"/>
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M19 22C20.6569 22 22 20.6569 22 19C22 17.3431 20.6569 16 19 16C17.3431 16 16 17.3431 16 19C16 20.6569 17.3431 22 19 22ZM20.6867 18.1662C20.7785 18.0631 20.7693 17.905 20.6662 17.8133C20.5631 17.7215 20.405 17.7307 20.3133 17.8338L18.7169 19.6274L18.184 19.0481C18.0905 18.9465 17.9323 18.9399 17.8307 19.0334C17.7291 19.1269 17.7225 19.285 17.816 19.3867L18.536 20.1693L18.7231 20.3726L18.9067 20.1662L20.6867 18.1662Z" fill="white"/>
+                                </svg>                                                                          
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Pending Requests Card Example -->
+                <div class="col-xl-4 col-md-6 mb-4 ">
+                    <div class="card border-left-warning shadow h-100 py-2 card-cobrowse " data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Count of Cobrowsing Requests denied by the Customer.">
+                        <div class="card-body">
+                            <div class="col mr-2">
+                                <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="div-total-sr-customer-denied">
+                                    ...</div>
+                                <div class=" mb-1 text-cobrowse" style="color: #16A1AA;">
+                                    Cobrowsing Request denied by Customer</div>
+                            </div>
+                            <div class="icon-cobrowse">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" fill="white"/>
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M6.02789 20C5.8688 18.1818 6.31426 14.4364 9.36889 14H14.6191C15.316 14 16.3659 14.3598 17.1106 15.4735C15.8543 16.148 15 17.4742 15 19C15 19.3453 15.0438 19.6804 15.126 20H6.02789Z" fill="white"/>
+                                    <path d="M9.36889 14V13.25H9.3156L9.26283 13.2575L9.36889 14ZM6.02789 20L5.28075 20.0654L5.34065 20.75H6.02789V20ZM17.1106 15.4735L17.4654 16.1343L18.1934 15.7434L17.7341 15.0566L17.1106 15.4735ZM15.126 20V20.75H16.0935L15.8523 19.8131L15.126 20ZM9.26283 13.2575C7.37834 13.5267 6.32802 14.8362 5.79416 16.2102C5.26791 17.5646 5.19431 19.0776 5.28075 20.0654L6.77504 19.9346C6.70238 19.1043 6.77197 17.8354 7.19233 16.7534C7.60509 15.6911 8.30482 14.9096 9.47496 14.7425L9.26283 13.2575ZM14.6191 13.25H9.36889V14.75H14.6191V13.25ZM17.7341 15.0566C16.8421 13.7226 15.5514 13.25 14.6191 13.25V14.75C15.0805 14.75 15.8898 14.997 16.4872 15.8904L17.7341 15.0566ZM15.75 19C15.75 17.7613 16.4427 16.6833 17.4654 16.1343L16.7559 14.8127C15.2659 15.6126 14.25 17.1871 14.25 19H15.75ZM15.8523 19.8131C15.7857 19.554 15.75 19.2817 15.75 19H14.25C14.25 19.4089 14.3018 19.8068 14.3997 20.1869L15.8523 19.8131ZM6.02789 20.75H15.126V19.25H6.02789V20.75Z" fill="white"/>
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M22 19C22 20.6569 20.6569 22 19 22C17.3431 22 16 20.6569 16 19C16 17.3431 17.3431 16 19 16C20.6569 16 22 17.3431 22 19ZM17.8507 17.8507C17.9483 17.7531 18.1066 17.7531 18.2042 17.8507L18.9948 18.6413L19.7624 17.8284C19.8572 17.728 20.0154 17.7234 20.1158 17.8182C20.2162 17.913 20.2207 18.0712 20.1259 18.1716L19.3485 18.995L20.1492 19.7957C20.2468 19.8933 20.2468 20.0516 20.1492 20.1492C20.0516 20.2469 19.8933 20.2469 19.7956 20.1492L19.0051 19.3587L18.2376 20.1716C18.1428 20.272 17.9846 20.2766 17.8842 20.1818C17.7838 20.087 17.7793 19.9288 17.8741 19.8284L18.6514 19.005L17.8507 18.2043C17.7531 18.1067 17.7531 17.9484 17.8507 17.8507Z" fill="white"/>
+                                </svg>                                    
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% if cobrowse_agent.role != "admin" %}
+                <!-- Earnings (Monthly) Card Example -->
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card border-left-info shadow h-100 py-2 card-cobrowse " data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Net Promoter Score given by customers at the end of sessions.">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="col-auto">
+                                        <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="div-agent-nps">
+                                            ...
+                                        </div>
+                                    </div>
+                                    <div class="mb-1 text-cobrowse" style="color: #806ef3;">
+                                        NPS
+                                    </div>
+                                </div>
+                                <div class="icon-cobrowse">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22ZM5.5691 8.20459C4.6671 9.41324 4.09862 10.8854 4 12.4846H5.50357C5.59542 11.2772 6.01714 10.162 6.67881 9.22895L5.5691 8.20459ZM6.21649 7.44128L7.31897 8.45895C8.39174 7.35322 9.85411 6.62761 11.4846 6.50357V5C9.41833 5.12742 7.56425 6.03921 6.21649 7.44128ZM18.4657 12.4846C18.3443 10.8895 17.6473 9.45539 16.5819 8.38948L17.5604 7.24784C18.9441 8.59294 19.8428 10.4343 19.9693 12.4846H18.4657ZM15.8229 7.73835L16.8014 6.59671C15.5859 5.67871 14.1001 5.09962 12.4846 5L12.4846 6.50357C13.7279 6.59815 14.8733 7.04246 15.8229 7.73835ZM16.1581 10.9745C16.4201 10.8872 16.5617 10.604 16.4743 10.342C16.387 10.0801 16.1039 9.93847 15.8419 10.0258L12.8419 11.0258C12.7895 11.0433 12.7419 11.0686 12.7 11.1C12.4263 10.7357 11.9907 10.5001 11.5 10.5001C10.6716 10.5001 10 11.1717 10 12.0001C10 12.8286 10.6716 13.5001 11.5 13.5001C12.3284 13.5001 12.9999 12.8286 13 12.0003C13.0524 12.0003 13.1057 11.992 13.1581 11.9745L16.1581 10.9745ZM9 16C8.44772 16 8 16.4477 8 17V18C8 18.5523 8.44772 19 9 19H15C15.5523 19 16 18.5523 16 18V17C16 16.4477 15.5523 16 15 16H9Z" fill="white"/>
+                                    </svg>                                                                                                                
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="col-xl-4 col-md-6 mb-4 " style="display: block;">
+                    <div class="card border-left-warning shadow h-100 py-2 card-cobrowse " data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Average time spent on each session.">
+                        <div class="card-body">
+                            <div class="h5 mb-0 font-weight-bold stats-cobrowse">
+                                <span id="div-avg-session-duration">...</span>
+                                <span class="stats-cobrowse-text" id="div-avg-session-duration-text"></span> 
+                            </div>
+                            <div class="col mr-2">
+                                <div class=" mb-1 text-cobrowse" style="color: #1caf3d">
+                                    Average Session Time
+                                </div>
+                            </div>
+                            <div class="icon-cobrowse">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 3C16.9707 3 21 7.0302 21 12C21 16.9698 16.9707 21 12 21C7.0293 21 3 16.9698 3 12C3 7.0302 7.0293 3 12 3ZM12 4.5003C7.8645 4.5003 4.5003 7.8645 4.5003 12C4.5003 16.1355 7.8645 19.4997 12 19.4997C16.1355 19.4997 19.4997 16.1355 19.4997 12C19.4997 7.8645 16.1355 4.5003 12 4.5003ZM11.325 6.6C11.6665 6.6 11.9491 6.8541 11.9938 7.18345L12 7.275V12H14.925C15.2976 12 15.6 12.3024 15.6 12.675C15.6 13.0166 15.3459 13.2991 15.0166 13.3438L14.925 13.35H11.325C10.9834 13.35 10.7009 13.0959 10.6562 12.7666L10.65 12.675V7.275C10.65 6.9024 10.9524 6.6 11.325 6.6Z" fill="white"/>
+                                </svg>                                                                 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-md-6 mb-4 ">
+                    <div class="card border-left-warning shadow h-100 py-2 card-cobrowse " data-toggle="tooltip" title="Percentage of leads converted with respect to leads attended." data-placement="bottom">
+                        <div class="card-body">
+                            <div class="h5 mb-0 font-weight-bold stats-cobrowse">
+                                <span id="div-conversion-rate">...</span>
+                                <span class="stats-cobrowse-text" id="div-conversion-rate-text"></span> 
+                            </div>
+                            <div class="col mr-2">
+                                <div class=" mb-1 text-cobrowse" style="color: #1caf3d">
+                                    Conversion Rate
+                                </div>
+                            </div>
+                            <div class="icon-cobrowse">
+                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4.10449 11.5L6.25375 8.77271" stroke="white" stroke-width="1.125" stroke-linecap="round"/>
+                                    <path d="M8.7612 8.77271L10.5522 10.1363" stroke="white" stroke-width="1.125" stroke-linecap="round"/>
+                                    <ellipse cx="7.32834" cy="7.74995" rx="1.79105" ry="1.70454" fill="white"/>
+                                    <ellipse cx="2.79105" cy="12.2954" rx="1.79105" ry="1.70454" fill="white"/>
+                                    <ellipse cx="11.6269" cy="11.1591" rx="1.79105" ry="1.70454" fill="white"/>
+                                    <ellipse cx="15.209" cy="5.70454" rx="1.79105" ry="1.70454" fill="white"/>
+                                    <path d="M14.8508 6.83374L12.7015 10.4772" stroke="white" stroke-width="1.125" stroke-linecap="round"/>
+                                </svg>                                                                                                 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card border-left-info shadow h-100 py-2 card-cobrowse "  data-toggle="tooltip" data-placement="bottom" title="" data-original-title="It is the time difference between the customer request time and agent connect time.">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="col-auto">
+                                        <div class="h5 mb-0 font-weight-bold stats-cobrowse">
+                                            <span id="div-avg-wait-time">...</span>
+                                            <span id="div-avg-wait-time-text" style="font-size: 15px; margin-left: -4px;"></span>                
+                                        </div>
+                                    </div>
+                                    <div class="mb-1 text-cobrowse" style="color: #806ef3;">
+                                        Average Waiting Time For Attended Leads
+                                    </div>
+                                </div>
+                                <div class="icon-cobrowse">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" fill="white"/>
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M7.22986 15.1926C8.83728 15.7114 10 17.2199 10 19C10 19.3453 9.95627 19.6804 9.87401 20H15.126C15.0438 19.6804 15 19.3453 15 19C15 17.4742 15.8543 16.148 17.1106 15.4735C16.366 14.3598 15.316 14 14.6191 14H9.36892C8.42775 14.1344 7.73427 14.583 7.22986 15.1926Z" fill="white"/>
+                                        <path d="M7.22986 15.1926L6.65203 14.7145L5.9469 15.5666L6.99948 15.9064L7.22986 15.1926ZM9.87401 20L9.14768 19.8131L8.90653 20.75H9.87401V20ZM15.126 20V20.75H16.0935L15.8524 19.8131L15.126 20ZM17.1106 15.4735L17.4654 16.1343L18.1934 15.7434L17.7341 15.0566L17.1106 15.4735ZM9.36892 14V13.25H9.31562L9.26286 13.2575L9.36892 14ZM6.99948 15.9064C8.30626 16.3282 9.25003 17.5548 9.25003 19H10.75C10.75 16.885 9.36829 15.0947 7.46023 14.4789L6.99948 15.9064ZM9.25003 19C9.25003 19.2817 9.21436 19.554 9.14768 19.8131L10.6003 20.1869C10.6982 19.8068 10.75 19.4089 10.75 19H9.25003ZM15.126 19.25H9.87401V20.75H15.126V19.25ZM14.25 19C14.25 19.4089 14.3019 19.8068 14.3997 20.1869L15.8524 19.8131C15.7857 19.554 15.75 19.2817 15.75 19H14.25ZM16.7559 14.8127C15.2659 15.6126 14.25 17.1871 14.25 19H15.75C15.75 17.7613 16.4427 16.6833 17.4654 16.1343L16.7559 14.8127ZM14.6191 14.75C15.0806 14.75 15.8898 14.997 16.4872 15.8904L17.7341 15.0566C16.8421 13.7226 15.5515 13.25 14.6191 13.25V14.75ZM9.36892 14.75H14.6191V13.25H9.36892V14.75ZM7.80768 15.6708C8.20323 15.1927 8.7335 14.8484 9.47498 14.7425L9.26286 13.2575C8.12199 13.4205 7.26531 13.9733 6.65203 14.7145L7.80768 15.6708Z" fill="white"/>
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M6 22C7.65685 22 9 20.6569 9 19C9 17.3431 7.65685 16 6 16C4.34315 16 3 17.3431 3 19C3 20.6569 4.34315 22 6 22ZM7.68675 18.1662C7.77854 18.0631 7.76935 17.905 7.66621 17.8133C7.56307 17.7215 7.40504 17.7307 7.31325 17.8338L5.71693 19.6274L5.18398 19.0481C5.0905 18.9465 4.93235 18.9399 4.83074 19.0334C4.72913 19.1269 4.72254 19.285 4.81602 19.3867L5.53602 20.1693L5.72307 20.3726L5.90675 20.1662L7.68675 18.1662Z" fill="white"/>
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M19 22C20.6569 22 22 20.6569 22 19C22 17.3431 20.6569 16 19 16C17.3431 16 16 17.3431 16 19C16 20.6569 17.3431 22 19 22ZM19.25 18C19.25 17.8619 19.1381 17.75 19 17.75C18.8619 17.75 18.75 17.8619 18.75 18V19.0798L17.8438 19.8048C17.736 19.891 17.7185 20.0484 17.8048 20.1562C17.891 20.264 18.0484 20.2815 18.1562 20.1952L19.1562 19.3952L19.25 19.3202V19.2V18Z" fill="white"/>
+                                    </svg>        
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card border-left-info shadow h-100 py-2 card-cobrowse " data-toggle="tooltip" data-placement="bottom" title="" data-original-title="It is the time difference between the customer request time and the customer leaving time.">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="col-auto">
+                                        <div class="h5 mb-0 font-weight-bold stats-cobrowse">
+                                            <span id="div-avg-wait-time-unattended">...</span>
+                                            <span id="div-avg-wait-time-text-unattended" style="font-size: 15px; margin-left: -4px;"></span>                
+                                        </div>
+                                    </div>
+                                    <div class="mb-1 text-cobrowse" style="color: #806ef3;">
+                                        Average Waiting Time For Unattended Leads
+                                    </div>
+                                </div>
+                                <div class="icon-cobrowse">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" fill="white"/>
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M7.22986 15.1926C8.83728 15.7114 10 17.2199 10 19C10 19.3453 9.95627 19.6804 9.87401 20H15.126C15.0438 19.6804 15 19.3453 15 19C15 17.4742 15.8543 16.148 17.1106 15.4735C16.366 14.3598 15.316 14 14.6191 14H9.36892C8.42775 14.1344 7.73427 14.583 7.22986 15.1926Z" fill="white"/>
+                                        <path d="M7.22986 15.1926L6.65203 14.7145L5.9469 15.5666L6.99948 15.9064L7.22986 15.1926ZM9.87401 20L9.14768 19.8131L8.90653 20.75H9.87401V20ZM15.126 20V20.75H16.0935L15.8524 19.8131L15.126 20ZM17.1106 15.4735L17.4654 16.1343L18.1934 15.7434L17.7341 15.0566L17.1106 15.4735ZM9.36892 14V13.25H9.31562L9.26286 13.2575L9.36892 14ZM6.99948 15.9064C8.30626 16.3282 9.25003 17.5548 9.25003 19H10.75C10.75 16.885 9.36829 15.0947 7.46023 14.4789L6.99948 15.9064ZM9.25003 19C9.25003 19.2817 9.21436 19.554 9.14768 19.8131L10.6003 20.1869C10.6982 19.8068 10.75 19.4089 10.75 19H9.25003ZM15.126 19.25H9.87401V20.75H15.126V19.25ZM14.25 19C14.25 19.4089 14.3019 19.8068 14.3997 20.1869L15.8524 19.8131C15.7857 19.554 15.75 19.2817 15.75 19H14.25ZM16.7559 14.8127C15.2659 15.6126 14.25 17.1871 14.25 19H15.75C15.75 17.7613 16.4427 16.6833 17.4654 16.1343L16.7559 14.8127ZM14.6191 14.75C15.0806 14.75 15.8898 14.997 16.4872 15.8904L17.7341 15.0566C16.8421 13.7226 15.5515 13.25 14.6191 13.25V14.75ZM9.36892 14.75H14.6191V13.25H9.36892V14.75ZM7.80768 15.6708C8.20323 15.1927 8.7335 14.8484 9.47498 14.7425L9.26286 13.2575C8.12199 13.4205 7.26531 13.9733 6.65203 14.7145L7.80768 15.6708Z" fill="white"/>
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M9 19C9 20.6569 7.65685 22 6 22C4.34315 22 3 20.6569 3 19C3 17.3431 4.34315 16 6 16C7.65685 16 9 17.3431 9 19ZM4.85069 17.8507C4.94832 17.7531 5.10661 17.7531 5.20424 17.8507L5.99482 18.6413L6.76237 17.8284C6.85716 17.728 7.01539 17.7234 7.11578 17.8182C7.21618 17.913 7.22072 18.0712 7.12593 18.1716L6.34852 18.995L7.1492 19.7957C7.24683 19.8933 7.24683 20.0516 7.1492 20.1492C7.05157 20.2469 6.89328 20.2469 6.79564 20.1492L6.00513 19.3587L5.23763 20.1716C5.14284 20.272 4.98461 20.2766 4.88422 20.1818C4.78382 20.087 4.77928 19.9288 4.87407 19.8284L5.65143 19.005L4.85069 18.2043C4.75306 18.1067 4.75306 17.9484 4.85069 17.8507Z" fill="white"/>
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M19 22C20.6569 22 22 20.6569 22 19C22 17.3431 20.6569 16 19 16C17.3431 16 16 17.3431 16 19C16 20.6569 17.3431 22 19 22ZM19.25 18C19.25 17.8619 19.1381 17.75 19 17.75C18.8619 17.75 18.75 17.8619 18.75 18V19.0798L17.8438 19.8048C17.736 19.891 17.7185 20.0484 17.8048 20.1562C17.891 20.264 18.0484 20.2815 18.1562 20.1952L19.1562 19.3952L19.25 19.3202V19.2V18Z" fill="white"/>
+                                    </svg>                                                
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Pending Requests Card Example -->
+                <div class="col-xl-4 col-md-6 mb-4 ">
+                    <div class="card border-left-warning shadow h-100 py-2 card-cobrowse " data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Leads who were connected with an agent and were marked converted by the agent while ending the session.">
+                        <div class="card-body">
+                            <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="div-total-sr-closed">...
+                            </div>
+                            <div class="col mr-2">
+                                <div class=" mb-1 text-cobrowse" style="color: #1caf3d">
+                                    Customers
+                                    Converted By Agent</div>
+                            </div>
+                            <div class="icon-cobrowse">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M20.3757 7.22087C20.3757 8.34315 19.7807 9.2633 18.9218 9.92069C18.2208 10.4573 17.3764 10.7915 16.6256 10.8995C17.1476 10.1507 17.6714 8.87473 17.6714 6.69388C17.6714 5.50023 16.978 4.53845 16.5403 3.93144C16.5226 3.90682 16.5053 3.88279 16.4884 3.85935C16.3821 3.71139 16.2979 3.59234 16.2349 3.4906C17.6625 3.26395 18.6698 3.65653 19.3286 4.32638C20.0091 5.01841 20.3757 6.06633 20.3757 7.22087Z" fill="white" stroke="white"/>
+                                    <path d="M22.9416 20.9264C23.5504 13.5466 19.2362 13.5466 17.7006 13.5466C19.8174 15.128 19.8174 17.2365 19.8174 20.9264H22.9416Z" fill="white" stroke="white"/>
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M11.3503 11.4379C13.6884 11.4379 15.5838 9.5499 15.5838 7.22091C15.5838 4.89192 13.6884 3.00391 11.3503 3.00391C9.01218 3.00391 7.11676 4.89192 7.11676 7.22091C7.11676 9.5499 9.01218 11.4379 11.3503 11.4379ZM5.02952 20.9263C4.86114 19.0094 5.33261 15.0608 8.56558 14.6008H14.1223C15.4693 14.6008 18.0624 15.8659 17.6583 20.9263H5.02952Z" fill="white"/>
+                                    <path d="M8.56558 14.6008V13.8508H8.51248L8.45992 13.8582L8.56558 14.6008ZM5.02952 20.9263L4.2824 20.9919L4.34251 21.6763H5.02952V20.9263ZM17.6583 20.9263V21.6763H18.3508L18.4059 20.986L17.6583 20.9263ZM14.8338 7.22091C14.8338 9.13292 13.277 10.6879 11.3503 10.6879V12.1879C14.0999 12.1879 16.3338 9.96687 16.3338 7.22091H14.8338ZM11.3503 3.75391C13.277 3.75391 14.8338 5.3089 14.8338 7.22091H16.3338C16.3338 4.47495 14.0999 2.25391 11.3503 2.25391V3.75391ZM7.86676 7.22091C7.86676 5.3089 9.42363 3.75391 11.3503 3.75391V2.25391C8.60073 2.25391 6.36676 4.47495 6.36676 7.22091H7.86676ZM11.3503 10.6879C9.42363 10.6879 7.86676 9.13292 7.86676 7.22091H6.36676C6.36676 9.96687 8.60073 12.1879 11.3503 12.1879V10.6879ZM8.45992 13.8582C6.48746 14.1389 5.38543 15.5036 4.82331 16.9447C4.26907 18.3656 4.19126 19.9544 4.2824 20.9919L5.77664 20.8606C5.6994 19.9813 5.77313 18.6374 6.22077 17.4898C6.66053 16.3623 7.41073 15.5226 8.67123 15.3433L8.45992 13.8582ZM14.1223 13.8508H8.56558V15.3508H14.1223V13.8508ZM18.4059 20.986C18.6182 18.3275 18.052 16.5359 17.1305 15.3947C16.2141 14.2597 15.0095 13.8508 14.1223 13.8508V15.3508C14.5821 15.3508 15.3476 15.5743 15.9635 16.337C16.5743 17.0935 17.1025 18.4646 16.9107 20.8666L18.4059 20.986ZM5.02952 21.6763H17.6583V20.1763H5.02952V21.6763Z" fill="white"/>
+                                </svg>                                                                                                           
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-md-6 mb-4 ">
+                    <div class="card border-left-warning shadow h-100 py-2 card-cobrowse " data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Cobrowsing sessions that reached the final page (where the customers are considered as converted) of the journey.">
+                        <div class="card-body">
+                            <div class="col mr-2">
+                                <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="div-total-sr-closed-url">
+                                    ...</div>
+                                <div class=" mb-1 text-cobrowse" style="color: #16A1AA;">
+                                    Customers Converted through URL
+                            </div>
+                            </div>
+                            <div class="icon-cobrowse">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" stroke="white"/>
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M11.853 14.1373C13.2716 14.1373 14.4216 12.9872 14.4216 11.5686C14.4216 10.15 13.2716 9 11.853 9C10.4343 9 9.28434 10.15 9.28434 11.5686C9.28434 12.9872 10.4343 14.1373 11.853 14.1373ZM8.01791 19.9167C7.91575 18.7491 8.20181 16.344 10.1634 16.0637H13.5348C14.3521 16.0637 15.9254 16.8343 15.6802 19.9167H8.01791Z" fill="white"/>
+                                    <path d="M10.1634 16.0637V15.3137H10.1101L10.0573 15.3213L10.1634 16.0637ZM8.01791 19.9167L7.27077 19.9821L7.33067 20.6667H8.01791V19.9167ZM15.6802 19.9167V20.6667H16.3729L16.4279 19.9762L15.6802 19.9167ZM13.6716 11.5686C13.6716 12.573 12.8574 13.3873 11.853 13.3873V14.8873C13.6858 14.8873 15.1716 13.4015 15.1716 11.5686H13.6716ZM11.853 9.75C12.8574 9.75 13.6716 10.5642 13.6716 11.5686H15.1716C15.1716 9.7358 13.6858 8.25 11.853 8.25V9.75ZM10.0343 11.5686C10.0343 10.5642 10.8486 9.75 11.853 9.75V8.25C10.0201 8.25 8.53434 9.7358 8.53434 11.5686H10.0343ZM11.853 13.3873C10.8486 13.3873 10.0343 12.573 10.0343 11.5686H8.53434C8.53434 13.4015 10.0201 14.8873 11.853 14.8873V13.3873ZM10.0573 15.3213C8.71934 15.5124 7.98215 16.4477 7.61765 17.3858C7.26077 18.3044 7.21279 19.3196 7.27077 19.9821L8.76506 19.8513C8.72086 19.3463 8.76483 18.5751 9.01583 17.9291C9.25921 17.3027 9.64582 16.8953 10.2694 16.8062L10.0573 15.3213ZM13.5348 15.3137H10.1634V16.8137H13.5348V15.3137ZM16.4279 19.9762C16.5606 18.3074 16.2098 17.1345 15.5904 16.3643C14.9756 15.6 14.1583 15.3137 13.5348 15.3137V16.8137C13.7286 16.8137 14.1066 16.9128 14.4215 17.3044C14.7317 17.6901 15.045 18.4436 14.9326 19.8572L16.4279 19.9762ZM8.01791 20.6667H15.6802V19.1667H8.01791V20.6667Z" fill="white"/>
+                                    <path d="M4 7H20" stroke="white" stroke-width="0.5" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            {% if cobrowse_agent.role == "admin" or cobrowse_agent.role == "supervisor" %}
+                                <div class="icon-download" style="cursor: pointer;" data-toggle="tooltip" data-placement="top" title="Export Customer Details" onclick="download_outbound_leads_converted_by_url()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="15pt" height="15pt" viewBox="0 0 15 15" version="1.1">
+                                        <g id="surface1">
+                                        <path style=" stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1;" d="M 11.207031 6.835938 C 11.132812 6.667969 10.964844 6.5625 10.78125 6.5625 L 8.90625 6.5625 L 8.90625 0.46875 C 8.90625 0.210938 8.695312 0 8.4375 0 L 6.5625 0 C 6.304688 0 6.09375 0.210938 6.09375 0.46875 L 6.09375 6.5625 L 4.21875 6.5625 C 4.035156 6.5625 3.867188 6.671875 3.792969 6.835938 C 3.714844 7.003906 3.746094 7.199219 3.867188 7.339844 L 7.148438 11.089844 C 7.238281 11.191406 7.363281 11.25 7.5 11.25 C 7.636719 11.25 7.761719 11.191406 7.851562 11.089844 L 11.132812 7.339844 C 11.253906 7.203125 11.285156 7.003906 11.207031 6.835938 Z M 11.207031 6.835938 "/>
+                                        <path style=" stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1;" d="M 12.65625 10.3125 L 12.65625 13.125 L 2.34375 13.125 L 2.34375 10.3125 L 0.46875 10.3125 L 0.46875 14.0625 C 0.46875 14.582031 0.890625 15 1.40625 15 L 13.59375 15 C 14.113281 15 14.53125 14.582031 14.53125 14.0625 L 14.53125 10.3125 Z M 12.65625 10.3125 "/>
+                                        </g>
+                                    </svg>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% if cobrowse_agent.role == "admin" and contains_unique_identifier != 0%}
+                <div class="col-xl-4 col-md-6 mb-4 ">
+                    <div class="card border-left-warning shadow h-100 py-2 card-cobrowse " data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Customers who have attended a session more than once.">
+                        <div class="card-body">
+                            <div class="col mr-2">
+                                <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="div-repeated-customer">
+                                    ...</div>
+                                <div class=" mb-1 text-cobrowse" style="color: #16A1AA;">
+                                    Repeated Customers
+                            </div>
+                            </div>
+                            <div class="icon-cobrowse">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M2.19302 15.1777C1.35968 10.1777 2.79302 0.577672 15.193 2.17767M15.193 2.17767L14 3.5M15.193 2.17767L14 0.84375" stroke="white" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M22 9.00006C22.8333 14.0001 21.4 23.6001 8.99998 22.0001M8.99998 22.0001L10.193 20.6777M8.99998 22.0001L10.193 23.334" stroke="white" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M17.8173 9.86775C17.8173 11.0994 16.8655 12.0978 15.6914 12.0978C14.5172 12.0978 15.8083 12.0542 15.6914 9.23059C15.3877 7.95628 14.7803 7.6377 15.6914 7.6377C16.8655 7.6377 17.8173 8.63613 17.8173 9.86775Z" fill="white"/>
+                                    <path d="M18.9694 17.5139C19.3359 13.0538 16.3122 13.3724 15.3877 13.3724C16.6025 14.3281 17.1938 15.9848 16.8122 17.5139H18.9694Z" fill="white"/>
+                                    <path d="M6.18268 9.86775C6.18268 11.0994 7.13449 12.0978 8.30862 12.0978C9.48275 12.0978 8.19165 12.0542 8.30863 9.23059C8.61233 7.95628 9.21972 7.6377 8.30862 7.6377C7.13449 7.6377 6.18268 8.63613 6.18268 9.86775Z" fill="white"/>
+                                    <path d="M5.03064 17.5139C4.66411 13.0538 7.68783 13.3724 8.6123 13.3724C7.39748 14.3281 6.80618 15.9848 7.18778 17.5139H5.03064Z" fill="white"/>
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12.0087 12.0973C13.4162 12.0973 14.5573 10.9562 14.5573 9.54864C14.5573 8.14106 13.4162 7 12.0087 7C10.6011 7 9.46001 8.14106 9.46001 9.54864C9.46001 10.9562 10.6011 12.0973 12.0087 12.0973ZM8.51615 17.5C8.42334 16.4394 8.6832 14.2546 10.4651 14.0001H13.5276C14.2701 14.0001 15.6993 14.7001 15.4765 17.5H8.51615Z" fill="white"/>
+                                    <path d="M10.4651 14.0001V13.2501H10.4118L10.359 13.2576L10.4651 14.0001ZM8.51615 17.5L7.769 17.5654L7.82891 18.25H8.51615V17.5ZM15.4765 17.5V18.25H16.1693L16.2242 17.5595L15.4765 17.5ZM13.8073 9.54864C13.8073 10.542 13.002 11.3473 12.0087 11.3473V12.8473C13.8304 12.8473 15.3073 11.3704 15.3073 9.54864H13.8073ZM12.0087 7.75C13.002 7.75 13.8073 8.55528 13.8073 9.54864H15.3073C15.3073 7.72685 13.8304 6.25 12.0087 6.25V7.75ZM10.21 9.54864C10.21 8.55528 11.0153 7.75 12.0087 7.75V6.25C10.1869 6.25 8.71001 7.72685 8.71001 9.54864H10.21ZM12.0087 11.3473C11.0153 11.3473 10.21 10.542 10.21 9.54864H8.71001C8.71001 11.3704 10.1869 12.8473 12.0087 12.8473V11.3473ZM10.359 13.2576C9.11089 13.4359 8.42517 14.3097 8.08852 15.1762C7.75948 16.023 7.71571 16.9564 7.769 17.5654L9.26329 17.4347C9.22378 16.9831 9.26354 16.2937 9.48669 15.7194C9.70223 15.1646 10.0374 14.8188 10.5711 14.7425L10.359 13.2576ZM13.5276 13.2501H10.4651V14.7501H13.5276V13.2501ZM16.2242 17.5595C16.3457 16.0319 16.0253 14.9472 15.4485 14.23C14.8763 13.5186 14.1137 13.2501 13.5276 13.2501V14.7501C13.684 14.7501 14.0072 14.8315 14.2796 15.1701C14.5472 15.5029 14.8301 16.1682 14.7289 17.4406L16.2242 17.5595ZM8.51615 18.25H15.4765V16.75H8.51615V18.25Z" fill="white"/>
+                                </svg>                                                                         
+                            </div>
+                            
+                                <div class="icon-download" style="cursor: pointer;" data-toggle="tooltip" data-placement="top" title="Export Customer Details">
+                                    <svg data-toggle="modal" onclick="download_outbound_repeated_customers()" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="15pt" height="15pt" viewBox="0 0 15 15" version="1.1">
+                                        <g id="surface1">
+                                        <path style=" stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1;" d="M 11.207031 6.835938 C 11.132812 6.667969 10.964844 6.5625 10.78125 6.5625 L 8.90625 6.5625 L 8.90625 0.46875 C 8.90625 0.210938 8.695312 0 8.4375 0 L 6.5625 0 C 6.304688 0 6.09375 0.210938 6.09375 0.46875 L 6.09375 6.5625 L 4.21875 6.5625 C 4.035156 6.5625 3.867188 6.671875 3.792969 6.835938 C 3.714844 7.003906 3.746094 7.199219 3.867188 7.339844 L 7.148438 11.089844 C 7.238281 11.191406 7.363281 11.25 7.5 11.25 C 7.636719 11.25 7.761719 11.191406 7.851562 11.089844 L 11.132812 7.339844 C 11.253906 7.203125 11.285156 7.003906 11.207031 6.835938 Z M 11.207031 6.835938 "/>
+                                        <path style=" stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1;" d="M 12.65625 10.3125 L 12.65625 13.125 L 2.34375 13.125 L 2.34375 10.3125 L 0.46875 10.3125 L 0.46875 14.0625 C 0.46875 14.582031 0.890625 15 1.40625 15 L 13.59375 15 C 14.113281 15 14.53125 14.582031 14.53125 14.0625 L 14.53125 10.3125 Z M 12.65625 10.3125 "/>
+                                        </g>
+                                    </svg>
+                                </div>
+                            
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-md-6 mb-4 ">
+                    <div class="card border-left-warning shadow h-100 py-2 card-cobrowse " data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Customers who have attended a session for the first time.">
+                        <div class="card-body">
+                            <div class="col mr-2">
+                                <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="div-unique-customers">
+                                    ...</div>
+                                <div class=" mb-1 text-cobrowse" style="color: #16A1AA;">
+                                    Unique Customers
+                            </div>
+                            </div>
+                            <div class="icon-cobrowse">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M20.9606 19.0001C21.4319 13.0609 17.5443 13.4851 16.3557 13.4851C17.9176 14.7578 18.6778 16.9638 18.1872 19.0001H20.9606Z" fill="white"/>
+                                    <path d="M3.03943 19.0001C2.56819 13.0609 6.4558 13.4851 7.64441 13.4851C6.08249 14.7578 5.32226 16.9638 5.81288 19.0001H3.03943Z" fill="white"/>
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12.0001 11.991C13.8641 11.991 15.3751 10.426 15.3751 8.4955C15.3751 6.56499 13.8641 5 12.0001 5C10.1361 5 8.62509 6.56499 8.62509 8.4955C8.62509 10.426 10.1361 11.991 12.0001 11.991ZM6.40121 18.9819C6.25206 17.2165 6.66968 13.5798 9.53341 13.1561H14.4555C15.6487 13.1561 17.9456 14.3212 17.5877 18.9819H6.40121Z" fill="white"/>
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M15.375 11.2585C15.9029 10.5831 16.2191 9.72292 16.2191 8.78628C16.2191 7.84973 15.903 6.98966 15.3752 6.31429C15.6391 6.21763 15.9232 6.16504 16.2191 6.16504C17.6169 6.16504 18.7501 7.33866 18.7501 8.7864C18.7501 10.2341 17.6169 11.4078 16.2191 11.4078C15.9231 11.4078 15.639 11.3552 15.375 11.2585Z" fill="white"/>
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M8.62515 11.2585C8.09727 10.5831 7.78106 9.72292 7.78106 8.78628C7.78106 7.84973 8.09721 6.98965 8.625 6.31428C8.36105 6.21763 8.07701 6.16504 7.78111 6.16504C6.38327 6.16504 5.2501 7.33866 5.2501 8.7864C5.2501 10.2341 6.38327 11.4078 7.78111 11.4078C8.07707 11.4078 8.36116 11.3552 8.62515 11.2585Z" fill="white"/>
+                                </svg>                                                                      
+                            </div>
+                            
+                            <div class="icon-download" style="cursor: pointer;" data-toggle="tooltip" data-placement="top" title="Export Customer Details">
+                                <svg data-toggle="modal" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="15pt" height="15pt" viewBox="0 0 15 15" version="1.1" onclick="download_outbound_unique_customers()">
+                                    <g id="surface1">
+                                    <path style=" stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1;" d="M 11.207031 6.835938 C 11.132812 6.667969 10.964844 6.5625 10.78125 6.5625 L 8.90625 6.5625 L 8.90625 0.46875 C 8.90625 0.210938 8.695312 0 8.4375 0 L 6.5625 0 C 6.304688 0 6.09375 0.210938 6.09375 0.46875 L 6.09375 6.5625 L 4.21875 6.5625 C 4.035156 6.5625 3.867188 6.671875 3.792969 6.835938 C 3.714844 7.003906 3.746094 7.199219 3.867188 7.339844 L 7.148438 11.089844 C 7.238281 11.191406 7.363281 11.25 7.5 11.25 C 7.636719 11.25 7.761719 11.191406 7.851562 11.089844 L 11.132812 7.339844 C 11.253906 7.203125 11.285156 7.003906 11.207031 6.835938 Z M 11.207031 6.835938 "/>
+                                    <path style=" stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1;" d="M 12.65625 10.3125 L 12.65625 13.125 L 2.34375 13.125 L 2.34375 10.3125 L 0.46875 10.3125 L 0.46875 14.0625 C 0.46875 14.582031 0.890625 15 1.40625 15 L 13.59375 15 C 14.113281 15 14.53125 14.582031 14.53125 14.0625 L 14.53125 10.3125 Z M 12.65625 10.3125 "/>
+                                    </g>
+                                </svg>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    {% if access_token_obj.get_proxy_config_obj.enable_proxy_cobrowsing %}
+        <div class="card shadow custom-card d-none" style="margin: 12px; margin-bottom: 20px !important; padding-top: 3.37em;" id="proxy-analytics-div">
+            <div class="row card-collection">    
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card border-left-info h-100 py-2 card-cobrowse skeletel-loading" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Number of co-browsing links generated.">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="col-auto">
+                                        <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="proxy-total-linked-generated">
+                                            ...
+                                        </div>
+                                    </div>
+                                    <div class="mb-1 text-cobrowse" style="color: #806ef3;">
+                                      Links Generated
+                                    </div>
+                                </div>
+                                <div class="icon-cobrowse">
+                                  <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M10.875 7.5C11.4963 7.5 12 8.00368 12 8.625C12 9.18984 11.5837 9.65745 11.0412 9.73781L10.875 9.75H7.5C4.6005 9.75 2.25 12.1005 2.25 15C2.25 17.7959 4.43561 20.0814 7.19153 20.2411L7.5 20.25H10.875C11.4963 20.25 12 20.7537 12 21.375C12 21.9398 11.5837 22.4074 11.0412 22.4878L10.875 22.5H7.5C3.35787 22.5 0 19.1421 0 15C0 10.9834 3.15744 7.70423 7.12568 7.50918L7.5 7.5H10.875ZM22.5 7.5C26.6421 7.5 30 10.8579 30 15C30 19.0166 26.8425 22.2958 22.8743 22.4908L22.5 22.5H19.125C18.5037 22.5 18 21.9963 18 21.375C18 20.8102 18.4163 20.3426 18.9588 20.2622L19.125 20.25H22.5C25.3995 20.25 27.75 17.8995 27.75 15C27.75 12.2041 25.5643 9.9186 22.8085 9.75891L22.5 9.75H19.125C18.5037 9.75 18 9.24631 18 8.625C18 8.06016 18.4163 7.59255 18.9588 7.5122L19.125 7.5H22.5ZM7.5 13.875H22.5C23.1213 13.875 23.625 14.3787 23.625 15C23.625 15.5696 23.2017 16.0402 22.6527 16.1147L22.5 16.125H7.5C6.87869 16.125 6.375 15.6213 6.375 15C6.375 14.4304 6.79823 13.9598 7.34735 13.8853L7.5 13.875H22.5H7.5Z" fill="white"/>
+                                    </svg>                                                                 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card border-left-info h-100 pb-2 card-cobrowse skeletel-loading" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Number of sessions joined by the customer.">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="col-auto">
+                                        <div class="h5 mb-0 font-weight-bold stats-cobrowse">
+                                            <span id="proxy-total-session-join-by-customer">...</span>              
+                                        </div>
+                                    </div>
+                                    <div class="mb-1 text-cobrowse" style="color: #806ef3;">
+                                      Sessions Joined by the Customer
+                                    </div>
+                                </div>
+                                <div class="icon-cobrowse">
+                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" fill="white"/>
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M6.02789 20C5.8688 18.1818 6.31426 14.4364 9.36889 14H14.6191C15.316 14 16.3659 14.3598 17.1106 15.4735C15.8543 16.148 15 17.4742 15 19C15 19.3453 15.0438 19.6804 15.126 20H6.02789Z" fill="white"/>
+                                    <path d="M9.36885 14V13.25H9.31556L9.26279 13.2575L9.36885 14ZM6.02785 20L5.28071 20.0654L5.34061 20.75H6.02785V20ZM17.1106 15.4735L17.4654 16.1343L18.1934 15.7434L17.7341 15.0566L17.1106 15.4735ZM15.126 20V20.75H16.0935L15.8523 19.8131L15.126 20ZM9.26279 13.2575C7.3783 13.5267 6.32798 14.8362 5.79412 16.2102C5.26787 17.5646 5.19427 19.0776 5.28071 20.0654L6.775 19.9346C6.70234 19.1043 6.77193 17.8354 7.19229 16.7534C7.60505 15.6911 8.30478 14.9096 9.47492 14.7425L9.26279 13.2575ZM14.6191 13.25H9.36885V14.75H14.6191V13.25ZM17.7341 15.0566C16.8421 13.7226 15.5514 13.25 14.6191 13.25V14.75C15.0805 14.75 15.8898 14.997 16.4872 15.8904L17.7341 15.0566ZM15.75 19C15.75 17.7613 16.4427 16.6833 17.4654 16.1343L16.7559 14.8127C15.2659 15.6126 14.25 17.1871 14.25 19H15.75ZM15.8523 19.8131C15.7857 19.554 15.75 19.2817 15.75 19H14.25C14.25 19.4089 14.3018 19.8068 14.3997 20.1869L15.8523 19.8131ZM6.02785 20.75H15.126V19.25H6.02785V20.75Z" fill="white"/>
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M19 22C20.6569 22 22 20.6569 22 19C22 17.3431 20.6569 16 19 16C17.3431 16 16 17.3431 16 19C16 20.6569 17.3431 22 19 22ZM20.6867 18.1662C20.7785 18.0631 20.7693 17.905 20.6662 17.8133C20.5631 17.7215 20.405 17.7307 20.3133 17.8338L18.7169 19.6274L18.184 19.0481C18.0905 18.9465 17.9323 18.9399 17.8307 19.0334C17.7291 19.1269 17.7225 19.285 17.816 19.3867L18.536 20.1693L18.7231 20.3726L18.9067 20.1662L20.6867 18.1662Z" fill="white"/>
+                                    </svg>
+                                                                                                   
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% if cobrowse_agent.role != "admin" %}
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-info h-100 pb-2 card-cobrowse skeletel-loading" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Average Net Promoter Score given by customers.">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="col-auto">
+                                            <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="proxy-nps">
+                                                ...
+                                            </div>
+                                        </div>
+                                        <div class="mb-1 text-cobrowse" style="color: #806ef3;">
+                                            NPS
+                                        </div>
+                                    </div>
+                                    <div class="icon-cobrowse">
+                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M10 20C15.5228 20 20 15.5228 20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20ZM3.5691 6.20459C2.6671 7.41324 2.09862 8.8854 2 10.4846H3.50357C3.59542 9.2772 4.01714 8.162 4.67881 7.22895L3.5691 6.20459ZM4.21649 5.44128L5.31897 6.45895C6.39174 5.35322 7.85411 4.62761 9.4846 4.50357V3C7.41833 3.12742 5.56425 4.03921 4.21649 5.44128ZM16.4657 10.4846C16.3443 8.8895 15.6473 7.45539 14.5819 6.38948L15.5604 5.24784C16.9441 6.59294 17.8428 8.4343 17.9693 10.4846H16.4657ZM13.8229 5.73835L14.8014 4.59671C13.5859 3.67871 12.1001 3.09962 10.4846 3V4.50357C11.7279 4.59815 12.8733 5.04246 13.8229 5.73835ZM14.1581 8.9745C14.4201 8.8872 14.5617 8.604 14.4743 8.342C14.387 8.0801 14.1039 7.93847 13.8419 8.0258L10.8419 9.0258C10.7895 9.0433 10.7419 9.0686 10.7 9.1C10.4263 8.7357 9.9907 8.5001 9.5 8.5001C8.6716 8.5001 8 9.1717 8 10.0001C8 10.8286 8.6716 11.5001 9.5 11.5001C10.3284 11.5001 10.9999 10.8286 11 10.0003C11.0524 10.0003 11.1057 9.992 11.1581 9.9745L14.1581 8.9745ZM7 14C6.44772 14 6 14.4477 6 15V16C6 16.5523 6.44772 17 7 17H13C13.5523 17 14 16.5523 14 16V15C14 14.4477 13.5523 14 13 14H7Z" fill="white"/>
+                                        </svg>                                                                  
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                <div class="col-xl-4 col-md-6 mb-4 ">
+                    <div class="card border-left-warning h-100 pb-2 card-cobrowse skeletel-loading" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="
+                    Average time spent on each session.">
+                        <div class="card-body">
+                            <div class="col mr-2">
+                                <div class="h5 mb-0 font-weight-bold stats-cobrowse">
+                                    <span id="proxy-avg-session-time">...</span>
+                                    <span id="proxy-avg-session-time-text" style="font-size: 15px; margin-left: -4px;"></span>                
+                                </div>
+                                <div class=" mb-1 text-cobrowse" style="color: #16A1AA;">
+                                  Average Session Time
+                                </div>
+                            </div>
+                            <div class="icon-cobrowse">
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 3C16.9707 3 21 7.0302 21 12C21 16.9698 16.9707 21 12 21C7.0293 21 3 16.9698 3 12C3 7.0302 7.0293 3 12 3ZM12 4.5003C7.8645 4.5003 4.5003 7.8645 4.5003 12C4.5003 16.1355 7.8645 19.4997 12 19.4997C16.1355 19.4997 19.4997 16.1355 19.4997 12C19.4997 7.8645 16.1355 4.5003 12 4.5003ZM11.325 6.6C11.6665 6.6 11.9491 6.8541 11.9938 7.18345L12 7.275V12H14.925C15.2976 12 15.6 12.3024 15.6 12.675C15.6 13.0166 15.3459 13.2991 15.0166 13.3438L14.925 13.35H11.325C10.9834 13.35 10.7009 13.0959 10.6562 12.7666L10.65 12.675V7.275C10.65 6.9024 10.9524 6.6 11.325 6.6Z" fill="white"/>
+                                </svg>                                                               
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-md-6 mb-4 ">
+                    <div class="card border-left-warning h-100 pb-2 card-cobrowse skeletel-loading" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Average time agents have to wait before customer joins a session.">
+                        <div class="card-body">
+                            <div class="col mr-2">
+                                <div class="h5 mb-0 font-weight-bold stats-cobrowse">
+                                    <span id="proxy-avg-waiting-time-attended-lead">...</span>
+                                    <span id="proxy-avg-waiting-time-attended-lead-text" style="font-size: 15px; margin-left: -4px;"></span>                
+                                </div>
+                                <div class=" mb-1 text-cobrowse" style="color: #16A1AA;">
+                                  Average Waiting Time For Attended Leads</div>
+                            </div>
+                            <div class="icon-cobrowse">
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" fill="white"/>
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M7.22949 15.1926C8.83691 15.7114 9.99963 17.2199 9.99963 19C9.99963 19.3453 9.9559 19.6804 9.87364 20H15.1256C15.0434 19.6804 14.9996 19.3453 14.9996 19C14.9996 17.4742 15.8539 16.148 17.1102 15.4735C16.3656 14.3598 15.3156 14 14.6187 14H9.36855C8.42738 14.1344 7.7339 14.583 7.22949 15.1926Z" fill="white"/>
+                                <path d="M7.23023 15.1926L6.6524 14.7145L5.94727 15.5666L6.99985 15.9064L7.23023 15.1926ZM9.87438 20L9.14805 19.8131L8.9069 20.75H9.87438V20ZM15.1264 20V20.75H16.0939L15.8528 19.8131L15.1264 20ZM17.111 15.4735L17.4658 16.1343L18.1938 15.7434L17.7345 15.0566L17.111 15.4735ZM9.36929 14V13.25H9.31599L9.26323 13.2575L9.36929 14ZM6.99985 15.9064C8.30663 16.3282 9.2504 17.5548 9.2504 19H10.7504C10.7504 16.885 9.36866 15.0947 7.4606 14.4789L6.99985 15.9064ZM9.2504 19C9.2504 19.2817 9.21473 19.554 9.14805 19.8131L10.6007 20.1869C10.6986 19.8068 10.7504 19.4089 10.7504 19H9.2504ZM15.1264 19.25H9.87438V20.75H15.1264V19.25ZM14.2504 19C14.2504 19.4089 14.3023 19.8068 14.4001 20.1869L15.8528 19.8131C15.7861 19.554 15.7504 19.2817 15.7504 19H14.2504ZM16.7563 14.8127C15.2663 15.6126 14.2504 17.1871 14.2504 19H15.7504C15.7504 17.7613 16.4431 16.6833 17.4658 16.1343L16.7563 14.8127ZM14.6195 14.75C15.081 14.75 15.8902 14.997 16.4876 15.8904L17.7345 15.0566C16.8425 13.7226 15.5519 13.25 14.6195 13.25V14.75ZM9.36929 14.75H14.6195V13.25H9.36929V14.75ZM7.80805 15.6708C8.2036 15.1927 8.73387 14.8484 9.47535 14.7425L9.26323 13.2575C8.12236 13.4205 7.26568 13.9733 6.6524 14.7145L7.80805 15.6708Z" fill="white"/>
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M6 22C7.65685 22 9 20.6569 9 19C9 17.3431 7.65685 16 6 16C4.34315 16 3 17.3431 3 19C3 20.6569 4.34315 22 6 22ZM7.68675 18.1662C7.77854 18.0631 7.76935 17.905 7.66621 17.8133C7.56307 17.7215 7.40504 17.7307 7.31325 17.8338L5.71693 19.6274L5.18398 19.0481C5.0905 18.9465 4.93235 18.9399 4.83074 19.0334C4.72913 19.1269 4.72254 19.285 4.81602 19.3867L5.53602 20.1693L5.72307 20.3726L5.90675 20.1662L7.68675 18.1662Z" fill="white"/>
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M19 22C20.6569 22 22 20.6569 22 19C22 17.3431 20.6569 16 19 16C17.3431 16 16 17.3431 16 19C16 20.6569 17.3431 22 19 22ZM19.25 18C19.25 17.8619 19.1381 17.75 19 17.75C18.8619 17.75 18.75 17.8619 18.75 18V19.0798L17.8438 19.8048C17.736 19.891 17.7185 20.0484 17.8048 20.1562C17.891 20.264 18.0484 20.2815 18.1562 20.1952L19.1562 19.3952L19.25 19.3202V19.2V18Z" fill="white"/>
+                                </svg>                           
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card border-left-info h-100 pb-2 card-cobrowse skeletel-loading" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Average time agents have to wait before the link gets expired.">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="col-auto">
+                                        <div class="h5 mb-0 font-weight-bold stats-cobrowse">
+                                            <span id="proxy-avg-wait-time-unattended">...</span>
+                                            <span id="proxy-avg-wait-time-unattended-text" style="font-size: 15px; margin-left: -4px;"></span>                
+                                        </div>
+                                    </div>
+                                    <div class="mb-1 text-cobrowse" style="color: #806ef3;">
+                                        Average Waiting Time For Unattended Leads
+                                    </div>
+                                </div>
+                                <div class="icon-cobrowse">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" fill="white"/>
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M7.22986 15.1926C8.83728 15.7114 10 17.2199 10 19C10 19.3453 9.95627 19.6804 9.87401 20H15.126C15.0438 19.6804 15 19.3453 15 19C15 17.4742 15.8543 16.148 17.1106 15.4735C16.366 14.3598 15.316 14 14.6191 14H9.36892C8.42775 14.1344 7.73427 14.583 7.22986 15.1926Z" fill="white"/>
+                                        <path d="M7.22986 15.1926L6.65203 14.7145L5.9469 15.5666L6.99948 15.9064L7.22986 15.1926ZM9.87401 20L9.14768 19.8131L8.90653 20.75H9.87401V20ZM15.126 20V20.75H16.0935L15.8524 19.8131L15.126 20ZM17.1106 15.4735L17.4654 16.1343L18.1934 15.7434L17.7341 15.0566L17.1106 15.4735ZM9.36892 14V13.25H9.31562L9.26286 13.2575L9.36892 14ZM6.99948 15.9064C8.30626 16.3282 9.25003 17.5548 9.25003 19H10.75C10.75 16.885 9.36829 15.0947 7.46023 14.4789L6.99948 15.9064ZM9.25003 19C9.25003 19.2817 9.21436 19.554 9.14768 19.8131L10.6003 20.1869C10.6982 19.8068 10.75 19.4089 10.75 19H9.25003ZM15.126 19.25H9.87401V20.75H15.126V19.25ZM14.25 19C14.25 19.4089 14.3019 19.8068 14.3997 20.1869L15.8524 19.8131C15.7857 19.554 15.75 19.2817 15.75 19H14.25ZM16.7559 14.8127C15.2659 15.6126 14.25 17.1871 14.25 19H15.75C15.75 17.7613 16.4427 16.6833 17.4654 16.1343L16.7559 14.8127ZM14.6191 14.75C15.0806 14.75 15.8898 14.997 16.4872 15.8904L17.7341 15.0566C16.8421 13.7226 15.5515 13.25 14.6191 13.25V14.75ZM9.36892 14.75H14.6191V13.25H9.36892V14.75ZM7.80768 15.6708C8.20323 15.1927 8.7335 14.8484 9.47498 14.7425L9.26286 13.2575C8.12199 13.4205 7.26531 13.9733 6.65203 14.7145L7.80768 15.6708Z" fill="white"/>
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M9 19C9 20.6569 7.65685 22 6 22C4.34315 22 3 20.6569 3 19C3 17.3431 4.34315 16 6 16C7.65685 16 9 17.3431 9 19ZM4.85069 17.8507C4.94832 17.7531 5.10661 17.7531 5.20424 17.8507L5.99482 18.6413L6.76237 17.8284C6.85716 17.728 7.01539 17.7234 7.11578 17.8182C7.21618 17.913 7.22072 18.0712 7.12593 18.1716L6.34852 18.995L7.1492 19.7957C7.24683 19.8933 7.24683 20.0516 7.1492 20.1492C7.05157 20.2469 6.89328 20.2469 6.79564 20.1492L6.00513 19.3587L5.23763 20.1716C5.14284 20.272 4.98461 20.2766 4.88422 20.1818C4.78382 20.087 4.77928 19.9288 4.87407 19.8284L5.65143 19.005L4.85069 18.2043C4.75306 18.1067 4.75306 17.9484 4.85069 17.8507Z" fill="white"/>
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M19 22C20.6569 22 22 20.6569 22 19C22 17.3431 20.6569 16 19 16C17.3431 16 16 17.3431 16 19C16 20.6569 17.3431 22 19 22ZM19.25 18C19.25 17.8619 19.1381 17.75 19 17.75C18.8619 17.75 18.75 17.8619 18.75 18V19.0798L17.8438 19.8048C17.736 19.891 17.7185 20.0484 17.8048 20.1562C17.891 20.264 18.0484 20.2815 18.1562 20.1952L19.1562 19.3952L19.25 19.3202V19.2V18Z" fill="white"/>
+                                    </svg>                                                
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Pending Requests Card Example -->
+                <div class="col-xl-4 col-md-6 mb-4 ">
+                    <div class="card border-left-warning h-100 pb-2 card-cobrowse skeletel-loading" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Customers who were connected with an agent and were marked converted by the agent while ending the session.">
+                        <div class="card-body">
+                            <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="proxy-total-customer-converted">
+                                ...
+                            </div>
+                            <div class="col mr-2">
+                                <div class=" mb-1 text-cobrowse" style="color: #1caf3d">
+                                    Customers
+                                    Converted By Agent</div>
+                            </div>
+                            <div class="icon-cobrowse">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M20.3757 7.22087C20.3757 8.34315 19.7807 9.2633 18.9218 9.92069C18.2208 10.4573 17.3764 10.7915 16.6256 10.8995C17.1476 10.1507 17.6714 8.87473 17.6714 6.69388C17.6714 5.50023 16.978 4.53845 16.5403 3.93144C16.5226 3.90682 16.5053 3.88279 16.4884 3.85935C16.3821 3.71139 16.2979 3.59234 16.2349 3.4906C17.6625 3.26395 18.6698 3.65653 19.3286 4.32638C20.0091 5.01841 20.3757 6.06633 20.3757 7.22087Z" fill="white" stroke="white"/>
+                                    <path d="M22.9416 20.9264C23.5504 13.5466 19.2362 13.5466 17.7006 13.5466C19.8174 15.128 19.8174 17.2365 19.8174 20.9264H22.9416Z" fill="white" stroke="white"/>
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M11.3503 11.4379C13.6884 11.4379 15.5838 9.5499 15.5838 7.22091C15.5838 4.89192 13.6884 3.00391 11.3503 3.00391C9.01218 3.00391 7.11676 4.89192 7.11676 7.22091C7.11676 9.5499 9.01218 11.4379 11.3503 11.4379ZM5.02952 20.9263C4.86114 19.0094 5.33261 15.0608 8.56558 14.6008H14.1223C15.4693 14.6008 18.0624 15.8659 17.6583 20.9263H5.02952Z" fill="white"/>
+                                    <path d="M8.56558 14.6008V13.8508H8.51248L8.45992 13.8582L8.56558 14.6008ZM5.02952 20.9263L4.2824 20.9919L4.34251 21.6763H5.02952V20.9263ZM17.6583 20.9263V21.6763H18.3508L18.4059 20.986L17.6583 20.9263ZM14.8338 7.22091C14.8338 9.13292 13.277 10.6879 11.3503 10.6879V12.1879C14.0999 12.1879 16.3338 9.96687 16.3338 7.22091H14.8338ZM11.3503 3.75391C13.277 3.75391 14.8338 5.3089 14.8338 7.22091H16.3338C16.3338 4.47495 14.0999 2.25391 11.3503 2.25391V3.75391ZM7.86676 7.22091C7.86676 5.3089 9.42363 3.75391 11.3503 3.75391V2.25391C8.60073 2.25391 6.36676 4.47495 6.36676 7.22091H7.86676ZM11.3503 10.6879C9.42363 10.6879 7.86676 9.13292 7.86676 7.22091H6.36676C6.36676 9.96687 8.60073 12.1879 11.3503 12.1879V10.6879ZM8.45992 13.8582C6.48746 14.1389 5.38543 15.5036 4.82331 16.9447C4.26907 18.3656 4.19126 19.9544 4.2824 20.9919L5.77664 20.8606C5.6994 19.9813 5.77313 18.6374 6.22077 17.4898C6.66053 16.3623 7.41073 15.5226 8.67123 15.3433L8.45992 13.8582ZM14.1223 13.8508H8.56558V15.3508H14.1223V13.8508ZM18.4059 20.986C18.6182 18.3275 18.052 16.5359 17.1305 15.3947C16.2141 14.2597 15.0095 13.8508 14.1223 13.8508V15.3508C14.5821 15.3508 15.3476 15.5743 15.9635 16.337C16.5743 17.0935 17.1025 18.4646 16.9107 20.8666L18.4059 20.986ZM5.02952 21.6763H17.6583V20.1763H5.02952V21.6763Z" fill="white"/>
+                                </svg>                                                                                                           
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-md-6 mb-4 ">
+                    <div class="card border-left-warning h-100 pb-2 card-cobrowse skeletel-loading" data-toggle="tooltip" data-placement="bottom" title="" data-original-title='Co-browsing sessions that reached the final page (Where the customers are considered as converted) of the journey'>
+                        <div class="card-body">
+                            <div class="col mr-2">
+                                <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="proxy-customer-converted-url">
+                                    ...</div>
+                                <div class=" mb-1 text-cobrowse" style="color: #16A1AA;">
+                                    Customers Converted through URL
+                            </div>
+                            </div>
+                            <div class="icon-cobrowse">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" stroke="white"/>
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M11.853 14.1373C13.2716 14.1373 14.4216 12.9872 14.4216 11.5686C14.4216 10.15 13.2716 9 11.853 9C10.4343 9 9.28434 10.15 9.28434 11.5686C9.28434 12.9872 10.4343 14.1373 11.853 14.1373ZM8.01791 19.9167C7.91575 18.7491 8.20181 16.344 10.1634 16.0637H13.5348C14.3521 16.0637 15.9254 16.8343 15.6802 19.9167H8.01791Z" fill="white"/>
+                                    <path d="M10.1634 16.0637V15.3137H10.1101L10.0573 15.3213L10.1634 16.0637ZM8.01791 19.9167L7.27077 19.9821L7.33067 20.6667H8.01791V19.9167ZM15.6802 19.9167V20.6667H16.3729L16.4279 19.9762L15.6802 19.9167ZM13.6716 11.5686C13.6716 12.573 12.8574 13.3873 11.853 13.3873V14.8873C13.6858 14.8873 15.1716 13.4015 15.1716 11.5686H13.6716ZM11.853 9.75C12.8574 9.75 13.6716 10.5642 13.6716 11.5686H15.1716C15.1716 9.7358 13.6858 8.25 11.853 8.25V9.75ZM10.0343 11.5686C10.0343 10.5642 10.8486 9.75 11.853 9.75V8.25C10.0201 8.25 8.53434 9.7358 8.53434 11.5686H10.0343ZM11.853 13.3873C10.8486 13.3873 10.0343 12.573 10.0343 11.5686H8.53434C8.53434 13.4015 10.0201 14.8873 11.853 14.8873V13.3873ZM10.0573 15.3213C8.71934 15.5124 7.98215 16.4477 7.61765 17.3858C7.26077 18.3044 7.21279 19.3196 7.27077 19.9821L8.76506 19.8513C8.72086 19.3463 8.76483 18.5751 9.01583 17.9291C9.25921 17.3027 9.64582 16.8953 10.2694 16.8062L10.0573 15.3213ZM13.5348 15.3137H10.1634V16.8137H13.5348V15.3137ZM16.4279 19.9762C16.5606 18.3074 16.2098 17.1345 15.5904 16.3643C14.9756 15.6 14.1583 15.3137 13.5348 15.3137V16.8137C13.7286 16.8137 14.1066 16.9128 14.4215 17.3044C14.7317 17.6901 15.045 18.4436 14.9326 19.8572L16.4279 19.9762ZM8.01791 20.6667H15.6802V19.1667H8.01791V20.6667Z" fill="white"/>
+                                    <path d="M4 7H20" stroke="white" stroke-width="0.5" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            
+                            {% if cobrowse_agent.role == "admin" or cobrowse_agent.role == "supervisor" %}
+                                <div class="icon-download" style="cursor: pointer;" data-toggle="tooltip" data-placement="top" title="Export Customer Details" onclick="download_outbound_leads_converted_by_url()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="15pt" height="15pt" viewBox="0 0 15 15" version="1.1">
+                                        <g id="surface1">
+                                        <path style=" stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1;" d="M 11.207031 6.835938 C 11.132812 6.667969 10.964844 6.5625 10.78125 6.5625 L 8.90625 6.5625 L 8.90625 0.46875 C 8.90625 0.210938 8.695312 0 8.4375 0 L 6.5625 0 C 6.304688 0 6.09375 0.210938 6.09375 0.46875 L 6.09375 6.5625 L 4.21875 6.5625 C 4.035156 6.5625 3.867188 6.671875 3.792969 6.835938 C 3.714844 7.003906 3.746094 7.199219 3.867188 7.339844 L 7.148438 11.089844 C 7.238281 11.191406 7.363281 11.25 7.5 11.25 C 7.636719 11.25 7.761719 11.191406 7.851562 11.089844 L 11.132812 7.339844 C 11.253906 7.203125 11.285156 7.003906 11.207031 6.835938 Z M 11.207031 6.835938 "/>
+                                        <path style=" stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1;" d="M 12.65625 10.3125 L 12.65625 13.125 L 2.34375 13.125 L 2.34375 10.3125 L 0.46875 10.3125 L 0.46875 14.0625 C 0.46875 14.582031 0.890625 15 1.40625 15 L 13.59375 15 C 14.113281 15 14.53125 14.582031 14.53125 14.0625 L 14.53125 10.3125 Z M 12.65625 10.3125 "/>
+                                        </g>
+                                    </svg>
+                                </div>
+                            {% endif %}                            
+                        </div>
+                    </div>
+                </div>
+                {% if cobrowse_agent.role == "admin" %}
+                    <div class="col-xl-4 col-md-6 mb-4 ">
+                        <div class="card border-left-warning h-100 pb-2 card-cobrowse skeletel-loading" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Customers who have attended a session more than once.">
+                            <div class="card-body">
+                                <div class="col mr-2">
+                                    <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="proxy-repeated-customer">
+                                        ...
+                                    </div>
+                                    <div class=" mb-1 text-cobrowse" style="color: #16A1AA;">
+                                        Repeated Customers
+                                    </div>
+                                </div>
+                                <div class="icon-cobrowse">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M2.19302 15.1777C1.35968 10.1777 2.79302 0.577672 15.193 2.17767M15.193 2.17767L14 3.5M15.193 2.17767L14 0.84375" stroke="white" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M22 9.00006C22.8333 14.0001 21.4 23.6001 8.99998 22.0001M8.99998 22.0001L10.193 20.6777M8.99998 22.0001L10.193 23.334" stroke="white" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M17.8173 9.86775C17.8173 11.0994 16.8655 12.0978 15.6914 12.0978C14.5172 12.0978 15.8083 12.0542 15.6914 9.23059C15.3877 7.95628 14.7803 7.6377 15.6914 7.6377C16.8655 7.6377 17.8173 8.63613 17.8173 9.86775Z" fill="white"/>
+                                        <path d="M18.9694 17.5139C19.3359 13.0538 16.3122 13.3724 15.3877 13.3724C16.6025 14.3281 17.1938 15.9848 16.8122 17.5139H18.9694Z" fill="white"/>
+                                        <path d="M6.18268 9.86775C6.18268 11.0994 7.13449 12.0978 8.30862 12.0978C9.48275 12.0978 8.19165 12.0542 8.30863 9.23059C8.61233 7.95628 9.21972 7.6377 8.30862 7.6377C7.13449 7.6377 6.18268 8.63613 6.18268 9.86775Z" fill="white"/>
+                                        <path d="M5.03064 17.5139C4.66411 13.0538 7.68783 13.3724 8.6123 13.3724C7.39748 14.3281 6.80618 15.9848 7.18778 17.5139H5.03064Z" fill="white"/>
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M12.0087 12.0973C13.4162 12.0973 14.5573 10.9562 14.5573 9.54864C14.5573 8.14106 13.4162 7 12.0087 7C10.6011 7 9.46001 8.14106 9.46001 9.54864C9.46001 10.9562 10.6011 12.0973 12.0087 12.0973ZM8.51615 17.5C8.42334 16.4394 8.6832 14.2546 10.4651 14.0001H13.5276C14.2701 14.0001 15.6993 14.7001 15.4765 17.5H8.51615Z" fill="white"/>
+                                        <path d="M10.4651 14.0001V13.2501H10.4118L10.359 13.2576L10.4651 14.0001ZM8.51615 17.5L7.769 17.5654L7.82891 18.25H8.51615V17.5ZM15.4765 17.5V18.25H16.1693L16.2242 17.5595L15.4765 17.5ZM13.8073 9.54864C13.8073 10.542 13.002 11.3473 12.0087 11.3473V12.8473C13.8304 12.8473 15.3073 11.3704 15.3073 9.54864H13.8073ZM12.0087 7.75C13.002 7.75 13.8073 8.55528 13.8073 9.54864H15.3073C15.3073 7.72685 13.8304 6.25 12.0087 6.25V7.75ZM10.21 9.54864C10.21 8.55528 11.0153 7.75 12.0087 7.75V6.25C10.1869 6.25 8.71001 7.72685 8.71001 9.54864H10.21ZM12.0087 11.3473C11.0153 11.3473 10.21 10.542 10.21 9.54864H8.71001C8.71001 11.3704 10.1869 12.8473 12.0087 12.8473V11.3473ZM10.359 13.2576C9.11089 13.4359 8.42517 14.3097 8.08852 15.1762C7.75948 16.023 7.71571 16.9564 7.769 17.5654L9.26329 17.4347C9.22378 16.9831 9.26354 16.2937 9.48669 15.7194C9.70223 15.1646 10.0374 14.8188 10.5711 14.7425L10.359 13.2576ZM13.5276 13.2501H10.4651V14.7501H13.5276V13.2501ZM16.2242 17.5595C16.3457 16.0319 16.0253 14.9472 15.4485 14.23C14.8763 13.5186 14.1137 13.2501 13.5276 13.2501V14.7501C13.684 14.7501 14.0072 14.8315 14.2796 15.1701C14.5472 15.5029 14.8301 16.1682 14.7289 17.4406L16.2242 17.5595ZM8.51615 18.25H15.4765V16.75H8.51615V18.25Z" fill="white"/>
+                                    </svg>                                                                         
+                                </div>                            
+                                <div class="icon-download" style="cursor: pointer;" data-toggle="tooltip" data-placement="top" title="Export Customer Details">
+                                    <svg data-toggle="modal" onclick="download_outbound_repeated_customers()" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="15pt" height="15pt" viewBox="0 0 15 15" version="1.1">
+                                        <g id="surface1">
+                                        <path style=" stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1;" d="M 11.207031 6.835938 C 11.132812 6.667969 10.964844 6.5625 10.78125 6.5625 L 8.90625 6.5625 L 8.90625 0.46875 C 8.90625 0.210938 8.695312 0 8.4375 0 L 6.5625 0 C 6.304688 0 6.09375 0.210938 6.09375 0.46875 L 6.09375 6.5625 L 4.21875 6.5625 C 4.035156 6.5625 3.867188 6.671875 3.792969 6.835938 C 3.714844 7.003906 3.746094 7.199219 3.867188 7.339844 L 7.148438 11.089844 C 7.238281 11.191406 7.363281 11.25 7.5 11.25 C 7.636719 11.25 7.761719 11.191406 7.851562 11.089844 L 11.132812 7.339844 C 11.253906 7.203125 11.285156 7.003906 11.207031 6.835938 Z M 11.207031 6.835938 "/>
+                                        <path style=" stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1;" d="M 12.65625 10.3125 L 12.65625 13.125 L 2.34375 13.125 L 2.34375 10.3125 L 0.46875 10.3125 L 0.46875 14.0625 C 0.46875 14.582031 0.890625 15 1.40625 15 L 13.59375 15 C 14.113281 15 14.53125 14.582031 14.53125 14.0625 L 14.53125 10.3125 Z M 12.65625 10.3125 "/>
+                                        </g>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-md-6 mb-4 ">
+                        <div class="card border-left-warning h-100 pb-2 card-cobrowse skeletel-loading" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Customers who have attended a session for the first time.">
+                            <div class="card-body">
+                                <div class="col mr-2">
+                                    <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="proxy-unique-customer">
+                                        ...
+                                    </div>
+                                    <div class=" mb-1 text-cobrowse" style="color: #16A1AA;">
+                                        Unique Customers
+                                    </div>
+                                </div>
+                                <div class="icon-cobrowse">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M20.9606 19.0001C21.4319 13.0609 17.5443 13.4851 16.3557 13.4851C17.9176 14.7578 18.6778 16.9638 18.1872 19.0001H20.9606Z" fill="white"/>
+                                        <path d="M3.03943 19.0001C2.56819 13.0609 6.4558 13.4851 7.64441 13.4851C6.08249 14.7578 5.32226 16.9638 5.81288 19.0001H3.03943Z" fill="white"/>
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M12.0001 11.991C13.8641 11.991 15.3751 10.426 15.3751 8.4955C15.3751 6.56499 13.8641 5 12.0001 5C10.1361 5 8.62509 6.56499 8.62509 8.4955C8.62509 10.426 10.1361 11.991 12.0001 11.991ZM6.40121 18.9819C6.25206 17.2165 6.66968 13.5798 9.53341 13.1561H14.4555C15.6487 13.1561 17.9456 14.3212 17.5877 18.9819H6.40121Z" fill="white"/>
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M15.375 11.2585C15.9029 10.5831 16.2191 9.72292 16.2191 8.78628C16.2191 7.84973 15.903 6.98966 15.3752 6.31429C15.6391 6.21763 15.9232 6.16504 16.2191 6.16504C17.6169 6.16504 18.7501 7.33866 18.7501 8.7864C18.7501 10.2341 17.6169 11.4078 16.2191 11.4078C15.9231 11.4078 15.639 11.3552 15.375 11.2585Z" fill="white"/>
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M8.62515 11.2585C8.09727 10.5831 7.78106 9.72292 7.78106 8.78628C7.78106 7.84973 8.09721 6.98965 8.625 6.31428C8.36105 6.21763 8.07701 6.16504 7.78111 6.16504C6.38327 6.16504 5.2501 7.33866 5.2501 8.7864C5.2501 10.2341 6.38327 11.4078 7.78111 11.4078C8.07707 11.4078 8.36116 11.3552 8.62515 11.2585Z" fill="white"/>
+                                    </svg>                                                                      
+                                </div>
+                                
+                                <div class="icon-download" style="cursor: pointer;" data-toggle="tooltip" data-placement="top" title="Export Customer Details">
+                                    <svg data-toggle="modal" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="15pt" height="15pt" viewBox="0 0 15 15" version="1.1" onclick="download_outbound_unique_customers()">
+                                        <g id="surface1">
+                                        <path style=" stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1;" d="M 11.207031 6.835938 C 11.132812 6.667969 10.964844 6.5625 10.78125 6.5625 L 8.90625 6.5625 L 8.90625 0.46875 C 8.90625 0.210938 8.695312 0 8.4375 0 L 6.5625 0 C 6.304688 0 6.09375 0.210938 6.09375 0.46875 L 6.09375 6.5625 L 4.21875 6.5625 C 4.035156 6.5625 3.867188 6.671875 3.792969 6.835938 C 3.714844 7.003906 3.746094 7.199219 3.867188 7.339844 L 7.148438 11.089844 C 7.238281 11.191406 7.363281 11.25 7.5 11.25 C 7.636719 11.25 7.761719 11.191406 7.851562 11.089844 L 11.132812 7.339844 C 11.253906 7.203125 11.285156 7.003906 11.207031 6.835938 Z M 11.207031 6.835938 "/>
+                                        <path style=" stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1;" d="M 12.65625 10.3125 L 12.65625 13.125 L 2.34375 13.125 L 2.34375 10.3125 L 0.46875 10.3125 L 0.46875 14.0625 C 0.46875 14.582031 0.890625 15 1.40625 15 L 13.59375 15 C 14.113281 15 14.53125 14.582031 14.53125 14.0625 L 14.53125 10.3125 Z M 12.65625 10.3125 "/>
+                                        </g>
+                                    </svg>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}    
+            </div>
+        </div>
+    {% endif %}
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Service Request Analytics</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="javascript:void(0)" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Timeline:</div>
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="show_daily_service_request_analytics()">Daily</a>
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="show_weeekly_service_request_analytics()">Weekly</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="show_monthly_service_request_analytics()">Monthly</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body card-body-sm">
+                    <div class="chart-area">
+                        <canvas id="service-request-analytics"></canvas>
+                        {% if access_token_obj.get_proxy_config_obj.enable_proxy_cobrowsing %}
+                            <canvas class="d-none skeletel-loading" id="service-request-analytics-proxy"></canvas>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if cobrowse_agent.role != "agent" %}
+        <div class="col-md-12">
+            <br>
+            <!-- Project Card Example -->
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Agent's Average NPS Score</h6>
+                </div>
+                <div class="card-body d-none" id="agent-wise-nps-body"></div>
+                {% if access_token_obj.get_proxy_config_obj.enable_proxy_cobrowsing %}
+                    <div class="card-body d-none bar-skeletel-loader" id="agent-proxy-wise-nps-body"></div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-12">
+            <br>
+            <!-- Project Card Example -->
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Page Wise Analytics</h6>
+                </div>
+                <div class="card-body d-none" id="page-wise-analytics-body"></div>
+                {% if access_token_obj.get_proxy_config_obj.enable_proxy_cobrowsing %}
+                    <div class="card-body d-none bar-skeletel-loader" id="page-wise-proxy-analytics-body"></div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-12">
+            <br>
+            <div class="card shadow show-data-filter">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Agent Wise Cobrowsing Session Analytics</h6>
+                </div>
+                <div class="card-body card-body-sm">
+                    <div class="table-responsive d-none" id="agent-wise-request-analytics" style="padding-top: 0.5em;">
+                    </div>
+                    {% if access_token_obj.get_proxy_config_obj.enable_proxy_cobrowsing %}
+                        <div class="table-responsive d-none table-skeletel-loading" id="agent-wise-proxy-request-analytics" style="padding-top: 0.5em;">
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% else %}
+        Inbound and Outbound Cobrowsing use case toggles are turned off. Please turn them on.
+    {% endif %}
+
+    {% if cobrowse_agent.role == "admin" and contains_unique_identifier != 0 %}
+        <div class="modal fade" id="export-unique-customer-modal" tabindex="-1" role="dialog" aria-labelledby="client_location_details_label" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="export_mis_lable" style="color:#0254D7 !important"> Export Unique Customers</h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="flex-column">
+                            <div class="heading-text">
+                                Email ID<span class="text-danger">*</span>
+                            </div>
+                            <textarea type="text"  class="form-control" id="export-email-input" style="height:10em;" placeholder="Enter Email ID">{{cobrowse_agent.user.email}}</textarea>
+                        </div>
+                        <div class="note-text-div mt-3">
+                            <p class="mb-0">
+                                Note: You will receive the Unique Customers data dump on the above email ID within 24 hours.
+                            </p>
+                        </div>
+                        <div class="error-text-div mt-3" style="display: none">
+                            <p class="mb-0">
+                            </p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button class="btn btn-info" type="button" onclick="cron_request_outbound_unique_customers()">Export</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="export-repeated-customer-modal" tabindex="-1" role="dialog" aria-labelledby="client_location_details_label" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="export_mis_lable" style="color:#0254D7 !important">Export Repeated Customers</h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="flex-column">
+                            <div class="heading-text">
+                                Email ID<span class="text-danger">*</span>
+                            </div>
+                            <textarea type="text"  class="form-control" id="export-email-input-repeated" style="height:10em;" placeholder="Enter Email ID">{{cobrowse_agent.user.email}}</textarea>
+                        </div>
+                        <div class="note-text-div mt-3">
+                            <p class="mb-0">
+                                Note: You will receive the Repeated Customers data dump on the above email ID within 24 hours.
+                            </p>
+                        </div>
+                        <div class="error-text-repeated-div mt-3" style="display: none">
+                            <p class="mb-0">
+                                Your request has been received. You shall receive the report in the provided email id within the next 24 hours.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button class="btn btn-info" type="button" onclick="cron_request_outbound_repeated_customers()">Export</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- ************************ Export data ***********************-->
+    <div class="modal fade client-location-details" id="modal-mis-filter" tabindex="-1" role="dialog" aria-labelledby="client_location_details_label" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="export_mis_lable">Export Outbound Analytics</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h6 style="color: #3e95cd">Select date range</h6>
+                            <select id="select-date-range" class="form-control" onchange="check_select_date_range(this)">
+                                <option value="0" selected="selected">Choose date range</option>
+                                <option value="1">Last day</option>
+                                <option value="2">Last 7 days</option>
+                                <option value="3">Last 1 month</option>
+                                <option value="4">Custom Range</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-6 mt-4" id="from-date-div" style="display: none;">
+                            <h6 style="color: #3e95cd">From Date</h6>
+                            <input id="startdate" placeholder="From Date" class="filter-parameter form-control datepicker" autocomplete="off" data-date-format="dd-mm-yyyy">
+                        </div>
+                        <div class="col-sm-6 mt-4" id="to-date-div" style="display: none;">
+                            <h6 style="color: #3e95cd">To Date</h6>
+                            <input id="enddate" placeholder="To Date" class="filter-parameter form-control datepicker" autocomplete="off" data-date-format="dd-mm-yyyy">
+                        </div>
+                        <div class="col-sm-12" id="email-id-div" style="display:none; padding-top: 25px;">
+                            <h6 style="color: #3e95cd">Email ID*</h6>
+                            <textarea class="form-control" id="filter-data-email" style="height:10em;">{{ request.user.email }}</textarea>
+                            <span><br><b>Note: You will receive the outbound analytics data dump on the above email ID within 24 hours.</b></span>
+                        </div>
+                        <div class="col-sm-12 mt-3" id="general-error-message">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn btn-info" type="button" onclick="export_outbound_analytics(this)">Export</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Content Row -->
+
+    <!-- capture leads modal -->
+
+    <div class="modal fade client-location-details" id="modal-capture-leads" tabindex="-1" role="dialog" aria-labelledby="client_location_details_label" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" style="color: #204DAF !important">Export Captured Leads </h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="col-sm-12" id="email-id-div" style="padding-top: 10px;">
+                        <h6><b> Email ID <span style="color: red">*</span></b></h6>
+                        <textarea class="form-control" id="capture-leads-email" placeholder="Enter Email ID" style="height:10em;">{{ request.user.email }}</textarea>
+                        <span><br><b>Note: You will receive the captured leads data dump on the above email ID within 24 hours.</b></span>
+                    </div>
+                    <div class="col-sm-12 mt-3" id="general-error-message-popup">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn btn-info" type="button" onclick="email_outbound_capture_leads(this)">Export</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- capture leads modal -->
+
+</div>
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/analytics_outbound.js' %}"></script>
+<script type="text/javascript">
+
+on_outbound_analytics_page = true;
+
+$(document).ready(function() {
+    initialize_custom_tabs();
+});
+
+function check_select_date_range(element){
+    general_error_message = document.getElementById("general-error-message");
+    general_error_message.innerHTML = "";
+
+    if(element.value == "0") {
+        general_error_message.innerHTML = "Please select valid date range filter";
+    } else {
+        general_error_message.innerHTML = "";
+    }
+
+    if(element.value=="4"){
+        document.getElementById("from-date-div").style.display="block";
+        document.getElementById("to-date-div").style.display="block";
+        document.getElementById("email-id-div").style.display="block";
+    }else{
+        document.getElementById("from-date-div").style.display="none";
+        document.getElementById("to-date-div").style.display="none";
+        document.getElementById("email-id-div").style.display="none";
+    }
+}
+
+
+$('#start-date').on('change', remove_success_message_on_modal);
+$('#end-date').on('change', remove_success_message_on_modal);
+
+function remove_success_message_on_modal() {
+    try {
+        document.getElementById("general-error-message-popup").innerHTML = "";
+        document.getElementById("general-error-message-popup").style.color = "red";
+    }
+    catch(err) {}
+}
+
+</script>
+{% endblock %}

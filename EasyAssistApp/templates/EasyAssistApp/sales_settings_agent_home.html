@@ -1,0 +1,482 @@
+{% extends 'EasyAssistApp/console.html' %}
+{% block content %}
+{% load static %}
+<link href="{% static 'EasyAssistApp/css/agent_new.css' %}" rel="stylesheet" type="text/css">
+<style type="text/css">
+    @font-face {
+      font-family: "Silka";
+      src: url('./Silka/Silka-Medium.woff');
+      font-weight: 500;
+      font-style: normal;
+    }
+
+    dd {
+      color: #7B7A7B !important;
+    }
+
+    #nav_btn {
+      font-family: Silka;
+      font-weight: 500;
+      font-size: 20px;
+      color: #94A3B8;
+    }
+
+   /* .active1 {
+      color: #0254D7 !important;
+    }*/
+  </style>
+  <style type="text/css">
+    .sidebar::-webkit-scrollbar {
+      display: none;
+    }
+
+    #rebtn {
+      padding: 10px 16px;
+      width: 148px;
+      height: 41px;
+      background: #0254D7;
+      color: white;
+      margin: 0px 20px;
+    }
+
+    .profile_input,
+    #id_password,
+    #id_password1,
+    #old-password {
+      display: flex;
+      padding: 12px 0px 12px 14px;
+      /* width: 389px; */
+      width: 100%;
+      height: 48px;
+      background: #FFFFFF;
+      border: 1px solid #CBCACA;
+      border-radius: 5px;
+    }
+
+
+    #accordionSidebar {
+      overflow-y: auto !important;
+      min-height: unset !important;
+      overflow-x: hidden;
+      top: 0;
+      bottom: 0;
+      -ms-overflow-style: none;
+      /* IE and Edge */
+      scrollbar-width: none;
+    }
+
+    @media only screen and (min-width: 760px) {
+      #accordionSidebar {
+        overflow-y: auto;
+        overflow-x: hidden;
+        z-index: 99999;
+        top: 0;
+        bottom: 0;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+
+      #content-wrapper {
+        height: 96vh;
+      }
+
+    }
+
+    @media only screen and (min-width: 769px) {
+      #accordionSidebar {
+        max-height: 100vh;
+      }
+    }
+
+    @media (min-width: 768px) {
+      #accordionSidebar {
+        width: 16rem !important;
+      }
+
+      #accordionSidebar.toggled {
+        width: 7rem !important;
+      }
+    }
+
+    .sidebar.toggled #submenu1,
+    .sidebar.toggled #submenu2 {
+      position: relative !important;
+      left: 0 !important;
+      top: 0 !important;
+    }
+
+    .sidebar.toggled .nav-link-sub-menu svg {
+      margin: 0 1em;
+    }
+
+    #old-password{
+      width: 94%;
+    }
+
+    @media only screen and (max-width: 600px) {
+      .sidebar.toggled {
+        position: fixed;
+        width: 6.5rem !important;
+      }
+
+      .profile_input{
+        width: 99%;
+      }
+
+      #id_password,
+      #id_password1,
+      #old-password{
+        width: 88%;
+      }
+      
+      .input-div{
+        padding-right: 0;
+        width: 93%;
+      }
+
+      .fa-eye-div{
+        margin-left: 0;
+      }
+
+      .responsive-mobile{
+        display: block !important;
+      }
+      .mobile-responsive-heading{
+        margin-top: 16px;
+      }
+      .mobile-responsive-heading .card-block{
+        padding-left: 10px !important;
+      }
+
+      #pills-profile .profile-pic-div{
+        margin-left: 10px !important;
+      }
+
+    }
+  </style>
+  <style type="text/css">
+    #archive_lead_modal .btn-secondary {
+      color: #0254D7 !important;
+    }
+
+    #apply_filter_modal .btn-secondary {
+      color: #0254D7 !important;
+    }
+  </style>  
+  <!-- Begin Page Content -->
+  <div class="container-fluid">
+    <!--sprint 5.9 options Agents side -->
+        <div>
+          <!--  tab Settings Body Start -->
+          <div>
+            <div class="page-header">
+              <div class="row">
+                <div class="col-sm-6 d-flex align-items-center">
+                  <div class="nav nav-pills navbar-right">
+                    <h5 id="nav_btn" class="my-0 active1">Settings </h5>  
+                  </div>
+                </div>
+                
+              </div>
+            </div>
+            <!--sprint 5.9 list of options -->
+                <ul class="nav d-flex flex-column w-100 mb-3 custom-list">
+                  <!--sprint 5.9 profile option list item -->
+                  <li class="nav-item custom-nav-item mb-custom mt-30">
+                    <div class="col-md-12 px-0">
+                      <div class="col-lg-6 col-md-12 col-sm-12 px-0">
+                        <div class="card bg-white border rounded" id="main_card">
+                          <!-- link to profile page -->
+                          <a href="/easy-assist/sales-ai/agent/profile/settings/" id="profiles-tab" class="d-flex w-100 custom-link">
+                            <div class="row no-gutters">
+                              <div class="col-auto d-flex-flex p-2 ml-3 mr-2 mt-4">
+                                <svg width="32" top="5" height="33" viewBox="0 0 32 33" fill="none"
+                                  xmlns="http://www.w3.org/2000/svg">
+                                  
+                                  {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                                  <path
+                                    d="M16 16.4998C19.6819 16.4998 22.6667 13.5151 22.6667 9.83317C22.6667 6.15127 19.6819 3.1665 16 3.1665C12.3181 3.1665 9.33334 6.15127 9.33334 9.83317C9.33334 13.5151 12.3181 16.4998 16 16.4998Z"
+                                    stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                  <path
+                                    d="M27.4533 29.8333C27.4533 24.6733 22.32 20.5 16 20.5C9.67999 20.5 4.54666 24.6733 4.54666 29.8333"
+                                    stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                  {% else %}
+                                  <path
+                                    d="M16 16.4998C19.6819 16.4998 22.6667 13.5151 22.6667 9.83317C22.6667 6.15127 19.6819 3.1665 16 3.1665C12.3181 3.1665 9.33334 6.15127 9.33334 9.83317C9.33334 13.5151 12.3181 16.4998 16 16.4998Z"
+                                    stroke="#0254D7" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                  <path
+                                    d="M27.4533 29.8333C27.4533 24.6733 22.32 20.5 16 20.5C9.67999 20.5 4.54666 24.6733 4.54666 29.8333"
+                                    stroke="#0254D7" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+ 
+                                  {% endif %} 
+                                  
+                                </svg>
+
+                              </div>
+                              <div class="col px-0">
+                                <div class="card-block px-2 mt-4 pb-0">
+                                  <h5 class="card-title tab-heading-text-main mb-0">
+                                    Profile
+                                  </h5>
+                                  <p class="card-text mt-2 mb-4 tab-sub-heading-text">
+                                    Name, Email, Change Password
+                                  </p>
+                                </div>
+                              </div>
+                              <div class="col-auto  pt-3 pr-3 mt-4">
+                                <svg width="16" height="17" viewBox="0 0 16 17" fill="none"
+                                  xmlns="http://www.w3.org/2000/svg">
+                                  <path
+                                    d="M11.3354 8.49994C11.3358 8.20566 11.2094 7.92549 10.9885 7.73101L6.02899 3.36784C5.68718 3.08103 5.17892 3.11954 4.88423 3.45459C4.58954 3.78963 4.61622 4.29865 4.94432 4.60106L9.28125 8.41633C9.30533 8.43744 9.31914 8.46791 9.31914 8.49994C9.31914 8.53196 9.30533 8.56243 9.28125 8.58355L4.94432 12.3988C4.61622 12.7012 4.58954 13.2102 4.88423 13.5453C5.17892 13.8803 5.68718 13.9188 6.02899 13.632L10.9868 9.2702C11.2081 9.07539 11.3351 8.79483 11.3354 8.49994Z"
+                                    fill="#CBCACA" />
+                                  <mask id="mask0_155_622" style="mask-type:alpha" maskUnits="userSpaceOnUse"
+                                    x="4" y="3" width="8" height="11">
+                                    <path
+                                      d="M11.3354 8.49994C11.3358 8.20566 11.2094 7.92549 10.9885 7.73101L6.02899 3.36784C5.68718 3.08103 5.17892 3.11954 4.88423 3.45459C4.58954 3.78963 4.61622 4.29865 4.94432 4.60106L9.28125 8.41633C9.30533 8.43744 9.31914 8.46791 9.31914 8.49994C9.31914 8.53196 9.30533 8.56243 9.28125 8.58355L4.94432 12.3988C4.61622 12.7012 4.58954 13.2102 4.88423 13.5453C5.17892 13.8803 5.68718 13.9188 6.02899 13.632L10.9868 9.2702C11.2081 9.07539 11.3351 8.79483 11.3354 8.49994Z"
+                                      fill="white" />
+                                  </mask>
+                                  <g mask="url(#mask0_155_622)">
+                                  </g>
+                                </svg>
+                              </div>
+                          </a>
+                        </div>
+
+                      </div>
+                    </div>
+                  </li>
+            <!--sprint 5.9 calender option list item -->
+            {% if access_token_obj.enable_inbound %}
+                  <li class="nav-item custom-nav-item mb-custom">
+                    <div class="col-md-12 px-0">
+                      <div class="col-lg-6 col-md-12 col-sm-12 px-0">
+                        <div class="card bg-white border rounded" id="main_card">
+                          <!-- link to calender page -->
+                          <a href="/easy-assist/sales-ai/settings/options/calendar/"  class="d-flex w-100 custom-link">
+                            <div class="row no-gutters">
+                              <div class="col-auto d-flex-flex p-2 ml-3 mr-2 mt-4">
+                                <svg width="32" height="33" viewBox="0 0 32 33" fill="none"
+                                  xmlns="http://www.w3.org/2000/svg">
+                                  {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                                  <path d="M10.6667 3.16699V7.16699" stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2"
+                                    stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                                  <path d="M21.3333 3.16699V7.16699" stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2"
+                                    stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                                  <path d="M4.66666 12.6201H27.3333" stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2"
+                                    stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                                  <path
+                                    d="M28 11.8337V23.167C28 27.167 26 29.8337 21.3333 29.8337H10.6667C6 29.8337 4 27.167 4 23.167V11.8337C4 7.83366 6 5.16699 10.6667 5.16699H21.3333C26 5.16699 28 7.83366 28 11.8337Z"
+                                    stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2" stroke-miterlimit="10"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                  <path d="M20.9263 18.7673H20.9383" stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2.66667"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                  <path d="M20.9263 22.7673H20.9383" stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2.66667"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                  <path d="M15.994 18.7673H16.0059" stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2.66667"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                  <path d="M15.994 22.7673H16.0059" stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2.66667"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                  <path d="M11.0591 18.7673H11.0711" stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2.66667"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                  <path d="M11.0591 22.7673H11.0711" stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2.66667"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                  {% else %}
+                                  <path d="M10.6667 3.16699V7.16699" stroke="#0254D7" stroke-width="2"
+                                    stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                                  <path d="M21.3333 3.16699V7.16699" stroke="#0254D7" stroke-width="2"
+                                    stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                                  <path d="M4.66666 12.6201H27.3333" stroke="#0254D7" stroke-width="2"
+                                    stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                                  <path
+                                    d="M28 11.8337V23.167C28 27.167 26 29.8337 21.3333 29.8337H10.6667C6 29.8337 4 27.167 4 23.167V11.8337C4 7.83366 6 5.16699 10.6667 5.16699H21.3333C26 5.16699 28 7.83366 28 11.8337Z"
+                                    stroke="#0254D7" stroke-width="2" stroke-miterlimit="10"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                  <path d="M20.9263 18.7673H20.9383" stroke="#0254D7" stroke-width="2.66667"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                  <path d="M20.9263 22.7673H20.9383" stroke="#0254D7" stroke-width="2.66667"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                  <path d="M15.994 18.7673H16.0059" stroke="#0254D7" stroke-width="2.66667"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                  <path d="M15.994 22.7673H16.0059" stroke="#0254D7" stroke-width="2.66667"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                  <path d="M11.0591 18.7673H11.0711" stroke="#0254D7" stroke-width="2.66667"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                  <path d="M11.0591 22.7673H11.0711" stroke="#0254D7" stroke-width="2.66667"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+ 
+                                  {% endif %} 
+                                  
+                                </svg>
+
+
+                              </div>
+                              <div class="col px-0">
+                                <div class="card-block px-2 mt-4 pb-0">
+                                  <h5 class="card-title tab-heading-text-main mb-0">
+                                    Calendar
+                                  </h5>
+                                  <p class="card-text mt-2 mb-4 tab-sub-heading-text">
+                                    View Working Days, Holidays
+                                  </p>
+                                </div>
+                              </div>
+                              <div class="col-auto  pt-3 pr-3 mt-4">
+                                <svg width="16" height="17" viewBox="0 0 16 17" fill="none"
+                                  xmlns="http://www.w3.org/2000/svg">
+                                  <path
+                                    d="M11.3354 8.49994C11.3358 8.20566 11.2094 7.92549 10.9885 7.73101L6.02899 3.36784C5.68718 3.08103 5.17892 3.11954 4.88423 3.45459C4.58954 3.78963 4.61622 4.29865 4.94432 4.60106L9.28125 8.41633C9.30533 8.43744 9.31914 8.46791 9.31914 8.49994C9.31914 8.53196 9.30533 8.56243 9.28125 8.58355L4.94432 12.3988C4.61622 12.7012 4.58954 13.2102 4.88423 13.5453C5.17892 13.8803 5.68718 13.9188 6.02899 13.632L10.9868 9.2702C11.2081 9.07539 11.3351 8.79483 11.3354 8.49994Z"
+                                    fill="#CBCACA" />
+                                  <mask id="mask0_155_622" style="mask-type:alpha" maskUnits="userSpaceOnUse"
+                                    x="4" y="3" width="8" height="11">
+                                    <path
+                                      d="M11.3354 8.49994C11.3358 8.20566 11.2094 7.92549 10.9885 7.73101L6.02899 3.36784C5.68718 3.08103 5.17892 3.11954 4.88423 3.45459C4.58954 3.78963 4.61622 4.29865 4.94432 4.60106L9.28125 8.41633C9.30533 8.43744 9.31914 8.46791 9.31914 8.49994C9.31914 8.53196 9.30533 8.56243 9.28125 8.58355L4.94432 12.3988C4.61622 12.7012 4.58954 13.2102 4.88423 13.5453C5.17892 13.8803 5.68718 13.9188 6.02899 13.632L10.9868 9.2702C11.2081 9.07539 11.3351 8.79483 11.3354 8.49994Z"
+                                      fill="white" />
+                                  </mask>
+                                  <g mask="url(#mask0_155_622)">
+                                  </g>
+                                </svg>
+                              </div>
+                          </a>
+                        </div>
+
+                      </div>
+                    </div>
+                  </li>
+              {% else %}
+              <li class="nav-item custom-nav-item mb-custom">
+                <div class="col-md-12 px-0">
+                  <div class="col-lg-6 col-md-12 col-sm-12 px-0" data-toggle="tooltip" data-placement="top" title="Not applicable to Reverse Co-browsing">
+                    <div class="card bg-white border rounded" id="main_card">
+                      <a href="#"  class="d-flex w-100 custom-link">
+                        <div class="row no-gutters">
+                          <div class="col-auto d-flex-flex p-2 ml-3 mr-2 mt-4">
+                            <svg width="32" height="33" viewBox="0 0 32 33" fill="none"
+                              xmlns="http://www.w3.org/2000/svg">
+                              <path d="M10.6667 3.16699V7.16699" stroke="#CBCACA" stroke-width="2"
+                                stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                              <path d="M21.3333 3.16699V7.16699" stroke="#CBCACA" stroke-width="2"
+                                stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                              <path d="M4.66666 12.6201H27.3333" stroke="#CBCACA" stroke-width="2"
+                                stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                              <path
+                                d="M28 11.8337V23.167C28 27.167 26 29.8337 21.3333 29.8337H10.6667C6 29.8337 4 27.167 4 23.167V11.8337C4 7.83366 6 5.16699 10.6667 5.16699H21.3333C26 5.16699 28 7.83366 28 11.8337Z"
+                                stroke="#CBCACA" stroke-width="2" stroke-miterlimit="10"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                              <path d="M20.9263 18.7673H20.9383" stroke="#CBCACA" stroke-width="2.66667"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                              <path d="M20.9263 22.7673H20.9383" stroke="#CBCACA" stroke-width="2.66667"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                              <path d="M15.994 18.7673H16.0059" stroke="#CBCACA" stroke-width="2.66667"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                              <path d="M15.994 22.7673H16.0059" stroke="#CBCACA" stroke-width="2.66667"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                              <path d="M11.0591 18.7673H11.0711" stroke="#CBCACA" stroke-width="2.66667"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                              <path d="M11.0591 22.7673H11.0711" stroke="#CBCACA" stroke-width="2.66667"
+                                stroke-linecap="round" stroke-linejoin="round" />                              
+                            </svg>
+                          </div>
+                          <div class="col px-0">
+                            <div class="card-block px-2 mt-4 pb-0">
+                              <h5 class="disable-menu-tab card-title tab-heading-text-main mb-0" style="color: #CBCACA !important;">
+                                Calendar
+                              </h5>
+                              <p class="disable-menu-tab card-text mt-2 mb-4 tab-sub-heading-text" style="color: #CBCACA !important;">
+                                View Working Days, Holidays
+                              </p>
+                            </div>
+                          </div>
+                          <div class="col-auto  pt-3 pr-3 mt-4">
+                            <svg width="16" height="17" viewBox="0 0 16 17" fill="none"
+                              xmlns="http://www.w3.org/2000/svg">
+                              <path
+                                d="M11.3354 8.49994C11.3358 8.20566 11.2094 7.92549 10.9885 7.73101L6.02899 3.36784C5.68718 3.08103 5.17892 3.11954 4.88423 3.45459C4.58954 3.78963 4.61622 4.29865 4.94432 4.60106L9.28125 8.41633C9.30533 8.43744 9.31914 8.46791 9.31914 8.49994C9.31914 8.53196 9.30533 8.56243 9.28125 8.58355L4.94432 12.3988C4.61622 12.7012 4.58954 13.2102 4.88423 13.5453C5.17892 13.8803 5.68718 13.9188 6.02899 13.632L10.9868 9.2702C11.2081 9.07539 11.3351 8.79483 11.3354 8.49994Z"
+                                fill="#CBCACA" />
+                              <mask id="mask0_155_622" style="mask-type:alpha" maskUnits="userSpaceOnUse"
+                                x="4" y="3" width="8" height="11">
+                                <path
+                                  d="M11.3354 8.49994C11.3358 8.20566 11.2094 7.92549 10.9885 7.73101L6.02899 3.36784C5.68718 3.08103 5.17892 3.11954 4.88423 3.45459C4.58954 3.78963 4.61622 4.29865 4.94432 4.60106L9.28125 8.41633C9.30533 8.43744 9.31914 8.46791 9.31914 8.49994C9.31914 8.53196 9.30533 8.56243 9.28125 8.58355L4.94432 12.3988C4.61622 12.7012 4.58954 13.2102 4.88423 13.5453C5.17892 13.8803 5.68718 13.9188 6.02899 13.632L10.9868 9.2702C11.2081 9.07539 11.3351 8.79483 11.3354 8.49994Z"
+                                  fill="white" />
+                              </mask>
+                              <g mask="url(#mask0_155_622)">
+                              </g>
+                            </svg>
+                          </div>
+                      </a>
+                    </div>
+
+                  </div>
+                </div>
+              </li>
+              {% endif %}
+              {% if cobrowse_agent.role != "admin_ally" and access_token_obj.enable_chat_functionality %}
+                <li class="nav-item custom-nav-item mb-custom">
+                  <div class="col-lg-6 col-md-12 col-sm-12 px-0">
+                      <div class="card bg-white border rounded" id="main_card">
+                          <!-- link to Canned Responses -->
+                          <a href="/easy-assist/sales-ai/settings/canned_response-dashboard/" class="d-flex w-100 anchor-reset">
+                              </a><div class="row no-gutters"><a href="/easy-assist/sales-ai/settings/canned_response-dashboard/" class="d-flex w-100 anchor-reset">
+                                  <div class="col-auto d-flex-flex p-2 ml-3 mr-2 mt-4">
+                                    {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                                    <svg width="32" height="33" viewBox="0 0 32 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                      <path d="M8.5332 14.7759H16.3837" stroke="{{access_token_obj.get_cobrowsing_console_theme_color.hex}}" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                                      <path d="M18.0663 23.6692H13.5803L8.58956 26.9889C7.84937 27.4823 6.85124 26.9552 6.85124 26.058V23.6692C3.48672 23.6692 1.24371 21.4262 1.24371 18.0617V11.3326C1.24371 7.96811 3.48672 5.7251 6.85124 5.7251H18.0663C21.4308 5.7251 23.6738 7.96811 23.6738 11.3326V18.0617C23.6738 21.4262 21.4308 23.6692 18.0663 23.6692Z" stroke="{{access_token_obj.get_cobrowsing_console_theme_color.hex}}" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                                      <path fill-rule="evenodd" clip-rule="evenodd" d="M18.1397 23.5105L20.1523 26.587L23.0695 28.5275L23.0702 28.5279C23.3152 28.6913 23.6425 28.5154 23.6425 28.2211V25.8323C23.6425 25.4181 23.9783 25.0823 24.3925 25.0823C25.9043 25.0823 27.1059 24.5816 27.9276 23.7599C28.7493 22.9381 29.25 21.7366 29.25 20.2247V13.4957C29.25 11.9839 28.7493 10.7823 27.9276 9.96058C27.1059 9.13885 25.9043 8.63818 24.3925 8.63818H23.7304C23.4792 8.06797 23.1386 7.56424 22.7198 7.13818H24.3925C26.2452 7.13818 27.8474 7.75902 28.9883 8.89992C30.1292 10.0408 30.75 11.643 30.75 13.4957V20.2247C30.75 22.0774 30.1292 23.6796 28.9883 24.8205C28.0043 25.8045 26.6773 26.4016 25.1425 26.5473V28.2211C25.1425 29.721 23.4741 30.5993 22.2388 29.7764L20.1523 26.587L20.1518 26.5867L22.2381 29.776L17.4368 26.5823H13.1774C11.9494 26.5823 10.8315 26.3095 9.88499 25.7934L11.5946 24.8759C12.075 25.0102 12.6039 25.0823 13.1774 25.0823H17.6634C17.8112 25.0823 17.9557 25.126 18.0788 25.2078L20.1518 26.5867L18.1394 23.5105H18.1397Z" fill="{{access_token_obj.get_cobrowsing_console_theme_color.hex}}"/>
+                                    </svg>                                            
+                                  {% else %}
+                                    <svg width="32" height="33" viewBox="0 0 32 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                      <path d="M8.5332 14.7759H16.3837" stroke="#0254D7" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                                      <path d="M18.0663 23.6692H13.5803L8.58956 26.9889C7.84937 27.4823 6.85124 26.9552 6.85124 26.058V23.6692C3.48672 23.6692 1.24371 21.4262 1.24371 18.0617V11.3326C1.24371 7.96811 3.48672 5.7251 6.85124 5.7251H18.0663C21.4308 5.7251 23.6738 7.96811 23.6738 11.3326V18.0617C23.6738 21.4262 21.4308 23.6692 18.0663 23.6692Z" stroke="#0254D7" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>                                      <path fill-rule="evenodd" clip-rule="evenodd" d="M18.1397 23.5105L20.1523 26.587L23.0695 28.5275L23.0702 28.5279C23.3152 28.6913 23.6425 28.5154 23.6425 28.2211V25.8323C23.6425 25.4181 23.9783 25.0823 24.3925 25.0823C25.9043 25.0823 27.1059 24.5816 27.9276 23.7599C28.7493 22.9381 29.25 21.7366 29.25 20.2247V13.4957C29.25 11.9839 28.7493 10.7823 27.9276 9.96058C27.1059 9.13885 25.9043 8.63818 24.3925 8.63818H23.7304C23.4792 8.06797 23.1386 7.56424 22.7198 7.13818H24.3925C26.2452 7.13818 27.8474 7.75902 28.9883 8.89992C30.1292 10.0408 30.75 11.643 30.75 13.4957V20.2247C30.75 22.0774 30.1292 23.6796 28.9883 24.8205C28.0043 25.8045 26.6773 26.4016 25.1425 26.5473V28.2211C25.1425 29.721 23.4741 30.5993 22.2388 29.7764L20.1523 26.587L20.1518 26.5867L22.2381 29.776L17.4368 26.5823H13.1774C11.9494 26.5823 10.8315 26.3095 9.88499 25.7934L11.5946 24.8759C12.075 25.0102 12.6039 25.0823 13.1774 25.0823H17.6634C17.8112 25.0823 17.9557 25.126 18.0788 25.2078L20.1518 26.5867L18.1394 23.5105H18.1397Z" fill="#0254D7"/>
+                                    </svg> 
+                                  {% endif %}
+                                  </div>
+                                  <div class="col px-0">
+                                      <div class="card-block px-2 mt-4 pb-0">
+                                          <h5 class="card-title tab-heading-text-main fs-18 mb-0">
+                                              Canned Responses
+                                          </h5>
+                                          <p class="card-text mt-2 mb-4 tab-sub-heading-text">
+                                            Add predefined chat responses for frequently asked customer queries
+                                          </p>
+                                      </div>
+                                  </div>
+                                  <div class="col-auto  pt-3 pr-3 mt-4">
+                                      <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                          <path d="M11.3354 8.49994C11.3358 8.20566 11.2094 7.92549 10.9885 7.73101L6.02899 3.36784C5.68718 3.08103 5.17892 3.11954 4.88423 3.45459C4.58954 3.78963 4.61622 4.29865 4.94432 4.60106L9.28125 8.41633C9.30533 8.43744 9.31914 8.46791 9.31914 8.49994C9.31914 8.53196 9.30533 8.56243 9.28125 8.58355L4.94432 12.3988C4.61622 12.7012 4.58954 13.2102 4.88423 13.5453C5.17892 13.8803 5.68718 13.9188 6.02899 13.632L10.9868 9.2702C11.2081 9.07539 11.3351 8.79483 11.3354 8.49994Z" fill="#CBCACA"></path>
+                                          <mask id="mask0_155_622" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="4" y="3" width="8" height="11">
+                                              <path d="M11.3354 8.49994C11.3358 8.20566 11.2094 7.92549 10.9885 7.73101L6.02899 3.36784C5.68718 3.08103 5.17892 3.11954 4.88423 3.45459C4.58954 3.78963 4.61622 4.29865 4.94432 4.60106L9.28125 8.41633C9.30533 8.43744 9.31914 8.46791 9.31914 8.49994C9.31914 8.53196 9.30533 8.56243 9.28125 8.58355L4.94432 12.3988C4.61622 12.7012 4.58954 13.2102 4.88423 13.5453C5.17892 13.8803 5.68718 13.9188 6.02899 13.632L10.9868 9.2702C11.2081 9.07539 11.3351 8.79483 11.3354 8.49994Z" fill="white"></path>
+                                          </mask>
+                                          <g mask="url(#mask0_155_622)">
+                                          </g>
+                                      </svg>
+                                  </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                  </li>
+                {% endif %}
+                </ul>
+          </div>
+        </div>
+  
+
+
+  </div>
+  <!-- sprint 5.9 content end -->
+
+
+
+<!-- toast message for profile upload -->
+<div id="agent-profile-toast"></div>
+
+
+<!-- show and hide a div start -->
+
+
+
+{% endblock %}

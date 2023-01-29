@@ -1,0 +1,213 @@
+{% extends 'EasyAssistSalesforceApp/console.html' %}
+{% block content %}
+{% load static %}
+<!-- Begin Page Content -->
+<div class="container-fluid">
+   <!-- Page Heading -->          
+   <!-- DataTales Example -->
+    <div class="row" style="margin: 0px 10px 10px 10px;">
+      <div class="col-sm-6">
+          <a class="btn btn-tab" href="/easy-assist-salesforce/sales-ai/audit-trail/?salesforce_token={{salesforce_token}}"> Audit Trail </a>
+      </div>
+      <div class="col-sm-6">
+          <a class="btn btn-tab" href="/easy-assist-salesforce/sales-ai/agent-audit-trail/?salesforce_token={{salesforce_token}}"> Agent Audit Trail </a>
+      </div>
+    </div>
+   <div class="card shadow mb-4">
+      <div class="card-header py-3">
+        <div class="row">
+          <div class="col-sm">
+            <h6 class="m-0 font-weight-bold text-primary">Agent Audit Trail</h6>
+          </div>
+          <div class="col-sm">
+            <button class="btn btn-info float-right" data-toggle="modal" data-target="#apply_filter_modal">Apply Filter</button>
+          </div>          
+        </div>
+      </div>
+      <div class="card-body">
+
+        {% if is_filter_applied %}
+
+         <div class="table-responsive">
+            <table class="table table-bordered" width="100%" cellspacing="0" id="audit-trail-table">
+               <thead>
+                  <tr>
+                     <th>Agent</th>
+                     <th>Date</th>
+                     <th>Total Online Duration</th>
+                  </tr>
+               </thead>
+               <tbody>
+                  {% for audit_trail_obj in agent_wise_audit_trail %}
+                  <tr>
+                      <td>{{ audit_trail_obj.agent_username }}</td>
+                      <td>{{ audit_trail_obj.date }}</td>
+                      <td>{{ audit_trail_obj.duration }}</td>
+                  </tr>
+                  {% endfor %}
+               </tbody>
+            </table>
+         </div>
+
+         {% else %}
+
+            <p><b>Please apply filter to see the audit trail details.</b></p>
+
+         {% endif %}
+
+      </div>
+   </div>
+</div>
+
+
+<div class="modal fade" id="apply_filter_modal" tabindex="-1" role="dialog" aria-labelledby="apply_filter_modal_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="apply_filter_modal_modal_label">Apply custom filter</h5>
+      </div>
+      <div class="modal-body">
+          <div class="row">
+              <div class="col-sm-12">
+                  <table class="table table-borderless">
+                        <thead>
+                              <tr>
+                                <th>
+                                    <select class="form-control" onchange="show_filter_options(this)" id="selected-filter-parameter">
+                                        <option value="None">Select Filter</option>
+                                        {% if cobrowse_agent.role != "agent" %}
+                                          <option value="agent">Agent</option>
+                                        {% endif %}
+                                        <option value="startdate">Start Date</option>
+                                        <option value="enddate">End Date</option>
+                                    </select>
+                                </th>
+                                <th>                                   
+                                    <select class="form-control filter-parameter" style="display:none;" id="selected-agent-filter">
+                                        <option value="None">Select Agent</option>
+                                        {% for agent in agents %}
+                                          <option value="{{ agent.user.username }}">{{ agent.user.username }}</option>
+                                        {% endfor %}
+                                    </select>                                    
+                                    <input type="date" id="filter-start-date" placeholder="Start Date" style="display:none;" class="filter-parameter" data-date-format="dd/mm/yyyy"> 
+                                    <input type="date" id="filter-end-date" placeholder="End Date"style="display:none;" class="filter-parameter" data-date-format="dd/mm/yyyy">
+                                </th>
+                                <th style="cursor:pointer;"><button class="btn btn-success btn-icon-split" type="button" onclick="add_new_filter_parameter(this)"><span class="icon text-white-50"><i class="fas fa-check"></i></span>
+                                <span class="text">Add</span></button></th>
+                              </tr>                            
+                        </thead>
+                        <tbody id="tbody-filter-parameters"></tbody>
+                  </table>
+              </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <button id="reset_filter" class="btn btn-info" disabled onclick="reset_audit_trail_filter(this)">Reset</button>
+        <button id="apply_filter_confirm" class="btn btn-info" disabled onclick="apply_audit_trail_filter(this)">Apply</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+
+    function show_filter_options(element){
+        if(element.value=="None"){
+           alert("Please select valid filter");
+        }else{
+
+            filter_parameters = document.getElementsByClassName("filter-parameter");
+            for(var index=0; index< filter_parameters.length; index++){
+                filter_parameters[index].style.display = "none";
+            }
+
+            if(element.value=="agent"){
+                document.getElementById("selected-agent-filter").style.display="block";
+            }else if(element.value=="startdate"){
+                document.getElementById("filter-start-date").style.display="block";     
+            }else if(element.value=="enddate"){
+                document.getElementById("filter-end-date").style.display="block";     
+            }else{
+                alert("Please select valid filter");
+            }
+        }
+    }
+
+    function add_new_filter_parameter(){
+        element = document.getElementById("selected-filter-parameter");
+        if(element.value=="None"){
+            alert("Please select valid filter parameter");
+        }else{
+            var value = "None";
+            var key = element.value;
+            if(element.value=="agent"){
+              value = document.getElementById("selected-agent-filter").value;
+            }else if(element.value=="startdate"){
+              value = document.getElementById("filter-start-date").value;
+            }else if(element.value=="enddate"){
+              value = document.getElementById("filter-end-date").value;
+            }else{
+              alert("Please select valid filter parameter");              
+            }   
+
+          tbody_html = '<tr class="tr-filter-parameters" filter-parameter="'+key+':'+value+'">\
+            <td>'+key+'</td>\
+            <td>'+value+'</td>\
+            <td onclick="remove_selected_filter_parameter(this)" style="cursor: pointer;">\
+              <i class="fas fa-fw fa-archive" style="color:#D93431;"></i>\
+            </td></tr>';
+
+            document.getElementById("tbody-filter-parameters").innerHTML += tbody_html;
+            document.getElementById("apply_filter_confirm").removeAttribute("disabled");
+            document.getElementById("reset_filter").removeAttribute("disabled");
+        }
+    }
+
+    function remove_selected_filter_parameter(element){
+        remove_element = element.parentElement;
+        remove_element.parentElement.removeChild(remove_element);
+        if(document.getElementsByClassName("tr-filter-parameters").length<=0){
+            document.getElementById("reset_filter").setAttribute("disabled", "disabled");
+            document.getElementById("apply_filter_confirm").setAttribute("disabled", "disabled");
+        }
+    }
+
+    function apply_audit_trail_filter(element){
+        selected_filter_parameters = document.getElementsByClassName("tr-filter-parameters");
+        var key_value = '';
+        for(var index=0; index < selected_filter_parameters.length; index++){
+            key_value_filter = selected_filter_parameters[index].getAttribute("filter-parameter");
+            key_value += key_value_filter.replace(":", "=") + "&";
+        }
+        if (window.SALESFORCE_TOKEN != null && window.SALESFORCE_TOKEN != undefined) {
+          key_value = "?salesforce_token=" + window.SALESFORCE_TOKEN + "&" + key_value;
+        } else {
+          key_value = "?" + key_value;
+        }
+        window.location = window.location.protocol + "//" + window.location.host + window.location.pathname + key_value;
+    }
+
+    function reset_audit_trail_filter() {
+      document.getElementById("tbody-filter-parameters").innerHTML = "";
+      document.getElementById("reset_filter").setAttribute("disabled", "disabled");
+      document.getElementById("apply_filter_confirm").setAttribute("disabled", "disabled");
+    }
+
+    $(document).ready(function() {
+        btn_tabs = document.getElementsByClassName("btn-tab");
+
+        for(var index=0; index< btn_tabs.length; index++){
+            btn_tabs[index].classList.remove("btn-tab-active");
+        }
+
+        for(var index=0; index< btn_tabs.length; index++){
+            if(btn_tabs[index].pathname==window.location.pathname){
+                btn_tabs[index].classList.add("btn-tab-active");
+            }
+        }
+    });
+</script>
+
+{% endblock %}

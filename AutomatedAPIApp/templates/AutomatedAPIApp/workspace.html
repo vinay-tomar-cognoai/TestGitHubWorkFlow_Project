@@ -1,0 +1,399 @@
+{% extends 'AutomatedAPIApp/console.html' %}
+
+{% block content %}
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'AutomatedAPIApp/css/automated_api_console.css' %}">
+
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <div class="auto-api-top-bar">
+        <div class="auto-api-tree-detail">
+            API Tree [{{automated_api_integration_obj.tree.pk}}] - {{automated_api_integration_obj.tree.name}}
+        </div>
+    </div>
+    
+    <div class="row auto-api-container">
+        <div class="col-md-12">
+            <div class="auto-api-metadata-1 row">
+                <div class="auto-api-metadata-1-method col-md-2 cognoai-noselect">
+                    <select class="form-control auto-api-metadata-1-method-select" id="request-type">
+                        <option value="POST" selected> POST </option>
+                        <option value="GET"> GET </option>
+                    </select>
+                </div>
+                <div class="auto-api-metadata-1-url col-md-7">
+                    <input type="text" class="form-control" id="request-url" placeholder="Pase your url" value="" autocomplete="off">
+                </div>
+                <div class="auto-api-metadata-1-send col-md-3">
+                    <button type="button" class="btn btn-primary btn-width-100" style="max-height: 38px;" onclick="execute_api()">Send</button>
+                    <button type="button" class="btn btn-success btn-width-100" style="margin-left: 10px; max-height: 38px;" onclick="save_active_api_metadata()">Save</button>
+                    <button type="button" class="btn btn-secondary btn-width-100" style="margin-left: 10px; max-height: 38px;" onclick="generate_automated_api()">Genarate</button>
+                </div>
+            </div>
+
+            <div class="auto-api-subsection-container card shadow auth-type-container">
+                <div class="auto-api-subsection-header card-header cognoai-noselect">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <span class="auto-api-header-name">
+                                Authorization
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="auto-api-subsection-body card-body">
+                    <div class="row">
+                        <div class="auto-api-subsection-row col-md-12 cognoai-noselect">
+                            <ul class="cognoai-custom-tag-input auto-api-authorization-ul">
+                                <li class="bg-primary api-auth-li active" auth_type="None" onclick="update_tbody_headers_based_on_authorization('None')">
+                                    <span class="value_display_span">No Auth</span>
+                                </li>
+                                <li class="bg-primary api-auth-li" auth_type="bearer-token" onclick="update_tbody_headers_based_on_authorization('bearer-token')">
+                                    <span class="value_display_span">Bearer Token</span>
+                                </li>
+                                <li class="bg-primary api-auth-li" auth_type="basic-auth" onclick="update_tbody_headers_based_on_authorization('basic-auth')">
+                                    <span class="value_display_span">Basic Auth</span>
+                                </li>
+                                <li class="bg-primary api-auth-li" auth_type="digest-auth" onclick="update_tbody_headers_based_on_authorization('digest-auth')">
+                                    <span class="value_display_span">Digest Auth</span>
+                                </li>
+                                <li class="bg-primary api-auth-li" auth_type="oauth-1.0-auth" onclick="update_tbody_headers_based_on_authorization('oauth-1.0-auth')">
+                                    <span class="value_display_span">OAuth 1.0</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!--
+                        <div class="auto-api-subsection-row col-md-3">
+                            <select class="auto-api-authorization-type-select" id="request-authorization-type" onchange="update_tbody_headers_based_on_authorization(this)">
+                                <option value="None" selected>Select Authorization</option>
+                                <option value="bearer-token">Bearer Token</option>
+                                <option value="basic-auth">Basic Auth</option>
+                                <option value="digest-auth">Digest Auth</option>
+                                <option value="oauth-1.0-auth">OAuth 1.0</option>
+                            </select>
+                        </div>
+                        -->
+
+                        <div class="auto-api-subsection-row col-md-12" style="display:none;" id="bearer-token-input-container">
+                            <div class="col-12">
+                                <input class="form-control" type="text" id="bearer-token-input" placeholder="Token">
+                            </div>
+                        </div>
+
+                        <div class="auto-api-subsection-row col-md-12" style="display:none;" id="basic-auth-input-container">
+                            <div class="col-12">
+                                <input class="form-control" type="text" id="basic-auth-username" placeholder="Username"><br>
+                            </div>
+                            <div class="col-12">
+                                <input class="form-control" type="password" id="basic-auth-password" placeholder="Password">
+                            </div>
+                        </div>
+
+                        <div class="auto-api-subsection-row col-md-12" style="display:none;" id="digest-auth-input-container">
+                            <div class="col-12">
+                                <input class="form-control" type="text" id="digest-auth-username" placeholder="Username"><br>
+                            </div>
+                            <div class="col-12">
+                                <input class="form-control" type="password" id="digest-auth-password" placeholder="Password">
+                            </div>
+                        </div>
+
+                        <div class="auto-api-subsection-row col-md-12" style="display:none;" id="oauth-1-input-container">
+                            <div class="col-12">
+                                <input class="form-control" type="text" id="oauth-1-auth-consumer-key" placeholder="Consumer Key"><br>
+                            </div>
+                            <div class="col-12">
+                                <input class="form-control" type="text" id="oauth-1-auth-consumer-secret" placeholder="Consumer Secret"><br>
+                            </div>
+                            <div class="col-12">
+                                <input class="form-control" type="text" id="oauth-1-auth-access-token" placeholder="Access Token"><br>
+                            </div>
+                            <div class="col-12">
+                                <input class="form-control" type="text" id="oauth-1-auth-token-secret" placeholder="Token Secret"><br>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="auto-api-subsection-container card shadow header-container">
+                <div class="auto-api-subsection-header card-header cognoai-noselect">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <span class="auto-api-header-name">
+                                Headers & Body
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="auto-api-subsection-body card-body">
+                    <div class="row">
+                        <div class="auto-api-subsection-row col-md-12 cognoai-noselect">
+                            <ul class="cognoai-custom-tag-input auto-api-api-type-ul">
+                                <li class="bg-primary api-type-li active" api_type="application/json" onclick="update_tbody_headers('application/json')">
+                                    <span class="value_display_span">JSON (application/json)</span>
+                                </li>
+                                <li class="bg-primary api-type-li" api_type="text/plain" onclick="update_tbody_headers('text/plain')">
+                                    <span class="value_display_span">Text (text/plain)</span>
+                                </li>
+                                <li class="bg-primary api-type-li" api_type="application/javascript" onclick="update_tbody_headers('application/javascript')">
+                                    <span class="value_display_span">Javascript (application/javascript)</span>
+                                </li>
+                                <li class="bg-primary api-type-li" api_type="application/xml" onclick="update_tbody_headers('application/xml')">
+                                    <span class="value_display_span">XML (application/xml)</span>
+                                </li>
+                                <li class="bg-primary api-type-li" api_type="text/xml" onclick="update_tbody_headers('text/xml')">
+                                    <span class="value_display_span">XML (text/xml)</span>
+                                </li>
+                                <li class="bg-primary api-type-li" api_type="text/html" onclick="update_tbody_headers('text/html')">
+                                    <span class="value_display_span">HTML (text/html)</span>
+                                </li>
+                                <li class="bg-primary api-type-li" api_type="application/x-www-form-urlencoded" onclick="update_tbody_headers('application/x-www-form-urlencoded')">
+                                    <span class="value_display_span">X-WWW-FORM-URLENCODED (application/x-www-form-urlencoded)</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!--
+                        <div class="auto-api-subsection-row col-md-3">
+                            <select class="auto-api-header-type-select" id="request-header-type" onchange="update_tbody_headers(this)">
+                                <option value="application/json" selected>JSON (application/json)</option>
+                                <option value="text/plain">Text (text/plain)</option>
+                                <option value="application/javascript">Javascript (application/javascript)</option>
+                                <option value="application/xml">XML (application/xml)</option>
+                                <option value="text/xml">XML (text/xml)</option>
+                                <option value="text/html">HTML (text/html)</option>
+                            </select>
+                        </div>
+
+                        <div class="auto-api-subsection-row col-md-9"></div>
+                        -->
+
+                        <div class="auto-api-subsection-row col-md-12">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Key</th>
+                                        <th scope="col">Value</th>
+                                        <th scope="col">Delete</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="header-table-tbody"></tbody>
+                            </table>
+                        </div>
+
+                        <div id ="auto-api-subsection-api-body"class="auto-api-subsection-row col-md-12">
+                            <label for="api-body">Body&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span for="api-body" onclick="beautify_body_content(this)" style="cursor: pointer;"><u>Beautify</u></span></label>
+                            <div class="form-control" id="api-body"  id="request-body" onkeyup="check_for_variable_input_textarea(this)"></div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="auto-api-subsection-container card shadow">
+                <div class="auto-api-subsection-header card-header cognoai-noselect">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <span class="auto-api-header-name">
+                                Variables
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="auto-api-subsection-body card-body">
+                    <div class="row">
+                        <div class="auto-api-subsection-row col-md-12">
+                            <span style="font-size: 23px;font-weight: 500;">
+                                Post Processor Variable
+                            </span>
+                            <div>
+                                <table id="post-processor-variables-table" class="table table-striped" style="display: none;width:100%;word-wrap: break-word;margin-top: 20px;">
+                                    <thead>
+                                        <tr>
+                                            <th>variable</th>
+                                            <th>how to use</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                                <span id="post-processor-variables-info"></span>
+                            </div>
+                        </div>
+                        <div class="auto-api-subsection-row col-md-12">
+                            <span style="font-size: 23px;font-weight: 500;">
+                                API Response Variable
+                            </span>
+                            <div>
+                                <table id="active-functions-usabled-variable-table" class="table table-striped" style="display: none;width:100%;word-wrap;: break-word;margin-top: 20px;">
+                                    <thead>
+                                        <tr>
+                                            <th>api number</th>
+                                            <th>variable</th>
+                                            <th>response data key</th>
+                                            <th>locally saved value</th>
+                                            <th>how to use</th>
+                                            <th>action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                                <span id="active-functions-usabled-variable-info"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="auto-api-subsection-container card shadow api-response-card">
+                <div class="auto-api-subsection-header card-header cognoai-noselect">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <span class="auto-api-header-name">
+                                JSON Response
+                            </span>
+                        </div>
+                        <div class="col-sm-6 api-response-action-button">
+                            <button 
+                                class="btn"
+                                id="parse-response-button"
+                                data-toggle="modal"
+                                data-target="#parsed-json-data-show-modal"
+                                style="display: none;background: #254a9c; color: white; max-height: 38px;width: fit-content; padding: 2px 20px 2px 20px; margin-right: 12px;"
+                            >
+                                Parse Response
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="auto-api-subsection-body card-body">
+                    <div id="api-response-container">
+                        <pre id="request-response-container"></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="auto-api-subsection-container card shadow api-generated-code-card" style="display: none;">
+                <div class="auto-api-subsection-header card-header cognoai-noselect">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <span class="auto-api-header-name">
+                                Generated Code
+                            </span>
+                        </div>
+                        <div class="col-sm-6 api-generated-code-button">
+                            <button 
+                                class="btn"
+                                onclick="save_code_into_api_tree('{{is_api_tree_already_present}}')"
+                                style="background: #254a9c; color: white; max-height: 38px;width: fit-content; padding: 2px 20px 2px 20px; margin-right: 12px;"
+                            >
+                                Save Into API Tree
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="auto-api-subsection-body card-body">
+                    <div class="row">
+                        <div class="auto-api-subsection-row col-md-12" style="text-align: right;">
+                            <a href="javascript:void(0)" data-position="top" data-tooltip="Full-screen mode" onclick="go_full_screen_mode()">
+                                <i class="fas fa-expand" style="color: black; font-size: 20px;"></i>
+                            </a>
+                        </div>
+                        <div class="auto-api-subsection-row col-md-12">
+                            <div id="api-generated-code"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="dynamic-request-parameter-confirmation-modal" tabindex="-1" role="dialog" aria-labelledby="dynamic-request-parameter-confirmation-modalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dynamic-request-parameter-confirmation-modalLabel">Confirmation on API Execution</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="api-execution-request-packet">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="execute_dynamic_api()">Send Request</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="parsed-json-data-show-modal" tabindex="-1" role="dialog" aria-labelledby="parsed-json-data-show-modal" aria-hidden="true">
+    <div class="modal-dialog" role="document" style="max-width:800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" >API Response Parsed Data</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="max-height: 600px;overflow-y: scroll;">
+                <table class="table table-striped" style="width:100%;word-wrap: break-word;">
+                    <thead>
+                        <tr>
+                            <th>key</th>
+                            <th>value</th>
+                            <th>type</th>
+                            <th>variable</th>
+                            <th>use</th>
+                        </tr>
+                    </thead>
+                    <tbody id="parse_json_data_and_load_into_table_container">
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" onclick="save_api_response_variables()">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade easychat-config-modals-wrapper" id="genrate_api_tree_confirmation_modal" tabindex="-1" role="dialog" aria-labelledby="parsed-json-data-show-modal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="row" style="margin-bottom: 12px !important;">
+    
+                <div class="modal-overflow-content-div">
+    
+                    <div class="termination-confirmation-modal-container">
+                        <div class="termination-icon">
+                            <svg width="83" height="82" viewBox="0 0 83 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M41.3395 6.83336C22.5888 6.83336 7.33337 22.1605 7.33337 41C7.33337 59.8395 22.6605 75.1667 41.5 75.1667C60.3395 75.1667 75.6667 59.8395 75.6667 41C75.6667 22.1605 60.2678 6.83336 41.3395 6.83336ZM44.9167 58.0834H38.0834V51.25H44.9167V58.0834ZM44.9167 44.4167H38.0834V23.9167H44.9167V44.4167Z" fill="#DB2A2A"></path>
+                            </svg>
+                        </div>
+                        <div class="termination-confirmation-text">
+                            This will replace your current api tree code are you sure you want to replace the api tree code ?
+                        </div>
+                        <div class="termination-buttons">
+                            <button class="termination-no-btn modal-close" data-dismiss="modal" >No</button>
+                            <button onclick="save_code_into_api_tree_api_call()" class="termination-yes-btn modal-close">Yes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'AutomatedAPIApp/vendor/ace/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+
+{% endblock %}

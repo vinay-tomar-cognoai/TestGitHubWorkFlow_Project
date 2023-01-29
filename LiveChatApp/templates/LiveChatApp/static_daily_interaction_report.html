@@ -1,0 +1,321 @@
+{% extends 'LiveChatApp/report_console.html' %}
+{% block consolecontent %}
+{% load static %}
+<style type="text/css">
+.dataTables_filter {
+        display: none;
+    }
+#daily-interaction-report-table_info {
+      font-size: 13px;
+      margin-top: 60px;
+      color: #4D4D4D;
+      width: 50%;
+      padding-left: 10px;
+      display: inline-block;
+      position: absolute;
+      bottom: 2px;
+    }
+    .dataTables_empty {
+    text-align: center !important;
+  }
+  .ui-state-default{
+  background: #f6f6f6 !important;
+  color: #454545 !important;
+  border: 1px solid #c5c5c5 !important;
+}
+.ui-state-highlight{
+    background: #ffffff !important;
+    color: {{admin_config.get_livechat_theme_lighten_one}} !important;
+}
+.ui-state-active{
+  background: {{admin_config.get_livechat_theme_lighten_one}} !important;
+  color: #ffffff !important;
+  border: 1px solid {{admin_config.get_livechat_theme_lighten_one}} !important;
+}
+</style>
+<div class="col-xl-10 col-lg-10 col-md-12 col-sm-12 col-12 py-2 overflow-hidden-desktop" id="live-chat-reports-content-d-interaction" style="height: calc(100vh - 4.375rem); background: #FAFAFA; overflow-y: auto; overflow-x: hidden; max-width: 83%;">
+          <div class="live-chat-report-d-interaction-heading ">
+        <div class="row">
+            <!-- <img src="./img/mobile-back.svg" class="back-arrow-div" id="live-chat-active-customers-opener-setting" onclick="myFunctionArrow()"> -->
+           <svg width="14" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg" id="live-chat-d-interaction-icon">
+                <rect width="14" height="15" fill="#E5E5E5"/>
+                <g clip-path="url(#clip0)">
+                <rect width="1440" height="760" transform="translate(-286 -85)" fill="white"/>
+                <rect x="-209" y="-29" width="1363" height="704" fill="#FAFAFA"/>
+                <rect x="-19" y="-20" width="1163" height="119" fill="white"/>
+                <path d="M13.44 0H0.56C0.25025 0 0 0.268125 0 0.6V14.4C0 14.7319 0.25025 15 0.56 15H13.44C13.7498 15 14 14.7319 14 14.4V0.6C14 0.268125 13.7498 0 13.44 0ZM12.74 13.65H1.26V1.35H12.74V13.65ZM3.374 7.725H4.26125C4.326 7.725 4.38025 7.66875 4.38025 7.5975V6.11812C4.38025 5.74875 4.6585 5.45063 5.0015 5.45063H8.60125V6.45188C8.60125 6.55875 8.715 6.61688 8.792 6.55125L10.7013 4.94438C10.7625 4.89375 10.7625 4.79438 10.7013 4.74375L8.792 3.13687C8.715 3.07125 8.60125 3.13125 8.60125 3.23625V4.2375H4.99975C4.0355 4.2375 3.255 5.0775 3.255 6.11438V7.59375C3.255 7.66875 3.3075 7.725 3.374 7.725ZM3.3005 10.2544L5.20975 11.8612C5.28675 11.9269 5.4005 11.8669 5.4005 11.7619V10.7606H9.00025C9.9645 10.7606 10.745 9.92062 10.745 8.88375V7.40438C10.745 7.335 10.6925 7.27688 10.626 7.27688H9.73875C9.674 7.27688 9.61975 7.33313 9.61975 7.40438V8.88375C9.61975 9.25313 9.3415 9.55125 8.9985 9.55125H5.4005V8.55C5.4005 8.44313 5.28675 8.385 5.20975 8.45063L3.3005 10.0575C3.23925 10.1044 3.23925 10.2038 3.3005 10.2544Z" fill="#4D4D4D"/>
+                </g>
+                <defs>
+                <clipPath id="clip0">
+                <rect width="1440" height="760" fill="white" transform="translate(-286 -85)"/>
+                </clipPath>
+                </defs>
+            </svg>
+            <span>Daily Interaction</span>
+        </div>
+        <div class="row">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-report-button-section">
+              
+                <button class="filter-button" id="filterBtn-interaction" data-toggle="modal" data-target="#apply-filter-interaction-report">Filters
+                    <svg width="16" height="9" viewBox="0 0 16 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="16" height="9" fill="#E5E5E5"/>
+                        <g clip-path="url(#clip0)">
+                        <rect width="1440" height="660" transform="translate(-174 -97)" fill="white"/>
+                        <rect x="-97" y="-41" width="1363" height="604" fill="#FAFAFA"/>
+                        <rect x="-88" y="-30" width="1345" height="68" fill="white"/>
+                        <rect x="-72.5" y="-13.5" width="103" height="34" rx="4.5" fill="white" stroke="#E6E6E6"/>
+                        <path d="M5.33333 8.35714C5.33333 8.18665 5.40357 8.02313 5.5286 7.90257C5.65362 7.78201 5.82319 7.71429 6 7.71429H10C10.1768 7.71429 10.3464 7.78201 10.4714 7.90257C10.5964 8.02313 10.6667 8.18665 10.6667 8.35714C10.6667 8.52764 10.5964 8.69115 10.4714 8.81171C10.3464 8.93227 10.1768 9 10 9H6C5.82319 9 5.65362 8.93227 5.5286 8.81171C5.40357 8.69115 5.33333 8.52764 5.33333 8.35714ZM2.66667 4.5C2.66667 4.3295 2.7369 4.16599 2.86193 4.04543C2.98695 3.92487 3.15652 3.85714 3.33333 3.85714H12.6667C12.8435 3.85714 13.013 3.92487 13.1381 4.04543C13.2631 4.16599 13.3333 4.3295 13.3333 4.5C13.3333 4.6705 13.2631 4.83401 13.1381 4.95457C13.013 5.07513 12.8435 5.14286 12.6667 5.14286H3.33333C3.15652 5.14286 2.98695 5.07513 2.86193 4.95457C2.7369 4.83401 2.66667 4.6705 2.66667 4.5ZM0 0.642857C0 0.472361 0.070238 0.308848 0.195262 0.188289C0.320287 0.0677295 0.489856 0 0.666667 0H15.3333C15.5101 0 15.6797 0.0677295 15.8047 0.188289C15.9298 0.308848 16 0.472361 16 0.642857C16 0.813353 15.9298 0.976867 15.8047 1.09743C15.6797 1.21798 15.5101 1.28571 15.3333 1.28571H0.666667C0.489856 1.28571 0.320287 1.21798 0.195262 1.09743C0.070238 0.976867 0 0.813353 0 0.642857Z" fill="#868686"/>
+                        </g>
+                        <defs>
+                        <clipPath id="clip0">
+                        <rect width="1440" height="660" fill="white" transform="translate(-174 -97)"/>
+                        </clipPath>
+                        </defs>
+                    </svg>
+                </button>
+                <button class="export-button" id="exportBtn-interaction" data-toggle="modal" data-target="#modal-daily-interaction-report-filter">Export
+                    <svg width="15" height="11" viewBox="0 0 15 11" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-left: 12px; margin-top: -3px;">
+                        <rect width="15" height="11" fill="#E5E5E5"/>
+                        <g clip-path="url(#clip0)">
+                        <rect width="1440" height="660" transform="translate(-290 -95)" fill="white"/>
+                        <rect x="-213" y="-39" width="1363" height="604" fill="#FAFAFA"/>
+                        <rect x="-204" y="-28" width="1345" height="68" fill="white"/>
+                        <rect x="-65" y="-12" width="95" height="35" rx="5" fill="{{ admin_config.get_livechat_theme_lighten_one }}"/>
+                        <path d="M11.25 9.58965H1.5V3.24309H3.44625C3.44625 3.24309 3.963 2.61126 5.07375 1.83275H0.75C0.551088 1.83275 0.360322 1.90704 0.21967 2.03929C0.0790176 2.17153 0 2.3509 0 2.53792L0 10.2948C0 10.4819 0.0790176 10.6612 0.21967 10.7935C0.360322 10.9257 0.551088 11 0.75 11H12C12.1989 11 12.3897 10.9257 12.5303 10.7935C12.671 10.6612 12.75 10.4819 12.75 10.2948V7.65325L11.25 8.81326V9.58965ZM10.0208 4.6887V7.19277L15 3.52516L10.0208 0V2.2079C3.975 2.2079 3.975 7.82672 3.975 7.82672C5.6865 5.18373 6.7395 4.6887 10.0208 4.6887Z" fill="white"/>
+                        </g>
+                        <defs>
+                        <clipPath id="clip0">
+                        <rect width="1440" height="660" fill="white" transform="translate(-290 -95)"/>
+                        </clipPath>
+                        </defs>
+                    </svg>    
+                </button>
+
+                <div class="search-container">
+                    
+                        <button type="submit">
+                          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="13" height="13" fill="#E5E5E5"/>
+                                <g clip-path="url(#clip0)">
+                                <rect width="1440" height="660" transform="translate(-1209 -141)" fill="white"/>
+                                <rect x="-962" y="-85" width="1193" height="604" fill="#FAFAFA"/>
+                                <rect x="-952" y="-74" width="1174" height="114" fill="white"/>
+                                <g filter="url(#filter0_d)">
+                                <rect x="-14" y="-10" width="219" height="33" rx="5" fill="white"/>
+                                </g>
+                                <path d="M5.55942 11.1182C6.79289 11.118 7.99083 10.7051 8.96247 9.94526L12.0174 13L13 12.0174L9.9451 8.96269C10.7054 7.991 11.1185 6.79285 11.1188 5.55912C11.1188 2.49396 8.62474 0 5.55942 0C2.49409 0 0 2.49396 0 5.55912C0 8.62428 2.49409 11.1182 5.55942 11.1182ZM5.55942 1.38978C7.85893 1.38978 9.72898 3.25973 9.72898 5.55912C9.72898 7.85851 7.85893 9.72846 5.55942 9.72846C3.2599 9.72846 1.38985 7.85851 1.38985 5.55912C1.38985 3.25973 3.2599 1.38978 5.55942 1.38978Z" fill="#757575"/>
+                                </g>
+                                <defs>
+                                <filter id="filter0_d" x="-22" y="-18" width="235" height="49" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                                <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                                <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
+                                <feOffset/>
+                                <feGaussianBlur stdDeviation="4"/>
+                                <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.08 0"/>
+                                <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+                                <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+                                </filter>
+                                <clipPath id="clip0">
+                                <rect width="1440" height="660" fill="white" transform="translate(-1209 -141)"/>
+                                </clipPath>
+                                </defs>
+                          </svg>  
+                        </button>
+                        <input type="text" placeholder="Search" name="search" id="daily-interaction-report-table-search">
+                   
+                </div>
+
+
+            </div>
+        </div>
+
+    </div>
+    {% if interaction_objects %}
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-report-d-interaction-table-area live-chat-table-parent-div">
+        <table role="table" id="daily-interaction-report-table" class="display">
+            <thead role="rowgroup">
+                <tr role="row">
+                    <th role="columnheader">Date </th>
+                    <th role="columnheader">Bot name</th>
+                    <th role="columnheader">Interaction count</th>
+
+
+                </tr>
+            </thead>
+            <tbody role="rowgroup">
+            {% for object in interaction_objects %}
+                <tr role="row">
+                    <td role="cell">{{ object.date }}</td>
+                    <td role="cell">{{ object.name}}</td>
+                    <td role="cell">{{ object.interaction_count}}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="col s12 right-align">
+          <div class="pagination-div">
+          {% if interaction_objects.has_other_pages %}
+            <ul class="pagination-content">
+
+                {% if interaction_objects.number|add:'-4' > 1 %}
+                    <li><a href="?selected_bot_pk={{selected_bot_pk}}&start_date={{start_date|date:"Y-m-d"}}&end_date={{end_date|date:"Y-m-d"}}&page={{ interaction_objects.number|add:'-5' }}">&hellip;</a></li>
+                {% endif %}
+
+                {% for i in interaction_objects.paginator.page_range %}
+                    {% if interaction_objects.number == i %}
+                        <li class="active-page purple darken-3"><a href="?selected_bot_pk={{selected_bot_pk}}&start_date={{start_date|date:"Y-m-d"}}&end_date={{end_date|date:"Y-m-d"}}&page={{ i }}">{{ i }}</a></li>
+                    {% elif i > interaction_objects.number|add:'-5' and i < interaction_objects.number|add:'5' %}
+                        <li><a href="?selected_bot_pk={{selected_bot_pk}}&start_date={{start_date|date:"Y-m-d"}}&end_date={{end_date|date:"Y-m-d"}}&page={{ i }}">{{ i }}</a></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if interaction_objects.paginator.num_pages > interaction_objects.number|add:'4' %}
+                    <li><a href="?selected_bot_pk={{selected_bot_pk}}&start_date={{start_date|date:"Y-m-d"}}&end_date={{end_date|date:"Y-m-d"}}&page={{ interaction_objects.number|add:'5' }}">&hellip;</a></li>
+                {% endif %}
+
+                
+            </ul>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% else %}
+      <div class="col s12" style="height: 80vh;">
+          <p class="green lighten-1 black-text center" style="padding:1em;">No record found.</p>
+      </div>
+    {% endif %}
+</div>
+    <!-- Modal content -->
+      <div class="modal fade" id="apply-filter-interaction-report" tabindex="-1" role="dialog" aria-labelledby="Admin_report_performance_filter_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6>Filter</h6>
+                <svg width="16" height="9" viewBox="0 0 16 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M5.33333 8.35714C5.33333 8.18665 5.40357 8.02313 5.5286 7.90257C5.65362 7.78201 5.82319 7.71429 6 7.71429H10C10.1768 7.71429 10.3464 7.78201 10.4714 7.90257C10.5964 8.02313 10.6667 8.18665 10.6667 8.35714C10.6667 8.52764 10.5964 8.69115 10.4714 8.81171C10.3464 8.93227 10.1768 9 10 9H6C5.82319 9 5.65362 8.93227 5.5286 8.81171C5.40357 8.69115 5.33333 8.52764 5.33333 8.35714ZM2.66667 4.5C2.66667 4.3295 2.7369 4.16599 2.86193 4.04543C2.98695 3.92487 3.15652 3.85714 3.33333 3.85714H12.6667C12.8435 3.85714 13.013 3.92487 13.1381 4.04543C13.2631 4.16599 13.3333 4.3295 13.3333 4.5C13.3333 4.6705 13.2631 4.83401 13.1381 4.95457C13.013 5.07513 12.8435 5.14286 12.6667 5.14286H3.33333C3.15652 5.14286 2.98695 5.07513 2.86193 4.95457C2.7369 4.83401 2.66667 4.6705 2.66667 4.5ZM0 0.642857C0 0.472361 0.070238 0.308848 0.195262 0.188289C0.320287 0.0677295 0.489856 0 0.666667 0H15.3333C15.5101 0 15.6797 0.0677295 15.8047 0.188289C15.9298 0.308848 16 0.472361 16 0.642857C16 0.813353 15.9298 0.976867 15.8047 1.09743C15.6797 1.21798 15.5101 1.28571 15.3333 1.28571H0.666667C0.489856 1.28571 0.320287 1.21798 0.195262 1.09743C0.070238 0.976867 0 0.813353 0 0.642857Z" fill="#2D2D2D"></path>
+                </svg>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 mb-2">
+                        <label>Bot name</label>
+                        <select name="day" class="form-control select-dropdown-icon" id="select-bot-name">
+                          <option value="0">All</option>
+                        {% for bot in bot_list %}
+                            {% if bot.pk == selected_bot_pk %}
+                                <option value="{{ bot.pk }}" selected>{{ bot.name }}</option>
+                            {% else %}
+                                <option value="{{ bot.pk }}">{{ bot.name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-6 mb-2">
+                        <label>Start date</label>
+                        <input type="text" class="form-control" id="interaction-report-start-date" value="{{ start_date|date:" d-m-Y " }}"  placeholder="Select">
+                    </div>
+                    <div class="col-6 mb-2">
+                        <label>End date</label>
+                        <input type="text" class="form-control" id="interaction-report-end-date" value="{{ end_date|date:" d-m-Y " }}" placeholder="Select">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div style="float: right;">
+                    <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                    <button class="btn-primary" type="button" id="submit-filter" onclick="submit_daily_interaction_report_filter()">Apply</button>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+
+    <!-- Export Modal -->
+
+    <div class="modal fade" id="modal-daily-interaction-report-filter" tabindex="-1" role="dialog" aria-labelledby="Admin_report_export_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6>Select Date Range</h6>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 mb-2">
+                        <label>Range</label>
+                        <select name="day" class="form-control select-dropdown-icon" id="select-date-range-daily" onchange="check_select_date_range(this)">
+                          <option value="0" selected="selected">Choose date range</option>
+                          <option value="1">Last day</option>
+                          <option value="2">Last 7 days</option>
+                          <option value="3">Last 1 month</option>
+                          <option value="4">Custom Range</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row" id="custom-range-filter-daily" style="display: none;">
+                  <div class="col-12">
+                      <label>Filter by date range</label><br>
+                      <input type="text" class="form-control" id="export-filter-daily-default-start-date" placeholder="Start Date" value="{{ start_date|date:" d-m-Y " }}">
+                      <input type="text" class="form-control" id="export-filter-daily-default-end-date" placeholder="End Date" value="{{ end_date|date:" d-m-Y " }}">
+                  </div>
+                  <div class="col-12" style="margin-top: 18px;">
+                      <label>Email ID*</label>
+                      <input class="form-control" type="text" placeholder="Enter your email id" id="filter-data-email-daily" value="{{ request.user.email }}">
+                  </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+                <div style="float: right;">
+                    <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                    <button class="btn-primary" type="button" id="daily-interaction-report-filter">Export</button>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+  <script type="text/javascript">
+
+    $(document).ready(function() {
+        $('#daily-interaction-report-table').DataTable({
+            "language": {
+              "info": "Showing _START_ to _END_ entries out of {{ total_interaction_objects }}",
+              "infoEmpty": "No records available",
+              "infoFiltered": "(filtered from _MAX_ total records)",
+            },
+            "bPaginate": false,
+            "ordering": false,
+            "infoCallback": function( settings, start, end, max, total, pre ) {
+                if (settings.oPreviousSearch["sSearch"] != ""){
+                    return pre;
+                }
+                end = ({{ start_point }} - 1) + end;
+                start = ({{ start_point }} - 1) + start;
+                return "Showing " + start + " to " + end + " entries out of {{ total_interaction_objects }}" ;
+              }
+        });
+        var table = $('#daily-interaction-report-table').DataTable();
+
+        $('#daily-interaction-report-table-search').keyup(function() {
+          let value = this.value;
+          table.search(value).draw();
+        })
+
+        try {
+          document.getElementsByClassName('dataTables_empty')[0].innerHTML = 'No record found.';
+        } catch (err) {}
+        var start_date = "{{start_date|date:" d-m-Y "}}";
+        var end_date = "{{end_date|date:" d-m-Y "}}";
+        $('#interaction-report-start-date').datepicker({ dateFormat: 'dd-mm-yy', prevText: "Previous" }).val(start_date.trim());
+        $('#interaction-report-end-date').datepicker({ dateFormat: 'dd-mm-yy', prevText: "Previous" }).val(end_date.trim());
+        $('#export-filter-daily-default-start-date').datepicker({ dateFormat: 'dd-mm-yy', prevText: "Previous" }).val(start_date.trim());
+        $('#export-filter-daily-default-end-date').datepicker({ dateFormat: 'dd-mm-yy', prevText: "Previous" }).val(end_date.trim());
+    });
+    function check_select_date_range(element){
+        if(element.value=="4"){
+            document.getElementById("custom-range-filter-daily").style.display="block";
+        }else{
+            document.getElementById("custom-range-filter-daily").style.display="none";
+        }
+    }
+  </script>
+{% endblock %}
