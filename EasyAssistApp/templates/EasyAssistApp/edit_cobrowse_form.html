@@ -1,0 +1,552 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    {% if cognomeet_config_obj.cognomeet_favicon %}
+        <link rel="shortcut icon" type="image/x-icon" href="{{ cognomeet_config_obj.cognomeet_favicon }}">
+    {% else %}
+        {% if request.user.enable_s3_bucket %}
+        <link rel="shortcut icon" type="image/x-icon" href="https://static.allincall.in/static/EasyAssistApp/img/cobrowseLogoShort.svg">
+        {% else %}
+        <link rel="shortcut icon" type="image/x-icon" href="{% static 'EasyAssistApp/img/cobrowseLogoShort.svg' %}">
+        {% endif %}
+    {% endif %}
+    
+    <title>{{ cognomeet_config_obj.cognomeet_title_text }}</title>
+    {% if request.user.enable_s3_bucket %}
+    <!-- Custom fonts for this template-->
+    <link href="https://static.allincall.in/static/EasyAssistApp/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    {% else %}
+    <link href="{% static 'EasyAssistApp/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+    {% endif %}
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+    {% if request.user.enable_s3_bucket %}
+    <!-- Custom styles for this template-->
+    <link rel="stylesheet" href="https://static.allincall.in/static/EasyAssistApp/css/bootstrap-select.css" />
+    <link href="https://static.allincall.in/static/EasyAssistApp/css/sb-admin-2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://static.allincall.in/static/EasyAssistApp/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://static.allincall.in/static/EasyAssistApp/css/bootstrap-multiselect.css">
+    {% else %}
+    <!-- Custom styles for this template-->
+    <link rel="stylesheet" href="{% static 'EasyAssistApp/css/bootstrap-select.css' %}" />
+    <link href="{% static 'EasyAssistApp/css/sb-admin-2.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'EasyAssistApp/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'EasyAssistApp/css/bootstrap-multiselect.css' %}">
+    {% endif %}
+
+    <link rel="stylesheet" type="text/css" href="{% static 'EasyAssistApp/css/console.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'EasyAssistApp/css/cobrowse_changes.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'EasyAssistApp/css/cobrowse_responsive.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'EasyAssistApp/css/cobrowse_form.css' %}">
+
+    {% if request.user.enable_s3_bucket %}
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/vendor/jquery/jquery.min.js"></script>
+    <script src="https://static.allincall.in/static/EasyAssistApp/js/popper.min.js"></script>
+    <script src="https://static.allincall.in/static/EasyAssistApp/js/bootstrap_4.5.min.js"></script>
+    {% else %}
+    <script type="text/javascript" src="/static/EasyAssistApp/vendor/jquery/jquery.min.js"></script>
+    <script src="{% static 'EasyAssistApp/js/popper.min.js' %}"></script>
+    <script src="{% static 'EasyAssistApp/js/bootstrap_4.5.min.js' %}"></script>
+    {% endif %}
+
+    <style>
+        .navbar {
+            padding: .5em 3em!important;
+            margin-bottom: 4em!important;
+        }
+
+        .navbar-expand .navbar-nav {
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .navbar {
+                padding: .5rem 1rem!important;
+            }
+        }
+
+        {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+
+        :root {
+          --color_rgba_3: rgba({{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.red }}, {{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.green }}, {{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.blue }}, 0.03);
+
+          --color_rgb: {{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.rgb }};
+
+          --color_text: #4A4A4A;
+        }
+
+        .btn-primary, .btn-info {
+          background: var(--color_rgb) !important;
+        }
+
+        .btn-primary:hover,
+        .btn-info:hover {
+          color: #FFFFFF!important;
+          background: var(--color_rgb) !important;
+        }
+
+        .cobrowse-form .form-header-card .card-header {
+            background: var(--color_rgba_3) !important;
+        }
+
+        #content {
+          height: 100%;
+          width: 100%;
+          position: absolute;
+          background: var(--color_rgba_3) !important;
+        }
+
+        .cobrowse-form .add-new-category-btn .add-new-category-btn-icon {
+            background: var(--color_rgb) !important;
+        }
+
+        .cobrowse-form .add-new-category-btn .add-category-text {
+            color: var(--color_rgb) !important;
+        }
+
+        .cobrowse-form .create-form-card .form-category-container .edit-form-category-container .edit-category-container .category_name {
+            color: var(--color_rgb) !important;
+        }
+
+        .cobrowse-form .create-form-card {
+            background: transparent;
+        }
+
+        .cobrowse-form .create-form-card .form-category-container .edit-form-category-container .edit-category-container .add-new-question-btn {
+            border-color: var(--color_rgb) !important;
+            color: var(--color_rgb)!important;
+        }
+
+        .cobrowse-form .form-header-card .card-header .cobrowse-form-input {
+            border-color: var(--color_rgb)!important;
+            color: var(--color_rgb)!important;
+        }
+
+        .cobrowse-form .create-form-card .form-category-container .edit-form-category-container .add-question-container .question-option-li{
+            background: var(--color_rgb) !important;
+        }
+        {% endif %}
+
+        @media only screen and (max-width: 769px) {
+            .cobrowse-form nav .navbar-nav li:first-child{
+                display: none!important;
+            }
+
+            .card-body {
+                padding: 1.25rem!important;
+            }
+
+            *[id^='form-category-name-'] {
+                width: 100%;
+            }
+
+            .cobrowse-form .create-form-card .form-category-container .collapse-dropdown-menu .dropdown-list .form-category-action-btn {
+                display: flex!important;
+                overflow: unset!important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    {% csrf_token %}
+
+      <!-- Main Content -->
+      <div id="content" class="cobrowse-form">
+
+        <!-- Topbar -->
+        <nav class="navbar navbar-expand navbar-light bg-white topbar static-top shadow">
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown no-arrow">
+                    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/" style="height:3.75rem !important;">
+                    {% if cognomeet_config_obj.cognomeet_logo %}
+                        <img id="cobrowseLogoImage" src="{{ cognomeet_config_obj.cognomeet_logo }}" alt="Logo" max-width = "90px" height = "50px" />
+                    {% else %}
+                    {% if cobrowse_agent.get_access_token_obj.source_easyassist_cobrowse_logo %}
+                        <img id="cobrowseLogoImage" src="/{{ cobrowse_agent.get_access_token_obj.source_easyassist_cobrowse_logo }}" alt="Cogno CoBrowse" max-width = "90px" height = "50px" />
+                    {% else %}
+                        {% if request.user.enable_s3_bucket %}
+                        <img id="cobrowseLogoImage" src="https://static.allincall.in/static/EasyAssistApp/img/cobrowseLogo.svg" id="sales-ai-logo" alt="Cogno CoBrowse" max-width = "90px" height = "50px"/>
+                        {% else %}
+                        <img id="cobrowseLogoImage" src="{% static 'EasyAssistApp/img/cobrowseLogo.svg' %}" id="sales-ai-logo" alt="Cogno CoBrowse" max-width = "90px" height = "50px"/>
+                        {% endif %}
+                    {% endif %}
+                    {% endif %}
+                    </a>
+                </li>
+
+                <li class="nav-item dropdown no-arrow">
+                    <span class="cobrowse-form-heading">Form</span>
+                </li>
+
+                <li class="nav-item dropdown no-arrow">
+                    <button class="btn btn-primary create-form-button" type="button" onclick="save_form(this);">
+                        Save Form
+                    </button>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="row justify-content-center mb-4">
+            <div class="col-md-8 col-sm-12">
+                <div class="card form-header-card">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-12">
+                                <div class="header-text">Form Name</div>
+                                <div class="mt-1">
+                                    <input class="cobrowse-form-input" type="text" id="form-name" value="{{ cobrowse_form_obj.form_name }}"/>
+                                    <input type="hidden" value="{{ cobrowse_form_obj.pk }}" id="form-id">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8 col-sm-12 mt-4">
+                <div class="card create-form-card">
+                    <div class="card-body form-category-container">
+                        <div>
+                            <div class="btn-group form-category-btn-group collapsed" role="group" data-toggle="collapse" data-target="#form-category" id="form-category-dropdown">
+                                <button type="button" class="btn">Select Section</button>
+                                <button type="button" class="btn collapsed">
+                                    <svg width="8" height="9" viewBox="0 0 8 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M7.05 3.37417C7.91667 3.87454 7.91667 5.12546 7.05 5.62583L2.7 8.13731C1.83333 8.63768 0.750001 8.01221 0.750001 7.01147L0.750001 1.98853C0.750001 0.987786 1.83333 0.362323 2.7 0.862693L7.05 3.37417Z" fill="#2D2D22"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <button type="button" class="btn add-new-category-btn" onclick="add_new_form_category();">
+                                <span class="add-new-category-btn-icon">
+                                    <svg width="20" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M23.8125 10.3125H13.6875V0.1875H10.3125V10.3125H0.1875V13.6875H10.3125V23.8125H13.6875V13.6875H23.8125V10.3125Z" fill="white"/>
+                                    </svg>
+                                </span>
+                                <span class="add-category-text">Add Section</span>
+                            </button>
+                        </div>
+                        <div id="form-category" class="collapse collapse-dropdown-menu">
+                            {% for form_category in cobrowse_form_categories %}
+                            <li class="dropdown-list" id="form-category-list-{{ form_category.pk }}">
+                                <div style="display: inline-block;">
+                                    <input type="text" value="{{ form_category.title }}" id="form-category-name-{{ form_category.pk }}" class="form-category-input" onmouseup="select_category_value(this)" onkeyup="update_category_name(this.value, '{{ form_category.pk }}')"/>
+                                </div>
+                                <div class="form-category-action-btn">
+                                    <button class="btn" type="button" role="group" data-toggle="collapse" data-target="#edit-category-{{ form_category.pk }}">
+                                        <svg width="17" height="17" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M9.84202 0.713396C10.7932 -0.237799 12.3354 -0.237799 13.2866 0.713396C14.1982 1.62496 14.2361 3.07929 13.4005 4.03608L13.2866 4.15798L4.8794 12.5652C4.6999 12.7447 4.48395 12.8826 4.24688 12.9699L4.10223 13.0162L0.553236 13.9841C0.249894 14.0668 -0.0302313 13.8143 0.00263139 13.5162L0.0159031 13.4468L0.98381 9.89777C1.0506 9.65287 1.16969 9.42602 1.33219 9.23255L1.43482 9.1206L9.84202 0.713396ZM9.08915 2.70443L2.0537 9.73947C1.97292 9.82025 1.909 9.91578 1.86519 10.0205L1.82819 10.1281L1.06094 12.9381L3.87194 12.1718C3.94541 12.1518 4.01564 12.1223 4.08095 12.0844L4.17504 12.0213L4.26053 11.9463L11.2956 4.91086L9.08915 2.70443ZM12.6677 1.33227C12.0922 0.756725 11.1789 0.72475 10.5658 1.23635L10.4609 1.33227L9.70793 2.08565L11.9144 4.29208L12.6677 3.5391C13.2433 2.96356 13.2753 2.05028 12.7637 1.43721L12.6677 1.33227Z" fill="#212121"/>
+                                        </svg>
+                                    </button>
+                                    <button class="btn" type="button" data-toggle="modal" data-target="#delete-category-modal-{{ form_category.pk }}">
+                                        <svg width="17" height="19" viewBox="0 0 12 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M6 0C7.20256 0 8.18476 0.926865 8.24688 2.09313L8.25 2.21053H11.55C11.7985 2.21053 12 2.40846 12 2.65263C12 2.87645 11.8307 3.06143 11.6111 3.0907L11.55 3.09474H10.9146L10.1827 11.9681C10.088 13.1159 9.11217 14 7.94004 14H4.05996C2.88783 14 1.91205 13.1159 1.81732 11.9681L1.0848 3.09474H0.45C0.222183 3.09474 0.0339053 2.92841 0.00410786 2.71262L0 2.65263C0 2.42881 0.169292 2.24384 0.388938 2.21456L0.45 2.21053H3.75C3.75 0.989686 4.75736 0 6 0ZM10.012 3.09474H1.98796L2.71438 11.8967C2.77121 12.5853 3.35668 13.1158 4.05996 13.1158H7.94004C8.64332 13.1158 9.22879 12.5853 9.28562 11.8967L10.012 3.09474ZM4.65 5.30526C4.87782 5.30526 5.06609 5.47159 5.09589 5.68738L5.1 5.74737V10.4632C5.1 10.7073 4.89853 10.9053 4.65 10.9053C4.42218 10.9053 4.23391 10.7389 4.20411 10.5231L4.2 10.4632V5.74737C4.2 5.5032 4.40147 5.30526 4.65 5.30526ZM7.35 5.30526C7.57782 5.30526 7.76609 5.47159 7.79589 5.68738L7.8 5.74737V10.4632C7.8 10.7073 7.59853 10.9053 7.35 10.9053C7.12218 10.9053 6.93391 10.7389 6.90411 10.5231L6.9 10.4632V5.74737C6.9 5.5032 7.10147 5.30526 7.35 5.30526ZM6 0.88421C5.28548 0.88421 4.70061 1.42957 4.65311 2.11972L4.65 2.21053H7.35L7.34689 2.11972C7.29939 1.42957 6.71452 0.88421 6 0.88421Z" fill="#212121"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <input type="hidden" value="{{ form_category.pk }}" name="form-category-id">
+                            </li>
+                            <div class="modal fade" id="delete-category-modal-{{ form_category.pk }}" tabindex="-1" role="dialog" aria-labelledby="apply_filter_modal_modal_label" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="apply_filter_modal_modal_label">Delete Section</h5>
+                                        </div>
+                                        <div class="modal-body">
+                                            Do you really want to delete this Section?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                                            <button class="btn btn-danger" onclick="delete_existing_form_category('{{ form_category.pk }}')">Delete</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="edit-category-{{ form_category.pk }}" class="collapse edit-form-category-container">
+                                <div class="row">
+                                    <div class="col-12" style="padding: 0">
+                                        <div class="card edit-category-container">
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-9 col-sm-12">
+                                                        <div style="vertical-align: middle">
+                                                            Please add your question in <span class="category_name">{{ form_category.title }}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-12 text-md-right mt-sm padding-sm" style="padding: 0">
+                                                        <button class="btn add-new-question-btn" onclick="add_new_question('{{ form_category.pk }}');">
+                                                            + Add new question
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row" id="question-container-{{ form_category.pk }}">
+                                    {% for form_element in cobrowse_form_elements %}
+                                    {% if form_element.form_category == form_category %}
+                                        <div class="col-12 mb-3" style="padding: 0;" id="form-question-{{ form_element.pk }}">
+                                            <div class="card add-question-container">
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-md-7 col-sm-12" style="padding: 0" id="form-category-question-field-{{ form_element.pk }}">
+                                                            {% if form_element.element_type == 'text' %}
+                                                            <div class="question-text">Add question</div>
+                                                            <div class="mt-3">
+                                                                <input class="cobrowse-form-input" placeholder="Label" type="text" id="question-label-{{ form_element.pk }}" value="{{ form_element.element_label }}"/>
+                                                            </div>
+                                                            <div id="question-option-container-{{ form_element.pk }}">
+                                                            </div>
+                                                            <div class="mt-4">
+                                                                {% if form_element.is_mandatory %}
+                                                                <input type="checkbox" class="mandatory-checkbox" id="mandatory-checkbox-{{ form_element.pk }}" checked />
+                                                                {% else %}
+                                                                <input type="checkbox" class="mandatory-checkbox" id="mandatory-checkbox-{{ form_element.pk }}" />
+                                                                {% endif %}
+                                                                <label for="mandatory-checkbox-{{ form_element.pk }}">Mandatory Field</label>
+                                                            </div>
+
+                                                            {% elif form_element.element_type == 'number' %}
+                                                            <div class="question-text">Add question</div>
+                                                            <div class="mt-3">
+                                                                <input class="cobrowse-form-input" placeholder="Label" type="text" id="question-label-{{ form_element.pk }}" value="{{ form_element.element_label }}"/>
+                                                            </div>
+                                                            <div id="question-option-container-{{ form_element.pk }}">
+                                                            </div>
+                                                            <div class="mt-4">
+                                                                {% if form_element.is_mandatory %}
+                                                                <input type="checkbox" class="mandatory-checkbox" id="mandatory-checkbox-{{ form_element.pk }}" checked />
+                                                                {% else %}
+                                                                <input type="checkbox" class="mandatory-checkbox" id="mandatory-checkbox-{{ form_element.pk }}" />
+                                                                {% endif %}
+                                                                <label for="mandatory-checkbox-{{ form_element.pk }}">Mandatory Field</label>
+                                                            </div>
+
+                                                            {% elif form_element.element_type == 'radio' %}
+                                                            <div class="question-text">Add question</div>
+                                                            <div class="mt-3">
+                                                                <input class="cobrowse-form-input" placeholder="Label" type="text" id="question-label-{{ form_element.pk }}" value="{{ form_element.element_label }}"/>
+                                                            </div>
+                                                            <div id="question-option-container-{{ form_element.pk }}">
+                                                                <div class="mt-3">
+                                                                    <ul class="question_options_list" style="padding: 0;" id="question-options-{{ form_element.pk }}">
+                                                                        {% for choice in form_element.get_element_choices %}
+                                                                        <li class="question-option-li">
+                                                                            <span style="font-weight: bold;" class="question-option-text">
+                                                                                {{ choice }}
+                                                                            </span>
+                                                                            <span style="color:white;cursor: pointer;font-weight: bold;float: right;margin-left:0.5em;" onclick="remove_question_option(this)">
+                                                                            x
+                                                                            </span>
+                                                                        </li>
+                                                                        {% endfor %}
+                                                                    </ul>
+                                                                    <input class="question-options-input cobrowse-form-input" placeholder="Options" type="text" />
+                                                                </div>
+                                                            </div>
+                                                            <div class="mt-4">
+                                                                {% if form_element.is_mandatory %}
+                                                                <input type="checkbox" class="mandatory-checkbox" id="mandatory-checkbox-{{ form_element.pk }}" checked />
+                                                                {% else %}
+                                                                <input type="checkbox" class="mandatory-checkbox" id="mandatory-checkbox-{{ form_element.pk }}" />
+                                                                {% endif %}
+                                                                <label for="mandatory-checkbox-{{ form_element.pk }}">Mandatory Field</label>
+                                                            </div>
+
+                                                            {% elif form_element.element_type == 'checkbox' %}
+                                                            <div class="question-text">Add question</div>
+                                                            <div class="mt-3">
+                                                                <input class="cobrowse-form-input" placeholder="Label" type="text" id="question-label-{{ form_element.pk }}" value="{{ form_element.element_label }}"/>
+                                                            </div>
+                                                            <div id="question-option-container-{{ form_element.pk }}">
+                                                                <div class="mt-3">
+                                                                    <ul class="question_options_list" style="padding: 0;" id="question-options-{{ form_element.pk }}">
+                                                                        {% for choice in form_element.get_element_choices %}
+                                                                        <li class="question-option-li">
+                                                                            <span style="font-weight: bold;" class="question-option-text">
+                                                                                {{ choice }}
+                                                                            </span>
+                                                                            <span style="color:white;cursor: pointer;font-weight: bold;float: right;margin-left:0.5em;" onclick="remove_question_option(this)">
+                                                                            x
+                                                                            </span>
+                                                                        </li>
+                                                                        {% endfor %}
+                                                                    </ul>
+                                                                    <input class="question-options-input cobrowse-form-input" placeholder="Options" type="text" />
+                                                                </div>
+                                                            </div>
+                                                            <div class="mt-4">
+                                                                {% if form_element.is_mandatory %}
+                                                                <input type="checkbox" class="mandatory-checkbox" id="mandatory-checkbox-{{ form_element.pk }}" checked />
+                                                                {% else %}
+                                                                <input type="checkbox" class="mandatory-checkbox" id="mandatory-checkbox-{{ form_element.pk }}" />
+                                                                {% endif %}
+                                                                <label for="mandatory-checkbox-{{ form_element.pk }}">Mandatory Field</label>
+                                                            </div>
+
+                                                            {% elif form_element.element_type == 'dropdown' %}
+                                                            <div class="question-text">Add question</div>
+                                                            <div class="mt-3">
+                                                                <input class="cobrowse-form-input" placeholder="Label" type="text" id="question-label-{{ form_element.pk }}" value="{{ form_element.element_label }}"/>
+                                                            </div>
+                                                            <div id="question-option-container-{{ form_element.pk }}">
+                                                                <div class="mt-3">
+                                                                    <ul class="question_options_list" style="padding: 0;" id="question-options-{{ form_element.pk }}">
+                                                                        {% for choice in form_element.get_element_choices %}
+                                                                        <li class="question-option-li">
+                                                                            <span style="font-weight: bold;" class="question-option-text">
+                                                                                {{ choice }}
+                                                                            </span>
+                                                                            <span style="color:white;cursor: pointer;font-weight: bold;float: right;margin-left:0.5em;" onclick="remove_question_option(this)">
+                                                                            x
+                                                                            </span>
+                                                                        </li>
+                                                                        {% endfor %}
+                                                                    </ul>
+                                                                    <input class="question-options-input cobrowse-form-input" placeholder="Options" type="text" />
+                                                                </div>
+                                                            </div>
+                                                            <div class="mt-4">
+                                                                {% if form_element.is_mandatory %}
+                                                                <input type="checkbox" class="mandatory-checkbox" id="mandatory-checkbox-{{ form_element.pk }}" checked />
+                                                                {% else %}
+                                                                <input type="checkbox" class="mandatory-checkbox" id="mandatory-checkbox-{{ form_element.pk }}" />
+                                                                {% endif %}
+                                                                <label for="mandatory-checkbox-{{ form_element.pk }}">Mandatory Field</label>
+                                                            </div>
+                                                            {% endif %}
+                                                        </div>
+                                                        <div class="col-md-5 col-sm-12 mt-sm" style="padding: 0">
+                                                            <div class="question-text">Choose Input Type</div>
+                                                            <div class="mt-3">
+                                                                <select class="selectpicker" id="question-type-{{ form_element.pk }}" onchange="update_form_category_question_field(this.value, '{{ form_element.pk }}')">
+                                                                    {% if form_element.element_type == 'text' %}
+                                                                    <option value="text" selected>Text</option>
+                                                                    {% else %}
+                                                                    <option value="text">Text</option>
+                                                                    {% endif %}
+
+                                                                    {% if form_element.element_type == 'number' %}
+                                                                    <option value="number" selected>Number</option>
+                                                                    {% else %}
+                                                                    <option value="number">Number</option>
+                                                                    {% endif %}
+
+                                                                    {% if form_element.element_type == 'radio' %}
+                                                                    <option value="radio" selected>Radio</option>
+                                                                    {% else %}
+                                                                    <option value="radio">Radio</option>
+                                                                    {% endif %}
+
+                                                                    {% if form_element.element_type == 'checkbox' %}
+                                                                    <option value="checkbox" selected>Checkbox</option>
+                                                                    {% else %}
+                                                                    <option value="checkbox">Checkbox</option>
+                                                                    {% endif %}
+
+                                                                    {% if form_element.element_type == 'dropdown' %}
+                                                                    <option value="dropdown" selected>Dropdown</option>
+                                                                    {% else %}
+                                                                    <option value="dropdown">Dropdown</option>
+                                                                    {% endif %}
+                                                                </select>
+                                                            </div> 
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="remove-question-container">
+                                                    <button class="btn" type="button" data-toggle="modal" data-target="#delete-question-modal-{{ form_element.pk }}">
+                                                        <svg width="11" height="10" viewBox="0 0 11 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M11 1.23576L9.64067 0L5.5 3.76424L1.35933 0L0 1.23576L4.14067 5L0 8.76424L1.35933 10L5.5 6.23576L9.64067 10L11 8.76424L6.85933 5L11 1.23576Z" fill="#757575"/>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                                <input type="hidden" name="form-question-id" value="{{ form_element.pk }}" />
+                                            </div>
+                                            <div class="modal fade" id="delete-question-modal-{{ form_element.pk }}" tabindex="-1" role="dialog" aria-labelledby="apply_filter_modal_modal_label" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="apply_filter_modal_modal_label">Delete Question</h5>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            Do you really want to delete this question?
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                                                            <button class="btn btn-danger" onclick="remove_existing_form_category_question('{{ form_element.pk }}')">Delete</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="3000" style="position: absolute; top: 0; right: 0;">
+        <div class="toast-header">
+            <strong class="mr-auto">Alert</strong>
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="toast-body" id="toast_message">
+        </div>
+    </div>
+    <script type="text/javascript" src="{% static 'EasyAssistApp/js/validations.js' %}"></script>
+    {% if request.user.enable_s3_bucket %}
+    <script src="https://static.allincall.in/static/EasyAssistApp/js/bootstrap-select.min.js"></script>
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/crypto-js.min.js"></script>
+    <script src="https://static.allincall.in/static/EasyAssistApp/js/timezz.min.js"></script>
+    {% else %}
+    <script src="{% static 'EasyAssistApp/js/bootstrap-select.min.js' %}"></script>
+    <script type="text/javascript" src="/static/EasyAssistApp/js/crypto-js.min.js"></script>
+    <script src="{% static 'EasyAssistApp/js/timezz.min.js' %}"></script>
+    {% endif %}
+    <script type="text/javascript" src="/static/EasyAssistApp/js/encrypt.js"></script>
+    <script src="{% static 'EasyAssistApp/js/cobrowse_form.js' %}"></script>
+    <script type="text/javascript">
+        $('.question-options-input').on('keypress', function(e) {
+            if (e.key === 'Enter' || e.keyCode==13) {
+                let val = e.target.value.trim().replace( /(<([^>]+)>)/ig, '');
+                if (val !== '') {
+                    let option_already_exist = false;
+                    $(e.target).parent().find('ul').find('.question-option-text').each(function(_, option_text_el) {
+                        if($(option_text_el).html().trim() == val) {
+                            option_already_exist = true;
+                            return;
+                        }
+                    });
+                    if(option_already_exist) {
+                        alert("Option already exist.");
+                    } else {
+                        render_question_options(e.target);
+                    }
+                    e.target.value = '';
+                    e.target.focus();
+                } else {
+                    alert('Options cannot be empty');
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

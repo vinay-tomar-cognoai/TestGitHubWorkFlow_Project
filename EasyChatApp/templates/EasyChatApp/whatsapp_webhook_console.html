@@ -1,0 +1,255 @@
+{% extends 'EasyChatApp/base.html' %}
+{% block content %}
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="/static/EasyChatApp/css/whatsapp_webhook_console.css?v={% random_int 1 100 %}" media="screen">
+<div class="add-scrolling">
+<div class="row" style="padding:1em;" id="easychat-whatsapp-webhooks-container">
+  <div class="col s8" style="padding: 0px;">
+      <div class="col s12" style="padding:20px 10px; display: flex;">
+          <a class="easychat-whatsapp-config-back-btn" href="/chat/channels/whatsapp/?id={{ bot_obj.pk }}">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8.73171 16.7951C9.03264 17.0797 9.50733 17.0665 9.79196 16.7656C10.0766 16.4646 10.0634 15.9899 9.76243 15.7053L4.52339 10.7502H17.2471C17.6613 10.7502 17.9971 10.4144 17.9971 10.0002C17.9971 9.58598 17.6613 9.25019 17.2471 9.25019H4.52112L9.76243 4.29294C10.0634 4.00831 10.0766 3.53362 9.79196 3.23269C9.50733 2.93175 9.03264 2.91853 8.73171 3.20316L2.31449 9.2726C2.14819 9.42989 2.04819 9.63 2.01448 9.83879C2.00308 9.89077 1.99707 9.94478 1.99707 10.0002C1.99707 10.0578 2.00356 10.1139 2.01585 10.1677C2.05084 10.3735 2.15039 10.5704 2.31449 10.7256L8.73171 16.7951Z" fill="#0254D7"/>
+              </svg>
+          </a>
+          <span class="easychat-whatsapp-config-bot-name">{{ bot_obj.name }}</span>
+      </div>
+      <div class="col s12 easychat-config-dropdown-btn-wrapper">
+          <div id="easychat_config_dropdown_wrapper">
+            <select name="eastchat_whatsapp_config_dropdown" id="eastchat_whatsapp_config_dropdown" onchange="get_whatsapp_webhook_default_code(this.value)">
+              <option value="none">
+                  Select WhatsApp BSP
+              </option>
+              {% for wsp in whatsapp_service_providers %}
+                {% if selected_whatsapp_service_provider == wsp %}
+                <option value="{{ wsp.name }}" selected>{{ wsp.get_name_display }}</option>
+                {% else %}
+                <option value="{{ wsp.name }}">{{ wsp.get_name_display }}</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+            <div id="eastchat_whatsapp_config_dropdown_container"></div>
+          </div>
+          <div>
+              {% if selected_whatsapp_service_provider == None and code == "" %}
+              <a id="save_wa_webhook_btn" onclick="save_whatsapp_webhooks_content({{ bot_obj.pk }})" class="btn easychat-config-save-reset-btns" style="background-color:#2755CB !important" disabled> Save</a>
+              {% else %}
+              <a id="save_wa_webhook_btn" onclick="save_whatsapp_webhooks_content({{ bot_obj.pk }})" class="btn easychat-config-save-reset-btns" style="background-color:#2755CB !important"> Save</a>
+              {% endif %}
+          </div>
+          <div>
+              {% if selected_whatsapp_service_provider == None and code == "" %}
+              <a id="reset_wa_webhook_btn" class="btn easychat-config-save-reset-btns modal-trigger" href="#easychat_whatsapp_config_reset_modal" style="background-color:#E53E3E !important" disabled> Reset</a>
+              {% else %}
+              <a id="reset_wa_webhook_btn" class="btn easychat-config-save-reset-btns modal-trigger" href="#easychat_whatsapp_config_reset_modal" style="background-color:#E53E3E !important"> Reset</a>
+              {% endif %}
+          </div>
+      </div>
+      {% if selected_whatsapp_service_provider == None and code == "" or is_any_other_user_active %}
+      <div id="whatsapp_webhook_function_div" class="col s12" style="background-color: #F8F9FC; display: none;">
+      {% else %}
+      <div id="whatsapp_webhook_function_div" class="col s12" style="background-color: #F8F9FC;">
+      {% endif %}
+          <div class="col s12" style="background-color: #F8F9FC; display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center;"><div class="easychat-whatsapp-config-bot-name-div">
+                  {{ bot_obj.name }} - {{ selected_whatsapp_service_provider.get_name_display }}
+              </div><p id="easychat-auto-save-tag" style="color: green; display: none; margin: 0 0 0 10px; font-size: 14px;">Changes saved!</p></div>
+              <a href="javascript:void(0)" class="right tooltipped" data-position="top" data-tooltip="Full-screen mode" onclick="go_full_screen_mode()"><i class="material-icons inline-icon black-text" style="font-size: 28px !important;">fullscreen</i></a>
+          </div>
+          <div id="editor-code-whatsapp">{{code}}</div><br><br>
+          <div class="col s12">
+              <br>
+              <textarea col="30" id="easychat-processor-status" disabled style="color: #F1F2EB;resize:none;height: 18em;border-radius: 0.5em;overflow: auto;display: none;background-color: #272822"></textarea>
+          </div>
+          <div class="processor-errors" id="system-command-error">Don't use system commands.</div>
+      </div>
+  </div>
+  <div class="col s4">
+      <div id="easychat_whatsapp">
+          <div class="easychat-whatsapp-webhook-heading">WhatsApp Webhook</div>
+          <ul class="collection">
+              <li class="collection-item">
+                  <button class="easychat_whatsapp_collapsible">status_code</button>
+                  <div class="easychat_whatsapp_content">
+                      <ul>
+                          <li>200: This status code represents the "SUCCESS".</li>
+                          <li>101: This status code represent whether the channel does not supports the WhatsApp or you haven't configured the WhatsApp Mobile Number.</li>
+                          <li>400: This status code represents when there is no response from the Whatsapp API.</li>
+                          <li>500: This status code represents the "Internal server error".</li>
+                      </ul>
+                  </div>
+              </li>
+              <li class="collection-item">
+                  <button class="easychat_whatsapp_collapsible">status_message</button>
+                  <div class="easychat_whatsapp_content">
+                      <p>Status message is based status code.</p>
+                      <ul>
+                          <li>200: "SUCCESS".</li>
+                          <li>101: "This channel currently not supported" or "Please configure whatsapp number".</li>
+                          <li>400: "Whatsapp end point API failed."</li>
+                          <li>500: "Internal server error".</li>
+                      </ul>
+                  </div>
+              </li>
+              <li class="collection-item">
+                  <button class="easychat_whatsapp_collapsible">Important points to remember</button>
+                  <div class="easychat_whatsapp_content">
+                      <p>1. Make sure you have configured the mobile number in "mobile_number" parameter.</p>
+                      <p>Ex. response["mobile_number"] = "99XXXXXXXX".</p>
+                      <p>2. For each bot the webhook url will be different</p>
+                      <p>Ex: If bot id is "1" than the webhook url will be: www.easychat.allincall.in/webhook/whatsapp/bot_id=1</p>
+                  </div>
+              </li>
+          </ul>
+      </div>
+  </div>
+</div>
+
+<!-- Whatsapp Config Reset  Modal -->
+<div id="easychat_whatsapp_config_reset_modal" class="modal easychat-custom-modals-wrapper easychat-custom-delete-modal">
+  <div class="modal-content">
+      <div class="row" style="margin-bottom: 0px !important;">
+          <div class="modal-overflow-content-div">
+              <div class="termination-confirmation-modal-container">
+                  <div class="termination-icon">
+                      <svg width="83" height="82" viewBox="0 0 83 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M41.3395 6.83336C22.5888 6.83336 7.33337 22.1605 7.33337 41C7.33337 59.8395 22.6605 75.1667 41.5 75.1667C60.3395 75.1667 75.6667 59.8395 75.6667 41C75.6667 22.1605 60.2678 6.83336 41.3395 6.83336ZM44.9167 58.0834H38.0834V51.25H44.9167V58.0834ZM44.9167 44.4167H38.0834V23.9167H44.9167V44.4167Z" fill="#DB2A2A"></path>
+                      </svg>
+                  </div>
+                  <div class="termination-confirmation-heading-text">
+                      Reset this configuration?
+                  </div>
+                  <div class="termination-confirmation-text">
+                      Are you sure you want to reset this configuration, as all your code changes will get lost and reset to default.
+                  </div>
+                  <div class="termination-buttons">
+                      <button class="termination-no-btn modal-close">Cancel</button>
+                      <button onclick="reset_whatsapp_webhook_code();" class="termination-yes-btn modal-close">Confirm</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- Whatsapp Config assign  Modal -->
+<div id="easychat_whatsapp_config_assign_modal" class="modal easychat-custom-modals-wrapper easychat-custom-delete-modal">
+  <div class="modal-content">
+      <div class="row" style="margin-bottom: 0px !important;">
+          <div class="modal-overflow-content-div">
+              <div class="termination-confirmation-modal-container">
+                  <div class="termination-icon">
+                      <svg width="83" height="82" viewBox="0 0 83 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M41.3395 6.83336C22.5888 6.83336 7.33337 22.1605 7.33337 41C7.33337 59.8395 22.6605 75.1667 41.5 75.1667C60.3395 75.1667 75.6667 59.8395 75.6667 41C75.6667 22.1605 60.2678 6.83336 41.3395 6.83336ZM44.9167 58.0834H38.0834V51.25H44.9167V58.0834ZM44.9167 44.4167H38.0834V23.9167H44.9167V44.4167Z" fill="#DB2A2A"></path>
+                      </svg>
+                  </div>
+                  <div class="termination-confirmation-subheading-text">
+                      {{bot_obj.name}} is already configured with {{selected_whatsapp_service_provider.get_name_display}}.
+                  </div>
+                  <div class="termination-confirmation-text">
+                      Selecting a different WhatsApp BSP will overwrite the existing code. Do you still want to continue?
+                  </div>
+                  <div class="termination-buttons">
+                      <button onclick="close_change_webhook_confirm_modal()" class="termination-no-btn modal-close">No</button>
+                      <button onclick="change_webhook_code()" class="termination-yes-btn modal-close">Yes</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- Whatsapp Config already working  Modal -->
+<div id="easychat_whatsapp_config_already_working_modal" class="modal easychat-custom-modals-wrapper easychat-custom-delete-modal">
+  <div class="modal-content">
+      <div class="row" style="margin-bottom: 0px !important;">
+          <div class="modal-overflow-content-div">
+              <div class="termination-confirmation-modal-container">
+                  <div class="termination-icon">
+                      <svg width="83" height="82" viewBox="0 0 83 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M41.3395 6.83336C22.5888 6.83336 7.33337 22.1605 7.33337 41C7.33337 59.8395 22.6605 75.1667 41.5 75.1667C60.3395 75.1667 75.6667 59.8395 75.6667 41C75.6667 22.1605 60.2678 6.83336 41.3395 6.83336ZM44.9167 58.0834H38.0834V51.25H44.9167V58.0834ZM44.9167 44.4167H38.0834V23.9167H44.9167V44.4167Z" fill="#DB2A2A"></path>
+                      </svg>
+                  </div>
+                  <div class="termination-confirmation-subheading-text">
+                    {% if active_user_mail != "" %} 
+                        {{ active_user_mail }}
+                    {% else %}
+                        Somebody 
+                    {% endif %} 
+                    is already working on this code
+                  </div>
+                  <div class="termination-confirmation-text">
+                      Proceeding further may result in overriding the code, please contact your team. Do you still want to continue anyway?
+                  </div>
+                  <div class="termination-buttons">
+                      <button class="termination-no-btn modal-close">No</button>
+                      <button onclick="continue_collaborative_coding()" class="termination-yes-btn modal-close">Yes</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+</div>
+
+{% if request.user.enable_s3_bucket %}
+
+<script src="https://static.allincall.in/static/EasyChatApp/js/ace.js" type="text/javascript" charset="utf-8"></script>
+
+{% else %}
+
+<script src="{% static 'EasyChatApp/js/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+
+{% endif %}
+
+<script src="{% static 'EasyChatApp/js/ext-searchbox.js' %}" type="text/javascript" charset="utf-8"></script>
+
+<script src="{% static 'EasyChatApp/js/whatsapp_webhook_console.js' %}?v={% random_int 1 100 %}" type="text/javascript"></script>
+
+<script>
+  window.SYSTEM_COMMANDS = {{ system_commands | safe }};
+
+  var coll = document.getElementsByClassName("easychat_whatsapp_collapsible");
+  var i;
+
+  for (i = 0; i < coll.length; i++) {
+    coll[i].addEventListener("click", function() {
+      this.classList.toggle("active");
+      var content = this.nextElementSibling;
+      if (content.style.maxHeight){
+        content.style.maxHeight = null;
+        setTimeout( function(){set_attributes(content)}, 360);
+      } else {
+        content.style.maxHeight = content.scrollHeight + "px";
+        content.style.border = "1px solid black";
+        content.style.borderRadius = "0.5em";
+        content.style.padding = "2% 4%";
+        content.style.overflow = "scroll";
+      } 
+    });
+  }
+  function set_attributes(content){
+
+    content.style.border = "unset";
+    content.style.borderRadius = "0";
+    content.style.padding = "0";
+  }
+  </script>
+
+<script>
+    selected_whatsapp_service_provider = null;
+    {% if selected_whatsapp_service_provider %}
+    selected_whatsapp_service_provider = '{{selected_whatsapp_service_provider.name}}';
+    {% endif %}
+
+    is_any_other_user_active = false;
+    {% if is_any_other_user_active %}
+    is_any_other_user_active = true;
+    {% endif %}
+
+    var editor = ace.edit("editor-code-whatsapp");
+    editor.setTheme("ace/theme/monokai");
+    editor.session.setMode("ace/mode/python");
+</script>
+
+{% endblock %}

@@ -1,0 +1,320 @@
+{% extends 'EasyChatApp/console.html' %}
+{% block consolecontent %}
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/changes_placement.css' %}?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/common_integrated_channel.css' %}?v={% random_int 1 100 %}">
+
+<div style="padding: 1em;">
+  <div class="row">
+    {% include "EasyChatApp/channels/channel_components/channel_integration_document_button.html" with channel_doc_download_link="https://drive.google.com/uc?export=download&id=1dZPj0TX1ZtdUyE4OUKVFjoeNBjvvXjiP" channel_name="Alexa" %}
+  </div>
+
+  {% include "EasyChatApp/channels/channel_components/language_dropdown_go_back.html" %}
+  <div class="row">
+    {% include "EasyChatApp/channels/channel_components/custom_message.html" with area="alexa-textarea" %}
+
+    <div class="col s12">
+      <div class="row">
+        {% if selected_language == "en" %}
+        {% include "EasyChatApp/channels/channel_components/language_specific.html" %}
+        <ul class="collapsible">
+          <li>
+            <div class="collapsible-header">Initial Questions</div>
+            <div class="collapsible-body">
+              <div class="row" id="channel-initial-messages">
+                *Search and select from existing Intent List
+
+                <div class="input-field col s12">
+                  <select multiple id="multiple-select-alexa-initial-message-list">
+                    {% for intent_name in intent_name_list %}
+                        {% if intent_name.is_selected %}
+                          <option value="{{ intent_name.intent_pk }}" selected>{{ intent_name.intent_name }}</option>
+                        {% else %}
+                          <option value="{{ intent_name.intent_pk }}">{{ intent_name.intent_name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+        <ul class="collapsible">
+          <li>
+            <div class="collapsible-header">Failure Recommendations</div>
+            <div class="collapsible-body">
+              <div class="row" id="channel-initial-messages">
+                *Search and select from existing Intent List
+
+                <div class="input-field col s12">
+                  <select multiple id="multiple-select-alexa-failure-message-list">
+                    {% for intent_name in intent_name_list_failure %}
+                        {% if intent_name.is_selected %}
+                          <option value="{{ intent_name.intent_pk }}" selected>{{ intent_name.intent_name }}</option>
+                        {% else %}
+                          <option value="{{ intent_name.intent_pk }}">{{ intent_name.intent_name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+        <ul class="collapsible">
+          <li>
+            <div class="collapsible-header">Deploy links</div>
+            <div class="collapsible-body">
+              <div class="row" id="alexa-deploy">
+                <div class="input-field col s12">
+                  <input type="text" value='https://{{ request.META.HTTP_HOST }}/chat/webhook/alexa/?id={{selected_bot_obj.pk}}' id="alexa-deploy-link" readonly style="width:96%;border: 0.1em solid black;padding:1em;font-family: Consolas, monaco, monospace;word-wrap: break-word;background-color:white;">
+                <button onclick="copyToClipboard('alexa-deploy-link', this)">Copy Script</button>
+                <br>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+        <ul class="collapsible">
+          <li>
+            <div class="collapsible-header">Auth Page Set-up</div>
+            <div class="collapsible-body">
+              <div class="col s12">
+                <div class="row">
+                  <div class="col s10">
+                    <table>
+                      <tr>
+                        <td>
+                          <p>Project ID</p>
+                        </td>
+                        <td style="display: flex; justify-content: space-between; align-items: center;">
+                          {% if proj_details_obj_pk != "" %} 
+                            <input type="text" id="alexa-project-id" placeholder="Enter alexa Project ID" class="white" style="padding:0em 1em 0em 1em;width:20em;border-radius:0.5em;" value="{{project_id}}" disabled>
+                          {% else %}
+                            <input type="text" id="alexa-project-id" placeholder="Enter alexa Project ID" class="white" style="padding:0em 1em 0em 1em;width:20em;border-radius:0.5em;" value="{{project_id}}" >
+                          {% endif %}
+                          {% if project_id == "" %}
+                            <a id="add-alexa-project-details"  class="waves-effect waves-light btn modal-trigger easychat-button disabled" onclick="add_alexa_project_id('Alexa')" >Get Auth details</a>
+                          {% else %}
+                            <a id="add-alexa-project-details"  class="waves-effect waves-light btn modal-trigger easychat-button" onclick="add_alexa_project_id('Alexa')" >Get Auth details</a>
+                          {% endif %}
+                          
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p>Auth Page title image</p>
+                        </td>
+                        <td>
+                          {% if proj_details_obj_pk != "" %} 
+                            {% if welcome_image_src == "" %}
+                              <a id="add-alexa-welcome-image" class="waves-effect waves-light btn modal-trigger easychat-button" href="#modal-upload-alexa-image">Upload From Device</a>
+                              <img src="{{welcome_image_src}}" id="uploaded-alexa-bot-welcome-image" style="max-height:10em;">
+                              <a id="remove-bot-alexa-welcome-image" style="display: none;"><i class="material-icons red-text text-darken-3">delete</i></a>
+                            {% else %}
+                              <a id="add-alexa-welcome-image" style="display: none;" class="waves-effect waves-light btn modal-trigger easychat-button" href="#modal-upload-alexa-image">Upload From Device</a>
+                              <img src="{{welcome_image_src}}" id="uploaded-alexa-bot-welcome-image" style="max-height:10em;">
+                              <a id="remove-bot-alexa-welcome-image" ><i class="material-icons red-text text-darken-3">delete</i></a>
+                            {% endif %}
+                          {% else %}
+                            {% if welcome_image_src == "" %}
+                              <a id="add-alexa-welcome-image" class="waves-effect waves-light btn modal-trigger easychat-button disabled" href="#modal-upload-alexa-image">Upload From Device</a>
+                              <img src="{{welcome_image_src}}" id="uploaded-alexa-bot-welcome-image" style="max-height:10em;">
+                              <a id="remove-bot-alexa-welcome-image" style="display: none;"><i class="material-icons red-text text-darken-3 disabled">delete</i></a>
+                            {% else %}
+                              <a id="add-alexa-welcome-image" style="display: none;" class="waves-effect waves-light btn modal-trigger easychat-button disabled" href="#modal-upload-alexa-image">Upload From Device</a>
+                              <img src="{{welcome_image_src}}" id="uploaded-alexa-bot-welcome-image" style="max-height:10em;">
+                              <a id="remove-bot-alexa-welcome-image" ><i class="material-icons red-text text-darken-3 disabled">delete</i></a>
+                            {% endif %}
+                          {% endif %}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p> Get OTP Processor</p>
+                        </td>
+                        <td>
+                          <label>        
+                            {% if proj_details_obj_pk == "" %}               
+                              <a id="alexa-project-oauth-status-get-otp"  class="waves-effect waves-light btn modal-trigger easychat-button  grey darken-1 disabled custom-on-hover-grey" href="/chat/edit-signin-processor-console/?id={{proj_details_obj_pk}}&type=get_otp" target="_blank">Pending</a>
+                            {% else %}
+                              {% if is_get_otp_added %}
+                                <a id="alexa-project-oauth-status-get-otp"  class="waves-effect waves-light btn modal-trigger easychat-button green lighten-2 custom-on-hover-green" href="/chat/edit-signin-processor-console/?id={{proj_details_obj_pk}}&type=get_otp" target="_blank">Completed!</a>
+                              {% else %}
+                                <a id="alexa-project-oauth-status-get-otp"  class="waves-effect waves-light btn modal-trigger easychat-button  grey darken-1 custom-on-hover-grey" href="/chat/edit-signin-processor-console/?id={{proj_details_obj_pk}}&type=get_otp" target="_blank">Pending</a>
+                              {% endif %}
+                            {% endif %}
+                            <span style="margin-left: 20px;"></span>
+                        </label>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p> Verify OTP Processor</p>
+                        </td>
+                        <td>
+                          <label>        
+                            {% if proj_details_obj_pk == "" %}
+                              <a id="alexa-project-oauth-status-verify-otp"  class="waves-effect waves-light btn modal-trigger easychat-button grey darken-1 disabled custom-on-hover-grey" target="_blank">Pending</a>
+                            {% else %}
+                              {% if is_verify_otp_added %}
+                                <a id="alexa-project-oauth-status-verify-otp"  class="waves-effect waves-light btn modal-trigger easychat-button green lighten-2 custom-on-hover-green" href="/chat/edit-signin-processor-console/?id={{proj_details_obj_pk}}&type=verify_otp" target="_blank">Completed!</a>
+                              {% else %}
+                                <a id="alexa-project-oauth-status-verify-otp"  class="waves-effect waves-light btn modal-trigger easychat-button grey darken-1 custom-on-hover-grey" href="/chat/edit-signin-processor-console/?id={{proj_details_obj_pk}}&type=verify_otp" target="_blank">Pending</a>
+                              {% endif %}
+                            {% endif %}
+                            <span style="margin-left: 20px;"></span>
+                        </label>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p>Custom Auth Page</p>
+                        </td>
+                        <td>
+                          <label>
+                          {% if proj_details_obj_pk == "" %}     
+                            <a id="alexa-project-auth-page" class="waves-effect waves-light btn modal-trigger easychat-button green lighten-2 custom-on-hover-green disabled" href="/chat/edit-console-page/?id={{proj_details_obj_pk}}&channel=alexa" target="_blank">Customize</a>
+                          {% else %}
+                            <a id="alexa-project-auth-page" class="waves-effect waves-light btn modal-trigger easychat-button green lighten-2 custom-on-hover-green" href="/chat/edit-console-page/?id={{proj_details_obj_pk}}&channel=alexa" target="_blank">Customize</a>
+                          {% endif %}
+                            <span style="margin-left: 20px;"></span>
+                        </label>
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <div class="progress" id="easychat_google_assistant_channel_preloader" style="display: none;">
+                <div class="indeterminate"></div>
+              </div>
+              <div class="row">
+              </div>
+            </div>
+          </li>
+        </ul>
+        {% endif %}
+       <div class="progress" id="easychat_alexa_channel_preloader" style="display: none;">
+        <div class="indeterminate"></div>
+      </div>
+      {% if selected_language == "en" %}
+        <a class="btn green lighten-2" style="background-color: #82C784; margin-left: 0.2em;" id="save-alexa-channel">Save</a>
+        {% else %}
+        <a class="btn green lighten-2" style="background-color: #82C784; margin-left: 0.2em;" id="save-alexa-channel-for-non-primary-language">Save</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-upload-alexa-image" class="modal">
+    <div class="modal-content">
+      <h5>Choose Image</h5>
+      <div class="file-field input-field col s10">
+        <div class="btn-small easychat-button">
+          <span>Choose image</span>
+          <input id="input_upload_image_bot_alexa_welcome_message" type="file">
+        </div>
+        <div class="file-path-wrapper">
+          <input id="input_upload_image_bot_alexa_welcome_message2" class="file-path validate" type="text">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a class="modal-close btn easychat-button" id="upload-alexa-welcome-image">Upload</a>
+    </div>
+  </div>
+
+  <div id="modal-alexa-project-details" class="modal" tabindex="0" style="z-index: 1003;  top: 10%; transform: scaleX(1) scaleY(1);">
+    <div class="modal-content">
+        <div class="row" style="margin-bottom: 4px !important;">
+            <div class="modal-header">
+                <h6 style="font-weight: 600 !important;font-size: 16px; color: #000000;" id="alexa-project-name"></h6>
+                <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                    <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z" fill="black" fill-opacity="0.54"></path>
+                    </svg>
+
+                </a>
+            </div>
+
+              <div class="easychat-manage-intent-modal-scrollable-content">
+                  <table>
+                      <tbody>
+                          <tr>
+                              <td>Project Id</td>
+                              <td id="alexa-project-project_id"></td>
+                          </tr>
+                          <tr>
+                              <td>Client Id</td>
+                              <td id="alexa-project-client_id" ></td>
+                          </tr>
+                          <tr>
+                              <td>Client Secret</td>
+                              <td id="alexa-project-client_secret"></td>
+                          </tr>
+                          <tr>
+                              <td> Client Type</td>
+                              <td id="alexa-project-client_type"></td>
+                          </tr>
+                          <tr>
+                              <td>Authorization Grant Type</td>
+                              <td id="alexa-project-authorization_grant_type" ></td>
+                          </tr>
+                          <tr>
+                              <td>Redirect Uris</td>
+                              <td id="alexa-project-redirect_uris"></td>
+                          </tr>
+                      </tbody>
+                  </table>
+
+              </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+
+      </div>
+  </div>
+  <div id="modal-upload-image" class="modal">
+    <div class="modal-content">
+      <h5>Choose Image</h5>
+      <div class="file-field input-field col s10">
+        <div class="btn-small easychat-button">
+          <span>Choose image</span>
+          <input id="input_upload_image_bot_welcome_message" type="file">
+        </div>
+        <div class="file-path-wrapper">
+          <input id="input_upload_image_bot_welcome_message2" class="file-path validate" type="text">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a class="modal-close btn easychat-button" id="upload-bot-welcome-image">Upload</a>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" src="{% static 'EasyChatApp/js/alexa_console.js' %}"></script>
+<script type="text/javascript">
+
+$(".alexa-textarea").trumbowyg({
+    tagsToKeep: [],
+    allowTagsFromPaste: {
+        allowedTags: ['h4', 'p', 'br']
+    },
+    minimalLinks: true,
+    btns: [
+        // ['viewHTML'],
+        ['strong', 'em'], 
+        ['emoji'],
+        ['link'],
+        ['unorderedList', 'orderedList'],
+        ['underline'],
+        ['justifyLeft'], ['justifyCenter'], ['justifyRight'], ['justifyFull'],
+    ],
+})
+
+</script>
+
+{% endblock %}

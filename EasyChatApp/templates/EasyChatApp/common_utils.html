@@ -1,0 +1,120 @@
+{% extends 'EasyChatApp/base.html' %}
+{% block content %}
+{% load static %}
+
+<!--css containing editor_common_utils and editor_custom_js and editor_code-->
+<link rel="stylesheet" type="text/css" href="/static/EasyChatApp/css/chatbot_custom_js.css?v={% random_int 1 100 %}" media="screen">
+
+<div class="add-scrolling processor-background-color">
+  <div class="row common-utils-heading-buttons-div">
+
+    <div class="col s8">
+        <div class="common-utils-heading-div">
+            <h5>
+                Common_utils_{{bot_pk}}.py
+            </h5>
+            <p>
+              {{edit_info}} 
+            </p>
+        </div>
+    </div>
+
+    <div class="col s4 common-utils-buttons-col-div easychat-autosave">
+        <div class="common-utils-buttons-div">
+            <a class="btn green lighten-2 check-transparent-btn" id="last_edit" onclick="last_edit('{{ bot_pk }}')">
+                Check last edit
+            </a>
+            {% if enable_save == "True" %}
+                <a class="btn save-blue-btn" id="save_common_utils_btn" onclick="save_common_utils('{{ bot_pk }}')" enabled >Save</a>
+            {% else %}
+                <a class="btn disabled" id="save_common_utils_btn" onclick="save_common_utils('{{ bot_pk }}')" disabled>Save</a>
+            {% endif %}
+            
+            
+        </div>
+        <p>
+            Last saved on {{last_modified}}
+        </p>
+        <span id="easychat-autosave-span">Changes saved</span>
+    </div>
+
+  </div>
+  <div class="row processor-editor-post-processor-row" style="padding: 0 1.125em;" id="easychat-common-utils">
+    <div class="col s8">
+      <div class="col s12">
+          
+        <div class="editor-header-div" >
+          <a href="javascript:void(0)" class="right tooltipped" data-position="top"  data-tooltip="Full-screen mode" onclick="go_full_screen_mode()">
+              <svg width="17" height="20" viewBox="0 0 17 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M4.26327 13.0956C4.61032 12.7486 5.173 12.7486 5.52005 13.0956C5.8671 13.4427 5.8671 14.0054 5.52005 14.3524L3.1491 16.7226H4.55766C5.01341 16.7226 5.38903 17.0657 5.44036 17.5077L5.44634 17.6113C5.44634 18.1021 5.04847 18.5 4.55766 18.5H1.00294C0.512134 18.5 0.114258 18.1021 0.114258 17.6113V14.0566C0.114258 13.5658 0.512134 13.1679 1.00294 13.1679C1.49374 13.1679 1.89162 13.5658 1.89162 14.0566V15.4669L4.26327 13.0956ZM11.6716 18.5C11.1808 18.5 10.7829 18.1021 10.7829 17.6113C10.7829 17.1205 11.1808 16.7226 11.6716 16.7226H13.0783L10.7097 14.3522C10.3894 14.0317 10.365 13.5276 10.6362 13.1791L10.7102 13.0954C11.0573 12.7485 11.62 12.7487 11.9669 13.0959L14.3376 15.4687V14.0566C14.3376 13.6008 14.6807 13.2252 15.1226 13.1739L15.2263 13.1679C15.7171 13.1679 16.115 13.5658 16.115 14.0566V17.6113C16.115 18.1021 15.7171 18.5 15.2263 18.5H11.6716ZM4.55766 2.5C5.04847 2.5 5.44634 2.89788 5.44634 3.38868C5.44634 3.87949 5.04847 4.27736 4.55766 4.27736H3.15088L5.51956 6.64851C5.83979 6.969 5.86423 7.47309 5.59302 7.82161L5.51906 7.9053C5.17188 8.25221 4.60919 8.25199 4.26228 7.90481L1.89162 5.53218V6.9434C1.89162 7.39915 1.54855 7.77477 1.10658 7.82611L1.00294 7.83208C0.512134 7.83208 0.114258 7.43421 0.114258 6.9434V3.38868C0.114258 2.89788 0.512134 2.5 1.00294 2.5H4.55766ZM15.2263 2.5C15.7171 2.5 16.115 2.89788 16.115 3.38868V6.9434C16.115 7.43421 15.7171 7.83208 15.2263 7.83208C14.7355 7.83208 14.3376 7.43421 14.3376 6.9434V5.53218L11.9668 7.90492C11.6465 8.22534 11.1424 8.25009 10.7938 7.97909L10.71 7.90518C10.3629 7.5582 10.3628 6.99552 10.7098 6.64839L13.0792 4.27736H11.6716C11.2158 4.27736 10.8402 3.9343 10.7889 3.49232L10.7829 3.38868C10.7829 2.89788 11.1807 2.5 11.6716 2.5H15.2263Z" fill="white"/>
+              </svg>
+          </a>
+        </div>
+
+        <div id="editor_common_utils" class="editor-code-div">{{code}}</div>
+        <br><br>
+  
+        <div class="col s12">
+          <br>
+          <textarea col="30"  disabled style="color: #F1F2EB;resize:none;height: 18em;border-radius: 0.5em;overflow: scroll;display: none;background-color: #272822"></textarea>
+        </div>
+        <div class="col s12">
+          <br>
+          <textarea col="30" id="easychat-processor-status" disabled style="color: #F1F2EB;resize:none;height: 18em;border-radius: 0.5em;overflow: auto;display: none;background-color: #272822"></textarea>
+        </div>
+        <div class="processor-errors" id="system-command-error">Don't use system commands.</div>
+      </div>
+    </div>
+    <div class="col s4">
+    <div id = "common_utils" class="post-processor-col-div">
+      <h4>Instructions</h4>
+      <ul class="collection">
+        <li class="collection-item">
+          <button class="easychat_processor_collapsible">Important Point</button>
+          <div class="easychat_processor_content">
+            <ol>
+              <li>If more than one developer is working on the same project, make sure to click on "Check Last Edit"</li>
+              <li>You will be redirected to another page, where you will be able to see last edited CODE</li>
+              <li>If there's a difference in the code, Copy your function from FIRST TAB and paste it into the SECOND TAB, save it in the SECOND TAB.</li>
+            </ol>
+          </div>
+        </li>
+        <li class="collection-item">
+          <button class="easychat_processor_collapsible">Some Instructions</button>
+          <div class="easychat_processor_content">
+            <ol>
+              <li>If UAT / Prod have same api endpoints, this file can be used.</li>
+              <li>Kindly do not overwrite other functions.</li>
+              <li>Kindly avoid functions with common names or functions with one letter or number.</li>
+              <li>Function names should be understandable.</li>
+            </ol>
+          </div>
+        </li>
+        <li class="collection-item">
+          <button class="easychat_processor_collapsible">How to import</button>
+          <div class="easychat_processor_content">
+            <ol>
+              <li> Import Line is already prewritten in the processors </li>
+            </ol>
+          </div>
+        </li>
+      </ul>
+    </div>
+    </div>
+  </div>
+</div>
+
+{% if request.user.enable_s3_bucket %}
+    <script src="https://static.allincall.in/static/EasyChatApp/js/ace.js" type="text/javascript" charset="utf-8"></script>
+{% else %}
+    <script src="{% static 'EasyChatApp/js/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+{% endif %}
+
+<script>
+    window.SYSTEM_COMMANDS = {{ system_commands | safe }};
+    var editor = ace.edit("editor_common_utils");
+    editor.setTheme("ace/theme/monokai");
+    editor.session.setMode("ace/mode/python");
+</script>
+
+{% endblock %}

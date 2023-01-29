@@ -1,0 +1,131 @@
+{
+  "executionRoleArn": "arn:aws:iam::866781885537:role/ecstaskexecution-custom-role",
+  "containerDefinitions": [
+    {
+      "portMappings": [],
+      "cpu": 0,
+      "environment": [],
+      "mountPoints": [
+        {
+          "containerPath": "/Cognoai/",
+          "sourceVolume": "easychat-full"
+        }
+      ],
+      "memoryReservation": 128,
+      "volumesFrom": [],
+      "image": "866781885537.dkr.ecr.ap-south-1.amazonaws.com/easychatapp:latest",
+      "name": "djangoapp-container"
+    },
+    {
+      "portMappings": [
+        {
+          "hostPort": 0,
+          "protocol": "tcp",
+          "containerPort": 80
+        }
+      ],
+      "cpu": 0,
+      "environment": [],
+      "mountPoints": [
+        {
+          "containerPath": "/Cognoai/files/",
+          "sourceVolume": "files"
+        },
+        {
+          "containerPath": "/Cognoai/static/",
+          "sourceVolume": "static"
+        },
+        {
+          "containerPath": "/etc/nginx/",
+          "sourceVolume": "nginx_conf"
+        }
+      ],
+      "memoryReservation": 128,
+      "volumesFrom": [],
+      "image": "866781885537.dkr.ecr.ap-south-1.amazonaws.com/nginx:latest",
+      "dependsOn": [
+        {
+          "containerName": "djangoapp-container",
+          "condition": "START"
+        },
+        {
+          "containerName": "daphne-container",
+          "condition": "START"
+        }
+      ],
+      "essential": true,
+      "links": [
+        "djangoapp-container:djangoapp-container",
+        "daphne-container:daphne-container"
+      ],
+      "name": "nginx-container"
+    },
+    {
+      "cpu": 0,
+      "environment": [],
+      "mountPoints": [
+        {
+          "containerPath": "/Cognoai/",
+          "sourceVolume": "easychat-full"
+        }
+      ],
+      "memoryReservation": 128,
+      "volumesFrom": [],
+      "image": "866781885537.dkr.ecr.ap-south-1.amazonaws.com/daphne:latest",
+      "name": "daphne-container"
+    }
+  ],
+  "placementConstraints": [],
+  "taskRoleArn": "arn:aws:iam::866781885537:role/ecstaskexecution-custom-role",
+  "family": "ECS-EasyChat-TD",
+  "requiresCompatibilities": [
+    "EC2"
+  ],
+  "networkMode": "bridge",
+  "volumes": [
+    {
+      "efsVolumeConfiguration": {
+        "fileSystemId": "fs-08b1a8d9026040e9b",
+        "authorizationConfig": {
+          "iam": "DISABLED"
+        },
+        "transitEncryption": "DISABLED",
+        "rootDirectory": "/"
+      },
+      "name": "easychat-full"
+    },
+    {
+      "efsVolumeConfiguration": {
+        "fileSystemId": "fs-08b1a8d9026040e9b",
+        "authorizationConfig": {
+          "iam": "DISABLED"
+        },
+        "transitEncryption": "DISABLED",
+        "rootDirectory": "/nginx_conf/"
+      },
+      "name": "nginx_conf"
+    },
+    {
+      "efsVolumeConfiguration": {
+        "fileSystemId": "fs-08b1a8d9026040e9b",
+        "authorizationConfig": {
+          "iam": "DISABLED"
+        },
+        "transitEncryption": "DISABLED",
+        "rootDirectory": "/static/"
+      },
+      "name": "static"
+    },
+    {
+      "efsVolumeConfiguration": {
+        "fileSystemId": "fs-08b1a8d9026040e9b",
+        "authorizationConfig": {
+          "iam": "DISABLED"
+        },
+        "transitEncryption": "DISABLED",
+        "rootDirectory": "/files/"
+      },
+      "name": "files"
+    }
+  ]
+}

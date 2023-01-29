@@ -1,0 +1,315 @@
+{% extends 'EasyAssistApp/console.html' %}
+{% load easyassist_custom_filters %}
+{% load static %}
+{% block content %}
+
+<link href="{% static 'EasyAssistApp/css/settings.css' %}" rel="stylesheet" type="text/css">
+<link href="{% static 'EasyAssistApp/css/sandbox_user_dashboard.css' %}" rel="stylesheet" type="text/css">
+
+{% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+
+<style type="text/css">
+.sandbox-user-edit-btn svg{
+    fill: {{ access_token_obj.get_cobrowsing_console_theme_color.hex }};
+}
+.cobrowse-sandbox-extend-btn{    
+    color: white;
+    background-color: {{ access_token_obj.get_cobrowsing_console_theme_color.hex }} !important;
+    border: 1px solid {{access_token_obj.get_cobrowsing_console_theme_color.hex}};
+}
+
+</style>
+
+{% endif %}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="page-header">
+                <div class="row">
+                    <div class="col-sm-7 d-flex align-items-center">
+                        <div class="nav nav-pills navbar-right">
+                            <a class="anchor-reset back-btn" href="/easy-assist/sales-ai/settings">
+                                <span class="mr-3 mb-auto" style="cursor: pointer">
+                                    <svg class="back-arrow-svg" width="44" height="44" viewBox="0 0 44 44" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <rect width="44" height="44" rx="22" transform="matrix(1 0 0 -1 0 44)"
+                                            fill="white" />
+                                            {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                                            <path
+                                            d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                                            fill="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" />
+                                            {% else %}
+                                            <path
+                                            d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                                            fill="#0254D7" />
+                                            {% endif %} 
+                                        
+                                    </svg>
+                                </span>
+                            </a>
+                            <h5 class="nav_btn mr-2 mt-2">
+                                <a class="anchor-reset" href="/easy-assist/sales-ai/settings">Settings</a>
+                            </h5>
+
+                            <div class="mr-2 pt-2">
+                                <svg class="mini-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                                        fill="#475569" />
+                                </svg>
+                            </div>
+
+                            <h5 class="nav_btn active1 mt-2">SandBox Credentials</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12 mt-4 mb-2 remove-margin-mobile">
+            <div class="row">
+                <div class="col-md-6 col-sm-12" style="display: flex; flex-wrap: wrap;">
+                    <button class="btn btn-primary mb-2 mr-sm-2 add-user-btn" id="add-new-agent-btn" data-toggle="modal" data-target="#modal-sandbox-add-user" style="padding: 0.375rem 2rem;">Add User</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <!-- DataTales Example -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <div class="row">
+                        <div class="col-md-8 col-sm-12">
+                            <h6 class="m-0 font-weight-bold text-primary heading-text-primary">SandBox Credentials
+                            <!-- <span data-toggle="tooltip" data-placement="top" title="" data-original-title="This is the calendar for Inbound cobrowsing and Meeting.">
+                            <i class="fas fa-info-circle"></i></span> -->
+                            </h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive sandbox-credentials-table-area" id="sandbox_user_table_container">
+                        <table class="table table-bordered" id="sandbox_user_table" width="100%" cellspacing="0">
+                        </table>
+                    </div>
+                    <div class="row mt-3" id="sandbox_user_table_pagination_div"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade client-location-details cobrowse-custom-modal-wrapper" id="modal-sandbox-add-user" tabindex="-1" role="dialog" aria-labelledby="client_location_details_label" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="export_mis_lable">Add User</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12 mb-4">
+                        <div class="cobrowse-custom-modal-subheading">Email Id <b>*</b></div>
+                        <input type="text" class="form-control" placeholder="Email Id" style="width:100%;" autocomplete="off" id="sandbox-user-email-id">
+                    </div>
+                    <div class="col-sm-12 mb-4">
+                        <div class="cobrowse-custom-modal-subheading">
+                            Password <b>*</b>
+                            <span data-toggle="tooltip" data-placement="top" title="" data-original-title="Password should consist of one capital letter, one small letter, one special character, one number, and length should be more than 8.">
+                                <i class="fas fa-info-circle"></i>
+                            </span>
+                        </div>
+                        <div class="cobrowse-password-show-hide-wrapper">
+                            <input type="password" class="form-control cobrowse-password-input-field" placeholder="Password" style="width:100%;" id="sandbox-user-password" autocomplete="new-password">
+                            <div class="cobrowse-show-password-icon-wrapper">
+                                <svg class="cobrowse-password-hide-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M2.85355 2.14645C2.65829 1.95118 2.34171 1.95118 2.14645 2.14645C1.95118 2.34171 1.95118 2.65829 2.14645 2.85355L5.64526 6.35237C3.97039 7.49178 2.72334 9.27383 2.28011 11.3979C2.22371 11.6682 2.39712 11.9331 2.66744 11.9895C2.93776 12.0459 3.20262 11.8725 3.25903 11.6021C3.66284 9.66698 4.82362 8.06289 6.3671 7.07421L7.94894 8.65604C7.06509 9.29133 6.48947 10.3284 6.48947 11.5C6.48947 13.433 8.05647 15 9.98947 15C11.161 15 12.1981 14.4244 12.8334 13.5405L17.1464 17.8536C17.3417 18.0488 17.6583 18.0488 17.8536 17.8536C18.0488 17.6583 18.0488 17.3417 17.8536 17.1464L2.85355 2.14645Z" fill="#212121"/>
+                                    <path d="M10.1238 8.00253L13.4869 11.3657C13.418 9.5395 11.95 8.07143 10.1238 8.00253Z" fill="#212121"/>
+                                    <path d="M7.53104 5.4098L8.3341 6.21286C8.87141 6.07353 9.43009 6 9.99995 6C13.2056 6 16.0574 8.32688 16.7409 11.6021C16.7973 11.8725 17.0622 12.0459 17.3325 11.9895C17.6028 11.933 17.7762 11.6682 17.7198 11.3979C16.9425 7.67312 13.6934 5 9.99995 5C9.14478 5 8.31342 5.14331 7.53104 5.4098Z" fill="#212121"/>
+                                </svg>
+                                <svg class="cobrowse-password-show-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M3.25909 11.6021C3.94254 8.32689 6.79437 6 10 6C13.2057 6 16.0574 8.32688 16.7409 11.6021C16.7974 11.8725 17.0622 12.0459 17.3325 11.9895C17.6029 11.933 17.7763 11.6682 17.7199 11.3979C16.9425 7.67312 13.6934 5 10 5C6.3066 5 3.05742 7.67311 2.28017 11.3979C2.22377 11.6682 2.39718 11.933 2.6675 11.9895C2.93782 12.0459 3.20268 11.8725 3.25909 11.6021Z" fill="#212121"/>
+                                    <path d="M9.98953 8C11.9225 8 13.4895 9.567 13.4895 11.5C13.4895 13.433 11.9225 15 9.98953 15C8.05653 15 6.48953 13.433 6.48953 11.5C6.48953 9.567 8.05653 8 9.98953 8Z" fill="#212121"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="cobrowse-custom-modal-subheading">Access <b>*</b></div>
+                        <div class="col-md-12 col-lg-12 col-sm-12 pl-0 cobrowse-custom-checkbox">
+                            <label class="cam">
+                            <input  type="checkbox" class="add-cobrowsing-access-cb" id="cobrowsing-access">
+                            <span class="checkmark"></span>
+                            <span style="text-transform: capitalize;">Cobrowsing</span>
+                            </label>
+                        </div>
+                        <div class="col-md-12 col-lg-12 col-sm-12 cobrowsing-options-wrapper">
+                            <div class="col-md-12 col-lg-12 col-sm-12 mb-2 mt-3 cobrowse-custom-checkbox">
+                                <label class="cam">
+                                <input  type="checkbox" name="cobrowsing-option" class="add-inbound-cobrowsing-cb" id="inbound-cobrowsing-access">
+                                <span class="checkmark"></span>
+                                <span style="text-transform: capitalize;">Inbound</span>
+                                </label>
+                            </div>
+                            <div class="col-md-12 col-lg-12 col-sm-12 mb-2 cobrowse-custom-checkbox">
+                                <label class="cam">
+                                <input  type="checkbox" name="cobrowsing-option" class="add-outbound-cobrowsing-cb" id="outbound-cobrowsing-access">
+                                <span class="checkmark"></span>
+                                <span style="text-transform: capitalize;">Outbound</span>
+                                </label>
+                            </div>
+                            <div class="col-md-12 col-lg-12 col-sm-12 cobrowse-custom-checkbox">
+                                <label class="cam">
+                                <input  type="checkbox" class="add-reverse-cobrowsing-cb" id="reverse-cobrowsing-access">
+                                <span class="checkmark"></span>
+                                <span style="text-transform: capitalize;">Reverse</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-lg-12 col-sm-12  mt-4 pl-0 cobrowse-custom-checkbox">
+                            <label class="cam">
+                            <input  type="checkbox" id="video-meeting-access">
+                            <span class="checkmark"></span>
+                            <span style="text-transform: capitalize;">Video Call</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12">
+                        <div id="error-element"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer cobrowse-modal-custom-footer">
+                <button class="btn cobrowse-modal-cancel-btn" data-dismiss="modal" type="button">Cancel</button>
+                <button class="btn btn-info cobrowse-modal-save-btn" type="button" onclick="add_new_sandbox_user(this)">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sandbox Edit User Modal -->
+<div class="modal fade client-location-details cobrowse-custom-modal-wrapper" id="modal-sandbox-edit-user" tabindex="-1" role="dialog" aria-labelledby="client_location_details_label" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="export_mis_lable">Edit User</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12 mb-4">
+                        <div class="cobrowse-custom-modal-subheading">Email Id</div>
+                        <input type="text" class="form-control" placeholder="Email Id" style="width:100%; pointer-events: none;" autocomplete="off" id="edit-sandbox-user-email-id">
+                    </div>
+                    <div class="col-sm-12 mb-4">
+                        <div class="cobrowse-custom-modal-subheading">
+                            Password <b>*</b>
+                            <span data-toggle="tooltip" data-placement="top" title="" data-original-title="Password should consist of one capital letter, one small letter, one special character, one number, and length should be more than 8.">
+                                <i class="fas fa-info-circle"></i>
+                            </span>
+                        </div>
+                        <div class="cobrowse-password-show-hide-wrapper">
+                            <input type="password" class="form-control cobrowse-password-input-field" placeholder="Password" style="width:100%;" id="edit-sandbox-user-password" autocomplete="new-password">
+                            <div class="cobrowse-show-password-icon-wrapper">
+                                <svg class="cobrowse-password-hide-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M2.85355 2.14645C2.65829 1.95118 2.34171 1.95118 2.14645 2.14645C1.95118 2.34171 1.95118 2.65829 2.14645 2.85355L5.64526 6.35237C3.97039 7.49178 2.72334 9.27383 2.28011 11.3979C2.22371 11.6682 2.39712 11.9331 2.66744 11.9895C2.93776 12.0459 3.20262 11.8725 3.25903 11.6021C3.66284 9.66698 4.82362 8.06289 6.3671 7.07421L7.94894 8.65604C7.06509 9.29133 6.48947 10.3284 6.48947 11.5C6.48947 13.433 8.05647 15 9.98947 15C11.161 15 12.1981 14.4244 12.8334 13.5405L17.1464 17.8536C17.3417 18.0488 17.6583 18.0488 17.8536 17.8536C18.0488 17.6583 18.0488 17.3417 17.8536 17.1464L2.85355 2.14645Z" fill="#212121"/>
+                                    <path d="M10.1238 8.00253L13.4869 11.3657C13.418 9.5395 11.95 8.07143 10.1238 8.00253Z" fill="#212121"/>
+                                    <path d="M7.53104 5.4098L8.3341 6.21286C8.87141 6.07353 9.43009 6 9.99995 6C13.2056 6 16.0574 8.32688 16.7409 11.6021C16.7973 11.8725 17.0622 12.0459 17.3325 11.9895C17.6028 11.933 17.7762 11.6682 17.7198 11.3979C16.9425 7.67312 13.6934 5 9.99995 5C9.14478 5 8.31342 5.14331 7.53104 5.4098Z" fill="#212121"/>
+                                </svg>
+                                <svg class="cobrowse-password-show-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M3.25909 11.6021C3.94254 8.32689 6.79437 6 10 6C13.2057 6 16.0574 8.32688 16.7409 11.6021C16.7974 11.8725 17.0622 12.0459 17.3325 11.9895C17.6029 11.933 17.7763 11.6682 17.7199 11.3979C16.9425 7.67312 13.6934 5 10 5C6.3066 5 3.05742 7.67311 2.28017 11.3979C2.22377 11.6682 2.39718 11.933 2.6675 11.9895C2.93782 12.0459 3.20268 11.8725 3.25909 11.6021Z" fill="#212121"/>
+                                    <path d="M9.98953 8C11.9225 8 13.4895 9.567 13.4895 11.5C13.4895 13.433 11.9225 15 9.98953 15C8.05653 15 6.48953 13.433 6.48953 11.5C6.48953 9.567 8.05653 8 9.98953 8Z" fill="#212121"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="cobrowse-custom-modal-subheading">Access <b>*</b></div>
+                        <div class="col-md-12 col-lg-12 col-sm-12 pl-0 cobrowse-custom-checkbox">
+                            <label class="cam">
+                            <input  type="checkbox" class="edit-cobrowsing-access-cb" id="edit-cobrowsing-enabled">
+                            <span class="checkmark"></span>
+                            <span style="text-transform: capitalize;">Cobrowsing</span>
+                            </label>
+                        </div>
+                        <div class="col-md-12 col-lg-12 col-sm-12 cobrowsing-options-wrapper">
+                            <div class="col-md-12 col-lg-12 col-sm-12 mb-2 mt-3 cobrowse-custom-checkbox">
+                                <label class="cam">
+                                <input  type="checkbox" class="edit-inbound-cobrowsing-cb" id="edit-inbound-enabled">
+                                <span class="checkmark"></span>
+                                <span style="text-transform: capitalize;">Inbound</span>
+                                </label>
+                            </div>
+                            <div class="col-md-12 col-lg-12 col-sm-12 mb-2 cobrowse-custom-checkbox">
+                                <label class="cam">
+                                <input  type="checkbox" class="edit-outbound-cobrowsing-cb" id="edit-outbound-enabled">
+                                <span class="checkmark"></span>
+                                <span style="text-transform: capitalize;">Outbound</span>
+                                </label>
+                            </div>
+                            <div class="col-md-12 col-lg-12 col-sm-12 cobrowse-custom-checkbox">
+                                <label class="cam">
+                                <input  type="checkbox" class="edit-reverse-cobrowsing-cb" id="edit-reverse-cobrowsing-enabled">
+                                <span class="checkmark"></span>
+                                <span style="text-transform: capitalize;">Reverse</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-lg-12 col-sm-12  mt-4 pl-0 cobrowse-custom-checkbox">
+                            <label class="cam">
+                            <input  type="checkbox" id="edit-video-meeting-enabled">
+                            <span class="checkmark"></span>
+                            <span style="text-transform: capitalize;">Video Call</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div id="edit-error-element"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer cobrowse-modal-custom-footer">
+                <button class="btn cobrowse-modal-cancel-btn" data-dismiss="modal" type="button">Cancel</button>
+                <button class="btn btn-info cobrowse-modal-save-btn" type="button" onclick="save_edited_sandbox_user_credentials(this)">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Sandbox Delete User Modal-->
+<div class="modal fade cobrowse-custom-delete-modal-wrapper" id="modal-sandbox-delete-user" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="col-md-12 col-lg-12 col-sm-12 mt-4 cobrowse-delete-modal-svg">
+                    <svg width="82" height="82" viewBox="0 0 82 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M40.8393 6.83336C22.0887 6.83336 6.83325 22.1605 6.83325 41C6.83325 59.8395 22.1604 75.1667 40.9999 75.1667C59.8394 75.1667 75.1666 59.8395 75.1666 41C75.1666 22.1605 59.7677 6.83336 40.8393 6.83336ZM44.4166 58.0834H37.5833V51.25H44.4166V58.0834ZM44.4166 44.4167H37.5833V23.9167H44.4166V44.4167Z" fill="#E53E3E"/>
+                    </svg>
+                </div>
+                <div class="col-md-12 col-lg-12 col-sm-12 mt-4 cobrowse-delete-modal-text">
+                    Are you sure you want to delete this User ?
+                    <input type="hidden" id="delete-sandbox-user-id">
+                </div>
+                <div class="col-md-12">
+                    <div id="delete-sandbox-user-error-element"></div>
+                </div>
+            </div>
+            <div class="modal-footer mb-4">
+                <button class="btn cobrowse-delete-modal-cancel-btn" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn cobrowse-delete-modal-delete-btn" type="button" onclick="delete_sandbox_user(this);">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/sandbox_user_dashboard.js' %}"></script>
+
+<script>
+
+$(document).ready(function() {
+    try {
+        document.getElementById("nav-settings-menu").classList.add("active")
+    } catch(err) {}
+});
+
+</script>
+{% endblock %}

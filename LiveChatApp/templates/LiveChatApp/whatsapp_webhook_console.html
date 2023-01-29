@@ -1,0 +1,226 @@
+{% extends 'LiveChatApp/base.html' %}
+{% block content %}
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'LiveChatApp/css/whatsapp_webhook_console.css' %}?v={% random_int 1 100 %}">
+
+<div class="container-fluid pl-1 pr-2 arange" style="overflow-y: auto;">
+    <div class="row">
+        <div id="content-wrapper" class="d-flex flex-column" style="height: 100vh;">
+            <div class="container-fluid pl-1 pr-2 arange">
+                <div class="row ml-0">
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 pt-2">
+                        <div class="livechat-developer-setting-subheading-container">
+                            <a href="/livechat/developer-settings/" class="livechat-settings-back-arrow-btn">
+                                <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9.10378 16.7951C9.40471 17.0797 9.8794 17.0665 10.164 16.7656C10.4487 16.4646 10.4354 15.9899 10.1345 15.7053L4.89546 10.7502H17.6191C18.0334 10.7502 18.3691 10.4144 18.3691 10.0002C18.3691 9.58598 18.0334 9.25019 17.6191 9.25019H4.89319L10.1345 4.29294C10.4354 4.00831 10.4487 3.53362 10.164 3.23269C9.8794 2.93175 9.40471 2.91853 9.10378 3.20316L2.68656 9.2726C2.52026 9.42989 2.42026 9.63 2.38655 9.83879C2.37515 9.89077 2.36914 9.94478 2.36914 10.0002C2.36914 10.0578 2.37563 10.1139 2.38792 10.1677C2.42291 10.3735 2.52246 10.5704 2.68656 10.7256L9.10378 16.7951Z" fill="#212121"/>
+                                </svg>
+                            </a>
+                            <span>Whatsapp Webhook Configuration</span>
+                        </div>
+                    </div>
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 py-2 live-chat-admin-setting-content-dev-setting-redirect" id="live-chat-admin-setting-content-dev-setting-redirect" style="height: calc(100vh - 4.375rem); padding: 0px 15px 0px 15px;  background: #FAFAFA;">
+                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 py-3" style="background: #fff;">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 px-0 livechat-whatsapp-config-btn-items">
+                                <div class="livechat-whatsapp-config-btn-item-wrapper">
+                                  <select name="month" class="form-control select-dropdown-icon" id="eastchat_whatsapp_config_dropdown" onchange="get_whatsapp_webhook_default_code(this.value)">
+                                    <option value="none">Select Vendor</option>
+                                    {% for whatsapp_service_provider in whatsapp_service_providers %}
+                                        {% if  whatsapp_service_provider == selected_whatsapp_service_provider %}
+                                        <option value="{{ whatsapp_service_provider.name }}" selected>{{ whatsapp_service_provider.get_name_display }}</option>
+                                        {% else %}
+                                        <option value="{{ whatsapp_service_provider.name }}">{{ whatsapp_service_provider.get_name_display }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                  </select>
+                                </div>
+                                <div>
+                                    {% if selected_whatsapp_service_provider == None and code == "" %}
+                                    <button id="save_wa_webhook_btn" type="button" class="livechat-whatsapp-config-save-btn" onclick="save_whatsapp_webhooks_content({{bot_obj.pk}})" disabled>Save Configuration</button>
+                                    {% else %}
+                                    <button id="save_wa_webhook_btn" type="button" class="livechat-whatsapp-config-save-btn" onclick="save_whatsapp_webhooks_content({{bot_obj.pk}})">Save Configuration</button>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    {% if selected_whatsapp_service_provider == None and code == "" %}
+                                    <button id="reset_wa_webhook_btn" type="button" class="livechat-whatsapp-config-reset-btn" data-toggle="modal" data-target="#modal-whatsapp-reset-config" disabled>Reset</button>
+                                    {% else %}
+                                    <button id="reset_wa_webhook_btn" type="button" class="livechat-whatsapp-config-reset-btn" data-toggle="modal" data-target="#modal-whatsapp-reset-config">Reset</button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% if selected_whatsapp_service_provider == None and code == "" or is_any_other_user_active %}
+                            <div id="whatsapp_webhook_function_div" class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 px-0 mt-3 editor-accodian-div" style="display: none;">
+                            {% else %}
+                            <div id="whatsapp_webhook_function_div" class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 px-0 mt-3 editor-accodian-div" style="display: flex;">
+                            {% endif %}
+                                <div class="col-xl-12 col-lg-12 col-md-12 px-0" style="margin-bottom: 10em;">
+                                    <div class="col s12 editor-fullscreen-div pl-0">
+                                        <div style="display: flex; align-items: center;"><div class="livechat-whatsapp-config-bot-name-div">{{ bot_obj.name }} - {{ selected_whatsapp_service_provider.get_name_display }}</div>
+                                        <p id="livechat-auto-save-tag" style="color: green; margin: 0 0 0 10px; display: none; font-size: 14px;">Changes saved!</p></div>
+                                        <svg id="go_full_screen" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 384.97 384.97" style="enable-background:new 0 0 384.97 384.97;" xml:space="preserve" width="13"
+                                            height="13">
+                                        <g><g id="Fullscreen">
+                                        <path d="M384.97,12.03c0-6.713-5.317-12.03-12.03-12.03H264.847c-6.833,0-11.922,5.39-11.934,12.223
+                                            c0,6.821,5.101,11.838,11.934,11.838h96.062l-0.193,96.519c0,6.833,5.197,12.03,12.03,12.03c6.833-0.012,12.03-5.197,12.03-12.03
+                                            l0.193-108.369c0-0.036-0.012-0.06-0.012-0.084C384.958,12.09,384.97,12.066,384.97,12.03z"/>
+                                        <path d="M120.496,0H12.403c-0.036,0-0.06,0.012-0.096,0.012C12.283,0.012,12.247,0,12.223,0C5.51,0,0.192,5.317,0.192,12.03
+                                            L0,120.399c0,6.833,5.39,11.934,12.223,11.934c6.821,0,11.838-5.101,11.838-11.934l0.192-96.339h96.242
+                                            c6.833,0,12.03-5.197,12.03-12.03C132.514,5.197,127.317,0,120.496,0z"/>
+                                        <path d="M120.123,360.909H24.061v-96.242c0-6.833-5.197-12.03-12.03-12.03S0,257.833,0,264.667v108.092
+                                            c0,0.036,0.012,0.06,0.012,0.084c0,0.036-0.012,0.06-0.012,0.096c0,6.713,5.317,12.03,12.03,12.03h108.092
+                                            c6.833,0,11.922-5.39,11.934-12.223C132.057,365.926,126.956,360.909,120.123,360.909z"/>
+                                        <path d="M372.747,252.913c-6.833,0-11.85,5.101-11.838,11.934v96.062h-96.242c-6.833,0-12.03,5.197-12.03,12.03
+                                            s5.197,12.03,12.03,12.03h108.092c0.036,0,0.06-0.012,0.084-0.012c0.036-0.012,0.06,0.012,0.096,0.012
+                                            c6.713,0,12.03-5.317,12.03-12.03V264.847C384.97,258.014,379.58,252.913,372.747,252.913z"/>
+                                        </g>
+                                        <g>
+                                        </svg>
+                                    </div>
+                                    <div id="editor-code">{{ code }}</div>
+                                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 p-l" style="display: flex; margin-bottom: 30px;">
+                                        <textarea col="90" id="livechat-processor-status" disabled style="color: #F1F2EB;resize:none;height: 18em;border-radius: 0.5em;overflow: auto;display: none;background-color: #272822;width: 100%;"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{% static 'LiveChatApp/js/admin_settings.js' %}?v={% random_int 1 100 %}"></script>
+    <script src="{% static 'EasyChatApp/js/ace.js' %}?v={% random_int 1 100 %}" type="text/javascript" charset="utf-8"></script>
+
+    <script>
+        SYSTEM_COMMANDS = {{ system_commands | safe }}
+
+        is_change_webhook_code_confirmed = false;
+        auto_save_interval = null;
+        auto_save_time_interval = 30000;
+        change_wsp_code = "";
+
+        selected_whatsapp_service_provider = null;
+        {% if selected_whatsapp_service_provider %}
+        selected_whatsapp_service_provider = '{{selected_whatsapp_service_provider.name}}';
+        {% endif %}
+
+        is_any_other_user_active = false;
+        {% if is_any_other_user_active %}
+        is_any_other_user_active = true;
+        {% endif %}
+
+        $(document).ready(function () {
+            editor = ace.edit("editor-code");
+            editor.setTheme("ace/theme/monokai");
+            editor.session.setMode("ace/mode/python");
+
+            if (is_any_other_user_active) {
+                setTimeout(function() {
+                    $("#modal-whatsapp-already-working-config").modal("show");
+                }, 500);
+                document.getElementById("eastchat_whatsapp_config_dropdown").disabled = true;
+                document.getElementById("save_wa_webhook_btn").setAttribute("disabled", "");
+                document.getElementById("reset_wa_webhook_btn").setAttribute("disabled", "");
+            }
+
+            if (selected_whatsapp_service_provider != null && !is_any_other_user_active) {
+                auto_save_interval = setInterval(auto_save_webhook_code, auto_save_time_interval);
+            }
+        })
+
+    </script>
+
+</div>
+
+<!-- Whatsapp Reset Config Modal -->
+<div class="modal fade backdrop livechat-custom-delete-modal" id="modal-whatsapp-reset-config" tabindex="-1" aria-labelledby="Add_category_modal_label" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 my-4">
+                        <svg width="82" height="82" viewBox="0 0 82 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M40.8391 6.8335C22.0884 6.8335 6.83301 22.1607 6.83301 41.0002C6.83301 59.8397 22.1602 75.1668 40.9997 75.1668C59.8392 75.1668 75.1663 59.8397 75.1663 41.0002C75.1663 22.1607 59.7674 6.8335 40.8391 6.8335ZM44.4163 58.0835H37.583V51.2502H44.4163V58.0835ZM44.4163 44.4168H37.583V23.9168H44.4163V44.4168Z" fill="#E53E3E"/>
+                            </svg>
+                    </div>
+                    <div class="col-12 mb-2">
+                        <div class="livechat-custom-delete-modal-heading">Reset this configuration?</div>
+                    </div>
+                    <div class="col-12 px-5">
+                        <div class="livechat-custom-delete-modal-subheading">Are you sure you want to reset this configuration, as all your code changes will get lost and reset to default.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer mb-4">
+                <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn-primary" type="button" onclick="reset_whatsapp_webhook_code()">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Whatsapp Already Config Modal -->
+<div class="modal fade backdrop livechat-custom-delete-modal" id="livechat_whatsapp_config_assign_modal" tabindex="-1" aria-labelledby="Add_category_modal_label" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 my-4">
+                        <svg width="82" height="82" viewBox="0 0 82 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M40.8391 6.8335C22.0884 6.8335 6.83301 22.1607 6.83301 41.0002C6.83301 59.8397 22.1602 75.1668 40.9997 75.1668C59.8392 75.1668 75.1663 59.8397 75.1663 41.0002C75.1663 22.1607 59.7674 6.8335 40.8391 6.8335ZM44.4163 58.0835H37.583V51.2502H44.4163V58.0835ZM44.4163 44.4168H37.583V23.9168H44.4163V44.4168Z" fill="#E53E3E"/>
+                            </svg>
+                    </div>
+                    <div class="col-12 mb-2">
+                        <div class="livechat-custom-delete-modal-heading-text"><span>{{ bot_obj.name }}</span> is already configured with {{ selected_whatsapp_service_provider.get_name_display }}.</div>
+                    </div>
+                    <div class="col-12 px-5">
+                        <div class="livechat-custom-delete-modal-subheading"> Selecting a different WhatsApp BSP will overwrite the existing code. Do you still want to continue?</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer mb-4">
+                <button class="btn-close" type="button" data-dismiss="modal">No</button>
+                <button class="btn-primary" type="button" onclick="change_webhook_code()">Yes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Whatsapp Already Config Modal -->
+<div class="modal fade backdrop livechat-custom-delete-modal" id="modal-whatsapp-already-working-config" tabindex="-1" aria-labelledby="Add_category_modal_label" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 my-4">
+                        <svg width="82" height="82" viewBox="0 0 82 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M40.8391 6.8335C22.0884 6.8335 6.83301 22.1607 6.83301 41.0002C6.83301 59.8397 22.1602 75.1668 40.9997 75.1668C59.8392 75.1668 75.1663 59.8397 75.1663 41.0002C75.1663 22.1607 59.7674 6.8335 40.8391 6.8335ZM44.4163 58.0835H37.583V51.2502H44.4163V58.0835ZM44.4163 44.4168H37.583V23.9168H44.4163V44.4168Z" fill="#E53E3E"/>
+                            </svg>
+                    </div>
+                    <div class="col-12 mb-2">
+                        <div class="livechat-custom-delete-modal-heading-text">Somebody is already working on this code</div>
+                    </div>
+                    <div class="col-12 px-5">
+                        <div class="livechat-custom-delete-modal-subheading">Proceeding further may result in overriding the code, please contact your team. Do you still want to continue anyway?</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer mb-4">
+                <button class="btn-close" type="button" data-dismiss="modal">No</button>
+                <button class="btn-primary" type="button" onclick="continue_collaborative_coding()">Yes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast-container" style="display: none;">
+    <div class="toast" id="toast_message">
+        This is a basic toast message.
+    </div>
+</div>
+
+{% endblock %}

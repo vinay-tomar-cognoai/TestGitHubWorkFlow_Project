@@ -1,0 +1,107 @@
+{% extends 'EasyAssistSalesforceApp/console.html' %}
+{% block content %}
+{% load static %}
+
+<!-- Begin Page Content -->
+<div class="container-fluid">
+
+          <div class="col-md-12">
+            <!-- DataTales Example -->
+            <div class="card shadow mb-4">
+              <div class="card-header py-3" style="padding: 0.5em 1.25em 0.5em 1.25em !important;">
+                  <div class="row">
+                      <div class="col-sm-5" style="margin-top: 5px;">
+                        <h6 class="m-0 font-weight-bold text-primary">Support Documents</h6>
+                      </div>
+                      <div class="col-sm-7" style="text-align: right;">
+                        <button class="btn mb-2 mr-sm-2" style="background-color: #C62828; color: white; display: none;" onclick="save_customer_support_document_details(true)" id="customer-support-delete-button">Delete</button>
+                         <button class="btn btn-info mb-2 mr-sm-2" data-toggle="modal" data-target="#customer_support_document_modal">Upload</button>
+                         <button class="btn btn-success mb-2 mr-sm-2" style="background-color: #17a673 !important; color: white;" onclick="save_customer_support_document_details()">Save</button>
+                      </div>
+                  </div>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-bordered" id="customer_support_document_table" width="100%" cellspacing="0">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Usable</th>
+                        <th>Delete</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        {% for support_document in support_document_objs %}
+                          <tr>
+                            <td>
+                              <span ondblclick="change_file_name(this)">{{ support_document.file_name }}</span>
+                              <input type="text" onkeypress="show_new_name_input(this, event)" value="{{ support_document.file_name }}" class="user-checkbox-collection-filename" style="width: 100%; display: none;">                            </td>
+                              <td> <a href="" onclick="window.open(window.location.protocol + '/easy-assist-salesforce/download-file/{{support_document.file_access_management_key}}?salesforce_token={{salesforce_token}}')" target="_blank" >{{ support_document.file_type }}</a> </td>
+                            {% if support_document.is_usable %}
+                              <td><input type="checkbox" id="{{support_document.pk}}" class="user-checkbox-collection-usable" checked></td>
+                            {% else %}
+                              <td><input type="checkbox" id="{{support_document.pk}}" class="user-checkbox-collection-usable"></td>
+                            {% endif %}
+                            <td><input type="checkbox" id="{{support_document.pk}}" class="user-checkbox-collection-delete"></td>
+                          </tr>
+                        {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+</div>
+
+<div class="modal fade" id="customer_support_document_modal" tabindex="-1" role="dialog" aria-labelledby="document_upload_modal_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="document_upload_modal_modal_label">Upload Files</h5>
+      </div>
+      <div class="modal-body">
+          <div class="row">
+              <div class="col-sm-12">
+                <form class="form-inline" action="javascript:void(0)">
+                  <div class="col-sm-12">
+                    <input type="file" id="customer-support-file-upload" class="form-control" name="" style="box-shadow:none !important;" multiple>
+                  </div>
+                  <div class="col-sm-12">
+                    <p style="padding-top: 1em;" id="customer-support-file-upload-error">
+                      Maximum 10 files can be uploaded at a time.
+                    </p>
+                  </div>
+                </form>
+              </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <button class="btn btn-success" onclick="upload_selected_customer_support_document()">Upload</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+
+  function change_file_name(element){
+    element.style.display="none";
+    element.nextElementSibling.style.display = "inline";
+  }
+  function show_new_name_input(element, event) {
+    if (!event.shiftKey) {
+      if (event.keyCode == 13 || event.which == 13) {
+        element.previousElementSibling.style.display="inline";
+        element.style.display = "none";
+        element.previousElementSibling.innerHTML = element.value;
+      }
+    }
+  }
+</script>
+
+{% endblock %}

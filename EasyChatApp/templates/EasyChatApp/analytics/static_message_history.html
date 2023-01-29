@@ -1,0 +1,1642 @@
+{% extends 'EasyChatApp/console.html' %}
+{% block consolecontent %}
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="/static/EasyChatApp/css/message_history.css?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="/static/EasyChatApp/css/bootstrap_datatable_min.css?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="/static/EasyChatApp/css/ion_range_slider.css?v={{version}}">
+
+<div class="row" style="margin-top:1%;">
+
+    <div class="col s3" style="display:none;">
+        <select id="selected-bot-message-history">
+            <option value="None">Choose a bot</option>
+            {% for bot_obj in bot_objs %}
+                {% if bot_obj == selected_bot_obj %}
+                    <option value="{{ bot_obj.pk }}" selected>{{ bot_obj.name }}</option>
+                {% else %}
+                    <option value="{{ bot_obj.pk }}">{{ bot_obj.name }}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col s12" id="main-console-container">
+
+<div class="easychat-custom-table-wrapper">
+
+    <div class="container-fluid">
+        <div class="card shadow mb-4">
+            <div class="card-header ppy-3" style="min-height: 60px;">
+                <div class="row" style="margin-top: 0;">
+                    <div class="col-sm-6" style="display: flex; align-items: center; column-gap: 16px;">
+                        <a class="easychat-custom-back-button" href="/chat/intent/?bot_pk={{selected_bot_obj.pk}}&selected_language=en">
+                            <svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M15 18.7927L9 12.7927L15 6.79272" stroke="#0254D7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </a>
+                        <div>
+                            <h6 class="m-0 font-weight-bold text-primary heading-text-primary">Message History</h6>
+                            {% if is_percentage_match_enabled %}
+                                {% if average_accuracy_percentage != "" %}
+                                    <div class="easychat-text-primary-subheading">Average Accuracy - {{ average_accuracy_percentage }}%</div>
+                                {% endif %}        
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-sm-6" style="display: flex; align-items: center; column-gap: 32px; justify-content: flex-end;">
+                        <div class="easychat-user-history-page-switch-toggle-wrapper">
+                            <div class="easychat-custom-switch-toggle-wrapper">
+                                <span>User History</span>
+                                <label class="easychat-custom-toggle-switch">
+                              <input type="checkbox" onclick="check_message_history_switch_status(this)" checked>
+                              <span class="easychat-custom-toggle-slider easychat-custom-toggle-round"></span>
+                            </label>
+                                <span>Message History</span>
+                            </div>
+                        </div>
+                        <a title="Edit" style="cursor: pointer;" class="modal-trigger easychat-custom-primary-button" id="edit_icon" href="#edit-table-modal" data-toggle="modal">
+                            <svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M11.4955 7.61783L14.329 10.4514L8.76486 16.0155C8.60985 16.1705 8.41706 16.2824 8.20556 16.34L5.3414 17.1212C5.02794 17.2067 4.74032 16.919 4.82581 16.6056L5.60694 13.7414C5.66462 13.5299 5.7765 13.3371 5.93152 13.1821L11.4955 7.61783ZM15.4657 6.48134C16.2481 7.26374 16.2481 8.53228 15.4657 9.31468L14.9225 9.85734L12.0889 7.02436L12.6323 6.48134C13.4147 5.69893 14.6832 5.69893 15.4657 6.48134Z" fill="white"/>
+                                </svg>
+                            <span>Edit</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                            <div class="custom-btn-row">
+                                            <div class="custom-filter-container" style="height: 34px; margin-right: -2px;">
+                                                <input type="text" class="pdf_search_bar" onkeyup="searchInfoMessageHistory('message-history-info-table', 11)" id="message-history-search-bar" style="border-bottom: 1px solid #E2E8F0 !important; width: 96% !important;
+                                                      height: 100% !important;
+                                                      background: #FFFFFF;
+                                                      margin-bottom: 0 !important;
+                                                      margin-top: 0 !important;
+                                                      border-radius: 4px;
+                                                      flex: none;
+                                                      order: 0;
+                                                      flex-grow: 1;
+                                                      border: 1px solid #E2E8F0 !important;
+                                                      box-shadow: none!important; 
+                                                      outline: none!important;
+                                                      padding-left: 15px;" placeholder="&nbsp; &nbsp; &nbsp; Search for message history">
+                                            </div>
+                                            <div class="easychat-table-record-manage-dropdown-div" id="easychat_message_history_table_row_drop_container">
+                                                <p>Show&nbsp;</p>
+                                                <select name="easychat_message_history_table_row_dropdown" id="easychat_message_history_table_row_dropdown" data-minimum-results-for-search="Infinity">
+                                               
+                                                <option value="10" selected>10</option>
+                                                <option value="25">25</option>
+                                                <option value="50">50</option>
+                                                <option value="75">75</option>
+                                                <option value="100">100</option>
+                                                
+                                          
+                                            </select>
+                                            <p>&nbsp; Enteries</p>
+                                                <div id="easychat_message_history_table_row_dropdown_container">
+
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <a class="btn easychat-custom-primary-button modal-trigger" data-target="modal-message-history-filter" data-toggle="modal">
+                                                    <svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M2.00018 7L17.6587 7" stroke="white" stroke-width="1.95732" stroke-linecap="round"/>
+                                                        <path d="M3.95752 10.9146L15.7014 10.9146" stroke="white" stroke-width="1.95732" stroke-linecap="round"/>
+                                                        <path d="M6.8938 14.8293L12.7658 14.8293" stroke="white" stroke-width="1.95732" stroke-linecap="round"/>
+                                                        </svg>
+                                                    <span>Filter </span>
+                                                </a>
+                                        </div>
+                                    <div>
+                                        <a class="btn white black-text left modal-trigger" href="#modal-mis-filter" style="margin-right:0.5em;">
+                                        <svg width="16" height="11" viewBox="0 0 16 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                              <path d="M12 9.58965H2.25V3.24309H4.19625C4.19625 3.24309 4.713 2.61126 5.82375 1.83275H1.5C1.30109 1.83275 1.11032 1.90704 0.96967 2.03929C0.829018 2.17153 0.75 2.3509 0.75 2.53792L0.75 10.2948C0.75 10.4819 0.829018 10.6612 0.96967 10.7935C1.11032 10.9257 1.30109 11 1.5 11H12.75C12.9489 11 13.1397 10.9257 13.2803 10.7935C13.421 10.6612 13.5 10.4819 13.5 10.2948V7.65325L12 8.81326V9.58965ZM10.7708 4.6887V7.19277L15.75 3.52516L10.7708 0V2.2079C4.725 2.2079 4.725 7.82672 4.725 7.82672C6.4365 5.18373 7.4895 4.6887 10.7708 4.6887Z" fill="white"></path>
+                                          </svg>
+                                            Export
+                                        </a>
+                                    </div>
+
+                                    <div class="ms-false-positive-btn-wrapper">
+                                        <a class="btn white black-text left ms-false-positive-btn" onclick="showToast('Successfully marked the flagged queries as False Positive.');">
+                                            False Positive
+                                        </a>
+                                    </div>
+
+                                    <div class="ms-false-positive-btn-wrapper">
+                                        <a class="btn white black-text left ms-not-false-positive-btn" onclick="showToast('Successfully marked the flagged queries as Not False Positive.');">
+                                            Not False Positive
+                                        </a>
+                                    </div>
+                                                                        
+                                    <div id="modal-mis-filter"
+                                    class="modal easychat-custom-modals-container">
+                                    <div class="modal-content">
+                                        <div class="row" style="margin-bottom: 12px !important;">
+                                            <div class="modal-header">
+                                                <div class="modal-heading-text-div">Export</div>
+                                                <a href="javascript:void(0)"
+                                                    class="modal-close-btn modal-close">
+                                                    <svg width="25" height="25" viewBox="0 0 25 25"
+                                                        fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path
+                                                            d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z"
+                                                            fill="black" fill-opacity="0.54" />
+                                                    </svg>
+                                                </a>
+                                            </div>
+                                            <div class="modal-overflow-content-div">
+                                                <div class="col s12 analytics-filter-select-area">
+                                                    <div class="filter-heading">
+                                                        Select Date Range
+                                                    </div>
+                                                    <label>
+                                                        <input type="radio"
+                                                            name="select-date-range" checked
+                                                            onclick="show_custom_date_export();"" value="1" />
+                                                        <div class="filter-box">
+                                                            <span>Last Day</span>
+                                                        </div>
+                                                    </label>
+                                                    <label>
+                                                        <input type="radio"
+                                                            name="select-date-range"
+                                                            onclick="show_custom_date_export();" value="2">
+                                                        <div class=" filter-box">
+                                                            <span>Last 7 Days</span>
+                                                        </div>
+                                                    </label>
+                                                    <label>
+                                                        <input type="radio"
+                                                            name="select-date-range"
+                                                            onclick="show_custom_date_export();" value="3">
+                                                        <div class=" filter-box">
+                                                            <span>Last 1 Month</span>
+                                                        </div>
+                                                    </label>
+                                                    <label>
+                                                        <input type="radio"
+                                                            name="select-date-range"
+                                                            id="analytics_filter_custom_date_btn_export"
+                                                            onclick="show_custom_date_export();" value="4">
+                                                        <div class=" filter-box">
+                                                            <span>Custom Date</span>
+                                                        </div>
+                                                    </label>
+                                                </div>
+                                                <div id="analytics-custom-date-select-area-export"
+                                                    style="display: none;">
+                                                    <div style="margin-bottom: 12px;">
+                                                        <div class="filter-heading">
+                                                            Filter Parameter
+                                                        </div>
+                                                        <select id="filter">
+                                                            <option value="0" selected="selected">
+                                                                Download all messages</option>
+                                                            <option value="1">Download unanswered
+                                                                messages</option>
+                                                            <option value="2">Download positive feedback
+                                                                messages</option>
+                                                            <option value="3">Download negative feedback
+                                                                messages</option>
+                                                        </select>
+                                                    </div>
+                                                    <div
+                                                        class="col s11 analytics-custom-date-select-area">
+                                                        <div class="col s6" style="padding-left: 2px; font-weight: 600;color: #4d4d4d; font-size: 14px;">
+                                                            Start Date
+                                                            <input type="date"
+                                                                class="analytics-start-date"
+                                                                id="startdate"
+                                                                value="{{ start_date|date:"Y-m-d" }}"
+                                                                placeholder="Enter start date "
+                                                                style="border: 2px solid #F6F6F6 !important; border-radius:4px !important;">
+                                                        </div>
+                                                        <div class="col s6" style="font-weight: 600; padding-right: 0px !important;color: #4d4d4d; font-size: 14px;">
+                                                            End Date
+                                                            <input type="date"
+                                                                class="analytics-end-date"
+                                                                value="{{ end_date|date:"Y-m-d" }}"
+                                                                id="enddate"
+                                                                placeholder="Enter end date "
+                                                                style="border: 2px solid #F6F6F6 !important; border-radius:4px !important;">
+                                                        </div>
+                                                        <div class="col s12" style="font-weight: 600; padding: 0px !important;color: #4d4d4d; font-size: 14px;">
+                                                            Email ID <span style="color: red;">*</span>
+                                                            <input type="email"
+                                                                id="filter-data-email"
+                                                                value="{{ request.user.email }}"
+                                                                style="border: 2px solid #F6F6F6 !important; border-radius:4px !important; width: 95.5% !important;">
+                                                            <span>
+                                                                <div
+                                                                    class="analytics-email-note-export">
+                                                                    Note: You will receive the message
+                                                                    history data dump on the above email
+                                                                    ID within 24 hours.</div>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button href="javascript:void(0)"
+                                            class="btn filter-modal-footer-btn"
+                                            id="export-mis-filter">Export</button>
+                                    </div>
+                                </div>
+                            <div id="modal-mis-keyword" class="modal">
+                                <div class="modal-content">
+                                    <div class="row">
+                                        <div class="col s12">
+                                            <h6 style="color: #3e95cd">Keywords for filter</h6>
+                                            <div class="input-field col s12">
+                                                <input placeholder="Write Keywords with comma(,) separation" id="keyword_str" type="text" class="validate">
+                                            </div>                    
+                                        </div>
+                                        <div class="col s12">
+                                            <h6 style="color: #3e95cd">Email ID*</h6>
+                                            <input type="email" id="filter-data-keyword-email" value="{{ request.user.email }}"><span><b>Note: You will receive the message history data dump on the above email ID</b></span>           
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button id="export-mis-keyword" class="modal-action btn green lighten-2 right">Export</button>
+                                </div>
+                            </div>
+                            </div>
+
+                        </div>
+
+                        <div class="avtive-customer-table" id="pdf_dashboard_table">
+                            <div id="pdf_table_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
+                                <div class="row">
+                                    <div class="col-sm-12" style="width: 100%; overflow: hidden; padding: 0px 24px;">
+                                        {% if message_history_list %}
+                                        <div id="search_table_wrapper" class="dataTables_wrapper no-footer message-history-table-parent-div">
+                                            <table class="dataTable  highlight no-footer" id="message-history-info-table" width="100%" cellspacing="0" role="grid" style="width: 100% !important; clear: unset !important;">
+                                                <thead>
+                                                    <tr role="row" id="message_history_row">
+                                                        <th data-orderable="false" class="sorting_disabled" style=" padding-right: 0px !important;">
+                                                            <div class="easychat-custom-checkbox-wrapper">
+                                                                <label>
+                                                                    <input class="filled-in" id="global-selected-message-history" type="checkbox" >
+                                                                    <span></span>
+                                                                </label>
+                                                            </div>
+                                                        </th>                                                     
+                                                    </tr>
+                                                </thead>
+                                        <tbody id="table-body-message-history">
+                                            {% for message_history in message_history_list %}
+                                                                                                            
+                                            {% if message_history %}
+                                                
+                                                <tr role="row">
+
+
+                                                    <td data-content="checkbox">
+                                                        <div class="easychat-custom-checkbox-wrapper">
+                                                            <label>
+                                                        <input class="filled-in selected-misdashboard" type="checkbox" name="input-checkbox-selected-misdashboard-" id="input-checkbox-selected-misdashboard-{{message_history.pk}}">
+                                                        <span></span>
+                                                    </label>
+                                                        </div>
+                                                    </td>
+                                                    {% for data in bot_metadata.lead_data_cols %}
+                                                    
+                                                    {% if data.name == "user_query" and data.selected == "true" %}
+
+                                                    <td><span>{{ message_history.message_received|safe }}</span></td>
+
+                                                    {% elif data.name == "bot_response" and data.selected == "true" %}
+                                                    <td><p class="tooltipped" data-position="top" data-tooltip="{{ message_history.bot_response|safe }}">{{ message_history.bot_response|safe|slice:"25" }}...</p>
+                                                        {% if message_history.attachment %}
+                                                            <a href="{{ message_history.attachment }}" target="_blank"><i class="material-icons blue-text text-darken-3">insert_link</i></a>
+                                                        {% endif %}
+                                                    </td>
+                                                    {% elif data.name == "time" and data.selected == "true" %}
+                                                    <td>27 Dec 2021 10:28 AM</td>
+                                                    {% elif data.name == "intent_recognized" and data.selected == "true" %}
+                                                    <td>
+                                                        {% if message_history.intent_recognized and message_history.get_intent_obj.pk  %}
+                                                            <!-- <a href='/chat/edit-intent/?intent_pk={{ message_history.get_intent_obj.pk }}' target="_blank">{{ message_history.intent_recognized.name }}</a> -->
+                                                        {% elif message_history.intent_recognized and not message_history.get_intent_obj.pk %}
+                                                            <!-- <span title="Deleted">{{ message_history.intent_recognized.name }}</span> -->
+
+                                                        {% elif message_history.intent_name|cut:" " in bot_flow_termination_keywords %}
+                                                            <!-- <a href='/chat/bot/edit/{{selected_bot_obj.pk}}/?selected_language=en#configurations-other-settings' target="_blank">{{ message_history.intent_name }}</a> -->
+                                                        {% endif %}
+                                                        <a href='' target="">{{ message_history.intent_name }}</a>
+                                                    </td>
+                                                    {% elif data.name == "user_id" and data.selected == "true" %}
+                                                    <td><a href="/chat/user-filtered/?bot_id={{ selected_bot_obj.pk }}&user_id={{ message_history.user_id }}&static_page=true" target="_blank">{{ message_history.user_id|slice:":15" }}...</a></td>
+                                                    {% elif data.name == "session_id" and data.selected == "true" %}
+                                                    <td><a href="/chat/user-filtered/?bot_id={{ selected_bot_obj.pk }}&user_id={{ message_history.user_id }}&session_id={{ message_history.session_id }}&static_page=true" target="_blank">{{ message_history.session_id|slice:":15" }}...</a></td>
+                                                    {% elif data.name == "channel" and data.selected == "true" %}
+                                                    <td><a>{{ message_history.get_channel_name }}</a></td>
+                                                    {% elif data.name == "user_feedback" and data.selected == "true" %}
+                                                    <td>
+                                                        {% ifequal message_history.is_helpful_field "1" %}
+                                                            <p class="green-text">{{message_history.feedback_comment}}</p>
+                                                        {% endifequal %}
+                                                        {% ifequal message_history.is_helpful_field "-1" %}
+                                                            <p class="red-text">{{message_history.feedback_comment}}</p>
+                                                        {% endifequal %}
+                                                    </td>
+                                                    {% elif data.name == "intent_feedback" and data.selected == "true" %}
+                                                    <td>
+                                                        {% ifequal message_history.is_helpful_field "1" %}
+                                                            <i class="material-icons green-text text-darken-3">thumb_up</i>
+                                                        {% endifequal %}
+                                                        {% ifequal message_history.is_helpful_field "-1" %}
+                                                            <i class="material-icons red-text text-darken-3">thumb_down</i>
+                                                        {% endifequal %}
+
+
+                                                    </td>
+                                                    {% elif data.name == "location" and data.selected == "true" %}
+                                                    <td  >
+                                                        <span class="client-location-city" style="display:table-cell;">
+                                                        {% if message_history.client_city %}
+                                                            {{message_history.client_city}}
+                                                        {% else %}
+                                                            -       
+                                                        {% endif %}
+                                                        </span>                 
+                                                        <span class="client-location-state" style="display:none;">
+                                                            {% if message_history.client_state %}
+                                                            {{message_history.client_state}}
+                                                        {% else %}
+                                                            -       
+                                                        {% endif %}                
+                                                        </span>
+                                                        <span class="client-location-pincode" style="display:none;">
+                                                            {% if message_history.client_pincode %}
+                                                            {{message_history.client_pincode}}
+                                                        {% else %}
+                                                            -       
+                                                        {% endif %}                
+                                                        </span>
+                                                    </td>
+                                        
+                                                    {% endif %}
+                                                    {% if is_percentage_match_enabled %}
+                                                        {% if data.name == "variation_responsible" and data.selected == "true" %}
+                                                        <td data-content="Variation Responsible">
+                                                            {{ message_history.training_question }}
+                                                        </td>
+                                                        {% elif data.name == "percentage_match" and data.selected == "true" %}
+                                                        <td data-content="Match Percentage">
+                                                            <div class="ms-percentage-match-container marked-percentage-status">
+                                                            {% if message_history.match_percentage %}
+                                                            {% if message_history.match_percentage <= 25 %}
+                                                                {% if message_history.flagged_queries_positive_type %}
+                                                                <div class="ms-percentage-match-tooltip-text">{{ message_history.flagged_queries_positive_type }}</div>
+                                                                {% endif %}
+                                                                <div class="peracentage-text-container below-threshold">
+                                                                    {% if message_history.flagged_queries_positive_type == "Not False Positive" %}
+                                                                    <svg class="not-false-positive-svg" width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block;">
+                                                                        <circle cx="8.5" cy="8.5" r="8" fill="white"/>
+                                                                        <path d="M8.50016 1.83334C12.1821 1.83334 15.1668 4.8181 15.1668 8.5C15.1668 12.1819 12.1821 15.1667 8.50016 15.1667C4.81826 15.1667 1.8335 12.1819 1.8335 8.5C1.8335 4.8181 4.81826 1.83334 8.50016 1.83334ZM10.856 6.45998L7.6663 9.65825L6.11522 8.10717C5.89826 7.89021 5.54651 7.89021 5.32955 8.10717C5.11259 8.32412 5.11259 8.67588 5.32955 8.89284L7.27399 10.8373C7.49116 11.0544 7.84332 11.0542 8.06019 10.8368L11.6427 7.2446C11.8594 7.02736 11.8589 6.6756 11.6417 6.45893C11.4245 6.24226 11.0727 6.24273 10.856 6.45998Z" fill="#10B981"/>
+                                                                    </svg>
+                                                                    {% elif message_history.flagged_queries_positive_type == "False Positive" %}
+                                                                    <svg class="false-positive-svg" width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block;">
+                                                                        <circle cx="8.5" cy="8" r="8" fill="white"/>
+                                                                        <path d="M8.50098 2.00002C11.8147 2.00002 14.501 4.68631 14.501 8.00002C14.501 11.3137 11.8147 14 8.50098 14C5.18727 14 2.50098 11.3137 2.50098 8.00002C2.50098 4.68631 5.18727 2.00002 8.50098 2.00002ZM7.03528 5.83861C6.84041 5.70361 6.57099 5.7229 6.39742 5.89646L6.33957 5.96571C6.20457 6.16058 6.22386 6.43 6.39742 6.60357L7.79398 8.00002L6.39742 9.39646L6.33957 9.46571C6.20457 9.66058 6.22386 9.93 6.39742 10.1036L6.46667 10.1614C6.66154 10.2964 6.93096 10.2771 7.10453 10.1036L8.50098 8.70702L9.89742 10.1036L9.96667 10.1614C10.1615 10.2964 10.431 10.2771 10.6045 10.1036L10.6624 10.0343C10.7974 9.83945 10.7781 9.57003 10.6045 9.39646L9.20798 8.00002L10.6045 6.60357L10.6624 6.53432C10.7974 6.33945 10.7781 6.07003 10.6045 5.89646L10.5353 5.83861C10.3404 5.70361 10.071 5.7229 9.89742 5.89646L8.50098 7.29302L7.10453 5.89646L7.03528 5.83861Z" fill="#FF0000"/>
+                                                                    </svg>
+                                                                    {% endif %}
+                                                            {% else %}
+                                                                <div class="peracentage-text-container above-threshold">
+                                                            {% endif %}
+                                                                    <span>{{ message_history.match_percentage }}%</span>
+                                                                </div>
+                                                            </div>
+                                                            {% else %}
+                                                                <span>100%</span>
+                                                                </div>
+                                                            </div>
+                                                            {% endif %}
+                                                        </td>
+                                                        {% endif %}
+                                                    {% endif %}      
+                                                    {% endfor %}
+                                                </tr>
+                                            {% endif %}
+                                            
+                                        {% endfor %}
+                                                                                                                
+                                                                                                        
+                                        </tbody>
+                                        </table>
+                                            {% else %}
+                                                {% if filter_flag %}
+                                                    <p class="green lighten-1 black-text center" style="padding:1em; margin: 1em;">No messages found for applied filter.</p>
+                                                {% else %}
+                                                    <p class="green lighten-1 black-text center" style="padding:1em; margin: 1em;">No messages found.</p>
+                                                {% endif %}
+
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12 col-md-5">
+
+                                    </div>
+                                    <div class="col-sm-12 col-md-7">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3" id="message_history_table_pagination_div">
+                            <div class="col-md-6 col-sm-12 entries" id="table_page_info">
+                               
+                            </div>
+                            <div class="col-md-6 col-sm-12">
+                                <div class="d-flex justify-content-end">
+                                    <nav aria-label="Page navigation example" style="box-shadow: none;">
+
+                                    {% if message_history_list.has_other_pages %}
+                                            <ul class="pagination" style="margin-right: 16px;">
+                                                {% if message_history_list.has_previous %}
+                                                <li class="page-item ">
+                                                    <a class="page-link previous_button" href="?bot_id={{selected_bot_obj.pk}}&page={{ message_history_list.previous_page_number }}" aria-label="Previous" style="pointer-events: all;">
+                                                        <span aria-hidden="true">
+                                                          Previous
+                                                        </span>
+                                                    </a>
+                                                </li>
+                                                {% else %}
+            
+                                                    <li class="page-item disabled">
+                                                        <a class="page-link previous_button" aria-label="Previous" style="pointer-events: none;">
+                                                            <span aria-hidden="true">
+                                                              Previous
+                                                            </span>
+                                                        </a>
+                                                    </li>
+                                                {% endif %}
+                                                
+                                                {% if message_history_list.number|add:'-4' > 1 %}
+                                                    <li><a href="?bot_id={{selected_bot_obj.pk}}&page={{ message_history_list.number|add:'-5' }}">&hellip;</a></li>
+                                                {% endif %}
+
+                                                {% for i in message_history_list.paginator.page_range %}
+                                                {% if message_history_list.number == i %}
+                                                    <li class="page-item">
+                                                        <a data-page="{{ i }}" href="?bot_id={{selected_bot_obj.pk}}&page={{ i }}" class="active page-link">
+                                                          {{ i }}
+                                                        </a>
+                                                    </li>
+                                                {% elif i > message_history_list.number|add:'-5' and i < message_history_list.number|add:'5' %}
+                                                    <li class="page-item">
+                                                        <a data-page="{{ i }}" href="?bot_id={{selected_bot_obj.pk}}&page={{ i }}" class="page-link">
+                                                          {{ i }}
+                                                        </a>
+                                                    </li>
+                                                {% endif %}
+                                            {% endfor %}
+
+                                            {% if message_history_list.paginator.num_pages > message_history_list.number|add:'4' %}
+                                                <li><a href="?bot_id={{selected_bot_obj.pk}}&page={{ message_history_list.number|add:'5' }}">&hellip;</a></li>
+                                            {% endif %}
+
+                                            {% if message_history_list.has_next %}
+
+                                                <li class="page-item" style="border-right: none;">
+                                                    <a class="page-link next_button" href="?bot_id={{selected_bot_obj.pk}}&page={{ message_history_list.next_page_number }}" aria-label="Next" style="pointer-events: all;">
+                                                        <span aria-hidden="true">
+                                                            Next
+                                                        </span>
+                                                    </a>
+                                                </li>
+                                            {% else %}
+
+                                                <li class="page-item disabled" style="border-right: none;">
+                                                    <a class="page-link next_button" aria-label="Next" style="pointer-events: none;">
+                                                        <span aria-hidden="true">
+                                                            Next
+                                                        </span>
+                                                    </a>
+                                                </li>
+                                            {% endif %}
+                                            
+                                                
+                                            </ul>
+                                    {% endif %}
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+                        
+  </div>
+
+
+    <div class="fixed-action-btn">
+        <a class="btn-floating btn-large easychat-message-history-edit-action-btn"  onclick="show_select_message_history('{{selected_bot_obj.pk}}')" id="revised-message-history-action" style="margin-right: 1em;display:none;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M13.9392 4.99957L19.0002 10.0606L9.06201 19.9987C8.78513 20.2755 8.44079 20.4754 8.06303 20.5784L2.94734 21.9736C2.38747 22.1263 1.87374 21.6125 2.02643 21.0527L3.42162 15.937C3.52465 15.5592 3.72447 15.2149 4.00135 14.938L13.9392 4.99957ZM21.0303 2.96967C22.4278 4.36713 22.4278 6.63286 21.0303 8.03033L20.0602 8.99957L14.9992 3.93957L15.9697 2.96967C17.3671 1.5722 19.6329 1.5722 21.0303 2.96967Z" fill="#7B7A7B"/>
+                </svg>
+
+        </a>
+    </div>
+
+</div>
+
+<div id="console-modal-container">
+    <div id="edit-table-modal" class="modal">
+                            <div class="modal-content">
+                                <div class="row" style="margin-bottom: 12px !important;">
+                                    <div class="modal-header">
+                                        <h6>Table Meta Data</h6>
+                                        <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                                            <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z" fill="black" fill-opacity="0.54"></path>
+                    </svg>
+                                        </a>
+                                    </div>
+
+                                    <div class="modal-overflow-content-div">
+                                    
+                                        <div class="col s12" style="margin-top: 9px; padding: 0px;">
+                                            <div class="easychat-custom-modal-subheading">
+                                                Choose column name
+                                            </div>
+                                            <select name="easychat_message_history_select_column_dropdown" class="easychat_message_history_select_column_dropdown" id="easychat_message_history_select_column_dropdown_metadata" onchange="add_to_chip()">
+                                                <option value="none" selected disabled hidden>
+                                                    Select column name 
+                                                </option>
+                                                
+                                          
+                                            </select>
+                                        </div>
+                                        <div class="col s12" style="padding: 0px;">
+                                            <ul class="meta-data-chips" id="sortable-chips" style="padding-left: 0px;display: flex;flex-wrap: wrap;gap:8px;margin-top: 24px!important;">
+                                            
+                                            </ul>
+                                        </div>
+                                    
+                                </div>
+                            </div>
+                            
+                        </div>
+
+                        <div class="modal-footer">
+
+                                <a class="btn filter-modal-footer-btn modal-close" onclick="save_lead_data_table_metadata()">Apply</a>
+
+                            </div>
+</div>
+
+
+
+<div id="modal-message-history-action" class="modal easychat-custom-modals-wrapper">
+                        <div class="modal-content">
+                            <div class="row" style="margin-bottom: 12px !important;">
+                                <div class="modal-header">
+                                    <div class="modal-heading-text-div">Add to Training Data</div>
+                                    <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                                        <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z" fill="black" fill-opacity="0.54"></path>
+                    </svg>
+
+                                    </a>
+                                </div>
+
+                                <div class="modal-overflow-content-div">
+                                    <div class="col s12 easychat-custom-modal-heading-content">
+                                        <p>Please select the intent to which you want to add the selected user query(ies) in training</p>
+                                      
+
+                                        <div id='show-bot-intent' style="display:none;">
+                                            <select name="easychat--select-intent-dropdown" class="easychat_message_history_treaningdata_select_intent_dropdown" onchange='disable_submit_btn()'id='select-show-bot-intent'>
+
+                                            </select>
+                                        </div>
+                                     
+                                        <div id="easychat_message_history_treaningdata_select_intent_dropdown_container"></div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+
+                            <a id="match-intent-btn"  class="btn filter-modal-footer-btn modal-close" onclick="map_message_to_intent()" disabled="true">Submit</a>
+
+                        </div>
+                    </div>
+
+
+<div id="modal-message-history-action-error" class="modal easychat-custom-modals-wrapper">
+                        <div class="modal-content">
+                            <div class="row" style="margin-bottom: 12px !important;">
+                                <div class="modal-header">
+                                    <div class="modal-heading-text-div">Error</div>
+
+                                </div>
+
+                                <div class="modal-overflow-content-div">
+                                    <div class="col s12 easychat-custom-modal-heading-content">
+                                        <p>The following messages are already present in the training data of the selected intent:</p>
+                                        <div>
+                                            <ul id = "unmatched-message-list" list-style-type="circle inside">
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+
+                            <a  class="btn filter-modal-footer-btn" style="padding: 0px 32px !important;" onclick="close_message_error_modal()">OK</a>
+                        </div>
+</div>
+
+<div id="modal-message-history-action-warning" class="modal easychat-custom-modals-wrapper">
+                        <div class="modal-content">
+                            <div class="row" style="margin-bottom: 12px !important;">
+                                <div class="modal-header">
+                                    <div class="modal-heading-text-div">Note</div>
+
+                                </div>
+
+                                <div class="modal-overflow-content-div">
+                                    <div class="col s12 easychat-custom-modal-heading-content">
+                                        <p> Please run automated testing to find conflicts if any!</p>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <a onclick="close_message_warning_modal()" class="btn filter-modal-footer-btn" style="padding: 0px 32px !important;">OK</a>
+                        </div>
+</div>
+
+
+<div id="modal-message-history-filter" class="modal">
+    <div class="modal-content">
+        <div class="row" style="margin-bottom: 12px !important;">
+            <div class="modal-header">
+                <h6>Apply filter</h6>
+                <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                    <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z" fill="black" fill-opacity="0.54"/>
+                    </svg>
+
+                </a>
+            </div>
+
+            <div class="modal-overflow-content-div">
+                <div class="col s12 analytics-filter-select-area">
+                    <div class="filter-heading">
+                        Queries
+                    </div>
+
+                    <label>
+                        {% if query_type == "all" %}
+                            <input type="radio" id="query-type-1" value="all" name="analytics-card-filter-btn" checked>
+                        {% else %}
+                            <input type="radio" id="query-type-1" value="all" name="analytics-card-filter-btn">
+                        {% endif %}
+                        
+                        <div class=" filter-box">
+                            <span>All Queries</span>
+                        </div>
+
+                    </label>
+
+                    <label>
+                        {% if query_type == "unanswered" %}
+                            <input type="radio" id="query-type-2" value="unanswered" name="analytics-card-filter-btn" checked>
+                        {% else %}
+                            <input type="radio" id="query-type-2" value="unanswered" name="analytics-card-filter-btn">
+                        {% endif %}
+                        
+                        <div class=" filter-box">
+                            <span>Unanswered Queries</span>
+                        </div>
+                    </label>
+
+                    <label>
+                        {% if query_type == "answered" %}
+                            <input type="radio" id="query-type-3" value="answered" name="analytics-card-filter-btn" checked>
+                        {% else %}
+                            <input type="radio" id="query-type-3" value="answered" name="analytics-card-filter-btn">
+                        {% endif %}
+                        
+                        <div class=" filter-box">
+                            <span>Answered Queries</span>
+                        </div>
+                    </label>
+
+                    <label>
+                        {% if query_type == "intuitive" %}
+                            <input type="radio" id="query-type-4" value="intuitive" name="analytics-card-filter-btn" checked>
+                        {% else %}
+                            <input type="radio" id="query-type-4" value="intuitive" name="analytics-card-filter-btn">
+                        {% endif %}
+                        
+                        <div class=" filter-box">
+                            <span>Intuitive Queries</span>
+                        </div>
+                    </label>
+
+                    <label>
+                        {% if query_type == "type_in" %}
+                            <input type="radio" id="query-type-5" value="type_in" name="analytics-card-filter-btn" checked>
+                        {% else %}
+                            <input type="radio" id="query-type-5" value="type_in" name="analytics-card-filter-btn">
+                        {% endif %}
+                        
+                        <div class=" filter-box custom-tooltip-message-history">
+                            <div class="message-history-filter-modal-tooltip-text">Customer who types the query manually and clicks on the Enter/Send button without selecting any suggestions, recommendations, menu, sticky, child intents</div>
+                            <span>Type-in Queries</span>
+                        </div>
+                    </label>
+
+                    {% if True %}
+                    <label>
+                        {% if query_type == "flagged" %}
+                        <input type="radio" id="query-type-6" value="flagged" name="analytics-card-filter-btn" checked>
+                        {% else %}
+                        <input type="radio" id="query-type-6" value="flagged" name="analytics-card-filter-btn">
+                        {% endif %}
+                    
+                        <div class=" filter-box">
+                            <span>Flagged Queries</span>
+                        </div>
+                    </label>
+                    {% endif %}
+
+                    {% if enable_flagged_queries_status %}
+                    <label>
+                        {% if query_type == "false_positive" %}
+                        <input type="radio" id="query-type-7" value="false_positive" name="analytics-card-filter-btn" checked>
+                        {% else %}
+                        <input type="radio" id="query-type-7" value="false_positive" name="analytics-card-filter-btn">
+                        {% endif %}
+                    
+                        <div class=" filter-box">
+                            <span>False Positives</span>
+                        </div>
+                    </label>
+                                    
+                    <label>
+                        {% if query_type == "not_false_positive" %}     
+                        <input type="radio" id="query-type-8" value="not_false_positive" name="analytics-card-filter-btn" checked>
+                        {% else %}
+                        <input type="radio" id="query-type-8" value="not_false_positive" name="analytics-card-filter-btn">
+                        {% endif %}
+                
+                        <div class=" filter-box">
+                            <span>Not False Positives</span>
+                        </div>
+                    </label>
+                    {% endif %}
+
+                </div>
+
+                <div class="col s12 analytics-filter-select-area">
+                    <div class="filter-heading">
+                        Feedback
+                    </div>
+
+                    <label>
+                        {% if feedback_type == "no_feedback" %}
+                        <input type="radio" id="no_feedback" value="no_feedback" name="analytics-card-feedback-filter-btn" checked>
+                        {% else %}
+                        <input type="radio" id="no_feedback" value="no_feedback" name="analytics-card-feedback-filter-btn">
+                        {% endif %}
+                        <div class=" filter-box">
+                            <span>No Feedback</span>
+                        </div>
+                    </label>
+
+                    <label>
+                        {% if feedback_type == "positive_feedback" %}
+                        <input type="radio" id="positive_feedback" value="positive_feedback" name="analytics-card-feedback-filter-btn" checked>
+                        {% else %}
+                        <input type="radio" id="positive_feedback" value="positive_feedback" name="analytics-card-feedback-filter-btn">
+                        {% endif %}
+                        <div class=" filter-box">
+                            <span>Positive Feedback</span>
+                        </div>
+                    </label>
+
+                    <label>
+                        {% if feedback_type == "negative_feedback" %}
+                        <input type="radio" id="negative_feedback" value="negative_feedback" name="analytics-card-feedback-filter-btn" checked>
+                        {% else %}
+                        <input type="radio" id="negative_feedback" value="negative_feedback" name="analytics-card-feedback-filter-btn">
+                        {% endif %}
+                        <div class=" filter-box">
+                            <span>Negative Feedback</span>
+                        </div>
+                    </label>
+
+                </div>
+
+                <div class="col s12 analytics-channel-select-area">
+                    <div class="filter-heading">
+                        Channel
+                    </div>
+
+                    {% for channel in channel_list %}
+                        <div class=" channel-box">
+                            {% if channel.name in selected_channels %}
+                                <input class="message-history-channel-checkbox" type="checkbox" id="{{channel.name}}" name="" value="" checked>
+                            {% else %}
+                            <input class="message-history-channel-checkbox" type="checkbox" id="{{channel.name}}" name="" value="">
+                            {% endif %}
+                            <label for="{{channel.name}}">
+                                {{ channel.icon|safe }}
+                                <span>{{ channel.name }}</span>
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                 <div class="col s12 analytics-filter-select-area">
+                        <div class="filter-heading">
+                            Name of the intent
+                        </div>
+                        <select name="easychat_message_history_select_intent_dropdown" class="easychat_message_history_select_intent_dropdown" id="easychat_message_history_select_intent_dropdown">
+                      
+                        </select>
+
+                </div>
+
+                <div class="col s12 analytics-filter-select-area">
+                    <div class="filter-heading" style="margin-bottom: 2px;">
+                        Percentage Match for recognised intent
+                    </div>
+                    <div class="easychat-dual-range-slider">
+                        <input type="text" style="opacity: 0;" class="js-range-slider" name="my_range" value="" data-type="double" data-min="0" data-max="100" data-grid="false" />
+
+                        <div class="easychat-min-max-range-div-wrapper">
+                            <div class="easychat-min-range-div-wrapper">
+                                <div class="easychat-min-range-div" id="easychat_min_range_div">
+                                    <input type="text" id="multi-range-slider-min-val" maxlength="1" value="0" class="from" readonly/>%</div>
+                                <p>Min range</p>
+                            </div>
+                            <svg style="margin-top: -24px;" width="16" height="2" viewBox="0 0 16 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M0.480713 0.845459H15.6983" stroke="#8F8F8F" stroke-width="1.69084"/>
+                                </svg>
+
+                            <div class="easychat-max-range-div-wrapper">
+                                <div class="easychat-max-range-div" id="easychat_max_range_div">
+                                    <input type="text" id="multi-range-slider-max-val" maxlength="1" value="100" class="to dual-range-max-value" readonly />%</div>
+                                <p>Max range</p>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col s12 analytics-filter-select-area">
+                    <div class="filter-heading">
+                        Sentiment
+                    </div>
+
+                    <label>
+                        {% if sentiment == "Positive" %}
+                        <input type="radio" id="sentiment-type-1" value="Positive" name="analytics-card-sentiment-filter-btn" checked>
+                        {% else %}
+                        <input type="radio" id="sentiment-type-1" value="Positive" name="analytics-card-sentiment-filter-btn"/>
+                        {% endif %}
+                        <div class=" filter-box">
+                            <span>Positive</span>
+                        </div>
+                    </label>
+
+                    <label>
+                        {% if sentiment == "Negative" %}
+                        <input type="radio" id="sentiment-type-2" value="Negative" name="analytics-card-sentiment-filter-btn" checked>
+                        {% else %}
+                        <input type="radio" id="sentiment-type-2" value="Negative" name="analytics-card-sentiment-filter-btn">
+                        {% endif %}
+                        <div class=" filter-box">
+                            <span>Negative</span>
+                        </div>
+                    </label>
+
+                    <label>
+                        {% if sentiment == "Neutral" %}
+                        <input type="radio" id="sentiment-type-3" value="Neutral" name="analytics-card-sentiment-filter-btn" checked>
+                        {% else %}
+                        <input type="radio" id="sentiment-type-3" value="Neutral" name="analytics-card-sentiment-filter-btn">
+                        {% endif %}
+                        <div class=" filter-box">
+                            <span>Neutral</span>
+                        </div>
+                    </label>
+
+                </div>
+
+                <div class="col s12 analytics-filter-select-area">
+                    <div class="filter-heading">
+                        Timestamp
+                    </div>
+                    <label onclick="show_custom_date();">
+                        {% if filter_type == "1" %}
+                        <input type="radio" id="filter-type-1" value="1" name="analytics-card-timestamp-filter-btn" checked>
+                        {% else %}
+                        <input type="radio" id="filter-type-1" value="1" name="analytics-card-timestamp-filter-btn">
+                        {% endif %}
+                        <div class=" filter-box">
+                            <span>Last week</span>
+                        </div>
+                    </label>
+                    <label onclick="show_custom_date();">
+                        {% if filter_type == "2" %}
+                        <input type="radio" id="filter-type-2" value="2" name="analytics-card-timestamp-filter-btn" checked>
+                        {% else %}
+                        <input type="radio" id="filter-type-2" value="2" name="analytics-card-timestamp-filter-btn">
+                        {% endif %}
+                        <div class=" filter-box">
+                            <span>Last month</span>
+                        </div>
+                    </label>
+                    <label onclick="show_custom_date();">
+                        {% if filter_type == "3" %}
+                        <input type="radio" id="filter-type-3" value="3" name="analytics-card-timestamp-filter-btn" checked>
+                        {% else %}
+                        <input type="radio" id="filter-type-3" value="3" name="analytics-card-timestamp-filter-btn">
+                        {% endif %}
+                        <div class=" filter-box">
+                            <span>Last 3 month</span>
+                        </div>
+                    </label>
+                    <label onclick="show_custom_date();">
+                        {% if filter_type == "4" %}
+                        <input type="radio" id="filter-type-4" value="4" name="analytics-card-timestamp-filter-btn" checked>
+                        {% else %}
+                        <input type="radio" id="filter-type-4" value="4" name="analytics-card-timestamp-filter-btn">
+                        {% endif %}
+                        <div class=" filter-box">
+                            <span>Since Go live</span>
+                        </div>
+                    </label>
+                    <label onclick="show_custom_date();">
+                        {% if filter_type == "5" %}
+                        <input type="radio" id="date-range-custom-date" value="5" name="analytics-card-timestamp-filter-btn" checked>
+                        {% else %}
+                        <input type="radio" id="date-range-custom-date" value="5" name="analytics-card-timestamp-filter-btn">
+                        {% endif %}
+                        <div class=" filter-box">
+                            <span>Custom Date</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="col s10 analytics-custom-date-select-area" id="analytics-custom-date-select-area" style="display: none;">
+                    <div class="easychat-calendar-div-wrapper">
+                      <div class="easychat-calendar-div" id="calendar-div-1" style="left: 1%;height: 190px;margin-bottom: 10px;">
+                          <label style="margin-left: -60%;color: #2D2D2D;">From</label>                
+                          <div class="main-wrapping-div">                    
+                              <div class="easychat-date-btn">                        
+                                  <input type="text" id="datepicker-1-0" onchange="changed_date('1-0','Double datetime',this)" style="width: 100px !important;" class="date-time-picker-btns easychat-datepicker-btn" value="{{ show_start_date }}">                   
+                                  <div class="date-displayer message-history-datepicker" id="date-displayer-1-0" onclick="callModal('1-0')" style="margin-top: -43px;">                                
+                                      <div class="row" style="display: none; justify-content: center; margin-left: 0px">                                    
+                                          <div class="col s6 date">NaN</div>                                    
+                                          <div class="col s6" style=" padding-left: 0">                                        
+                                              <div class="row month-year" style="margin-bottom: 1px !important;margin-top: 8px !important;">undefined NaN</div>                                        
+                                              <div class="row day">undefined</div>                                    
+                                          </div>                                
+                                      </div>                            
+                                  </div>                                            
+                              </div>                    
+                              <div class="easychat-time-btn">                      
+                                  <input type="button" id="time-picker-btn-1-0" class="date-time-picker-btns easychat-timepicker-btn" value="{{ show_start_time }}" onclick="handle_time_picker_click('1-0')" style="width: 100px !important;" onchange="handleTimeBtnChange('Double datetime')">                    
+                              </div>                
+                          </div>                
+                          <hr style="width: 85%;border: none;border-bottom: 1px solid #e5e5e5; margin-top: 10px; margin-bottom: 8px ">
+                          <label style="margin-left: -64%;color: #2D2D2D;">To</label>                
+                          <div class="main-wrapping-div">                    
+                              <div class="easychat-date-btn">                        
+                                  <input type="text" id="datepicker-1-1" onchange="changed_date('1-1','Double datetime',this)" style="width: 100px !important;" class="date-time-picker-btns easychat-datepicker-btn" value="{{ show_end_date }}">                            
+                                  <div class="date-displayer message-history-datepicker" id="date-displayer-1-1" onclick="callModal('1-1')" style="margin-top: -43px;">                                
+                                      <div class="row" style="display: none; justify-content: center; margin-left: 0px;">                                    
+                                          <div class="col s6 date">NaN</div>                                    
+                                          <div class="col s6" style=" padding-left: 0">                                        
+                                              <div class="row month-year" style="margin-bottom: 1px !important;margin-top: 8px !important;">undefined NaN</div>                                        
+                                              <div class="row day">undefined</div>                                    
+                                          </div>                                
+                                      </div>                            
+                                  </div>                                            
+                              </div>                    
+                              <div class="easychat-time-btn">                      
+                                  <input type="button" id="time-picker-btn-1-1" class="date-time-picker-btns easychat-timepicker-btn" value="{{ show_end_time }}" onclick="handle_time_picker_click('1-1')" style="width: 100px !important;" onchange="handleTimeBtnChange('Double datetime')">                    
+                              </div>                
+                          </div>                
+                      </div>
+                      <div class="reset-icon" style="margin-left: 10px;margin-top: 12px;cursor: pointer;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" onclick="refresh_timestamp()">
+                            <path d="M13.146 11.0499L12.9717 9.05752L15.3463 8.84977C14.4472 7.98322 13.2243 7.4503 11.877 7.4503C9.11553 7.4503 6.87695 9.68888 6.87695 12.4503C6.87695 15.2117 9.11553 17.4503 11.877 17.4503C13.6977 17.4503 15.2912 16.4771 16.1655 15.0224L18.1682 15.5231C17.0302 17.8487 14.6406 19.4503 11.877 19.4503C8.01096 19.4503 4.87695 16.3163 4.87695 12.4503C4.87695 8.58431 8.01096 5.4503 11.877 5.4503C13.8234 5.4503 15.5843 6.24474 16.8531 7.52706L16.6078 4.72412L18.6002 4.5498L19.1232 10.527L13.146 11.0499Z" fill="#2D2D2D"></path>
+                        </svg>                                
+                    </div>
+                      <div id="timepicker-container-1-0">
+                          <div class="custom-timepicker">
+                              <div class="custom-timepicker-heading">
+                                  <div class="custom-timepicker-heading-text">
+                                      Select Time
+                                  </div>
+                                  <div class="cross-icon" onclick="close_time_modal('1-0')">
+                                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                          <path d="M12.1995 3.80664C12.0749 3.6818 11.9058 3.61165 11.7295 3.61165C11.5531 3.61165 11.384 3.6818 11.2595 3.80664L7.99949 7.05997L4.73949 3.79997C4.61494 3.67514 4.44584 3.60498 4.26949 3.60498C4.09315 3.60498 3.92405 3.67514 3.79949 3.79997C3.53949 4.05997 3.53949 4.47997 3.79949 4.73997L7.05949 7.99997L3.79949 11.26C3.53949 11.52 3.53949 11.94 3.79949 12.2C4.05949 12.46 4.47949 12.46 4.73949 12.2L7.99949 8.93997L11.2595 12.2C11.5195 12.46 11.9395 12.46 12.1995 12.2C12.4595 11.94 12.4595 11.52 12.1995 11.26L8.93949 7.99997L12.1995 4.73997C12.4528 4.48664 12.4528 4.05997 12.1995 3.80664Z" fill="#7B7B7B"/>
+                                      </svg>                    
+                                  </div>
+                              </div>
+                              <div class="custom-timepicker-body">
+                                  <div class="hr-clock" onclick="handle_click_time('1-0')">
+                                      <ul>
+                                          <li><label for="timepickerhrone-1-0" class="ppppp">01</label><input id="timepickerhrone-1-0" type="radio" name="hrvalue"></input></li>
+                                          <li><label for="timepickerhrtwo-1-0">02</label><input id="timepickerhrtwo-1-0" type="radio" name="hrvalue"></input></li>
+                                          <li><label for="timepickerhrthree-1-0">03</label><input id="timepickerhrthree-1-0" type="radio" name="hrvalue"></input></li>
+                                          <li><label for="timepickerhrfour-1-0">04</label><input id="timepickerhrfour-1-0" type="radio" name="hrvalue"></input></li>
+                                          <li><label for="timepickerhrfive-1-0">05</label><input id="timepickerhrfive-1-0" type="radio" name="hrvalue"></input></li>
+                                          <li><label for="timepickerhrsix-1-0">06</label><input id="timepickerhrsix-1-0" type="radio" name="hrvalue"></input></li>
+                                          <li><label for="timepickerhrseven-1-0">07</label><input id="timepickerhrseven-1-0" type="radio" name="hrvalue"></input></li>
+                                          <li><label for="timepickerhreight-1-0">08</label><input id="timepickerhreight-1-0" type="radio" name="hrvalue"></input></li>
+                                          <li><label for="timepickerhrnine-1-0">09</label><input id="timepickerhrnine-1-0" type="radio" name="hrvalue"></input></li>
+                                          <li><label for="timepickerhrten-1-0">10</label><input id="timepickerhrten-1-0" type="radio" name="hrvalue"></input></li>
+                                          <li><label for="timepickerhreleven-1-0">11</label><input id="timepickerhreleven-1-0" type="radio" name="hrvalue"></input></li>
+                                          <li><label for="timepickerhrtwelve-1-0">12</label><input id="timepickerhrtwelve-1-0" type="radio" name="hrvalue"></input></li>
+                                      </ul>
+                                  </div>
+                                  <div class="min-clock" onclick="handle_click_time('1-0')">
+                                      <ul>
+                                          <li><label for="timepickerminzero-1-0">00</label><input id="timepickerminzero-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminone-1-0">01</label><input id="timepickerminone-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermintwo-1-0">02</label><input id="timepickermintwo-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminthree-1-0">03</label><input id="timepickerminthree-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfour-1-0">04</label><input id="timepickerminfour-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfive-1-0">05</label><input id="timepickerminfive-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminsix-1-0">06</label><input id="timepickerminsix-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminseven-1-0">07</label><input id="timepickerminseven-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermineight-1-0">08</label><input id="timepickermineight-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminnine-1-0">09</label><input id="timepickerminnine-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminten-1-0">10</label><input id="timepickerminten-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermineleven-1-0">11</label><input id="timepickermineleven-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermintwelve-1-0">12</label><input id="timepickermintwelve-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminthirteen-1-0">13</label><input id="timepickerminthirteen-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfourteen-1-0">14</label><input id="timepickerminfourteen-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfifteen-1-0">15</label><input id="timepickerminfifteen-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminsixteen-1-0">16</label><input id="timepickerminsixteen-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminseventeen-1-0">17</label><input id="timepickerminseventeen-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermineighteen-1-0">18</label><input id="timepickermineighteen-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminnineteen-1-0">19</label><input id="timepickerminnineteen-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermintwenty-1-0">20</label><input id="timepickermintwenty-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermintwentyone-1-0">21</label><input id="timepickermintwentyone-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermintwentytwo-1-0">22</label><input id="timepickermintwentytwo-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermintwentythree-1-0">23</label><input id="timepickermintwentythree-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermintwentyfour-1-0">24</label><input id="timepickermintwentyfour-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermintwentyfive-1-0">25</label><input id="timepickermintwentyfive-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermintwentysix-1-0">26</label><input id="timepickermintwentysix-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermintwentyseven-1-0">27</label><input id="timepickermintwentyseven-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermintwentyeight-1-0">28</label><input id="timepickermintwentyeight-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermintwentynine-1-0">29</label><input id="timepickermintwentynine-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminthirty-1-0">30</label><input id="timepickerminthirty-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminthirtyone-1-0">31</label><input id="timepickerminthirtyone-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminthirtytwo-1-0">32</label><input id="timepickerminthirtytwo-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminthirtythree-1-0">33</label><input id="timepickerminthirtythree-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminthirtyfour-1-0">34</label><input id="timepickerminthirtyfour-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminthirtyfive-1-0">35</label><input id="timepickerminthirtyfive-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminthirtysix-1-0">36</label><input id="timepickerminthirtysix-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminthirtyseven-1-0">37</label><input id="timepickerminthirtyseven-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminthirtyeight-1-0">38</label><input id="timepickerminthirtyeight-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminthirtynine-1-0">39</label><input id="timepickerminthirtynine-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminforty-1-0">40</label><input id="timepickerminforty-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfortyone-1-0">41</label><input id="timepickerminfortyone-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfortytwo-1-0">42</label><input id="timepickerminfortytwo-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfortythree-1-0">43</label><input id="timepickerminfortythree-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfortyfour-1-0">44</label><input id="timepickerminfortyfour-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfortyfive-1-0">45</label><input id="timepickerminfortyfive-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfortysix-1-0">46</label><input id="timepickerminfortysix-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfortyseven-1-0">47</label><input id="timepickerminfortyseven-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfortyeight-1-0">48</label><input id="timepickerminfortyeight-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfortynine-1-0">49</label><input id="timepickerminfortynine-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfifty-1-0">50</label><input id="timepickerminfifty-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfiftyone-1-0">51</label><input id="timepickerminfiftyone-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfiftytwo-1-0">52</label><input id="timepickerminfiftytwo-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfiftythree-1-0">53</label><input id="timepickerminfiftythree-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfiftyfour-1-0">54</label><input id="timepickerminfiftyfour-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfiftyfive-1-0">55</label><input id="timepickerminfiftyfive-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfiftysix-1-0">56</label><input id="timepickerminfiftysix-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfiftyseven-1-0">57</label><input id="timepickerminfiftyseven-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfiftyeight-1-0">58</label><input id="timepickerminfiftyeight-1-0" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfiftynine-1-0">59</label><input id="timepickerminfiftynine-1-0" type="radio" name="minvalue"></input></li>
+                                      </ul>
+                                  </div>
+                                  <div class="ampm-clock" onclick="handle_click_time('1-0')">
+                                      <ul>
+                                          <li><label for="timepickerampmAM-1-0" style="padding: 8px 6px;right: 8%;position: relative;">AM</label><input type="radio" id="timepickerampmAM-1-0" name="ampmvalue"></input></li>
+                                          <li><label for="timepickerampmPM-1-0" style="padding: 8px 6px;right: 8%;position: relative;">PM</label><input type="radio" id="timepickerampmPM-1-0" name="ampmvalue"></input></li>
+                                      </ul>
+                                  </div>
+                              </div>
+                              <div class="custom-timepicker-footer">
+                                  <button type="submit" class="cancel-btn btn" onclick="close_time_modal('1-0')">Cancel</button>
+                                  <button type="submit" class="submit-btn btn" onclick="handle_save_time('1-0')">Save</button>
+                              </div>
+                          </div>
+                      </div>
+              
+                      <div id="timepicker-container-1-1">
+                          <div class="custom-timepicker">
+                              <div class="custom-timepicker-heading">
+                                  <div class="custom-timepicker-heading-text">
+                                      Select Time
+                                  </div>
+                                  <div class="cross-icon" onclick="close_time_modal('1-1')">
+                                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                          <path d="M12.1995 3.80664C12.0749 3.6818 11.9058 3.61165 11.7295 3.61165C11.5531 3.61165 11.384 3.6818 11.2595 3.80664L7.99949 7.05997L4.73949 3.79997C4.61494 3.67514 4.44584 3.60498 4.26949 3.60498C4.09315 3.60498 3.92405 3.67514 3.79949 3.79997C3.53949 4.05997 3.53949 4.47997 3.79949 4.73997L7.05949 7.99997L3.79949 11.26C3.53949 11.52 3.53949 11.94 3.79949 12.2C4.05949 12.46 4.47949 12.46 4.73949 12.2L7.99949 8.93997L11.2595 12.2C11.5195 12.46 11.9395 12.46 12.1995 12.2C12.4595 11.94 12.4595 11.52 12.1995 11.26L8.93949 7.99997L12.1995 4.73997C12.4528 4.48664 12.4528 4.05997 12.1995 3.80664Z" fill="#7B7B7B"/>
+                                      </svg>                    
+                                  </div>
+                              </div>
+                              <div class="custom-timepicker-body">
+                                  <div class="hr-clock" onclick="handle_click_time('1-1')">
+                                      <ul>
+                                          <li><label for="timepickerhrone-1-1" class="skdjankdjank">01</label><input id="timepickerhrone-1-1" type="radio" name="hrvalue"></input></li>
+                                          <li><label for="timepickerhrtwo-1-1">02</label><input id="timepickerhrtwo-1-1" type="radio" name="hrvalue"></input></li>
+                                          <li><label for="timepickerhrthree-1-1">03</label><input id="timepickerhrthree-1-1" type="radio" name="hrvalue"></input></li>
+                                          <li><label for="timepickerhrfour-1-1">04</label><input id="timepickerhrfour-1-1" type="radio" name="hrvalue"></input></li>
+                                          <li><label for="timepickerhrfive-1-1">05</label><input id="timepickerhrfive-1-1" type="radio" name="hrvalue"></input></li>
+                                          <li><label for="timepickerhrsix-1-1">06</label><input id="timepickerhrsix-1-1" type="radio" name="hrvalue"></input></li>
+                                          <li><label for="timepickerhrseven-1-1">07</label><input id="timepickerhrseven-1-1" type="radio" name="hrvalue"></input></li>
+                                          <li><label for="timepickerhreight-1-1">08</label><input id="timepickerhreight-1-1" type="radio" name="hrvalue"></input></li>
+                                          <li><label for="timepickerhrnine-1-1">09</label><input id="timepickerhrnine-1-1" type="radio" name="hrvalue"></input></li>
+                                          <li><label for="timepickerhrten-1-1">10</label><input id="timepickerhrten-1-1" type="radio" name="hrvalue"></input></li>
+                                          <li><label for="timepickerhreleven-1-1">11</label><input id="timepickerhreleven-1-1" type="radio" name="hrvalue"></input></li>
+                                          <li><label for="timepickerhrtwelve-1-1">12</label><input id="timepickerhrtwelve-1-1" type="radio" name="hrvalue"></input></li>
+                                      </ul>
+                                  </div>
+                                  <div class="min-clock" onclick="handle_click_time('1-1')">
+                                      <ul>
+                                          <li><label for="timepickerminzero-1-1">00</label><input id="timepickerminzero-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminone-1-1">01</label><input id="timepickerminone-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermintwo-1-1">02</label><input id="timepickermintwo-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminthree-1-1">03</label><input id="timepickerminthree-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfour-1-1">04</label><input id="timepickerminfour-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfive-1-1">05</label><input id="timepickerminfive-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminsix-1-1">06</label><input id="timepickerminsix-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminseven-1-1">07</label><input id="timepickerminseven-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermineight-1-1">08</label><input id="timepickermineight-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminnine-1-1">09</label><input id="timepickerminnine-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminten-1-1">10</label><input id="timepickerminten-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermineleven-1-1">11</label><input id="timepickermineleven-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermintwelve-1-1">12</label><input id="timepickermintwelve-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminthirteen-1-1">13</label><input id="timepickerminthirteen-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfourteen-1-1">14</label><input id="timepickerminfourteen-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfifteen-1-1">15</label><input id="timepickerminfifteen-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminsixteen-1-1">16</label><input id="timepickerminsixteen-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminseventeen-1-1">17</label><input id="timepickerminseventeen-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermineighteen-1-1">18</label><input id="timepickermineighteen-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminnineteen-1-1">19</label><input id="timepickerminnineteen-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermintwenty-1-1">20</label><input id="timepickermintwenty-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermintwentyone-1-1">21</label><input id="timepickermintwentyone-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermintwentytwo-1-1">22</label><input id="timepickermintwentytwo-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermintwentythree-1-1">23</label><input id="timepickermintwentythree-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermintwentyfour-1-1">24</label><input id="timepickermintwentyfour-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermintwentyfive-1-1">25</label><input id="timepickermintwentyfive-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermintwentysix-1-1">26</label><input id="timepickermintwentysix-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermintwentyseven-1-1">27</label><input id="timepickermintwentyseven-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermintwentyeight-1-1">28</label><input id="timepickermintwentyeight-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickermintwentynine-1-1">29</label><input id="timepickermintwentynine-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminthirty-1-1">30</label><input id="timepickerminthirty-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminthirtyone-1-1">31</label><input id="timepickerminthirtyone-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminthirtytwo-1-1">32</label><input id="timepickerminthirtytwo-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminthirtythree-1-1">33</label><input id="timepickerminthirtythree-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminthirtyfour-1-1">34</label><input id="timepickerminthirtyfour"-1-1 type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminthirtyfive-1-1">35</label><input id="timepickerminthirtyfive-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminthirtysix-1-1">36</label><input id="timepickerminthirtysix-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminthirtyseven-1-1">37</label><input id="timepickerminthirtyseven-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminthirtyeight-1-1">38</label><input id="timepickerminthirtyeight-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminthirtynine-1-1">39</label><input id="timepickerminthirtynine-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminforty-1-1">40</label><input id="timepickerminforty-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfortyone-1-1">41</label><input id="timepickerminfortyone-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfortytwo-1-1">42</label><input id="timepickerminfortytwo-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfortythree-1-1">43</label><input id="timepickerminfortythree-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfortyfour-1-1">44</label><input id="timepickerminfortyfour-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfortyfive-1-1">45</label><input id="timepickerminfortyfive-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfortysix-1-1">46</label><input id="timepickerminfortysix-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfortyseven-1-1">47</label><input id="timepickerminfortyseven-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfortyeight-1-1">48</label><input id="timepickerminfortyeight-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfortynine-1-1">49</label><input id="timepickerminfortynine-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfifty-1-1">50</label><input id="timepickerminfifty-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfiftyone-1-1">51</label><input id="timepickerminfiftyone-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfiftytwo-1-1">52</label><input id="timepickerminfiftytwo-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfiftythree-1-1">53</label><input id="timepickerminfiftythree-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfiftyfour-1-1">54</label><input id="timepickerminfiftyfour-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfiftyfive-1-1">55</label><input id="timepickerminfiftyfive-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfiftysix-1-1">56</label><input id="timepickerminfiftysix-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfiftyseven-1-1">57</label><input id="timepickerminfiftyseven-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfiftyeight-1-1">58</label><input id="timepickerminfiftyeight-1-1" type="radio" name="minvalue"></input></li>
+                                          <li><label for="timepickerminfiftynine-1-1">59</label><input id="timepickerminfiftynine-1-1" type="radio" name="minvalue"></input></li>
+                                      </ul>
+                                  </div>
+                                  <div class="ampm-clock" onclick="handle_click_time('1-1')">
+                                      <ul>
+                                          <li><label for="timepickerampmAM-1-1" style="padding: 8px 6px;right: 8%;position: relative;">AM</label><input type="radio" id="timepickerampmAM-1-1" name="ampmvalue"></input></li>
+                                          <li><label for="timepickerampmPM-1-1" style="padding: 8px 6px;right: 8%;position: relative;">PM</label><input type="radio" id="timepickerampmPM-1-1" name="ampmvalue"></input></li>
+                                      </ul>
+                                  </div>
+                              </div>
+                              <div class="custom-timepicker-footer">
+                                  <button type="submit" class="cancel-btn btn" onclick="close_time_modal('1-1')">Cancel</button>
+                                  <button type="submit" class="submit-btn btn" onclick="handle_save_time('1-1')">Save</button>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                </div>
+
+                <div class="col s8" style="padding-left: 0;">
+                    <div class="filter-heading">
+                       Select Location
+                    </div>
+                    <div class="outer-dropdown-wrapper" id="location-dropdown-div" style="position: relative;left: 1%;">
+                        <div class="dropdown-wrapper dropdown-wrapper-main">
+                            <div class="dropdown">
+                                <div class="title">
+                                    Select Location
+                                </div>
+                                <div>
+                                    <svg width="53" height="38" viewBox="0 0 53 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0.405151 0H33.4052C43.8986 0 52.4052 8.50659 52.4052 19C52.4052 29.4934 43.8986 38 33.4052 38H0.405151V0Z" fill="#F6F6F6"/>
+                                        <path d="M21.6056 16.7397C21.8874 16.4361 22.362 16.4186 22.6655 16.7004L26.4052 20.2265L30.1448 16.7004C30.4483 16.4186 30.9229 16.4361 31.2048 16.7397C31.4866 17.0432 31.469 17.5177 31.1655 17.7996L26.9155 21.7996C26.6277 22.0668 26.1826 22.0668 25.8948 21.7996L21.6448 17.7996C21.3413 17.5177 21.3237 17.0432 21.6056 16.7397Z" fill="#909090"/>
+                                        <path d="M0.405151 0H33.4052C43.8986 0 52.4052 8.50659 52.4052 19C52.4052 29.4934 43.8986 38 33.4052 38H0.405151V0Z" stroke="#F6F6F6"/>
+                                    </svg>                                        
+                                </div>
+                             
+                            </div>
+                            <div class="dropdown-menu dropdown-menu-main">
+                                <div class="search-box search-box-main">
+                                    <input type="text" style="width: unset !important;margin: 6px 20px !important;border-bottom: 1px solid #e1e1e1 !important;" placeholder="&nbsp; &nbsp; &nbsp; Search Location">
+                                    </input>
+                                  </div>
+                                  <hr>
+                                <label  class="option state" for="myCheckState">
+                                    <div>
+                                      <input type="radio" class="radio" id="state" name="category" />
+                                      <label for="State">State</label>
+                                      <input type="checkbox" class="item-checkbox" id="myCheckState" name="State">
+                                    </div>
+                                </label>
+                                <hr>
+                                <label  class="option city" for="myCheckCity">
+                                    <div>
+                                      <input type="radio" class="radio" id="city" name="category" />
+                                      <label for="City">City</label>
+                                      <input type="checkbox" class="item-checkbox" id="myCheckCity" name="City">
+                                    </div>
+                                </label>
+                                <hr>
+                                <label  class="option pincode" for="myCheckPincode">
+                                    <div>
+                                      <input type="radio" class="radio" id="pincode" name="category" />
+                                      <label for="Pincode">Pincode</label>
+                                      <input type="checkbox" class="item-checkbox" id="myCheckPincode" name="Pincode">
+                                    </div>
+                                </label>
+                                <hr>
+                                <h2 class='no-elem'>No such filter found</h2>
+                            </div>
+                        </div>
+    
+                       
+    
+                        <div class="dropdown-wrapper state-wrapper">
+                            <div class="dropdown">
+                                <div class="title">
+                                    Select State
+                                </div>
+                                <div>
+                                    <svg width="53" height="38" viewBox="0 0 53 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0.405151 0H33.4052C43.8986 0 52.4052 8.50659 52.4052 19C52.4052 29.4934 43.8986 38 33.4052 38H0.405151V0Z" fill="#F6F6F6"/>
+                                        <path d="M21.6056 16.7397C21.8874 16.4361 22.362 16.4186 22.6655 16.7004L26.4052 20.2265L30.1448 16.7004C30.4483 16.4186 30.9229 16.4361 31.2048 16.7397C31.4866 17.0432 31.469 17.5177 31.1655 17.7996L26.9155 21.7996C26.6277 22.0668 26.1826 22.0668 25.8948 21.7996L21.6448 17.7996C21.3413 17.5177 21.3237 17.0432 21.6056 16.7397Z" fill="#909090"/>
+                                        <path d="M0.405151 0H33.4052C43.8986 0 52.4052 8.50659 52.4052 19C52.4052 29.4934 43.8986 38 33.4052 38H0.405151V0Z" stroke="#F6F6F6"/>
+                                    </svg> 
+                                </div>
+                             
+                            </div>
+                            <div class="dropdown-menu dropdown-menu-state">
+                            {% if client_state_list|length  %}
+                                <div class="search-box search-box-state">
+                                    <input type="text"  placeholder="&nbsp; &nbsp; &nbsp; Search State">
+                                    </input>
+                                  </div>
+                                  <hr>
+                                {% if client_state_list %}
+                                {% for client_state in client_state_list %}
+                                <label class="option" for="myCheck{{ client_state }}">
+                                    <div>
+                                      <input type="radio" class="radio" id="{{ client_state }}" name="category" />
+                                      <label for="{{ client_state }}">{{ client_state }}</label>
+                                      <input type="checkbox" class="item-checkbox-state" style="width: unset !important" id="myCheck{{ client_state }}" name="{{ client_state }}">
+                                    </div>
+                                </label>
+                                <hr>
+                                {% endfor %}
+                                {% endif %}
+                                <h2 class='no-elem'>No such filter found</h2>
+                            {% else %}
+                                <div class="search-box search-box-state">
+                                    <h2 style="display:block;" class='no-elem'>No State found</h2>
+                                </div>
+                            {% endif %}
+                            </div>
+                        </div>
+    
+                        
+                        <div class="dropdown-wrapper city-wrapper">
+                            <div class="dropdown">
+                                <div class="title">
+                                    Select City
+                                </div>
+                                <div>
+                                     <svg width="53" height="38" viewBox="0 0 53 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0.405151 0H33.4052C43.8986 0 52.4052 8.50659 52.4052 19C52.4052 29.4934 43.8986 38 33.4052 38H0.405151V0Z" fill="#F6F6F6"/>
+                                        <path d="M21.6056 16.7397C21.8874 16.4361 22.362 16.4186 22.6655 16.7004L26.4052 20.2265L30.1448 16.7004C30.4483 16.4186 30.9229 16.4361 31.2048 16.7397C31.4866 17.0432 31.469 17.5177 31.1655 17.7996L26.9155 21.7996C26.6277 22.0668 26.1826 22.0668 25.8948 21.7996L21.6448 17.7996C21.3413 17.5177 21.3237 17.0432 21.6056 16.7397Z" fill="#909090"/>
+                                        <path d="M0.405151 0H33.4052C43.8986 0 52.4052 8.50659 52.4052 19C52.4052 29.4934 43.8986 38 33.4052 38H0.405151V0Z" stroke="#F6F6F6"/>
+                                    </svg> 
+                                </div>
+                             
+                            </div>
+                            <div class="dropdown-menu dropdown-menu-city">
+                            {% if client_city_list|length %}
+                                <div class="search-box search-box-city">
+                                    <input type="text" placeholder="&nbsp; &nbsp; &nbsp; Search City">
+                                    </input>
+                                  </div>
+                                  <hr>
+                                {% for client_city in client_city_list %}
+                                <label class="option" for="myCheck{{ client_city }}">
+                                    <div>
+                                      <input type="radio" class="radio" id="{{ client_city }}" name="category" />
+                                      <label for="{{ client_city }}">{{ client_city }}</label>
+                                      <input type="checkbox" class="item-checkbox-city" style="width: unset !important" id="myCheck{{ client_city }}" name="{{ client_city }}">
+                                    </div>
+                                </label>
+                                <hr>
+                                {% endfor %}
+                                <h2 class='no-elem'>No such filter found</h2>
+                                {% else %}
+                                    <div class="search-box search-box-city">
+                                        <h2 style="display:block;" class='no-elem'>No City found</h2>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+    
+                      
+    
+                        <div class="dropdown-wrapper pincode-wrapper">
+                            <div class="dropdown">
+                                <div class="title">
+                                    Select Pincode
+                                </div>
+                                <div>
+                                     <svg width="53" height="38" viewBox="0 0 53 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0.405151 0H33.4052C43.8986 0 52.4052 8.50659 52.4052 19C52.4052 29.4934 43.8986 38 33.4052 38H0.405151V0Z" fill="#F6F6F6"/>
+                                        <path d="M21.6056 16.7397C21.8874 16.4361 22.362 16.4186 22.6655 16.7004L26.4052 20.2265L30.1448 16.7004C30.4483 16.4186 30.9229 16.4361 31.2048 16.7397C31.4866 17.0432 31.469 17.5177 31.1655 17.7996L26.9155 21.7996C26.6277 22.0668 26.1826 22.0668 25.8948 21.7996L21.6448 17.7996C21.3413 17.5177 21.3237 17.0432 21.6056 16.7397Z" fill="#909090"/>
+                                        <path d="M0.405151 0H33.4052C43.8986 0 52.4052 8.50659 52.4052 19C52.4052 29.4934 43.8986 38 33.4052 38H0.405151V0Z" stroke="#F6F6F6"/>
+                                    </svg> 
+                                </div>
+                             
+                            </div>
+                            <div class="dropdown-menu dropdown-menu-pincode">
+                            {% if client_pincode_list|length %}
+                                <div class="search-box search-box-pincode">
+                                    <input type="text"  placeholder="&nbsp; &nbsp; &nbsp; Search Pincode">
+                                    </input>
+                                  </div>
+                                  <hr>
+                                {% for client_pincode in client_pincode_list %}
+                                <label class="option" for="myCheck{{ client_pincode }}">
+                                    <div>
+                                      <input type="radio" class="radio" id="{{ client_pincode }}" name="category" />
+                                      <label for="{{ client_pincode }}">{{ client_pincode }}</label>
+                                      <input type="checkbox" class="item-checkbox-pincode" style="width: unset !important" id="myCheck{{ client_pincode }}" name="{{ client_pincode }}">
+                                    </div>
+                                </label>
+                                <hr>
+                                {% endfor %}
+                                <h2 class='no-elem'>No such filter found</h2>
+                                {% else %}
+                                <div class="search-box search-box-pincode">
+                                    <h2 style="display:block;" class='no-elem'>No Pincode found</h2>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+
+        <a href="/chat/message-history/?bot_id={{selected_bot_obj.pk}}" class="modal-close btn filter-modal-footer-btn-cancel">Clear filter</a>
+        <a onclick="apply_message_history_filter()" class="btn filter-modal-footer-btn">Apply filter</a>
+
+    </div>
+</div>
+
+<script type="text/javascript" src="{% static 'EasyChatApp/js/message_history.js' %}?v={% random_int 1 100 %}"></script>
+<!-- NEW SCRIPTS -->
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script> 
+<script src="{% static 'EasyChatApp/js/ion_range_slider.js' %}"></script>
+<script type="text/javascript">
+    window.NEED_TO_BUILD = "{{ selected_bot_obj.need_to_build }}";
+    window.current_page_number = {{ message_history_list.number }}
+    window.current_page_entries_length = {{ message_history_list|length }}
+    window.page_range = {{ message_history_list.paginator.num_pages }}
+    window.total_entries = {{ total_entries }}
+    window.bot_metadata = {{ bot_metadata | safe }}
+
+    window.is_percentage_match_enabled = "{{ is_percentage_match_enabled }}"
+
+    is_flagged_queries_filter_applied = false;
+
+    {% if query_type == "flagged" %}
+    is_flagged_queries_filter_applied = true;
+    {% endif %}
+
+    // js 5.1
+    $(document).ready(function() {
+            var t = $('#message-history-info-table').DataTable({
+                paging: false,
+                searching: false,
+
+                info: false,
+
+                'order': [],
+                'columnDefs': [{
+                    "orderable": false
+                }]
+
+            });
+
+            setTimeout(function() {
+                $('#easychat_message_history_table_row_dropdown').select2({
+                dropdownParent: $('#easychat_message_history_table_row_drop_container'),
+   
+            });
+            $('#location-dropdown').select2({
+                dropdownParent: $('#location-dropdown-header'),
+   
+            });
+            }, 100);
+
+        });
+
+    $('.easychat_message_history_select_column_dropdown').select2().on('select2:open', function(e) {
+            $('.select2-search__field').attr('placeholder', 'Search column name ');
+        });
+        $('.easychat_message_history_select_intent_dropdown').select2().on('select2:open', function(e) {
+            $('.select2-search__field').attr('placeholder', 'Search intent ');
+        });
+        $(".modal-trigger").click(function() {
+            $(".modal").removeAttr("tabindex");
+            $(".modal").removeAttr("tabindex");
+
+
+        });
+
+    // ! js 5.1 !
+    document.getElementById("global-selected-message-history").onchange = function(e){
+        selected_misdashboard_list = document.getElementsByClassName("selected-misdashboard");
+        var checked = document.getElementById("global-selected-message-history").checked;
+        for (var i = 0; i < selected_misdashboard_list.length; i++) {
+            selected_misdashboard_list[i].checked = checked;
+        }
+        $(".selected-misdashboard").change();
+    }
+
+    $(document).on("change", "#selected-bot-message-history", function(e){
+        bot_id = document.getElementById("selected-bot-message-history").value;
+        url = window.location.href;
+        if(url.search("bot_id") == -1){
+            if(bot_id!="None"){
+                if(url.search("intent_pk") > 0){
+                    window.location = window.location.href+"&bot_id="+bot_id;
+                }
+                else if(url.search("channel_name") > 0){
+                    window.location = window.location.href+"&bot_id="+bot_id;
+                }
+                else{
+                    window.location = window.location.href+"?bot_id="+bot_id;
+                }
+            }
+        }
+        else if(url.search("bot_id") > -1 && bot_id != "None"){
+            window.location = window.location.origin + window.location.pathname +"?bot_id="+bot_id;
+        }
+        else{
+            window.location = window.location.pathname;
+        }
+    });
+    function get_url_vars() {
+                var vars = {};
+                var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+                  vars[key] = value;
+                });
+                return vars;
+            }
+
+    function get_user_filtered_data(){
+        bot_id = get_url_vars()["bot_id"]
+        if (bot_id == "None") {
+            window.location = "/chat/message-history/";
+        } else {
+           window.location = "/chat/user-filtered/?bot_id=" + bot_id;
+        }
+    }
+    try{
+        chevrons = document.getElementsByClassName('pagination')
+        num_of_chevs = chevrons[0].getElementsByTagName('a').length;
+        chev_collection = chevrons[0].getElementsByTagName('a');
+        for(i=0;i<num_of_chevs;i++){
+            chevron = chev_collection[i];
+            chevron.addEventListener("click", redirect_with_filters);
+        }
+        function redirect_with_filters(e){
+            e.preventDefault();
+            filter_path = window.location.href.split("?")[1];
+            if(filter_path!= undefined && filter_path!=""){
+                filter_with_page = filter_path.replace("page=","^");
+                index= filter_with_page.indexOf("^");
+                //checking if url has pagenumber
+                if(index!=-1){
+                     filter_with_page = filter_with_page.slice(index+1);
+                     //taking arguments other than page number
+                     if(isNaN(filter_with_page)){
+                         index= filter_with_page.indexOf("&");
+                         filter_path = filter_with_page.slice(index+1);
+                         href = this.getAttribute('href')+"&";
+                         href+= filter_path;
+                        }
+                     else{
+                        href = this.getAttribute('href')
+                        }
+                     this.setAttribute('href', href);
+                     window.location = href;
+                }
+                else{
+                    href = this.getAttribute('href') + "&";
+                    href+= filter_path;
+                    console.log(href);
+                    window.location = href;
+                }
+            }
+            else{
+                    href = this.getAttribute('href')
+                    console.log(href);
+                    window.location = href;
+                 }
+        }
+    }
+    catch{
+    }
+
+    function check_message_history_switch_status(element){
+        if(element.checked == false){
+            get_user_filtered_data();
+        }else{
+
+        }
+    }
+
+    function check_select_date_range(element){
+        if(element.value=="4"){
+            document.getElementById("custom-range-filter").style.display="block";
+        }else{
+            document.getElementById("custom-range-filter").style.display="none";
+        }
+    }
+
+    function show_custom_date_export() {
+        if (document.getElementById('analytics_filter_custom_date_btn_export').checked) {
+            $('#analytics-custom-date-select-area-export').show()
+        } else {
+            $('#analytics-custom-date-select-area-export').hide()
+        }
+    }
+
+    function reset_message_history_filter() {
+        bot_id = get_url_vars()["bot_id"]
+        window.location = "/chat/message-history/?bot_id=" + bot_id;
+    }
+
+</script>
+
+{% endblock %}

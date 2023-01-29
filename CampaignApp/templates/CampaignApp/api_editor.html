@@ -1,0 +1,326 @@
+{% extends 'CampaignApp/console.html' %}
+
+{% block content %}
+{% load static %}
+
+<style type="text/css" media="screen">
+	#editor-code { 
+		width:100%;
+		height:40em;
+		overflow:auto;
+	}
+  
+
+	#pills-assign-task-tabContent .dropdown{
+		width: 100% !important;
+	}
+
+    .bootstrap-select button {
+        border-radius: 5px!important;
+        border: 0px solid #2755cb !important;
+        box-shadow: 0 0 1px #000 inset !important;
+        text-align: left;
+        font-size: 1rem!important;
+        width: 100%!important;
+    }
+
+    .bootstrap-select .filter-option {
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    .bootstrap-select .dropdown-item {
+        color: #6e707e!important;
+        font-size: 1rem;
+        background-color: transparent;
+    }
+
+    .bootstrap-select .dropdown-item:hover {
+        background-color: #F8F9F9;
+    }
+  	
+  	.bootstrap-select .dropdown-toggle, .bootstrap-select .dropdown-toggle:focus {
+  		transform: none!important;
+	    background: white!important;
+	    border: 1px solid #E6E6E6!important;
+	    box-shadow: none!important;
+	    outline: none!important;
+  	}
+
+  	.dropdown-menu {
+  		min-width: 100%!important;
+  	}
+
+	.easyassist-disabled-input:hover{
+        cursor: not-allowed;
+        background: #2755cb !important;
+        box-shadow: none !important;
+    }
+
+	#api_completion_status:disabled:hover {
+		transform: none !important;
+		transition: none !important;
+		box-shadow: none !important;
+		cursor: not-allowed;
+	}
+
+	#campaign-namespace {
+        display: block;
+        border: 1px solid rgb(203, 202, 202)!important;
+        height: 40px;
+        width: 100%;
+    }
+    #campaign-namespace:focus-visible {
+        border: 1px solid rgb(203, 202, 202)!important;
+        box-shadow: none;
+        outline: none;
+    }
+
+	#campaign-namespace::placeholder {
+		font-weight: 500;
+		font-size: 14px;
+		line-height: 17px;
+		color: #CBCACA;
+	}
+
+	.zoom-icon{
+        justify-content: flex-end;
+    }
+    .namespace-main-div{
+        justify-content: flex-end;
+        padding-right: 0px;
+    }
+    @media only screen and (max-width: 768px) and (min-width: 100px)  {
+        .zoom-icon{
+        justify-content: flex-start;
+		padding-left: 10px;
+		margin-top: 0px!important;
+    }
+    .namespace-main-div{
+        justify-content: flex-start;
+    }
+	#namespace-input-text{
+		justify-content: flex-start!important;
+	}
+
+}
+   @media only screen and (max-width: 1236px) and (min-width: 768px)  {
+    .namespace-input-row{
+        gap:1px;
+    }
+        
+    }
+</style>
+
+<link rel="stylesheet" href="{% static 'CampaignApp/css/whatsapp_webhook_console.css' %}?v={% random_int 1 100 %}">
+
+<div class="container-fluid">
+	<div class="col-md-12 mb">
+		<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+			<li class="nav-item">
+				<a class="nav-link active" id="pills-assign-task-tab" role="tab" aria-controls="pills-assign-task" aria-selected="true">Whatsapp webhook configuration</a>
+			</li>
+		</ul>
+		<div class="tab-content" id="pills-assign-task-tabContent">
+			<div class="tab-pane fade show active" id="pills-assign-task" role="tabpanel" aria-labelledby="pills-assign-task-tab">
+				<div class="card shadow">
+					<div class="card-body">
+						<div class="card-header">
+							<div class="row" style="align-items: center;">
+								<div class="col-md-8 col-sm-12 mt-1 mb-1 campaign-whatsapp-config-dropdown-container">
+									<select class="form-control campaign-select" id="campaign-list-select" onchange="get_selected_bot_wsp_code(this.value)">
+										<option value="none" selected>Select WhatsApp BSP</option>
+										{% for whatsapp_service_provider in whatsapp_service_providers %}
+										<option value="{{whatsapp_service_provider.name}}">{{whatsapp_service_provider}}</option>
+										{% endfor %}
+									</select>
+								</div>
+								<div class="col-md-2 col-sm-12 mt-1 mb-1" style="text-align: right;">
+									<button id="save-wa-code-btn" class="btn campaign-primary-button-custom campaign-save-reset-btns" onclick="save_api_code()" disabled>Save</button>
+								</div>
+								<div class="col-md-2 col-sm-12 mt-1 mb-1 " style="text-align: right;">
+									<button id="reset-wa-code-btn" class="btn campaign-primary-button-custom-red campaign-save-reset-btns" data-toggle="modal" data-target="#whatsapp_config_reset_modal"  disabled>Reset</button>
+								</div>
+							</div>
+						</div>
+						<div id="campaign-api-code-editor" class="card-body" style="padding: 1.25rem 0.8rem; display: none;">
+							<div class="row" style="background: #F8F9FC;">
+								<div class="col-md-12" style="display: flex; align-items: center; justify-content: space-between; padding-right: 0px; padding-top: 8px;">
+                                    <div class="row" style="width: 100%; justify-content: space-between;">
+                                    <div class=" col-md-4 col-sm-12 mt-2 mb-2 campaign-whatsapp-config-bot-name-div">
+                                        {{selected_bot_obj.name}} - 
+                                    </div>
+
+									<div class="namespace-main-div col-md-7 col-sm-12 mt-2 mb-2"style=" display:flex; align-items:center; column-gap:24px;">
+										<div class="row namespace-input-row"style="width: 100%; justify-content: flex-end;">
+										<div class="col-md-3 col-sm-12"id="namespace-input-text" style="display:none;align-items: center; padding-right: 0px; justify-content: flex-end; column-gap: 6px;">
+												Namespace <span style="color:red">*</span><span class="campaign-tooltip-namespace" href="javascript:void(0)" data-toggle="tooltip" data-placement="top" data-original-title="This ID is unique for each WhatsApp account and you can get this in the WhatsApp Manager from the Message Template page." style="text-decoration: none; width: 14px;">
+													<svg class="campaign-tooltip-svg" width="14" height="14" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+														<path d="M9 0C13.9707 0 18 4.0302 18 9C18 13.9698 13.9707 18 9 18C4.0293 18 0 13.9698 0 9C0 4.0302 4.0293 0 9 0ZM9 1.5003C4.8645 1.5003 1.5003 4.8645 1.5003 9C1.5003 13.1355 4.8645 16.4997 9 16.4997C13.1355 16.4997 16.4997 13.1355 16.4997 9C16.4997 4.8645 13.1355 1.5003 9 1.5003ZM9 12.15C9.49706 12.15 9.9 12.5529 9.9 13.05C9.9 13.5471 9.49706 13.95 9 13.95C8.50294 13.95 8.1 13.5471 8.1 13.05C8.1 12.5529 8.50294 12.15 9 12.15ZM9 4.275C10.3669 4.275 11.475 5.3831 11.475 6.75C11.475 7.65968 11.2072 8.16664 10.529 8.87272L10.3773 9.0273C9.81759 9.587 9.675 9.82465 9.675 10.35C9.675 10.7228 9.37279 11.025 9 11.025C8.62721 11.025 8.325 10.7228 8.325 10.35C8.325 9.44032 8.59279 8.93336 9.27103 8.22727L9.4227 8.0727C9.98241 7.513 10.125 7.27535 10.125 6.75C10.125 6.12868 9.62132 5.625 9 5.625C8.41751 5.625 7.93842 6.06769 7.88081 6.63497L7.875 6.75C7.875 7.12279 7.57279 7.425 7.2 7.425C6.82721 7.425 6.525 7.12279 6.525 6.75C6.525 5.3831 7.6331 4.275 9 4.275Z" fill="#737373"/>
+													</svg>
+												</span> :
+										</div>
+									
+										<div  class="col-md-8 col-sm-12" style="width: 100%;">
+											<input type="text" id="campaign-namespace" name="campaign namespace" placeholder="Enter Namespace here"autocomplete="off">
+										</div>
+									   </div>
+										</div>
+										
+									   
+										<div class="zoom-icon mt-2 mb-2"style="display: flex;align-items: center; padding-right: 5px;">
+											<a href="javascript:void(0)" data-position="top" data-tooltip="Full-screen mode" onclick="go_full_screen_mode()">
+												<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+													<path d="M5.25 2C3.45507 2 2 3.45507 2 5.25V8.25C2 8.66421 2.33579 9 2.75 9C3.16421 9 3.5 8.66421 3.5 8.25V5.25C3.5 4.2835 4.2835 3.5 5.25 3.5H8.25C8.66421 3.5 9 3.16421 9 2.75C9 2.33579 8.66421 2 8.25 2H5.25Z" fill="#212121"/>
+													<path d="M11.75 2C11.3358 2 11 2.33579 11 2.75C11 3.16421 11.3358 3.5 11.75 3.5H14.75C15.7165 3.5 16.5 4.2835 16.5 5.25V8.25C16.5 8.66421 16.8358 9 17.25 9C17.6642 9 18 8.66421 18 8.25V5.25C18 3.45507 16.5449 2 14.75 2H11.75Z" fill="#212121"/>
+													<path d="M2.75 11C3.16421 11 3.5 11.3358 3.5 11.75V14.75C3.5 15.7165 4.2835 16.5 5.25 16.5H8.25C8.66421 16.5 9 16.8358 9 17.25C9 17.6642 8.66421 18 8.25 18H5.25C3.45507 18 2 16.5449 2 14.75V11.75C2 11.3358 2.33579 11 2.75 11Z" fill="#212121"/>
+													<path d="M18 11.75C18 11.3358 17.6642 11 17.25 11C16.8358 11 16.5 11.3358 16.5 11.75V14.75C16.5 15.7165 15.7165 16.5 14.75 16.5H11.75C11.3358 16.5 11 16.8358 11 17.25C11 17.6642 11.3358 18 11.75 18H14.75C16.5449 18 18 16.5449 18 14.75V11.75Z" fill="#212121"/>
+													</svg>
+													
+											</a>
+										</div>
+									</div>
+									</div>
+									<div class="col-md-12 col-sm-12 mt-2 mb-2">
+										<div id="editor-code"></div>
+									</div>
+							  </div>
+						</div>
+						<div class="card-footer" style="border: none;">
+							<div class="row">
+								<div class="col-md-10"></div>
+								<div class="col-md-2">
+									<button class="btn btn-primary" style="width: 100%; min-width: 60px; display: none;" id="run_api_btn" onclick="run_api_code(this);">Run</button>
+								</div>
+								<div class="col-md-12">
+									<textarea col="30" id="campaign-processor-status" disabled style="color: #F1F2EB;resize:none;height: 18em;border-radius: 0.5em;overflow: auto;display: none;background-color: #272822; width: 100%; margin: 20px 0;"></textarea>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal custom_modal fade" id="api_completed_confirmation_modal" tabindex="-1" role="dialog" aria-labelledby="document_upload_modal_modal_label" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+	  <div class="modal-content">
+		<div class="modal-header">
+			<div class="row">
+				<div class="col-md-6">
+					<h5 class="modal-title" id="document_upload_modal_modal_label">Confirmation</h5>
+				</div>
+				  <div class="col-md-6" style="text-align: right; padding-right: 0">
+					<button class="btn" type="button" data-dismiss="modal" style="padding: 0!important">
+						<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M13.4931 0.710017C13.3063 0.522765 13.0526 0.417532 12.7881 0.417532C12.5236 0.417532 12.2699 0.522765 12.0831 0.710017L7.19309 5.59002L2.30309 0.700017C2.11625 0.512765 1.8626 0.407532 1.59809 0.407532C1.33357 0.407532 1.07992 0.512765 0.893086 0.700017C0.503086 1.09002 0.503086 1.72002 0.893086 2.11002L5.78309 7.00002L0.893086 11.89C0.503086 12.28 0.503086 12.91 0.893086 13.3C1.28309 13.69 1.91309 13.69 2.30309 13.3L7.19309 8.41002L12.0831 13.3C12.4731 13.69 13.1031 13.69 13.4931 13.3C13.8831 12.91 13.8831 12.28 13.4931 11.89L8.60309 7.00002L13.4931 2.11002C13.8731 1.73002 13.8731 1.09002 13.4931 0.710017Z" fill="black" fill-opacity="0.54"/>
+						</svg>
+					</button>
+				</div>
+			</div>
+		</div>
+		<div class="modal-body">
+			<div class="row">
+				<div class="col-sm-12">
+				  <p>Please confirm if API Integration is completed. (Do not confirm if API Integration is not completed and tested.)</p>
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer">
+		  <button class="btn btn-primary" onclick="mark_api_integration_completed()">Confirm</button>
+		</div>
+	  </div>
+	</div>
+</div>
+
+<div class="modal custom_modal fade" id="session_expire_alert_modal" tabindex="-1" role="dialog" aria-labelledby="document_upload_modal_modal_label" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h5 class="modal-title" id="document_upload_modal_modal_label">Session Expire</h5>
+		</div>
+		<div class="modal-body">
+			<div class="row">
+				<div class="col-sm-12">
+				  <p>Your session will expire in 10 minutes. Click 'yes' if you want to extend your session.</p>
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer">
+		  <button class="btn btn-text-only" type="button" data-dismiss="modal">No</button>
+		  <button class="btn btn-primary" onclick="extend_session()">Yes</button>
+		</div>
+	  </div>
+	</div>
+</div>
+
+<!-- Whatsapp config Reset Modal -->
+<div class="modal fade campaign-delete-custom-modal" id="whatsapp_config_reset_modal" tabindex="-1" role="dialog" aria-labelledby="whatsapp_config_reset_modal_label" style="display: none;" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-sm-12 mt-4 mb-4">
+						<svg width="82" height="82" viewBox="0 0 82 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M40.8391 6.83325C22.0884 6.83325 6.83301 22.1604 6.83301 40.9999C6.83301 59.8394 22.1602 75.1666 40.9997 75.1666C59.8392 75.1666 75.1663 59.8394 75.1663 40.9999C75.1663 22.1604 59.7674 6.83325 40.8391 6.83325ZM44.4163 58.0833H37.583V51.2499H44.4163V58.0833ZM44.4163 44.4166H37.583V23.9166H44.4163V44.4166Z" fill="#E53E3E"/>
+							</svg>
+					</div>
+					<div class="col-sm-12 mb-2">
+						<div class="campaign-delete-modal-heading-text">
+							Reset this configuration?
+						</div>
+					</div>
+					<div class="col-sm-12 mt-1 mb-2 px-5">
+						<div class="campaign-delete-modal-content-text">
+							Are you sure you want to reset this configuration, as all your code changes will get lost and reset to default.
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer pt-0 mb-4 pb-4">
+				<button class="btn btn-secondary campaign-delete-modal-cancel-btn" type="button" data-dismiss="modal">Cancel</button>
+				<button class="btn btn-success campaign-delete-modal-save-btn" onclick="reset_bot_wsp_code()">Confirm</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+{% if request.user.enable_s3_bucket %}
+<script src="https://static.allincall.in/static/EasyAssistApp/vendor/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+{% else %}
+<script src="{% static 'CampaignApp/vendor/ace/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+{% endif %}
+
+<script src="{% static 'CampaignApp/vendor/ace/ext-language_tools.min.js' %}" type="text/javascript" charset="utf-8"></script>
+
+<script src="{% static 'CampaignApp/js/whatsapp_webhook_console.js' %}?v={% random_int 1 100 %}"></script>
+
+<script type="text/javascript">
+	window.EXPIRE_TIME_SECONDS = {{expire_time_seconds}}
+	window.SYSTEM_COMMANDS = {{ system_commands | safe }}
+
+    $(document).ready(function(){
+		window.editor = ace.edit("editor-code");
+	    editor.setTheme("ace/theme/monokai");
+	    document.getElementById('editor-code').style.fontSize='14px';
+	    editor.getSession().setMode("ace/mode/python");
+	    editor.setOptions({
+		    enableBasicAutocompletion: true,
+		    enableSnippets: true,
+    		enableLiveAutocompletion: true
+		});
+
+        setTimeout(function(){
+            $('.bootstrap-select button').removeClass();
+            $('.bootstrap-select button').addClass('custom-select');
+        }, 1000);
+
+    });
+</script>
+
+<script type="text/javascript" src="{% static 'CampaignApp/js/api_integration.js' %}?v={% random_int 1 100 %}"></script>
+
+{% endblock %}

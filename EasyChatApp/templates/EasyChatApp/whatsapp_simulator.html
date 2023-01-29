@@ -1,0 +1,87 @@
+{% extends 'EasyChatApp/base.html' %}
+{% block content %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/whatsapp_style.css' %}?v={% random_int 1 100 %}">
+<div class="add-scrolling">
+<div class="row" style="padding:2em;">
+    <div class="col s8">
+        <div class="col s7" style="margin-bottom:50px;">
+            <h6>WhatsApp Webhook URL</h6><br>
+            <input type="text" placeholder="Webhook End Point" id="whatsapp-bot-end-point">
+        </div>
+        <div class="col s7" style="margin-bottom:50px;">
+            <h6>Mobile Number</h6>
+            <input type="text" id="whatsapp_mobile_number" placeholder="Enter mobile number">
+        </div>
+        <div class="col s7" style="margin-bottom:50px;">
+            <h6>Request Packet</h6>
+            <div id="editor-code-request-packet">{{code}}</div>
+        </div>
+        <div class="col s7">
+            <a class="btn green lighten-2" onclick="run_whatsapp_simulator()">Run Simulator</a>
+        </div>
+    </div>
+    <div class="col s4" id="whatsapp-simulator" style="display: none;">
+        <div class="marvel-device iphone-x scale--01">
+            <div class="notch">
+                <div class="camera"></div>
+                <div class="speaker"></div>
+            </div>
+            <div class="volume"></div>
+            <div class="screen">
+                <div class="screen-container">
+                    <div class="status-bar">
+                    </div>
+                    <div class="chat">
+                        <div class="chat-container">
+                            <div class="user-bar">
+                                <div class="back"> <i class="material-icons">keyboard_backspace</i>
+                                </div>
+                                <div class="avatar">
+                                    <img src="{% static 'EasyChatApp/img/whatsapp_avatar.jpg' %}" alt="Avatar">
+                                </div>
+                                <div class="name"> <span>Bot</span>
+                                    <span id="whatsapp_status" class="status">online</span>
+                                </div>
+                                <div class="actions more"> <i class="zmdi zmdi-more-vert"></i>
+                                </div>
+                                <div class="actions attachment"> <i class="zmdi zmdi-phone"></i>
+                                </div>
+                                <div class="actions">
+                                    <img src="{% static 'EasyChatApp/img/whatsapp_videocall_icon.png' %}" />
+                                </div>
+                            </div>
+                            <div class="conversation">
+                                <div class="conversation-container"></div>
+                                <form class="conversation-compose">
+                                    <div class="emoji">
+                                        <a class="material-icons black-text">mood</a>
+                                    </div>
+                                    <input class="input-msg" style="border-radius: 0;" name="input" placeholder="Type a message" autocomplete="off" autofocus>
+                                    <button class="send">
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% if request.user.enable_s3_bucket %}
+
+<script src="https://static.allincall.in/static/EasyChatApp/js/ace.js" type="text/javascript" charset="utf-8"></script>
+
+{% else %}
+
+<script src="{% static 'EasyChatApp/js/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+
+{% endif %}
+<script>
+    var editor = ace.edit("editor-code-request-packet");
+    editor.setTheme("ace/theme/monokai");
+    editor.session.setMode("ace/mode/python");
+</script>
+{% endblock %}

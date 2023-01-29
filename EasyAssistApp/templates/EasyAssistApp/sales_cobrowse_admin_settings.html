@@ -1,0 +1,463 @@
+{% extends 'EasyAssistApp/console.html' %}
+{% block content %}
+{% load static %}
+
+{% if request.user.enable_s3_bucket %}
+<script src="https://static.allincall.in/static/EasyAssistApp/js/ace.js" type="text/javascript"
+  charset="utf-8"></script>
+<script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/jscolor.min.js"></script>
+{% else %}
+<script src="{% static 'EasyAssistApp/js/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/jscolor.min.js' %}"></script>
+{% endif %}
+
+<link href="{% static 'EasyAssistApp/css/settings.css' %}" rel="stylesheet" type="text/css">
+
+<div class="container-fluid">
+  <div>
+    <div id="pills-cobrowse-admin-setting-options">
+      <div class="page-header">
+        <div class="row justify-content-between">
+          <div class="col-sm-8 d-flex align-items-center">
+            <div class="nav nav-pills navbar-right">
+              <a class="anchor-reset back-btn" href="/easy-assist/sales-ai/settings/options/cobrowse">
+                <span class="mr-3 mb-auto" style="cursor: pointer;">
+                  <svg class="back-arrow-svg" width="44" height="44" viewBox="0 0 44 44" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <rect width="44" height="44" rx="22" transform="matrix(1 0 0 -1 0 44)" fill="white" />
+                    {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                    <path
+                      d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                      fill="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" />
+                    {% else %}
+                    <path
+                      d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                      fill="#0254D7" />
+
+                    {% endif %}
+
+                  </svg>
+                </span>
+              </a>
+              <h5 class="nav_btn mr-2 mt-2"><a class="anchor-reset" href="/easy-assist/sales-ai/settings">Settings</a>
+              </h5>
+              <div class=" mr-2 pt-2">
+                <svg class="mini-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                    fill="#475569" />
+                </svg>
+              </div>
+              <h5 class="nav_btn mr-2 mt-2"><a class="anchor-reset"
+                  href="/easy-assist/sales-ai/settings/options">Options </a></h5>
+              <div class=" mr-2 pt-2">
+                <svg class="mini-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                    fill="#475569" />
+                </svg>
+              </div>
+              <h5 class="nav_btn mr-2 mt-2"><a class="anchor-reset"
+                href="/easy-assist/sales-ai/settings/options/cobrowse">Cobrowse</a></h5>
+            <div class=" mr-2 pt-2">
+              <svg class="mini-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                  fill="#475569" />
+              </svg>
+            </div>
+              <h5 class="nav_btn active1 mt-2">Admin Settings</h5>
+            </div>
+          </div>
+                <div class="col-sm-4 d-flex justify-content-end">
+                  <button class="btn btn-width-100" data-toggle="modal" data-target="#modal-confirm-reset-all"
+                    id="reset-button">Reset All</button>
+                  <button class="btn btn-width-100" id="save-button" onclick="sales_cobrowse_admin_settings(this)"
+                    style="background: #10B981!important;">Save</button>
+                </div>
+              
+            </div>
+          </div>
+      {% if access_token_obj.allow_agent_to_customer_cobrowsing %}   
+        <div class="card shadow mb-4 mt-30">
+          <div class="card-body p-0">
+            <div class="card">
+              <div class="card-body table-responsive p-0">
+                <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                  <tbody>
+                    <tr class="tr-flex-smF">
+                      <th scope="row" class="disable-menu-tab heading-toggle-text" style="color: #CBCACA !important;">Select masking type for sensitive data fields</th>
+                      <td class="dropdown-tr-td" data-toggle="tooltip" data-placement="bottom" data-placement="bottom" title="" data-original-title="Not applicable to Reverse Co-browsing">
+                        <select disabled class="custom-select-dropdown-masking disable-menu-tab" style="color: #CBCACA !important;" id="input-masking-type" style="width: 50%">
+                          {% if access_token_obj.masking_type == "no-masking" %}
+                          <option selected="" value="no-masking" disabled>No Masking</option>
+                          {% else %}
+                          <option value="no-masking" disabled>No Masking</option>
+                          {% endif %}
+                          {% if access_token_obj.masking_type == "partial-masking" %}
+                          <option selected="" value="partial-masking" disabled>Partial Masking</option>
+                          {% else %}
+                          <option value="partial-masking" disabled>Partial Masking</option>
+                          {% endif %}
+                          {% if access_token_obj.masking_type == "full-masking" %}
+                          <option selected="" value="full-masking" disabled>Full Masking</option>
+                          {% else %}
+                          <option value="full-masking" disabled>Full Masking</option>
+                          {% endif %}
+                        </select>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          
+         
+        </div>
+      </div>
+      <div class="card shadow mb-4 mt-20">
+        <div class="card-body p-0">
+          <div class="card">
+            <div class="card-body table-responsive p-0">
+              <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                <tbody>
+                  <tr class="tr-flex-sm">
+                    <th scope="row" class="disable-menu-tab heading-toggle-text" style="color: #CBCACA !important;">Enable cross domain co-browsing
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="If this is enabled, customers will be able to share their screen. This will allow agents to view the customer's activity even on domains where cobrowsing JS is not embedded"><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      <label class="easyassist-option-switch" data-toggle="tooltip" data-placement="bottom" data-placement="bottom" title="" data-original-title="Not applicable to Reverse Co-browsing">
+                        <input type="checkbox" id="allow_screen_sharing_cobrowse" disabled>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="card shadow mb-4 mt-30">
+        <div class="card-body p-0">
+          <div class="card">
+            <div class="card-body table-responsive p-0">
+              <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                <tbody>
+                  <tr class="tr-flex-sm">
+                    <th scope="row" class="heading-toggle-text">Select masking type for sensitive data fields</th>
+                    <td>
+                      <select class="custom-select-dropdown-masking" id="input-masking-type" style="width: 50%">
+                        {% if access_token_obj.masking_type == "no-masking" %}
+                        <option selected="" value="no-masking">No Masking</option>
+                        {% else %}
+                        <option value="no-masking">No Masking</option>
+                        {% endif %}
+                        {% if access_token_obj.masking_type == "partial-masking" %}
+                        <option selected="" value="partial-masking">Partial Masking</option>
+                        {% else %}
+                        <option value="partial-masking">Partial Masking</option>
+                        {% endif %}
+                        {% if access_token_obj.masking_type == "full-masking" %}
+                        <option selected="" value="full-masking">Full Masking</option>
+                        {% else %}
+                        <option value="full-masking">Full Masking</option>
+                        {% endif %}
+                      </select>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card shadow mb-4 mt-20">
+        <div class="card-body p-0">
+          <div class="card">
+            <div class="card-body table-responsive p-0">
+              <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                <tbody>
+                  <tr>
+                    <th scope="row" class="heading-toggle-text">Enable cross domain co-browsing
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="If this is enabled, customers will be able to share their screen. This will allow agents to view the customer's activity even on domains where cobrowsing JS is not embedded"><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.allow_screen_sharing_cobrowse %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="allow_screen_sharing_cobrowse" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="allow_screen_sharing_cobrowse">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      <div class="card shadow mb-4 mt-20">
+        <div class="card-body p-0">
+          <div class="card">
+            <div class="card-body table-responsive p-0">
+              <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                <tbody>
+                  <tr>
+                    <th scope="row" class="heading-toggle-text">
+                      Enable low bandwidth co-browsing
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="Website will load in tabular format if the internet speed falls below the required speed">
+                        <i class="fas fa-info-circle"></i>
+                      </span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.enable_low_bandwidth_cobrowsing %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_low_bandwidth_cobrowsing" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_low_bandwidth_cobrowsing">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% if access_token_obj.enable_low_bandwidth_cobrowsing %}
+                  <tr id="enable_manual_switching_div">
+                    <th scope="row" class="sub-heading-toggle-text">
+                      Enable manual switching
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="Enabling this field will show an icon to switch between Lite mode and Normal mode">
+                        <i class="fas fa-info-circle"></i>
+                      </span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.enable_manual_switching %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_manual_switching" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_manual_switching">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  <tr id="low_bandwidth_cobrowsing_threshold_div" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Low bandwidth network limit in kbps
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      <input type="number" aria-label="Checkbox for following text input"
+                        value="{{ access_token_obj.low_bandwidth_cobrowsing_threshold }}"
+                        id="low_bandwidth_cobrowsing_threshold" min="0" class="positive_numeric">
+                    </td>
+                  </tr>
+                  {% else %}
+                  <tr id="enable_manual_switching_div" style="display: none;">
+                    <th scope="row">
+                      Enable manual switching
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="Enabling this field will show an icon to switch between Lite mode and Normal mode">
+                        <i class="fas fa-info-circle"></i>
+                      </span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.enable_manual_switching %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_manual_switching" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_manual_switching">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  <tr id="low_bandwidth_cobrowsing_threshold_div" class="tr-flex-sm" style="display: none!important;">
+                    <th scope="row" class="sub-heading-toggle-text">Low bandwidth network limit in kbps
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      <input type="number" aria-label="Checkbox for following text input"
+                        value="{{ access_token_obj.low_bandwidth_cobrowsing_threshold }}"
+                        id="low_bandwidth_cobrowsing_threshold" min="0" class="positive_numeric">
+                    </td>
+                  </tr>
+                  {% endif %}
+
+                  <tr id="archive_on_common_inactivity_timer_section" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Session Inactivity (In mins)
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="Session will be archived if the agent/customer stays inactive in the session or if the customer closes the webpage after requesting and does not return within the specified time."><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      <input type="number" aria-label="Checkbox for following text input"
+                        value="{{ access_token_obj.archive_on_common_inactivity_threshold }}"
+                        id="archive_on_common_inactivity_threshold" min="0" class="positive_numeric">
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card shadow mb-4 mt-20">
+        <div class="card-body p-0">
+          <div class="card">
+            <div class="card-body table-responsive p-0">
+              <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                <tbody>
+                  {% if access_token_obj.allow_agent_to_customer_cobrowsing %}
+                    <tr class="tr-flex-sm">
+                      <th scope="row" class="heading-toggle-text disable-menu-tab" style="color: #CBCACA !important;">Generate Drop Link Expiry Time (In mins)
+                        <span data-toggle="tooltip" data-placement="bottom"
+                          title="Time after which the link will expire."><i class="fas fa-info-circle"></i></span>
+                      </th>
+                      <td style="vertical-align: inherit;">
+                        <label data-toggle="tooltip" data-placement="bottom" data-original-title="Not applicable to Reverse Co-browsing">
+                        <input type="number" aria-label="Checkbox for following text input"
+                          value="{{ access_token_obj.drop_link_expiry_time }}" id="drop_link_expiry_time" min="0"
+                          class="disable-menu-tab positive_numeric" disabled style="color: #CBCACA !important;">
+                        </label>
+                      </td>
+                    </tr>
+                  {% else %}
+                    <tr class="tr-flex-sm">
+                      <th scope="row" class="heading-toggle-text">Generate Drop Link Expiry Time (In mins)
+                        <span data-toggle="tooltip" data-placement="bottom"
+                          title="Time after which the link will expire."><i class="fas fa-info-circle"></i></span>
+                      </th>
+                      <td style="vertical-align: inherit;">
+                        <input type="number" aria-label="Checkbox for following text input"
+                          value="{{ access_token_obj.drop_link_expiry_time }}" id="drop_link_expiry_time" min="0"
+                          class="positive_numeric">
+                      </td>
+                    </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card shadow mb-4 mt-20">
+        <div class="card-body p-0">
+          <div class="card">
+            <div class="card-body table-responsive p-0">
+              <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                <tbody>
+                  <tr class="tr-flex-sm">
+                    <th scope="row" class="heading-toggle-text" id="url-fields">URLs where lead is considered as converted <br><span
+                        class="sub-heading-toggle-text">(e.g. www.xyz.com/page, www.abc.com/page1/page2)<br>Note: URLs
+                        will be matched exactly from the beginning</span></th>
+                    <td style="vertical-align: inherit;">
+                      <textarea class="form-control" style="height:10em;"
+                        id="urls_consider_lead_converted">{{ access_token_obj.urls_consider_lead_converted }}</textarea>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card shadow mb-4 mt-20">
+        <div class="card-body p-0">
+          <div class="card">
+            <div class="card-body table-responsive p-0">
+              <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                <tr class="tr-flex-sm">
+                  <th scope="row" class="heading-toggle-text" id="url-fields">URLs which will be blocked <br> <span
+                      class="sub-heading-toggle-text">(e.g. www.xyz.com/page, www.abc.com/page1/page2)<br>Note: URLs
+                      will be matched exactly from the beginning</span> </th>
+                  <td style="vertical-align: inherit;">
+                    <textarea class="form-control" style="height:10em;"
+                      id="restricted_urls">{{ access_token_obj.restricted_urls }}</textarea>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade upload_file_modal" id="modal-confirm-reset-all" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Reset All Settings</h5>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-sm-12">
+            <p>This will reset all settings across the console. Are you sure you want to continue?
+            <p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-text-only" type="button" data-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary" onclick="reset_cobrowsing_meta_details(this)">Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+  function enable_low_bandwidth_cobrowsing_change_actions(e) {
+    var check_element = document.getElementById("enable_low_bandwidth_cobrowsing");
+    if (check_element.checked == false) {
+      document.getElementById("low_bandwidth_cobrowsing_threshold_div").style.setProperty("display", "none", "important");
+      document.getElementById("enable_manual_switching_div").style.display = "none";
+      document.getElementById("enable_manual_switching").checked = false;
+    } else {
+      document.getElementById("low_bandwidth_cobrowsing_threshold_div").style.display = "";
+      document.getElementById("enable_manual_switching_div").style.display = "";
+    }
+  }
+
+  function default_function_calls() {
+    enable_low_bandwidth_cobrowsing_change_actions();
+  }
+
+  default_function_calls();
+
+  document.getElementById("enable_low_bandwidth_cobrowsing").addEventListener(
+    "change", enable_low_bandwidth_cobrowsing_change_actions)
+
+  $(document).ready(function() {
+	  try {
+      document.getElementById("nav-settings-menu").classList.add("active")
+    } catch(err) {}
+	});
+
+</script>
+
+{% endblock %}

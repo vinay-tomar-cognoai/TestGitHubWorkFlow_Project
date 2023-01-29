@@ -1,0 +1,200 @@
+{% extends 'EasyChatApp/console.html' %}
+{% block consolecontent %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/changes_placement.css' %}?v={% random_int 1 100 %}">
+
+    <div style="padding: 1em;">
+
+      <div class="row">
+        <div class="col s12 center-align white z-depth-1" style="padding: 1em;">
+          ET-Source
+        </div>        
+      </div>
+
+     <div class="row">
+        <a class="btn white transparent-btn black-text" id="channel-back-btn" href="/chat/channels/edit/{{ bot_id }}/"><i class="material-icons inline-icon">arrow_back</i> Back</a>
+      </div>
+
+      <div class="row">
+        <div class="input-field col s4">
+            <h6>Welcome Message</h6>
+            <div class="divider"></div>
+            <textarea id="welcome-message" class="materialize-textarea etsource-textarea">
+              {{ bot_channel_obj.welcome_message }}
+            </textarea>
+        </div>
+
+        <div class="input-field col s4">
+            <h6>Failure Message</h6>
+            <div class="divider"></div>
+            <textarea id="failure-message" class="materialize-textarea etsource-textarea">
+              {{ bot_channel_obj.failure_message }}
+            </textarea>
+        </div>        
+
+        <div class="input-field col s4">
+            <h6>Authentication Message</h6>
+            <div class="divider"></div>
+            <textarea id="authentication-message" class="materialize-textarea white etsource-textarea"  style="padding:1em;">
+              {{ bot_channel_obj.authentication_message }}
+            </textarea>
+        </div>
+
+        <div class="col s12">
+
+          <div class="row">
+            <ul class="collapsible">
+              <li>
+                <div class="collapsible-header">Initial Questions</div>
+                <div class="collapsible-body">
+                  <div class="row" id="channel-initial-messages">
+                    *Search and select from existing Intent List
+
+                    <div class="input-field col s12">
+                      <select multiple id="multiple-select-etsource-initial-message-list">
+                        {% for intent_name in intent_name_list %}
+                            {% if intent_name.is_selected %}
+                              <option value="{{ intent_name.intent_pk }}" selected>{{ intent_name.intent_name }}</option>
+                            {% else %}
+                              <option value="{{ intent_name.intent_pk }}">{{ intent_name.intent_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+            <ul class="collapsible">
+              <li>
+                <div class="collapsible-header">Failure Recommendations</div>
+                <div class="collapsible-body">
+                  <div class="row" id="channel-initial-messages">
+                    *Search and select from existing Intent List
+
+                    <div class="input-field col s12">
+                      <select multiple id="multiple-select-etsource-failure-message-list">
+                        {% for intent_name in intent_name_list_failure %}
+                            {% if intent_name.is_selected %}
+                              <option value="{{ intent_name.intent_pk }}" selected>{{ intent_name.intent_name }}</option>
+                            {% else %}
+                              <option value="{{ intent_name.intent_pk }}">{{ intent_name.intent_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+
+            <ul class="collapsible">
+                <li>
+                  <div class="collapsible-header">Webhook Set-Up</div>
+                  <div class="collapsible-body">
+                    <div class="row" id="telegram-webhook-setup">
+                      <div class="input-field col s12">
+                        <input type="text" value='{{bot_channel_obj.api_key}}' id="telegram-api-token" readonly style="width:96%;border: 0.1em solid black;padding:1em;font-family: Consolas, monaco, monospace;word-wrap: break-word;background-color:white;">
+                        <p id="token-guideline">Please pass above api key into headers while calling API.</p>
+                      <br><br>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+            </ul>
+          <!-- </div>
+          
+        </div> -->        
+<ul class="collapsible">
+    <li>
+      <div class="collapsible-header">Other Settings</div>
+      <div class="collapsible-body">
+        <div class="col s12">
+          <div class="row">
+            <div class="col s8">
+              <table>
+                  <tr>
+                    <td>
+                      <p>Add image in welcome response</p>
+                      <a class="waves-effect waves-light btn modal-trigger easychat-button" href="#modal-upload-image">Upload From Device</a>
+                    </td>
+                    <td>
+                      <img src="" id="uploaded-bot-welcome-image" style="max-height:10em;">
+                      <a id="remove-bot-welcome-image" style="display: none;"><i class="material-icons red-text text-darken-3">delete</i></a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>Add video in welcome response
+                        <sup>
+                          <i class="material-icons inline-icon tooltipped" data-position="top" data-tooltip=" URL/Links added must consist of HTTP/HTTPS, Eg. https://www.google.com">help</i>
+                        </sup> 
+                      </p>
+                    </td>
+                    <td>
+                      <input type="text" name="upload-bot-welcome-video-url" id="upload-bot-welcome-video-url" placeholder="Copy video url here" class="white" style="padding:0em 1em 0em 1em;width:20em;border-radius:0.5em;">
+                    </td>
+                  </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      <div class="progress" id="easychat_etsource_channel_preloader" style="display: none;">
+            <div class="indeterminate"></div>
+      </div>
+      <div class="row">
+      </div>
+      </div>
+</li>
+</ul>
+<a class="btn green lighten-2" style="background-color: #82C784; margin-left: 0.2em;"id="save-etsource-channel">Save</a>
+</div>
+</div>
+</div>
+
+
+
+<div id="modal-upload-image" class="modal">
+  <div class="modal-content">
+    <h5>Choose Image</h5>
+    <div class="file-field input-field col s10">
+      <div class="btn-small easychat-button">
+        <span>Choose image</span>
+        <input id="input_upload_image_bot_welcome_message" type="file">
+      </div>
+      <div class="file-path-wrapper">
+        <input id="input_upload_image_bot_welcome_message2" class="file-path validate" type="text">
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <a class="modal-close btn easychat-button" id="upload-bot-welcome-image">Upload</a>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+
+  $(".etsource-textarea").trumbowyg({
+                    tagsToKeep: [],
+                    allowTagsFromPaste: {
+                        allowedTags: ['h4', 'p', 'br']
+                    },
+                    minimalLinks: true,
+                    btns: [
+                        // ['viewHTML'],
+                        ['strong', 'em'], 
+                        ['emoji'],
+                        ['link'],
+                        ['unorderedList', 'orderedList'],
+                        ['underline'],
+                        ['justifyLeft'], ['justifyCenter'], ['justifyRight'], ['justifyFull'],
+                    ],
+                })
+</script>
+<script>
+  if (document.referrer.match("/chat/bots/$")) {
+      $("#channel-back-btn")[0].href = document.referrer
+  }
+</script>
+{% endblock %}

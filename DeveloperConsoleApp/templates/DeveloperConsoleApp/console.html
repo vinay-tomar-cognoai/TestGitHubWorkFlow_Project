@@ -1,0 +1,343 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <link rel="shortcut icon" type="image/x-icon" href="{% static 'DeveloperConsoleApp/img/cobrowseLogoShort.svg' %}">
+        <title>Developer Console</title>
+        <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+        <link href="{% static 'DeveloperConsoleApp/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="{% static 'DeveloperConsoleApp/css/bootstrap-select.css' %}" />
+        <!-- Custom styles for this template-->
+        <link href="{% static 'DeveloperConsoleApp/css/sb-admin-2.min.css' %}" rel="stylesheet">
+        <link href="{% static 'DeveloperConsoleApp/vendor/datatables/dataTables.bootstrap4.min.css' %}" rel="stylesheet">
+        <script type="text/javascript" src="{% static 'DeveloperConsoleApp/vendor/jquery/jquery.min.js' %}"></script>
+        <script src="{% static 'DeveloperConsoleApp/vendor/chart.js/Chart.min.js' %}"></script>
+        <link rel="stylesheet" type="text/css" href="{% static 'DeveloperConsoleApp/css/bootstrap-datepicker.min.css' %}">
+        <script type="text/javascript" src="{% static 'DeveloperConsoleApp/js/bootstrap-datepicker.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'DeveloperConsoleApp/js/bootstrap-multiselect.js' %}"></script>
+        <link rel="stylesheet" type="text/css" href="{% static 'DeveloperConsoleApp/css/bootstrap-multiselect.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'DeveloperConsoleApp/css/console.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'DeveloperConsoleApp/css/console_changes.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'DeveloperConsoleApp/css/console_responsive.css' %}">
+        <style>
+            .sidebar::-webkit-scrollbar {
+                display: none;
+            }
+
+            #accordionSidebar {
+                overflow-y: auto!important;
+                min-height: unset!important;
+                overflow-x: hidden;
+                top: 0;
+                bottom: 0;
+                -ms-overflow-style: none;
+                /* IE and Edge */
+                scrollbar-width: none;
+            }
+
+            @media only screen and (min-width: 760px) {
+                #accordionSidebar {
+                    overflow-y: auto;
+                    overflow-x: hidden;
+                    z-index: 99999;
+                    top: 0;
+                    bottom: 0;
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                }
+                #content-wrapper {
+                    height: 100vh;
+                }
+            }
+
+            @media only screen and (min-width: 769px) {
+                #accordionSidebar {
+                    max-height: 100vh;
+                }
+            }
+
+            @media (min-width: 768px) {
+                #accordionSidebar {
+                    width: 16rem !important;
+                }
+                #accordionSidebar.toggled {
+                    width: 7rem!important;
+                }
+            }
+
+            .sidebar.toggled #submenu1,
+            .sidebar.toggled #submenu2 {
+                position: relative!important;
+                left: 0!important;
+                top: 0!important;
+            }
+
+            .sidebar.toggled .nav-link-sub-menu svg {
+                margin: 0 1em;
+            }
+
+            @media only screen and (max-width: 600px) {
+                .sidebar.toggled {
+                    position: fixed;
+                    width: 6.5rem!important;
+                }
+            }
+        </style>
+    </head>
+    <body id="page-top">
+        {% csrf_token %}
+        <!-- Page Wrapper -->
+        <div id="wrapper">
+            <!-- Sidebar -->
+            <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion toggled" id="accordionSidebar" style="z-index: 0;">
+                <!-- Sidebar - Brand -->
+                <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/" style="height:3.75rem !important;">
+                    <div class="sidebar-brand-icon rotate-n-15"></div>
+                    <img id="cobrowseLogoImage" src="{% static 'DeveloperConsoleApp/img/cobrowseLogo.svg' %}" id="sales-ai-logo" alt="Cogno CoBrowse" max-width = "90px" height = "50px"/>
+                    <img id="cobrowseLogoSmall" src="{% static 'DeveloperConsoleApp/img/cobrowseLogoShort.svg' %}" id="sales-ai-logo" alt="Cogno CoBrowse" />
+                </a>
+                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3"
+                    amino-styles="margin: 5px 0 10px 0 !important;" style="min-height: 42px!important;">
+                <i class="fa fa-bars"></i>
+                </button>
+                <div class="topbar-divider-left-nav"></div>
+                <div class="topbar-divider-left-nav d-sm-block"></div>
+                <!-- Divider -->
+                <hr class="sidebar-divider my-0">
+                <!-- Nav Item - Dashboard -->
+                <li class="nav-item active nav-item-menu">
+                    <a class="nav-link tooltip-navbar" href="/developer-console/settings/" data-tooltip="tooltip" data-original-title="Settings">
+                        <svg width="20" height="19" viewBox="0 0 20 19" fill="none" xmlns="http://www.w3.org/2000/svg" >
+                            <path d="M2 10.999L11 11C12.0538 11 12.9181 11.8155 12.9945 12.8507L13 13V14.5C12.999 18 9.284 19 6.5 19C3.77787 19 0.164695 18.044 0.00545406 14.7296L0 14.5V12.999C0 11.9452 0.816397 11.0809 1.85081 11.0045L2 10.999ZM13.22 11H18C19.0538 11 19.9181 11.8164 19.9945 12.8508L20 13V14C19.999 17.062 17.142 18 15 18C14.32 18 13.569 17.904 12.86 17.678C13.196 17.292 13.467 16.851 13.662 16.351C14.205 16.476 14.715 16.5 15 16.5L15.2665 16.494C16.2518 16.4509 18.3529 16.1306 18.4927 14.205L18.5 14V13C18.5 12.7547 18.3222 12.5504 18.0896 12.5081L18 12.5H13.949C13.865 11.9986 13.6554 11.5432 13.3545 11.1598L13.22 11H18H13.22ZM2 12.499L1.89934 12.509C1.77496 12.5343 1.69 12.6018 1.646 12.645C1.6028 12.689 1.53528 12.7733 1.51 12.898L1.5 12.999V14.5C1.5 15.509 1.95 16.222 2.917 16.742C3.74315 17.1869 4.91951 17.4563 6.18258 17.4951L6.5 17.5L6.8174 17.4951C8.08035 17.4563 9.25592 17.1869 10.083 16.742C10.9886 16.2545 11.4416 15.5974 11.4947 14.6849L11.5 14.499V13C11.5 12.7547 11.3222 12.5504 11.0896 12.5081L11 12.5L2 12.499ZM6.5 0C8.985 0 11 2.015 11 4.5C11 6.985 8.985 9 6.5 9C4.015 9 2 6.985 2 4.5C2 2.015 4.015 0 6.5 0ZM15.5 2C17.433 2 19 3.567 19 5.5C19 7.433 17.433 9 15.5 9C13.567 9 12 7.433 12 5.5C12 3.567 13.567 2 15.5 2ZM6.5 1.5C4.846 1.5 3.5 2.846 3.5 4.5C3.5 6.154 4.846 7.5 6.5 7.5C8.154 7.5 9.5 6.154 9.5 4.5C9.5 2.846 8.154 1.5 6.5 1.5ZM15.5 3.5C14.397 3.5 13.5 4.397 13.5 5.5C13.5 6.603 14.397 7.5 15.5 7.5C16.603 7.5 17.5 6.603 17.5 5.5C17.5 4.397 16.603 3.5 15.5 3.5Z" fill="#212121"/>
+                        </svg>
+                        <span>Settings</span>
+                    </a>
+                </li>
+                <!-- Divider -->
+                <hr class="sidebar-divider">
+                <div class="text-center d-none d-md-inline">
+                    <button class="rounded-circle border-0" id="sidebarToggle" onclick="change_sales_logo_property()"></button>
+                </div>
+            </ul>
+            <!-- End of Sidebar -->
+            <!-- Content Wrapper -->
+            <div id="content-wrapper" class="d-flex flex-column">
+                <!-- Main Content -->
+                <div id="content">
+                    <!-- Topbar -->
+                    <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                        <!-- Sidebar Toggle (Topbar) -->
+                        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                        </button>
+                        <!-- Topbar Navbar -->
+                        <ul class="navbar-nav ml-auto navbar-right">
+                            <!-- Nav Item - Search Dropdown (Visible Only XS) -->
+                            <li class="nav-item dropdown no-arrow d-sm-none">
+                                <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-search fa-fw"></i>
+                                </a>
+                                <!-- Dropdown - Messages -->
+                                <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in" aria-labelledby="searchDropdown">
+                                    <form class="form-inline mr-auto w-100 navbar-search">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-primary" type="button">
+                                                <i class="fas fa-search fa-sm"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </li>
+                            <!-- Nav Item - User Information -->
+                            <li class="nav-item dropdown no-arrow">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ request.user.username }}</span>
+                                <img alt="Person icon" class="img-profile rounded-circle" src="/static/DeveloperConsoleApp/img/personImg.svg">
+                                </a>
+                                <!-- Dropdown - User Information -->
+                                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                                    <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" data-target="#logoutModal">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Logout
+                                    </a>
+                                </div>
+                            </li>
+                        </ul>
+                    </nav>
+                    <!-- End of Topbar -->
+                    {% block content %}
+                    {% endblock %}
+                </div>
+                <!-- End of Main Content -->
+                <!-- Footer -->
+                <footer id="cobrowse-footer" class="sticky-footer bg-white">
+                    <div class="container my-auto" style="display: inline-table;">
+                        <div class="copyright text-center my-auto">
+                            <span style="float: left;">Version: {{ cobrowse_agent.get_easychat_version }}</span>
+                            <span>Copyright &copy; AllinCall Research and Solutions Pvt Ltd.&nbsp;&nbsp;
+                            </span>
+                        </div>
+                    </div>
+                </footer>
+                <!-- End of Footer -->
+            </div>
+            <!-- End of Content Wrapper -->
+        </div>
+        <!-- End of Page Wrapper -->
+        <!-- Scroll to Top Button-->
+        <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+        </a>
+        <!-- Logout Modal-->
+        <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    </div>
+                    <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                        <a class="btn btn-primary" href="/easy-assist/logout/">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="easyassist-snackbar"></div>
+        <script type="text/javascript">
+            function show_easyassist_toast(message){
+                var element = document.getElementById("easyassist-snackbar");
+                element.innerHTML = message;
+                element.className = "show";
+                setTimeout(function(){ element.className = element.className.replace("show", ""); }, 5000);
+            }
+        </script>
+        <script src="{% static 'DeveloperConsoleApp/js/bootstrap.bundle.min.js' %}"></script>
+        <script src="{% static 'DeveloperConsoleApp/js/bootstrap-select.min.js' %}"></script>
+        <script src="{% static 'DeveloperConsoleApp/vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+        <!-- Custom scripts for all pages-->
+        <script src="{% static 'DeveloperConsoleApp/js/sb-admin-2.min.js' %}"></script>
+        <script src="{% static 'DeveloperConsoleApp/js/crypto-js.min.js' %}"></script>
+        <script src="/static/DeveloperConsoleApp/vendor/datatables/jquery.dataTables.min.js"></script>
+        <script src="/static/DeveloperConsoleApp/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+        <script src="{% static 'DeveloperConsoleApp/js/encrypt.js' %}"></script>
+        <!-- Core plugin JavaScript-->
+        <script type="text/javascript">
+            nav_items = document.getElementsByClassName("nav-item-menu");
+
+            for (var index = 0; index < nav_items.length; index++) {
+                nav_items[index].classList.remove("active");
+            }
+
+            for (var index = 0; index < nav_items.length; index++) {
+                if (nav_items[index].children[0].pathname == window.location.pathname) {
+                    nav_items[index].classList.add("active");
+
+                    if ($(nav_items[index]).closest('.nav-item-submenu')) {
+                        $(nav_items[index]).closest('.collapse').collapse();
+                    }
+                }
+            }
+
+            function change_sales_logo_property() {
+                var sales_logo = document.getElementById("sales-ai-logo");
+                var is_sidebar_toggled = false;
+                if (document.getElementById("accordionSidebar").getAttribute("class").indexOf("toggled") != -1) {
+                    set_cookie("sidebar-easy-assist", "", path = "/");
+                    if (window.matchMedia("(min-width: 720px)")) {
+                        $('#accordianSidebar').css({
+                            "position": "fixed"
+                        });
+                    }
+                    is_sidebar_toggled = false;
+                } else {
+                    set_cookie("sidebar-easy-assist", "toggled", path = "/");
+                    if ((window.matchMedia("(min-width: 720px)"))) {
+                        $('#accordianSidebar').css({
+                            "position": "relative"
+                        });
+                    }
+                    is_sidebar_toggled = true;
+                }
+
+                if (is_sidebar_toggled) {
+                    $(".tooltip-navbar").tooltip({
+
+                        boundary: 'window',
+                        placement: "right",
+                        container: 'body',
+                        trigger: 'hover'
+                    });
+                    $('.tooltip-navbar').tooltip('enable');
+                    $('.tooltip-navbar').css('width', '100%');
+                } else {
+                    $('.tooltip-navbar').tooltip('dispose');
+                    $('.tooltip-navbar').css('width', '');
+                }
+            }
+
+            function show_cobrowsing_feedback_module(element) {
+                $("#cobrowsing_feedback_modal").modal("show");
+            }
+
+            $(document).ready(function() {
+                if (get_cookie("sidebar-easy-assist") == "") {
+                    document.getElementById("accordionSidebar").classList.remove("toggled");
+                } else if (get_cookie("sidebar-easy-assist") == "toggled") {
+                    document.getElementById("accordionSidebar").classList.add("toggled");
+                    $(".tooltip-navbar").tooltip({
+                        boundary: 'window',
+                        placement: "right",
+                        container: 'body',
+                        trigger: 'hover'
+                    });
+                    $('.tooltip-navbar').tooltip('enable');
+                    $('.tooltip-navbar').css('width', '100%');
+                }
+
+                if (window.innerWidth <= 767) {
+                    $('.tooltip-navbar').tooltip('dispose');
+                    $('.tooltip-navbar').css('width', '');
+
+                    // in the below listener if the nav bar is open and a click is performed anywhere on the page then the nav bar is closed
+                    document.addEventListener("click", function(event) {
+                        var parent = $(event.target).closest("#accordionSidebar, #sidebarToggleTop");
+                        if (parent.length === 0) {
+                            if (document.getElementById("accordionSidebar").classList.contains('toggled')) {
+                                document.getElementById("sidebarToggleTop").click();
+                            }
+                        }
+                    });
+                }
+            });
+
+            window.addEventListener("resize", function(event) {
+                if (window.innerWidth <= 767) {
+                    $('.tooltip-navbar').tooltip('dispose');
+                    $('.tooltip-navbar').css('width', '');
+                } else {
+                    if (get_cookie("sidebar-easy-assist") == "toggled") {
+                        document.getElementById("accordionSidebar").classList.add("toggled");
+                        $(".tooltip-navbar").tooltip({
+                            boundary: 'window',
+                            placement: "right",
+                            container: 'body',
+                            trigger: 'hover'
+                        });
+                        $('.tooltip-navbar').tooltip('enable');
+                        $('.tooltip-navbar').css('width', '100%');
+                    }
+                }
+            });
+        </script>
+    </body>
+</html>

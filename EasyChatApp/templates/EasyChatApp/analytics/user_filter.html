@@ -1,0 +1,891 @@
+{% extends 'EasyChatApp/console.html' %}
+{% block consolecontent %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="/static/EasyChatApp/css/widgets_chatbot.css?v={% random_int 1 100 %}">
+
+<link rel="stylesheet" type="text/css" href="/static/EasyChatApp/css/user_filter.css?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="/static/EasyChatApp/css/user_message_history.css?v={% random_int 1 100 %}">
+<link type="text/css" rel="stylesheet" media="screen" href="{% static 'EasyChatApp/css/intlTelInput.css' %}">
+<link rel="stylesheet" href="/static/EasyChatApp/css/slick.min.css">
+<div class="easychat-user-chat-history-page-container">
+    <div class="easychat-user-history-page-header">
+        <div class="user-history-page-heading-botname-div">
+            User Chat History
+        </div>
+        <div style="display: flex; align-items: center; column-gap: 24px;">
+            <div class="easychat-user-history-page-switch-toggle-wrapper">
+                <div class="easychat-custom-switch-toggle-wrapper">
+                    <span>User History</span>
+                    <label class="easychat-custom-toggle-switch">
+                  <input type="checkbox" onclick="check_message_history_switch_status(this)"/>
+                  <span class="easychat-custom-toggle-slider easychat-custom-toggle-round"></span>
+                </label>
+                    <span>Message History</span>
+                </div>
+            </div>
+            <a href="#easychat-message-history-filter-modal" class="easychat-btns-custom modal-trigger">
+                <svg width="16" height="10" viewBox="0 0 16 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_183_21737)">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M15.4449 2.50011L-0.110657 2.50011L-0.110657 0.555664L15.4449 0.555664V2.50011Z" fill="white"/>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M13.5004 6.38878L1.83374 6.38878L1.83374 4.44434L13.5004 4.44434V6.38878Z" fill="white"/>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M10.5838 10.2777L4.75043 10.2777L4.75043 8.33325L10.5838 8.33325V10.2777Z" fill="white"/>
+                    </g>
+                    <defs>
+                    <clipPath id="clip0_183_21737">
+                    <rect width="16" height="9.99998" fill="white"/>
+                    </clipPath>
+                    </defs>
+                    </svg>
+                <span>Filter</span></a>
+        </div>
+    </div>
+    <div class="easychat-user-history-page-content-wrapper">
+        <div class="easychat-user-history-chats-sidepanel-wrapper">
+            <div id="user_chat_list_search_wrapper" class="user-chat-list-search-wrapper">
+                <span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M14.9043 13.8563L18.7827 17.7357C19.0724 18.0259 19.0724 18.496 18.7827 18.7862C18.4906 19.0713 18.0246 19.0713 17.7324 18.7862L13.854 14.9068C11.5449 16.6639 8.26951 16.3309 6.36104 14.145C4.45258 11.9591 4.56373 8.66785 6.61531 6.61573C8.6669 4.56362 11.9573 4.45244 14.1426 6.36139C16.328 8.27035 16.6609 11.5465 14.9043 13.8563ZM10.5352 6.52409C8.32072 6.52409 6.52551 8.31976 6.52551 10.5348C6.52813 12.7488 8.3218 14.5429 10.5352 14.5456C12.7497 14.5456 14.5449 12.7499 14.5449 10.5348C14.5449 8.31976 12.7497 6.52409 10.5352 6.52409Z" fill="#7B7A7B"/>
+                    </svg>
+                </span>
+                <input type="text" id="search-user-input" class="user-id-search-box" placeholder="Type and hit enter to search user id" />
+                <div onclick="clear_user_filtered_data()" class="message-history-clear-input-div" style="cursor: pointer; display: none;">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M13.725 4.2825C13.5849 4.14206 13.3947 4.06313 13.1963 4.06313C12.9979 4.06313 12.8077 4.14206 12.6675 4.2825L9.00004 7.9425L5.33254 4.275C5.19242 4.13456 5.00218 4.05563 4.80379 4.05563C4.6054 4.05563 4.41516 4.13456 4.27504 4.275C3.98254 4.5675 3.98254 5.04 4.27504 5.3325L7.94254 9L4.27504 12.6675C3.98254 12.96 3.98254 13.4325 4.27504 13.725C4.56754 14.0175 5.04004 14.0175 5.33254 13.725L9.00004 10.0575L12.6675 13.725C12.96 14.0175 13.4325 14.0175 13.725 13.725C14.0175 13.4325 14.0175 12.96 13.725 12.6675L10.0575 9L13.725 5.3325C14.01 5.0475 14.01 4.5675 13.725 4.2825Z" fill="#0B1E65"></path>
+                        </svg>
+                </div>
+            </div>
+            <div id="loader-user-id" style="display: none;">
+                <img height="100px" width="100px" src="{% static 'EasyChatApp/img/chat_history_loader.gif' %}" alt="" style="margin-top: -20px">
+            </div>
+            <div {% if not user_history_list %}style="display:flex"{% else %}style="display:none"{% endif %} id="no-data-found-div" class="wrap no-data-found-div">
+                <svg width="120" height="85" viewBox="0 0 120 85" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_543_25103)">
+                    <path d="M106.403 84.1143H13.5488L26.9751 7.96915H119.829L106.403 84.1143Z" fill="#F2F8FF"/>
+                    <path d="M58.754 0.0835233H28.3649L26.9746 7.96924H59.4961L58.754 0.0835233Z" fill="#F2F8FF"/>
+                    <path d="M59.4961 7.96924H26.9746L28.3649 0.0835233H58.754L59.4961 7.96924Z" fill="#E1E7EF"/>
+                    <path d="M106.403 84.1143H13.5488L26.9751 7.96915H119.829L118.43 15.9085L115.3 33.6566L106.403 84.1143Z" fill="#E1E7EF"/>
+                    <path d="M106.267 84.1143H13.212L0 10.7336H93.0548L106.267 84.1143Z" fill="#F1F5F9"/>
+                    <path d="M36.1134 51.7241C36.1134 53.8601 34.3817 55.5918 32.2457 55.5918C30.1096 55.5918 28.3779 53.8601 28.3779 51.7241C28.3779 49.588 30.1096 47.8563 32.2457 47.8563C34.3817 47.8563 36.1134 49.588 36.1134 51.7241Z" fill="#17282F"/>
+                    <path d="M66.6889 51.7241C66.6889 53.8601 64.9569 55.5918 62.8209 55.5918C60.6851 55.5918 58.9531 53.8601 58.9531 51.7241C58.9531 49.588 60.6851 47.8563 62.8209 47.8563C64.9569 47.8563 66.6889 49.588 66.6889 51.7241Z" fill="#17282F"/>
+                    <path d="M53.0882 56.2092L52.8758 55.8042C52.8566 55.7676 50.8586 52.0745 46.8382 52.0745C43.1716 52.0745 42.2777 55.5519 42.2414 55.7L42.1329 56.1431L41.2461 55.9288L41.3528 55.4851C41.3631 55.4421 42.4423 51.1602 46.8382 51.1602C51.4209 51.1602 53.5953 55.2075 53.6856 55.38L53.898 55.7847L53.0882 56.2092Z" fill="#17282F"/>
+                    </g>
+                    <defs>
+                    <clipPath id="clip0_543_25103">
+                    <rect width="120" height="84.1143" fill="white"/>
+                    </clipPath>
+                    </defs>
+                </svg>
+                <span>No data found</span>
+                <svg width="102" height="33" viewBox="0 0 102 33" fill="none" xmlns="http://www.w3.org/2000/svg" onclick="clear_user_filtered_data()" style="cursor: pointer;">
+                    <rect x="0.5" y="0.114258" width="101" height="32" rx="4" fill="#F8F8F8"/>
+                    <path d="M25.2027 10.9409V13.1571C25.2027 13.5032 24.9136 13.7839 24.5569 13.7839H22.2736C21.9169 13.7839 21.6278 13.5032 21.6278 13.1571C21.6278 12.8109 21.9169 12.5302 22.2736 12.5302L22.8044 12.5296C21.0681 11.5216 18.7852 11.7434 17.2895 13.1951C15.5241 14.9086 15.5241 17.6868 17.2895 19.4003C19.055 21.1138 21.9173 21.1138 23.6827 19.4003C24.7573 18.3574 25.207 16.8849 24.9248 15.463C24.8573 15.1231 25.0865 14.7944 25.4368 14.729C25.787 14.6635 26.1256 14.8859 26.1931 15.2259C26.5556 17.052 25.9769 18.9465 24.5961 20.2868C22.3262 22.4899 18.6461 22.4899 16.3762 20.2868C14.1064 18.0837 14.1064 14.5117 16.3762 12.3086C18.4297 10.3155 21.6375 10.1255 23.9111 11.7387L23.9111 10.9409C23.9111 10.5947 24.2002 10.3141 24.5569 10.3141C24.9136 10.3141 25.2027 10.5947 25.2027 10.9409Z" fill="#7B7A7B"/>
+                    <path d="M38.2295 20.6143V10.8115H41.7295C42.723 10.8115 43.5205 11.0918 44.1221 11.6523C44.7236 12.2083 45.0244 12.9329 45.0244 13.8262C45.0244 14.5007 44.8398 15.0908 44.4707 15.5967C44.1061 16.1025 43.6413 16.458 43.0762 16.6631L45.3047 20.6143H43.5957L41.5928 16.8887H39.7402V20.6143H38.2295ZM39.7402 15.5762H41.6611C42.1989 15.5762 42.6341 15.4258 42.9668 15.125C43.2995 14.8242 43.4658 14.3913 43.4658 13.8262C43.4658 13.3294 43.3018 12.9215 42.9736 12.6025C42.6501 12.279 42.1943 12.1172 41.6064 12.1172H39.7402V15.5762ZM46.4189 16.9775C46.4189 16.2165 46.5785 15.542 46.8975 14.9541C47.2165 14.3617 47.6517 13.9059 48.2031 13.5869C48.7591 13.2679 49.3835 13.1084 50.0762 13.1084C50.6322 13.1084 51.138 13.2064 51.5938 13.4023C52.0495 13.5983 52.4255 13.8672 52.7217 14.209C53.0225 14.5508 53.2526 14.9495 53.4121 15.4053C53.5762 15.861 53.6582 16.3509 53.6582 16.875V17.4219H47.8887C47.916 18.0645 48.1325 18.5817 48.5381 18.9736C48.9437 19.3656 49.4792 19.5615 50.1445 19.5615C50.6094 19.5615 51.0241 19.4567 51.3887 19.2471C51.7578 19.0374 52.0153 18.7549 52.1611 18.3994H53.5898C53.3984 19.1195 52.9906 19.7005 52.3662 20.1426C51.7464 20.5801 50.9922 20.7988 50.1035 20.7988C49.0143 20.7988 48.1279 20.4411 47.4443 19.7256C46.7607 19.0055 46.4189 18.0895 46.4189 16.9775ZM47.916 16.2871H52.2021C52.1566 15.6855 51.9355 15.2116 51.5391 14.8652C51.1426 14.5143 50.6549 14.3389 50.0762 14.3389C49.5111 14.3389 49.0234 14.5212 48.6133 14.8857C48.2031 15.2503 47.9707 15.7174 47.916 16.2871ZM55.1143 18.7959V10.1143H56.584V18.707C56.584 18.903 56.6318 19.0534 56.7275 19.1582C56.8232 19.263 56.9622 19.3154 57.1445 19.3154H57.4521V20.6143H56.8506C56.2992 20.6143 55.8708 20.4548 55.5654 20.1357C55.2646 19.8167 55.1143 19.3701 55.1143 18.7959ZM58.5596 16.957C58.5596 16.2324 58.7236 15.5762 59.0518 14.9883C59.3844 14.4004 59.847 13.9401 60.4395 13.6074C61.0319 13.2747 61.6973 13.1084 62.4355 13.1084C63.1738 13.1084 63.8369 13.277 64.4248 13.6143C65.0173 13.9515 65.4753 14.4141 65.7988 15.002C66.127 15.5853 66.291 16.237 66.291 16.957C66.291 17.6771 66.1247 18.3311 65.792 18.9189C65.4639 19.5023 65.0036 19.9626 64.4111 20.2998C63.8187 20.6325 63.1556 20.7988 62.4219 20.7988C61.3008 20.7988 60.3757 20.4365 59.6465 19.7119C58.9219 18.9827 58.5596 18.0645 58.5596 16.957ZM60.0566 16.957C60.0566 17.6862 60.2777 18.2878 60.7197 18.7617C61.1663 19.2311 61.7337 19.4658 62.4219 19.4658C63.1146 19.4658 63.682 19.2288 64.124 18.7549C64.5706 18.2809 64.7939 17.6816 64.7939 16.957C64.7939 16.2279 64.5706 15.6286 64.124 15.1592C63.682 14.6898 63.1146 14.4551 62.4219 14.4551C61.7292 14.4551 61.1618 14.6921 60.7197 15.166C60.2777 15.6354 60.0566 16.2324 60.0566 16.957ZM68.5264 19.7393C67.8701 19.0329 67.542 18.1123 67.542 16.9775C67.542 15.8428 67.8678 14.9154 68.5195 14.1953C69.1712 13.4707 70.0075 13.1084 71.0283 13.1084C71.3564 13.1084 71.6641 13.154 71.9512 13.2451C72.2383 13.3363 72.4775 13.4548 72.6689 13.6006C72.8649 13.7464 73.0199 13.8809 73.1338 14.0039C73.2477 14.1224 73.3434 14.2409 73.4209 14.3594H73.5234V13.293H74.9932V20.6143H73.5508V19.5752H73.4619C72.8831 20.391 72.0947 20.7988 71.0967 20.7988C70.0439 20.7988 69.1872 20.4456 68.5264 19.7393ZM69.0391 16.957C69.0391 17.7135 69.2464 18.3219 69.6611 18.7822C70.0804 19.238 70.6296 19.4658 71.3086 19.4658C71.9922 19.4658 72.5391 19.2266 72.9492 18.748C73.3594 18.2695 73.5645 17.6725 73.5645 16.957C73.5645 16.1868 73.3503 15.5785 72.9219 15.1318C72.498 14.6807 71.9557 14.4551 71.2949 14.4551C70.6296 14.4551 70.0872 14.6898 69.668 15.1592C69.2487 15.624 69.0391 16.2233 69.0391 16.957ZM77.5771 19.7393C76.9209 19.0329 76.5928 18.1123 76.5928 16.9775C76.5928 15.8428 76.9186 14.9154 77.5703 14.1953C78.222 13.4707 79.0583 13.1084 80.0791 13.1084C80.4072 13.1084 80.7148 13.154 81.002 13.2451C81.2891 13.3363 81.5283 13.4548 81.7197 13.6006C81.9157 13.7464 82.0706 13.8809 82.1846 14.0039C82.2985 14.1224 82.3942 14.2409 82.4717 14.3594H82.5742V10.1143H84.0439V20.6143H82.6016V19.5752H82.5127C81.9339 20.391 81.1455 20.7988 80.1475 20.7988C79.0947 20.7988 78.238 20.4456 77.5771 19.7393ZM78.0898 16.957C78.0898 17.7135 78.2972 18.3219 78.7119 18.7822C79.1312 19.238 79.6803 19.4658 80.3594 19.4658C81.043 19.4658 81.5898 19.2266 82 18.748C82.4102 18.2695 82.6152 17.6725 82.6152 16.957C82.6152 16.1868 82.401 15.5785 81.9727 15.1318C81.5488 14.6807 81.0065 14.4551 80.3457 14.4551C79.6803 14.4551 79.138 14.6898 78.7188 15.1592C78.2995 15.624 78.0898 16.2233 78.0898 16.957Z" fill="#7B7A7B"/>
+                </svg>
+            </div>
+            <ul {% if not user_history_list %}style="display:none"{% else %}style="display:block"{% endif %} id="user-contacts" class="easychat-user-chat-contacts-list-wrapper">
+                {% for message_history in user_history_list %}
+                <li class="easychat-user-chat-contacts-list-item" onclick="get_user_messages('{{  message_history.0 }}')">
+                    <div class="user-chat-contacts-list-item-img">
+                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g filter="url(#filter0_dd_232_13545)">
+                            <rect x="4.00024" y="2" width="32" height="32" rx="16" fill="#F6F6F6"/>
+                            <rect x="4.50024" y="2.5" width="31" height="31" rx="15.5" stroke="#EBEBEB"/>
+                            </g>
+                            <g clip-path="url(#clip0_232_13545)">
+                            <circle cx="20.0788" cy="14.6304" r="3.12377" stroke="#2D2D2D" stroke-width="1.42442"/>
+                            <path d="M15.4971 24.6039C15.375 23.209 15.7168 20.3355 18.0603 20.0007H22.0882C23.0646 20.0007 24.9443 20.9214 24.6514 24.6039" stroke="#2D2D2D" stroke-width="1.42442" stroke-linecap="round"/>
+                            </g>
+                            <defs>
+                            <filter id="filter0_dd_232_13545" x="0.000244141" y="0" width="40" height="40" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                            <feOffset dy="2"/>
+                            <feGaussianBlur stdDeviation="2"/>
+                            <feColorMatrix type="matrix" values="0 0 0 0 0.196487 0 0 0 0 0.196487 0 0 0 0 0.279476 0 0 0 0.06 0"/>
+                            <feBlend mode="multiply" in2="BackgroundImageFix" result="effect1_dropShadow_232_13545"/>
+                            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                            <feOffset/>
+                            <feGaussianBlur stdDeviation="1"/>
+                            <feColorMatrix type="matrix" values="0 0 0 0 0.196487 0 0 0 0 0.196487 0 0 0 0 0.279476 0 0 0 0.06 0"/>
+                            <feBlend mode="multiply" in2="effect1_dropShadow_232_13545" result="effect2_dropShadow_232_13545"/>
+                            <feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_232_13545" result="shape"/>
+                            </filter>
+                            <clipPath id="clip0_232_13545">
+                            <rect width="15.8889" height="15.8889" fill="white" transform="translate(12 10)"/>
+                            </clipPath>
+                            </defs>
+                            </svg>
+                    </div>
+                    <div class="user-chat-contacts-id-wrapper">
+                        <div class="user-chat-contacts-id-text">
+                            {{ message_history.0 }}
+                        </div>
+                        <div class="user-chat-contacts-response-text">
+                            {{ message_history.1 }}
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            <nav {% if not user_history_list %}style="display:none"{% else %}style="display:flex"{% endif %} id="chat-pagination" aria-label="Page navigation" class="user-chat-history-pagination-wrapper" style="box-shadow: none;">
+                {% if unique_user_id.has_other_pages %}
+                <ul class="pagination" style="margin-right: 16px;">
+                    {% if unique_user_id.has_previous %}
+                        <li class="page-item"><a class="page-link previous_button" aria-label="Previous" onclick="select_page({{ unique_user_id.previous_page_number }})"><span aria-hidden="true">Previous</span></a></li>
+                    {% else %}
+                        <li class="page-item" style="pointer-events: none;"><a class="page-link previous_button" aria-label="Previous">
+                            <span aria-hidden="true">Previous</span>
+                        </a></li>
+                    {% endif %}
+                    {% if unique_user_id.number|add:'-2' > 1 %}
+                        <li class="page-item"><a  class="page-link" onclick="select_page(page={{ unique_user_id.number|add:'-2' }})">&hellip;</a></li>
+                    {% endif %}
+                    {% for i in unique_user_id.paginator.page_range %}
+                        {% if unique_user_id.number == i %}
+                            <li class="page-item"><a class="active page-link" onclick="select_page({{ i }})">{{ i }}</a></li>
+                        {% elif i > unique_user_id.number|add:'-2' and i < unique_user_id.number|add:'2' %}
+                            <li class="page-item"><a class="page-link" onclick="select_page({{ i }})">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if unique_user_id.paginator.num_pages > unique_user_id.number|add:'2' %}
+                        <li class="page-item"><a class="page-link" onclick="select_page({{ unique_user_id.number|add:'2' }})">&hellip;</a></li>
+                    {% endif %}
+                    {% if unique_user_id.has_next %}
+                        <li class="page-item next_button" style="border-right: none;"><a aria-label="Next" style="pointer-events: all;" class="page-link" onclick="select_page({{ unique_user_id.next_page_number }})"><span aria-hidden="true">Next</span></a></li>
+                    {% else %}
+                        <li class="page-item next_button" style="border-right: none; pointer-events: none;"><a aria-label="Next" class="page-link"><span aria-hidden="true">Next</span></a></li>
+                    {% endif %}
+                </ul>
+            {% endif %}
+            </nav>
+        </div>
+        <div class="easychat-user-chat-history-frame-wrapper">
+            <div class="easychat-user-chat-history-message-frame-header-container">
+                <div class="easychat-user-chat-history-message-frame-header">
+                    <div class="user-id-text-wrapper">
+                        <div class="user-chat-contacts-list-item-img">
+                            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g filter="url(#filter0_dd_232_13545)">
+                                <rect x="4.00024" y="2" width="32" height="32" rx="16" fill="#F6F6F6"/>
+                                <rect x="4.50024" y="2.5" width="31" height="31" rx="15.5" stroke="#EBEBEB"/>
+                                </g>
+                                <g clip-path="url(#clip0_232_13545)">
+                                <circle cx="20.0788" cy="14.6304" r="3.12377" stroke="#2D2D2D" stroke-width="1.42442"/>
+                                <path d="M15.4971 24.6039C15.375 23.209 15.7168 20.3355 18.0603 20.0007H22.0882C23.0646 20.0007 24.9443 20.9214 24.6514 24.6039" stroke="#2D2D2D" stroke-width="1.42442" stroke-linecap="round"/>
+                                </g>
+                                <defs>
+                                <filter id="filter0_dd_232_13545" x="0.000244141" y="0" width="40" height="40" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                                <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                                <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                                <feOffset dy="2"/>
+                                <feGaussianBlur stdDeviation="2"/>
+                                <feColorMatrix type="matrix" values="0 0 0 0 0.196487 0 0 0 0 0.196487 0 0 0 0 0.279476 0 0 0 0.06 0"/>
+                                <feBlend mode="multiply" in2="BackgroundImageFix" result="effect1_dropShadow_232_13545"/>
+                                <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                                <feOffset/>
+                                <feGaussianBlur stdDeviation="1"/>
+                                <feColorMatrix type="matrix" values="0 0 0 0 0.196487 0 0 0 0 0.196487 0 0 0 0 0.279476 0 0 0 0.06 0"/>
+                                <feBlend mode="multiply" in2="effect1_dropShadow_232_13545" result="effect2_dropShadow_232_13545"/>
+                                <feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_232_13545" result="shape"/>
+                                </filter>
+                                <clipPath id="clip0_232_13545">
+                                <rect width="15.8889" height="15.8889" fill="white" transform="translate(12 10)"/>
+                                </clipPath>
+                                </defs>
+                                </svg>
+                        </div>
+                        <div class="user-chat-contacts-id-text" id="select-user-id">
+                        </div>
+                        
+                    </div>
+                    <div style="display: flex; column-gap: 8px; align-items: center;">
+                        <div class="user-call-recording-wrapper">
+                            <button class="easychat-call-recording-btn" id="call_recording_btn_message_history" style="display: none;">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 1.23877C13.1421 1.23877 16.5 4.59663 16.5 8.73877C16.5 12.8809 13.1421 16.2388 9 16.2388C4.85786 16.2388 1.5 12.8809 1.5 8.73877C1.5 4.59663 4.85786 1.23877 9 1.23877ZM9 2.36377C5.47918 2.36377 2.625 5.21795 2.625 8.73877C2.625 12.2596 5.47918 15.1138 9 15.1138C12.5208 15.1138 15.375 12.2596 15.375 8.73877C15.375 5.21795 12.5208 2.36377 9 2.36377ZM6.78959 6.17783C6.87192 6.01317 7.05904 5.93555 7.22971 5.98538L7.29271 6.01012L12.0792 8.40336C12.1518 8.43965 12.2106 8.49849 12.2469 8.57106C12.3292 8.73572 12.279 8.932 12.1368 9.03863L12.0792 9.07418L7.29271 11.4674C7.24063 11.4935 7.18322 11.507 7.125 11.507C6.94091 11.507 6.78779 11.3744 6.75604 11.1994L6.75 11.132V6.34553C6.75 6.28732 6.76355 6.2299 6.78959 6.17783Z" fill="white"/>
+                                </svg>
+                            <span>
+                                Call Recording
+                            </span>    
+                        </button>
+                            <div class="easychat-message-history-recording-wrapper" style=" display: none;">
+                                <audio controls="" style="display: none;">
+                                    <source id="easychat_user_call_recording_source" src="" type="audio/mp3">
+                                </audio>
+                                <div class="audio-player">
+                                    <div class="play-container">
+                                        <div class="toggle-play pause">
+                                        </div>
+                                    </div>
+                                    <div class="time">
+                                        <div class="current">0:13</div>
+                                    </div>
+                                    <div class="timeline">
+                                        <div class="progress" style="width: 100%;">
+                                        </div>
+                                    </div>
+                                    <div class="time">
+                                        <div class="length">0:13</div>
+                                    </div>
+                                    <a class="audio-player-download-btn" href="https://s3-ap-south-1.amazonaws.com/exotel-mum1-recordings/ameyo1m/f7cd9c54-8812-4025-99d3-2f739021b43c.mp3" target="_blank" id="user_call_recording_download_src" download="">
+                                        <svg style="margin-top: 0px;" width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M6.69641 3.59055C6.69641 3.12134 7.08066 2.74097 7.55464 2.74097C8.02863 2.74097 8.41287 3.12134 8.41287 3.59055V7.56284C8.41287 7.62334 8.46241 7.67238 8.52352 7.67238H9.70043C9.86857 7.67245 10.0212 7.76967 10.0909 7.92112C10.1607 8.07257 10.1347 8.25038 10.0244 8.37605L7.87864 10.8192C7.79717 10.9122 7.67897 10.9656 7.55464 10.9656C7.43032 10.9656 7.31211 10.9122 7.23065 10.8192L5.08486 8.37605C4.97462 8.25038 4.94862 8.07257 5.01836 7.92112C5.08809 7.76967 5.24071 7.67245 5.40885 7.67238H6.58576C6.64687 7.67238 6.69641 7.62334 6.69641 7.56284V3.59055ZM11.7396 10.6935C11.7396 10.4002 11.9798 10.1624 12.276 10.1624C12.4187 10.1618 12.5557 10.2175 12.6568 10.3172C12.7579 10.4168 12.8147 10.5522 12.8147 10.6935V11.5062C12.8147 12.4742 12.022 13.2589 11.0442 13.2589H4.06512C3.08819 13.2576 2.29687 12.4733 2.29688 11.5062V10.6935C2.29688 10.4002 2.53705 10.1624 2.83332 10.1624C3.12959 10.1624 3.36977 10.4002 3.36977 10.6935V11.5062C3.37026 11.8861 3.68136 12.1939 4.06512 12.1941H11.0442C11.428 12.1939 11.7391 11.8861 11.7396 11.5062V10.6935Z" fill="white"/>
+                                        </svg>    
+                                    </a>
+                                    <button class="audio-player-cross-btn">
+                                    <svg  width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M7.23022 6L18.7701 18" stroke="#7B7A7B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        <path d="M18.7698 6L7.22995 18" stroke="#7B7A7B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </svg>
+                                </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="user-messages-search-wrapper">
+                            <div class="easychat-history-global-searchbar-container">
+                                <span>
+                                    <svg width="19" height="20" viewBox="0 0 19 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M11.705 11.4579L14.7508 14.5046C14.9784 14.7325 14.9784 15.1017 14.7508 15.3296C14.5214 15.5534 14.1555 15.5534 13.9261 15.3296L10.8802 12.2829C9.0667 13.6628 6.49443 13.4013 4.99564 11.6846C3.49685 9.9679 3.58414 7.38319 5.19533 5.77158C6.80652 4.15998 9.39057 4.07266 11.1068 5.57184C12.8231 7.07102 13.0845 9.64395 11.705 11.4579ZM8.27403 5.69955C6.53489 5.69955 5.12505 7.10976 5.12505 8.84934C5.12711 10.5881 6.53575 11.9971 8.27403 11.9991C10.0132 11.9991 11.423 10.5889 11.423 8.84934C11.423 7.10976 10.0132 5.69955 8.27403 5.69955Z" fill="#4D4D4D"/>
+                                    </svg>
+                                </span>
+                                <input type="text" id="user_history_global_search" class="textSearchvalue_h" placeholder="Type and hit enter to search" name="search" autocomplete="off">
+                                <div id="search_results_track" class="search_result_numbers"><span id="current_search_id">0</span>/<span id="total_search_result">0</span></div>
+                                <div class="user-search-up-down-arrow-wrapper">
+                                    <a href="#" class="search-up-arrow" onclick='search_chat_up()'>
+                                        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M7.05166 3.92407C7.25539 3.92382 7.44936 4.01132 7.584 4.16422L10.6047 7.59714C10.7445 7.74884 10.7912 7.96439 10.7267 8.16036C10.6621 8.35633 10.4965 8.50199 10.2939 8.54096C10.0913 8.57993 9.88351 8.50612 9.75089 8.34807L7.10955 5.34619C7.09493 5.32952 7.07384 5.31996 7.05166 5.31996C7.02949 5.31996 7.0084 5.32952 6.99378 5.34619L4.35244 8.34868C4.21982 8.50673 4.012 8.58055 3.80939 8.54158C3.60679 8.5026 3.44119 8.35695 3.37667 8.16097C3.31216 7.965 3.35885 7.74946 3.49867 7.59775L6.51841 4.16545C6.65328 4.01219 6.8475 3.92427 7.05166 3.92407Z" fill="black"/>
+                                            </svg>
+                                    </a>
+                                    <a href="#" class="search-down-arrow" onclick='search_chat_down()'>
+                                        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M6.68804 8.82556C6.47616 8.82582 6.27443 8.73482 6.13441 8.57581L2.99293 5.00493C2.78642 4.75883 2.81415 4.39288 3.05538 4.18071C3.29661 3.96853 3.66311 3.98774 3.88084 4.22397L6.62784 7.34656C6.64304 7.3639 6.66498 7.37384 6.68804 7.37384C6.71109 7.37384 6.73303 7.3639 6.74823 7.34656L9.49523 4.22397C9.63315 4.0596 9.84929 3.98282 10.06 4.02336C10.2707 4.06389 10.4429 4.21537 10.51 4.41918C10.5771 4.62299 10.5286 4.84716 10.3831 5.00493L7.24262 8.57452C7.10236 8.73392 6.90036 8.82536 6.68804 8.82556Z" fill="#2D2D2D"/>
+                                            </svg>
+                                    </a>
+                                </div>
+                                <div class="user-search-cross-icon" style="display: none;">
+                                    <svg width="12" height="12" viewBox="0 0 12 12" fill="#4D4D4D" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M1.89705 2.05379L1.96967 1.96967C2.23594 1.7034 2.6526 1.6792 2.94621 1.89705L3.03033 1.96967L6 4.939L8.96967 1.96967C9.26256 1.67678 9.73744 1.67678 10.0303 1.96967C10.3232 2.26256 10.3232 2.73744 10.0303 3.03033L7.061 6L10.0303 8.96967C10.2966 9.23594 10.3208 9.6526 10.1029 9.94621L10.0303 10.0303C9.76406 10.2966 9.3474 10.3208 9.05379 10.1029L8.96967 10.0303L6 7.061L3.03033 10.0303C2.73744 10.3232 2.26256 10.3232 1.96967 10.0303C1.67678 9.73744 1.67678 9.26256 1.96967 8.96967L4.939 6L1.96967 3.03033C1.7034 2.76406 1.6792 2.3474 1.89705 2.05379L1.96967 1.96967L1.89705 2.05379Z"></path>
+                                    </svg>
+                                </div>
+                                <div class="easychat-history-global-searchbar-btn" id="easychat-history-global-searchbar-btn">
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12.4657 11.8385L15.5116 14.8852C15.7391 15.1131 15.7391 15.4823 15.5116 15.7102C15.2822 15.934 14.9162 15.934 14.6868 15.7102L11.6409 12.6635C9.82744 14.0434 7.25517 13.7819 5.75638 12.0652C4.25759 10.3485 4.34488 7.76381 5.95607 6.1522C7.56726 4.54059 10.1513 4.45328 11.8676 5.95246C13.5838 7.45164 13.8453 10.0246 12.4657 11.8385ZM9.03477 6.08017C7.29564 6.08017 5.88579 7.49038 5.88579 9.22996C5.88785 10.9687 7.29649 12.3777 9.03477 12.3797C10.7739 12.3797 12.1837 10.9695 12.1837 9.22996C12.1837 7.49038 10.7739 6.08017 9.03477 6.08017Z" fill="white"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="easychat-user-message-history-dropdown-btn-wrapper">
+                    <div class="easychat-user-message-history-session-id-dropdown-wrapper" style="display: none;" id="user_chat_session_id_drop">
+                        <div class="user-dropdown-session-selected-btn">
+                            <div class="user-dropdown-session-selected-text" id="session_id_dropdown_selected_text">
+
+                            </div>
+                            <div class="user-dropdown-session-arrow">
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9.78033 3.23123C9.48744 2.92292 9.01256 2.92292 8.71967 3.23123L6 6.09404L3.28033 3.23123C2.98744 2.92292 2.51256 2.92292 2.21967 3.23123C1.92678 3.53954 1.92678 4.03941 2.21967 4.34772L5.46967 7.76877C5.76256 8.07708 6.23744 8.07708 6.53033 7.76877L9.78033 4.34772C10.0732 4.03941 10.0732 3.53954 9.78033 3.23123Z" fill="#334155"/>
+                                    </svg>
+                            </div>
+                        </div>
+                        <div class="easychat-user-message-history-session-ids-container">
+                            <div class="easychat-user-message-history-session-ids-search-div">
+                                <div class="session-id-search-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M13.8563 14.9043L17.7357 18.7827C18.0259 19.0724 18.496 19.0724 18.7862 18.7827C19.0713 18.4906 19.0713 18.0246 18.7862 17.7324L14.9068 13.854C16.6639 11.5449 16.3309 8.26951 14.145 6.36104C11.9591 4.45258 8.66785 4.56373 6.61573 6.61531C4.56362 8.6669 4.45244 11.9573 6.36139 14.1426C8.27035 16.328 11.5465 16.6609 13.8563 14.9043ZM6.52409 10.5352C6.52409 8.32072 8.31976 6.52551 10.5348 6.52551C12.7488 6.52813 14.5429 8.3218 14.5456 10.5352C14.5456 12.7497 12.7499 14.5449 10.5348 14.5449C8.31976 14.5449 6.52409 12.7497 6.52409 10.5352Z" fill="#7B7A7B"/>
+                                    </svg>
+                                </div>
+                                <input type="text" id="session_id_drop_search" placeholder="Search session ID" autocomplete="off" onkeyup="user_session_dropdown_search();">
+                            </div>
+                            <ul class="easychat-user-message-history-session-ids-items-wrapper" id="session_id_dropdown">
+                                <div class="session-drop-data-not-found-div" id="session_drop_nodata_found">No result found</div>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="easychat-user-message-history-btns-wrapper">
+                        <a onclick="show_select('{{selected_bot_obj.pk}}')" class="user-history-add-intent-btn modal-trigger" id="user_history_add_intent_btn">Add to Intent</a>
+                        <a href="#" class="user-history-clearall-btn" onclick="hide_selected_mis(this)">Clear All</a>
+                    </div>
+                </div>
+            </div>
+            <div id="loader-user-message" style="display: none;">
+                <img height="200px" width="200px" src="{% static 'EasyChatApp/img/chat_history_loader.gif' %}" alt="">
+            </div>
+            <div class="easychat-user-chat-history-message-container" id="load_user_messages">
+                <div id="no-user-selected" class="no-chat-selected-div">
+                    <svg width="161" height="140" viewBox="0 0 161 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M24.6427 109.488C25.586 107.459 26.3164 105.386 26.8476 103.295C10.7544 93.5384 0 75.8565 0 55.6623C0 24.9208 24.9208 2.28882e-05 55.6623 2.28882e-05C86.4036 2.28882e-05 111.325 24.9208 111.325 55.6623C111.325 86.4036 86.4036 111.324 55.6623 111.324C51.4635 111.324 47.3744 110.857 43.4417 109.975C36.1942 119.004 24.9414 123.824 13.5538 123.017C18.1852 119.629 22.0516 115.058 24.6427 109.488Z" fill="#CBD5E1"/>
+                        <path d="M136.167 126.383C135.224 124.355 134.494 122.282 133.962 120.191C150.056 110.434 160.81 92.7524 160.81 72.5583C160.81 41.8167 135.889 16.896 105.148 16.896C74.4064 16.896 49.4854 41.8167 49.4854 72.5583C49.4854 103.3 74.4064 128.22 105.148 128.22C109.346 128.22 113.436 127.752 117.368 126.871C124.616 135.9 135.869 140.72 147.256 139.913C142.625 136.525 138.758 131.954 136.167 126.383Z" fill="#F1F5F9"/>
+                        <path d="M89.8882 73.8381C89.8882 76.7246 87.5483 79.0645 84.6619 79.0645C81.7754 79.0645 79.4355 76.7246 79.4355 73.8381C79.4355 70.9519 81.7754 68.612 84.6619 68.612C87.5483 68.612 89.8882 70.9519 89.8882 73.8381Z" fill="#CBD5E1"/>
+                        <path d="M110.373 73.8381C110.373 76.7246 108.034 79.0645 105.147 79.0645C102.261 79.0645 99.9209 76.7246 99.9209 73.8381C99.9209 70.9519 102.261 68.612 105.147 68.612C108.034 68.612 110.373 70.9519 110.373 73.8381Z" fill="#CBD5E1"/>
+                        <path d="M130.359 73.8381C130.359 76.7246 128.019 79.0645 125.133 79.0645C122.246 79.0645 119.906 76.7246 119.906 73.8381C119.906 70.9519 122.246 68.612 125.133 68.612C128.019 68.612 130.359 70.9519 130.359 73.8381Z" fill="#CBD5E1"/>
+                    </svg>
+                    <center><span>Select a user to see the chat history.</span></center>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+        <div class="col s-eleven-half offset-s-half"></div>
+    <div class="fixed-action-btn"> 
+        <a class="btn-floating btn-large purple darken-3 modal-trigger" onclick="show_select('{{selected_bot_obj.pk}}')" id="revised-message-history-action" style="margin-right: 1em;display:none;"><i class="large material-icons">mode_edit</i></a>   
+    </div>
+
+    <!-- filter modal -->
+    <div id="easychat-message-history-filter-modal" class="modal">
+        <div class="modal-content">
+            <div class="row" style="margin-bottom: 12px !important;">
+                <div class="modal-header">
+                    <h6>Filter data</h6>
+                    <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                        <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z" fill="black" fill-opacity="0.54"/>
+                        </svg>
+
+                    </a>
+                </div>
+
+                <div class="modal-overflow-content-div">
+                    <div class="col s12 analytics-filter-select-area">
+                        <div class="filter-heading">
+                            Select Date range
+                        </div>
+                        <label onclick="show_custom_date();">
+                    {% if filter_type == "1" %}
+                    <input type="radio" name="analytics-card-filter-btn" id="date_range_1" checked/>
+                    {% else %}
+                    <input type="radio" name="analytics-card-filter-btn" id="date_range_1">
+                    {% endif %}
+                    <div class=" filter-box">
+                      <span>Last week</span>
+                    </div>
+                  </label>
+                        <label onclick="show_custom_date();">
+                    {% if filter_type == "2" %}
+                    <input type="radio" name="analytics-card-filter-btn" id="date_range_2" checked>
+                    {% else %}
+                    <input type="radio" name="analytics-card-filter-btn" id="date_range_2">
+                    {% endif %}
+                    <div class=" filter-box">
+                      <span>Last Month</span>
+                    </div>
+                  </label>
+                        <label onclick="show_custom_date();">
+                    {% if filter_type == "3" %}
+                    <input type="radio" name="analytics-card-filter-btn" id="date_range_3" checked>
+                    {% else %}
+                    <input type="radio" name="analytics-card-filter-btn" id="date_range_3">
+                    {% endif %}
+                    <div class=" filter-box">
+                      <span>Last 3 Month</span>
+                    </div>
+                  </label>
+                        <label onclick="show_custom_date();">
+                    {% if filter_type == "4" %}
+                    <input type="radio" name="analytics-card-filter-btn" id="date_range_4" checked>
+                    {% else %}
+                    <input type="radio" name="analytics-card-filter-btn" id="date_range_4">
+                    {% endif %}
+                    <div class=" filter-box">
+                      <span>From beginning</span>
+                    </div>
+                  </label>
+                        <label onclick="show_custom_date();">
+                    {% if filter_type == "5" %}
+                    <input type="radio" name="analytics-card-filter-btn" id="date_range_5" checked>
+                    {% else %}
+                    <input type="radio" name="analytics-card-filter-btn" id="date_range_5">
+                    {% endif %}
+                    <div class=" filter-box" >
+                      <span>Custom Date</span>
+                    </div>
+                  </label>
+
+
+
+                    </div>
+                    {% if filter_type == "5" %}
+                    <div class="col s10 analytics-custom-date-select-area" id="analytics-custom-date-select-area" style="display: block;">
+                    {% else %}
+                    <div class="col s10 analytics-custom-date-select-area" id="analytics-custom-date-select-area" style="display: none;">
+                    {% endif %}
+
+                    <div class="easychat-calendar-div-wrapper">
+                        <div class="easychat-calendar-div" id="calendar-div-1" style="left: 1%;height: 190px;">
+                            <label style="margin-left: -60%;color: #2D2D2D;">From</label>                
+                            <div class="main-wrapping-div">                    
+                                <div class="easychat-date-btn">                        
+                                    <input type="text" id="datepicker-1-0" onchange="changed_date('1-0','Double datetime',this)" style="width: 100px !important;" class="date-time-picker-btns easychat-datepicker-btn" value="{{ show_start_date }}">                            
+                                    <div class="date-displayer user-filter-datepicker" id="date-displayer-1-0" style="margin-top: -43px;">                                
+                                        <div class="row" style="display: none; justify-content: center; margin-left: 0px;">                                    
+                                            <div class="col s6 date">NaN</div>                                    
+                                            <div class="col s6" style=" padding-left: 0">                                        
+                                                <div class="row month-year" style="margin-bottom: 1px !important;margin-top: 8px !important;">undefined NaN</div>                                        
+                                                <div class="row day">undefined</div>                                    
+                                            </div>                                
+                                        </div>                            
+                                    </div>                                            
+                                </div>                    
+                                <div class="easychat-time-btn">                      
+                                    <input type="button" id="time-picker-btn-1-0" class="date-time-picker-btns easychat-timepicker-btn" value="{{ show_start_time }}" onclick="handle_time_picker_click('1-0')" style="width: 100px !important;" onchange="handleTimeBtnChange('Double datetime')">                    
+                                </div>                
+                            </div>                
+                            <hr style="width: 85%;border: none;border-bottom: 1px solid #e5e5e5; margin-top: 18px; margin-bottom: 10px ">
+                            <label style="margin-left: -64%;color: #2D2D2D;">To</label>                
+                            <div class="main-wrapping-div">                    
+                                <div class="easychat-date-btn">                        
+                                    <input type="text" id="datepicker-1-1"  onchange="changed_date('1-1','Double datetime',this)" style="width: 100px !important;" class="date-time-picker-btns easychat-datepicker-btn" value="{{ show_end_date }}">                            
+                                    <div class="date-displayer user-filter-datepicker" id="date-displayer-1-1"  style="margin-top: -43px;">                                
+                                        <div class="row" style="display: none; justify-content: center; margin-left: 0px;">                                    
+                                            <div class="col s6 date">NaN</div>                                    
+                                            <div class="col s6" style=" padding-left: 0">                                        
+                                                <div class="row month-year" style="margin-bottom: 1px !important;margin-top: 8px !important;">undefined NaN</div>                                        
+                                                <div class="row day">undefined</div>                                    
+                                            </div>                                
+                                        </div>                            
+                                    </div>                                            
+                                </div>                    
+                                <div class="easychat-time-btn">                      
+                                    <input type="button" id="time-picker-btn-1-1" class="date-time-picker-btns easychat-timepicker-btn" value="{{ show_end_time }}" onclick="handle_time_picker_click('1-1')" style="width: 100px !important;" onchange="handleTimeBtnChange('Double datetime')">                    
+                                </div>                
+                            </div>                
+                        </div>
+                        <div class="reset-icon" style="margin-left: 10px;margin-top: 12px;cursor: pointer;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" onclick="refresh_timestamp()">
+                                <path d="M13.146 11.0499L12.9717 9.05752L15.3463 8.84977C14.4472 7.98322 13.2243 7.4503 11.877 7.4503C9.11553 7.4503 6.87695 9.68888 6.87695 12.4503C6.87695 15.2117 9.11553 17.4503 11.877 17.4503C13.6977 17.4503 15.2912 16.4771 16.1655 15.0224L18.1682 15.5231C17.0302 17.8487 14.6406 19.4503 11.877 19.4503C8.01096 19.4503 4.87695 16.3163 4.87695 12.4503C4.87695 8.58431 8.01096 5.4503 11.877 5.4503C13.8234 5.4503 15.5843 6.24474 16.8531 7.52706L16.6078 4.72412L18.6002 4.5498L19.1232 10.527L13.146 11.0499Z" fill="#2D2D2D"/>
+                            </svg>                                
+                        </div>
+                        <div id="timepicker-container-1-0">
+                            <div class="custom-timepicker">
+                                <div class="custom-timepicker-heading">
+                                    <div class="custom-timepicker-heading-text">
+                                        Select Time
+                                    </div>
+                                    <div class="cross-icon" onclick="close_time_modal('1-0')">
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M12.1995 3.80664C12.0749 3.6818 11.9058 3.61165 11.7295 3.61165C11.5531 3.61165 11.384 3.6818 11.2595 3.80664L7.99949 7.05997L4.73949 3.79997C4.61494 3.67514 4.44584 3.60498 4.26949 3.60498C4.09315 3.60498 3.92405 3.67514 3.79949 3.79997C3.53949 4.05997 3.53949 4.47997 3.79949 4.73997L7.05949 7.99997L3.79949 11.26C3.53949 11.52 3.53949 11.94 3.79949 12.2C4.05949 12.46 4.47949 12.46 4.73949 12.2L7.99949 8.93997L11.2595 12.2C11.5195 12.46 11.9395 12.46 12.1995 12.2C12.4595 11.94 12.4595 11.52 12.1995 11.26L8.93949 7.99997L12.1995 4.73997C12.4528 4.48664 12.4528 4.05997 12.1995 3.80664Z" fill="#7B7B7B"/>
+                                        </svg>                    
+                                    </div>
+                                </div>
+                                <div class="custom-timepicker-body">
+                                    <div class="hr-clock" onclick="handle_click_time('1-0')">
+                                        <ul>
+                                            <li><label for="timepickerhrone-1-0" class="ppppp">01</label><input id="timepickerhrone-1-0" type="radio" name="hrvalue"></input></li>
+                                            <li><label for="timepickerhrtwo-1-0">02</label><input id="timepickerhrtwo-1-0" type="radio" name="hrvalue"></input></li>
+                                            <li><label for="timepickerhrthree-1-0">03</label><input id="timepickerhrthree-1-0" type="radio" name="hrvalue"></input></li>
+                                            <li><label for="timepickerhrfour-1-0">04</label><input id="timepickerhrfour-1-0" type="radio" name="hrvalue"></input></li>
+                                            <li><label for="timepickerhrfive-1-0">05</label><input id="timepickerhrfive-1-0" type="radio" name="hrvalue"></input></li>
+                                            <li><label for="timepickerhrsix-1-0">06</label><input id="timepickerhrsix-1-0" type="radio" name="hrvalue"></input></li>
+                                            <li><label for="timepickerhrseven-1-0">07</label><input id="timepickerhrseven-1-0" type="radio" name="hrvalue"></input></li>
+                                            <li><label for="timepickerhreight-1-0">08</label><input id="timepickerhreight-1-0" type="radio" name="hrvalue"></input></li>
+                                            <li><label for="timepickerhrnine-1-0">09</label><input id="timepickerhrnine-1-0" type="radio" name="hrvalue"></input></li>
+                                            <li><label for="timepickerhrten-1-0">10</label><input id="timepickerhrten-1-0" type="radio" name="hrvalue"></input></li>
+                                            <li><label for="timepickerhreleven-1-0">11</label><input id="timepickerhreleven-1-0" type="radio" name="hrvalue"></input></li>
+                                            <li><label for="timepickerhrtwelve-1-0">12</label><input id="timepickerhrtwelve-1-0" type="radio" name="hrvalue"></input></li>
+                                        </ul>
+                                    </div>
+                                    <div class="min-clock" onclick="handle_click_time('1-0')">
+                                        <ul>
+                                            <li><label for="timepickerminzero-1-0">00</label><input id="timepickerminzero-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminone-1-0">01</label><input id="timepickerminone-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermintwo-1-0">02</label><input id="timepickermintwo-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminthree-1-0">03</label><input id="timepickerminthree-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfour-1-0">04</label><input id="timepickerminfour-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfive-1-0">05</label><input id="timepickerminfive-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminsix-1-0">06</label><input id="timepickerminsix-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminseven-1-0">07</label><input id="timepickerminseven-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermineight-1-0">08</label><input id="timepickermineight-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminnine-1-0">09</label><input id="timepickerminnine-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminten-1-0">10</label><input id="timepickerminten-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermineleven-1-0">11</label><input id="timepickermineleven-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermintwelve-1-0">12</label><input id="timepickermintwelve-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminthirteen-1-0">13</label><input id="timepickerminthirteen-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfourteen-1-0">14</label><input id="timepickerminfourteen-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfifteen-1-0">15</label><input id="timepickerminfifteen-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminsixteen-1-0">16</label><input id="timepickerminsixteen-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminseventeen-1-0">17</label><input id="timepickerminseventeen-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermineighteen-1-0">18</label><input id="timepickermineighteen-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminnineteen-1-0">19</label><input id="timepickerminnineteen-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermintwenty-1-0">20</label><input id="timepickermintwenty-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermintwentyone-1-0">21</label><input id="timepickermintwentyone-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermintwentytwo-1-0">22</label><input id="timepickermintwentytwo-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermintwentythree-1-0">23</label><input id="timepickermintwentythree-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermintwentyfour-1-0">24</label><input id="timepickermintwentyfour-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermintwentyfive-1-0">25</label><input id="timepickermintwentyfive-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermintwentysix-1-0">26</label><input id="timepickermintwentysix-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermintwentyseven-1-0">27</label><input id="timepickermintwentyseven-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermintwentyeight-1-0">28</label><input id="timepickermintwentyeight-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermintwentynine-1-0">29</label><input id="timepickermintwentynine-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminthirty-1-0">30</label><input id="timepickerminthirty-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminthirtyone-1-0">31</label><input id="timepickerminthirtyone-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminthirtytwo-1-0">32</label><input id="timepickerminthirtytwo-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminthirtythree-1-0">33</label><input id="timepickerminthirtythree-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminthirtyfour-1-0">34</label><input id="timepickerminthirtyfour-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminthirtyfive-1-0">35</label><input id="timepickerminthirtyfive-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminthirtysix-1-0">36</label><input id="timepickerminthirtysix-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminthirtyseven-1-0">37</label><input id="timepickerminthirtyseven-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminthirtyeight-1-0">38</label><input id="timepickerminthirtyeight-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminthirtynine-1-0">39</label><input id="timepickerminthirtynine-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminforty-1-0">40</label><input id="timepickerminforty-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfortyone-1-0">41</label><input id="timepickerminfortyone-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfortytwo-1-0">42</label><input id="timepickerminfortytwo-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfortythree-1-0">43</label><input id="timepickerminfortythree-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfortyfour-1-0">44</label><input id="timepickerminfortyfour-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfortyfive-1-0">45</label><input id="timepickerminfortyfive-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfortysix-1-0">46</label><input id="timepickerminfortysix-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfortyseven-1-0">47</label><input id="timepickerminfortyseven-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfortyeight-1-0">48</label><input id="timepickerminfortyeight-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfortynine-1-0">49</label><input id="timepickerminfortynine-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfifty-1-0">50</label><input id="timepickerminfifty-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfiftyone-1-0">51</label><input id="timepickerminfiftyone-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfiftytwo-1-0">52</label><input id="timepickerminfiftytwo-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfiftythree-1-0">53</label><input id="timepickerminfiftythree-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfiftyfour-1-0">54</label><input id="timepickerminfiftyfour-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfiftyfive-1-0">55</label><input id="timepickerminfiftyfive-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfiftysix-1-0">56</label><input id="timepickerminfiftysix-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfiftyseven-1-0">57</label><input id="timepickerminfiftyseven-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfiftyeight-1-0">58</label><input id="timepickerminfiftyeight-1-0" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfiftynine-1-0">59</label><input id="timepickerminfiftynine-1-0" type="radio" name="minvalue"></input></li>
+                                        </ul>
+                                    </div>
+                                    <div class="ampm-clock" onclick="handle_click_time('1-0')">
+                                        <ul>
+                                            <li><label for="timepickerampmAM-1-0" style="padding: 8px 6px;right: 8%;position: relative;">AM</label><input type="radio" id="timepickerampmAM-1-0" name="ampmvalue"></input></li>
+                                            <li><label for="timepickerampmPM-1-0" style="padding: 8px 6px;right: 8%;position: relative;">PM</label><input type="radio" id="timepickerampmPM-1-0" name="ampmvalue"></input></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="custom-timepicker-footer">
+                                    <button type="submit" class="cancel-btn btn" onclick="close_time_modal('1-0')">Cancel</button>
+                                    <button type="submit" class="submit-btn btn" onclick="handle_save_time('1-0')">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                
+                        <div id="timepicker-container-1-1">
+                            <div class="custom-timepicker">
+                                <div class="custom-timepicker-heading">
+                                    <div class="custom-timepicker-heading-text">
+                                        Select Time
+                                    </div>
+                                    <div class="cross-icon" onclick="close_time_modal('1-1')">
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M12.1995 3.80664C12.0749 3.6818 11.9058 3.61165 11.7295 3.61165C11.5531 3.61165 11.384 3.6818 11.2595 3.80664L7.99949 7.05997L4.73949 3.79997C4.61494 3.67514 4.44584 3.60498 4.26949 3.60498C4.09315 3.60498 3.92405 3.67514 3.79949 3.79997C3.53949 4.05997 3.53949 4.47997 3.79949 4.73997L7.05949 7.99997L3.79949 11.26C3.53949 11.52 3.53949 11.94 3.79949 12.2C4.05949 12.46 4.47949 12.46 4.73949 12.2L7.99949 8.93997L11.2595 12.2C11.5195 12.46 11.9395 12.46 12.1995 12.2C12.4595 11.94 12.4595 11.52 12.1995 11.26L8.93949 7.99997L12.1995 4.73997C12.4528 4.48664 12.4528 4.05997 12.1995 3.80664Z" fill="#7B7B7B"/>
+                                        </svg>                    
+                                    </div>
+                                </div>
+                                <div class="custom-timepicker-body">
+                                    <div class="hr-clock" onclick="handle_click_time('1-1')">
+                                        <ul>
+                                            <li><label for="timepickerhrone-1-1" class="skdjankdjank">01</label><input id="timepickerhrone-1-1" type="radio" name="hrvalue"></input></li>
+                                            <li><label for="timepickerhrtwo-1-1">02</label><input id="timepickerhrtwo-1-1" type="radio" name="hrvalue"></input></li>
+                                            <li><label for="timepickerhrthree-1-1">03</label><input id="timepickerhrthree-1-1" type="radio" name="hrvalue"></input></li>
+                                            <li><label for="timepickerhrfour-1-1">04</label><input id="timepickerhrfour-1-1" type="radio" name="hrvalue"></input></li>
+                                            <li><label for="timepickerhrfive-1-1">05</label><input id="timepickerhrfive-1-1" type="radio" name="hrvalue"></input></li>
+                                            <li><label for="timepickerhrsix-1-1">06</label><input id="timepickerhrsix-1-1" type="radio" name="hrvalue"></input></li>
+                                            <li><label for="timepickerhrseven-1-1">07</label><input id="timepickerhrseven-1-1" type="radio" name="hrvalue"></input></li>
+                                            <li><label for="timepickerhreight-1-1">08</label><input id="timepickerhreight-1-1" type="radio" name="hrvalue"></input></li>
+                                            <li><label for="timepickerhrnine-1-1">09</label><input id="timepickerhrnine-1-1" type="radio" name="hrvalue"></input></li>
+                                            <li><label for="timepickerhrten-1-1">10</label><input id="timepickerhrten-1-1" type="radio" name="hrvalue"></input></li>
+                                            <li><label for="timepickerhreleven-1-1">11</label><input id="timepickerhreleven-1-1" type="radio" name="hrvalue"></input></li>
+                                            <li><label for="timepickerhrtwelve-1-1">12</label><input id="timepickerhrtwelve-1-1" type="radio" name="hrvalue"></input></li>
+                                        </ul>
+                                    </div>
+                                    <div class="min-clock" onclick="handle_click_time('1-1')">
+                                        <ul>
+                                            <li><label for="timepickerminzero-1-1">00</label><input id="timepickerminzero-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminone-1-1">01</label><input id="timepickerminone-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermintwo-1-1">02</label><input id="timepickermintwo-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminthree-1-1">03</label><input id="timepickerminthree-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfour-1-1">04</label><input id="timepickerminfour-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfive-1-1">05</label><input id="timepickerminfive-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminsix-1-1">06</label><input id="timepickerminsix-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminseven-1-1">07</label><input id="timepickerminseven-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermineight-1-1">08</label><input id="timepickermineight-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminnine-1-1">09</label><input id="timepickerminnine-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminten-1-1">10</label><input id="timepickerminten-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermineleven-1-1">11</label><input id="timepickermineleven-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermintwelve-1-1">12</label><input id="timepickermintwelve-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminthirteen-1-1">13</label><input id="timepickerminthirteen-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfourteen-1-1">14</label><input id="timepickerminfourteen-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfifteen-1-1">15</label><input id="timepickerminfifteen-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminsixteen-1-1">16</label><input id="timepickerminsixteen-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminseventeen-1-1">17</label><input id="timepickerminseventeen-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermineighteen-1-1">18</label><input id="timepickermineighteen-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminnineteen-1-1">19</label><input id="timepickerminnineteen-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermintwenty-1-1">20</label><input id="timepickermintwenty-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermintwentyone-1-1">21</label><input id="timepickermintwentyone-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermintwentytwo-1-1">22</label><input id="timepickermintwentytwo-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermintwentythree-1-1">23</label><input id="timepickermintwentythree-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermintwentyfour-1-1">24</label><input id="timepickermintwentyfour-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermintwentyfive-1-1">25</label><input id="timepickermintwentyfive-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermintwentysix-1-1">26</label><input id="timepickermintwentysix-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermintwentyseven-1-1">27</label><input id="timepickermintwentyseven-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermintwentyeight-1-1">28</label><input id="timepickermintwentyeight-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickermintwentynine-1-1">29</label><input id="timepickermintwentynine-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminthirty-1-1">30</label><input id="timepickerminthirty-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminthirtyone-1-1">31</label><input id="timepickerminthirtyone-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminthirtytwo-1-1">32</label><input id="timepickerminthirtytwo-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminthirtythree-1-1">33</label><input id="timepickerminthirtythree-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminthirtyfour-1-1">34</label><input id="timepickerminthirtyfour"-1-1 type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminthirtyfive-1-1">35</label><input id="timepickerminthirtyfive-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminthirtysix-1-1">36</label><input id="timepickerminthirtysix-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminthirtyseven-1-1">37</label><input id="timepickerminthirtyseven-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminthirtyeight-1-1">38</label><input id="timepickerminthirtyeight-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminthirtynine-1-1">39</label><input id="timepickerminthirtynine-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminforty-1-1">40</label><input id="timepickerminforty-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfortyone-1-1">41</label><input id="timepickerminfortyone-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfortytwo-1-1">42</label><input id="timepickerminfortytwo-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfortythree-1-1">43</label><input id="timepickerminfortythree-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfortyfour-1-1">44</label><input id="timepickerminfortyfour-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfortyfive-1-1">45</label><input id="timepickerminfortyfive-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfortysix-1-1">46</label><input id="timepickerminfortysix-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfortyseven-1-1">47</label><input id="timepickerminfortyseven-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfortyeight-1-1">48</label><input id="timepickerminfortyeight-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfortynine-1-1">49</label><input id="timepickerminfortynine-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfifty-1-1">50</label><input id="timepickerminfifty-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfiftyone-1-1">51</label><input id="timepickerminfiftyone-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfiftytwo-1-1">52</label><input id="timepickerminfiftytwo-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfiftythree-1-1">53</label><input id="timepickerminfiftythree-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfiftyfour-1-1">54</label><input id="timepickerminfiftyfour-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfiftyfive-1-1">55</label><input id="timepickerminfiftyfive-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfiftysix-1-1">56</label><input id="timepickerminfiftysix-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfiftyseven-1-1">57</label><input id="timepickerminfiftyseven-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfiftyeight-1-1">58</label><input id="timepickerminfiftyeight-1-1" type="radio" name="minvalue"></input></li>
+                                            <li><label for="timepickerminfiftynine-1-1">59</label><input id="timepickerminfiftynine-1-1" type="radio" name="minvalue"></input></li>
+                                        </ul>
+                                    </div>
+                                    <div class="ampm-clock" onclick="handle_click_time('1-1')">
+                                        <ul>
+                                            <li><label for="timepickerampmAM-1-1" style="padding: 8px 6px;right: 8%;position: relative;">AM</label><input type="radio" id="timepickerampmAM-1-1" name="ampmvalue"></input></li>
+                                            <li><label for="timepickerampmPM-1-1" style="padding: 8px 6px;right: 8%;position: relative;">PM</label><input type="radio" id="timepickerampmPM-1-1" name="ampmvalue"></input></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="custom-timepicker-footer">
+                                    <button type="submit" class="cancel-btn btn" onclick="close_time_modal('1-1')">Cancel</button>
+                                    <button type="submit" class="submit-btn btn" onclick="handle_save_time('1-1')">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+
+                        <!-- <div class="col s6" style="padding-left: 0px; font-weight: 600;color: #4d4d4d;
+                font-size: 14px;">
+                            Start Date
+                            <input type="date" id="start_date" class="message-default-start-date" value="{{ start_date }}">
+                        </div>
+                        <div class="col s6" style="font-weight: 600; padding-right: 0px !important;color: #4d4d4d;
+                font-size: 14px;">
+                            End Date
+                            <input type="date" id="end_date" class="message-default-end-date" value="{{ end_date }}">
+                        </div>
+                    </div> -->
+                    <div class="col s12 analytics-channel-select-area">
+                        <div class="filter-heading">
+                            Select Channel
+                        </div>
+
+                        {% for channel in channel_list %}
+	                		<div class=" channel-box">
+                                {% if channel.name in selected_channels %}
+                                    <input class="user-chat-history-channel-checkbox" type="checkbox" id="{{channel.name}}" name="" value="" checked>
+                                {% else %}
+                                <input class="user-chat-history-channel-checkbox" type="checkbox" id="{{channel.name}}" name="" value="">
+                                {% endif %}
+                                <label for="{{channel.name}}">
+                                    {{ channel.icon|safe }}
+                                    <span>{{ channel.name }}</span>
+                                </label>
+	                    	</div>
+	                    {% endfor %}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+
+            <a href="/chat/user-filtered/?bot_id={{ selected_bot_obj.pk }}" class="modal-close btn filter-modal-footer-btn-cancel">Clear filter</a>
+            <a onclick="apply_user_chat_history_filter()" class="btn filter-modal-footer-btn">Apply filter</a>
+
+        </div>
+    </div>
+    <div id="modal-message-history-action" class="modal easychat-custom-modals-container">
+        <div class="modal-content">
+            <div class="row" style="margin-bottom: 12px !important;">
+                <div class="modal-header">
+                    <div class="modal-heading-text-div">Add to training data </div>
+                    <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                        <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z" fill="black" fill-opacity="0.54"></path>
+                        </svg>
+                    </a>
+                </div>
+                <div class="modal-overflow-content-div">
+                    <div class="custom-modal-subheading-div">
+                        Please choose an intent for which you want to add these in training questions
+                    </div>
+                    <div id='show-bot-intent'>
+                        <select onchange='disable_submit_btn()' id='select-show-bot-intent'>
+                            <option value="none" selected="" disabled="" hidden="">
+                                Select Intent
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a id="match-intent-btn" class="modal-trigger btn filter-modal-footer-btn" onclick="map_message_to_intent()">Add to training questions</a>
+        </div>
+    </div>
+
+<div id="modal-message-history-action-error" class="modal easychat-custom-modals-container">
+    <div class="modal-content">
+        <div class="row" style="margin-bottom: 12px !important;">
+            <div class="modal-header">
+                <a href="javascript:void(0)" class="modal-close-btn modal-close" style="margin-right: -10px; padding-top: 4px;">
+                    <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z" fill="black" fill-opacity="0.54"></path>
+                    </svg>
+                </a>
+            </div>
+            <div class="modal-overflow-content-div-wrapper">
+                <div class="add-succesfull-text-div">
+                    <img src="{% static 'EasyChatApp/img/error.gif' %}" alt="">
+                </div>
+                <div>
+                    <ul id="unmatched-message-list" list-style-type="circle inside">
+                    </ul>
+                </div>
+                <div class="custom-modal-subheading-div" style="margin-top: 20px; margin-bottom: 32px;">
+                    Could not be added as it already exists in the training question for the selected intent.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="preview-big-image-modal" >
+    <svg id="preview-big-image-cross-button" onclick="close_preview_image(event)" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M15 1.85364L13.1464 0L7.5 5.64636L1.85364 0L0 1.85364L5.64636 7.5L0 13.1464L1.85364 15L7.5 9.35364L13.1464 15L15 13.1464L9.35364 7.5L15 1.85364Z" fill="white"></path>
+    </svg>
+    <img id="preview-big-image">
+</div>
+
+<div id="modal-message-history-action-warning" class="modal easychat-custom-modals-container">
+    <div class="modal-content">
+        <div class="row" style="margin-bottom: 12px !important;">
+            <div class="modal-header">
+                <a class="modal-close-btn modal-trigger modal-close" style="margin-right: -10px; padding-top: 4px;">
+                    <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z" fill="black" fill-opacity="0.54"></path>
+                    </svg>
+                </a>
+            </div>
+            <div class="modal-overflow-content-div-wrapper">
+                <div class="add-succesfull-text-div">
+                    <img src="{% static 'EasyChatApp/img/add_success.gif' %}" alt="">
+                </div>
+                <div class="custom-modal-subheading-div" style="margin-bottom: 32px; text-align: center;">
+                    Training question added to intent successfully. <br> Please run automated testing to find conflicts if any!
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <script type="text/javascript">
+            function get_url_vars() {
+                var vars = {};
+                var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+                  vars[key] = value;
+                });
+                return vars;
+            }
+            $(document).on("change", "#selected-bot-message-history", function (e) {
+                bot_id = document.getElementById("selected-bot-message-history").value;
+                if (bot_id != "None") {
+                    window.location = window.location.pathname + "?bot_id=" + bot_id;
+                } else {
+                    window.location = window.location.pathname
+                }
+            });
+
+
+            function check_message_history_switch_status(element) {
+                if (element.checked == true) {
+                    bot_id = get_url_vars()["bot_id"]
+                    if (bot_id == "None") {
+                        window.location = "/chat/message-history/";
+                    } else {
+                        window.location = "/chat/message-history/?bot_id=" + bot_id;
+                    }
+                }
+            }
+        </script>
+
+
+    </div>
+
+    </div>
+    
+    <script type="text/javascript">
+        function show_custom_date() {
+            if (document.getElementById('date_range_5').checked) {
+                document.getElementById("analytics-custom-date-select-area").style.display = "block";
+            } else {
+                document.getElementById("analytics-custom-date-select-area").style.display = "none";
+
+            }
+        }
+        window.NEED_TO_BUILD = "{{ selected_bot_obj.need_to_build }}";
+
+        $("#home-button").click(function () {
+            if ($("#panel").is(":visible") == true) {
+                $("#panel").hide(100);
+            } else {
+                $("#panel").show(100);
+            }
+        });
+
+        $(document).ready(function() {
+            setTimeout(function() {
+                $('.modal').removeAttr('tabindex')
+            }, 500)
+            setTimeout(function() {
+                if ($("#easychat-build-bot-toast-div").css('display') == 'flex') {
+                $(".easychat-user-chat-contacts-list-wrapper").addClass("user-history-change-div-height");
+                $(".easychat-user-chat-history-message-container").addClass("user-history-change-div-height");
+            }
+            }, 1100)
+        });
+
+        $(document).on('contextmenu', '.collapsible_custom', function (e) {
+            e.preventDefault();
+            var d = document.getElementById('menu-div');
+            d.style.position = "absolute";
+            d.style.left = e.pageX + 'px';
+            d.style.top = e.pageY + 'px';
+            pk_list = this.id.split("_");
+            global_select_tree_name = $(this).text().trim()
+            global_select_intent_id = pk_list[0];
+            global_select_parent_id = pk_list[1];
+            global_select_tree_id = pk_list[2];
+            var tree_name = document.getElementById(this.id + "_tree_name_container").getAttribute("value");
+            document.getElementById("modal_tree_name").value = tree_name;
+            $("#menu-div").show();
+            return false;
+        });
+
+    </script>
+    <!-- slider script end -->
+    <script src="{% static 'EasyChatApp/js/slick.min.js' %}"></script>
+    <script src="{% static 'EasyChatApp/js/intlTelInput.js' %}"></script>
+    
+    <script type="text/javascript" src="{% static 'EasyChatApp/js/user_filter.js' %}?v={% random_int 1 100 %}"></script>
+    <!-- <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script> -->
+    <script src="{% static 'EasyChatApp/js/jquery_custom_script_datepicker.js' %}"></script>
+    
+{% endblock %}

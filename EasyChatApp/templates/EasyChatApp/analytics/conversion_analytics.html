@@ -1,0 +1,1192 @@
+{% extends 'EasyChatApp/console.html' %}
+{% block consolecontent %}
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/apexcharts.css' %}?v={% random_int 1 100 %}">
+<script type="text/javascript" src="https://easychat-dev.allincall.in/static/EasyChatApp/js/wordcloud2.js"></script>
+
+
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/conversion_analytics.css' %}?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/revised_analytics.css' %}?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/bootstrap_datatable_min.css' %}?v={% random_int 1 100 %}">
+<link href="{% static 'EasyChatApp/css/revised_flow_analytics.css' %}?v={% random_int 1 100 %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+<div>
+    
+</div>
+<img id="conversion_analytics_loader" src="{% static 'EasyChatApp/images/analytics_loader.gif' %}" style="display:none; height:100vh; width:100vw">
+
+
+
+<div class="row conversion-analytics-content-wrapper" style="height: fit-content; height: -moz-fit-content;" id="capture-html-to-canvas">
+
+    <div class="easychat-tab-pane-wrapper">
+        <div class="easychat-tab-pane-item">
+            <a class="easychat-tab-pane-item-btn " href="/chat/revised-analytics/?bot_id={{ selected_bot_obj.pk }}&selected_language=en"> Combined Analytics </a>
+        </div>
+        <div class="easychat-tab-pane-item">
+            <a class="easychat-tab-pane-item-btn active-page" href="/chat/conversion-analytics/?bot_id={{ selected_bot_obj.pk }}&selected_language=en"> Conversion Analytics </a>
+        </div>
+    </div>
+    <div class="easychat-analytics-buttons-wrapper">
+        <div class="easychat-analytics-botname-div">
+            {{selected_bot_obj.name}} Conversion Analytics
+        </div>
+        <div class="easychat-analytics-btn-container">
+            <div class="conversion-analytics-filter-lang-wrapper">
+                <div class="easychat-console-custom-dropdown">
+                    <div class="easychat-console-select-drop" style="display: none;">
+                        {% for language in supported_language %}
+                        <span data-value="{{language.lang}}">{{language.name_in_english}}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <a href="#conversion-global-analytics-filter-modal" class="easychat-btns-custom modal-trigger">
+                <svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2.00024 6.51178L17.6588 6.51178" stroke="white" stroke-width="1.95732" stroke-linecap="round"></path>
+                    <path d="M3.95764 10.4264L15.7015 10.4264" stroke="white" stroke-width="1.95732" stroke-linecap="round"></path>
+                    <path d="M6.8938 14.3411L12.7658 14.3411" stroke="white" stroke-width="1.95732" stroke-linecap="round"></path>
+                    </svg>
+
+                <span>Filter</span></a>
+
+        </div>
+
+    </div>
+
+
+    <!-- Flow Completion Rate html Start -->
+    {% include "EasyChatApp/analytics/flow_completion_rate.html" %}
+    <!-- Flow Completion Rate html End -->
+
+    {% if selected_bot_obj.is_livechat_enabled %}
+
+    <!--  Live Chat analytics html Start -->
+    {% include "EasyChatApp/analytics/live_chat_analytics.html" %}
+    <!--  Live Chat analytics html End -->
+
+    {% endif %}
+
+    <!-- Intent Analytics html Start -->
+    {% include "EasyChatApp/analytics/intent_analytics.html" %}
+    <!-- Intent Analytics html End -->
+
+    <!-- Customer Dropoff Analytics html start -->
+    {% include "EasyChatApp/analytics/customer_dropoff_analytics.html" %}
+    <!-- Customer Dropoff Analytics html end -->
+
+    <!-- Traffic Analytics html start -->
+    {% include "EasyChatApp/analytics/traffic_analytics.html" %}
+    <!-- Traffic Analytics html end -->
+
+    <!-- welcome banner html start -->
+    {% include "EasyChatApp/analytics/welcome_banner_click_rates.html" %}                
+    <!-- welcome banner html end -->
+
+    <!-- Blocked users (WhatsApp)  html start -->
+    {% include "EasyChatApp/analytics/whatsapp_blocked_users_analytics.html" %} 
+    <!-- Blocked users (WhatsApp)  html end -->
+
+    <!-- Catalogue (WhatsApp) html start -->
+    {% include "EasyChatApp/analytics/catalogue_conversion_analytics.html" %} 
+    <!-- Catalogue (WhatsApp) html end -->
+</div>
+
+<div id="div-intent-list-modal-container">
+
+<!-- Banner image preview modal -->
+<div id="easychat-livechat-welcome-banner-preview-image-filter-modal"  class="modal">
+    <div class="modal-content">
+        <div class="row" style="margin-bottom: -6px !important;margin-left: auto;margin-right: auto;">
+            <div class="modal-header">
+                <div class="modal-heading-text-div" style="color: #e9dcdc;" id="preview_modal_heading">...</div>
+                <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3.7315 3.97096L3.84244 3.84244C4.24924 3.43565 4.88581 3.39867 5.33438 3.7315L5.4629 3.84244L9.99989 8.37892L14.5369 3.84244C14.9844 3.39497 15.7099 3.39497 16.1573 3.84244C16.6048 4.28992 16.6048 5.01542 16.1573 5.4629L11.6209 9.99989L16.1573 14.5369C16.5641 14.9437 16.6011 15.5803 16.2683 16.0288L16.1573 16.1573C15.7505 16.5641 15.114 16.6011 14.6654 16.2683L14.5369 16.1573L9.99989 11.6209L5.4629 16.1573C5.01542 16.6048 4.28992 16.6048 3.84244 16.1573C3.39497 15.7099 3.39497 14.9844 3.84244 14.5369L8.37892 9.99989L3.84244 5.4629C3.43565 5.0561 3.39867 4.41953 3.7315 3.97096L3.84244 3.84244L3.7315 3.97096Z" fill="white"/>
+                    </svg>
+                        
+                </a>
+            </div>
+            <img style="max-height: 600px; width: 100%; max-width: 800px;" id="preview_modal_img" src="https://easychat-dev.allincall.in/files/4a8bcc87-e7d0-4301-a602-5acced80f197.jpg" alt="preview-image" />
+        </div>  
+    </div>
+</div>
+
+<!-- Filter data  -->
+<div id="easychat-livechat-welcome-banner-filter-modal" class="modal">
+    <div class="modal-content">
+        <div class="row" style="margin-bottom: 0px !important;">
+            <div class="modal-header">
+                <div class="modal-heading-text-div">Filter data</div>
+                <a href="javascript:void(0)" style="margin-left: 5px;" class="modal-close-btn modal-close">
+                    <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z" fill="black" fill-opacity="0.54"/>
+                    </svg>
+
+                </a>
+            </div>
+            <div class="modal-overflow-content-div">
+
+                <div class="col s12 analytics-filter-select-area" style="margin-bottom: 20px;">
+                    <div class="filter-heading">
+                        Select Date range
+                    </div>
+                    <label onclick="show_custom_date();">
+                <input type="radio" id="conversion_welcome_week" name="analytics-card-filter-btn" start_date_value="{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}" end_date_value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" checked/>
+                <div class=" filter-box">
+                  <span>Last week</span>
+                </div>
+              </label>
+                    <label onclick="show_custom_date();">
+                <input type="radio" id="conversion_welcome_month" name="analytics-card-filter-btn" start_date_value="{{ LAST_MONTH_START_DATETIME|date:"Y-m-d" }}" end_date_value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}">
+                <div class=" filter-box">
+                  <span>Last Month</span>
+                </div>
+              </label>
+                    <label onclick="show_custom_date();">
+                <input type="radio" id="conversion_welcome_three_month" name="analytics-card-filter-btn" start_date_value="{{ LAST3_MONTH_START_DATETIME|date:"Y-m-d" }}" end_date_value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}">
+                <div class=" filter-box">
+                  <span>Last 3 Month</span>
+                </div>
+              </label>
+                    <label onclick="show_custom_date();">
+                <input type="radio" id="conversion_welcome_beg" name="analytics-card-filter-btn" start_date_value="{{ go_live_date|date:"Y-m-d" }}" end_date_value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}">
+                <div class=" filter-box">
+                  <span>From beginning</span>
+                </div>
+              </label>
+                <label onclick="show_custom_date();">
+                <input type="radio" id="conversion_welcome_custom_date_btn" name="analytics-card-filter-btn">
+                <div class=" filter-box" >
+                  <span>Custom Date</span>
+                </div>
+              </label>
+
+                </div>
+                <div class="col s10 analytics-custom-date-select-area" id="analytics-custom-date-select-area-welcome" style="display: none; margin-bottom: 20px">
+
+                    <div class="col s6" style="padding-left: 0px; font-weight: 600;color: #4d4d4d;
+                font-size: 14px;">
+                        Start Date
+                        <input type="date" class="message-default-start-date" id="conversion_welcome_custom_start_date" value="{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}">
+                    </div>
+                    <div class="col s6" style="font-weight: 600; padding-right: 0px !important;color: #4d4d4d;
+                font-size: 14px;">
+                        End Date
+                        <input type="date" class="message-default-end-date" id="conversion_welcome_custom_end_date" value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+
+        <a href="javascript:void(0)" class="modal-close btn filter-modal-footer-btn-cancel" onclick="clear_filter('welcome')">Clear filter</a>
+        <a href="javascript:void(0)" class="modal-close btn filter-modal-footer-btn" onclick="set_page_and_load_welcome_analytics()">Apply filter</a>
+
+    </div>
+</div>
+
+
+<!-- Filter - Traffic Analytics -->
+<div id="easychat-livechat-traffic-analytics-filter-modal" class="modal">
+    <div class="modal-content">
+        <div class="row" style="margin-bottom: 0px !important;">
+            <div class="modal-header">
+                <div class="modal-heading-text-div">Filter - Traffic Analytics</div>
+                <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                    <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z" fill="black" fill-opacity="0.54"/>
+                    </svg>
+
+                </a>
+            </div>
+
+            <div class="modal-overflow-content-div">
+            <div class="col s12 analytics-filter-select-area">
+                <div class="filter-heading">
+                    Select Date Range
+                </div>
+                <label>
+                <input type="radio" name="conversion_traffic_analytics_date_filter" id="conversion_traffic_week" start_date_value="{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}" end_date_value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" checked onclick="show_custom_date();" />
+                <div class="filter-box">
+                  <span>Last Week</span>
+                </div>
+              </label>
+                <label>
+                <input type="radio" name="conversion_traffic_analytics_date_filter" id="conversion_traffic_month" start_date_value="{{ LAST_MONTH_START_DATETIME|date:"Y-m-d" }}" end_date_value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" onclick="show_custom_date();">
+                <div class=" filter-box">
+                  <span>Last Month</span>
+                </div>
+              </label>
+                <label>
+                <input type="radio" name="conversion_traffic_analytics_date_filter" id="conversion_traffic_three_month" start_date_value="{{ LAST3_MONTH_START_DATETIME|date:"Y-m-d" }}" end_date_value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" onclick="show_custom_date();">
+                <div class=" filter-box">
+                  <span>Last 3 Month</span>
+                </div>
+              </label>
+                <label>
+                <input type="radio" name="conversion_traffic_analytics_date_filter" id="conversion_traffic_beg" start_date_value="{{ go_live_date|date:"Y-m-d" }}" end_date_value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" onclick="show_custom_date();">
+                <div class=" filter-box">
+                  <span>From Beginning</span>
+                </div>
+              </label>
+                <label>
+                <input type="radio" id="conversion_traffic_custom_date_btn" name="conversion_traffic_analytics_date_filter" onclick="show_custom_date();">
+                <div class=" filter-box" >
+                  <span>Custom Date</span>
+                </div>
+              </label>
+
+
+
+            </div>
+
+            <div class="col s10 analytics-custom-date-select-area" id="analytics-custom-date-select-area-traffic" style="display: none;">
+
+                <div class="col s6" style="padding-left: 0px; font-weight: 600;color: #4d4d4d;
+            font-size: 14px;">
+                    Start Date
+                    <input type="date" class="message-default-start-date" id="conversion_traffic_custom_start_date" value="{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}">
+                </div>
+                <div class="col s6" style="font-weight: 600; padding-right: 0px !important;color: #4d4d4d;
+            font-size: 14px;">
+                    End Date
+                    <input type="date" class="message-default-end-date" id="conversion_traffic_custom_end_date" value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}">
+                </div>
+            </div>
+            <div class="col s12 analytics-channel-select-area">
+                <div class="filter-heading">
+                    Select Source/Medium
+                </div>
+
+                {% for web_page_source_obj in web_page_source_objs %}
+
+                <div class=" channel-box">
+
+                    <input type="checkbox" id="traffic_source_checkbox{{ forloop.counter }}" name="" value="{{ web_page_source_obj }}">
+                    <label for="traffic_source_checkbox{{ forloop.counter }}">
+                        
+                            
+                        <span>{{ web_page_source_obj }}</span></label>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+        </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+
+        <a href="javascript:void(0)" class="modal-close btn filter-modal-footer-btn-cancel" onclick="clear_filter('traffic')">Clear filter</a>
+        <a href="javascript:void(0)" class="modal-close btn filter-modal-footer-btn" onclick="set_page_and_load_traffic_analytics()">Apply filter</a>
+
+    </div>
+</div>
+</div>
+
+
+<!-- Filter - Flow Completion Rate -->
+<div id="div-intent-list-modal-container">
+    <div id="easychat-livechat-analytics-filter-modal" class="modal">
+        <div class="modal-content">
+            <div class="row" style="margin-bottom: 12px !important;">
+                <div class="modal-header">
+                    <div class="modal-heading-text-div">Filter - Flow Completion Rate</div>
+                    <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                        <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z" fill="black" fill-opacity="0.54"/>
+                        </svg>
+
+                    </a>
+                </div>
+
+                <div class="modal-overflow-content-div">
+                <div class="col s12 analytics-filter-select-area">
+                    <div class="filter-heading">
+                        Select Date Range
+                    </div>
+                    <label>
+                    <input type="radio" name="conversion_flow_analytics_date_filter" id="conversion_flow_week" start_date_value="{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}" end_date_value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" checked onclick="show_custom_date();" />
+                    <div class="filter-box">
+                      <span>Last Week</span>
+                    </div>
+                  </label>
+                    <label>
+                    <input type="radio" name="conversion_flow_analytics_date_filter" id="conversion_flow_month" start_date_value="{{ LAST_MONTH_START_DATETIME|date:"Y-m-d" }}" end_date_value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" onclick="show_custom_date();">
+                    <div class=" filter-box">
+                      <span>Last Month</span>
+                    </div>
+                  </label>
+                    <label>
+                    <input type="radio" name="conversion_flow_analytics_date_filter" id="conversion_flow_three_month" start_date_value="{{ LAST3_MONTH_START_DATETIME|date:"Y-m-d" }}" end_date_value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" onclick="show_custom_date();">
+                    <div class=" filter-box">
+                      <span>Last 3 Month</span>
+                    </div>
+                  </label>
+                    <label>
+                    <input type="radio" name="conversion_flow_analytics_date_filter" id="conversion_flow_beg" start_date_value="{{ go_live_date|date:"Y-m-d" }}" end_date_value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" onclick="show_custom_date();">
+                    <div class=" filter-box">
+                      <span>From Beginning</span>
+                    </div>
+                  </label>
+                    <label>
+                    <input type="radio" id="conversion_flow_custom_date_btn" name="conversion_flow_analytics_date_filter" onclick="show_custom_date();">
+                    <div class=" filter-box" >
+                      <span>Custom Date</span>
+                    </div>
+                  </label>
+
+
+
+                </div>
+
+                <div class="col s10 analytics-custom-date-select-area" id="analytics-custom-date-select-area-flow" style="display: none;">
+
+                    <div class="col s6" style="padding-left: 0px; font-weight: 600;color: #4d4d4d;
+                font-size: 14px;">
+                        Start Date
+                        <input type="date" class="message-default-start-date" id="conversion_flow_custom_start_date" value="{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}">
+                    </div>
+                    <div class="col s6" style="font-weight: 600; padding-right: 0px !important;color: #4d4d4d;
+                font-size: 14px;">
+                        End Date
+                        <input type="date" class="message-default-end-date" id="conversion_flow_custom_end_date" value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}">
+                    </div>
+                </div>
+                <div class="col s12 analytics-channel-select-area">
+                    <div class="filter-heading">
+                        Select Channel
+                    </div>
+                    {% for channel in channel_list %}
+                        <div class="channel-box">
+                            <input type="checkbox" class="flow-completion-rate-channels {{ channel.name }}" id="flow-completion-{{ channel.name }}" value="{{ channel.name }}" name="flow_channel_checkbox">
+                            <label for="flow-completion-{{ channel.name }}">
+                                    {{ channel.icon|safe }}
+                                    <span>{{ channel.name }}</span>
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        </div>
+        <div class="modal-footer">
+
+            <a href="javascript:void(0)" class="modal-close btn filter-modal-footer-btn-cancel" onclick="clear_filter('flow')">Clear filter</a>
+            <a href="javascript:void(0)" class="modal-close btn filter-modal-footer-btn" onclick="load_flow_conversion_analytics()">Apply filter</a>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- Filter - Intent Analytics -->
+<div id="div-intent-list-modal-container">
+    <div id="conversion-intent-analytics-filter-modal" class="modal">
+        <div class="modal-content">
+            <div class="row" style="margin-bottom: 12px !important;">
+                <div class="modal-header">
+                    <div class="modal-heading-text-div">Filter - Intent Analytics</div>
+                    <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                        <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z" fill="black" fill-opacity="0.54"/>
+                        </svg>
+
+                    </a>
+                </div>
+
+                <div class="modal-overflow-content-div">
+                <div class="col s12 analytics-filter-select-area">
+                    <div class="filter-heading">
+                        Select Date Range
+                    </div>
+                    <label>
+                    <input type="radio" name="conversion_intent_analytics_date_filter" id="conversion_intent_week" start_date_value="{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}" end_date_value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" checked onclick="show_custom_date();" />
+                    <div class="filter-box">
+                      <span>Last Week</span>
+                    </div>
+                  </label>
+
+                    <label>
+                    <input type="radio" name="conversion_intent_analytics_date_filter" id="conversion_intent_month" start_date_value="{{ LAST_MONTH_START_DATETIME|date:"Y-m-d" }}" end_date_value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" onclick="show_custom_date();">
+                    <div class=" filter-box">
+                      <span>Last Month</span>
+                    </div>
+                  </label>
+                    <label>
+                    <input type="radio" name="conversion_intent_analytics_date_filter" id="conversion_intent_three_month" start_date_value="{{ LAST3_MONTH_START_DATETIME|date:"Y-m-d" }}" end_date_value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" onclick="show_custom_date();">
+                    <div class=" filter-box">
+                      <span>Last 3 Month</span>
+                    </div>
+                  </label>
+                    <label>
+                    <input type="radio" name="conversion_intent_analytics_date_filter" id="conversion_intent_beg" start_date_value="{{ go_live_date|date:"Y-m-d" }}" end_date_value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}"  onclick="show_custom_date();">
+                    <div class=" filter-box">
+                      <span>From Beginning</span>
+                    </div>
+                  </label>
+                    <label>
+                    <input type="radio" name="conversion_intent_analytics_date_filter" id="conversion_intent_custom_date_btn" onclick="show_custom_date();">
+                    <div class=" filter-box" >
+                      <span>Custom Date</span>
+                    </div>
+                  </label>
+
+
+
+                </div>
+
+                <div class="col s10 analytics-custom-date-select-area" id="analytics-custom-date-select-area-intent" style="display: none;">
+
+                    <div class="col s6" style="padding-left: 0px; font-weight: 600;color: #4d4d4d;
+                font-size: 14px;">
+                        Start Date
+                        <input type="date" class="message-default-start-date" id="conversion_intent_custom_start_date" value="{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}">
+                    </div>
+                    <div class="col s6" style="font-weight: 600; padding-right: 0px !important;color: #4d4d4d;
+                font-size: 14px;">
+                        End Date
+                        <input type="date" class="message-default-end-date" id="conversion_intent_custom_end_date" value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}">
+                    </div>
+                </div>
+                <div class="col s12 analytics-channel-select-area">
+                    <div class="filter-heading">
+                        Select Channel
+                    </div>
+                    {% for channel in channel_list %}
+                        <div class="channel-box">
+                            <input type="checkbox" class="intent-analytics-channels {{ channel.name }}" id="intent-analytics-{{ channel.name }}" value="{{ channel.name }}" name="flow_channel_checkbox">
+                            <label for="intent-analytics-{{ channel.name }}">
+                                    {{ channel.icon|safe }}
+                                    <span>{{ channel.name }}</span>
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        </div>
+        <div class="modal-footer">
+
+            <a href="javascript:void(0)" class="modal-close btn filter-modal-footer-btn-cancel" onclick="clear_filter('intent')">Clear filter</a>
+            <a href="javascript:void(0)" class="modal-close btn filter-modal-footer-btn" onclick="set_page_and_load_intent_analytics()">Apply filter</a>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- Filter - Live Chat Analytics -->
+<div id="div-intent-list-modal-container">
+    <div id="conversion-livechat-analytics-filter-modal" class="modal">
+        <div class="modal-content">
+            <div class="row" style="margin-bottom: 12px !important;">
+                <div class="modal-header">
+                    <div class="modal-heading-text-div">Filter - LiveChat Analytics</div>
+                    <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                        <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z" fill="black" fill-opacity="0.54"/>
+                        </svg>
+
+                    </a>
+                </div>
+
+                <div class="modal-overflow-content-div">
+                <div class="col s12 analytics-filter-select-area">
+                    <div class="filter-heading">
+                        Select Date Range
+                    </div>
+                    <label>
+                    <input type="radio" name="conversion_livechat_analytics_date_filter" id="conversion_livechat_week" start_date_value="{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}" end_date_value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" checked onclick="show_custom_date();"/>
+                    <div class="filter-box">
+                      <span>Last Week</span>
+                    </div>
+                  </label>
+                    <label>
+                    <input type="radio" name="conversion_livechat_analytics_date_filter" id="conversion_livechat_month" start_date_value="{{ LAST_MONTH_START_DATETIME|date:"Y-m-d" }}" end_date_value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" onclick="show_custom_date();">
+                    <div class=" filter-box">
+                      <span>Last Month</span>
+                    </div>
+                  </label>
+                    <label>
+                    <input type="radio" name="conversion_livechat_analytics_date_filter" id="conversion_livechat_three_month" start_date_value="{{ LAST3_MONTH_START_DATETIME|date:"Y-m-d" }}" end_date_value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" onclick="show_custom_date();">
+                    <div class=" filter-box">
+                      <span>Last 3 Month</span>
+                    </div>
+                  </label>
+                    <label>
+                    <input type="radio" name="conversion_livechat_analytics_date_filter" id="conversion_livechat_beg" start_date_value="{{ go_live_date|date:"Y-m-d" }}" end_date_value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" onclick="show_custom_date();">
+                    <div class=" filter-box">
+                      <span>From Beginning</span>
+                    </div>
+                  </label>
+                    <label>
+                    <input type="radio" name="conversion_livechat_analytics_date_filter" id="conversion_livechat_custom_date_btn" onclick="show_custom_date();">
+                    <div class=" filter-box" >
+                      <span>Custom Date</span>
+                    </div>
+                  </label>
+                </div>
+
+                <div class="col s10 analytics-custom-date-select-area" id="analytics-custom-date-select-area-livechat" style="display: none;">
+
+                    <div class="col s6" style="padding-left: 0px; font-weight: 600;color: #4d4d4d;
+                font-size: 14px;">
+                        Start Date
+                        <input type="date" class="message-default-start-date" id="conversion_livechat_custom_start_date" value="{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}">
+                    </div>
+                    <div class="col s6" style="font-weight: 600; padding-right: 0px !important;color: #4d4d4d;
+                font-size: 14px;">
+                        End Date
+                        <input type="date" class="message-default-end-date" id="conversion_livechat_custom_end_date" value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}">
+                    </div>
+                </div>
+                <div class="col s12 analytics-channel-select-area">
+                    <div class="filter-heading">
+                        Select Channel
+                    </div>
+                    {% for channel in channel_list %}
+                        <div class="channel-box">
+                            <input type="checkbox" class="livechat-analytics-channels {{ channel.name }}" id="livechat-analytics-{{ channel.name }}" value="{{ channel.name }}" name="flow_channel_checkbox">
+                            <label for="livechat-analytics-{{ channel.name }}">
+                                    {{ channel.icon|safe }}
+                                    <span>{{ channel.name }}</span>
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        </div>
+        <div class="modal-footer">
+
+            <a href="javascript:void(0)" class="modal-close btn filter-modal-footer-btn-cancel" onclick="clear_filter('livechat')">Clear filter</a>
+            <a href="javascript:void(0)" class="modal-close btn filter-modal-footer-btn" onclick="set_filter_flag_and_load_livechat_analytics()">Apply filter</a>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- Filter - Conversion Analytics -->
+<div id="div-intent-list-modal-container">
+    <div id="conversion-global-analytics-filter-modal" class="modal">
+        <div class="modal-content">
+            <div class="row" style="margin-bottom: 12px !important;">
+                <div class="modal-header">
+                    <div class="modal-heading-text-div">Filter - Conversion Analytics</div>
+                    <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                        <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z" fill="black" fill-opacity="0.54"/>
+                        </svg>
+
+                    </a>
+                </div>
+
+                <div class="modal-overflow-content-div">
+                <div class="col s12 analytics-filter-select-area">
+                    <div class="filter-heading">
+                        Select Date Range
+                    </div>
+                    <label>
+                    <input type="radio" name="conversion_global_analytics_date_filter" id="conversion_global_week" start_date_value="{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}" end_date_value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" checked onclick="show_custom_date();"/>
+                    <div class="filter-box">
+                      <span>Last Week</span>
+                    </div>
+                  </label>
+                    <label>
+                    <input type="radio" name="conversion_global_analytics_date_filter" id="conversion_global_month" start_date_value="{{ LAST_MONTH_START_DATETIME|date:"Y-m-d" }}" end_date_value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" onclick="show_custom_date();">
+                    <div class=" filter-box">
+                      <span>Last Month</span>
+                    </div>
+                  </label>
+                    <label>
+                    <input type="radio" name="conversion_global_analytics_date_filter" id="conversion_global_three_month" start_date_value="{{ LAST3_MONTH_START_DATETIME|date:"Y-m-d" }}" end_date_value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" onclick="show_custom_date();">
+                    <div class=" filter-box">
+                      <span>Last 3 Month</span>
+                    </div>
+                  </label>
+                    <label>
+                    <input type="radio" name="conversion_global_analytics_date_filter" id="conversion_global_beg" start_date_value="{{ go_live_date|date:"Y-m-d" }}" end_date_value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" onclick="show_custom_date();">
+                    <div class=" filter-box">
+                      <span>From Beginning</span>
+                    </div>
+                  </label>
+                    <label>
+                    <input type="radio" name="conversion_global_analytics_date_filter" id="conversion_global_custom_date_btn" onclick="show_custom_date();">
+                    <div class=" filter-box" >
+                      <span>Custom Date</span>
+                    </div>
+                  </label>
+
+
+
+                </div>
+
+                <div class="col s10 analytics-custom-date-select-area" id="analytics-custom-date-select-area-global" style="display: none;">
+
+                    <div class="col s6" style="padding-left: 0px; font-weight: 600;color: #4d4d4d;
+                font-size: 14px;">
+                        Start Date
+                        <input type="date" class="message-default-start-date" id="conversion_global_custom_start_date" value="{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}">
+                    </div>
+                    <div class="col s6" style="font-weight: 600; padding-right: 0px !important;color: #4d4d4d;
+                font-size: 14px;">
+                        End Date
+                        <input type="date" class="message-default-end-date" id="conversion_global_custom_end_date" value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}">
+                    </div>
+                </div>
+                <div class="col s12 analytics-channel-select-area">
+                    <div class="filter-heading">
+                        Select Channel
+                    </div>
+                    {% for channel in channel_list %}
+                        <div class="channel-box">
+                            <input type="checkbox" class="conversion-analytics-channels {{ channel.name }}" id="conversion-{{ channel.name }}" value="{{ channel.name }}" name="flow_channel_checkbox">
+                            <label for="conversion-{{ channel.name }}">
+                                    {{ channel.icon|safe }}
+                                    <span>{{ channel.name }}</span>
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        </div>
+        <div class="modal-footer">
+
+            <a href="javascript:void(0)" class="modal-close btn filter-modal-footer-btn-cancel" onclick="clear_filter('global')">Clear filter</a>
+            <a href="javascript:void(0)" class="modal-close btn filter-modal-footer-btn" onclick="apply_global_filter();">Apply filter</a>
+
+        </div>
+    </div>
+</div>
+
+<!-- Customer Dropoff Analytics filter -->
+<div id="easychat-dropoff-analytics-filter-modal" class="modal">
+    <div class="modal-content">
+        <div class="row" style="margin-bottom: 12px !important;">
+            <div class="modal-header">
+                <div class="modal-heading-text-div">Filter - Customer Dropoff Analytics</div>
+                <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                    <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z" fill="black" fill-opacity="0.54"/>
+                    </svg>
+                </a>
+            </div>
+
+            <div class="modal-overflow-content-div">
+                <div class="col s12 analytics-filter-select-area">
+                    <div class="filter-heading">
+                        Select Date Range
+                    </div>
+                    <label>
+                        <input type="radio" name="conversion_dropoff_analytics_date_filter" id="conversion_dropoff_intent_week" start_date_value="{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}" end_date_value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" checked onclick="show_custom_date();"/>
+                        <div class="filter-box">
+                        <span>Last Week</span>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="conversion_dropoff_analytics_date_filter" id="conversion_dropoff_intent_month" start_date_value="{{ LAST_MONTH_START_DATETIME|date:"Y-m-d" }}" end_date_value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" onclick="show_custom_date();">
+                        <div class=" filter-box">
+                        <span>Last Month</span>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="conversion_dropoff_analytics_date_filter" id="conversion_dropoff_intent_three_month" start_date_value="{{ LAST3_MONTH_START_DATETIME|date:"Y-m-d" }}" end_date_value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" onclick="show_custom_date();">
+                        <div class=" filter-box">
+                        <span>Last 3 Month</span>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="conversion_dropoff_analytics_date_filter" id="conversion_dropoff_intent_beg" start_date_value="{{ go_live_date|date:"Y-m-d" }}" end_date_value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}"  onclick="show_custom_date();">
+                        <div class=" filter-box">
+                        <span>From Beginning</span>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="conversion_dropoff_analytics_date_filter" id="conversion_dropoff_intent_custom_date_btn" onclick="show_custom_date();">
+                        <div class=" filter-box" >
+                        <span>Custom Date</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="col s10 analytics-custom-date-select-area" id="analytics-custom-date-select-area-dropoff" style="display: none;">
+
+                    <div class="col s6" style="padding-left: 0px; font-weight: 600;color: #4d4d4d; font-size: 14px;">
+                        Start Date
+                        <input type="date" class="message-default-start-date" id="conversion_dropoff_custom_start_date" value="{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}">
+                    </div>
+                    <div class="col s6" style="font-weight: 600; padding-right: 0px !important;color: #4d4d4d; font-size: 14px;">
+                        End Date
+                        <input type="date" class="message-default-end-date" id="conversion_dropoff_custom_end_date" value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}">
+                    </div>
+                </div>
+                <div class="col s12 analytics-channel-select-area">
+                    <div class="filter-heading">
+                        Select Channel
+                    </div>
+
+                    {% for channel in channel_list %}
+                        <div class="channel-box">
+                            <input type="checkbox" class="dropoff-analytics-channels {{ channel.name }}" id="dropoff-analytics-{{ channel.name }}" value="{{ channel.name }}" name="flow_channel_checkbox">
+                            <label for="dropoff-analytics-{{ channel.name }}">
+                                    {{ channel.icon|safe }}
+                                    <span>{{ channel.name }}</span>
+                            </label>
+                        </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+
+        <a href="javascript:void(0)" class="modal-close btn filter-modal-footer-btn-cancel" onclick="clear_filter('dropoff')">Clear filter</a>
+        <a href="javascript:void(0)" class="modal-close btn filter-modal-footer-btn" onclick="load_flow_dropoff_analytics()">Apply filter</a>
+
+    </div>
+</div>
+
+<!-- Export - Flow Completion Rate -->
+<div id="modal-email-for-export-flow-conversion-analytics" class="modal easychat-custom-modals-container">
+    <div class="modal-content">
+            <div class="row" style="margin-bottom: 12px !important;">
+                <div class="modal-header">
+                    <div class="modal-heading-text-div">Export - Flow Completion Rate</div>
+                    <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                        <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z"
+                                fill="black" fill-opacity="0.54" />
+                        </svg>
+      
+                    </a>
+                </div>
+                <div class="modal-overflow-content-div">
+                    <div class="col s12 analytics-custom-date-select-area">
+                        <div class="col s12" style="font-weight: 600; padding: 0px !important;color: #4d4d4d;font-size: 14px;">
+                            Email ID <span style="color: red;">*</span>
+                            <textarea id="export-data-email-flow-conversion-analytics" rows="3" onkeydown="resize_Textarea('export-data-email-flow-conversion-analytics')">{{ request.user.email }}</textarea>
+                            <p class="email-validation-error"></p>
+                            <p class="duplicate-email-error"></p>
+                            <span>
+                                <div class="analytics-email-note-export">Note: You will receive the data dump on the email address(es) provided.<br>To add multiple email addresses, follow the format example: example@xyz.com, example@abc.com</div>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+        <a href="javascript:void(0)" class="btn filter-modal-footer-btn" onclick="export_analytics_excel('flow_conversion_analytics',true)">Export</a>
+    </div>
+</div> 
+
+
+<!-- Export - Intent Analytics -->
+<div id="modal-email-for-export-intent-conversion-analytics" class="modal easychat-custom-modals-container">
+    <div class="modal-content">
+            <div class="row" style="margin-bottom: 12px !important;">
+                <div class="modal-header">
+                    <div class="modal-heading-text-div">Export - Intent Analytics</div>
+                    <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                        <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z"
+                                fill="black" fill-opacity="0.54" />
+                        </svg>
+      
+                    </a>
+                </div>
+                <div class="modal-overflow-content-div">
+                    <div class="col s12 analytics-custom-date-select-area">
+                        <div class="col s12" style="font-weight: 600; padding: 0px !important;color: #4d4d4d;font-size: 14px;">
+                            Email ID <span style="color: red;">*</span>
+                            <textarea id="export-data-email-intent-conversion-analytics" rows="3" onkeydown="resize_Textarea('export-data-email-intent-conversion-analytics')">{{ request.user.email }}</textarea>
+                            <p class="email-validation-error"></p>
+                            <p class="duplicate-email-error"></p>
+                            <span>
+                                <div class="analytics-email-note-export">Note: You will receive the data dump on the email address(es) provided.<br>To add multiple email addresses, follow the format example: example@xyz.com, example@abc.com</div>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+        <a href="javascript:void(0)" class="btn filter-modal-footer-btn" onclick="export_analytics_excel('intent_conversion_analytics',true)">Export</a>
+    </div>
+</div>
+
+
+<!-- Export - Live Chat Analytics -->
+<div id="modal-email-for-export-livechat-conversion-analytics" class="modal easychat-custom-modals-container">
+    <div class="modal-content">
+        <div class="row" style="margin-bottom: 12px !important;">
+            <div class="modal-header">
+                <div class="modal-heading-text-div">Export - Live Chat Analytics</div>
+                <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                    <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z"
+                            fill="black" fill-opacity="0.54" />
+                    </svg>
+  
+                </a>
+            </div>
+            <div class="modal-overflow-content-div">
+                <div class="col s12 analytics-custom-date-select-area">
+                    <div class="col s12" style="font-weight: 600; padding: 0px !important;color: #4d4d4d;font-size: 14px;">
+                        Email ID <span style="color: red;">*</span>
+                        <textarea id="export-data-email-livechat-conversion-analytics" rows="3" onkeydown="resize_Textarea('export-data-email-livechat-conversion-analytics')">{{ request.user.email }}</textarea>
+                        <p class="email-validation-error"></p>
+                        <p class="duplicate-email-error"></p>
+                        <span>
+                            <div class="analytics-email-note-export">Note: You will receive the data dump on the email address(es) provided.<br>To add multiple email addresses, follow the format example: example@xyz.com, example@abc.com</div>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+        <div class="modal-footer">
+        <a href="javascript:void(0)" class="btn filter-modal-footer-btn" onclick="export_analytics_excel('livechat_conversion_analytics',true)">Export</a>
+    </div>
+</div> 
+
+
+<!-- Export - Customer Dropoff Analytics -->
+<div id="modal-email-for-export-Customer-Dropoff-analytics" class="modal easychat-custom-modals-container">
+    <div class="modal-content">
+            <div class="row" style="margin-bottom: 12px !important;">
+                <div class="modal-header">
+                    <div class="modal-heading-text-div">Export - Customer Dropoff Analytics</div>
+                    <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                        <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z"
+                                fill="black" fill-opacity="0.54" />
+                        </svg>
+      
+                    </a>
+                </div>
+                <div class="modal-overflow-content-div">
+                    <div class="col s12 analytics-custom-date-select-area">
+                        <div class="col s12" style="font-weight: 600; padding: 0px !important;color: #4d4d4d;font-size: 14px;">
+                            Email ID <span style="color: red;">*</span>
+                            <textarea id="export-data-email-Customer-Dropoff-analytics" rows="3" onkeydown="resize_Textarea('export-data-email-Customer-Dropoff-analytics')">{{ request.user.email }}</textarea>
+                            <p class="email-validation-error"></p>
+                            <p class="duplicate-email-error"></p>
+                            <span>
+                                <div class="analytics-email-note-export">Note: You will receive the data dump on the email address(es) provided.<br>To add multiple email addresses, follow the format example: example@xyz.com, example@abc.com</div>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+        <a href="javascript:void(0)" class="btn filter-modal-footer-btn" onclick="export_analytics_excel('dropoff_conversion_analytics',true)">Export</a>
+    </div>
+</div> 
+
+<div id="conversion-node-analytics-modal" class="modal" tabindex="0" style="z-index: 1005;  top: 10%; transform: scaleX(1) scaleY(1);">
+    <div class="modal-content">
+        <div class="row" style="margin-bottom: 12px !important;">
+
+            <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z" fill="black" fill-opacity="0.54"></path>
+                    </svg>
+            </a>
+            <div class="node-analytics-wrapper-div"></div>
+            <a class="btn left white black-text conversion-node-analytics-download-excel-btn" style="right:190px!important; font-family: inherit;" onclick="download_user_specific_dropoff_intent_specific()"><svg width="12" height="12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10.5 7.5V9.5C10.5 9.76522 10.3946 10.0196 10.2071 10.2071C10.0196 10.3946 9.76522 10.5 9.5 10.5H2.5C2.23478 10.5 1.98043 10.3946 1.79289 10.2071C1.60536 10.0196 1.5 9.76522 1.5 9.5V7.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M3.5 5L6 7.5L8.5 5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M6 7.5V1.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg> &nbsp;
+                User Specific Dropoff</a>
+                
+            <a class="btn left white black-text conversion-node-analytics-download-excel-btn" style="margin-left:0.5em; font-family: inherit;" onclick="download_conversion_node_analytics()"><svg width="12" height="12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10.5 7.5V9.5C10.5 9.76522 10.3946 10.0196 10.2071 10.2071C10.0196 10.3946 9.76522 10.5 9.5 10.5H2.5C2.23478 10.5 1.98043 10.3946 1.79289 10.2071C1.60536 10.0196 1.5 9.76522 1.5 9.5V7.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <path d="M3.5 5L6 7.5L8.5 5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <path d="M6 7.5V1.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg> &nbsp;Download Excel</a>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="{% static 'EasyChatApp/js/html2pdf.bundle.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'EasyChatApp/js/apexcharts.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'EasyChatApp/js/html2canvas.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'EasyChatApp/js/jspdf.debug.js' %}"></script>
+<script type="text/javascript" src="{% static 'EasyChatApp/js/conversion_analytics.js' %}?v={% random_int 1 100 %}"></script>
+<script type="text/javascript" src="{% static 'EasyChatApp/js/apexcharts.js' %}"></script>
+<script type="text/javascript" src="{% static 'EasyChatApp/js/datatables.js' %}?v={% random_int 1 100 %}"></script>
+<script type="text/javascript" src="{% static 'EasyChatApp/js/d3.min.js' %}?v={% random_int 1 100 %}"></script>
+<script type="text/javascript" src="{% static 'EasyChatApp/js/d3plus.min.js' %}?v={% random_int 1 100 %}"></script>
+
+<script type="text/javascript">
+    window.user_email = '{{request.user.email}}'
+    window.NEED_TO_BUILD = "{{ selected_bot_obj.need_to_build }}";
+    window.default_start_date = "{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}"
+    window.default_end_date = "{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}"
+    var source_length = '{{ web_page_source_objs|length }}'
+
+    window.is_livechat_enabled = false;
+
+    {% if selected_bot_obj.is_livechat_enabled %}
+    window.is_livechat_enabled = true;
+    {% endif %}
+    
+    function show_custom_date() {
+        if (document.getElementById('conversion_flow_custom_date_btn').checked) {
+            document.getElementById("analytics-custom-date-select-area-flow").style.display = "block";
+        }
+        if (document.getElementById('conversion_intent_custom_date_btn').checked){
+            document.getElementById("analytics-custom-date-select-area-intent").style.display = "block";
+        }
+        if(document.getElementById('conversion_livechat_custom_date_btn').checked){
+            document.getElementById("analytics-custom-date-select-area-livechat").style.display = "block";
+        }
+        if(document.getElementById('conversion_global_custom_date_btn').checked){
+            document.getElementById("analytics-custom-date-select-area-global").style.display = "block";
+        }
+        if(!document.getElementById('conversion_flow_custom_date_btn').checked){
+            document.getElementById("analytics-custom-date-select-area-flow").style.display = "none";
+        }
+        if(!document.getElementById('conversion_intent_custom_date_btn').checked){
+            document.getElementById("analytics-custom-date-select-area-intent").style.display = "none";
+        }
+        if(!document.getElementById('conversion_livechat_custom_date_btn').checked){
+            document.getElementById("analytics-custom-date-select-area-livechat").style.display = "none";
+        }
+        if(!document.getElementById('conversion_global_custom_date_btn').checked){
+            document.getElementById("analytics-custom-date-select-area-global").style.display = "none";
+        }
+        if(document.getElementById('conversion_traffic_custom_date_btn').checked){
+            document.getElementById("analytics-custom-date-select-area-traffic").style.display = "block";
+        }
+        if(!document.getElementById('conversion_traffic_custom_date_btn').checked){
+            document.getElementById("analytics-custom-date-select-area-traffic").style.display = "none";
+        }
+
+        // NEW ENTRY Welcome banner
+        if (document.getElementById('conversion_welcome_custom_date_btn').checked) {
+            document.getElementById("analytics-custom-date-select-area-welcome").style.display = "block";
+        } 
+        if(!document.getElementById('conversion_welcome_custom_date_btn').checked){
+            document.getElementById("analytics-custom-date-select-area-welcome").style.display = "none";
+        }     
+
+        if (document.getElementById('conversion_dropoff_intent_custom_date_btn').checked) {
+            document.getElementById('analytics-custom-date-select-area-dropoff').style.display = "block";
+        }
+        if (!document.getElementById('conversion_dropoff_intent_custom_date_btn').checked) {
+            document.getElementById('analytics-custom-date-select-area-dropoff').style.display = "none";
+        }
+
+        if (document.getElementById('whatsapp_block_custom_date_btn').checked) {
+            document.getElementById('analytics-custom-date-select-area-whatsapp').style.display = "block";
+        }
+        if (!document.getElementById('whatsapp_block_custom_date_btn').checked) {
+            document.getElementById('analytics-custom-date-select-area-whatsapp').style.display = "none";
+        }
+        if (document.getElementById('catalogue_custom_date_btn').checked) {
+            document.getElementById('analytics-custom-date-select-area-catalogue').style.display = "block";
+        }
+        if (!document.getElementById('catalogue_custom_date_btn').checked) {
+            document.getElementById('analytics-custom-date-select-area-catalogue').style.display = "none";
+        }
+
+    }
+</script>
+
+<script>
+    var boxWidth = 200,
+        boxHeight = 175,
+        textMargin = 5;
+    // Setup zoom and pan
+    var zoom = d3.behavior.zoom()
+        .scaleExtent([.1, 1])
+        .on('zoom', function() {
+            $('svg').removeAttr("viewBox");
+            svg.attr("transform", "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")");
+        })
+        // Offset so that first pan and zoom does not jump back to the origin
+        .translate([150, 200]);
+
+    var svg = d3.select(".node-analytics-wrapper-div").append("svg")
+        // .attr('width', 1200)
+        // .attr('height', 600)
+        .attr("viewBox", "0 0 2100 700")
+        .call(zoom)
+        .append('g')
+        // Left padding of tree so that the whole root node is on the screen.
+        // TODO: find a better way
+        .attr("transform", "translate(150,240)");
+
+    var tree = d3.layout.tree()
+        // Using nodeSize we are able to control
+        // the separation between nodes. If we used
+        // the size parameter instead then d3 would
+        // calculate the separation dynamically to fill
+        // the available space.
+        .nodeSize([380, 320])
+        // By default, cousins are drawn further apart than siblings.
+        // By returning the same value in all cases, we draw cousins
+        // the same distance apart as siblings.
+        .separation(function() {
+            return .5;
+        })
+        // Tell d3 what the child nodes are. Remember, we're drawing
+        // a tree so the ancestors are child nodes.
+        .children(function(person) {
+            return person.children;
+        });
+
+    function render_flow_analytics_data(json, max_level){
+        var nodes = tree.nodes(json),
+            links = tree.links(nodes);
+
+        var link = svg.selectAll(".link")
+            .data(links)
+            .enter()
+            .append("g")
+            .attr("class", "link");
+
+        link.append("path")
+            .attr("fill", "none")
+            .attr("stroke", "#40B3E0")
+            .attr("stroke-width", "1.5px")
+            .attr("d", elbow);
+
+        link.append("text")
+
+        .attr("fill", "#2d2d2d")
+            .style("font", "normal 12px sans-serif")
+            .attr("transform", function(d) {
+                return "translate(" +
+                    ((d.source.y + d.target.y) / 2 + 12) + "," +
+                    ((d.target.x) / 1) + ")";
+            })
+            .attr("dy", "-0.20em")
+            .attr("text-anchor", "middle")
+
+        .text(function(d) {
+
+                return d.target.rule + '% of clicked';
+            });
+
+        // Style nodes    
+        var node = svg.selectAll("g.analytics-node-person")
+            .data(nodes)
+            .enter().append("g")
+            .attr("class", "analytics-node-person")
+            .attr("transform", function(d) {
+                return "translate(" + d.y + "," + d.x + ")";
+            });
+
+        // Draw the rectangle person boxes
+        node.append("rect")
+            .attr({
+                x: -(boxWidth / 2),
+                y: -(boxHeight / 2),
+                width: boxWidth,
+                height: boxHeight
+            })
+            .attr('rx', 8);
+        node.on("click", function(d) {
+
+            let all_nodes = document.querySelectorAll(".node-percentage-level-of-parent-text-div");
+
+            for (let i = 0; i < all_nodes.length; i++) {
+                all_nodes[i].style.display = "none";
+            }
+
+            while (d.parent) {
+                document.getElementById("level-"+d.tree_pk).style.display = "block";
+                d = d.parent;
+            }
+        });
+
+        node.append('foreignObject')
+            .attr('x', -100)
+            .attr('y', -87.5)
+            .attr('width', function() {
+                return (boxWidth)
+
+            })
+            .attr('height', function() {
+                return (boxHeight)
+            })
+            .append('xhtml').html(function(d) {
+                var drop_percent = (100 - d.click_percent - d.abort_percent);
+                var node_name = d.name
+                if(get_conversion_node_analytics_status_code == 200){
+                    node_name = d.multilingual_name
+                }
+                if(parseInt(d.size) == 0)
+                    drop_percent = 0;
+                var progress_div = '<div class="node-closing-intent-div">Closing Actions</div>';
+                if(d.children){
+                    progress_div = '<div class="progressbar-wrapper-div"><div class="progressbar dropped-progress"> <div class="clicked-progress" style="width: ' +
+                    (d.click_percent) + '%;"></div> <div class="abort-progress" style=" width: ' +
+                    (d.abort_percent) + '%;"></div></div>' +
+                    '<div class="progressbar-name-div"><p class="progressbar-clicked-text-div">' + d.click_percent + '% Clicked</p> <p class="progressbar-aborted-text-div">' + (d.abort_percent) + '% Aborted/ Terminated</p> <p class="progressbar-dropped-text-div">' + drop_percent + '% Dropped</p>  </div></div>'
+                }
+                return '<div style="width: ' +
+                    (boxWidth) + 'px; height: ' +
+                    (boxHeight) + 'px;" class="node-container">' +
+                    '<div class="node-level-status-div"><div></div><div>' + d.level + '</div><div>(' + d.behavior + ')</div></div>' +
+                    '<div class="node-full-detail-div"><div class="node-name-div">' + node_name + '</div>' +
+                    '<div class="node-actions-div">' + d.size + ' Actions</div>' + progress_div +
+                    '<div class="node-percentage-level-of-parent-text-div"  id="level-' + d.tree_pk + '">' + d.percentage_of_parent + '% of Level 1</div>' +
+                    '</div></div>';
+            })
+        }
+    /**
+     * Custom path function that creates straight connecting lines.
+     */
+    function elbow(d) {
+        return "M" + d.source.y + "," + d.source.x +
+            "H" + (d.source.y + (d.target.y - d.source.y) / 2) +
+            "V" + d.target.x +
+            "H" + d.target.y;
+    }
+  <!-- language drop box js start-->
+
+
+</script>
+<!-- language drop box js end-->
+
+</script>
+
+<script>
+    let ad_block_element = document.createElement("div");
+    ad_block_element.className = "textads banner-ads banner_ads ad-unit ad-zone ad-space adsbox"
+      
+    ad_block_element.style.height = "1px"
+    
+    document.body.appendChild(ad_block_element)
+    
+    let x_width = ad_block_element.offsetHeight;    
+    var element = document.getElementById("warning-msg");
+      
+    if(x_width==0){
+      element.style.display = "";   
+      $('#warning-msg').delay(7000).fadeOut(3000);
+    } 
+</script>
+<!-- For tippy tooltip used in WhatsApp Catalogue Analytics -->
+<script src="{% static 'EasyChatApp/js/popper.min.js' %}"></script>
+<script src="{% static 'EasyChatApp/js/tippy-bundle-umd.min.js' %}"></script>
+
+{% endblock %}

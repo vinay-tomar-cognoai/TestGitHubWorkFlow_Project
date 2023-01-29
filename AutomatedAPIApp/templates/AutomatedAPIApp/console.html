@@ -1,0 +1,132 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" type="image/x-icon" href="/static/AutomatedAPIApp/img/favicon.svg">
+    <title id="cogno_desk_title">Automation Testing Console | Home</title>
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <!-- Custom fonts for this template-->
+    <link href="{% static 'AutomatedAPIApp/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="{% static 'AutomatedAPIApp/css/bootstrap-select.css' %}" />
+    <!-- Custom styles for this template-->
+    <link href="{% static 'AutomatedAPIApp/css/sb-admin-2.min.css' %}" rel="stylesheet">
+    <link href="{% static 'AutomatedAPIApp/vendor/datatables/dataTables.bootstrap4.min.css' %}" rel="stylesheet">
+    <script src="{% static 'AutomatedAPIApp/vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'AutomatedAPIApp/vendor/chart.js/Chart.min.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'AutomatedAPIApp/css/bootstrap-datepicker.min.css' %}">
+    <script type="text/javascript" src="{% static 'AutomatedAPIApp/js/bootstrap-datepicker.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'AutomatedAPIApp/js/bootstrap-multiselect.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'AutomatedAPIApp/css/bootstrap-multiselect.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'AutomatedAPIApp/css/console.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'AutomatedAPIApp/css/automated_api_changes.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'AutomatedAPIApp/css/automated_api_responsive.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'AutomatedAPIApp/css/automated-api-custom-select.css' %}">
+
+</head>
+
+<body id="page-top">
+    {% csrf_token %}
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar" style="z-index: 0;">
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/" style="height:3.75rem !important;">
+                <div class="sidebar-brand-icon rotate-n-15"></div>
+
+                <img id="cognoDeskLarge" src="/static/AutomatedAPIApp/img/favicon.svg" alt="CognoDesk" max-width = "90px" height = "50px"/>
+            </a>
+            <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3" amino-styles="margin: 5px 0 10px 0 !important;" style="min-height: 42px!important;">
+                <i class="fa fa-bars"></i>
+            </button>
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+            <!-- Nav Item - Dashboard -->
+            {% if function_name_list %}
+                {% for function_name in function_name_list %}
+                    {% if api_pk == function_name.pk %}
+                    <li class="nav-item active nav-item-menu">
+                    {% else %}
+                    <li class="nav-item nav-item-menu">
+                    {% endif %}
+                        <a class="nav-link tooltip-navbar" href="javascript:void(0)" onclick="redirect_to_workspace('{{function_name.pk}}')">
+                            <span>{{function_name.index}}. {{automated_api_integration_obj.tree.name}}</span>
+                        </a>
+                    </li>
+                {% endfor %}
+            {% endif %}
+
+            {% if api_pk == -1 %}
+            <li class="nav-item active nav-item-menu">
+            {% else %}
+            <li class="nav-item nav-item-menu">
+            {% endif %}
+                <a class="nav-link tooltip-navbar" href="javascript:void(0)" onclick="redirect_to_workspace(-1)">
+                    <span>Create New</span>
+                </a>
+            </li>
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+        </ul>
+        <!-- End of Sidebar -->
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+            <!-- Main Content -->
+            <div id="content">
+                <!-- End of Topbar -->
+                {% block content %}
+                {% endblock %}
+            </div>
+            <!-- End of Main Content -->
+            <!-- Footer -->
+            
+            {% if developer_config_obj.enable_footer_over_entire_console %}
+            <footer id="cognodesk-footer" class="sticky-footer bg-white">
+                <div class="container my-auto" style="display: inline-table;">
+                    <div class="copyright text-center my-auto">
+                        <span>Copyright &copy; AllinCall Research and Solutions Pvt Ltd.&nbsp;&nbsp;
+                            <!-- <i class="fas fa-info-circle" onclick="show_cobrowsing_feedback_module(this)" style="cursor:pointer;"></i> -->
+                        </span>
+                    </div>
+                </div>
+            </footer>
+            {% endif %}
+            <!-- End of Footer -->
+        </div>
+        <!-- End of Content Wrapper -->
+    </div>
+    <!-- End of Page Wrapper -->
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <div id="automated-api-snackbar"></div>
+
+    <script src="{% static 'AutomatedAPIApp/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'AutomatedAPIApp/js/bootstrap-select.min.js' %}"></script>
+    <script src="{% static 'AutomatedAPIApp/vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+    <!-- Custom scripts for all pages-->
+    <script src="{% static 'AutomatedAPIApp/js/sb-admin-2.min.js' %}"></script>
+    <script src="{% static 'AutomatedAPIApp/js/crypto-js.min.js' %}"></script>
+    <script src="{% static 'AutomatedAPIApp/js/encrypt.js' %}"></script>
+    <script src="{% static 'AutomatedAPIApp/js/app.js' %}"></script>
+    <script type="text/javascript" src="{% static 'AutomatedAPIApp/js/automated-api-custom-select.js' %}"></script>
+    <script type="text/javascript" src="{% static 'AutomatedAPIApp/js/jquery.json-editor.min.js' %}"></script>
+</body>
+
+<script type="text/javascript">
+    function redirect_to_workspace(api_pk){
+        var url_vars = get_url_multiple_vars();
+        url_vars["api_pk"] = [api_pk];
+        var new_url = get_updated_url_with_filters(url_vars);
+        window.location.href = new_url;
+    }
+</script>
+</html>

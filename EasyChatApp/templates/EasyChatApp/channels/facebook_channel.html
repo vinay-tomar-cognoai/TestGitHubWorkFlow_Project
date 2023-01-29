@@ -1,0 +1,203 @@
+{% extends 'EasyChatApp/console.html' %}
+{% block consolecontent %}
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/changes_placement.css' %}?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/common_integrated_channel.css' %}?v={% random_int 1 100 %}">    
+<div style="padding: 1em;">
+
+  <div class="row">
+    {% include "EasyChatApp/channels/channel_components/channel_integration_document_button.html" with channel_doc_download_link="https://drive.google.com/uc?export=download&id=1Eyar_SmOe-rxBym2_SQQJm-CMBJ_hyAe" channel_name="Facebook" %}
+  </div>
+
+      {% include "EasyChatApp/channels/channel_components/language_dropdown_go_back.html" %}
+
+      <div class="row">
+        {% include "EasyChatApp/channels/channel_components/custom_message.html" with area="facebook-textarea" %}
+
+        <div class="col s12">
+
+          <div class="row">
+            {% if selected_language == "en" %}
+            {% include "EasyChatApp/channels/channel_components/language_specific.html" %}
+            <ul class="collapsible">
+              <li>
+                <div class="collapsible-header">Initial Questions</div>
+                <div class="collapsible-body">
+                  <div class="row" id="channel-initial-messages">
+                    *Search and select from existing Intent List
+
+                    <div class="input-field col s12">
+                      <select multiple id="multiple-select-facebook-initial-message-list">
+                        {% for intent_name in intent_name_list %}
+                            {% if intent_name.is_selected %}
+                              <option value="{{ intent_name.intent_pk }}" selected>{{ intent_name.intent_name }}</option>
+                            {% else %}
+                              <option value="{{ intent_name.intent_pk }}">{{ intent_name.intent_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+            <ul class="collapsible">
+              <li>
+                <div class="collapsible-header">Failure Recommendations</div>
+                <div class="collapsible-body">
+                  <div class="row" id="channel-initial-messages">
+                    *Search and select from existing Intent List
+
+                    <div class="input-field col s12">
+                      <select multiple id="multiple-select-facebook-failure-message-list">
+                        {% for intent_name in intent_name_list_failure %}
+                            {% if intent_name.is_selected %}
+                              <option value="{{ intent_name.intent_pk }}" selected>{{ intent_name.intent_name }}</option>
+                            {% else %}
+                              <option value="{{ intent_name.intent_pk }}">{{ intent_name.intent_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+            <ul class="collapsible">
+              <li>
+                <div class="collapsible-header">Facebook Configurations</div>
+                <div class="collapsible-body">
+                  <div class="row" id="channel-initial-messages">
+                    <div class="input-field col s12">
+                      {% if verification_code %}
+                      <input type="text" id="facebook_verification_code" value="{{verification_code}}">
+                      <label for="facebook_verification_code">Verification Code*</label>
+                      {% else %}
+                      <input type="text" id="facebook_verification_code" value="">
+                      <label for="facebook_verification_code">Verification Code*</label>
+                      {% endif %}
+                    </div>
+                    <div class="input-field col s12">
+                      {% if page_access_token %}
+                      <input type="text" id="facebook_page_access_token" value="{{page_access_token}}">
+                      <label for="facebook_page_access_token">Page Access Token*</label>
+                      {% else %}
+                      <input type="text" id="facebook_page_access_token" value="">
+                      <label for="facebook_page_access_token">Page Access Token*</label>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+            <ul class="collapsible">
+                <li>
+                  <div class="collapsible-header">Deploy links</div>
+                  <div class="collapsible-body">
+                    <div class="row" id="facebook-deploy">
+                      <div class="input-field col s12">
+                        <input type="text" value='https://{{ request.META.HTTP_HOST }}/chat/webhook/facebook/?id={{selected_bot_obj.pk}}' id="facebook-deploy-link" readonly style="width:96%;border: 0.1em solid black;padding:1em;font-family: Consolas, monaco, monospace;word-wrap: break-word;background-color:white;">
+                      <button onclick="copyToClipboard('facebook-deploy-link', this)">Copy Script</button>
+                      <br>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+          <!-- </div>
+          
+        </div>      -->   
+  <ul class="collapsible">
+    <li>
+      <div class="collapsible-header">Other Settings</div>
+      <div class="collapsible-body">
+        <div class="col s12">
+          <div class="row">
+            <div class="col s8">
+              <table>
+                  <tr>
+                    <td>
+                      <p>Add image in welcome response</p>
+                      <a class="waves-effect waves-light btn modal-trigger easychat-button" href="#modal-upload-image">Upload From Device</a>
+                    </td>
+                    <td>
+                      <img src="" id="uploaded-bot-welcome-image" style="max-height:10em;">
+                      <a id="remove-bot-welcome-image" style="display: none;"><i class="material-icons red-text text-darken-3">delete</i></a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>Add video in welcome response
+                        <sup>
+                          <i class="material-icons inline-icon tooltipped" data-position="top" data-tooltip=" URL/Links added must consist of HTTP/HTTPS, Eg. https://www.google.com">help</i>
+                        </sup> 
+                      </p>
+                    </td>
+                    <td>
+                      <input type="text" name="upload-bot-welcome-video-url" id="upload-bot-welcome-video-url" placeholder="Copy video url here" class="white" style="padding:0em 1em 0em 1em;width:20em;border-radius:0.5em;">
+                    </td>
+                  </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      <div class="row">
+      </div>
+      </div>
+    </li>
+  </ul>
+  {% endif %}
+  <div class="progress" id="easychat_facebook_channel_preloader" style="display: none;">
+    <div class="indeterminate"></div>
+</div>
+{% if selected_language == "en" %}
+  <a class="btn green lighten-2 " style="background-color: #82C784; margin-left: 0.2em"id="save-facebook-channel">Save</a>
+  {% else %}
+  <a class="btn green lighten-2" style="background-color: #82C784; margin-left: 0.2em;" id="save-facebook-channel-for-non-primary-language">Save</a>
+{% endif %}   
+</div>
+
+    </div>
+
+  <div id="modal-upload-image" class="modal">
+    <div class="modal-content">
+      <h5>Choose Image</h5>
+      <div class="file-field input-field col s10">
+        <div class="btn-small easychat-button">
+          <span>Choose image</span>
+          <input id="input_upload_image_bot_welcome_message" type="file">
+        </div>
+        <div class="file-path-wrapper">
+          <input id="input_upload_image_bot_welcome_message2" class="file-path validate" type="text">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a class="modal-close btn easychat-button" id="upload-bot-welcome-image">Upload</a>
+    </div>
+  </div>
+
+
+<script type="text/javascript">
+
+  $(".facebook-textarea").trumbowyg({
+                    tagsToKeep: [],
+                    allowTagsFromPaste: {
+                        allowedTags: ['h4', 'p', 'br']
+                    },
+                    minimalLinks: true,
+                    btns: [
+                        // ['viewHTML'],
+                        ['strong', 'em'], 
+                        ['emoji'],
+                        ['link'],
+                        ['unorderedList', 'orderedList'],
+                        ['underline'],
+                        ['justifyLeft'], ['justifyCenter'], ['justifyRight'], ['justifyFull'],
+                    ],
+  })
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QA Testing Query API</title>
+</head>
+<body>
+
+    <pre>QA Testing Query API</pre>
+
+    <hr>
+
+    <pre>
+
+- Add following code into EasyChatApp/views.py
+
+
+class QAAutomationTestingToolQueryAPI(APIView):
+
+    authentication_classes = (
+        CsrfExemptSessionAuthentication, BasicAuthentication)
+
+    def post(self, request, *args, **kwargs):
+        response = {}
+        try:
+            logger.info("Into QAAutomationToolQueryAPI...", extra={
+                        'AppName': 'EasyChat', 'user_id': 'None', 'source': 'None', 'channel': 'None', 'bot_id': 'None'})
+
+            data = request.data
+
+            src = "en"
+            if "src" in data:
+                src = data["src"]
+
+            user_id = data['user_id']
+            user_id = remo_html_from_string(user_id)
+            message = data['message']
+            message = remo_html_from_string(message)
+            bot_id = data['bot_id']
+            bot_id = remo_html_from_string(str(bot_id))
+
+            original_message = message
+
+            channel = data['channel']
+            channel = remo_html_from_string(channel)
+            channel_params = data['channel_params']
+            channel_params = remo_html_from_string(channel_params)
+            bot_name = "uat"
+
+            response = execute_query(
+                user_id, bot_id, bot_name, message, src, channel, channel_params)
+
+            logger.info("Exit from QAAutomationTestingToolQueryAPI : %s", json.dumps(response), extra={'AppName': 'EasyChat', 'user_id': str(
+                user_id), 'source': str(src), 'channel': str(channel), 'bot_id': str(bot_id)})
+
+        except Exception as e:  # noqa: F841
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            logger.error("[ENGINE] %s at %s", str(e), str(exc_tb.tb_lineno), extra={'AppName': 'EasyChat', 'user_id': str(
+                user_id), 'source': str(src), 'channel': str(channel), 'bot_id': str(bot_id)})
+            response = build_error_response(
+                "We are facing some issues. Please try again later.")
+            response["status_code"] = 500
+
+        return Response(data=response)
+
+
+QAAutomationTestingToolQuery = QAAutomationTestingToolQueryAPI.as_view()
+        
+    </pre>
+
+    <hr>
+
+    <pre>
+- Add following code into EasyChatApp/urls.py
+
+urlpatterns = [
+    ...
+    url(r'^webhook/automation/query/$', views.QAAutomationTestingToolQuery),        
+    ...
+]
+    </pre>
+
+    <hr>
+    <pre>@copyrights AllinCall Research and Solutions PVT LTD.</pre>
+</body>
+</html>

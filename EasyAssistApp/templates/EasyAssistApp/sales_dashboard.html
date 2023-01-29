@@ -1,0 +1,1459 @@
+{% extends 'EasyAssistApp/console.html' %}
+{% load easyassist_custom_filters %}
+
+{% block content %}
+{% load static %}
+
+<style>
+
+.disable-select {
+  user-select: none;
+  -webkit-user-select: none; 
+  -khtml-user-select: none;
+  -moz-user-select: none; 
+  -ms-user-select: none; 
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+#active_users_table .dataTables_filter {
+  display: none;
+}
+
+#cobrowse-active-lead-table {
+  border-spacing: 0 1em;
+}
+
+#cobrowse-active-lead-table  tbody tr.tr-hover:hover {
+  box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.25);
+}
+
+#cobrowse-active-lead-table tbody tr:hover td :last-child{
+  visibility: visible;
+}
+
+#close_session_modal .modal-content {
+  width: 450px;
+}
+
+@media(max-width: 500px) {
+  #close_session_modal .modal-content {
+    width: auto;
+  }
+}
+#close_session_modal .close-session-remarks-text {
+  min-height: 71px!important;
+  font-size: 14px;
+  resize: none;
+}
+
+#close_session_modal .modal-header, #request_for_inbound_cobrowsing_modal .modal-header {
+  font-size: 14px;
+  padding-top: 8px;
+  padding-left: 20px;
+  padding-right: 0px;
+  padding-bottom: 0px;
+}
+
+#close_session_modal .modal-footer, #request_for_inbound_cobrowsing_modal .modal-footer {
+  padding: 16px;
+}
+
+#close_session_modal .modal-body, #request_for_inbound_cobrowsing_modal .modal-body {
+  padding-bottom: 0px !important;
+  font-size: 14px;
+  letter-spacing: 0px !important;
+}
+
+#close_session_modal .btn-primary, #request_for_inbound_cobrowsing_modal .btn-primary {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #0254D7;
+  border-radius: 25px!important;
+  border-color: #0254D7;
+  letter-spacing: -0.02em;
+  color: #fff !important;
+  min-width: 113px;
+  height: 33px;
+  font-size: 14px!important;
+  font-style: normal;
+  font-weight: 500;
+  outline: none!important;
+  box-shadow: none!important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+}
+
+#close_session_modal .btn-secondary, #request_for_inbound_cobrowsing_modal .btn-secondary {
+  color: #0254D7;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: -0.02em;
+  background: #FFFFFF;
+  outline: none!important;
+  box-shadow: none!important;
+  padding: .375rem .75rem !important;
+  vertical-align: text-top;
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+}
+
+#archive_lead_modal .modal-content {
+  width: 450px;
+}
+
+@media(max-width: 500px) {
+  #archive_lead_modal .modal-content {
+    width: auto;
+  }
+}
+#archive_lead_modal .modal-header {
+  font-size: 14px;
+  padding-top: 8px;
+  padding-left: 20px;
+  padding-right: 0px;
+  padding-bottom: 0px;
+}
+
+#archive_lead_modal .modal-footer {
+  padding: 16px;
+}
+
+#archive_lead_modal .modal-body {
+  padding-bottom: 0px !important;
+  font-size: 14px;
+  letter-spacing: 0px !important;
+}
+
+#archive_lead_modal .btn-primary {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #0254D7;
+  border-radius: 25px!important;
+  border-color: #0254D7;
+  letter-spacing: -0.02em;
+  color: #fff !important;
+  min-width: 113px;
+  height: 33px;
+  font-size: 14px!important;
+  font-style: normal;
+  font-weight: 500;
+  outline: none!important;
+  box-shadow: none!important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+}
+
+#archive_lead_modal .btn-secondary {
+  background: #FFFFFF!important;
+  border: none!important;
+  font-family: Silka;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 16px;
+  text-align: center;
+  box-shadow: none!important;
+  color: #0254D7;
+}
+
+.archive-lead-remarks-text {
+  min-height: 71px!important;
+  border: 1px solid #E6E6E6;
+  box-sizing: border-box;
+  border-radius: 10px;
+  font-family: Silka;
+  font-style: normal;
+  font-size: 13px;
+  line-height: 16px;
+  padding: 1em;
+  outline: none!important;
+  box-shadow: none!important;
+  /*color: #4D4D4D;*/
+  resize: none;
+}
+
+#archive_lead_modal label {
+  font-family: Silka;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 16px;
+  color: #4D4D4D;
+  margin-bottom: 0!important;
+}
+
+#archive_lead_modal_label {
+  font-family: Silka;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 22px;
+  display: flex;
+  align-items: center;
+  color: #4D4D4D;
+}
+
+#request_for_inbound_cobrowsing_modal .modal-header .btn-secondary{
+  background: #F8F8F8 !important;
+  min-width: 113px;
+  height: 38px !important;
+  padding: 0px !important;
+  border: none !important;
+}
+
+#request_for_inbound_cobrowsing_modal .modal-header .btn-primary{
+  height: 38px !important;
+}
+#request_for_inbound_cobrowsing_modal .modal-header .btn-secondary:hover{
+  background: #F8F8F8 !important;
+  color: #858796 !important
+}
+
+#request_for_inbound_cobrowsing_modal .table.easy-assist-table {
+  display: inline-table!important;
+}
+
+@media only screen and (min-width: 475px) {
+  #request_for_inbound_cobrowsing_modal .modal-content {
+    width: 450px;
+    margin: auto;
+  }
+}
+
+.toggle-header {
+  font-weight: 400!important;
+  margin: 5px!important;
+  opacity: 1!important;
+  color: #0254D7!important;
+  border: unset!important;
+  background-color: unset!important;
+}
+
+#predefined-remarks-buttons-list,
+#predefined-sub-remarks-buttons-list {
+  padding: 0px;
+  margin-bottom: 15px !important;
+  overflow-y: auto;
+  white-space: nowrap;
+}
+
+.predefined-remarks-list-item {
+  display: inline-block;
+  padding: 8px 12px 8px 0px;
+  margin-bottom: 15px;
+}
+
+.predefined-remarks-button {
+  border-radius: 100px;
+  font: normal 14px "Silka", Sans-Serif;
+  line-height: 14px;
+  box-shadow: none !important;
+  color:  #0254D7 !important;
+  background: rgba(2, 84, 215, 0.07);
+  height: 30px;
+}
+.predefined-remarks-button:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  transition: none !important;
+}
+
+.predefined-remarks-button-clicked {
+  background-color: #0254D7 !important;
+  color: #fff !important;
+}
+
+{% if access_token_obj.cobrowsing_console_theme_color != None %}
+
+.copy-link{
+  color:  var(--color_rgb) !important;
+}
+.predefined-remarks-button {
+  color:  var(--color_rgb) !important;
+  background-color: var(--color_rgba_8) !important;
+  height: 30px;
+}
+
+.predefined-remarks-button-clicked {
+  background-color: var(--color_rgb) !important;
+  color: #fff !important;
+}
+
+.transfer-lead-radio:checked {
+  background: url("data:image/svg+xml,%3Csvg width='20' height='21' viewBox='0 0 20 21' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M10 0.5C4.48 0.5 0 4.98 0 10.5C0 16.02 4.48 20.5 10 20.5C15.52 20.5 20 16.02 20 10.5C20 4.98 15.52 0.5 10 0.5ZM10 18.5C5.58 18.5 2 14.92 2 10.5C2 6.08 5.58 2.5 10 2.5C14.42 2.5 18 6.08 18 10.5C18 14.92 14.42 18.5 10 18.5ZM5 10.5C5 7.73858 7.23858 5.5 10 5.5C12.7614 5.5 15 7.73858 15 10.5C15 13.2614 12.7614 15.5 10 15.5C7.23858 15.5 5 13.2614 5 10.5Z' fill='%23{{ access_token_obj.get_cobrowsing_console_theme_color.hex|slice:'1:' }}'/%3E%3C/svg%3E%0A");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.toggle-header{
+  color:  var(--color_rgb) !important;
+}
+{% endif %}
+
+.predefined-remarks-list-item:last-child{
+  padding-right: 0px;
+}
+
+#predefined-remarks-buttons-list::-webkit-scrollbar {
+  width: 8px;
+  height: 5px;
+}
+
+#predefined-remarks-buttons-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#predefined-remarks-buttons-list::-webkit-scrollbar-thumb {
+  background: #c1c2c9;
+  border-radius: 10px;
+}
+
+#archive-lead-remarks-buttons-list,
+#archive-lead-sub-remarks-buttons-list {
+  padding: 0px;
+  margin-bottom: 15px !important;
+  overflow-y: auto;
+  white-space: nowrap;
+}
+
+#archive-lead-remarks-buttons-list::-webkit-scrollbar,
+#archive-lead-sub-remarks-buttons-list::-webkit-scrollbar, {
+  width: 8px;
+  height: 5px;
+}
+
+#archive-lead-remarks-buttons-list::-webkit-scrollbar-track,
+#archive-lead-sub-remarks-buttons-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#archive-lead-remarks-buttons-list::-webkit-scrollbar-thumb,
+#archive-lead-sub-remarks-buttons-list::-webkit-scrollbar-thumb {
+  background: #c1c2c9;
+  border-radius: 10px;
+}
+
+.close-session-error {
+  display: none;
+  color: #FC0505;
+  font-size: 12px;
+  font-style: normal;
+  font-family: 'Silka', Sans-Serif !important;
+  margin-top: 0.5em;
+}
+
+.tooltip { 
+  top: 0; 
+}
+
+@media only screen and (max-width: 350px){
+  #request_for_inbound_cobrowsing_modal .btn-primary {
+    font-size: 12px !important;
+  }
+
+  #request_for_inbound_cobrowsing_modal .table.easy-assist-table {
+    display: block !important;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  *[id^='select-assign-agent-'] {
+    width: 100%!important;
+  }
+}
+
+{% if access_token_obj.allow_video_meeting_only or access_token_obj.allow_cobrowsing_meeting == False %} 
+#request_for_inbound_cobrowsing_modal .modal-header .btn-primary {
+  transform: none !important;
+  cursor: default;
+}
+{% if access_token_obj.cobrowsing_console_theme_color == None %}
+  #request_for_inbound_cobrowsing_modal .modal-header .btn-primary:hover {
+    background-color: #3662C5 !important; 
+  }
+{% else %}
+  #request_for_inbound_cobrowsing_modal .modal-header .btn-primary:hover {
+    background-color: var(--color_rgb) !important;
+  }
+{% endif %}
+{% endif %}
+
+.tooltip-custom {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted #ccc;
+    /*color: #006080;*/
+}
+
+.tooltip-custom .tooltiptext-custom {
+    visibility: hidden;
+    position: absolute;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.3s;
+    padding: 5px;
+}
+
+.tooltip-right-custom {
+    top: -5px;
+    left: 125%;
+}
+
+.tooltip-top-custom {
+    bottom: 90%;
+    left: 50%;
+    transform: translate(-50%, 0%);
+}
+
+.tooltip-top-custom::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+.tooltip-custom:hover .tooltiptext-custom {
+    visibility: visible;
+    opacity: 1;
+}
+
+.suggestion-id-div {
+    position: absolute;
+    top: 60px;
+    background: #FFFFFE;
+    border: 1px solid #B1B1B1;
+    box-sizing: border-box;
+    border-radius: 5px;
+    min-width: 190px;
+    width: 90%;
+    z-index: 100;
+}
+
+.suggestion-id-div a {
+    display: block;
+    text-decoration: none;
+    cursor: pointer;
+    color: #2d2d2d !important;
+    padding-bottom: 4px;
+    overflow: hidden;
+    width: 100%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 6px;
+}
+
+.suggestion-id-div a:hover {
+  background: #204DAF;
+  color: white;
+  opacity: 0.8;
+}
+
+@media only screen and (max-width: 760px) {
+    .suggestion-id-div {
+        top: 90px;
+        width: 96%;
+    }
+    .tooltip-top-custom {
+        bottom: 65%;
+    }
+}
+
+#transfer_lead_by_supervisor_modal span,
+#transfer_lead_by_supervisor_modal p {
+  font-family: Silka;
+  font-style: normal;
+  font-size: 14px;
+
+  color: #4D4D4D;
+}
+
+.table-responsive #cobrowse-active-lead-table_wrapper .row:nth-of-type(2){
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 8px !important;
+}
+
+@media screen and (max-width: 864px) and (min-width: 769px) { 
+    .generate-drop-link-btn {
+      margin-bottom: 5px;
+    }
+
+}
+
+.btn-danger.btn-icon-split {
+  display: inline-flex!important;
+}
+</style>
+
+<!-- Begin Page Content -->
+<div class="container-fluid">
+  <!-- Page Heading -->
+  <!-- DataTales Example -->
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <div class="row">
+            <div class="col-sm-4">
+              <h6 class="m-0 font-weight-bold text-primary heading-text-primary">Customers Requiring Support
+                <span data-toggle="tooltip" data-placement="top" title="" data-original-title="Customers who have requested for assistance and are live."><i class="fas fa-info-circle"></i></span>
+              </h6>
+            </div>
+            <div class="col-sm-8">
+              {% if cobrowse_agent.role == "agent" %}
+                {% if access_token_obj.allow_connect_with_drop_link == True and access_token_obj.allow_video_meeting_only == False and access_token_obj.enable_inbound %}
+                  <button class="btn btn-info float-right btn-width-100 ml-sm-10 generate-drop-link-btn mb-1" data-toggle="modal" data-target="#generate_drop_link_modal">Generate Drop Link</button>
+                {% endif %}
+
+                {% if access_token_obj.lead_generation == True %}
+                <button class="btn btn-info float-right btn-width-100 ml-2 mb-1" data-toggle="modal" data-target="#search_lead_modal">Search Lead</button>
+                {% endif %}
+                
+                {% if access_token_obj.get_proxy_config_obj.enable_proxy_cobrowsing %}
+                  <button class="btn btn-info float-right btn-width-100" data-toggle="modal" data-target="#start-proxy-cobrowse-session">Generate Co-browsing Link</button>
+                {% endif %}
+              {% endif %}
+
+              {% if cobrowse_agent.role == "supervisor" %}
+                <button class="btn btn-info float-right btn-width-100 ml-sm-10 transfer-lead-btn disabled" id="supervisor-transfer-lead-btn">Transfer Lead</button>
+              {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="card-body" style="padding-top:0px;">
+      <div class="table-responsive avtive-customer-table" id="active_users_table">
+        <table class="table table-bordered" id="cobrowse-active-lead-table" style="width: 100%;">
+          <thead>
+            <tr>
+              {% if cobrowse_agent.role == "supervisor" %}
+              <th scope="col"></th>
+              {% endif %}
+
+              <th scope="col">Customer Details</th>
+              <th scope="col">Product</th>
+              {% if access_token_obj.allow_agent_to_customer_cobrowsing == False %}
+                {% if access_token_obj.choose_product_category or access_token_obj.enable_tag_based_assignment_for_outbound %}
+                  <th scope="col">Category</th>
+                {% endif %}
+              
+                {% if access_token_obj.allow_language_support %}
+                  <th scope="col">Language</th>
+                {% endif %}
+              {% endif %}
+
+              <th scope="col">Request Date & Time</th>
+              
+              {% if cobrowse_agent.role != "agent" %}
+                <th scope="col">Start Date & Time</th>
+              {% endif %}
+              <th scope="col">Status</th>
+              <th scope="col">Time Duration</th>
+              {% if access_token_obj.enable_auto_assign_unattended_lead %}
+                <th scope="col">Auto-assign Time</th>
+                
+              {% endif %}
+              
+              {% if access_token_obj.enable_lead_status %}
+                <th scope="col" id="lead-status-col">Lead Status</th>
+              {% endif %}
+
+              {% if access_token_obj.enable_session_transfer_in_cobrowsing %}
+                  <th scope="col" id="transfer-expiry-col">Transfer Expiry Time</th>
+              {% endif %}
+              
+              {% if access_token_obj.enable_auto_assign_unattended_lead %}
+                <th scope="col" class="text-center unattended-lead-transfer-count-header">Assigned Agents</th>
+              {% endif %}
+              {% if cobrowse_agent.role != "agent" %}
+                <th scope="col">Agent</th>
+              {% endif %}
+              {% if cobrowse_agent.role == "admin_ally" %}
+                <th scope="col">Supervisors</th>
+              {% endif %}
+              {% if cobrowse_agent.role == "admin" %}
+                <th scope="col">Notify</th>
+              {% endif %}
+              {% if cobrowse_agent.role == "agent" %}
+                <th scope="col">Connect/Archive</th>
+              {% endif %}
+              {% if cobrowse_agent.role == "agent" %}
+                <th scope="col" style="text-align: center;"></th>
+              {% endif %}
+            </tr>
+          </thead>
+
+          <tbody id="cognoai-lead-table-body">
+
+          </tbody>
+        </table>
+      </div>
+      <div id="table-pagination-div"></div>
+    </div>
+  </div>
+
+</div>
+<!-- /.container-fluid -->
+
+
+<div class="modal fade" id="search_lead_modal" tabindex="-1" role="dialog" aria-labelledby="search_lead_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content" style="margin: auto !important;">
+      <div class="modal-header">
+        <h5 class="modal-title" id="search_lead_modal_label">Ready to search for captured lead?</h5>
+      </div>
+      <div class="modal-body">
+          <div class="row">
+              <div class="col-sm-12">
+                {% if access_token_obj.search_lead_label_text %}
+                <label>{{ access_token_obj.search_lead_label_text }}</label>
+                {% endif %}
+                <input type="text" name="search-primary-value" class="form-control" id="search-primary-value" placeholder="Search...">
+                <p id="search-primary-value-error"></p>
+              </div>
+              <div class="col-sm-12" id="running-session-details"></div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <button id="search_lead_button" class="btn btn-info" onclick="search_for_captured_lead()"><i class="fas fa-fw fa-search"></i> Search</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{%if access_token_obj.get_proxy_config_obj.enable_proxy_cobrowsing %}
+  <div class="modal fade custom-modal" id="start-proxy-cobrowse-session" tabindex="-1" role="dialog" aria-labelledby="start-proxy-cobrowse-session_label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Generate a Drop Link for Co-browsing</h5>
+        </div>
+        <div class="modal-body" id="start-proxy-cobrowse-session-body">
+            <div class="row">
+              <div class="col-sm-12 custom-input-wrapper-div">
+                <h6>Website Link <sup style="color:red">*</sup> </h6>
+                <input type="text" autocomplete="off" class="custom-user-input"  placeholder="https://www.example.com" id="proxy-cobrowse-website-url-data">
+                <p class="mb-0 error-message" id="generate-proxy-drop-link-url-error"></p>
+              </div>
+              <div class="col-sm-12 custom-input-wrapper-div">
+                <h6>Customer Name <sup style="color:red">*</sup></h6>
+                <input onpaste="return false;" autocomplete="off" onCopy="return false" onCut="return false" type="text" class="custom-user-input"  id="proxy-cobrowse-customer-name-data" placeholder="Enter Customer Name">
+                <p class="mb-0 error-message" id="generate-proxy-drop-link-name-error"></p>
+              </div>
+              <div class="col-sm-12 custom-input-wrapper-div">
+                <h6>Customer Mobile Number <sup style="color:red">*</sup></h6>
+                <input onpaste="return false;" autocomplete="off" onCopy="return false" onCut="return false" type="number" onkeydown="easyassist_prevent_non_numeric_characters(event);easyassist_word_limit(event, this, 10);" class="custom-user-input positive_numeric"  id="proxy-cobrowse-customer-mobile-data" placeholder="Enter Customer Mobile Number">
+                <p class="mb-0 error-message" id="generate-proxy-drop-link-mobile-error"></p>
+              </div>
+              <div class="col-sm-12 custom-input-wrapper-div">
+                <h6>Customer Email (optional)</h6>
+                <input onpaste="return false;" autocomplete="off" onCopy="return false" onCut="return false" type="text" class="custom-user-input"  id="proxy-cobrowse-customer-email-data" placeholder="Enter Customer Email (optional)">
+                <p class="mb-0 error-message" id="generate-proxy-drop-link-email-error"></p>
+              </div>
+              <div class="col-sm-12 session-link-note">
+                <p class="mb-0">On clicking "Generate Link", a new session will start and a unique support link will be generated which can be shared with the customer for co-browsing. Support link will be sent to the customer via email, if provided.</p>
+              </div>
+              <div class="col-sm-12 mt-4 d-none" id="success-message-div">
+                <div class="w-100 sucess-message">
+                  <p class="mb-0">Link has been generated successfully.</p>
+                </div>
+                <p class="mb-1 mt-3 copy-link-heading">Cobrowsing session link</p>
+                <div class="d-flex align-items-center justify-content-between w-100">
+                  <div class="proxy-link-div">
+                      <input type="text" value="" class="form-control" id="proxy-drop-link" readonly="">
+                  </div>
+                  <div class="copy-link-btn-div">
+                      <button class="copy-link" onclick="copy_shareable_link_to_clipboard('proxy-drop-link')" title="Copy Link">Copy link</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary cancel-button" id="proxy-cobrowse-start-session-link-cancel" data-dismiss="modal" type="button" >Cancel</button>
+          <button id="proxy-cobrowse-start-session-link-button" type="submit" class="btn btn-primary" onclick="start_proxy_cobrowsing_session(this)">Generate Link</button>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+<div class="modal fade custom-modal" id="generate_drop_link_modal" tabindex="-1" role="dialog" aria-labelledby="generate_drop_link_modal_label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Generate a droplink for co-browsing</h5>
+          </div>
+          <div class="modal-body" id="generate-drop-link-cobrowse-session-body">
+            <div class="row">
+              <div class="col-sm-12 custom-input-wrapper-div">
+                <h6>Website Link <sup>*</sup> </h6>
+                <input type="text" autocomplete="off" class="custom-user-input"  placeholder="https://www.example.com" id="client-page-link">
+                <p class="mb-0 error-message" id="generate-drop-link-url-error"></p>
+              </div>
+              <div class="col-sm-12 custom-input-wrapper-div">
+                <h6>Customer Name <sup>*</sup></h6>
+                <input onpaste="return false;" autocomplete="off" onCopy="return false" onCut="return false" type="text" class="custom-user-input"  id="customer-name" placeholder="John Doe">
+                <p class="mb-0 error-message" id="generate-drop-link-name-error"></p>
+              </div>
+              <div class="col-sm-12 custom-input-wrapper-div">
+                <h6>Customer Mobile Number <sup>*</sup></h6>
+                <input onpaste="return false;" autocomplete="off" onCopy="return false" onCut="return false" type="number" onkeydown="easyassist_prevent_non_numeric_characters(event);easyassist_word_limit(event, this, 10);" class="custom-user-input positive_numeric"  id="customer-mobile-number" placeholder="9999999999">
+                <p class="mb-0 error-message" id="generate-drop-link-mobile-error"></p>
+              </div>
+              {% if access_token_obj.is_droplink_email_mandatory %}
+                <div class="col-sm-12 custom-input-wrapper-div">
+                  <h6>Customer Email <sup style="color: red !important;">*</sup></h6>
+                  <input onpaste="return false;" autocomplete="off" onCopy="return false" onCut="return false" type="text" class="custom-user-input"  id="customer-email-id" placeholder="abc@example.com">
+                  <p class="mb-0 error-message" id="generate-drop-link-email-error"></p>
+                </div>
+              {% else %}
+                <div class="col-sm-12 custom-input-wrapper-div">
+                  <h6>Customer Email (optional)</h6>
+                  <input onpaste="return false;" autocomplete="off" onCopy="return false" onCut="return false" type="text" class="custom-user-input"  id="customer-email-id" placeholder="abc@example.com">
+                  <p class="mb-0 error-message" id="generate-drop-link-email-error"></p>
+                </div>
+              {% endif %}
+              <div class="col-sm-12 session-link-note">
+                <p class="mb-0">On clicking "Generate Link", a unique drop link will be generated which can be shared with the customer for Co-browsing. Drop link will be sent to the customer via email, if provided.</p>
+                <p class="mb-0 error-message mt-2" id="generate-drop-link-general-error"></p>
+              </div>
+              <div class="col-sm-12 mt-4 d-none" id="success-message-div">
+                <div class="w-100 sucess-message">
+                  <p class="mb-0">Link has been generated successfully</p>
+                </div>
+                <p class="mb-1 mt-3 copy-link-heading">Co-browsing session link</p>
+                <div class="d-flex align-items-center justify-content-between w-100">
+                  <div class="proxy-link-div">
+                      <input type="text" value="" class="form-control" id="drop-link" readonly="">
+                  </div>
+                  <div class="copy-link-btn-div">
+                      <button class="copy-link" onclick="copy_shareable_link_to_clipboard('drop-link')" title="Copy Link">Copy link</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <div id="generate-drop-link-before">
+              <button class="btn btn-secondary mr-2" id="generate-drop-link-cobrowse-start-session-link-cancel" type="button" data-dismiss="modal" onclick="refresh_page();">Cancel</button>
+              <button class="btn btn-primary" id="generate-drop-link-button" onclick="generate_drop_link(this)">Generate Link</button>
+            </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+<div class="modal fade" id="remark_modal" tabindex="-1" role="dialog" aria-labelledby="document_upload_modal_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+      </div>
+      <div class="modal-body">
+          <div class="row">
+              <div class="col-sm-12">
+                <div class="table-responsive">
+                  <table class="table table-borderless" style="max-height: 305px;">
+                      <thead>
+                          <tr>
+                              <th scope="col">Date & Time</th>
+                              <th scope="col">Remarks</th>
+                          </tr>
+                      </thead>
+                      <tbody >
+                        <tr>
+                          <td id="updated_date_time" style="background-color: white !important;"></td>
+                          <td id="easy_assist_remarks" style="background-color: white !important;"></td>
+                        </tr>
+                      </tbody>
+                  </table>
+                </div>
+              </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-width-100" type="button" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="request_for_inbound_cobrowsing_modal" tabindex="-1" role="dialog" aria-labelledby="request_for_inbound_cobrowsing_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="row">
+          <ul class="nav">
+            <li class="nav-item">
+              <button class="btn btn-primary" type="button" id="cobrowsing-request-tab-button" data-toggle="tab" href="#cobrowsing-tab" role="tab" aria-controls="home" aria-selected="true" onclick="change_modal_button_style(this)" style="border-radius: 8px !important; margin: 14px 12px !important; margin-right: 0px !important;">Co-browsing</button>
+            </li>
+            <li class="nav-item">
+              <button class="btn btn-secondary" type="button" id="meeting-request-tab-button" data-toggle="tab" href="#meeting-tab" role="tab" aria-controls="home" aria-selected="true" onclick="change_modal_button_style(this)" style="border-radius: 8px !important; margin: 14px 12px !important;">Meeting</button>
+            </li>
+          </ul>
+        </div>
+      </div>
+        <div class="tab-content" id="myTabContent">
+          <div class="tab-pane fade show active" id="cobrowsing-tab" role="tabpanel" aria-labelledby="cobrowsing-tab">1</div>
+          <div class="tab-pane fade" id="meeting-tab" role="tabpanel" aria-labelledby="cobrowsing-tab">2</div>
+        </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade transfer_session_modal" id="assign_session_modal" tabindex="-1" role="dialog" aria-labelledby="assign_session_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assign_session_label">Transfer Session To Another Agent</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <select id="select-assign-agent" class="form-control custom-select-dropdown-arrow-icon">
+                          <option value="">Select Agent</option>
+                        </select>
+                    </div>
+                    <div class="col-md-12 mt-4 mb-2">
+                      <span id="assign-session-error" style="display: none; color:red;"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-success" id="assign-cobrowsing-agent-button">Transfer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="close_session_modal" tabindex="-1" role="dialog" aria-labelledby="close_session_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content" style="margin: auto;">
+      <div class="modal-header" style="padding: 16px !important;">
+        <h5 class="modal-title" id="close_session_modal_label">End Session</h5>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="checkbox-btn-container-item">
+                  <input type="checkbox" id="mask-successfull-cobrowsing-session" checked>
+                  <label for="mask-successfull-cobrowsing-session"><span>Lead has been closed successfully.</span></label>
+                </div>
+                <label for="close-session-remarks" id='close-session-subremarks-label'>Please mention why you want to End Session?</label>
+                <div class="row">
+                  {% if enable_predefined_remarks %}
+                  <div class="col-12 mt-3" style="margin-bottom: 10px !important;">
+                    <label>
+                      Remarks
+                      {% if not predefined_remarks_optional %}
+                        <sup style='color: red;'>*</sup>
+                      {% endif %}
+                    </label>
+                    <div>
+                      <select id="close-session-remarks" onchange="show_comments_textbox(this)">
+                            {% for predefined_remark in predefined_remarks %}
+                              <option value="{{ predefined_remark.remark }}">{{ predefined_remark.remark }}</option>
+                            {% endfor %}
+                            <option value="others">Others</option>
+                      </select>
+                    </div>
+                    <span class="close-session-error" id="close-session-remarks-error"></span>
+                  </div>
+
+                  {% if enable_predefined_subremarks %}
+                  <div class="col-12 mt-3 subremarks-container" style="margin-bottom: 10px!important; display: none;">
+                    <label for="close-session-subremarks">
+                      Sub-Remarks
+                      {% if not predefined_remarks_optional %}
+                        <sup style='color: red;'>*</sup>
+                      {% endif %}
+                    </label>
+                    <div>
+                        <select id="close-session-subremarks" onchange="show_comments_textbox(this)">
+                            <option value="None">None</option>
+                        </select>
+                    </div>
+                  </div>
+                  {% endif %}
+
+                  <div class="col-12 mt-3" style="margin-bottom: 40px !important;">
+                    <label>Comments</label>
+                    {% if predefined_remarks_optional %}
+                      <textarea class="form-control close-session-remarks-text" id="close-session-remarks-text"></textarea>
+                    {% else %}
+                      <textarea class="form-control close-session-remarks-text" id="close-session-remarks-text" disabled></textarea>
+                    {% endif %}
+                    <span class="close-session-error" id="close-session-text-error"></span>
+                  </div>
+                  {% elif enable_predefined_remarks_with_buttons %}
+                  <div class="col-12">
+                    <textarea class="form-control close-session-remarks-text" rows="1" id="close-session-remarks-text" placeholder="Remarks"></textarea>
+                    <span class="close-session-error" id="close-session-text-error"></span>
+                  </div>
+                  <label class="col-12 mt-3">Suggestions</label>
+                  <div class="col-12">
+                    <ul id="predefined-remarks-buttons-list">
+                      {% for predefined_remark in predefined_remarks_with_buttons %}
+                      <li class="predefined-remarks-list-item">
+                        <button class="btn predefined-remarks-button" onclick="set_remarks_in_textbox(this)">{{predefined_remark}}</button>
+                      </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                  {% else %}
+                  <div class="col-12" style="margin-bottom: 40px !important;">
+                    <textarea class="form-control close-session-remarks-text" id="close-session-remarks-text" placeholder="Remarks" style="margin-top: 5px !important; margin-bottom: 5px !important;"></textarea>
+                    <span class="close-session-error" id="close-session-text-error"></span>
+                  </div>
+                  {% endif %}
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal" id="end_session_cancel_btn">Cancel</button>
+        <a class="btn btn-primary" href="javascript:void(0)" onclick="close_easyassist_cobrowsing_session(this)">End Session</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="archive_lead_modal" tabindex="-1" role="dialog" aria-labelledby="archive_lead_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="margin: auto;">
+            <div class="modal-header" style="padding: 16px !important;">
+                <h5 class="modal-title" id="archive_lead_modal_label">Archive Session</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <label for="close-session-remarks">Please enter the remarks</label>
+                        <div class="row">
+                            {% if enable_predefined_remarks %}
+                            <div class="col-12 mt-3" style="margin-bottom: 10px !important;">
+                                <label>
+                                    {% if not predefined_remarks_optional %}
+                                        Remarks<sup style='color: red;'>*</sup>
+                                    {% else %}
+                                        Remarks
+                                    {% endif %}
+                                </label>
+                                <div>
+                                    <select id="archive-lead-remarks" onchange="show_archive_comments_textbox(this)">
+                                        {% for predefined_remark in predefined_remarks %}
+                                            <option value="{{ predefined_remark.remark }}">{{ predefined_remark.remark }}</option>
+                                        {% endfor %}
+                                        <option value="others">Others</option>
+                                    </select>
+                                </div>
+                            </div>
+                            {% if enable_predefined_subremarks %}
+                            <div class="col-12 mt-3 subremarks-container" style="margin-bottom: 10px !important; display: none;">
+                              <label for="archive-lead-subremarks">
+                                  {% if not predefined_remarks_optional %}
+                                      Sub-Remarks<sup style='color: red;'>*</sup>
+                                  {% else %}
+                                      Sub-Remarks
+                                  {% endif %}
+                              </label>
+                              <div>
+                                  <select id="archive-lead-subremarks">
+                                      <option value="None">None</option>
+                                  </select>
+                              </div>
+                            </div>
+                            {% endif %}
+                            <div class="col-12 mt-3" style="margin-bottom: 40px !important;">
+                                <label>Comments</label>
+                                <textarea class="form-control archive-lead-remarks-text" id="archive-lead-remarks-text" disabled></textarea>
+                                <span class="close-session-error" id="archive-lead-text-error"></span>
+                            </div>
+                            {% elif enable_predefined_remarks_with_buttons %}
+                            <div class="col-12 mt-4">
+                                <textarea class="form-control archive-lead-remarks-text" rows="1" id="archive-lead-remarks-text" placeholder="Remarks"></textarea>
+                                <span class="close-session-error" id="archive-lead-text-error"></span>
+                            </div>
+                            <label class="col-12 mt-3">Suggestions</label>
+                            <div class="col-12 mt-3">
+                                <ul id="archive-lead-remarks-buttons-list">
+                                    {% for predefined_remark in predefined_remarks_with_buttons %}
+                                    <li class="predefined-remarks-list-item">
+                                        <button class="btn predefined-remarks-button" onclick="set_archive_remarks_in_textbox(this)">{{predefined_remark}}</button>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+
+                            {% else %}
+                            <div class="col-12 mt-3" style="margin-bottom: 40px !important;">
+                                <textarea class="form-control archive-lead-remarks-text" id="archive-lead-remarks-text" placeholder="Remarks"></textarea>
+                                <span class="close-session-error" id="archive-lead-text-error"></span>
+                            </div>
+                            {% endif %}
+                            <div class="col-md-12">
+                                <span class="close-session-error" id="archive-lead-remarks-error" style="margin-bottom: 2em;"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal" id="archive_lead_cancel_btn">Cancel</button>
+                <a class="btn btn-primary" href="javascript:void(0)" onclick="archive_easyassist_cobrowsing_session(this)">Archive</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="transfer_lead_by_supervisor_modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="margin: auto !important;">
+            <div class="modal-header">
+                <h5 class="modal-title">Transfer Lead</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <p>Are you sure that you want to transfer the lead to the agent <b><span id="tranfer-lead-agent-name"></span></b> ?</p>
+                    </div>
+                    <div class="col-sm-12" id="transfer-session-error-details"></div>
+                </div>
+            </div>
+            <div class="modal-footer" style="border: none;">
+                <button class="btn" type="button" data-dismiss="modal">Cancel</button>
+                <button id="tranfer-lead-btn" class="btn btn-info"> Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Agent auto assign audit trail modal -->
+<div class="modal fade auto-assign-transfer-audit-trail" id="auto_assign_audit_trail" tabindex="-1" role="dialog" aria-hidden="true">
+   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+      <div class="modal-content" style="margin: auto !important;">
+         <div class="modal-header">
+            <h5 class="modal-title" id="auto_assign_audit_trail_modal_label">Auto Assign Audit Trail
+            </h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M3.34525 3L20.655 21" stroke="#2D2D2D" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M20.6548 3L3.34502 21" stroke="#2D2D2D" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/>
+               </svg>
+            </button>
+         </div>
+         <div class="modal-body">
+            <div class="table-responsive" id="auto_assign_transfer_audit_trail_table_div">
+               <table id="auto_assign_transfer_audit_trail_table" class="table table-bordered" style="width: 100%;">
+                  <thead>
+                     <tr>
+                        <th scope="col">SL No.</th>
+                        <th scope="col">Date Time</th>
+                        <th scope="col">Auto Assigned Agent</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                  </tbody>
+               </table>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+
+<script type="text/javascript">
+window.ENABLE_PREDEFINED_REMARKS = "{{ enable_predefined_remarks }}";
+window.ENABLE_PREDEFINED_SUBREMARKS = "{{ enable_predefined_subremarks }}";
+window.ENABLE_PREDEFINED_REMARKS_WITH_BUTTONS = "{{ enable_predefined_remarks_with_buttons }}";
+window.ALLOW_SCREEN_SHARING_COBROWSE = "{{access_token_obj.allow_screen_sharing_cobrowse}}"
+window.REMARKS_OPTIONAL = "{{ predefined_remarks_optional }}";
+window.close_session_remark_dropdown = null;
+window.close_session_subremark_dropdown = null;
+window.archieve_lead_remark_dropdown = null;
+window.archieve_lead_subremark_dropdown = null;
+window.IS_COGNOMEET_ACCESS_TOKEN_GENERATED = "{{ is_cognomeet_token_generated }}";
+window.ADMIN_AGENT_USERNAME = "{{ access_token_obj.agent.user.username }}"
+window.IS_DROPLINK_EMAIL_MANDATORY = "{{ access_token_obj.is_droplink_email_mandatory }}"
+
+window.onload = function() {
+    generate_cognomeet_access_token();
+    var console_theme_color = getComputedStyle(document.body).getPropertyValue('--color_rgb');
+    if(console_theme_color.length == 0) {
+        console_theme_color = "#0254D7";
+    }
+
+    if (document.getElementById("close-session-remarks")) {
+        $('#close-session-remarks')[0].selectedIndex = -1;
+        window.close_session_remark_dropdown = new EasyassistCustomSelect("#close-session-remarks", "Select One", console_theme_color);
+    }
+
+    if (document.getElementById("close-session-subremarks")) {
+        $('#close-session-subremarks')[0].selectedIndex = -1;
+        window.close_session_subremark_dropdown = new EasyassistCustomSelect("#close-session-subremarks", "Select One", console_theme_color);
+
+        document.getElementById("close-session-remarks").addEventListener('change', function() {
+            var val = this.value;
+            var predefined_remarks = {{ predefined_remarks | safe }};
+            var subremark_list = [];
+            for (var idx = 0; idx < predefined_remarks.length; idx++) {
+                if (predefined_remarks[idx].remark == val) {
+                    subremark_list = predefined_remarks[idx].subremark;
+                    break;
+                }
+            }
+
+            var option_html = `<option value="None">None</option>`;
+            subremark_list.forEach(function(value) {
+                option_html += `<option value="${value.remark}">${value.remark}</option>`;
+            });
+
+            var close_session_subremarks = $('#close-session-subremarks')[0];
+            close_session_subremarks.innerHTML = option_html;
+            close_session_subremarks.selectedIndex = -1;
+            close_session_subremarks.reinitialize();
+
+            close_session_subremarks.closest(".subremarks-container").style.display = "";
+        });
+    }
+
+    if (document.getElementById("archive-lead-remarks")) {
+        $('#archive-lead-remarks')[0].selectedIndex = -1;
+        window.archieve_lead_remark_dropdown = new EasyassistCustomSelect("#archive-lead-remarks", "Select One", console_theme_color);
+    }
+
+    if (document.getElementById("archive-lead-subremarks")) {
+        $('#archive-lead-subremarks')[0].selectedIndex = -1;
+        window.archieve_lead_subremark_dropdown = new EasyassistCustomSelect(
+          "#archive-lead-subremarks", "Select One", console_theme_color);
+
+        document.getElementById("archive-lead-remarks").addEventListener('change', function() {
+            var val = this.value;
+            var predefined_remarks = {{ predefined_remarks | safe }};
+            var subremark_list = [];
+            for (var idx = 0; idx < predefined_remarks.length; idx++) {
+                if (predefined_remarks[idx].remark == val) {
+                    subremark_list = predefined_remarks[idx].subremark;
+                    break;
+                }
+            }
+
+            var option_html = `<option value="None">None</option>`;
+            subremark_list.forEach(function(value) {
+                option_html += `<option value="${value.remark}">${value.remark}</option>`;
+            });
+
+            var archive_lead_subremarks = $('#archive-lead-subremarks')[0];
+            archive_lead_subremarks.innerHTML = option_html;
+            archive_lead_subremarks.selectedIndex = -1;
+            archive_lead_subremarks.reinitialize();
+
+            archive_lead_subremarks.closest(".subremarks-container").style.display = "";
+        });
+    }
+
+    {% if enable_predefined_remarks_with_buttons %}
+        document.getElementById("close-session-remarks-text").addEventListener("keyup", function(event) {
+            var input_text = event.target.value;
+            var predefined_remarks_list = document.getElementById("predefined-remarks-buttons-list").children;
+            for (var idx = 0; idx < predefined_remarks_list.length; idx++) {
+                var predefined_remarks = predefined_remarks_list[idx];
+                var button_element = predefined_remarks.getElementsByTagName("button")[0];
+                if (button_element.innerHTML.toLowerCase().indexOf(input_text.toLowerCase()) >= 0) {
+                    predefined_remarks.style.display = "inline-block";
+                } else {
+                    predefined_remarks.style.display = "none";
+                }
+                button_element.classList.remove("predefined-remarks-button-clicked")
+            }
+        });
+
+        document.getElementById("archive-lead-remarks-text").addEventListener("keyup", function(event) {
+            var input_text = event.target.value;
+            var predefined_remarks_list = document.getElementById("archive-lead-remarks-buttons-list").children;
+            for (var idx = 0; idx < predefined_remarks_list.length; idx++) {
+                var predefined_remarks = predefined_remarks_list[idx];
+                var button_element = predefined_remarks.getElementsByTagName("button")[0];
+                if (button_element.innerHTML.toLowerCase().indexOf(input_text.toLowerCase()) >= 0) {
+                    predefined_remarks.style.display = "inline-block";
+                } else {
+                    predefined_remarks.style.display = "none";
+                }
+                button_element.classList.remove("predefined-remarks-button-clicked")
+            }
+        });
+    {% endif %}
+
+    $("#close_session_modal").on("hidden.bs.modal", function () {
+      document.getElementById("close-session-remarks-text").value = "";
+      if(window.close_session_remark_dropdown) {
+        window.close_session_remark_dropdown.update_value();
+      }
+
+      if(window.close_session_subremark_dropdown) {
+        window.close_session_subremark_dropdown.update_value();
+        var close_session_subremarks = $('#close-session-subremarks')[0];
+        close_session_subremarks.closest(".subremarks-container").style.display = "none";
+      }
+
+      if(document.getElementById("predefined-remarks-buttons-list")) {
+        $("#predefined-remarks-buttons-list .predefined-remarks-button").removeClass('predefined-remarks-button-clicked');
+      }
+
+    });
+
+    $("#archive_lead_modal").on("hidden.bs.modal", function () {
+      document.getElementById("archive-lead-remarks-text").value = "";
+      if(window.archieve_lead_remark_dropdown) {
+        window.archieve_lead_remark_dropdown.update_value();
+      }
+
+      if(window.archieve_lead_subremark_dropdown) {
+        window.archieve_lead_subremark_dropdown.update_value();
+
+        var archive_lead_subremarks = $('#archive-lead-subremarks')[0];
+        archive_lead_subremarks.closest(".subremarks-container").style.display = "none";
+      }
+
+      if(document.getElementById("archive-lead-remarks-buttons-list")) {
+        $("#archive-lead-remarks-buttons-list .predefined-remarks-button").removeClass('predefined-remarks-button-clicked');
+      }
+    });
+};
+
+$(document).ready(function() {
+  $("#auto_assign_audit_trail").on('hide.bs.modal', function(){
+      $("#auto_assign_audit_trail .modal-body").scrollTop(0);
+  });
+});
+
+function load_remarks(e, el) {
+    document.getElementById("easy_assist_remarks").innerHTML = e;
+    document.getElementById("updated_date_time").innerHTML = el;
+}
+
+function show_video_conferencing_details() {
+    document.getElementById("video-conferencing-data-div").style.display = "block";
+}
+
+function hide_video_conferencing_details() {
+    document.getElementById("video-conferencing-data-div").style.display = "none";
+}
+
+function open_video_conferencing_link(element) {
+    value = document.getElementById("video-conferencing-link").value;
+    if (value != "" && value != undefined && value != null) {
+        window.open(value, "_blank");
+    }
+}
+
+function generate_cobrowsing_link() {
+    product_url = document.getElementById("product-page-url").value;
+    if (product_url != null && product_url != undefined && product_url != "") {
+        session_id = document.getElementById("product-page-url").getAttribute("cobrowse-session");
+        product_url = product_url + "#ea_id=" + session_id;
+        document.getElementById("generated-cobrowsing-link").value = product_url;
+        show_generated_cobrowsing_link_details();
+    }
+}
+
+function show_generated_cobrowsing_link_details() {
+    document.getElementById("generated-cobrowsing-link-div").style.display = "block";
+    console.log("show details");
+}
+
+function hide_generated_cobrowsing_link_details() {
+    document.getElementById("generated-cobrowsing-link-div").style.display = "none";
+}
+
+function show_assign_session_modal(session_id) {
+    $('#assign_session_modal').modal('show');
+    document.getElementById("assign-cobrowsing-agent-button").setAttribute("onclick",
+        "assign_cobrowsing_session_to_another_agent(this, '" + session_id + "')");
+}
+
+function change_modal_button_style(element) {
+    if (element.id == "cobrowsing-request-tab-button") {
+        element.classList.remove('btn-secondary');
+        element.classList.add('btn-primary');
+        document.getElementById("meeting-request-tab-button").classList.remove('btn-primary')
+        document.getElementById("meeting-request-tab-button").classList.add('btn-secondary')
+    } else {
+        element.classList.remove('btn-secondary');
+        element.classList.add('btn-primary');
+        document.getElementById("cobrowsing-request-tab-button").classList.remove('btn-primary')
+        document.getElementById("cobrowsing-request-tab-button").classList.add('btn-secondary')
+    }
+}
+
+function set_remarks_in_textbox(element) {
+    document.getElementById('close-session-remarks-text').value = element.innerText.trim();
+    $("#predefined-remarks-buttons-list .predefined-remarks-button").removeClass('predefined-remarks-button-clicked');
+    element.classList.add('predefined-remarks-button-clicked');
+    document.getElementById("close-session-text-error").style.display = "none";
+}
+
+function set_archive_remarks_in_textbox(element) {
+    document.getElementById('archive-lead-remarks-text').value = element.innerHTML;
+    $("#archive-lead-remarks-buttons-list .predefined-remarks-button").removeClass('predefined-remarks-button-clicked');
+    element.classList.add('predefined-remarks-button-clicked');
+    document.getElementById("archive-lead-text-error").style.display = "none";
+}
+
+function show_comments_textbox(element) {
+    document.getElementById("close-session-remarks-error").style.display = "none";
+    document.getElementById("close-session-text-error").style.display = "none";
+    document.getElementById("close-session-remarks-text").removeAttribute("disabled");
+    setTimeout(function() {
+        document.getElementById("close-session-remarks-text").focus();
+    }, 100);
+}
+
+function show_archive_comments_textbox(element) {
+    document.getElementById("archive-lead-remarks-error").style.display = "none";
+    document.getElementById("archive-lead-text-error").style.display = "none";
+    document.getElementById("archive-lead-remarks-text").value = '';
+    document.getElementById("archive-lead-remarks-text").removeAttribute("disabled");
+    setTimeout(function() {
+        document.getElementById("archive-lead-remarks-text").focus();
+    }, 100);
+}
+</script>
+
+{% if request.user.enable_s3_bucket %}
+<script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/clipboard.min.js"></script>
+{% else %}
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/clipboard.min.js' %}"></script>
+{% endif %}
+<script type="text/javascript">
+  var clipboard = new ClipboardJS('.btn');
+
+  clipboard.on('success', function(e) {
+      e.clearSelection();
+      show_easyassist_toast("Link has been copied successfully.");
+  });
+
+  clipboard.on('error', function(e) {
+    show_easyassist_toast("Oop! Unable to copy the link. Please try again.");
+  });
+
+  function refresh_page(){
+    window.location.reload();
+  }
+
+  
+function load_map_script() {
+
+    var params = JSON.stringify({});
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "/easy-assist/map-script/", true);
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.setRequestHeader('X-CSRFToken', get_csrfmiddlewaretoken());
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            response = JSON.parse(this.responseText);
+            response = easyassist_custom_decrypt(response.Response);
+            response = JSON.parse(response);
+            if (response["status"] == 200) {
+                var src = response['src'];
+                var script = document.createElement('script');
+                script.type = 'text/javascript';
+                script.defer = true;
+                script.src = src
+                document.body.appendChild(script);
+
+                if (window.navigator.geolocation) {
+                    var geolocation_options = {
+                        enableHighAccuracy: true,
+                        timeout: 15000,
+                        maximumAge: 0
+                    };
+                    window.navigator.geolocation.getCurrentPosition(accept_location_request, cancel_location_request, geolocation_options);
+                }
+            }
+        }
+    }
+    xhttp.send(params);
+}
+
+$(document).ready(function() {
+  load_map_script();
+  update_all_lead_status_interval = setInterval(update_active_lead_status, UPDATE_ACTIVE_LEAD_STATUS_INTERVAL_TIME);
+  update_active_lead_status();
+});
+
+$('.cobrowse-agent-search-box').on('keyup', function(event) {
+  var key_pressed = event.key.toLowerCase();
+  var blacklisted_keys = ["control", "arrowleft", "arrowright", "arrowup", "arrowdown", "shift", "escape", "meta", "alt"];
+  if(blacklisted_keys.indexOf(key_pressed) == -1) {
+    var element = this;
+    get_available_agent_list_for_supervisor(element);
+  }
+});
+
+$('.cobrowse-agent-search-box').on('focusout', function() {
+  var element = this;
+  setTimeout(function() {
+    var parent_element = element.parentElement;
+    $(parent_element).find('.suggestion-id-div').hide();
+    $(parent_element).find('.tooltiptext-custom').show();
+    var current_agent_name = $(parent_element).find('.tooltiptext-custom').html().trim();
+    element.value = current_agent_name;
+  }, 1000);
+});
+
+window.localStorage.setItem("active_customers_current_page", 1);
+
+</script>
+
+<script type="text/javascript">
+    function notify_agent(session_id){
+        request_params = {
+          "session_id": session_id
+        };
+        json_params = JSON.stringify(request_params);
+        encrypted_data = easyassist_custom_encrypt(json_params);
+        encrypted_data = {
+          "Request": encrypted_data
+        };
+        const params = JSON.stringify(encrypted_data);
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "/easy-assist/agent/set-notification-for-agent/", true);
+        xhttp.setRequestHeader('Content-Type', 'application/json');
+        xhttp.setRequestHeader('X-CSRFToken', get_csrfmiddlewaretoken());
+        xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            response = JSON.parse(this.responseText);
+            response = easyassist_custom_decrypt(response.Response);
+            response = JSON.parse(response);
+            update_active_lead_status();
+            // if (response.status == 200) {
+            //   window.location.reload();
+            // }
+          }
+        }
+        xhttp.send(params);
+    }
+</script>
+
+{% endblock %}

@@ -1,0 +1,275 @@
+{% extends 'AutomatedAPIApp/base_old.html' %}
+{% block content %}
+{% load static %}
+
+<style type="text/css">
+	.json-editor-blackbord {
+		height: 76vh;
+	}
+</style>
+
+<div class="container-fluid">
+
+	<div class="row">
+		
+		<div class="col-5">
+
+			<div class="col-sm" style="max-height:80vh; overflow:scroll;">
+
+				<div class="row" style="padding:1em 0.5em 1em 0.5em;">
+			    	<div class="col-3">
+						<select class="custom-select" id="request-type">
+					  		<option value="POST" selected>POST</option>
+					  		<option value="GET">GET</option>
+						</select>
+			    	</div>
+			   		<div class="col-9">
+			      		<input type="text" class="form-control" placeholder="Enter request URL" id="request-url" onkeyup="check_for_variable_input_textarea(this)">
+			    	</div>
+			  	</div>
+
+				<div class="row" style="padding:0.5em 0.5em 0.5em 0.5em;">
+			    	<div class="col-5">
+						<select class="custom-select" id="request-header-type" onchange="update_tbody_headers(this)">
+					  		<option value="application/json" selected>JSON (application/json)</option>
+					  		<option value="text/plain">Text (text/plain)</option>
+					  		<option value="application/javascript">Javascript (application/javascript)</option>
+					  		<option value="application/xml">XML (application/xml)</option>
+					  		<option value="text/xml">XML (text/xml)</option>
+					  		<option value="text/html">HTML (text/html)</option>
+						</select>
+			    	</div>
+			    	<div class="col-5">
+						<select class="custom-select" id="request-authorization-type" onchange="update_tbody_headers_based_on_authorization(this)">
+					  		<option value="None" selected>Authorization</option>
+					  		<option value="bearer-token">Bearer Token</option>
+					  		<option value="basic-auth">Basic Auth</option>
+					  		<option value="digest-auth">Digest Auth</option>
+					  		<option value="oauth-1.0-auth">OAuth 1.0</option>
+						</select>
+			    	</div>
+			    	<div class="col-2">
+						<button class="btn float-right" class="btn btn-primary" onclick="execute_api(this)">Send</button>	
+			    	</div>
+			  	</div>
+
+			  	<div class="row" style="padding:1em 0.5em 1em 0.5em;display:none;" id="bearer-token-input-container">
+			  		<div class="col-12">
+			  			<input class="form-control" type="text" id="bearer-token-input" placeholder="Token">
+			  		</div>
+			  	</div>
+
+			  	<div class="row" style="padding:1em 0.5em 1em 0.5em;display:none;" id="basic-auth-input-container">
+			  		<div class="col-12">
+			  			<input class="form-control" type="text" id="basic-auth-username" placeholder="Username"><br>
+			  		</div>
+			  		<div class="col-12">
+			  			<input class="form-control" type="password" id="basic-auth-password" placeholder="Password">
+			  		</div>
+			  	</div>
+
+			  	<div class="row" style="padding:1em 0.5em 1em 0.5em;display:none;" id="digest-auth-input-container">
+			  		<div class="col-12">
+			  			<input class="form-control" type="text" id="digest-auth-username" placeholder="Username"><br>
+			  		</div>
+			  		<div class="col-12">
+			  			<input class="form-control" type="password" id="digest-auth-password" placeholder="Password">
+			  		</div>
+			  	</div>
+
+			  	<div class="row" style="padding:1em 0.5em 1em 0.5em;display:none;" id="oauth-1-input-container">
+			  		<div class="col-12">
+			  			<input class="form-control" type="text" id="oauth-1-auth-consumer-key" placeholder="Consumer Key"><br>
+			  		</div>
+			  		<div class="col-12">
+			  			<input class="form-control" type="text" id="oauth-1-auth-consumer-secret" placeholder="Consumer Secret"><br>
+			  		</div>
+			  		<div class="col-12">
+			  			<input class="form-control" type="text" id="oauth-1-auth-access-token" placeholder="Access Token"><br>
+			  		</div>
+			  		<div class="col-12">
+			  			<input class="form-control" type="text" id="oauth-1-auth-token-secret" placeholder="Token Secret"><br>
+			  		</div>
+			  	</div>
+
+				<div class="row" style="padding:1em 0.5em 1em 0.5em;">
+					<div class="col">
+
+						<table class="table table-striped">
+						  	<thead>
+						    	<tr>
+						      		<th colspan="2">Headers</th>
+						      		<th colspan="1" onclick="add_table_row('header-table-tbody')" style="cursor:pointer;"><i class="fa fa-plus"></i></th>
+						    	</tr>
+						    	<tr>
+						      		<th scope="col">Key</th>
+						      		<th scope="col">Value</th>
+						      		<th scope="col">Delete</th>
+						    	</tr>
+						  	</thead>
+						  	<tbody id="header-table-tbody">
+								<tr>
+							  		<td contenteditable="false">Content-Type</td>
+							  		<td contenteditable="false">application/json</td>
+							  		<td onclick="delete_header_table_row(this)" style="cursor:pointer;"></td>
+								</tr>
+						  	</tbody>
+						</table>
+
+					</div>
+			  	</div>
+
+
+				<div class="row" style="padding:1em 0.5em 1em 0.5em;">
+					<div class="col-12">
+						<label for="api-body">Body&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span for="api-body" onclick="beautify_body_content(this)"><u>Beautify</u></span></label>
+						<textarea class="form-control" id="api-body" rows="8" id="request-body" onkeyup="check_for_variable_input_textarea(this)"></textarea>
+					</div>
+			  	</div>
+
+
+		  	</div>
+
+
+		</div>
+
+		<div class="col-7">
+
+			<div class="row">
+
+				<div class="col" id="api-response-container" style="display:none;">
+					<pre id="request-response-container"></pre>					
+					<button class="btn btn-primary" onclick="tag_integrated_api_with_selected_tree(this)">Save API</button>
+					{% if automated_api_integration_obj.initial_api %}
+					<button class="btn btn-primary" onclick="parse_json_data_and_load_into_table(this)">Run API Response Parser</button>
+					{% endif %}
+				</div>				
+			</div>
+
+		</div>
+
+		<div class="col-12" style="margin-bottom:1em;">
+			<p style="padding: 1em;text-align: center;background-color: beige;margin-top: 1em;">API Sample Response Parsed Data</p>
+			<table class="table table-striped" style="table-layout: fixed; width:100%;word-wrap: break-word;">
+				<thead>
+					<tr>
+						<th>key</th>
+						<th>value</th>
+						<th>type</th>
+						<th>alias</th>
+					</tr>
+				</thead>
+				<tbody id="parse_json_data_and_load_into_table_container"></tbody>
+			</table>
+			{% if automated_api_integration_obj.initial_api %}
+				<button class="btn btn-primary float-right" data-toggle="modal" data-target="#confirmation-generate-code">Generate API Tree Code</button><hr>
+			{% endif %}
+		</div>
+
+	</div>
+
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="dynamic-request-parameter-confirmation-modal" tabindex="-1" role="dialog" aria-labelledby="dynamic-request-parameter-confirmation-modalLabel" aria-hidden="true">
+  	<div class="modal-dialog" role="document">
+    	<div class="modal-content">
+      		<div class="modal-header">
+        		<h5 class="modal-title" id="dynamic-request-parameter-confirmation-modalLabel">Confirmation on API Execution</h5>
+        		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          			<span aria-hidden="true">&times;</span>
+        		</button>
+      		</div>
+			<div class="modal-body" id="api-execution-request-packet">
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="execute_dynamic_api(this)">Send Request</button>
+			</div>
+    	</div>
+  	</div>
+</div>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="confirmation-generate-code" tabindex="-1" role="dialog" aria-labelledby="confirmation-generate-code-modalLabel" aria-hidden="true">
+  	<div class="modal-dialog" role="document">
+    	<div class="modal-content">
+      		<div class="modal-header">
+        		<h5 class="modal-title" id="confirmation-generate-code-modalLabel">Confirm - Generate automated code</h5>
+        		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          			<span aria-hidden="true">&times;</span>
+        		</button>
+      		</div>
+			<div class="modal-body">
+				<p>Are you sure, you want to generate automated API integration code and replace existing code in API tree?</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="generate_automated_api()">Yes, Generate code</button>
+			</div>
+    	</div>
+  	</div>
+</div>
+
+
+<script type="text/javascript">
+	
+	function delete_header_table_row(element){
+		element.parentElement.parentElement.removeChild(element.parentElement);
+	}
+
+	function add_table_row(tbody_id) {
+		table_tbody = document.getElementById(tbody_id);
+		table_tbody.innerHTML += '<tr>\
+      		<td contenteditable="true"></td>\
+      		<td contenteditable="true"></td>\
+      		<td onclick="delete_header_table_row(this)" style="cursor:pointer;"><i class="fa fa-trash" style="color:red;"></i></td>\
+    	</tr>';
+	}
+
+	function beautify_body_content(element) {
+		textarea = document.getElementById(element.getAttribute("for"));
+		try{
+			json_data = JSON.parse(textarea.value);			
+			textarea.value = JSON.stringify(json_data, null, 4);
+		}catch(err){
+			alert("Invalid data");
+		}
+	}
+
+	function update_tbody_headers(element) {
+		table_tbody = document.getElementById("header-table-tbody");
+		table_tbody.innerHTML = '<tr>\
+      		<td contenteditable="false">Content-Type</td>\
+      		<td contenteditable="false">'+element.value+'</td>\
+      		<td onclick="delete_header_table_row(this)" style="cursor:pointer;"></td>\
+    	</tr>';
+	}
+
+	function update_tbody_headers_based_on_authorization(element){
+		bearer_token_container = document.getElementById("bearer-token-input-container");
+		basic_auth_container = document.getElementById("basic-auth-input-container");
+		digest_auth_container = document.getElementById("digest-auth-input-container");
+		oauth_1_container = document.getElementById("oauth-1-input-container");
+
+		bearer_token_container.style.display = "none";
+		basic_auth_container.style.display = "none";
+		digest_auth_container.style.display = "none";
+		oauth_1_container.style.display = "none";
+
+		if(element.value == "bearer-token") {
+			bearer_token_container.style.display = "block";
+		}else if (element.value == "basic-auth") {
+			basic_auth_container.style.display = "block";
+		}else if (element.value == "digest-auth") {
+			digest_auth_container.style.display = "block";
+		}else if (element.value == "oauth-1.0-auth") {
+			oauth_1_container.style.display = "block";
+		}
+	}
+
+</script>
+
+{% endblock %}

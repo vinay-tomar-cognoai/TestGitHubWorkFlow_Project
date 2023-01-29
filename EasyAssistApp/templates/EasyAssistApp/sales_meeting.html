@@ -1,0 +1,558 @@
+{% extends 'EasyAssistApp/console.html' %}
+{% load static %}
+{% block content %}
+{% load easyassist_custom_filters %}
+
+{% if request.user.enable_s3_bucket %}
+<link href="https://static.allincall.in/static/EasyAssistApp/css/jquery.timepicker.css" rel="stylesheet" type="text/css">
+<script src="https://static.allincall.in/static/EasyAssistApp/js/jquery.timepicker.js"></script>
+{% else %}
+<link href="{% static 'EasyAssistApp/css/jquery.timepicker.css' %}" rel="stylesheet" type="text/css">
+<script src="{% static 'EasyAssistApp/js/jquery.timepicker.js' %}"></script>
+{% endif %}
+<style>
+    input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+
+@media only screen and (max-width: 769px) {
+    *[id^='select-assign-agent-'] {
+        width: 100%!important;
+    }
+}
+</style>
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <!-- DataTales Example -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <div class="row">
+                <div class="col-sm">
+                    <h6 class="m-0 font-weight-bold text-primary customer-metting-text">Customers Meetings</h6>
+                </div>
+                {% if cobrowse_agent.role == "agent" or cobrowse_agent.role == "supervisor" %}
+                <div class="col-sm">
+                    <button class="btn btn-info float-right ml-3 customer-metting-btn" data-toggle="modal" data-target="#generate_link_modal" onclick="fill_random_password();">Schedule Meeting</button>
+                    <button class="btn btn-info float-right ml-3 customer-metting-btn" onclick="get_scheduled_meeting_list();">Today's meetings</button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive customer-metting-table">
+                <table class="table table-bordered" id="dataTable" style="width: 100%;" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Mobile Number</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Start Time</th>
+                            <th scope="col">End Time</th>
+                            <th scope="col">Meeting Password</th>
+                            <th scope="col">Transfer meeting</th>
+                            <th scope="col">Edit</th>
+                            <th scope="col">Join</th>
+                        </tr>
+                    </thead>
+                    <tbody>                       
+                            {% for cognovid_obj in cognovid_objs %}
+                            <tr>
+                                <td>
+                                    {% if cognovid_obj.full_name|length %}
+                                        {{ cognovid_obj.full_name }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                    <div class="tooltip-textarea" style="display: inline-flex;">
+                                        {% if cognovid_obj.is_expired %}
+                                        <a data-toggle="tooltip" title="Meeting has ended" style="margin-right: 1rem">
+                                            <svg data-toggle="tooltip" data-placement="top" title="" class="svg-hide-on-desktop"width="18" height="17" viewBox="0 0 18 17" fill="none" xmlns="http://www.w3.org/2000/svg" data-original-title="Edit">
+                                                <path d="M4.8126 6.4684H4.2573C3.49951 6.44102 2.74418 6.56966 2.03818 6.84635C1.33218 7.12304 0.690574 7.54187 0.153186 8.07686L0 8.25558V13.5405H2.60416V10.5406L2.95522 10.1449L3.11478 9.95977C3.94577 9.10608 4.98032 8.47788 6.12106 8.1343C5.54993 7.69972 5.09949 7.12624 4.8126 6.4684Z" fill="#757575"></path>
+                                                <path d="M17.1569 8.05773C16.6196 7.52275 15.978 7.10391 15.272 6.82722C14.566 6.55053 13.8106 6.42189 13.0528 6.44928C12.8204 6.44994 12.5882 6.46272 12.3571 6.48757C12.0648 7.10473 11.6267 7.64144 11.0806 8.05135C12.2984 8.38826 13.4016 9.05018 14.2719 9.96618L14.4315 10.1449L14.7762 10.5406V13.5469H17.291V8.23645L17.1569 8.05773Z" fill="#757575"></path>
+                                                <path d="M4.23808 5.22378H4.43595C4.34401 4.43439 4.48252 3.63526 4.83476 2.92286C5.187 2.21045 5.73791 1.61523 6.42099 1.20903C6.17338 0.830755 5.83177 0.52327 5.42962 0.316686C5.02747 0.110101 4.57856 0.0114991 4.12685 0.0305345C3.67515 0.04957 3.23613 0.18559 2.85278 0.425276C2.46944 0.664962 2.15491 1.0001 1.94001 1.39786C1.7251 1.79563 1.61718 2.24239 1.62681 2.69439C1.63645 3.1464 1.7633 3.58815 1.99496 3.9764C2.22662 4.36465 2.55514 4.68608 2.94835 4.90921C3.34156 5.13235 3.78597 5.24954 4.23808 5.24931V5.22378Z" fill="#757575"></path>
+                                                <path d="M12.7465 4.74507C12.7542 4.89177 12.7542 5.03878 12.7465 5.18548C12.869 5.20489 12.9927 5.21556 13.1167 5.21739H13.2379C13.6881 5.19339 14.1243 5.05325 14.5042 4.8106C14.8841 4.56796 15.1946 4.23109 15.4057 3.83279C15.6167 3.43449 15.721 2.98832 15.7085 2.53774C15.6959 2.08715 15.5669 1.6475 15.334 1.26159C15.101 0.87567 14.7721 0.55664 14.3793 0.335558C13.9865 0.114476 13.5431 -0.00112567 13.0924 8.26235e-06C12.6416 0.0011422 12.1988 0.118973 11.8071 0.342029C11.4154 0.565085 11.0882 0.885765 10.8572 1.27285C11.4349 1.65003 11.9099 2.16471 12.2396 2.77073C12.5694 3.37675 12.7435 4.05515 12.7465 4.74507Z" fill="#757575"></path>
+                                                <path d="M8.55939 7.60452C10.1351 7.60452 11.4125 6.32715 11.4125 4.75143C11.4125 3.17571 10.1351 1.89834 8.55939 1.89834C6.98367 1.89834 5.7063 3.17571 5.7063 4.75143C5.7063 6.32715 6.98367 7.60452 8.55939 7.60452Z" fill="#757575"></path>
+                                                <path d="M8.7126 9.12363C7.87904 9.08997 7.04729 9.2253 6.26739 9.52147C5.48749 9.81763 4.77557 10.2685 4.17446 10.847L4.01489 11.0257V15.066C4.01738 15.1976 4.04578 15.3274 4.09845 15.448C4.15113 15.5687 4.22705 15.6777 4.32189 15.769C4.41672 15.8603 4.52861 15.932 4.65116 15.98C4.77372 16.028 4.90453 16.0515 5.03613 16.0489H12.3699C12.5015 16.0515 12.6323 16.028 12.7549 15.98C12.8774 15.932 12.9893 15.8603 13.0842 15.769C13.179 15.6777 13.2549 15.5687 13.3076 15.448C13.3603 15.3274 13.3887 15.1976 13.3912 15.066V11.0385L13.238 10.847C12.6408 10.2667 11.9313 9.81458 11.1532 9.51824C10.375 9.2219 9.5445 9.08762 8.7126 9.12363Z" fill="#757575"></path>
+                                            </svg>
+                                        </a>
+                                        {% else %}
+                                        <a data-toggle="modal" data-target="#assign_meeting-{{ cognovid_obj.pk }}" style="margin-right: 1rem;cursor: pointer;">
+                                            <svg class="svg-hide-on-desktop" width="18" height="17" viewBox="0 0 18 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M4.8126 6.4684H4.2573C3.49951 6.44102 2.74418 6.56966 2.03818 6.84635C1.33218 7.12304 0.690574 7.54187 0.153186 8.07686L0 8.25558V13.5405H2.60416V10.5406L2.95522 10.1449L3.11478 9.95977C3.94577 9.10608 4.98032 8.47788 6.12106 8.1343C5.54993 7.69972 5.09949 7.12624 4.8126 6.4684Z" fill="#757575"></path>
+                                                <path d="M17.1569 8.05773C16.6196 7.52275 15.978 7.10391 15.272 6.82722C14.566 6.55053 13.8106 6.42189 13.0528 6.44928C12.8204 6.44994 12.5882 6.46272 12.3571 6.48757C12.0648 7.10473 11.6267 7.64144 11.0806 8.05135C12.2984 8.38826 13.4016 9.05018 14.2719 9.96618L14.4315 10.1449L14.7762 10.5406V13.5469H17.291V8.23645L17.1569 8.05773Z" fill="#757575"></path>
+                                                <path d="M4.23808 5.22378H4.43595C4.34401 4.43439 4.48252 3.63526 4.83476 2.92286C5.187 2.21045 5.73791 1.61523 6.42099 1.20903C6.17338 0.830755 5.83177 0.52327 5.42962 0.316686C5.02747 0.110101 4.57856 0.0114991 4.12685 0.0305345C3.67515 0.04957 3.23613 0.18559 2.85278 0.425276C2.46944 0.664962 2.15491 1.0001 1.94001 1.39786C1.7251 1.79563 1.61718 2.24239 1.62681 2.69439C1.63645 3.1464 1.7633 3.58815 1.99496 3.9764C2.22662 4.36465 2.55514 4.68608 2.94835 4.90921C3.34156 5.13235 3.78597 5.24954 4.23808 5.24931V5.22378Z" fill="#757575"></path>
+                                                <path d="M12.7465 4.74507C12.7542 4.89177 12.7542 5.03878 12.7465 5.18548C12.869 5.20489 12.9927 5.21556 13.1167 5.21739H13.2379C13.6881 5.19339 14.1243 5.05325 14.5042 4.8106C14.8841 4.56796 15.1946 4.23109 15.4057 3.83279C15.6167 3.43449 15.721 2.98832 15.7085 2.53774C15.6959 2.08715 15.5669 1.6475 15.334 1.26159C15.101 0.87567 14.7721 0.55664 14.3793 0.335558C13.9865 0.114476 13.5431 -0.00112567 13.0924 8.26235e-06C12.6416 0.0011422 12.1988 0.118973 11.8071 0.342029C11.4154 0.565085 11.0882 0.885765 10.8572 1.27285C11.4349 1.65003 11.9099 2.16471 12.2396 2.77073C12.5694 3.37675 12.7435 4.05515 12.7465 4.74507Z" fill="#757575"></path>
+                                                <path d="M8.55939 7.60452C10.1351 7.60452 11.4125 6.32715 11.4125 4.75143C11.4125 3.17571 10.1351 1.89834 8.55939 1.89834C6.98367 1.89834 5.7063 3.17571 5.7063 4.75143C5.7063 6.32715 6.98367 7.60452 8.55939 7.60452Z" fill="#757575"></path>
+                                                <path d="M8.7126 9.12363C7.87904 9.08997 7.04729 9.2253 6.26739 9.52147C5.48749 9.81763 4.77557 10.2685 4.17446 10.847L4.01489 11.0257V15.066C4.01738 15.1976 4.04578 15.3274 4.09845 15.448C4.15113 15.5687 4.22705 15.6777 4.32189 15.769C4.41672 15.8603 4.52861 15.932 4.65116 15.98C4.77372 16.028 4.90453 16.0515 5.03613 16.0489H12.3699C12.5015 16.0515 12.6323 16.028 12.7549 15.98C12.8774 15.932 12.9893 15.8603 13.0842 15.769C13.179 15.6777 13.2549 15.5687 13.3076 15.448C13.3603 15.3274 13.3887 15.1976 13.3912 15.066V11.0385L13.238 10.847C12.6408 10.2667 11.9313 9.81458 11.1532 9.51824C10.375 9.2219 9.5445 9.08762 8.7126 9.12363Z" fill="#757575"></path>
+                                            </svg>
+                                        </a>
+                                        {% endif %}
+                                        {% if cognovid_obj.is_expired %}
+                                        <a data-toggle="tooltip" title="Meeting has ended" style="margin-right: 1rem">
+                                            <svg class="svg-hide-on-desktop" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M15.36 14.48H0.64C0.286 14.48 0 14.766 0 15.12V15.84C0 15.928 0.072 16 0.16 16H15.84C15.928 16 16 15.928 16 15.84V15.12C16 14.766 15.714 14.48 15.36 14.48ZM2.914 12.8C2.954 12.8 2.994 12.796 3.034 12.79L6.398 12.2C6.438 12.192 6.476 12.174 6.504 12.144L14.982 3.666C15.0005 3.6475 15.0153 3.62552 15.0253 3.60133C15.0353 3.57713 15.0405 3.55119 15.0405 3.525C15.0405 3.49881 15.0353 3.47287 15.0253 3.44867C15.0153 3.42448 15.0005 3.4025 14.982 3.384L11.658 0.058C11.62 0.02 11.57 0 11.516 0C11.462 0 11.412 0.02 11.374 0.058L2.896 8.536C2.866 8.566 2.848 8.602 2.84 8.642L2.25 12.006C2.23054 12.1131 2.2375 12.2234 2.27025 12.3273C2.30301 12.4311 2.36059 12.5254 2.438 12.602C2.57 12.73 2.736 12.8 2.914 12.8Z" fill="#757575"></path>
+                                            </svg>
+                                        </a>
+                                        {% else %}
+                                        <a data-toggle="modal" data-target="#edit_meeting-{{ cognovid_obj.pk }}" style="cursor: pointer;margin-right: 1rem;">
+                                            <svg class="svg-hide-on-desktop" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M15.36 14.48H0.64C0.286 14.48 0 14.766 0 15.12V15.84C0 15.928 0.072 16 0.16 16H15.84C15.928 16 16 15.928 16 15.84V15.12C16 14.766 15.714 14.48 15.36 14.48ZM2.914 12.8C2.954 12.8 2.994 12.796 3.034 12.79L6.398 12.2C6.438 12.192 6.476 12.174 6.504 12.144L14.982 3.666C15.0005 3.6475 15.0153 3.62552 15.0253 3.60133C15.0353 3.57713 15.0405 3.55119 15.0405 3.525C15.0405 3.49881 15.0353 3.47287 15.0253 3.44867C15.0153 3.42448 15.0005 3.4025 14.982 3.384L11.658 0.058C11.62 0.02 11.57 0 11.516 0C11.462 0 11.412 0.02 11.374 0.058L2.896 8.536C2.866 8.566 2.848 8.602 2.84 8.642L2.25 12.006C2.23054 12.1131 2.2375 12.2234 2.27025 12.3273C2.30301 12.4311 2.36059 12.5254 2.438 12.602C2.57 12.73 2.736 12.8 2.914 12.8Z" fill="#757575"></path>
+                                            </svg>
+                                        </a>
+                                        {% endif %}
+                                        {% if cognovid_obj.is_expired %}
+
+                                        {% else %}
+                                        <a href="/easy-assist/meeting/{{ cognovid_obj.meeting_id }}" target="_blank">
+                                            <svg class="svg-hide-on-desktop" width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M0.229248 14C0.229248 14.5304 0.439962 15.0391 0.815034 15.4142C1.19011 15.7893 1.69882 16 2.22925 16L14.2292 16C14.7597 16 15.2684 15.7893 15.6435 15.4142C16.0185 15.0391 16.2292 14.5304 16.2292 14L16.2292 2C16.2292 1.46957 16.0185 0.96086 15.6435 0.585787C15.2684 0.210715 14.7597 3.18529e-07 14.2292 3.41715e-07L2.22925 8.66252e-07C1.69881 8.89437e-07 1.19011 0.210715 0.815034 0.585788C0.439961 0.96086 0.229247 1.46957 0.229247 2L0.229248 14ZM11.2292 9.5L11.2292 5.5C11.2292 5.36739 11.1766 5.24021 11.0828 5.14645C10.989 5.05268 10.8619 5 10.7292 5L6.72925 5C6.59664 5 6.46946 5.05268 6.37569 5.14645C6.28193 5.24022 6.22925 5.36739 6.22925 5.5C6.22925 5.63261 6.28193 5.75979 6.37569 5.85355C6.46946 5.94732 6.59664 6 6.72925 6L9.52225 6L5.37525 10.146C5.28136 10.2399 5.22862 10.3672 5.22862 10.5C5.22862 10.6328 5.28136 10.7601 5.37525 10.854C5.46913 10.9479 5.59647 11.0006 5.72925 11.0006C5.86202 11.0006 5.98936 10.9479 6.08325 10.854L10.2292 6.707L10.2292 9.5C10.2292 9.63261 10.2819 9.75979 10.3757 9.85355C10.4695 9.94732 10.5966 10 10.7292 10C10.8619 10 10.989 9.94732 11.0828 9.85355C11.1766 9.75979 11.2292 9.63261 11.2292 9.5Z" fill="#757575"></path>
+                                            </svg>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                
+                                {% if cognovid_obj.mobile_number|length %}
+                                <td>{{ cognovid_obj.mobile_number|mask_data }}</td>
+                                {% else %}
+                                <td>-</td>
+                                {% endif %}
+                                {% if cognovid_obj.email_id|length %}
+                                <td>{{ cognovid_obj.email_id|mask_data }}</td>
+                                {% else %}
+                                <td>-</td>
+                                {% endif %}
+                                <td>{{ cognovid_obj.meeting_description }}</td>
+                                <td>{{ cognovid_obj.meeting_start_date }}</td>
+                                <td>{{ cognovid_obj.meeting_start_time|time:"h:i a" }}</td>
+                                <td>{{ cognovid_obj.meeting_end_time|time:"h:i a" }}</td>
+                                {% if cognovid_obj.meeting_password|length %}
+                                <td class="td-hide-on-small-device">{{ cognovid_obj.meeting_password }}</td>
+                                {% else %}
+                                <td class="td-hide-on-small-device">-</td>
+                                {% endif %}
+                                <td class="td-hide-on-small-device">
+                                    {% if cognovid_obj.is_expired %}
+                                        <a data-toggle="tooltip" title="Meeting has ended"><i class="fas fa-fw fa-users"></i></a>
+                                    {% else %}
+                                        <a data-toggle="modal" data-target="#assign_meeting-{{ cognovid_obj.pk }}" style="cursor: pointer;" onclick="get_active_meeting_agent('{{ cognovid_obj.pk }}');">
+                                            <i class="fas fa-fw fa-users"></i>
+                                        </a>
+                                    {% endif %}
+                                </td>
+                                <td class="td-hide-on-small-device">
+                                    {% if cognovid_obj.is_expired %}
+                                        <a data-toggle="tooltip" title="Meeting has ended"><i class="fas fa-fw fa-edit"></i></a>
+                                    {% else %}
+                                        <a data-toggle="modal" data-target="#edit_meeting-{{ cognovid_obj.pk }}" style="cursor: pointer;"><i class="fas fa-fw fa-edit"></i></a>
+                                    {% endif %}
+                                </td>
+                                <td class="td-hide-on-small-device">
+                                    {% if cognovid_obj.is_expired %}
+                                    Expired
+                                    {% else %}
+                                    <a class="btn" href="/easy-assist/meeting/{{ cognovid_obj.meeting_id }}" target="_blank"><i class="fas fa-fw fa-external-link-square-alt"></i></a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% for cognovid_obj in cognovid_objs %}
+<div class="modal fade" id="edit_meeting-{{ cognovid_obj.pk }}" tabindex="-1" role="dialog" aria-labelledby="edit_meeting_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="edit_meeting_label">Edit Meeting Details</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Customer Full Name</span>
+                            </div>
+                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="client-full-name-{{ cognovid_obj.pk }}" value="{{ cognovid_obj.full_name }}">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Customer Mobile Number</span>
+                            </div>
+                            <input type="number" class="form-control positive_numeric mobile_number" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="client-modile-number-{{ cognovid_obj.pk }}" value="{{ cognovid_obj.mobile_number }}">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Customer Email</span>
+                            </div>
+                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="client-email-id-{{ cognovid_obj.pk }}" value="{{ cognovid_obj.email_id }}">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Meeting Description</span>
+                            </div>
+                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="client-meeting-description-{{ cognovid_obj.pk }}" value="{{ cognovid_obj.meeting_description }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Meeting Date</span>
+                            </div>
+                            <input class="form-control datepicker" aria-label="Sizing example input" autocomplete="off"  aria-describedby="inputGroup-sizing-sm" id="client-meeting-start-date-{{ cognovid_obj.pk }}" data-date-format="dd-mm-yyyy" value="{{ cognovid_obj.meeting_start_date | date:'d-m-Y'  }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Meeting Password</span>
+                            </div>
+                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" autocomplete="off" id="client-meeting-password-{{ cognovid_obj.pk }}" value="{{ cognovid_obj.meeting_password }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Meeting Start Time</span>
+                            </div>
+                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="client-meeting-start-time-{{ cognovid_obj.pk }}" value="{{ cognovid_obj.meeting_start_time |time:'H:i'  }}" onkeypress="return meeting_time_input_validate(event)">
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Meeting End Time</span>
+                            </div>
+                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="client-meeting-end-time-{{ cognovid_obj.pk }}" value="{{ cognovid_obj.meeting_end_time|time:'H:i'  }}" onkeypress="return meeting_time_input_validate(event)">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div style="margin-top: 1em;">
+                            <div class="tab-content">
+                                <div class="tab-pane fade show active" role="tabpanel" aria-labelledby="pills-video-conferencing-tab" style="padding:1em 1em 0em 1em;">
+                                    <div class="">
+                                        <div class="input-group input-group-sm mb-3">
+                                            <input type="text" class="form-control" value="https://{{ request.META.HTTP_HOST }}/easy-assist/meeting/{{ cognovid_obj.meeting_id }}" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p style="color:green;" id="generate-link-details-error-{{ cognovid_obj.pk }}"></p>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-success" onclick="save_meeting_link(this, '{{ cognovid_obj.pk }}')"><i class="fas fa-fw fa-check"></i>Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="assign_meeting-{{ cognovid_obj.pk }}" tabindex="-1" role="dialog" aria-labelledby="assign_meeting_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assign_meeting_label">Transfer Meeting To Another Agent</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <select id="select-assign-agent-{{ cognovid_obj.pk }}" class="form-control" style="width:50%;">
+                          <option value="">Select Agent</option> 
+                            {% for agent_obj in agent_objs %}
+                            <option value="{{ agent_obj.pk }}">{{ agent_obj.user.username }}</option>
+                            {% endfor %}
+                        </select>
+                        <div id="assign-meeting-session-error-{{ cognovid_obj.pk }}" style="color: red;" class="mt-4"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary" id="assign-meeting-btn-{{ cognovid_obj.pk }}" onclick="assign_meeting_to_another_agent(this, '{{ cognovid_obj.pk }}')">Transfer</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $('#client-meeting-start-time-{{ cognovid_obj.pk }}').timepicker({ 
+        'step': {{ meeting_end_time }},
+        'scrollDefault': 'now',
+        "timeFormat": 'h:iA'
+    });
+    $('#client-meeting-end-time-{{ cognovid_obj.pk }}').timepicker({ 
+        'step': {{ meeting_end_time }},
+        'scrollDefault': 'now',
+        "timeFormat": 'h:iA'
+    });
+</script>
+{% endfor %}
+
+<div class="modal fade" id="generate_link_modal" tabindex="-1" role="dialog" aria-labelledby="generate_link_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="generate_link_modal_label">Ready to schedule meeting?</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Customer Full Name</span>
+                            </div>
+                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="client-full-name" autocomplete="off">
+                        </div>
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Customer Mobile Number</span>
+                            </div>
+                            <input type="number" class="form-control positive_numeric mobile_number" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="client-modile-number" autocomplete="off">
+                        </div>
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Customer Email</span>
+                            </div>
+                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" maxlength="50" id="client-email-id" autocomplete="off">
+                        </div>
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Meeting Description</span>
+                            </div>
+                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" maxlength="100" id="client-meeting-description" autocomplete="off">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-sm-12">
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="inputGroup-sizing-sm">Meeting Date</span>
+                                    </div>
+                                    <input class="form-control datepicker" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" autocomplete="off" data-date-format="dd-mm-yyyy" id="client-meeting-start-date">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-12">
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="inputGroup-sizing-sm">Meeting Password</span>
+                                    </div>
+                                    <input type="text" class="form-control" value="{{ default_password }}" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" autocomplete="off" id="client-meeting-password">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-sm-12">
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="inputGroup-sizing-sm">Meeting Start Time</span>
+                                    </div>
+                                    <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="client-meeting-start-time" onkeypress="return meeting_time_input_validate(event)">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-12">
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="inputGroup-sizing-sm">Meeting End Time</span>
+                                    </div>
+                                    <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="client-meeting-end-time" onkeypress="return meeting_time_input_validate(event)">
+                                </div>
+                            </div>
+                        </div>
+                        <p id="schedule-meeting-text">On clicking "Schedule Meeting", a unique video conference link will be generated. Anyone on the internet with this link can join the video call.</p>
+                        <div id="video-conferencing-data-div" style="display:none;">
+                            <div class="tab-content" id="pills-tabContent">
+                                <div class="tab-pane fade show active" id="pills-video-conferencing-link" role="tabpanel" aria-labelledby="pills-video-conferencing-tab" style="padding:1em 1em 0em 1em;">
+                                    <div class="">
+                                        <div class="input-group input-group-sm mb-3">
+                                            <input type="text" value="" class="form-control" id="video-conferencing-link" onchange="generate_cobrowsing_link();" readonly>
+                                        </div>
+                                        <div class="input-group input-group-sm mb-3">
+                                            <button class="btn" data-clipboard-target="#video-conferencing-link" title="Copy Meeting Link"><i class="fas fa-fw fa-copy"></i></button>
+                                            <button class="btn" onclick="open_video_conferencing_link(this)" title="Join Video Call"><i class="fas fa-fw fa-external-link-square-alt"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade show" id="pills-cobrowsing-link" role="tabpanel" aria-labelledby="pills-home-tab" style="padding:1em 1em 0em 1em;">
+                                    <div class="">
+                                        <div class="input-group input-group-sm mb-3">
+                                            <p>Please enter product link which customer wants to purchase</p>
+                                            <input type="text" class="form-control" id="product-page-url" placeholder="Enter product page url" cobrowse-session="">
+                                        </div>
+                                        <div class="input-group input-group-sm mb-3">
+                                            <button class="btn btn-primary" onclick="generate_cobrowsing_link()">Generate Co-browsing Link</button>
+                                        </div>
+                                        <div class="input-group input-group-sm mb-3" id="generated-cobrowsing-link-div" style="display:none;">
+                                            <p>Copy below co-browsing url and share it with customer</p>
+                                            <div class="input-group input-group-sm mb-3">
+                                                <input type="text" value="" class="form-control" id="generated-cobrowsing-link" disabled>
+                                            </div>
+                                            <div class="input-group input-group-sm mb-3">
+                                                <button class="btn" data-clipboard-target="#generated-cobrowsing-link"><i class="fas fa-fw fa-copy"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p style="color:green;" id="generate-link-details-error"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal" onclick="refresh_page();">Cancel</button>
+                <button class="btn btn-primary" id="generate_sharable_link_button"onclick="generate_sharable_link(this)">Schedule Meeting</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="todays_meeting_modal" tabindex="-1" role="dialog" aria-labelledby="todays_meeting_modal_label" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="generate_link_modal_label">Scheduled Meetings</h5>
+            </div>
+            <div class="modal-body">
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+window.onload = function() {
+    $("#dataTable").DataTable({
+        "ordering": false
+    });
+};
+
+function show_video_conferencing_details() {
+    document.getElementById("video-conferencing-data-div").style.display = "block";
+}
+
+function hide_video_conferencing_details() {
+    document.getElementById("video-conferencing-data-div").style.display = "none";
+}
+
+function open_video_conferencing_link(element) {
+    value = document.getElementById("video-conferencing-link").value;
+    if (value != "" && value != undefined && value != null) {
+        window.open(value, "_blank");
+    }
+}
+
+function generate_cobrowsing_link() {
+    product_url = document.getElementById("product-page-url").value;
+    if (product_url != null && product_url != undefined && product_url != "") {
+        session_id = document.getElementById("product-page-url").getAttribute("cobrowse-session");
+        product_url = product_url + "#ea_id=" + session_id;
+        document.getElementById("generated-cobrowsing-link").value = product_url;
+        show_generated_cobrowsing_link_details();
+    }
+}
+
+function show_generated_cobrowsing_link_details() {
+    document.getElementById("generated-cobrowsing-link-div").style.display = "block";
+    console.log("show details");
+}
+
+function hide_generated_cobrowsing_link_details() {
+    document.getElementById("generated-cobrowsing-link-div").style.display = "none";
+}
+</script>
+
+{% if request.user.enable_s3_bucket %}
+<script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/clipboard.min.js">
+</script>
+{% else %}
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/clipboard.min.js' %}">
+</script>
+{% endif %}
+<script type="text/javascript">
+var clipboard = new ClipboardJS('.btn');
+
+clipboard.on('success', function(e) {
+    e.clearSelection();
+    show_easyassist_toast("Link has been copied successfully.");
+});
+
+clipboard.on('error', function(e) {
+    show_easyassist_toast("Oop! Unable to copy the link. Please try again.");
+});
+
+$('#client-meeting-start-time').timepicker({ 
+    'step': {{ meeting_end_time }},
+    'scrollDefault': 'now',
+    "timeFormat": 'h:iA'
+
+});
+$('#client-meeting-end-time').timepicker({ 
+    'step': {{ meeting_end_time }},
+    'scrollDefault': 'now',
+    "timeFormat": 'h:iA'
+
+});
+</script>
+<script type="text/javascript">
+$(document).ready(function() {
+    // Set today's date in the form
+    var todays_date = new Date().toISOString().slice(0, 10);
+    todays_date = todays_date.split("-");
+    todays_date.reverse();
+    todays_date = todays_date.join('-');
+    document.getElementById('client-meeting-start-date').value = todays_date;
+    $("#client-meeting-start-date").datepicker({ startDate: new Date()});    
+});
+
+var input_index=1;
+var inputs=$("#generate_link_modal input").slice(0,8);
+function modal_event_handler(event) {
+        var key = event.key || event.keyCode;
+        if (key === 'Enter' || key === 'enter' || key === 13) {
+            console.log('event');
+            if(input_index==8){
+                $('#generate_sharable_link_button').trigger('click');
+                document.removeEventListener('keydown', modal_event_handler);
+                input_index=1;
+                return;
+            }
+            if(input_index==5){
+                input_index++;
+                return;
+            }
+            inputs[input_index].focus();
+            input_index++;
+        }
+}
+
+$('#generate_link_modal').on('shown.bs.modal', function () {
+    $('#client-full-name').focus();
+    document.addEventListener('keydown', modal_event_handler);
+})  
+function refresh_page(){
+    window.location.reload();
+}
+
+function fill_random_password() {
+    
+    var password = Math.random().toString(36).slice(2) +  Math.random().toString(36) .toUpperCase().slice(2); 
+    var filed_pass = document.getElementById("client-meeting-password").value;
+    if(filed_pass == ""){
+        document.getElementById("client-meeting-password").value = password.substring(0,5)
+    }
+}
+</script>
+{% endblock %}

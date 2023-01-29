@@ -1,0 +1,167 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+   <head lang="en">
+      <title>EasyChat</title>
+
+      {% if request.user.enable_s3_bucket %}     
+       <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/jquery.min.js"></script>
+      {% else %}
+         <script type="text/javascript" src="{% static 'EasyChatApp/js/jquery.min.js' %}"></script>
+      {% endif %}
+
+      
+      <script src="{% static 'EasyChatApp/js/materialize.js' %}"></script>
+      <script type="text/javascript" src="{% static 'EasyChatApp/js/agent_chatbox.js' %}?v={% random_int 1 100 %}"></script>
+
+      <link href="{% static 'EasyChatApp/css/agent_chatbox.css' %}?v={% random_int 1 100 %}" rel="stylesheet">
+
+      {% if request.user.enable_s3_bucket %}
+
+        <link href="https://static.allincall.in/static/EasyChatApp/img/favicon.svg" rel="icon">
+        <link href="https://static.allincall.in/static/EasyChatApp/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+
+
+      {% else %}
+        <link href="{% static 'EasyChatApp/img/favicon.svg' %}" rel="icon">
+        <link href="{% static 'EasyChatApp/css/materialize.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+      {% endif %}
+      
+      <link href="{% static 'EasyChatApp/css/material_icons.css' %}" rel="stylesheet">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      
+   </head>
+   <body style="overflow-y: hidden;">
+
+       <div class="row" style=" border: 1px; background-color: #6a1b9a">
+         <div class="col s12" style="padding-bottom: 1em">
+           <h8 style="color: white; "><br><strong>User ID</strong> : {{ user_id }}</h8>
+         </div>     
+         <br>
+       </div>
+       
+       <div class="scrollbar row" id="style-2" style="position: absolute;">    
+         <div class="row">      
+           <div class="new-chat-form-launcher disabled" data-radium="true" style="width: 100% !important;">
+               
+               {% for message in message_history %}
+              
+                {% if message.sender == "agent" %}
+                  <script> 
+                    append_response_user("{{ message.message }}") 
+                    scroll_to_bottom()
+                  </script>
+                {% elif message.sender == "customer" %}
+                  <script> 
+                    append_response_server("{{ message.message }}","","","","") 
+                    scroll_to_bottom()
+                  </script>
+                {% endif %}
+              {% endfor %}
+
+                <div id="submit" class="send-button">
+                   <i id="submit-response" class="material-icons responsive-img" title="Send" onclick="send_message_to_user('{{ user_id }}')" style="border:none; color: #6a1b9a">send</i>    
+                </div>
+
+
+                <div class="input-container" data-radium="true">
+                  <div>
+                    <input class="chat-input" id="query" type="text" placeholder="Write your response" style="border:none;">
+                  </div>
+                </div>
+                
+                <img id="scrollBot-img" src="/static/EasyChatApp/img/double_arrow_bottom_bold.png" width="25" height="25" class="srolltobot-img" style="display:none">
+
+               </div>
+               <div id="restart-button" class="menu-button" title="Restart" style="color: rgb(102, 56, 205); background:#6a1b9a;"><img src="{% static 'EasyChatApp/img/restart.png' %}" width="24" height="22" style="padding:auto" class="responsive-img">
+            </div>
+            </div>
+         </div>
+
+         
+      
+      
+
+      <script type="text/javascript">
+
+       var user_id = "{{ user_id }}"
+       var room_name = user_id;
+       
+        var chat_socket = new WebSocket(
+            'ws://' + window.location.host +
+            '/ws/chat/room/' + room_name + '/');
+
+        $(document).on("keyup","#query",function (e) {
+            var key = e.which;
+            if(key == 13)
+            {
+                $('#submit-response').click();
+                return false;
+            }
+        });
+
+        chat_socket.onmessage = function(e) {
+            
+            var data = JSON.parse(e.data);
+           
+            var message = data['message'];
+            var sender = data['sender'];
+            
+            if(sender=="customer")
+              append_response_server(message,"","","",""); 
+
+            scroll_to_bottom();
+        };
+
+        chat_socket.onclose = function(e) {
+              $.ajax({
+                url: "/chat/delete-livechat-session/",
+                type: "POST",
+                data: {
+                  user_id:user_id,
+                },
+                success: function(response) {
+                  console.log("Success");
+                },
+                error: function(xhr, textstatus, errorthrown) {
+                    // console.log("Please report this error: "+errorthrown+xhr.status+xhr.responseText);
+                }
+
+
+              });
+            
+            console.error('Chat socket closed unexpectedly');
+        };
+
+       function send_message_to_user(user_id){              
+
+             if(($.trim($('#query').val()) != '') && ($("#query").val()).length<300){
+
+                var sentence = $("#query").val();
+                sentence = $($.parseHTML(sentence)).text();
+                if (sentence.length == 0) {      // error!
+                  $("#query").val("");
+                  return;
+                }
+                $("#query").val("");
+                append_response_user(sentence);
+
+               var sentence = JSON.stringify({
+                     'message':JSON.stringify({"text_message": sentence, "type": "text", "channel": "Web", "path": ""}),
+                    'sender':"agent"
+                 });
+                 
+               
+               chat_socket.send(sentence);
+               scroll_to_bottom();
+
+             }     
+           }
+                       
+       </script> 
+
+      
+
+   </body>
+</html>

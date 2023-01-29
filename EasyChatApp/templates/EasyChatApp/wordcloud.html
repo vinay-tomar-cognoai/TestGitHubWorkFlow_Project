@@ -1,0 +1,134 @@
+{% extends 'EasyChatApp/console.html' %}
+{% block consolecontent %}
+{% load static %}
+
+<div class="row" id="select-bot-for-analytics">
+    <div class="col s3">
+        *Search and select from existing bot list
+        <div class="input-field col s12">
+          <select multiple id="multiple-select-bot-choice-pk-list">
+            {% for bot_obj in bot_list %}
+                {% if bot_obj.is_selected %}
+                  <option value="{{ bot_obj.pk }}" selected>{{ bot_obj.name }}</option>
+                {% else %}
+                  <option value="{{ bot_obj.pk }}">{{ bot_obj.name }}</option>
+                {% endif %}
+            {% endfor %}
+          </select>
+        </div>
+    </div>
+    <div class="col s2" style="margin-top: 3em;">
+        <label>
+            <input name="bot-type-group" type="radio" id="uat" checked/>
+            <span style="color: black">UAT</span>
+        </label>
+        <label>
+            <input name="bot-type-group" type="radio" id="prod" />
+            <span style="color: black">PRODUCTION</span>
+        </label>
+    </div>
+    <div class="col s2" style="margin-top: 3em;">
+        <a href="javascript:void(0)" id="show-wordcloud-btn" class="btn deep-purple">Show Word Cloud</a>
+    </div>
+    <div id="word-cloud-filter-div" class="col s3" style="display: none;margin-top: 3em;">
+    <select id="word-cloud-filter">
+    	<option value="today">Today</option>
+    	<option value="week">Last 7 days</option>
+    	<option value="month">This Month</option>
+    	<option value="6months" >Last 6 Months</option>
+    </select>
+    </div>
+</div>
+
+<script src="https://pulipulichen.github.io/blogger/posts/2016/11/r-text-mining/wordcloud2.js"></script>
+<canvas id="word_cloud" width="1170"  height= "760	"></canvas>
+
+
+<script>
+
+$('#word-cloud-filter').change(function(){
+    filter_value = $("#word-cloud-filter").val();
+    make_wordcloud(word_freq_data[filter_value])
+});
+function make_wordcloud(data_list) {
+	list = [];
+	for (var i in data_list) {
+	  list.push([data_list[i]["word"], data_list[i]["freq"]])
+	}
+
+	// WordCloud.minFontSize = "15px"
+	WordCloud(document.getElementById('word_cloud'), { list: list,
+	  gridSize: 18,
+	  weightFactor: 3,
+	  fontFamily: 'Finger Paint, cursive, sans-serif',
+	  color: '#f0f0c0',
+	  hover: window.drawBox,
+	  click: function(item) {
+	    alert(item[0] + ': ' + item[1]);
+	  },
+	  backgroundColor: '#001f00'
+	} );
+}
+
+var data_list = [  
+{"word":"布丁","freq":1},
+{"word":"name","freq":2},
+{"word":"false","freq":1},
+]
+// make_wordcloud(data_list)
+
+
+$('#show-wordcloud-btn').click(function(){
+    selected_bot_pk_list = $("#multiple-select-bot-choice-pk-list").val();
+    setTimeout(function(){
+        showWordCloud(selected_bot_pk_list);
+    }, 500);
+});
+
+var word_freq_data
+
+function showWordCloud(bots_pk){
+
+    list = document.getElementsByName("bot-type-group")
+    var bot_type=null;
+    
+    for(bot_type=0;bot_type<list.length;bot_type++)
+    {
+        if(list[bot_type].checked){
+            bot_type = list[bot_type].id
+            break
+        }
+    }
+
+	$.ajax({
+			url:"/chat/get-word-cloud/",
+			type:"POST",
+			data:{
+	          bots_pk : JSON.stringify(bots_pk),
+	          bot_type : bot_type, 
+	        },
+			success: function(response){
+				// console.log(response)
+			    $("#word-cloud-filter-div").hide()
+			    if(response["status"]==200){
+			    	word_freq_data = response["wordcloud_data"]
+			       M.toast({"html":"Details updated successfully."})
+			       // make_wordcloud(word_freq_data["month"])
+			       make_wordcloud(word_freq_data["today"])
+			       $("#word-cloud-filter-div").show()
+			       // console.log(data_list)
+			       // console.log(word_freq_data["month"])
+			    }
+			    else{
+			       M.toast({"html":"Internal Server Error. Please report this error"})
+			    }
+			},
+			error: function(error){
+			   console.log("Report this error: ", error);
+			}
+    });
+}
+
+</script>
+
+{% endblock %}

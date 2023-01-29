@@ -1,0 +1,518 @@
+{% extends 'EasyAssistSalesforceApp/console.html' %} {% block content %} {% load static %}
+<style type="text/css">
+.easychat-bot-message-div {
+    margin-top: 0em;
+    width: 100%;
+    display: inline-block;
+}
+
+@media only screen and (min-width: 760px) {
+#accordionSidebar{
+    position: fixed;
+    overflow: hidden;
+    z-index: 99999;
+}
+#content-wrapper{
+    margin-left: 220px !important;
+}   
+}
+
+.message-time-user {
+    font-size: 11px;
+    float: right;
+    text-align: right;
+    margin-left: 20px;
+    color: white;
+    padding: 0.5em 0em 0em 0.5em;
+}
+
+.message-time-bot {
+    font-size: 11px;
+    text-align: right;
+    width: 100%;
+    float: right;
+    padding: 0.5em 0em 0em 0.5em;
+}
+
+.easychat-bot-message {
+    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
+    float: left;
+    width: fit-content;
+    height: auto;
+    font-size: 14px;
+    color: #262626;
+    border-radius: 0px 10px 10px 10px;
+    background-color: #ffffff;
+    padding-bottom: 10px;
+    word-wrap: break-word;
+    display: inline-block;
+}
+
+@media screen and (min-width: 425px) {
+    .easychat-bot-message {
+        width: fit-content;
+        max-width: 80%;
+    }
+}
+
+.easychat-bot-message-line {
+    line-height: 20px;
+    padding: 0.8em 0.5em 0.8em 0.5em;
+}
+
+.easychat-user-message-div {
+    margin: 0em 0em 0em 0em;
+    width: 100%;
+    display: inline-block;
+}
+
+.easychat-user-message {
+    box-shadow: -1px 1px 5px rgba(0, 0, 0, 0.2);
+    float: right;
+    height: auto;
+    max-width: 80%;
+    font-size: 14px;
+    color: white;
+    border-radius: 10px 0px 10px 10px;
+    word-wrap: break-word;
+    display: inline-block;
+    margin-right: 0.3em;
+}
+
+.easychat-user-message-line {
+    line-height: 16px;
+    padding: 0.8em 0.7em 0.8em 0.8em !important;
+}
+
+.easychat-livechat-customer-attachment {
+    width: 50%;
+    float: left;
+    background-color: #ffffff;
+    margin: 1em 0px 3px 0px;
+    padding: 4px 4px 1px 4px;
+    border-radius: 0em 1em 1em 1em;
+    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
+}
+
+.easychat-livechat-message {
+    height: fit-content;
+    padding: 6px;
+    word-wrap: break-word;
+}
+</style>
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <!-- DataTales Example -->
+    <div class="row" style="margin: 0px 10px 10px 10px;">
+        {% if cobrowse_agent.get_access_token_obj.allow_video_meeting_only == False %}
+            <div class="col-md col-sm-12">
+                <a class="btn btn-tab" href="/easy-assist-salesforce/sales-ai/support-history/?salesforce_token={{salesforce_token}}"> Cobrowse Support History </a>
+            </div>
+        {% endif %}
+
+        {% if cobrowse_agent.get_access_token_obj.allow_generate_meeting == True %}
+            <div class="col-md col-sm-12">
+                <a class="btn btn-tab" href="/easy-assist-salesforce/sales-ai/meeting-audit-trail/?salesforce_token={{salesforce_token}}"> Meeting Support History </a>
+            </div>
+        {% endif %}
+
+        {% if cobrowse_agent.get_access_token_obj.allow_video_meeting_only == False %}
+            <div class="col-md col-sm-12">
+                <a class="btn btn-tab" href="/easy-assist-salesforce/sales-ai/unattended-leads/?salesforce_token={{salesforce_token}}"> Unattended Leads </a>
+            </div>
+        {% endif %}
+
+        {% if cobrowse_agent.get_access_token_obj.allow_video_meeting_only == False %}
+        {% if cobrowse_agent.get_access_token_obj.allow_screen_recording == True %}
+            <div class="col-md col-sm-12">
+                <a class="btn btn-tab" href="/easy-assist-salesforce/sales-ai/screen-recording-audit-trail/?salesforce_token={{salesforce_token}}"> Screen Recording History </a>
+            </div>
+        {% endif %}
+        {% endif %}
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <div class="row">
+                <div class="col-sm-7">
+                    <h6 class="m-0 font-weight-bold text-primary">Unattended Leads</h6>
+                </div>
+                <div class="col-sm-5" style="text-align: right;">
+                    <button class="btn btn-info" style="width: 110px;" onclick="export_unattended_leads(this)">Export</button>
+                    <button class="btn btn-info" data-toggle="modal" data-target="#apply_filter_modal" style="width: 110px;">Apply Filter</button>
+                </div>
+            </div>
+            <h6 class="m-0 font-weight-bold text-primary"></h6>
+        </div>
+        <div class="card-body">
+            {% if is_filter_applied %}
+            <div class="table-responsive">
+                <table class="table table-bordered" width="100%" cellspacing="0" id="support-history-table">
+                    <thead>
+                        <tr>
+                            <th>Customer Name</th>
+                            <th>Customer Mobile Number</th>
+                            <th>SR Datetime</th>
+                            {% if cobrowse_agent.role != "agent" %}
+                            <th>Agent</th>
+                            {% endif %}
+                            <th>Agent Remarks</th>
+                            <!-- <th>Session Details</th> -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cobrowse_io_obj in cobrowse_io_objs %}
+                        <tr>
+                            {% if cobrowse_io_obj.is_lead %}
+                                {% for value in cobrowse_io_obj.get_sync_data_name_mobile %}
+                                    <td> {{value}} </td>
+                                {% endfor %}
+                            {% else %}
+                                <td> {{ cobrowse_io_obj.full_name }} </td>
+                                <td> {{ cobrowse_io_obj.mobile_number }} </td>
+                            {% endif %}
+                            <td>{{ cobrowse_io_obj.request_datetime }}</td>
+                            
+                            {% if cobrowse_agent.role != "agent" %} 
+                                {% if cobrowse_io_obj.agent %}
+                                    <td>{{ cobrowse_io_obj.agent.user.username }}</td>
+                                {% else %}
+                                    <td>No agent</td>
+                                {% endif %} 
+                            {% endif %}
+                            <td>{{ cobrowse_io_obj.agent_comments }}</td>
+                            <!-- <td><a href="{{ cobrowse_io_obj.product_url }}" target="_blank">{{ cobrowse_io_obj.product_name|slice:":40" }}...</a></td>-->
+                            <!-- <td>
+                                <a href="javascript:void(0)" onclick="show_right_sidenav('{{ cobrowse_io_obj.pk }}')" class="btn btn-info btn-icon-split">
+                                    <span class="icon text-white-50">
+                            <i class="fas fa-info-circle"></i>
+                        </span>
+                                    <span class="text">Session Details</span>
+                                </a>
+                            </td> -->
+                        </tr>
+                        <!-- Product Infomation Start -->
+                        <ul class="navbar-nav bg-gradient-light sidebar sidebar-dark accordion product-session-details" id="accordionSidebar-{{ cobrowse_io_obj.pk }}" style="overflow-y: scroll;max-height: 100vh;">
+                            <a class="sidebar-brand" href="javascript:void(0)">
+                                <div class="text-dark mx-3">Session Details<i class="fas fa-window-close text-dark" style="float:right;" onclick="hide_right_sidenav(this)"></i></div>
+                            </a>
+                            <div style="padding:0.5em;">
+                                <div><b>Client Details</b>
+                                    <hr>
+                                </div>
+                                {% if cobrowse_io_obj.is_lead %}
+                                <p>{{ cobrowse_io_obj.get_sync_data|safe }}</p>
+                                {% else %}
+                                <p><b>Name:</b> {{ cobrowse_io_obj.full_name }}</p>
+                                <p><b>Mobile Number:</b> {{ cobrowse_io_obj.mobile_number }}</p>
+                                {% endif %}
+                                <p><b>Request DateTime:</b> {{ cobrowse_io_obj.request_datetime }}</p>
+                                {% if cobrowse_io_obj.role != "agent" %} {% if cobrowse_io_obj.agent_rating %}
+                                <p>NPS: {{ cobrowse_io_obj.agent_rating }}</p>
+                                {% endif %} {% if cobrowse_io_obj.client_comments %}
+                                <p>Comments: {{ cobrowse_io_obj.client_comments }}</p>
+                                {% endif %} {% endif %}
+                                <div>
+                                    <hr><b>Product Details</b>
+                                    <hr>
+                                </div>
+                                <p><b>Name:</b> <u><a href="{{ cobrowse_io_obj.product_url }}" target="_blank">{{ cobrowse_io_obj.product_name }}</a></u> </p>
+                                <p><b>Description:</b> {{ cobrowse_io_obj.product_description|slice:":100" }}</p>
+                                <!-- <p><b><u><a href="{{ cobrowse_io_obj.product_url }}" target="_blank">Product page</a></u></b> -->
+                                {% if cobrowse_io_obj.html %}
+                                <!-- <p><u><a href="/easy-assist-salesforce/sales-ai/support-history/last-state/{{ cobrowse_io_obj.pk }}" target="_blank">See Last State of Client Screen</a></u></p> -->
+                                {% endif %}
+                                <button class="btn btn-info" data-toggle="modal" data-target="#see_agent_comments" onclick="show_agents_comment_for_session('{{ cobrowse_io_obj.pk }}')">Agent(s) Comment</button><br><br>
+                            </div>
+                        </ul>
+                        <!-- Product Information End -->
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p><b>Please apply filter to see the support history details.</b></p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="see_agent_comments" tabindex="-1" role="dialog" aria-labelledby="see_agent_comments_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="see_agent_comments_modal_label">Agent(s) comments</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table class="table table-borderless" style="max-height: 305px;overflow-y: scroll;">
+                            <thead>
+                                <tr>
+                                    <th>Agent</th>
+                                    <th>Comments</th>
+                                    <th>DateTime</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-agent-comments-details"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="apply_filter_modal" tabindex="-1" role="dialog" aria-labelledby="apply_filter_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="apply_filter_modal_modal_label">Apply Custom Filter</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table class="table table-borderless">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <select class="form-control" onchange="show_filter_options(this)" id="selected-filter-parameter">
+                                            <option value="None">Select Filter</option>
+                                            <option value="title">Title</option>
+                                            {% if cobrowse_agent.role != "agent" %}
+                                            <option value="agent">Agent</option>
+                                            {% endif %}
+                                            <option value="startdate">Start Date</option>
+                                            <option value="enddate">End Date</option>
+                                        </select>
+                                    </th>
+                                    <th>
+                                        <select class="form-control filter-parameter" style="display:none;" id="selected-title-filter">
+                                            <option value="None">Select Title</option>
+                                            {% for page_title in title_list %}
+                                            <option value="{{ page_title }}">{{ page_title }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <select class="form-control filter-parameter" style="display:none;" id="selected-agent-filter">
+                                            <option value="None">Select Agent</option>
+                                            {% for agent in agents %}
+                                            <option value="{{ agent.user.username }}">{{ agent.user.username }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <input type="date" id="filter-start-date" placeholder="Start Date" style="display:none;" class="filter-parameter" data-date-format="dd/mm/yyyy">
+                                        <input type="date" id="filter-end-date" placeholder="End Date" style="display:none;" class="filter-parameter" data-date-format="dd/mm/yyyy">
+                                    </th>
+                                    <th style="cursor:pointer;"><button class="btn btn-success btn-icon-split" type="button" onclick="add_new_filter_parameter(this)"><span class="icon text-white-50"><i class="fas fa-check"></i></span>
+                                            <span class="text">Add</span></button></th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-filter-parameters"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <button id="reset_filter" class="btn btn-info" disabled onclick="reset_unattended_leads_filter(this)">Reset</button>
+                <button id="apply_filter_confirm" class="btn btn-info" disabled onclick="apply_unattended_leads_filter(this)">Apply Filter</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /.container-fluid -->
+<script type="text/javascript">
+function hide_right_sidenav(element) {
+    element.parentElement.parentElement.parentElement.style.display = "none";
+}
+
+function show_right_sidenav(element_id) {
+    var right_sidenav = document.getElementsByClassName("product-session-details");
+    for (var index = 0; index < right_sidenav.length; index++) {
+        right_sidenav[index].style.display = "none";
+    }
+    document.getElementById("accordionSidebar-" + element_id).style.display = "block";
+}
+
+function show_filter_options(element) {
+    if (element.value == "None") {
+        alert("Please select valid filter");
+    } else {
+
+        filter_parameters = document.getElementsByClassName("filter-parameter");
+        for (var index = 0; index < filter_parameters.length; index++) {
+            filter_parameters[index].style.display = "none";
+        }
+
+        if (element.value == "title") {
+            document.getElementById("selected-title-filter").style.display = "block";
+        } else if (element.value == "agent") {
+            document.getElementById("selected-agent-filter").style.display = "block";
+        } else if (element.value == "startdate") {
+            document.getElementById("filter-start-date").style.display = "block";
+        } else if (element.value == "enddate") {
+            document.getElementById("filter-end-date").style.display = "block";
+        } else {
+            alert("Please select valid filter");
+        }
+    }
+}
+
+
+    var last_startdate=null;
+    var last_enddate=null;
+    function add_new_filter_parameter(){
+        element = document.getElementById("selected-filter-parameter");
+        if(element.value=="None"){
+            alert("Please select valid filter parameter");
+        }else{
+            var value = "None";
+            var key = element.value;
+            if(element.value=="title"){
+              value = document.getElementById("selected-title-filter").value;
+              if(value == "None"){
+                alert("Please choose valid filter.");
+                return;
+              }
+            }else if(element.value=="agent"){
+              value = document.getElementById("selected-agent-filter").value;
+              if(value == "None"){
+                alert("Please choose valid filter.");
+                return;
+              }
+            }else if(element.value=="startdate"){
+              value = document.getElementById("filter-start-date").value;
+              if(last_startdate != null){
+                alert("Start Date filter already exists.");
+                return;
+              }
+              if(last_enddate!=null){
+                if(last_enddate<value){
+                  alert("Start Date is ahead of End date. Please choose valid filter value.");
+                  return;
+                }
+              }
+              var today = new Date();
+              var dd = today.getDate();
+              var mm = today.getMonth()+1; 
+              var yyyy = today.getFullYear();
+              if(dd<10) 
+              {
+                  dd='0'+dd;
+              } 
+
+              if(mm<10) 
+              {
+                  mm='0'+mm;
+              } 
+              today = yyyy+'-'+mm+'-'+dd;
+              if(value=="")
+              {
+                alert("Please select valid date");
+                return;
+              }
+              if(value>today || value.length>10){
+                alert("Please select valid date.");
+                return;
+              }
+              last_startdate = value;
+            }else if(element.value=="enddate"){
+              value = document.getElementById("filter-end-date").value;
+              if(last_enddate != null){
+                alert("End Date filter already exists.");
+                return;
+              }
+              if(last_startdate!=null){
+                if(last_startdate>value){
+                  alert("Start Date is ahead of End date. Please choose valid filter value.");
+                  return;
+                }
+              }
+              var today = new Date();
+              var dd = today.getDate();
+              var mm = today.getMonth()+1; 
+              var yyyy = today.getFullYear();
+              if(dd<10) 
+              {
+                  dd='0'+dd;
+              } 
+
+              if(mm<10) 
+              {
+                  mm='0'+mm;
+              } 
+              today = yyyy+'-'+mm+'-'+dd;
+              if(value=="")
+              {
+                alert("Please select valid date");
+                return;
+              }
+              if(value>today || value.length>10){
+                alert("Please select valid date.");
+                return;
+              }
+              last_enddate = value;
+            }else{
+              alert("Please select valid filter parameter");              
+            }   
+
+        tbody_html = '<tr class="tr-filter-parameters" filter-parameter="' + key + ':' + value + '">\
+            <td>' + key + '</td>\
+            <td>' + value + '</td>\
+            <td onclick="remove_selected_filter_parameter(this)" style="cursor: pointer;">\
+              <i class="fas fa-fw fa-archive" style="color:#D93431;"></i>\
+            </td></tr>';
+
+        document.getElementById("tbody-filter-parameters").innerHTML += tbody_html;
+        document.getElementById("apply_filter_confirm").removeAttribute("disabled");
+        document.getElementById("reset_filter").removeAttribute("disabled");
+    }
+}
+
+    function remove_selected_filter_parameter(element){
+        remove_element = element.parentElement;
+        if($(remove_element).attr("filter-parameter").split(":")[0] == "startdate")
+          last_startdate = null;
+        if($(remove_element).attr("filter-parameter").split(":")[0] == "enddate")
+          last_enddate = null;
+        remove_element.parentElement.removeChild(remove_element);
+        if(document.getElementsByClassName("tr-filter-parameters").length<=0){
+            document.getElementById("reset_filter").setAttribute("disabled", "disabled");
+            document.getElementById("apply_filter_confirm").setAttribute("disabled", "disabled");
+        }
+    }
+
+
+function apply_unattended_leads_filter(element) {
+    selected_filter_parameters = document.getElementsByClassName("tr-filter-parameters");
+    var key_value = '';
+    for (var index = 0; index < selected_filter_parameters.length; index++) {
+        key_value_filter = selected_filter_parameters[index].getAttribute("filter-parameter");
+        key_value += key_value_filter.replace(":", "=") + "&";
+    }
+    window.location = window.location.protocol + "//" + window.location.host + window.location.pathname + "?salesforce_token={{salesforce_token}}&" + key_value;
+}
+
+function reset_unattended_leads_filter() {
+    document.getElementById("tbody-filter-parameters").innerHTML = "";
+    document.getElementById("reset_filter").setAttribute("disabled", "disabled");
+    document.getElementById("apply_filter_confirm").setAttribute("disabled", "disabled");
+}
+
+$(document).ready(function() {
+    btn_tabs = document.getElementsByClassName("btn-tab");
+
+    for(var index=0; index< btn_tabs.length; index++){
+        btn_tabs[index].classList.remove("btn-tab-active");
+    }
+
+    for(var index=0; index< btn_tabs.length; index++){
+        if(btn_tabs[index].pathname==window.location.pathname){
+            btn_tabs[index].classList.add("btn-tab-active");
+        }
+    }
+});
+</script>
+{% endblock %}

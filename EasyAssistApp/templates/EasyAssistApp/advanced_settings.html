@@ -1,0 +1,984 @@
+{% extends 'EasyAssistApp/console.html' %}
+{% block content %}
+{% load static %}
+
+{% if request.user.enable_s3_bucket %}
+<script src="https://static.allincall.in/static/EasyAssistApp/js/ace.js" type="text/javascript"
+  charset="utf-8"></script>
+<script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/jscolor.min.js"></script>
+{% else %}
+<script src="{% static 'EasyAssistApp/js/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/jscolor.min.js' %}"></script>
+{% endif %}
+
+<link href="{% static 'EasyAssistApp/css/settings.css' %}" rel="stylesheet" type="text/css">
+
+<div class="container-fluid">
+  <div>
+    <div>
+      <div class="page-header">
+        <div class="row">
+          <div class="col-sm-6 d-flex align-items-center">
+            <div class="nav nav-pills navbar-right">
+              <a class="anchor-reset back-btn" href="/easy-assist/sales-ai/settings">
+                <span class="mr-3 mb-auto" style="cursor: pointer;">
+                  <svg class="back-arrow-svg" width="44" height="44" viewBox="0 0 44 44" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <rect width="44" height="44" rx="22" transform="matrix(1 0 0 -1 0 44)" fill="white" />
+                    {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                    <path
+                      d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                      fill="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" />
+                          {% else %}
+                          <path
+                      d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                      fill="#0254D7" />
+ 
+                          {% endif %} 
+                    
+                  </svg>
+                </span>
+              </a>
+              <!-- sprint 5.9 back to previous individual page wise link -->
+              <h5 class="nav_btn mr-2 mt-2"><a class="anchor-reset" href="/easy-assist/sales-ai/settings">Settings</a>
+              </h5>
+
+              <div class=" mr-2 pt-2">
+                <svg class="mini-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                    fill="#475569" />
+                </svg>
+              </div>
+
+              <h5 class="nav_btn active1 mt-2">Advanced Settings</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-30" id="advance-setting-tab">
+        <div class="col-md-12">
+          <div class="card shadow mb-4">
+            <div class="card-header py-3 masking-field-header">
+              <div class="row">
+                <div class="col-sm-5 d-flex align-items-center pl-0">
+                  <h6 class="m-0 font-weight-bold text-primary advance-setting-text ">Masking Fields</h6>
+                </div>
+                <div class="col-sm-7 d-flex justify-content-end">
+                  <button class="btn add-fields-btn  admin-setting-btn-save-changes" data-toggle="modal"
+                    data-target="#add_new_masking_field_modal">Add Field</button>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              {% if access_token_obj.obfuscated_fields.all %}
+              <div class="table-responsive">
+                <table class="table table-bordered" id="fieldTable" style="width: 100%; border-spacing: 0px;">
+                  <thead>
+                    <tr>
+                      <th scope="col">Field Key</th>
+                      <th scope="col">Field Value</th>
+                      <th scope="col">Masking Type</th>
+                      <th scope="col"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for field in access_token_obj.obfuscated_fields.all %}
+                    <tr>
+                      <td>
+                        {{ field.key }}
+                        <div style="position: absolute; right: 0; top: 20px;">
+                          <a onclick="show_edit_masking_field_modal('{{ field.pk }}');"
+                            style="margin-top: -2rem;display: inline-block;margin-right: 0.5em;">
+                            <svg class="svg-hide-on-desktop" width="18" height="18" viewBox="0 0 18 18" fill="none"
+                              xmlns="http://www.w3.org/2000/svg">
+                              {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                              <path
+                                d="M17.0604 0.939564C18.3132 2.19232 18.3132 4.22343 17.0604 5.47618L6.33146 16.2052C6.08325 16.4534 5.77457 16.6325 5.43593 16.7249L0.849981 17.9756C0.348084 18.1124 -0.112448 17.6519 0.0244331 17.15L1.27515 12.5641C1.3675 12.2254 1.54664 11.9167 1.79484 11.6685L12.5238 0.939564C13.7766 -0.313188 15.8077 -0.313188 17.0604 0.939564ZM11.6547 3.7104L2.74567 12.6194C2.66293 12.7021 2.60322 12.805 2.57244 12.9179L1.6313 16.3687L5.08212 15.4276C5.195 15.3968 5.2979 15.3371 5.38063 15.2543L14.2894 6.34506L11.6547 3.7104ZM13.4746 1.89039L12.6049 2.75927L15.2396 5.39482L16.1096 4.52535C16.8372 3.79773 16.8372 2.61802 16.1096 1.89039C15.382 1.16277 14.2023 1.16277 13.4746 1.89039Z"
+                                fill="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" />
+                                {% else %}
+                                <path
+                                d="M17.0604 0.939564C18.3132 2.19232 18.3132 4.22343 17.0604 5.47618L6.33146 16.2052C6.08325 16.4534 5.77457 16.6325 5.43593 16.7249L0.849981 17.9756C0.348084 18.1124 -0.112448 17.6519 0.0244331 17.15L1.27515 12.5641C1.3675 12.2254 1.54664 11.9167 1.79484 11.6685L12.5238 0.939564C13.7766 -0.313188 15.8077 -0.313188 17.0604 0.939564ZM11.6547 3.7104L2.74567 12.6194C2.66293 12.7021 2.60322 12.805 2.57244 12.9179L1.6313 16.3687L5.08212 15.4276C5.195 15.3968 5.2979 15.3371 5.38063 15.2543L14.2894 6.34506L11.6547 3.7104ZM13.4746 1.89039L12.6049 2.75927L15.2396 5.39482L16.1096 4.52535C16.8372 3.79773 16.8372 2.61802 16.1096 1.89039C15.382 1.16277 14.2023 1.16277 13.4746 1.89039Z"
+                                fill="#0254D7" />
+
+                                {% endif %}
+                            </svg>
+                          </a>
+                          <a onclick="show_delete_masking_field_modal('{{ field.pk }}')"
+                            style="margin: -2rem 2rem 0px 0px; display: inline-block;margin-right: 0.5em">
+                            <svg class="svg-hide-on-desktop" width="16" height="18" viewBox="0 0 16 18" fill="none"
+                              xmlns="http://www.w3.org/2000/svg">
+                              <path
+                                d="M8 0C9.60341 0 10.913 1.19168 10.9958 2.69116L11 2.84211H15.4C15.7314 2.84211 16 3.0966 16 3.41053C16 3.6983 15.7743 3.93612 15.4814 3.97376L15.4 3.97895H14.5528L13.5769 15.3876C13.4506 16.8633 12.1496 18 10.5867 18H5.41328C3.85044 18 2.5494 16.8633 2.42309 15.3876L1.4464 3.97895H0.6C0.296243 3.97895 0.0452071 3.7651 0.00547714 3.48766L0 3.41053C0 3.12276 0.225723 2.88493 0.518584 2.84729L0.6 2.84211H5C5 1.27245 6.34315 0 8 0ZM13.3494 3.97895H2.65062L3.61917 15.2957C3.69495 16.1812 4.47557 16.8632 5.41328 16.8632H10.5867C11.5244 16.8632 12.305 16.1812 12.3808 15.2957L13.3494 3.97895ZM6.2 6.82105C6.50376 6.82105 6.75479 7.0349 6.79452 7.31234L6.8 7.38947V13.4526C6.8 13.7666 6.53137 14.0211 6.2 14.0211C5.89624 14.0211 5.64521 13.8072 5.60548 13.5298L5.6 13.4526V7.38947C5.6 7.07554 5.86863 6.82105 6.2 6.82105ZM9.8 6.82105C10.1038 6.82105 10.3548 7.0349 10.3945 7.31234L10.4 7.38947V13.4526C10.4 13.7666 10.1314 14.0211 9.8 14.0211C9.49624 14.0211 9.24521 13.8072 9.20548 13.5298L9.2 13.4526V7.38947C9.2 7.07554 9.46863 6.82105 9.8 6.82105ZM8 1.13684C7.04731 1.13684 6.26748 1.83802 6.20415 2.72535L6.2 2.84211H9.8L9.79585 2.72535C9.73252 1.83802 8.95269 1.13684 8 1.13684Z"
+                                fill="#EE2525" />
+                            </svg>
+                          </a>
+                        </div>
+                      </td>
+                      <td>{{ field.value }}</td>
+                      {% if field.masking_type == "full-masking" %}
+                      <td>Full Masking</td>
+                      {% elif field.masking_type == "partial-masking" %}
+                      <td>Partial Masking</td>
+                      {% else %}
+                      <td>No Masking</td>
+                      {% endif %}
+                      <td class="td-hide-on-small-device">
+                        <div class="edit-delete-btn-class"
+                          style="visibility: hidden;display: flex; justify-content: center;">
+                          <a data-toggle="tooltip" data-placement="bottom" title="Edit"
+                            style="cursor: pointer; margin-right: 1em;"
+                            onclick="show_edit_masking_field_modal('{{ field.pk }}');">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+                              xmlns="http://www.w3.org/2000/svg">
+                              {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                              <path
+                                d="M13.2692 0.730772C14.2436 1.70513 14.2436 3.28489 13.2692 4.25925L4.92447 12.604C4.73142 12.7971 4.49134 12.9364 4.22794 13.0082L0.661097 13.981C0.270732 14.0875 -0.0874597 13.7293 0.0190035 13.3389L0.99178 9.77206C1.06361 9.50867 1.20294 9.26858 1.39599 9.07553L9.74075 0.730772C10.7151 -0.243591 12.2949 -0.243591 13.2692 0.730772ZM9.06478 2.88586L2.13552 9.81506C2.07117 9.87941 2.02473 9.95944 2.00078 10.0472L1.26879 12.7312L3.95276 11.9992C4.04056 11.9753 4.12059 11.9288 4.18494 11.8645L11.114 4.93504L9.06478 2.88586ZM10.4803 1.4703L9.80385 2.1461L11.853 4.19597L12.5297 3.51972C13.0956 2.95379 13.0956 2.03623 12.5297 1.4703C11.9638 0.904373 11.0462 0.904373 10.4803 1.4703Z"
+                                fill="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" />
+                                {% else %}
+                                <path
+                                d="M13.2692 0.730772C14.2436 1.70513 14.2436 3.28489 13.2692 4.25925L4.92447 12.604C4.73142 12.7971 4.49134 12.9364 4.22794 13.0082L0.661097 13.981C0.270732 14.0875 -0.0874597 13.7293 0.0190035 13.3389L0.99178 9.77206C1.06361 9.50867 1.20294 9.26858 1.39599 9.07553L9.74075 0.730772C10.7151 -0.243591 12.2949 -0.243591 13.2692 0.730772ZM9.06478 2.88586L2.13552 9.81506C2.07117 9.87941 2.02473 9.95944 2.00078 10.0472L1.26879 12.7312L3.95276 11.9992C4.04056 11.9753 4.12059 11.9288 4.18494 11.8645L11.114 4.93504L9.06478 2.88586ZM10.4803 1.4703L9.80385 2.1461L11.853 4.19597L12.5297 3.51972C13.0956 2.95379 13.0956 2.03623 12.5297 1.4703C11.9638 0.904373 11.0462 0.904373 10.4803 1.4703Z"
+                                fill="#0254D7" />
+            
+                                {% endif %}
+                            </svg>
+                          </a>
+                          <a data-toggle="tooltip" data-placement="bottom" title="Delete"
+                            style="cursor: pointer; margin-right: 1em;"
+                            onclick="show_delete_masking_field_modal('{{ field.pk }}')">
+                            <svg width="14" height="16" viewBox="0 0 14 16" fill="none"
+                              xmlns="http://www.w3.org/2000/svg">
+                              <path
+                                d="M7 0C8.40298 0 9.54889 1.05927 9.62136 2.39215L9.625 2.52632H13.475C13.7649 2.52632 14 2.75253 14 3.03158C14 3.28737 13.8025 3.49877 13.5462 3.53223L13.475 3.53684H12.7337L11.8798 13.6779C11.7693 14.9896 10.6309 16 9.26338 16H4.73662C3.36913 16 2.23072 14.9896 2.12021 13.6779L1.2656 3.53684H0.525C0.259213 3.53684 0.0395562 3.34676 0.0047925 3.10014L0 3.03158C0 2.77578 0.197508 2.56438 0.453761 2.53093L0.525 2.52632H4.375C4.375 1.13107 5.55025 0 7 0ZM11.6807 3.53684H2.31929L3.16677 13.5962C3.23308 14.3832 3.91613 14.9895 4.73662 14.9895H9.26338C10.0839 14.9895 10.7669 14.3832 10.8332 13.5962L11.6807 3.53684ZM5.425 6.06316C5.69079 6.06316 5.91044 6.25324 5.94521 6.49986L5.95 6.56842V11.9579C5.95 12.2369 5.71495 12.4632 5.425 12.4632C5.15921 12.4632 4.93956 12.2731 4.90479 12.0265L4.9 11.9579V6.56842C4.9 6.28937 5.13505 6.06316 5.425 6.06316ZM8.575 6.06316C8.84079 6.06316 9.06044 6.25324 9.09521 6.49986L9.1 6.56842V11.9579C9.1 12.2369 8.86495 12.4632 8.575 12.4632C8.30921 12.4632 8.08956 12.2731 8.05479 12.0265L8.05 11.9579V6.56842C8.05 6.28937 8.28505 6.06316 8.575 6.06316ZM7 1.01053C6.1664 1.01053 5.48405 1.63379 5.42863 2.42254L5.425 2.52632H8.575L8.57137 2.42254C8.51595 1.63379 7.8336 1.01053 7 1.01053Z"
+                                fill="#EE2525" />
+                            </svg>
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              {% else %}
+              <div class="table-responsive">
+                Masking fields not available
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12">
+          <div class="card shadow mb-4">
+            <div class="card-header py-3 masking-field-header">
+              <div class="row">
+                <div class="col-sm-5 d-flex align-items-center pl-0">
+                  <h6 class="m-0 font-weight-bold text-primary advance-setting-text">Search Tag Fields</h6>
+                </div>
+                <div class="col-sm-7 d-flex justify-content-end">
+                  <button class="btn add-fields-btn admin-setting-btn-save-changes" data-toggle="modal"
+                    data-target="#add_new_search_tag_field_modal">Add Field</button>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              {% if access_token_obj.search_fields.all %}
+              <div class="table-responsive">
+                <table class="table table-bordered" id="fieldTable" style="width: 100%; border-spacing: 0px;">
+                  <thead>
+                    <tr>
+                      <th scope="col">Tag</th>
+                      <th scope="col">Tag Label</th>
+                      <th scope="col">Tag Key</th>
+                      <th scope="col">Tag Value</th>
+                      <th scope="col">Tag Type</th>
+                      <th scope="col">Unique Identifier</th>
+                      <th scope="col"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for field in access_token_obj.search_fields.all %}
+                    {% if not field.is_deleted %}
+                    <tr>
+                      <td>
+                        {{ field.tag }}
+                        <div style="position: absolute; right: 0; top: 20px;">
+                          <a onclick="show_search_tag_field_modal('{{ field.pk }}');"
+                            style="margin-top: -2rem;display: inline-block;margin-right: 0.5em;">
+                            <svg class="svg-hide-on-desktop" width="18" height="18" viewBox="0 0 18 18" fill="none"
+                              xmlns="http://www.w3.org/2000/svg">
+                              {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                              <path
+                                d="M17.0604 0.939564C18.3132 2.19232 18.3132 4.22343 17.0604 5.47618L6.33146 16.2052C6.08325 16.4534 5.77457 16.6325 5.43593 16.7249L0.849981 17.9756C0.348084 18.1124 -0.112448 17.6519 0.0244331 17.15L1.27515 12.5641C1.3675 12.2254 1.54664 11.9167 1.79484 11.6685L12.5238 0.939564C13.7766 -0.313188 15.8077 -0.313188 17.0604 0.939564ZM11.6547 3.7104L2.74567 12.6194C2.66293 12.7021 2.60322 12.805 2.57244 12.9179L1.6313 16.3687L5.08212 15.4276C5.195 15.3968 5.2979 15.3371 5.38063 15.2543L14.2894 6.34506L11.6547 3.7104ZM13.4746 1.89039L12.6049 2.75927L15.2396 5.39482L16.1096 4.52535C16.8372 3.79773 16.8372 2.61802 16.1096 1.89039C15.382 1.16277 14.2023 1.16277 13.4746 1.89039Z"
+                                fill="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" />
+                                {% else %}
+                                <path
+                                d="M17.0604 0.939564C18.3132 2.19232 18.3132 4.22343 17.0604 5.47618L6.33146 16.2052C6.08325 16.4534 5.77457 16.6325 5.43593 16.7249L0.849981 17.9756C0.348084 18.1124 -0.112448 17.6519 0.0244331 17.15L1.27515 12.5641C1.3675 12.2254 1.54664 11.9167 1.79484 11.6685L12.5238 0.939564C13.7766 -0.313188 15.8077 -0.313188 17.0604 0.939564ZM11.6547 3.7104L2.74567 12.6194C2.66293 12.7021 2.60322 12.805 2.57244 12.9179L1.6313 16.3687L5.08212 15.4276C5.195 15.3968 5.2979 15.3371 5.38063 15.2543L14.2894 6.34506L11.6547 3.7104ZM13.4746 1.89039L12.6049 2.75927L15.2396 5.39482L16.1096 4.52535C16.8372 3.79773 16.8372 2.61802 16.1096 1.89039C15.382 1.16277 14.2023 1.16277 13.4746 1.89039Z"
+                                fill="#0254D7" />
+            
+                              {% endif %}
+                            </svg>
+                          </a>
+                          <a onclick="show_delete_search_tag_field_modal('{{ field.pk }}')"
+                            style="margin: -2rem 2rem 0px 0px; display: inline-block;margin-right: 0.5em">
+                            <svg class="svg-hide-on-desktop" width="16" height="18" viewBox="0 0 16 18" fill="none"
+                              xmlns="http://www.w3.org/2000/svg">
+                              <path
+                                d="M8 0C9.60341 0 10.913 1.19168 10.9958 2.69116L11 2.84211H15.4C15.7314 2.84211 16 3.0966 16 3.41053C16 3.6983 15.7743 3.93612 15.4814 3.97376L15.4 3.97895H14.5528L13.5769 15.3876C13.4506 16.8633 12.1496 18 10.5867 18H5.41328C3.85044 18 2.5494 16.8633 2.42309 15.3876L1.4464 3.97895H0.6C0.296243 3.97895 0.0452071 3.7651 0.00547714 3.48766L0 3.41053C0 3.12276 0.225723 2.88493 0.518584 2.84729L0.6 2.84211H5C5 1.27245 6.34315 0 8 0ZM13.3494 3.97895H2.65062L3.61917 15.2957C3.69495 16.1812 4.47557 16.8632 5.41328 16.8632H10.5867C11.5244 16.8632 12.305 16.1812 12.3808 15.2957L13.3494 3.97895ZM6.2 6.82105C6.50376 6.82105 6.75479 7.0349 6.79452 7.31234L6.8 7.38947V13.4526C6.8 13.7666 6.53137 14.0211 6.2 14.0211C5.89624 14.0211 5.64521 13.8072 5.60548 13.5298L5.6 13.4526V7.38947C5.6 7.07554 5.86863 6.82105 6.2 6.82105ZM9.8 6.82105C10.1038 6.82105 10.3548 7.0349 10.3945 7.31234L10.4 7.38947V13.4526C10.4 13.7666 10.1314 14.0211 9.8 14.0211C9.49624 14.0211 9.24521 13.8072 9.20548 13.5298L9.2 13.4526V7.38947C9.2 7.07554 9.46863 6.82105 9.8 6.82105ZM8 1.13684C7.04731 1.13684 6.26748 1.83802 6.20415 2.72535L6.2 2.84211H9.8L9.79585 2.72535C9.73252 1.83802 8.95269 1.13684 8 1.13684Z"
+                                fill="#EE2525" />
+                            </svg>
+                          </a>
+                        </div>
+                      </td>
+                      <td>{{ field.tag_label }}</td>
+                      <td>{{ field.tag_key }}</td>
+                      <td>{{ field.tag_value }}</td>
+                      <td>{{ field.tag_type }}</td>
+                      {% if field.unique_identifier %}
+                      <td>Yes</td>
+                      {% else %}
+                      <td>No</td>
+                      {% endif %}
+                      <td class="td-hide-on-small-device">
+                        <div class="edit-delete-btn-class" style="visibility: hidden;display: flex; ">
+                          <a data-toggle="tooltip" data-placement="bottom" title="Edit"
+                            style="cursor: pointer; margin-right: 1em;"
+                            onclick="show_search_tag_field_modal('{{ field.pk }}');">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+                              xmlns="http://www.w3.org/2000/svg">
+                              {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                              <path
+                                d="M13.2692 0.730772C14.2436 1.70513 14.2436 3.28489 13.2692 4.25925L4.92447 12.604C4.73142 12.7971 4.49134 12.9364 4.22794 13.0082L0.661097 13.981C0.270732 14.0875 -0.0874597 13.7293 0.0190035 13.3389L0.99178 9.77206C1.06361 9.50867 1.20294 9.26858 1.39599 9.07553L9.74075 0.730772C10.7151 -0.243591 12.2949 -0.243591 13.2692 0.730772ZM9.06478 2.88586L2.13552 9.81506C2.07117 9.87941 2.02473 9.95944 2.00078 10.0472L1.26879 12.7312L3.95276 11.9992C4.04056 11.9753 4.12059 11.9288 4.18494 11.8645L11.114 4.93504L9.06478 2.88586ZM10.4803 1.4703L9.80385 2.1461L11.853 4.19597L12.5297 3.51972C13.0956 2.95379 13.0956 2.03623 12.5297 1.4703C11.9638 0.904373 11.0462 0.904373 10.4803 1.4703Z"
+                                fill="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" />
+                                {% else %}
+                                <path
+                                d="M13.2692 0.730772C14.2436 1.70513 14.2436 3.28489 13.2692 4.25925L4.92447 12.604C4.73142 12.7971 4.49134 12.9364 4.22794 13.0082L0.661097 13.981C0.270732 14.0875 -0.0874597 13.7293 0.0190035 13.3389L0.99178 9.77206C1.06361 9.50867 1.20294 9.26858 1.39599 9.07553L9.74075 0.730772C10.7151 -0.243591 12.2949 -0.243591 13.2692 0.730772ZM9.06478 2.88586L2.13552 9.81506C2.07117 9.87941 2.02473 9.95944 2.00078 10.0472L1.26879 12.7312L3.95276 11.9992C4.04056 11.9753 4.12059 11.9288 4.18494 11.8645L11.114 4.93504L9.06478 2.88586ZM10.4803 1.4703L9.80385 2.1461L11.853 4.19597L12.5297 3.51972C13.0956 2.95379 13.0956 2.03623 12.5297 1.4703C11.9638 0.904373 11.0462 0.904373 10.4803 1.4703Z"
+                                fill="#0254D7" />
+            
+                              {% endif %}
+                            </svg>
+                          </a>
+                          <a data-toggle="tooltip" data-placement="bottom" title="Delete"
+                            style="cursor: pointer; margin-right: 1em;"
+                            onclick="show_delete_search_tag_field_modal('{{ field.pk }}')">
+                            <svg width="14" height="16" viewBox="0 0 14 16" fill="none"
+                              xmlns="http://www.w3.org/2000/svg">
+                              <path
+                                d="M7 0C8.40298 0 9.54889 1.05927 9.62136 2.39215L9.625 2.52632H13.475C13.7649 2.52632 14 2.75253 14 3.03158C14 3.28737 13.8025 3.49877 13.5462 3.53223L13.475 3.53684H12.7337L11.8798 13.6779C11.7693 14.9896 10.6309 16 9.26338 16H4.73662C3.36913 16 2.23072 14.9896 2.12021 13.6779L1.2656 3.53684H0.525C0.259213 3.53684 0.0395562 3.34676 0.0047925 3.10014L0 3.03158C0 2.77578 0.197508 2.56438 0.453761 2.53093L0.525 2.52632H4.375C4.375 1.13107 5.55025 0 7 0ZM11.6807 3.53684H2.31929L3.16677 13.5962C3.23308 14.3832 3.91613 14.9895 4.73662 14.9895H9.26338C10.0839 14.9895 10.7669 14.3832 10.8332 13.5962L11.6807 3.53684ZM5.425 6.06316C5.69079 6.06316 5.91044 6.25324 5.94521 6.49986L5.95 6.56842V11.9579C5.95 12.2369 5.71495 12.4632 5.425 12.4632C5.15921 12.4632 4.93956 12.2731 4.90479 12.0265L4.9 11.9579V6.56842C4.9 6.28937 5.13505 6.06316 5.425 6.06316ZM8.575 6.06316C8.84079 6.06316 9.06044 6.25324 9.09521 6.49986L9.1 6.56842V11.9579C9.1 12.2369 8.86495 12.4632 8.575 12.4632C8.30921 12.4632 8.08956 12.2731 8.05479 12.0265L8.05 11.9579V6.56842C8.05 6.28937 8.28505 6.06316 8.575 6.06316ZM7 1.01053C6.1664 1.01053 5.48405 1.63379 5.42863 2.42254L5.425 2.52632H8.575L8.57137 2.42254C8.51595 1.63379 7.8336 1.01053 7 1.01053Z"
+                                fill="#EE2525" />
+                            </svg>
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              {% else %}
+              <div class="table-responsive">
+                Search tag fields not available
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12">
+          <div class="card shadow mb-4">
+            <div class="card-header py-3 masking-field-header">
+              <div class="row">
+                <div class="col-sm-5 d-flex align-items-center pl-0">
+                  <h6 class="m-0 font-weight-bold text-primary advance-setting-text">Auto-fetch Fields</h6>
+                </div>
+                <div class="col-sm-7 d-flex justify-content-end">
+                  <button class="btn add-fields-btn admin-setting-btn-save-changes" data-toggle="modal"
+                    data-target="#add_new_auto_fetch_field_modal">Add Field</button>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              {% if access_token_obj.auto_fetch_fields.all %}
+              <div class="table-responsive">
+                <table class="table table-bordered" id="fieldTable" style="width: 100%; border-spacing: 0px;">
+                  <thead>
+                    <tr>
+                      <th scope="col">Fetch Field Key</th>
+                      <th scope="col">Fetch Field Value</th>
+                      <th scope="col">Modal Field Key</th>
+                      <th scope="col">Modal Field Value</th>
+                      <th scope="col"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for field in access_token_obj.auto_fetch_fields.all %}
+                    <tr>
+                      <td>
+                        {{ field.fetch_field_key }}
+                        <div style="position: absolute; right: 0; top: 20px;">
+                          <a onclick="show_edit_auto_fetch_field_modal('{{ field.pk }}');"
+                            style="margin-top: -2rem;display: inline-block;margin-right: 0.5em;">
+                            <svg class="svg-hide-on-desktop" width="18" height="18" viewBox="0 0 18 18" fill="none"
+                              xmlns="http://www.w3.org/2000/svg">
+                              {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                              <path
+                                d="M17.0604 0.939564C18.3132 2.19232 18.3132 4.22343 17.0604 5.47618L6.33146 16.2052C6.08325 16.4534 5.77457 16.6325 5.43593 16.7249L0.849981 17.9756C0.348084 18.1124 -0.112448 17.6519 0.0244331 17.15L1.27515 12.5641C1.3675 12.2254 1.54664 11.9167 1.79484 11.6685L12.5238 0.939564C13.7766 -0.313188 15.8077 -0.313188 17.0604 0.939564ZM11.6547 3.7104L2.74567 12.6194C2.66293 12.7021 2.60322 12.805 2.57244 12.9179L1.6313 16.3687L5.08212 15.4276C5.195 15.3968 5.2979 15.3371 5.38063 15.2543L14.2894 6.34506L11.6547 3.7104ZM13.4746 1.89039L12.6049 2.75927L15.2396 5.39482L16.1096 4.52535C16.8372 3.79773 16.8372 2.61802 16.1096 1.89039C15.382 1.16277 14.2023 1.16277 13.4746 1.89039Z"
+                                fill="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" />
+                                {% else %}
+                                <path
+                                d="M17.0604 0.939564C18.3132 2.19232 18.3132 4.22343 17.0604 5.47618L6.33146 16.2052C6.08325 16.4534 5.77457 16.6325 5.43593 16.7249L0.849981 17.9756C0.348084 18.1124 -0.112448 17.6519 0.0244331 17.15L1.27515 12.5641C1.3675 12.2254 1.54664 11.9167 1.79484 11.6685L12.5238 0.939564C13.7766 -0.313188 15.8077 -0.313188 17.0604 0.939564ZM11.6547 3.7104L2.74567 12.6194C2.66293 12.7021 2.60322 12.805 2.57244 12.9179L1.6313 16.3687L5.08212 15.4276C5.195 15.3968 5.2979 15.3371 5.38063 15.2543L14.2894 6.34506L11.6547 3.7104ZM13.4746 1.89039L12.6049 2.75927L15.2396 5.39482L16.1096 4.52535C16.8372 3.79773 16.8372 2.61802 16.1096 1.89039C15.382 1.16277 14.2023 1.16277 13.4746 1.89039Z"
+                                fill="#0254D7" />
+            
+                                {% endif %}
+                            </svg>
+                          </a>
+                          <a onclick="show_delete_auto_fetch_field_modal('{{ field.pk }}')"
+                            style="margin: -2rem 2rem 0px 0px; display: inline-block;margin-right: 0.5em">
+                            <svg class="svg-hide-on-desktop" width="16" height="18" viewBox="0 0 16 18" fill="none"
+                              xmlns="http://www.w3.org/2000/svg">
+                              <path
+                                d="M8 0C9.60341 0 10.913 1.19168 10.9958 2.69116L11 2.84211H15.4C15.7314 2.84211 16 3.0966 16 3.41053C16 3.6983 15.7743 3.93612 15.4814 3.97376L15.4 3.97895H14.5528L13.5769 15.3876C13.4506 16.8633 12.1496 18 10.5867 18H5.41328C3.85044 18 2.5494 16.8633 2.42309 15.3876L1.4464 3.97895H0.6C0.296243 3.97895 0.0452071 3.7651 0.00547714 3.48766L0 3.41053C0 3.12276 0.225723 2.88493 0.518584 2.84729L0.6 2.84211H5C5 1.27245 6.34315 0 8 0ZM13.3494 3.97895H2.65062L3.61917 15.2957C3.69495 16.1812 4.47557 16.8632 5.41328 16.8632H10.5867C11.5244 16.8632 12.305 16.1812 12.3808 15.2957L13.3494 3.97895ZM6.2 6.82105C6.50376 6.82105 6.75479 7.0349 6.79452 7.31234L6.8 7.38947V13.4526C6.8 13.7666 6.53137 14.0211 6.2 14.0211C5.89624 14.0211 5.64521 13.8072 5.60548 13.5298L5.6 13.4526V7.38947C5.6 7.07554 5.86863 6.82105 6.2 6.82105ZM9.8 6.82105C10.1038 6.82105 10.3548 7.0349 10.3945 7.31234L10.4 7.38947V13.4526C10.4 13.7666 10.1314 14.0211 9.8 14.0211C9.49624 14.0211 9.24521 13.8072 9.20548 13.5298L9.2 13.4526V7.38947C9.2 7.07554 9.46863 6.82105 9.8 6.82105ZM8 1.13684C7.04731 1.13684 6.26748 1.83802 6.20415 2.72535L6.2 2.84211H9.8L9.79585 2.72535C9.73252 1.83802 8.95269 1.13684 8 1.13684Z"
+                                fill="#EE2525" />
+                            </svg>
+                          </a>
+                        </div>
+                      </td>
+                      <td>{{ field.fetch_field_value }}</td>
+                      <td>{{ field.modal_field_key }}</td>
+                      <td>{{ field.modal_field_value }}</td>
+                      <td class="td-hide-on-small-device">
+                        <div class="edit-delete-btn-class"
+                          style="visibility: hidden;display: flex; justify-content: center;">
+                          <a data-toggle="tooltip" data-placement="bottom" title="Edit"
+                            style="cursor: pointer; margin-right: 1em;"
+                            onclick="show_edit_auto_fetch_field_modal('{{ field.pk }}');">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+                              xmlns="http://www.w3.org/2000/svg">
+                              {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                              <path
+                                d="M13.2692 0.730772C14.2436 1.70513 14.2436 3.28489 13.2692 4.25925L4.92447 12.604C4.73142 12.7971 4.49134 12.9364 4.22794 13.0082L0.661097 13.981C0.270732 14.0875 -0.0874597 13.7293 0.0190035 13.3389L0.99178 9.77206C1.06361 9.50867 1.20294 9.26858 1.39599 9.07553L9.74075 0.730772C10.7151 -0.243591 12.2949 -0.243591 13.2692 0.730772ZM9.06478 2.88586L2.13552 9.81506C2.07117 9.87941 2.02473 9.95944 2.00078 10.0472L1.26879 12.7312L3.95276 11.9992C4.04056 11.9753 4.12059 11.9288 4.18494 11.8645L11.114 4.93504L9.06478 2.88586ZM10.4803 1.4703L9.80385 2.1461L11.853 4.19597L12.5297 3.51972C13.0956 2.95379 13.0956 2.03623 12.5297 1.4703C11.9638 0.904373 11.0462 0.904373 10.4803 1.4703Z"
+                                fill="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" />
+                                {% else %}
+                                <path
+                                d="M13.2692 0.730772C14.2436 1.70513 14.2436 3.28489 13.2692 4.25925L4.92447 12.604C4.73142 12.7971 4.49134 12.9364 4.22794 13.0082L0.661097 13.981C0.270732 14.0875 -0.0874597 13.7293 0.0190035 13.3389L0.99178 9.77206C1.06361 9.50867 1.20294 9.26858 1.39599 9.07553L9.74075 0.730772C10.7151 -0.243591 12.2949 -0.243591 13.2692 0.730772ZM9.06478 2.88586L2.13552 9.81506C2.07117 9.87941 2.02473 9.95944 2.00078 10.0472L1.26879 12.7312L3.95276 11.9992C4.04056 11.9753 4.12059 11.9288 4.18494 11.8645L11.114 4.93504L9.06478 2.88586ZM10.4803 1.4703L9.80385 2.1461L11.853 4.19597L12.5297 3.51972C13.0956 2.95379 13.0956 2.03623 12.5297 1.4703C11.9638 0.904373 11.0462 0.904373 10.4803 1.4703Z"
+                                fill="#0254D7" />
+            
+                                {% endif %}
+                            </svg>
+                          </a>
+                          <a data-toggle="tooltip" data-placement="bottom" title="Delete"
+                            style="cursor: pointer; margin-right: 1em;"
+                            onclick="show_delete_auto_fetch_field_modal('{{ field.pk }}')">
+                            <svg width="14" height="16" viewBox="0 0 14 16" fill="none"
+                              xmlns="http://www.w3.org/2000/svg">
+                              <path
+                                d="M7 0C8.40298 0 9.54889 1.05927 9.62136 2.39215L9.625 2.52632H13.475C13.7649 2.52632 14 2.75253 14 3.03158C14 3.28737 13.8025 3.49877 13.5462 3.53223L13.475 3.53684H12.7337L11.8798 13.6779C11.7693 14.9896 10.6309 16 9.26338 16H4.73662C3.36913 16 2.23072 14.9896 2.12021 13.6779L1.2656 3.53684H0.525C0.259213 3.53684 0.0395562 3.34676 0.0047925 3.10014L0 3.03158C0 2.77578 0.197508 2.56438 0.453761 2.53093L0.525 2.52632H4.375C4.375 1.13107 5.55025 0 7 0ZM11.6807 3.53684H2.31929L3.16677 13.5962C3.23308 14.3832 3.91613 14.9895 4.73662 14.9895H9.26338C10.0839 14.9895 10.7669 14.3832 10.8332 13.5962L11.6807 3.53684ZM5.425 6.06316C5.69079 6.06316 5.91044 6.25324 5.94521 6.49986L5.95 6.56842V11.9579C5.95 12.2369 5.71495 12.4632 5.425 12.4632C5.15921 12.4632 4.93956 12.2731 4.90479 12.0265L4.9 11.9579V6.56842C4.9 6.28937 5.13505 6.06316 5.425 6.06316ZM8.575 6.06316C8.84079 6.06316 9.06044 6.25324 9.09521 6.49986L9.1 6.56842V11.9579C9.1 12.2369 8.86495 12.4632 8.575 12.4632C8.30921 12.4632 8.08956 12.2731 8.05479 12.0265L8.05 11.9579V6.56842C8.05 6.28937 8.28505 6.06316 8.575 6.06316ZM7 1.01053C6.1664 1.01053 5.48405 1.63379 5.42863 2.42254L5.425 2.52632H8.575L8.57137 2.42254C8.51595 1.63379 7.8336 1.01053 7 1.01053Z"
+                                fill="#EE2525" />
+                            </svg>
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              {% else %}
+              <div class="table-responsive">
+                Auto-fetch fields not available
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-12">
+          <div class="card shadow mb-4">
+            <div class="card-header py-3 masking-field-header">
+              <div class="row">
+                <div class="col-sm-5 d-flex align-items-center pl-0">
+                  <h6 class="m-0 font-weight-bold text-primary advance-setting-text">Other Settings</h6>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                  <tbody>
+                    <tr style="border: none;">
+                      <th scope="row" style="padding-left: 0;">Masking PII</th>
+                      <td style="vertical-align: inherit; border: none !important;">
+                        <label class="easyassist-option-switch">
+                          {% if access_token_obj.enable_masking_pii_data %}
+                          <input type="checkbox" id="enable_masking_pii_data" checked
+                            onclick="send_otp_for_masking_pii_data(this, event);">
+                          <span class="easyassist-option-switch-slider round"></span>
+                          {% else %}
+                          <input type="checkbox" id="enable_masking_pii_data"
+                            onclick="enable_masking_of_pii_data(this);">
+                          <span class="easyassist-option-switch-slider round"></span>
+                          {% endif %}
+                        </label>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% for field in access_token_obj.obfuscated_fields.all %}
+<div class="modal fade" id="edit_masking_field_modal_{{ field.pk }}" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Masking Field</h5>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-sm-6 mb-sm">
+            <label class="sr-only" for="edit-masking-field-key-{{field.pk}}">Masking Field Key</label>
+            <input type="text" style="width: 100%;" class="form-control mb-2" id="edit-masking-field-key-{{field.pk}}"
+              placeholder="Masking field key" value="{{field.key}}">
+          </div>
+          <div class="col-sm-6 mb-sm">
+            <label class="sr-only" for="edit-masking-field-value-{{field.pk}}">Masking Field Value</label>
+            <input type="text" style="width: 100%;" class="form-control mb-2" id="edit-masking-field-value-{{field.pk}}"
+              placeholder="Masking field value" value="{{field.value}}">
+          </div>
+          <div class="col-sm-6">
+            <select class="custom-select custom-select-dropdown-masking" id="edit-masking-type-{{ field.pk }}" style="width: 100%;">
+              {% if field.masking_type == "no-masking" %}
+              <option value="no-masking" selected>No Masking</option>
+              {% else %}
+              <option value="no-masking">No Masking</option>
+              {% endif %}
+
+              {% if field.masking_type == "partial-masking" %}
+              <option value="partial-masking" selected>Partial Masking</option>
+              {% else %}
+              <option value="partial-masking">Partial Masking</option>
+              {% endif %}
+
+              {% if field.masking_type == "full-masking" %}
+              <option value="full-masking" selected>Full Masking</option>
+              {% else %}
+              <option value="full-masking">Full Masking</option>
+              {% endif %}
+            </select>
+          </div>
+        </div>
+        <p id="edit-masking-field-error-{{ field.pk }}" style="display: none; margin: 1em 0 0 0;"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <button class="btn btn-success" onclick="save_masking_field(this, '{{ field.pk }}')">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="delete_masking_field_modal_{{ field.pk }}" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete Masking Field</h5>
+      </div>
+      <div class="modal-body">
+        Do you really want to delete this field?
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <button class="btn delete-field-btn delete-masking-file" onclick="delete_masking_field(this, '{{ field.pk }}')">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+<div class="modal fade" id="add_new_masking_field_modal" tabindex="-1" role="dialog"
+  aria-labelledby="add_new_masking_field_modal_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="add_new_masking_field_modal_modal_label">Add Masking Field</h5>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-sm-12">
+            <form class="form-inline" action="javascript:void(0)">
+              <div class="col-sm-6 mb-sm">
+                <label class="sr-only" for="inline-form-input-masking-field-key">Masking Field Key</label>
+                <input type="text" style="width: 100%;" class="form-control mb-2"
+                  id="inline-form-input-masking-field-key" placeholder="Masking field key">
+              </div>
+              <div class="col-sm-6 mb-sm">
+                <label class="sr-only" for="inline-form-input-masking-field-value">Masking Field Value</label>
+                <input type="text" style="width: 100%;" class="form-control mb-2"
+                  id="inline-form-input-masking-field-value" placeholder="Masking field value">
+              </div>
+              <div class="col-sm-6">
+                <select class="custom-select custom-select-dropdown-masking" id="inline-form-input-masking-type" style="width: 100%;">
+                  <option selected="" value="">Choose masking type</option>
+                  <option value="no-masking">No Masking</option>
+                  <option value="partial-masking">Partial Masking</option>
+                  <option value="full-masking">Full Masking</option>
+                </select>
+              </div>
+            </form>
+            <p class="mt-3 mb-0" id="add-new-masking-field-error" style="margin-left: 13px;" ></p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <button class="btn btn-success" onclick="add_new_masking_field(this)">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% for field in access_token_obj.search_fields.all %}
+<div class="modal fade" id="edit_search_tag_field_modal_{{ field.pk }}" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Search Tag Field</h5>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-sm-6 mb-sm">
+            <select class="custom-select custom-select-dropdown-masking" id="edit-search-tag-{{ field.pk }}" style="width: 100%;">
+              <option selected="" value="">Choose tag</option>
+              {% if field.tag == "input" %}
+              <option value="input" selected>input</option>
+              {% else %}
+              <option value="input">input</option>
+              {% endif %}
+
+              {% if field.tag == "textarea" %}
+              <option value="textarea" selected>textarea</option>
+              {% else %}
+              <option value="textarea">textarea</option>
+              {% endif %}
+
+              {% if field.tag == "select" %}
+              <option value="select" selected>select</option>
+              {% else %}
+              <option value="select">select</option>
+              {% endif %}
+            </select>
+          </div>
+          <div class="col-sm-6 mb-sm">
+            <label class="sr-only" for="edit-search-tag-label-{{ field.pk }}">Tag Label</label>
+            <input type="text" style="width: 100%;" class="form-control mb-2" id="edit-search-tag-label-{{ field.pk }}"
+              placeholder="Tag label" value="{{ field.tag_label }}">
+          </div>
+          <div class="col-sm-6 mb-sm">
+            <label class="sr-only" for="edit-search-tag-key-{{ field.pk }}">Tag Key</label>
+            <input type="text" style="width: 100%;" class="form-control mb-2" id="edit-search-tag-key-{{ field.pk }}"
+              placeholder="Tag key" value="{{ field.tag_key }}">
+          </div>
+          <div class="col-sm-6 mb-sm">
+            <label class="sr-only" for="edit-search-tag-value-{{ field.pk }}">Tag Value</label>
+            <input type="text" style="width: 100%;" class="form-control mb-2" id="edit-search-tag-value-{{ field.pk }}"
+              placeholder="Tag value" value="{{ field.tag_value }}">
+          </div>
+          <div class="col-sm-6">
+            <select class="custom-select custom-select-dropdown-masking" id="edit-search-tag-type-{{ field.pk }}" style="width: 100%;">
+              <option selected="" value="">Choose tag type</option>
+              {% if field.tag_type == "primary" %}
+              <option value="primary" selected>primary</option>
+              {% else %}
+              <option value="primary">primary</option>
+              {% endif %}
+
+              {% if field.tag_type == "secondary" %}
+              <option value="secondary" selected>secondary</option>
+              {% else %}
+              <option value="secondary">secondary</option>
+              {% endif %}
+            </select>
+          </div>
+          <div class="col-sm-12">
+            <div class="d-flex align-items-center mt-4 unique-identifier-heading">
+              Mark as Unique Identifier
+              <span class="ml-2" data-toggle="tooltip" data-placement="bottom"
+                title="Marking this field as unique identifier would treat user details generated from this field as a unique detail to display unique or repeated customer count in outbound analytics."><i
+                  class="fas fa-info-circle"></i></span>
+              {% if field.unique_identifier %}
+              <label class="easyassist-option-switch mt-0 ml-3">
+                <input type="checkbox" id="edit-unique-identifier-{{ field.pk }}" checked>
+                <span class="easyassist-option-switch-slider round "></span>
+              </label>
+              {% else %}
+              <label class="easyassist-option-switch mt-0 ml-3">
+                <input type="checkbox" id="edit-unique-identifier-{{ field.pk }}">
+                <span class="easyassist-option-switch-slider round "></span>
+              </label>
+              {% endif %}
+            </div>
+          </div>
+          <div class="message-container">
+            <p class="mb-0">Editing the unique identifier toggle value will affect unique and repeated customers data in
+              outbound analytics and there are high chances of data mismatch.</p>
+          </div>
+        </div>
+        <p id="edit-search-tag-field-error-{{ field.pk }}" style="display: none; margin: 1em 0 0 0;"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <button class="btn btn-success" onclick="save_search_tag_field(this, '{{ field.pk }}')">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="delete_search_tag_field_field_modal_{{ field.pk }}" tabindex="-1" role="dialog"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete Search Tag Field</h5>
+      </div>
+      <div class="modal-body">
+        Do you really want to delete this field?
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <button class="btn delete-field-btn" onclick="delete_search_tag_field(this, '{{ field.pk }}')">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+<div class="modal fade" id="add_new_search_tag_field_modal" tabindex="-1" role="dialog"
+  aria-labelledby="add_new_search_tag_field_modal_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="add_new_search_tag_field_modal_modal_label">Add Search Tag Field</h5>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-sm-12">
+            <form class="form-inline" action="javascript:void(0)">
+              <div class="col-sm-6 mb-sm">
+                <select class="custom-select custom-select-dropdown-masking" id="inline-form-input-search-tag" style="width: 100%;">
+                  <option selected="" value="">Choose tag</option>
+                  <option value="input">input</option>
+                  <option value="textarea">textarea</option>
+                  <option value="select">select</option>
+                </select>
+              </div>
+              <div class="col-sm-6 mb-sm">
+                <label class="sr-only" for="inline-form-input-search-tag-label">Tag Label</label>
+                <input type="text" style="width: 100%;" class="form-control mb-2"
+                  id="inline-form-input-search-tag-label" placeholder="Tag label">
+              </div>
+              <div class="col-sm-6 mb-sm">
+                <label class="sr-only" for="inline-form-input-search-tag-key">Tag Key</label>
+                <input type="text" style="width: 100%;" class="form-control mb-2" id="inline-form-input-search-tag-key"
+                  placeholder="Tag key">
+              </div>
+              <div class="col-sm-6 mb-sm">
+                <label class="sr-only" for="inline-form-input-search-tag-value">Tag Value</label>
+                <input type="text" style="width: 100%;" class="form-control mb-2"
+                  id="inline-form-input-search-tag-value" placeholder="Tag value">
+              </div>
+              <div class="col-sm-6">
+                <select class="custom-select custom-select-dropdown-masking" id="inline-form-input-search-tag-type" style="width: 100%;">
+                  <option selected="" value="">Choose tag type</option>
+                  <option value="primary">primary</option>
+                  <option value="secondary">secondary</option>
+                </select>
+              </div>
+              <div class="col-sm-12">
+                <div class="d-flex align-items-center mt-4 unique-identifier-heading">
+                  Mark as Unique Identifier
+                  <span class="ml-2" data-toggle="tooltip" data-placement="bottom"
+                    title="Marking this field as unique identifier would treat user details generated from this field as a unique detail to display unique or repeated customer count in outbound analytics."><i
+                      class="fas fa-info-circle"></i></span>
+                  <label class="easyassist-option-switch mt-0 ml-3">
+                    <input type="checkbox" id="enable-mark-unique-identifier" checked>
+                    <span class="easyassist-option-switch-slider round "></span>
+                  </label>
+                </div>
+              </div>
+              <div class="message-container">
+                <p class="mb-0">Adding a search tag keeping the unique identifier toggle disabled, would treat all
+                  customers coming from that tag as unique customers even if he/she joins a session with the same data
+                  more than once.</p>
+              </div>
+            </form>
+            <p id="add-new-search-tag-field-error"></p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <button class="btn btn-success" onclick="add_new_search_tag_field(this)">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% for field in access_token_obj.auto_fetch_fields.all %}
+<div class="modal fade" id="edit_auto_fetch_field_modal_{{ field.pk }}" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Auto Fetch Field</h5>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-sm-6 mb-sm">
+            <label class="sr-only" for="edit-auto-fetch-field-key-{{ field.pk }}">Fetch Field Key</label>
+            <input type="text" style="width: 100%;" class="form-control mb-2"
+              id="edit-auto-fetch-field-key-{{ field.pk }}" placeholder="Fetch field key"
+              value="{{ field.fetch_field_key }}">
+          </div>
+          <div class="col-sm-6 mb-sm">
+            <label class="sr-only" for="edit-auto-fetch-field-value-{{ field.pk }}">Fetch Field Value</label>
+            <input type="text" style="width: 100%;" class="form-control mb-2"
+              id="edit-auto-fetch-field-value-{{ field.pk }}" placeholder="Fetch field value"
+              value="{{ field.fetch_field_value }}">
+          </div>
+          <div class="col-sm-6 mb-sm">
+            <label class="sr-only" for="edit-auto-fetch-field-modal-key-{{ field.pk }}">Modal Field Key</label>
+            <input type="text" style="width: 100%;" class="form-control mb-2"
+              id="edit-auto-fetch-field-modal-key-{{ field.pk }}" placeholder="Modal field key"
+              value="{{ field.modal_field_key }}">
+          </div>
+          <div class="col-sm-6">
+            <label class="sr-only" for="edit-auto-fetch-field-modal-value-{{ field.pk }}">Modal Field Value</label>
+            <input type="text" style="width: 100%;" class="form-control mb-2"
+              id="edit-auto-fetch-field-modal-value-{{ field.pk }}" placeholder="Modal field value"
+              value="{{ field.modal_field_value }}">
+          </div>
+        </div>
+        <p id="edit-auto-fetch-field-error-{{ field.pk }}" style="display: none; margin: 1em 0 0 0;"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <button class="btn btn-success" onclick="save_auto_fetch_field(this, '{{ field.pk }}')">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="delete_auto_fetch_field_field_modal_{{ field.pk }}" tabindex="-1" role="dialog"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete Search Tag Field</h5>
+      </div>
+      <div class="modal-body">
+        Do you really want to delete this field?
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <button class="btn delete-field-btn" onclick="delete_auto_fetch_field(this, '{{ field.pk }}')">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+<div class="modal fade" id="add_new_auto_fetch_field_modal" tabindex="-1" role="dialog"
+  aria-labelledby="add_new_auto_fetch_field_modal_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="add_new_auto_fetch_field_modal_modal_label">Add Auto Fetch Field</h5>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-sm-12">
+            <form class="form-inline" action="javascript:void(0)">
+              <div class="col-sm-6 mb-sm">
+                <label class="sr-only" for="inline-form-input-fetch-field-key">Fetch Field Key</label>
+                <input type="text" style="width: 100%;" class="form-control mb-2" id="inline-form-input-fetch-field-key"
+                  placeholder="Fetch field key">
+              </div>
+              <div class="col-sm-6 mb-sm">
+                <label class="sr-only" for="inline-form-input-fetch-field-value"">Fetch Field Value</label>
+                <input type=" text" style="width: 100%;" class="form-control mb-2"
+                  id="inline-form-input-fetch-field-value"" placeholder=" Fetch field value">
+              </div>
+              <div class="col-sm-6 mb-sm">
+                <label class="sr-only" for="inline-form-input-modal-field-key">Modal Field Key</label>
+                <input type="text" style="width: 100%;" class="form-control mb-2" id="inline-form-input-modal-field-key"
+                  placeholder="Modal field key">
+              </div>
+              <div class="col-sm-6">
+                <label class="sr-only" for="inline-form-input-modal-field-value">Modal Field Value</label>
+                <input type="text" style="width: 100%;" class="form-control mb-2"
+                  id="inline-form-input-modal-field-value" placeholder="Modal field value">
+              </div>
+            </form>
+            <p id="add-new-auto-fetch-field-error"></p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <button class="btn btn-success" onclick="add_auto_fetch_field(this)">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="otp_verification_masking_pi_modal" tabindex="-1" role="dialog" aria-labelledby="add_new_masking_field_modal_modal_label" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="add_new_masking_field_modal_modal_label">OTP Verification</h5>
+          </div>
+          <div class="modal-body">
+              <div class="row">
+                  <div class="col-sm-12 ">
+
+                      <div class="col-sm-12 mb-sm mb-4">
+                          <div class="switch-off-toggle-info-div">
+                              To switch off the Masking PII toggle you need to enter the 6-digit OTP code.
+                          </div>
+                      </div>
+                      <div class="col-sm-12 mb-sm mb-4">
+                          <div class="otp-send-to-div">
+                              OTP is send to 
+                              {% for email_id in email_ids %}
+                                {% if not forloop.last %}
+                                  <a href="#">{{ email_id }}, </a>
+                                {% else %}
+                                  <a href="#">{{ email_id }}</a>
+                                {% endif %}
+                              {% endfor %}
+                          </div>
+                      </div>
+                      <div class="col-sm-12 mb-4 px-5 px-mx-sm">
+                          <div class="d-flex flex-row mx-5 padding-sm">
+                              <input type="text" class="pii-data-otp" autofocus>
+                              <input type="text" class="pii-data-otp">
+                              <input type="text" class="pii-data-otp">
+                              <input type="text" class="pii-data-otp">
+                              <input type="text" class="pii-data-otp">
+                              <input type="text" class="pii-data-otp" style="margin-right: 0px !important;"></div>
+                      </div>
+                      <div class="col-sm-12">
+                          <div class="resend-otp-div">
+                              Didn’t receive the OTP? <a href="#" style="font-weight: bold;" onclick="resend_pii_data_otp(this);">RESEND OTP</a>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div class="modal-footer" style="border: none;">
+              <button class="btn btn-text" type="button" data-dismiss="modal" style="border: none !important; color: #0254D7 !important;">Cancel</button>
+              <button class="btn btn-success" type="button" onclick="verify_pii_data_otp(this)">Submit</button>
+          </div>
+      </div>
+
+  </div>
+</div>
+
+<script>
+
+  function show_edit_masking_field_modal(field_id) {
+      $("#edit_masking_field_modal_" + field_id).modal("show");
+  }
+
+  function show_delete_masking_field_modal(field_id) {
+      $("#delete_masking_field_modal_" + field_id).modal("show");
+  }
+
+  function show_search_tag_field_modal(field_id) {
+      $("#edit_search_tag_field_modal_" + field_id).modal("show");
+  }
+
+  function show_delete_search_tag_field_modal(field_id) {
+      $("#delete_search_tag_field_field_modal_" + field_id).modal("show");
+  }
+
+  function show_edit_auto_fetch_field_modal(field_id) {
+      $("#edit_auto_fetch_field_modal_" + field_id).modal("show");
+  }
+
+  function show_delete_auto_fetch_field_modal(field_id) {
+      $("#delete_auto_fetch_field_field_modal_" + field_id).modal("show");
+  }
+
+  $(document).ready(function() {
+    var verify_inputs = document.getElementsByClassName('pii-data-otp');
+    for(let idx = 0; idx < verify_inputs.length; idx ++) {
+        verify_inputs[idx].addEventListener('keyup', function(e) {
+            if(e.key == 'Backspace') {
+                if(this.previousElementSibling) {
+                    this.previousElementSibling.focus();
+                }
+            } else if(e.key >= '0' && e.key <= '9') {
+                keys = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+                if (keys.indexOf(this.value) != -1) {
+                    if(this.nextElementSibling) {
+                        this.nextElementSibling.focus();
+                    }
+                }
+            }
+        });
+
+        verify_inputs[idx].addEventListener('keydown', function(e) {
+            if(e.key >= 0 && e.key <= 9) {
+                if(this.value.length + 1 > 1) {
+                    if(this.nextElementSibling) {
+                        this.nextElementSibling.focus();
+                    } else {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                }
+            } else if(e.key == "ArrowDown" || e.key == "ArrowUp") {
+                e.preventDefault();
+                e.stopPropagation();
+            } else if(e.key == "-" || e.key == "_" || e.key == "+" || e.key == "=" || e.key == "e" || e.key == "E") {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        });
+
+        verify_inputs[idx].addEventListener('paste', function(e) {
+            var regex_code = /^[0-9]{6}$/g;
+            var clipboard_data = e.clipboardData || e.originalEvent.clipboardData || window.clipboardData;
+            var pasted_data = clipboard_data.getData('text');
+
+            if(idx == 0) {
+                if(regex_code.test(pasted_data)){
+                    for(var index = 0; index < verify_inputs.length; index ++) {
+                        verify_inputs[index].value = pasted_data[index];
+                        verify_inputs[index].focus();
+                    }
+                }
+            }
+            e.preventDefault();
+            e.stopPropagation();
+        });
+    }
+  });
+
+  $(document).ready(function() {
+		try {
+            document.getElementById("nav-settings-menu").classList.add("active")
+        } catch(err) {}
+	});
+
+</script>
+
+{% endblock %}

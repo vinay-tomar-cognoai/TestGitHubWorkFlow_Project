@@ -1,0 +1,419 @@
+{% extends 'LiveChatApp/agent_console_settings.html' %}
+{% block consolecontent %}
+{% load static %}
+
+<style type="text/css">
+
+.active-page {
+    background: {{ admin_config.get_livechat_theme_lighten_three }} !important;
+    border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }} !important;
+}
+.active-page a {
+    color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+}
+.mobile-select-month-year-modal .mobile-select-month-year-div ul li.active-ui-selected{
+      background: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+}
+
+</style>
+
+ <link href="{% static 'LiveChatApp/css/agent_calender.css' %}?v={% random_int 1 100 %}" type="text/css" rel="stylesheet"/>
+ <link href="{% static 'LiveChatApp/css/calender.css' %}" rel="stylesheet" type="text/css">
+
+<div class="col-xl-10 col-lg-10 col-md-9 col-sm-12 col-12 py-2 overflow-hidden-desktop" id="live-chat-setting-content-c" style="background: #FAFAFA;">
+
+    <div class="live-chat-calender-heading-mobile">
+        <svg width="25" height="21" viewBox="0 0 25 21" fill="none" xmlns="http://www.w3.org/2000/svg" class="back-arrow-div" id="live-chat-active-customers-opener-setting" onclick="go_back_mobile()">
+            <path d="M25 9.1376H5.19713L12.3832 1.92643L10.4635 0L0 10.5L10.4635 21L12.3832 19.0736L5.19713 11.8624H25V9.1376Z" fill="#757575"/>
+        </svg>
+
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11.4722 0C12.8683 0 14 1.13172 14 2.52778V11.4722C14 12.8683 12.8683 14 11.4722 14H2.52778C1.13172 14 0 12.8683 0 11.4722V2.52778C0 1.13172 1.13172 0 2.52778 0H11.4722ZM11.4722 1.16667H2.52778C1.77606 1.16667 1.16667 1.77606 1.16667 2.52778V11.4722C1.16667 12.2239 1.77606 12.8333 2.52778 12.8333H11.4722C12.2239 12.8333 12.8333 12.2239 12.8333 11.4722V2.52778C12.8333 1.77606 12.2239 1.16667 11.4722 1.16667ZM3.69444 8.16667C4.23139 8.16667 4.66667 8.60195 4.66667 9.13889C4.66667 9.67583 4.23139 10.1111 3.69444 10.1111C3.1575 10.1111 2.72222 9.67583 2.72222 9.13889C2.72222 8.60195 3.1575 8.16667 3.69444 8.16667ZM7 8.16667C7.53694 8.16667 7.97222 8.60195 7.97222 9.13889C7.97222 9.67583 7.53694 10.1111 7 10.1111C6.46306 10.1111 6.02778 9.67583 6.02778 9.13889C6.02778 8.60195 6.46306 8.16667 7 8.16667ZM3.69444 4.27778C4.23139 4.27778 4.66667 4.71306 4.66667 5.25C4.66667 5.78694 4.23139 6.22222 3.69444 6.22222C3.1575 6.22222 2.72222 5.78694 2.72222 5.25C2.72222 4.71306 3.1575 4.27778 3.69444 4.27778ZM7 4.27778C7.53694 4.27778 7.97222 4.71306 7.97222 5.25C7.97222 5.78694 7.53694 6.22222 7 6.22222C6.46306 6.22222 6.02778 5.78694 6.02778 5.25C6.02778 4.71306 6.46306 4.27778 7 4.27778ZM10.3056 4.27778C10.8425 4.27778 11.2778 4.71306 11.2778 5.25C11.2778 5.78694 10.8425 6.22222 10.3056 6.22222C9.76861 6.22222 9.33333 5.78694 9.33333 5.25C9.33333 4.71306 9.76861 4.27778 10.3056 4.27778Z" fill="#4D4D4D" />
+        </svg>                
+        <span>Calendar</span>
+    </div>
+        <div class="live-chat-setting-calender-heading ">
+            <div class="row" id="icon-calender-img">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin: 4px 0;">
+                    <path d="M11.4722 0C12.8683 0 14 1.13172 14 2.52778V11.4722C14 12.8683 12.8683 14 11.4722 14H2.52778C1.13172 14 0 12.8683 0 11.4722V2.52778C0 1.13172 1.13172 0 2.52778 0H11.4722ZM11.4722 1.16667H2.52778C1.77606 1.16667 1.16667 1.77606 1.16667 2.52778V11.4722C1.16667 12.2239 1.77606 12.8333 2.52778 12.8333H11.4722C12.2239 12.8333 12.8333 12.2239 12.8333 11.4722V2.52778C12.8333 1.77606 12.2239 1.16667 11.4722 1.16667ZM3.69444 8.16667C4.23139 8.16667 4.66667 8.60195 4.66667 9.13889C4.66667 9.67583 4.23139 10.1111 3.69444 10.1111C3.1575 10.1111 2.72222 9.67583 2.72222 9.13889C2.72222 8.60195 3.1575 8.16667 3.69444 8.16667ZM7 8.16667C7.53694 8.16667 7.97222 8.60195 7.97222 9.13889C7.97222 9.67583 7.53694 10.1111 7 10.1111C6.46306 10.1111 6.02778 9.67583 6.02778 9.13889C6.02778 8.60195 6.46306 8.16667 7 8.16667ZM3.69444 4.27778C4.23139 4.27778 4.66667 4.71306 4.66667 5.25C4.66667 5.78694 4.23139 6.22222 3.69444 6.22222C3.1575 6.22222 2.72222 5.78694 2.72222 5.25C2.72222 4.71306 3.1575 4.27778 3.69444 4.27778ZM7 4.27778C7.53694 4.27778 7.97222 4.71306 7.97222 5.25C7.97222 5.78694 7.53694 6.22222 7 6.22222C6.46306 6.22222 6.02778 5.78694 6.02778 5.25C6.02778 4.71306 6.46306 4.27778 7 4.27778ZM10.3056 4.27778C10.8425 4.27778 11.2778 4.71306 11.2778 5.25C11.2778 5.78694 10.8425 6.22222 10.3056 6.22222C9.76861 6.22222 9.33333 5.78694 9.33333 5.25C9.33333 4.71306 9.76861 4.27778 10.3056 4.27778Z" fill="#4D4D4D" />
+                </svg>
+                <span>Calendar</span>
+            </div>
+        <div class="row">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-calender-date">
+                    <div class="filter-month-name-div">
+                        <button class="filter-btn" id="live-chat-calendar-filter-btn" data-toggle="modal" data-target="#calendar-filter-modal">
+                            <span>Filter</span>
+                            <svg width="16" height="9" viewBox="0 0 16 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5.33333 8.35714C5.33333 8.18665 5.40357 8.02313 5.5286 7.90257C5.65362 7.78201 5.82319 7.71429 6 7.71429H10C10.1768 7.71429 10.3464 7.78201 10.4714 7.90257C10.5964 8.02313 10.6667 8.18665 10.6667 8.35714C10.6667 8.52764 10.5964 8.69115 10.4714 8.81171C10.3464 8.93227 10.1768 9 10 9H6C5.82319 9 5.65362 8.93227 5.5286 8.81171C5.40357 8.69115 5.33333 8.52764 5.33333 8.35714ZM2.66667 4.5C2.66667 4.3295 2.7369 4.16599 2.86193 4.04543C2.98695 3.92487 3.15652 3.85714 3.33333 3.85714H12.6667C12.8435 3.85714 13.013 3.92487 13.1381 4.04543C13.2631 4.16599 13.3333 4.3295 13.3333 4.5C13.3333 4.6705 13.2631 4.83401 13.1381 4.95457C13.013 5.07513 12.8435 5.14286 12.6667 5.14286H3.33333C3.15652 5.14286 2.98695 5.07513 2.86193 4.95457C2.7369 4.83401 2.66667 4.6705 2.66667 4.5ZM0 0.642857C0 0.472361 0.070238 0.308848 0.195262 0.188289C0.320287 0.0677295 0.489856 0 0.666667 0H15.3333C15.5101 0 15.6797 0.0677295 15.8047 0.188289C15.9298 0.308848 16 0.472361 16 0.642857C16 0.813353 15.9298 0.976867 15.8047 1.09743C15.6797 1.21798 15.5101 1.28571 15.3333 1.28571H0.666667C0.489856 1.28571 0.320287 1.21798 0.195262 1.09743C0.070238 0.976867 0 0.813353 0 0.642857Z" fill="#868686"/>
+                            </svg>
+                        </button>
+    
+                        <div class="month-arrow-name-div">
+                            <div class="navigate-month-arrow">
+                                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" class="prev-month" id="prev-month-agent-id" >
+                                    <path d="M4.37695 7.26101C4.37664 7.00581 4.48625 6.76283 4.67778 6.59418L8.97887 2.81029C9.27529 2.56155 9.71608 2.59495 9.97164 2.88551C10.2272 3.17607 10.2041 3.61752 9.91953 3.87977L6.1584 7.18851C6.13751 7.20681 6.12554 7.23324 6.12554 7.26101C6.12554 7.28879 6.13751 7.31521 6.1584 7.33352L9.91953 10.6423C10.1175 10.8084 10.21 11.0687 10.1612 11.3225C10.1123 11.5763 9.92989 11.7837 9.6844 11.8646C9.43891 11.9454 9.16891 11.8869 8.97887 11.7117L4.67933 7.92901C4.48733 7.76006 4.3772 7.51676 4.37695 7.26101Z" {% if prev_month_calendar_objs_count != 0 %} fill="#2D2D2D" {% else %} fill="#cacaca" {% endif %} />
+                                </svg>                                    
+                                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" class="next-month" id="next-month-agent-id" >
+                                    <path d="M10.7812 7.45383C10.7815 7.71967 10.6674 7.97277 10.4679 8.14845L5.98756 12.09C5.67878 12.3491 5.21963 12.3143 4.95341 12.0116C4.6872 11.709 4.7113 11.2491 5.00769 10.976L8.92554 7.52936C8.9473 7.51029 8.95977 7.48276 8.95977 7.45383C8.95977 7.4249 8.9473 7.39737 8.92554 7.3783L5.00769 3.93171C4.7113 3.65852 4.6872 3.19869 4.95341 2.89602C5.21963 2.59335 5.67878 2.55856 5.98756 2.81766L10.4662 6.758C10.6662 6.93399 10.781 7.18743 10.7812 7.45383Z" {% if next_month_calendar_objs_count != 0 %} fill="#2D2D2D" {% else %} fill="#cacaca" {% endif %}/>
+                                </svg>
+                            </div>
+                            <div class="month-name-year" id="month-name-year-div-id">
+                                <p>{{selected_month_name}} {{selected_year}}</p>
+                            </div>
+                        </div>
+                    </div>
+                   
+                </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12 live-chat-calender-area live-chat-table-parent-div livechat-new-calendar agent-livechat-calendar livechat-calendar-mobile">
+        <!-- mobile  -->
+            <div class="calendar-mobile-heading-div">
+                <p>
+                    Today, {% now "l" %}  <br>
+                  <span>{% now "jS F Y" %}</span>  
+                </p>
+            </div>
+            <div class="mobile-date-year-div desktop-year-div">
+                <div class="mobile-month-year-input-div" data-toggle="modal" data-target="#mobile-select-month-year-modal">
+                   <span>{{selected_month_name}} {{selected_year}}</span>
+                   <div class="show-month-year-arrow">
+                    <svg width="8" height="8" viewBox="0 0 11 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5.23893 7.44281C4.95267 7.44316 4.68013 7.32021 4.49095 7.10537L0.246614 2.28091C-0.0323884 1.94841 0.00507571 1.45398 0.330995 1.16732C0.656914 0.880659 1.15207 0.90661 1.44624 1.22577L5.1576 5.44458C5.17814 5.46801 5.20778 5.48145 5.23893 5.48145C5.27009 5.48145 5.29973 5.46801 5.32026 5.44458L9.03162 1.22577C9.21797 1.0037 9.50998 0.899973 9.79466 0.954736C10.0793 1.0095 10.312 1.21416 10.4027 1.48952C10.4933 1.76488 10.4277 2.06774 10.2313 2.28091L5.98821 7.10364C5.79871 7.319 5.5258 7.44254 5.23893 7.44281Z" fill="#0254D7"/>
+                    </svg>
+                   </div>
+                </div>
+            </div>
+            <!-- mobile end  --> 
+    </div>       
+
+    {% if total_calender_objs > 0 %}
+        <div class="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12 live-chat-calender-area live-chat-table-parent-div livechat-new-calendar agent-livechat-calendar livechat-calendar-mobile">
+            <div class="created-on-date">
+                    {% with calendar_objs|first as first_calendar_obj %}
+                    Created on : {{ first_calendar_obj.created_at | date:"jS M Y" }}
+                    {% endwith %}
+                </div>
+            
+                
+                <table class="calendar-table table table-bordered calendar-month-area">
+                    <thead>
+                        <tr>
+                            <th class="weekday">Sun</th>
+                            <th class="weekday working">Mon</th>
+                            <th class="weekday working">Tue</th>
+                            <th class="weekday working">Wed</th>
+                            <th class="weekday working">Thu</th>
+                            <th class="weekday working">Fri</th>
+                            <th class="weekday working">Sat</th>
+                        </tr>
+                        <tr class="mobile-calendar-table-head">
+                            <th class="weekday">Su</th>
+                            <th class="weekday working">Mo</th>
+                            <th class="weekday working">Tu</th>
+                            <th class="weekday working">We</th>
+                            <th class="weekday working">Th</th>
+                            <th class="weekday working">Fr</th>
+                            <th class="weekday working">Sa</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% now "M d, Y" as today %}
+                        <!-- row loop -->
+                        
+                        {% for new_calender_objs in calender_list %}
+                        <tr>
+                            <!-- column loop -->
+                            {% for calendar_obj in new_calender_objs %}
+                              
+                              {% is_numeric calendar_obj as numeric %}
+
+
+                              {% if not numeric %}  
+                                {% if calendar_obj.event_date|date:"M d, Y" == today %}
+                                <td class="weekday-number present">
+                                {% elif calendar_obj.event_type == "1" %}  
+                                <td class="weekday-number working">
+                                {% elif calendar_obj.event_type == "2" %}     
+                                <td class="weekday-number holiday">
+                                {% endif %}    
+                                    <div class="month-day-detail" id="mobile-date-status-pk-{{ calendar_obj.pk }}" data-event_type="{{ calendar_obj.event_type }}" data-event_date="{{ calendar_obj.event_date | date:"jS-M-Y-l"}}"  
+                                    data-start_time="{{ calendar_obj.start_time | time:'H:i' }}" data-end_time="{{ calendar_obj.end_time | time:'H:i' }}" data-description="{{ calendar_obj.description }}" >
+                                        <p class="month-date">
+                                            {{calendar_obj.event_date | date:"j"}}
+                                        </p>
+                                        {% if calendar_obj.event_type == "1" %}
+                                        <p class="working-hours" >
+                                            <span class="working-hrs-color"></span>
+                                            <span class="working-hrs-time">{{ calendar_obj.start_time | time:'H:i' }} - {{ calendar_obj.end_time | time:'H:i' }}</span>
+                                        </p>
+                                        {% else %}
+                                        <p class="working-hours" style="display: none;">
+                                            <span class="working-hrs-color"></span>
+                                            <span class="working-hrs-time">{{ calendar_obj.start_time | time:'H:i' }} - {{ calendar_obj.end_time | time:'H:i' }}</span>
+                                        </p>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                              {% else %}
+                               <td class="weekday-number next-month-date">
+                                   {{calendar_obj}}
+                                </td>
+                              {% endif %} 
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}        
+                        </tr> 
+                    </tbody>
+                </table>
+                <!-- mobile  -->
+                <div class="mobile-calendar-note">
+                    Note: select date to see working hour
+                </div>
+                <!-- mobile ends -->
+            <div class="calendar-color-code-detail">
+                <div class="working-color-code color-code-div">
+                    <span class="working-color"></span>
+                    <p>Working </p>
+                </div>
+                <div class="working-color-code color-code-div present-color-code">
+                    <span class="present-color"></span>
+                    <p>Present day </p>
+                </div>
+                <div class="holiday-color-code color-code-div">
+                    <span class="holiday-color"></span>
+                    <p>Holidays</p>
+                </div>
+            </div>
+
+            <!-- mobile  -->
+            {% now "n" as today_month %}
+            {% now "Y" as today_year %}
+            
+            <div class="mobile-calendar-date-status" id="mobile-calendar-card">
+                {% if selected_month == today_month and selected_year == today_year %}
+                {% if today_calendar_obj.event_type == "1" %}  
+                    <div class="date-current-status-timing-div">
+                        <div class="date-status-div">
+                            <p>
+                                {{today_calendar_obj.event_date | date:"jS M Y" }}, 
+                                <span class="current-date-day">&nbsp;{{today_calendar_obj.event_date | date:"l" }}</span> 
+                                <span class="current-status">Working</span>
+                            </p>
+                        </div>
+                        <div class="date-event-timing">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M7.00001 13.6666C6.0889 13.6666 5.22779 13.4916 4.41668 13.1416C3.60557 12.7916 2.89723 12.3139 2.29168 11.7083C1.68612 11.1028 1.20834 10.3944 0.858343 9.58331C0.508343 8.7722 0.333344 7.91109 0.333344 6.99998C0.333344 6.08887 0.508343 5.22776 0.858343 4.41665C1.20834 3.60554 1.68612 2.8972 2.29168 2.29165C2.89723 1.68609 3.60557 1.20831 4.41668 0.858313C5.22779 0.508313 6.0889 0.333313 7.00001 0.333313C7.91112 0.333313 8.77223 0.508313 9.58334 0.858313C10.3945 1.20831 11.1028 1.68609 11.7083 2.29165C12.3139 2.8972 12.7917 3.60554 13.1417 4.41665C13.4917 5.22776 13.6667 6.08887 13.6667 6.99998C13.6667 7.91109 13.4917 8.7722 13.1417 9.58331C12.7917 10.3944 12.3139 11.1028 11.7083 11.7083C11.1028 12.3139 10.3945 12.7916 9.58334 13.1416C8.77223 13.4916 7.91112 13.6666 7.00001 13.6666ZM9.45001 10.2166L10.2 9.46665L7.55001 6.79998V3.44998H6.55001V7.19998L9.45001 10.2166Z" fill="#CBCACA"/>
+                            </svg>
+                            <span class="date-working-hour-timing">
+                                {{ today_calendar_obj.start_time | time:'H:i' }} 
+                                <span class="time-hyphen"></span>
+                                {{ today_calendar_obj.end_time | time:'H:i' }}
+                            </span>
+                        </div>
+                    </div>
+                {% else %}
+                  
+                    <div class="date-current-status-timing-div status-holiday">
+                        <div class="date-status-div">
+                            <p>
+                                {{today_calendar_obj.event_date | date:"j M Y" }}, 
+                                <span class="current-date-day">&nbsp;{{today_calendar_obj.event_date | date:"l" }}</span> 
+                                <span class="current-status">Holiday</span>
+                            </p>
+                        </div>
+                        <div class="date-event-timing">
+                            {{ today_calendar_obj.description }}
+                        </div>
+                    </div>
+                {% endif %}
+                {% endif %}
+            </div>
+            
+            <!-- mobile end  -->
+
+        </div>
+        <!-- mobile view -->
+    {% else %}
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-report-d-interaction-table-area" style="text-align: center; padding: 40px 40px;">
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="40" height="40" fill="#E5E5E5"/>
+                <g clip-path="url(#clip0)">
+                <rect width="1440" height="760" transform="translate(-749 -242)" fill="white"/>
+                <rect x="-672" y="-186" width="1363" height="704" fill="#FAFAFA"/>
+                <rect x="-482" y="-47" width="1163" height="142" rx="8" fill="white"/>
+                <g opacity="0.15" clip-path="url(#clip1)">
+                <path d="M19.8234 39.9998C19.605 39.9998 19.3917 39.9132 19.2334 39.7565C19.0367 39.5598 18.95 39.2765 19.005 39.0048L20.1834 33.1132C20.2167 32.9498 20.2934 32.8015 20.4117 32.6865L33.375 19.7232C34.3484 18.7498 35.9367 18.7498 36.91 19.7232L39.2667 22.0798C40.2417 23.0548 40.2417 24.6398 39.2667 25.6148L26.3034 38.5782C26.1884 38.6948 26.04 38.7732 25.8767 38.8065L19.985 39.9848C19.9317 39.9948 19.8767 39.9998 19.8234 39.9998ZM21.77 33.6848L20.8867 38.1032L25.305 37.2198L38.09 24.4348C38.415 24.1098 38.415 23.5815 38.09 23.2565L35.7334 20.8998C35.4084 20.5748 34.88 20.5748 34.555 20.8998L21.77 33.6848ZM25.715 37.9882H25.7317H25.715Z" fill="#757575"/>
+                <path d="M15.8333 35H4.16667C1.86833 35 0 33.1317 0 30.8333V9.16667C0 6.86833 1.86833 5 4.16667 5H7.5C7.96 5 8.33333 5.37333 8.33333 5.83333C8.33333 6.29333 7.96 6.66667 7.5 6.66667H4.16667C2.78833 6.66667 1.66667 7.78833 1.66667 9.16667V30.8333C1.66667 32.2117 2.78833 33.3333 4.16667 33.3333H15.8333C16.2933 33.3333 16.6667 33.7067 16.6667 34.1667C16.6667 34.6267 16.2933 35 15.8333 35Z" fill="#757575"/>
+                <path d="M27.5 20C27.04 20 26.6667 19.6267 26.6667 19.1667V9.16667C26.6667 7.78833 25.545 6.66667 24.1667 6.66667H20.8333C20.3733 6.66667 20 6.29333 20 5.83333C20 5.37333 20.3733 5 20.8333 5H24.1667C26.465 5 28.3333 6.86833 28.3333 9.16667V19.1667C28.3333 19.6267 27.96 20 27.5 20Z" fill="#757575"/>
+                <path d="M19.1667 10H9.16675C7.78841 10 6.66675 8.87833 6.66675 7.5V4.16667C6.66675 3.70667 7.04008 3.33333 7.50008 3.33333H10.0834C10.4701 1.43333 12.1551 0 14.1667 0C16.1784 0 17.8634 1.43333 18.2501 3.33333H20.8334C21.2934 3.33333 21.6667 3.70667 21.6667 4.16667V7.5C21.6667 8.87833 20.5451 10 19.1667 10ZM8.33341 5V7.5C8.33341 7.95833 8.70842 8.33333 9.16675 8.33333H19.1667C19.6251 8.33333 20.0001 7.95833 20.0001 7.5V5H17.5001C17.0401 5 16.6667 4.62667 16.6667 4.16667C16.6667 2.78833 15.5451 1.66667 14.1667 1.66667C12.7884 1.66667 11.6667 2.78833 11.6667 4.16667C11.6667 4.62667 11.2934 5 10.8334 5H8.33341Z" fill="#757575"/>
+                <path d="M22.5 14.9997H5.83333C5.37333 14.9997 5 14.6263 5 14.1663C5 13.7063 5.37333 13.333 5.83333 13.333H22.5C22.96 13.333 23.3333 13.7063 23.3333 14.1663C23.3333 14.6263 22.96 14.9997 22.5 14.9997Z" fill="#757575"/>
+                <path d="M22.5 19.9997H5.83333C5.37333 19.9997 5 19.6263 5 19.1663C5 18.7063 5.37333 18.333 5.83333 18.333H22.5C22.96 18.333 23.3333 18.7063 23.3333 19.1663C23.3333 19.6263 22.96 19.9997 22.5 19.9997Z" fill="#757575"/>
+                <path d="M22.5 24.9997H5.83333C5.37333 24.9997 5 24.6263 5 24.1663C5 23.7063 5.37333 23.333 5.83333 23.333H22.5C22.96 23.333 23.3333 23.7063 23.3333 24.1663C23.3333 24.6263 22.96 24.9997 22.5 24.9997Z" fill="#757575"/>
+                </g>
+                </g>
+                <defs>
+                <clipPath id="clip0">
+                <rect width="1440" height="760" fill="white" transform="translate(-749 -242)"/>
+                </clipPath>
+                <clipPath id="clip1">
+                <rect width="40" height="40" fill="white"/>
+                </clipPath>
+                </defs>
+            </svg>
+            <span style="color: rgba(134, 134, 134, 0.5); font-size:20px;">No data found</span>
+    </div>
+    {% endif %}
+</div>
+
+<div class="modal fade backdrop" id="calendar-filter-modal" tabindex="-1" role="dialog" aria-labelledby="calendar_work_timing_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="calendar-filter-header">
+                    <h6>Filter</h6>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 mb-4">
+                        <label>Month</label>
+                        <select name="month" class="form-control select-dropdown-icon selectpicker create-user-select-field" id="select-calender-month">
+                            <option>Select</option>
+                            {% for month in calender_month %}
+                                {% if month.key == selected_month %}
+                                    <option value="{{month.key}}" selected>{{month.value}}</option>
+                                {% else %}
+                                    <option value="{{month.key}}">{{month.value}}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-12 mb-4" >
+                        <label>Year</label>
+                        <select name="year" class="form-control select-dropdown-icon selectpicker create-user-select-field" id="select-calender-year">
+                            <option>Select</option>
+                            {% for year in calender_year %}
+                                {% if year.key == selected_year %}
+                            <option value="{{year.key}}" selected>{{year.value}}</option>
+                                {% else %}
+                            <option value="{{year.key}}">{{year.value}}</option>
+                                {% endif %}
+                            {% endfor %}
+                       </select> 
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div style="float: right;">
+                    <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                    <button class="btn-primary" type="button" onclick="apply_calender_filter()">Apply</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade backdrop mobile-select-month-year-modal" id="mobile-select-month-year-modal" tabindex="-1" role="dialog" aria-labelledby="mobile_calendar_month_year_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="calendar-filter-header">
+                    <h6>Select month and year</h6>
+                </div>
+            </div>
+            <div class="modal-body">
+               <div class="mobile-select-month-year-div">
+                   <ul class="mobile-select-month-div" id="mobile-calendar-month-select">
+                    {% for month in calender_month %}
+                        {% if month.key == selected_month %}
+                            <li class="month active-ui-selected" id="mobile-month-select-id" value="{{month.key}}">{{selected_month_name}}</li>
+                        {% else %}    
+                            <li class="month" value="{{month.key}}">{{month.value}}</li>
+                        {% endif %}
+                    {% endfor %}        
+                   </ul>
+                   <ul class="mobile-select-year-div" id="mobile-calendar-year-select">
+                    {% for year in calender_year %}
+                        {% if year.key == selected_year %}
+                            <li class="year active-ui-selected" id="mobile-year-select-id" value="{{year.key}}">{{year.value}}</li>
+                        {% else %}
+                            <li class="year" value="{{year.key}}">{{year.value}}</li>
+                        {% endif %}
+                    {% endfor %}
+                   </ul>
+               </div>
+            </div>
+            <div class="modal-footer">
+                <div style="float: right;">
+                    <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                    <button class="btn-primary" type="button" onclick="apply_calender_filter()">Apply</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function select_filter(){
+        value = document.getElementById("select-work-mode").value;
+        if(value == "1"){
+            document.getElementById("div-working-month").style.display = "block";
+             document.getElementById("div-working-year").style.display = "block";
+        }else if(value == "2"){
+            document.getElementById("div-working-month").style.display = "none";
+             document.getElementById("div-working-year").style.display = "block";
+        }
+    }
+    function display_calender_event(pk){
+
+        value = document.getElementById("select-edit-calender-type-" + pk).value
+        if(value == "1"){
+
+            $("#edit-start-working-time-div-"+pk).show()
+            $("#edit-end-working-time-div-"+pk).show()
+            $("#edit-holiday-calender-event-description-"+pk).hide()
+            $("#edit-holiday-calender-event-autoreponse-"+pk).hide()
+        }else{
+
+            $("#edit-start-working-time-div-"+pk).hide()
+            $("#edit-end-working-time-div-"+pk).hide()
+            $("#edit-holiday-calender-event-description-"+pk).show()
+            $("#edit-holiday-calender-event-autoreponse-"+pk).show()
+        }
+    }
+    $(document).ready(function() {
+
+      var table = $('#table-calender-details').DataTable({
+          "language": {
+            "info": "Showing _START_ to _END_ entries out of {{ total_calender_objs }}",
+            "infoEmpty": "No records available",
+            "infoFiltered": "(filtered from _MAX_ total records)",
+          },
+          "bPaginate": false,
+          "ordering": false,
+          "infoCallback": function( settings, start, end, max, total, pre ) {
+              if (settings.oPreviousSearch["sSearch"] != ""){
+                  return pre;
+              }
+              end = ({{ start_point }} - 1) + end;
+              start = ({{ start_point }} - 1) + start;
+              return "Showing " + start + " to " + end + " entries out of {{ total_calender_objs }}" ;
+            }
+      });
+
+      //var table = $('#table-calender-details').DataTable();
+
+        $('#table-calender-details-search').keyup(function() {
+            let value = this.value;
+            table.search(value).draw();
+        });
+    });
+    window.SELECTED_MONTH = '{{selected_month}}'
+    window.SELECTED_YEAR = '{{selected_year}}'
+    window.PREVIOUS_MONTH_CALENDAR_OBJECT_COUNT = '{{prev_month_calendar_objs_count}}'
+    window.NEXT_MONTH_CALENDAR_OBJECT_COUNT = '{{next_month_calendar_objs_count}}'
+</script>
+{% endblock %}

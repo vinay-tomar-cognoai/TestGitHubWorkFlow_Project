@@ -1,0 +1,652 @@
+{% extends 'EasyAssistApp/console.html' %}
+{% block content %}
+{% load static %}
+
+{% if request.user.enable_s3_bucket %}
+<script src="https://static.allincall.in/static/EasyAssistApp/js/ace.js" type="text/javascript"
+  charset="utf-8"></script>
+<script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/jscolor.min.js"></script>
+{% else %}
+<script src="{% static 'EasyAssistApp/js/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/jscolor.min.js' %}"></script>
+{% endif %}
+
+<link href="{% static 'EasyAssistApp/css/settings.css' %}" rel="stylesheet" type="text/css">
+
+<div class="container-fluid">
+  <div>
+    <div id="pills-cobrowse-agent-setting-options">
+      <div class="page-header">
+        <div class="row justify-content-between">
+          <div class="col-sm-8 d-flex align-items-center">
+            <div class="nav nav-pills navbar-right">
+              <a class="anchor-reset back-btn" href="/easy-assist/sales-ai/settings/options/cobrowse">
+                <span class="mr-3 mb-auto" style="cursor: pointer;">
+                  <svg class="back-arrow-svg" width="44" height="44" viewBox="0 0 44 44" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <rect width="44" height="44" rx="22" transform="matrix(1 0 0 -1 0 44)" fill="white" />
+                    {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                    <path
+                      d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                      fill="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" />
+                    {% else %}
+                    <path
+                      d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                      fill="#0254D7" />
+
+                    {% endif %}
+
+                  </svg>
+                </span>
+              </a>
+              <h5 class="nav_btn mr-2 mt-2"><a class="anchor-reset" href="/easy-assist/sales-ai/settings">Settings</a>
+              </h5>
+              <div class=" mr-2 pt-2">
+                <svg class="mini-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                    fill="#475569" />
+                </svg>
+              </div>
+              <h5 class="nav_btn mr-2 mt-2"><a class="anchor-reset"
+                  href="/easy-assist/sales-ai/settings/options">Options </a></h5>
+              <div class=" mr-2 pt-2">
+                <svg class="mini-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                    fill="#475569" />
+                </svg>
+              </div>
+              <h5 class="nav_btn mr-2 mt-2"><a class="anchor-reset"
+                  href="/easy-assist/sales-ai/settings/options/cobrowse">Cobrowse</a></h5>
+              <div class=" mr-2 pt-2">
+                <svg class="mini-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                    fill="#475569" />
+                </svg>
+              </div>
+              <h5 class="nav_btn active1 mt-2">Agent Settings</h5>
+            </div>
+          </div>
+          <div class="col-sm-4 d-flex justify-content-end">
+            <button class="btn btn-width-100" data-toggle="modal" data-target="#modal-confirm-reset-all"
+              id="reset-button">Reset
+              All</button>
+            <button class="btn btn-width-100" id="save-button" style="background: #10B981!important;"
+              onclick="sales_cobrowse_agent_settings(this)">Save</button>
+          </div>
+        </div>
+      </div>
+      <div class="card shadow mb-4 mt-30">
+        <div class="card-body p-0">
+          <div class="card">
+            <div class="card-body table-responsive p-0">
+              <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                <tbody>
+                  <tr>
+                    <th scope="row" class="heading-toggle-text">Navigation Bar</th>
+                    <td style="vertical-align: inherit;">
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row" class="sub-heading-toggle-text">Enable screen capture</th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.enable_screenshot_agent %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_screenshot_agent" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_screenshot_agent">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row" class="sub-heading-toggle-text">Enable Invite Agent</th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.enable_invite_agent_in_cobrowsing %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_invite_agent_in_cobrowsing" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_invite_agent_in_cobrowsing">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  <tr id="enable_session_transfer_div">
+                    {% if not access_token_obj.allow_agent_to_customer_cobrowsing %}
+                      <th scope="row" class="sub-heading-toggle-text">Enable session transfer
+                        <span data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Enabling this toggle will allow a primary agent to transfer an entire session to another agent."><i class="fas fa-info-circle"></i></span>
+                      </th>
+                      <td style="vertical-align: inherit;">                 
+                          {% if access_token_obj.enable_session_transfer_in_cobrowsing %}
+                            <label class="easyassist-option-switch">
+                              <input type="checkbox" id="enable_session_transfer_in_cobrowsing" checked="">
+                              <span class="easyassist-option-switch-slider round"></span>
+                            </label>
+                          {% else %}
+                            <label class="easyassist-option-switch">
+                              <input type="checkbox" id="enable_session_transfer_in_cobrowsing" >
+                              <span class="easyassist-option-switch-slider round"></span>
+                            </label>
+                          {% endif %}
+                      </td>
+                      {% else %}
+                        <th scope="row" class="sub-heading-toggle-text"  style="color: #CBCACA !important;">Enable session transfer
+                          <span data-toggle="tooltip" class="disable-menu-tab" data-placement="bottom" title="" data-original-title="Enabling this toggle will allow a primary agent to transfer an entire session to another agent."><i class="fas fa-info-circle"></i></span>
+                        </th>
+                        <td style="vertical-align: inherit;">
+                          <label class="easyassist-option-switch" data-toggle="tooltip" data-placement="bottom" data-original-title="Not applicable to Reverse Co-browsing">
+                            <input type="checkbox" id="enable_session_transfer_in_cobrowsing" disabled >
+                            <span class="easyassist-option-switch-slider round"></span>
+                          </label>
+                        </td>
+                        </tr>
+                        <tr id="transfer_request_archive_div" class="tr-flex-sm disable-menu-tab" style="display: none !important;">
+                          <th scope="row" class="sub-heading-toggle-text">Transfer request expiry time (In secs)
+                          </th>
+                          <td style="vertical-align: inherit;">                 
+                            <input type="number" id="transfer_request_archive_time" disabled min="5"
+                            placeholder="Enter expiry time" class="positive_numeric" value="{{ access_token_obj.transfer_request_archive_time }}">        
+                          </td>
+                      {% endif %}
+                  </tr>
+                  {% if not access_token_obj.allow_agent_to_customer_cobrowsing %}
+                    <tr id="transfer_request_archive_div" class="tr-flex-sm">
+                      <th scope="row" class="sub-heading-toggle-text">Transfer request expiry time (In secs)
+                      </th>
+                      <td style="vertical-align: inherit;">                 
+                        <input type="number" id="transfer_request_archive_time" min="5"
+                        placeholder="Enter expiry time" class="positive_numeric" value="{{ access_token_obj.transfer_request_archive_time }}">        
+                      </td>
+                    </tr>
+                  {% endif %}
+                  <tr>
+                    <th scope="row" class="sub-heading-toggle-text">Enable 'Edit access'</th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.enable_edit_access %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_edit_access" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_edit_access">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row" class="sub-heading-toggle-text">
+                      Enable video calling while co-browsing
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="This will allow agents to start video call in a new tab."><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.allow_cobrowsing_meeting %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="allow_video_calling_cobrowsing" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="allow_video_calling_cobrowsing">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  <tr id="allow_customer_initiate_video_call">
+                    <th scope="row" class="sub-heading-toggle-text">
+                      Allow end customer to initiate Video Call
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.customer_initiate_video_call %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="customer_initiate_video_call" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="customer_initiate_video_call">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row" class="sub-heading-toggle-text">
+                      Enable Voice Call
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="Agent and Customer can connect over voice call."><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.enable_voip_calling %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_voip_calling" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_voip_calling">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  <tr id="allow_customer_initiate_voice_call">
+                    <th scope="row" class="sub-heading-toggle-text">
+                      Allow end customer to initiate Voice Call
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.customer_initiate_voice_call %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="customer_initiate_voice_call" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="customer_initiate_voice_call">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% if access_token_obj.allow_agent_to_customer_cobrowsing %}
+
+                <tr id="auto_voip_calling_first_time_div">
+                  <th scope="row" class="disable-menu-tab sub-heading-toggle-text" style="color: #CBCACA !important;">Initiate a call when agent joins the session</th>
+                  <td style="vertical-align: inherit;">
+                    <label class="easyassist-option-switch" data-toggle="tooltip" data-placement="bottom" data-original-title="Not applicable to Reverse Co-browsing">
+                      <input type="checkbox" id="enable_auto_voip_calling_for_first_time" disabled>
+                      <span class="easyassist-option-switch-slider round"></span>
+                    </label>
+                  </td>
+                </tr>
+
+                {% else %}
+
+                <tr id="auto_voip_calling_first_time_div">
+                  <th scope="row" class="sub-heading-toggle-text">Initiate a call when agent joins the session</th>
+                  <td style="vertical-align: inherit;">
+                    {% if access_token_obj.enable_auto_voip_calling_for_first_time %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_auto_voip_calling_for_first_time" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_auto_voip_calling_for_first_time">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+                    </td>
+                  </tr>
+
+                  {% endif %}
+
+                  <tr id="voip_calling_message_div" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Voice Call message
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="This message is shown to the customer when agent requests for a voice call."><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      <textarea class="form-control" style="height:auto;" maxlength="1024"
+                        id="voip_calling_text">{{ access_token_obj.voip_calling_message }}</textarea>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row" class="sub-heading-toggle-text">
+                      Enable video calling as a PIP
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="PIP minimizes the video into a small player that you can move around."><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.enable_voip_with_video_calling %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_voip_with_video_calling" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_voip_with_video_calling">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  <tr id="allow_customer_initiate_video_call_as_pip">
+                    <th scope="row" class="sub-heading-toggle-text">
+                      Allow end customer to initiate Video Call as PIP
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.customer_initiate_video_call_as_pip %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="customer_initiate_video_call_as_pip" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="customer_initiate_video_call_as_pip">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+                    </td>
+                  </tr>
+
+                  {% if access_token_obj.allow_agent_to_customer_cobrowsing %}
+
+                <tr id="auto_voip_with_video_calling_first_time_div" >
+                  <th scope="row" class="disable-menu-tab sub-heading-toggle-text" style="color: #CBCACA !important;">Initiate a call when agent joins the session</th>
+                  <td style="vertical-align: inherit;">
+
+                      <label class="easyassist-option-switch" data-toggle="tooltip" data-placement="bottom" data-original-title="Not applicable to Reverse Co-browsing">
+                        <input type="checkbox" id="enable_auto_voip_with_video_calling_for_first_time" disabled>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                    </td>
+                  </tr>
+
+                  {% else %}
+
+                  <tr id="auto_voip_with_video_calling_first_time_div">
+                    <th scope="row" class="sub-heading-toggle-text">Initiate a call when agent joins the session</th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.enable_auto_voip_with_video_calling_for_first_time %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_auto_voip_with_video_calling_for_first_time" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="enable_auto_voip_with_video_calling_for_first_time">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endif %}
+
+
+                  <tr class="tr-flex-sm" id="voip_with_video_calling_message_div">
+                    <th scope="row" class="sub-heading-toggle-text">Video calling as a PIP message
+                      <span data-toggle="tooltip" data-placement="bottom"
+                        title="This message is shown to the customer when agent requests for a video call"><i
+                          class="fas fa-info-circle"></i></span>
+                    </th>
+                    <td style="vertical-align: inherit;">
+                      <textarea class="form-control" style="height:auto;" maxlength="1024"
+                        id="voip_with_video_calling_text">{{ access_token_obj.voip_with_video_calling_message }}</textarea>
+                    </td>
+                  </tr>
+
+                  {% if access_token_obj.allow_agent_to_customer_cobrowsing %}
+
+                  <tr>
+                    <th scope="row" class="disable-menu-tab" style="color: #CBCACA !important;">Enable Screen Recording</th>
+                    <td style="vertical-align: inherit;">
+                        <label class="easyassist-option-switch" data-toggle="tooltip" data-placement="bottom" data-original-title="Not applicable to Reverse Co-browsing">
+                          <input type="checkbox" id="allow_screen_recording" disabled>
+                          <span class="easyassist-option-switch-slider round"></span>
+                        </label>
+  
+                      </td>
+                    </tr>
+                  <tr id="screen_recording_expire_div" class="tr-flex-sm">
+                    <th scope="row" class="disable-menu-tab sub-heading-toggle-text" style="color: #CBCACA !important;">Screen recording expires(days)</th>
+                    <td style="vertical-align: inherit;">
+                      <input type="number" aria-label="Checkbox for following text input"
+                        value="{{ access_token_obj.recording_expires_in_days }}" id="recording_expires_in_days" min="0"
+                        placeholder="Enter Days" class="disable-menu-tab positive_numeric" style="color: #CBCACA !important;">
+                    </td>
+                  </tr>
+
+                  {% else %}
+
+                  <tr>
+                    <th scope="row" class="sub-heading-toggle-text">Enable Screen Recording</th>
+                    <td style="vertical-align: inherit;">
+                      {% if access_token_obj.allow_screen_recording %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="allow_screen_recording" checked>
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% else %}
+                      <label class="easyassist-option-switch">
+                        <input type="checkbox" id="allow_screen_recording">
+                        <span class="easyassist-option-switch-slider round"></span>
+                      </label>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  <tr id="screen_recording_expire_div" class="tr-flex-sm">
+                    <th scope="row" class="sub-heading-toggle-text">Screen recording expires(days)</th>
+                    <td style="vertical-align: inherit;">
+                      <input type="number" aria-label="Checkbox for following text input"
+                        value="{{ access_token_obj.recording_expires_in_days }}" id="recording_expires_in_days" min="0"
+                        placeholder="Enter Days" class="positive_numeric">
+                    </td>
+                  </tr>
+
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade upload_file_modal" id="modal-confirm-reset-all" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Reset All Settings</h5>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-sm-12">
+            <p>This will reset all settings across the console. Are you sure you want to continue?
+            <p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-text-only" type="button" data-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary" onclick="reset_cobrowsing_meta_details(this)">Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+  if (document.getElementById("transfer_request_archive_time")) {
+    $("#transfer_request_archive_time").on("keypress", function(event){
+        var currentValue = String.fromCharCode(event.which);
+        var finalValue = $(this).val() + currentValue;
+        if(finalValue > 600){
+          event.preventDefault();
+          show_easyassist_toast("Request expiry time should be between 1-600 seconds");
+          return ;
+        }
+    });
+  }
+
+  function get_tr_tag_from_parent_recursive(element) {
+    var current_element = element;
+    var selected_element = null;
+
+    while (current_element) {
+      if (current_element.tagName.toLowerCase() == "tr") {
+        selected_element = current_element;
+      }
+      current_element = current_element.parentElement;
+    }
+
+    return selected_element;
+  }
+
+  function allow_screen_recording_change_actions() {
+    var check_element = document.getElementById("allow_screen_recording");
+    var tr_check_element = get_tr_tag_from_parent_recursive(check_element);
+    if (check_element.checked == true && tr_check_element.classList.contains("easyassist_hidden_div") == false) {
+      if (document.getElementById("screen_recording_expire_div"))
+        document.getElementById("screen_recording_expire_div").classList.remove("easyassist_hidden_div");
+    } else {
+      if (document.getElementById("screen_recording_expire_div"))
+        document.getElementById("screen_recording_expire_div").classList.add("easyassist_hidden_div");
+    }
+  }
+
+  function allow_video_calling_cobrowsing_change_actions(element) {
+    var check_element = document.getElementById("allow_video_calling_cobrowsing");
+    var tr_check_element = get_tr_tag_from_parent_recursive(check_element);
+    if (check_element.checked == true && tr_check_element.classList.contains("easyassist_hidden_div") == false) {
+      if (element) {
+        document.getElementById("customer_initiate_video_call").checked = true;
+      }
+      document.getElementById("enable_voip_with_video_calling").checked = false;
+      document.getElementById("customer_initiate_video_call_as_pip").checked = false;
+      document.getElementById("enable_voip_calling").checked = false;
+      document.getElementById("customer_initiate_voice_call").checked = false;
+      document.getElementById("voip_with_video_calling_message_div").classList.add("easyassist_hidden_div");
+      document.getElementById("auto_voip_with_video_calling_first_time_div").classList.add("easyassist_hidden_div");
+      document.getElementById("voip_calling_message_div").classList.add("easyassist_hidden_div");
+      document.getElementById("auto_voip_calling_first_time_div").classList.add("easyassist_hidden_div");
+      document.getElementById("allow_customer_initiate_video_call").classList.remove("easyassist_hidden_div");
+      document.getElementById("allow_customer_initiate_voice_call").classList.add("easyassist_hidden_div");
+      document.getElementById("allow_customer_initiate_video_call_as_pip").classList.add("easyassist_hidden_div");
+    }
+    else {
+      document.getElementById("allow_customer_initiate_video_call").classList.add("easyassist_hidden_div");
+    }
+  }
+
+  function enable_voip_calling_change_actions(element) {
+    var check_element = document.getElementById("enable_voip_calling");
+    var tr_check_element = get_tr_tag_from_parent_recursive(check_element);
+    if (check_element.checked == true && tr_check_element.classList.contains("easyassist_hidden_div") == false) {
+      if (element) {
+        document.getElementById("customer_initiate_voice_call").checked = true;
+      }
+      document.getElementById("enable_voip_with_video_calling").checked = false;
+      document.getElementById("customer_initiate_video_call_as_pip").checked = false;
+      document.getElementById("allow_video_calling_cobrowsing").checked = false;
+      document.getElementById("customer_initiate_video_call").checked = false;
+      document.getElementById("voip_calling_message_div").classList.remove("easyassist_hidden_div");
+      document.getElementById("auto_voip_calling_first_time_div").classList.remove("easyassist_hidden_div");
+      document.getElementById("allow_customer_initiate_voice_call").classList.remove("easyassist_hidden_div");
+      document.getElementById("voip_with_video_calling_message_div").classList.add("easyassist_hidden_div");
+      document.getElementById("auto_voip_with_video_calling_first_time_div").classList.add("easyassist_hidden_div");
+      document.getElementById("allow_customer_initiate_video_call").classList.add("easyassist_hidden_div")
+      document.getElementById("allow_customer_initiate_video_call_as_pip").classList.add("easyassist_hidden_div")
+    } else {
+      document.getElementById("voip_calling_message_div").classList.add("easyassist_hidden_div");
+      document.getElementById("auto_voip_calling_first_time_div").classList.add("easyassist_hidden_div");
+      document.getElementById("allow_customer_initiate_voice_call").classList.add("easyassist_hidden_div");
+    }
+  }
+
+  function enable_voip_with_video_calling_change_actions(e) {
+    var check_element = document.getElementById("enable_voip_with_video_calling");
+    var tr_check_element = get_tr_tag_from_parent_recursive(check_element);
+    if (check_element.checked == true && tr_check_element.classList.contains("easyassist_hidden_div") == false) {
+      if (e) {
+        document.getElementById("customer_initiate_video_call_as_pip").checked = true;
+      }
+      document.getElementById("enable_voip_calling").checked = false;
+      document.getElementById("customer_initiate_voice_call").checked = false;
+      document.getElementById("allow_video_calling_cobrowsing").checked = false;
+      document.getElementById("customer_initiate_video_call").checked = false;
+      document.getElementById("voip_with_video_calling_message_div").classList.remove("easyassist_hidden_div");
+      document.getElementById("auto_voip_with_video_calling_first_time_div").classList.remove("easyassist_hidden_div");
+      document.getElementById("voip_calling_message_div").classList.add("easyassist_hidden_div");
+      document.getElementById("enable_auto_voip_calling_for_first_time").classList.remove("easyassist_hidden_div");
+      document.getElementById("auto_voip_calling_first_time_div").classList.add("easyassist_hidden_div");
+      document.getElementById("allow_customer_initiate_video_call").classList.add("easyassist_hidden_div")
+      document.getElementById("allow_customer_initiate_voice_call").classList.add("easyassist_hidden_div")
+      document.getElementById("allow_customer_initiate_video_call_as_pip").classList.remove("easyassist_hidden_div");
+
+    } else {
+      document.getElementById("voip_with_video_calling_message_div").classList.add("easyassist_hidden_div");
+      document.getElementById("enable_auto_voip_calling_for_first_time").classList.add("easyassist_hidden_div");
+      document.getElementById("auto_voip_with_video_calling_first_time_div").classList.add("easyassist_hidden_div");
+      document.getElementById("allow_customer_initiate_video_call_as_pip").classList.add("easyassist_hidden_div");
+    }
+  }
+
+  function session_transfer_change_actions(){
+    var check_element = document.getElementById("enable_invite_agent_in_cobrowsing");
+    var tr_check_element = get_tr_tag_from_parent_recursive(check_element);
+    if(check_element.checked == true && tr_check_element.classList.contains("easyassist_hidden_div") == false){
+        document.getElementById("enable_session_transfer_div").classList.remove("easyassist_hidden_div");
+        transfer_request_toggle_action();
+    } else {
+        document.getElementById("enable_session_transfer_div").classList.add("easyassist_hidden_div");  
+        document.getElementById("transfer_request_archive_div").classList.add("easyassist_hidden_div");
+    }
+  }
+
+  function transfer_request_toggle_action(){
+    if(! document.getElementById("transfer_request_archive_div")) 
+      return 
+    let enable_invite_agent_in_cobrowsing = document.getElementById("enable_session_transfer_in_cobrowsing");
+    if (enable_invite_agent_in_cobrowsing.checked) {
+      document.getElementById("transfer_request_archive_div").classList.remove("easyassist_hidden_div");
+    } else {
+      document.getElementById("transfer_request_archive_div").classList.add("easyassist_hidden_div");
+    }
+  }
+
+  function default_function_calls() {
+    allow_screen_recording_change_actions();
+    allow_video_calling_cobrowsing_change_actions();
+    enable_voip_calling_change_actions();
+    enable_voip_with_video_calling_change_actions();
+    session_transfer_change_actions();
+    transfer_request_toggle_action();
+  }
+
+  default_function_calls();
+
+  document.getElementById("allow_screen_recording").addEventListener(
+    "click", allow_screen_recording_change_actions);
+  document.getElementById("allow_video_calling_cobrowsing").addEventListener(
+    'change', allow_video_calling_cobrowsing_change_actions);
+  document.getElementById("enable_voip_calling").addEventListener(
+    'change', enable_voip_calling_change_actions);
+  document.getElementById("enable_voip_with_video_calling").addEventListener(
+    'change', enable_voip_with_video_calling_change_actions);
+  document.getElementById('enable_invite_agent_in_cobrowsing').addEventListener(
+    "change",session_transfer_change_actions)
+  document.getElementById("enable_session_transfer_in_cobrowsing").addEventListener(
+    "change",transfer_request_toggle_action)
+  
+  $(document).ready(function() {
+		try {
+      document.getElementById("nav-settings-menu").classList.add("active")
+    } catch(err) {}
+	});
+  
+</script>
+
+{% endblock %}

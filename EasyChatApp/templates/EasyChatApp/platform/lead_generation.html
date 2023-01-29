@@ -1,0 +1,144 @@
+{% extends 'EasyChatApp/console.html' %}
+{% block consolecontent %}
+{% load static %}
+
+
+{% if lead_generation_bot_objs %}
+
+<div class="row" style="padding:0.5em;">
+
+    <!-- <div class="col s12">
+      <div class="input-field col s4">
+        <select id="select-lead-generation-bot">
+          <option value="">---Choose bot---</option>
+            {% for lead_generation_bot_obj in lead_generation_bot_objs %}
+              {% if lead_generation_bot_obj == bot_obj %}
+                <option value="{{ lead_generation_bot_obj.pk }}" selected>{{ lead_generation_bot_obj.name }}</option>
+              {% else %}
+                <option value="{{ lead_generation_bot_obj.pk }}">{{ lead_generation_bot_obj.name }}</option>
+              {% endif %}
+            {% endfor %}
+        </select>
+      </div>
+    </div> -->
+
+      <div class="col s12">
+        {% if bot_obj %}
+          <a class="waves-effect btn easychat-button modal-trigger right" onclick="table_to_excel('{{ bot_obj.name }}.csv');"><i class="inline-icon material-icons">arrow_downward</i>Download Excel</a><br>
+        {% endif %}
+      </div>
+
+      <div class="col s12 center" id="manage-intent-preloader" style="display:none;">
+        <div class="preloader-wrapper big active">
+          <div class="spinner-layer spinner-blue-only">
+            <div class="circle-clipper left">
+              <div class="circle"></div>
+            </div><div class="gap-patch">
+              <div class="circle"></div>
+            </div><div class="circle-clipper right">
+              <div class="circle"></div>
+            </div>
+          </div>
+        </div>      
+      </div>
+
+      <div class="col s12" id="div-intent-list-container">
+         
+          {% if bot_obj %}
+
+
+            {% if lead_generation_objs %}
+
+              <br>
+              <table id="leadTable" style="table-layout:fixed;word-wrap:break-word;">
+                <thead>
+                  <tr>
+                    <th>Date and Time</th>
+                    <th>Bot</th>
+                    <th>Name</th>
+                    <th>Email Id</th>
+                    <th>Phone Number</th>
+                  </tr>            
+                </thead>
+                <tbody>
+                  
+                  {% for lead_generation_obj in lead_generation_objs %}
+
+                    <tr>
+                      <td>{{ lead_generation_obj.date_time |  date:"D d M Y | H:i" }}</td>
+                      <td>{{ lead_generation_obj.bot.name }}</td>
+                      <td>{{ lead_generation_obj.name }}</td>
+                      <td>{{ lead_generation_obj.email_id }}</td>
+                      <td>{{ lead_generation_obj.phone_no }}</td>
+                      
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+
+            {% else %}
+
+              <p class="center green lighten-1" style="padding: 1em;">No existing record found.</p>
+
+            {% endif %}
+
+          {% else %}
+
+              <p class="center green lighten-1" style="padding: 1em;">Kindly choose the bot</p>
+
+          {% endif %}
+
+      </div>
+
+</div>
+
+{% else %}
+
+<div class="row">
+  <p class="green center lighten-1" style="padding:1em;">No existing lead generation bots found. Kindly create one.</p>
+</div>
+
+{% endif %}
+
+
+<script type="text/javascript">
+    $(document).ready(function(e){
+      $("#select-lead-generation-bot").select2({
+        width:"100%",        
+      });
+    });
+
+    window.NEED_TO_BUILD = "{{ bot_obj.need_to_build }}";
+</script>
+<script>
+function table_to_excel(filename) 
+{
+  if(document.getElementById("leadTable")==null || document.getElementById("leadTable")==undefined){
+      showToast("No leads to download");
+      return;
+  }
+
+  var csv = [];
+  var html = document.getElementById("leadTable").outerHTML
+  var rows = document.querySelectorAll("table tr");
+  for (var i = 0; i < rows.length; i++) {
+      var row = []
+      var cols = rows[i].querySelectorAll("td, th");
+      for (var j = 0; j < cols.length; j++)
+          row.push(cols[j].innerText);
+      csv.push(row.join(","));
+  }
+  csv = csv.join("\n")
+  var file = new Blob([csv], {
+      type: "text/csv"
+  });
+  var excel_link;
+  excel_link = document.createElement("a");
+  excel_link.download = filename;
+  excel_link.href = window.URL.createObjectURL(file);
+  excel_link.style.display = "none";
+  document.body.appendChild(excel_link);
+  excel_link.click();
+}
+</script>
+{% endblock %}

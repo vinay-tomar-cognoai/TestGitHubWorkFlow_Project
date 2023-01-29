@@ -1,0 +1,273 @@
+{% extends 'EasyAssistApp/console.html' %}
+{% block content %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'EasyAssistApp/css/cobrowse_form.css' %}">
+<link href="{% static 'EasyChatApp/css/select2.min.css' %}" rel="stylesheet"/>
+
+<!-- Begin Page Content -->
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-12 mt-3">
+            <div class="video-conferencing-form card shadow">
+                <div class="card-header">
+                    <h6 class="m-0 font-weight-bold text-primary form-heading-text">Forms</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive admin-forms-table">
+                        <table class="table table-bordered" id="dataTable" style="width: 100%; border-spacing: 0px;">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Name</th>
+                                    {% if cobrowse_agent.get_access_token_obj.choose_product_category %}
+                                    <th scope="col">Product Category</th>
+                                    {% endif %}
+                                    <th scope="col">Agents</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cogno_vid_form in cogno_vid_forms %}
+                                <tr>
+                                    <td><span id="cobrowse-form-name-{{ cogno_vid_form.pk }}">{{ cogno_vid_form.form_name }}</span></td>
+                                    {% if cobrowse_agent.get_access_token_obj.choose_product_category %}
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Product Category
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <li class="dropdown-item">
+                                                    <div class="dropdown-item-text">
+                                                        Select Product Category
+                                                    </div>
+                                                </li>
+                                                {% for product_category in product_categories %}
+                                                    <li class="dropdown-item">
+                                                        <label class="dropdown-item-text" for="product-category-cb-{{ cogno_vid_form.pk }}-{{ product_category.pk }}">
+                                                            {{ product_category.title }}
+                                                            <input type="hidden" name="product_category_pk" value="{{ product_category.pk }}">
+                                                        </label>
+                                                        <div class="dropdown-item-checkbox">
+                                                            <input type="checkbox" id="product-category-cb-{{ cogno_vid_form.pk }}-{{ product_category.pk }}" onclick="show_category_wise_agent(this);"/>
+                                                        </div>
+                                                    </li>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    {% endif %}
+                                    <td>
+                                        <div class="dropdown agent-select-dropdown" id="agent-dropdown-{{ cogno_vid_form.pk }}">
+                                            <button class="btn dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Agents
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <li class="dropdown-item">
+                                                    <div class="dropdown-item-text">
+                                                        Select Agents
+                                                    </div>
+                                                </li>
+                                                {% for agent in agent_objs %}
+                                                    <li class="dropdown-item agent-dropdown-list" >
+                                                        <label class="dropdown-item-text" for="agent-cb-{{ cogno_vid_form.pk }}-{{ agent.pk }}">
+                                                            {{ agent.user.username }}
+                                                            <input type="hidden" name="agent_pk" value="{{ agent.pk }}">
+                                                        </label>
+                                                        <div class="dropdown-item-checkbox">
+                                                            {% if agent in cogno_vid_form.agents.all %}
+                                                                <input type="checkbox" id="agent-cb-{{ cogno_vid_form.pk }}-{{ agent.pk }}" checked />
+                                                            {% else %}
+                                                                <input type="checkbox" id="agent-cb-{{ cogno_vid_form.pk }}-{{ agent.pk }}" />
+                                                            {% endif %}
+                                                        </div>
+                                                    </li>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <input name="form_id" type="hidden" value="{{ cogno_vid_form.pk }}" />
+                                    </td>
+                                    <td>
+                                        <div class="btn-primary form-edit-delete-btn">
+                                            <button class="btn" onclick="show_edit_form('{{ cogno_vid_form.pk }}');">
+                                                <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M18.0082 0.991762C19.3306 2.31411 19.3306 4.45806 18.0082 5.78041L6.68321 17.1054C6.42121 17.3674 6.09538 17.5565 5.73792 17.654L0.897203 18.9742C0.367422 19.1187 -0.118695 18.6326 0.0257905 18.1028L1.34599 13.2621C1.44348 12.9046 1.63256 12.5788 1.89456 12.3168L13.2196 0.991762C14.5419 -0.330587 16.6859 -0.330587 18.0082 0.991762ZM12.3022 3.91653L2.89821 13.3204C2.81087 13.4078 2.74785 13.5164 2.71535 13.6355L1.72193 17.2781L5.36446 16.2846C5.48362 16.2522 5.59223 16.1891 5.67956 16.1018L15.0832 6.69756L12.3022 3.91653ZM14.2232 1.99541L13.3052 2.91256L16.0863 5.69453L17.0046 4.77676C17.7726 4.00871 17.7726 2.76346 17.0046 1.99541C16.2365 1.22736 14.9913 1.22736 14.2232 1.99541Z" fill="white"/>
+                                                </svg>
+                                            </button>
+                                            <button class="btn" type="button" data-toggle="modal" data-target="#delete-form-modal-{{ cogno_vid_form.pk }}">
+                                                <svg width="16" height="19" viewBox="0 0 16 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M8 0C9.60341 0 10.913 1.25789 10.9958 2.84067L11 3H15.4C15.7314 3 16 3.26863 16 3.6C16 3.90376 15.7743 4.15479 15.4814 4.19452L15.4 4.2H14.5528L13.5769 16.2424C13.4506 17.8002 12.1496 19 10.5867 19H5.41328C3.85044 19 2.5494 17.8002 2.42309 16.2424L1.4464 4.2H0.6C0.296243 4.2 0.0452071 3.97428 0.00547714 3.68142L0 3.6C0 3.29624 0.225723 3.04521 0.518584 3.00548L0.6 3H5C5 1.34315 6.34315 0 8 0ZM13.3494 4.2H2.65062L3.61917 16.1455C3.69495 17.0801 4.47557 17.8 5.41328 17.8H10.5867C11.5244 17.8 12.305 17.0801 12.3808 16.1455L13.3494 4.2ZM6.2 7.2C6.50376 7.2 6.75479 7.42572 6.79452 7.71858L6.8 7.8V14.2C6.8 14.5314 6.53137 14.8 6.2 14.8C5.89624 14.8 5.64521 14.5743 5.60548 14.2814L5.6 14.2V7.8C5.6 7.46863 5.86863 7.2 6.2 7.2ZM9.8 7.2C10.1038 7.2 10.3548 7.42572 10.3945 7.71858L10.4 7.8V14.2C10.4 14.5314 10.1314 14.8 9.8 14.8C9.49624 14.8 9.24521 14.5743 9.20548 14.2814L9.2 14.2V7.8C9.2 7.46863 9.46863 7.2 9.8 7.2ZM8 1.2C7.04731 1.2 6.26748 1.94013 6.20415 2.87676L6.2 3H9.8L9.79585 2.87676C9.73252 1.94013 8.95269 1.2 8 1.2Z" fill="white"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% if cogno_vid_forms.count == 0 %}
+                        <div class="form-table-no-data">
+                            <svg class="form-table-no-data-svg" width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M11.6666 7H3.88881C3.74147 7 3.60016 6.93854 3.49597 6.82915C3.39178 6.71975 3.33325 6.57138 3.33325 6.41667V4.08333C3.33325 3.92862 3.39178 3.78025 3.49597 3.67085C3.60016 3.56146 3.74147 3.5 3.88881 3.5H11.6666C11.8139 3.5 11.9552 3.56146 12.0594 3.67085C12.1636 3.78025 12.2221 3.92862 12.2221 4.08333V6.41667C12.2221 6.57138 12.1636 6.71975 12.0594 6.82915C11.9552 6.93854 11.8139 7 11.6666 7ZM4.44436 5.83333H11.111V4.63167H4.44436V5.83333Z" fill="#E6E6E6"/>
+                                <path d="M11.6666 8.21333H3.88881C3.74147 8.21333 3.60016 8.27479 3.49597 8.38419C3.39178 8.49358 3.33325 8.64196 3.33325 8.79667V11.0833C3.33325 11.238 3.39178 11.3864 3.49597 11.4958C3.60016 11.6052 3.74147 11.6667 3.88881 11.6667H10.1999L12.2221 9.50833V8.79667C12.2221 8.64196 12.1636 8.49358 12.0594 8.38419C11.9552 8.27479 11.8139 8.21333 11.6666 8.21333ZM11.111 10.5H4.44436V9.33333H11.111V10.5Z" fill="#E6E6E6"/>
+                                <path d="M6.14442 18.3808V18.3458L6.3222 17.535H2.2222V2.33334H13.3333V8.3125L14.4444 7.21V1.75001C14.4444 1.5953 14.3859 1.44692 14.2817 1.33753C14.1775 1.22813 14.0362 1.16667 13.8889 1.16667H1.66664C1.5193 1.16667 1.37799 1.22813 1.2738 1.33753C1.16962 1.44692 1.11108 1.5953 1.11108 1.75001V18.0833C1.11108 18.238 1.16962 18.3864 1.2738 18.4958C1.37799 18.6052 1.5193 18.6667 1.66664 18.6667H6.11108C6.11566 18.5707 6.1268 18.4752 6.14442 18.3808Z" fill="#E6E6E6"/>
+                                <path d="M12.2222 11.1825L11.7888 11.6433C11.8963 11.6201 11.9949 11.5639 12.072 11.4819C12.1491 11.3998 12.2014 11.2957 12.2222 11.1825Z" fill="#E6E6E6"/>
+                                <path d="M3.33325 15.715C3.33325 15.8697 3.39178 16.0181 3.49597 16.1275C3.60016 16.2369 3.74146 16.2983 3.88881 16.2983H6.5777L6.74436 15.54L6.81659 15.2192V15.19H4.44436V14H7.96659L9.0777 12.8333H3.88881C3.74146 12.8333 3.60016 12.8948 3.49597 13.0042C3.39178 13.1136 3.33325 13.262 3.33325 13.4167V15.715Z" fill="#E6E6E6"/>
+                                <path d="M18.6055 9.72416L16.7332 7.75833C16.6502 7.67085 16.5514 7.60144 16.4428 7.55408C16.3341 7.50672 16.2176 7.48235 16.0999 7.48235C15.9822 7.48235 15.8657 7.50672 15.7571 7.55408C15.6484 7.60144 15.5497 7.67085 15.4666 7.75833L7.84991 15.8025L7.22213 18.6083C7.19863 18.7294 7.1981 18.8541 7.22058 18.9754C7.24305 19.0966 7.28809 19.212 7.35312 19.315C7.41814 19.418 7.50187 19.5064 7.59951 19.5754C7.69716 19.6443 7.80679 19.6923 7.92213 19.7167C7.97939 19.7227 8.03709 19.7227 8.09435 19.7167C8.16242 19.7283 8.23184 19.7283 8.29991 19.7167L10.9944 19.0925L18.6055 11.0833C18.6886 10.9966 18.7546 10.8934 18.7996 10.7798C18.8447 10.6662 18.8678 10.5443 18.8678 10.4212C18.8678 10.2982 18.8447 10.1763 18.7996 10.0627C18.7546 9.94906 18.6886 9.84591 18.6055 9.75916V9.72416ZM10.4277 18.0308L8.39435 18.5033L8.8888 16.3858L14.5999 10.325L16.1666 11.97L10.4277 18.0308ZM16.7944 11.3108L15.2277 9.66583L16.111 8.75L17.6888 10.4067L16.7944 11.3108Z" fill="#E6E6E6"/>
+                            </svg>
+                            <div class="form-table-no-data-text">
+                                No Form Available
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <a class="btn btn-primary add-new-form-container" href="/easy-assist/sales-ai/cobrowse-video-conferencing-form/create/" target="blank">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M23.8125 10.3125H13.6875V0.1875H10.3125V10.3125H0.1875V13.6875H10.3125V23.8125H13.6875V13.6875H23.8125V10.3125Z" fill="white"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% for cogno_vid_form in cogno_vid_forms %}
+    <div class="modal fade" id="delete-form-modal-{{ cogno_vid_form.pk }}" tabindex="-1" role="dialog" aria-labelledby="apply_filter_modal_modal_label" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="apply_filter_modal_modal_label">Delete Form</h5>
+                </div>
+                <div class="modal-body">
+                    Do you really want to delete this form?
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <button class="btn btn-danger" onclick="delete_video_conferencing_form('{{ cogno_vid_form.pk }}')">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script type="text/javascript" src="{% static 'EasyChatApp/js/select2.min.js' %}"></script>
+<script type="text/javascript">
+    {% if cogno_vid_forms.count > 0 %}
+    window.onload = function() {
+        $("#dataTable").DataTable({
+            "ordering": false,
+            "bInfo": false,
+            "lengthChange": false,
+        });
+    };
+    {% endif %}
+
+    window.AGENT_CATEGORY_MAP = {};
+    window.FORM_AGENTS = {};
+
+    {% for product_category in product_categories %}
+        AGENT_CATEGORY_MAP["{{ product_category.pk }}"] = [];
+    {% endfor %}
+
+    {% for agent in agent_objs %}
+        {% for product_category in agent.product_category.all %}
+            AGENT_CATEGORY_MAP["{{ product_category.pk }}"].push("{{ agent.pk }}");
+        {% endfor %}
+    {% endfor %}
+
+    {% for cogno_vid_form in cogno_vid_forms %}
+        FORM_AGENTS["{{ cogno_vid_form.pk }}"] = [];
+        {% for agent in agent_objs %}
+            {% if agent in cogno_vid_form.agents.all %}
+                FORM_AGENTS["{{ cogno_vid_form.pk }}"].push("{{ agent.pk }}");
+            {% endif %}
+        {% endfor %}
+        FORM_AGENTS["{{ cogno_vid_form.pk }}"].sort();
+    {% endfor %}
+
+    $(document).ready(function() {
+        $('#dataTable tbody tr').on('mouseover', function(e) {
+            $(this).find('.form-edit-delete-btn').show();
+        })
+
+        $('#dataTable tbody tr').on('mouseout', function(e) {
+            $(this).find('.form-edit-delete-btn').hide();
+        })
+    })
+
+    $('.dropdown-item').on('click', function(e) {
+        e.stopPropagation();
+    });
+
+    function show_category_wise_agent(el) {
+        var table_column = $(el).closest('td');
+        var table_row = $(table_column).parent();
+
+        if($(table_column).find('input[type="checkbox"]:checked').length == 0) {
+            $(table_row).find('li.agent-dropdown-list').each(function(idx, li_element) {
+                $(li_element).show();
+            });
+            return;
+        }
+
+        var selected_agents = new Set();
+        $(table_column).find('li.dropdown-item').each(function(idx, li_element) {
+            var checkbox_el = $(li_element).find('input[type="checkbox"]');
+            if(checkbox_el.length) {
+                if($(checkbox_el).prop('checked')) {
+                    var selected_product_category = $(li_element).find('input[name="product_category_pk"]').val();
+
+                    $.each(AGENT_CATEGORY_MAP[selected_product_category], function(idx, agent_id) {
+                        selected_agents.add(agent_id);
+                    });
+                }
+            }
+        });
+
+        $(table_row).find('li.agent-dropdown-list').each(function(idx, li_element) {
+            var agent_id = $(li_element).find('input[name="agent_pk"]').val();
+            if(selected_agents.has(agent_id)) {
+                $(li_element).show();
+            } else {
+                $(li_element).hide();
+            }
+        });
+    }
+
+    $('.agent-select-dropdown').on('hide.bs.dropdown', function(e) {
+        var agent_dropdown = e.target;
+        var form_id = $(agent_dropdown).closest('td').find('input[name="form_id"]').val();
+        var selected_agents = [];
+
+        $(agent_dropdown).find('li.dropdown-item').each(function(_, li_element) {
+            var agent_id = $(li_element).find('input[name="agent_pk"]').val();
+            var is_selected = $(li_element).find('input[type="checkbox"]').prop('checked');
+            if(is_selected) {
+                selected_agents.push(agent_id);
+            }
+        });
+
+        selected_agents.sort();
+        var is_agent_change = false;
+        if(selected_agents.length != FORM_AGENTS[form_id].length) {
+            is_agent_change = true;
+        } else {
+            for(var idx = 0; idx < selected_agents.length; idx ++) {
+                if(FORM_AGENTS[form_id][idx] != selected_agents[idx]) {
+                    is_agent_change = true;
+                    break;
+                }
+            }
+        }
+
+        if(is_agent_change) {
+            change_form_agents(form_id, selected_agents);
+        }
+    });
+
+    function show_edit_form(form_id) {
+        window.open('edit/'+form_id);
+    }
+</script>
+{% endblock %}

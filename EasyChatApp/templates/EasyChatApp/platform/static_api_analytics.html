@@ -1,0 +1,433 @@
+{% extends 'EasyChatApp/console.html' %}
+{% block consolecontent %}
+{% load static %}
+<style type="text/css">
+.dataTables_filter {
+   float: left !important;
+} 
+body{
+  overflow-x: hidden;
+}
+</style>
+<div class="row" style="padding:1em;">
+	
+		<div class="col s12" style="margin-top: 1em;">
+      <!-- <div class="col s6"></div> -->
+      <div class="col s6 switch" style="display: inline-block;">
+        <label>
+          API logs
+          {% if status == "0" %}
+            <input type="checkbox" id="logs-to-statistics-switch">
+            <span class="lever"></span>
+          {% else %}
+            <input type="checkbox" checked id="logs-to-statistics-switch">
+            <span class="lever"></span>
+          {% endif %}
+          API statistics
+        </label>
+      </div>
+      <div class="col s6" style="display: inline-block;">
+        <a href="#apply-filter-api-analytics" class="right btn modal-trigger black-text" style="background-color: white;"><i class="material-icons inline-icon">filter_list</i> &nbsp;Apply filters</a>
+      </div>
+	 </div>
+	
+	<div class="col s12">
+
+		{% if True %}
+
+			<table id="api-analytics-table" class="display">
+			    <thead>
+			        <tr>
+			        	<th>User ID</th>
+			        	<th>API Name</th>
+		            <th>Request</th>
+		            <th>Response</th>
+		            <th>Elapsed Time</th>
+		            <th>API status/code</th>
+		            <th>Created at</th>
+			        </tr>
+			    </thead>
+			    <tbody>
+				        <tr>
+				        	<td>1ff61549-5a54-4f7b-92d3-acf6bf53e6b7</td>
+				        	<td>AskPanAPI</td>
+				        	<td><a href="javascript:void(0)" onclick="show_api_request_modal('1')"><u>Click Here</u></td>
+				        	<td><a href="javascript:void(0)" onclick="show_api_response_modal('1')"><u>Click Here</u></td>
+				            <td>0.0</td>
+				            <td>Passed(200)</td>
+				            <td>{{ display_date.0 }}</td>
+				        </tr>
+
+				        <!-- API Request -->
+				        <div id="API-Request-1" class="easychat-modal">
+	                        <div class="easychat-modal-content" style="max-height: 80vh;min-height: 60vh; width: 50%; overflow-y: unset; border: 0.15em solid black;">
+	                           <div class="row" style="padding-left: 11px; padding-right: 11px;">
+		                           <h5 style="margin: 0rem 0 .656rem 0 !important;"><center>API Request&nbsp;&nbsp;
+                                <a href="javascript:void(0)" onclick="copyToClipboardfromPreTag('api-request-1', 'Request')"><i class="material-icons black-text prefix inline-icon">content_copy</i></a>&nbsp;&nbsp;
+                                <a href="javascript:void(0)" onclick="DownloadStaticJSON('1', 'request')"><i class="material-icons black-text prefix inline-icon">file_download</i></a>
+		                            <a href="javascript:void(0)" onclick="hide_api_request_modal('1')" class="modal-close right black-text" style="margin-right: 1em;">x</a></center></h4>
+		                            <hr>
+		                            <div class="scrollbar row" style="position: absolute; overflow-x: scroll;">
+<pre id="api-request-1">
+{
+    "url": ""
+}
+</pre>
+
+		                            </div>
+	                            </div>
+	                        </div>
+                        </div>
+
+                        <!-- API Response -->
+
+                        <div id="API-Response-1" class="easychat-modal">
+	                        <div class="easychat-modal-content" style="max-height: 80vh;min-height: 60vh; width: 50%; overflow-y: unset; border: 0.15em solid black;">
+		                        <div class="row" style="padding-left: 11px; padding-right: 11px;">
+		                           <h5 style="margin: 0rem 0 .656rem 0 !important;"><center>API Response&nbsp;&nbsp;
+                                <a href="javascript:void(0)" onclick="copyToClipboardfromPreTag('api-response-1', 'Response')"><i class="material-icons black-text prefix inline-icon">content_copy</i></a>&nbsp;&nbsp;
+                                <a href="javascript:void(0)" onclick="DownloadStaticJSON('1', 'response')"><i class="material-icons black-text prefix inline-icon">file_download</i></a>
+		                           <a href="javascript:void(0)" onclick="hide_api_response_modal('1')" class="modal-close right black-text" style="margin-right: 1em;">x</a></center></h4>
+		                           <hr>
+		                           <div class="scrollbar row" style="position: absolute; overflow-x: scroll;">
+<pre id="api-response-1">
+{
+    "url": ""
+}
+</pre>
+		                           </div>
+	                            </div>
+	                        </div>
+                        </div>
+                <tr>
+                  <td>1ff61549-5a54-4f7b-92d3-acf6bf53e6b7</td>
+                  <td>CheckKYCAPI</td>
+                  <td><a href="javascript:void(0)" onclick="show_api_request_modal('2')"><u>Click Here</u></td>
+                  <td><a href="javascript:void(0)" onclick="show_api_response_modal('2')"><u>Click Here</u></td>
+                    <td>5.534</td>
+                    <td>Passed(200)</td>
+                    <td>{{ display_date.1 }}</td>
+                </tr>
+
+                <!-- API Request -->
+                <div id="API-Request-2" class="easychat-modal">
+                          <div class="easychat-modal-content" style="max-height: 80vh;min-height: 60vh; width: 50%; overflow-y: unset; border: 0.15em solid black;">
+                             <div class="row" style="padding-left: 11px; padding-right: 11px;">
+                               <h5 style="margin: 0rem 0 .656rem 0 !important;"><center>API Request&nbsp;&nbsp;
+                                <a href="javascript:void(0)" onclick="copyToClipboardfromPreTag('api-request-2', 'Request')"><i class="material-icons black-text prefix inline-icon">content_copy</i></a>&nbsp;&nbsp;
+                                <a href="javascript:void(0)" onclick="DownloadStaticJSON('2', 'request')"><i class="material-icons black-text prefix inline-icon">file_download</i></a>
+                                <a href="javascript:void(0)" onclick="hide_api_request_modal('2')" class="modal-close right black-text" style="margin-right: 1em;">x</a></center></h4>
+                                <hr>
+                                <div class="scrollbar row" style="position: absolute; overflow-x: scroll;">
+<pre id="api-request-2">
+{
+   "data": "BCDEF9981Q"
+}
+</pre>
+
+                                </div>
+                              </div>
+                          </div>
+                        </div>
+
+                        <!-- API Response -->
+
+                        <div id="API-Response-2" class="easychat-modal">
+                          <div class="easychat-modal-content" style="max-height: 80vh;min-height: 60vh; width: 50%; overflow-y: unset; border: 0.15em solid black;">
+                            <div class="row" style="padding-left: 11px; padding-right: 11px;">
+                               <h5 style="margin: 0rem 0 .656rem 0 !important;"><center>API Response&nbsp;&nbsp;
+                                <a href="javascript:void(0)" onclick="copyToClipboardfromPreTag('api-response-2', 'Response')"><i class="material-icons black-text prefix inline-icon">content_copy</i></a>&nbsp;&nbsp;
+                                <a href="javascript:void(0)" onclick="DownloadStaticJSON('2', 'response')"><i class="material-icons black-text prefix inline-icon">file_download</i></a>
+                               <a href="javascript:void(0)" onclick="hide_api_response_modal('2')" class="modal-close right black-text" style="margin-right: 1em;">x</a></center></h4>
+                               <hr>
+                               <div class="scrollbar row" style="position: absolute; overflow-x: scroll;">
+<pre id="api-response-2">
+{
+   "data": "BCDEF9981Q"
+}
+</pre>
+                               </div>
+                              </div>
+                          </div>
+                        </div>
+                <tr>
+                  <td>1ff61549-5a54-4f7b-92d3-acf6bf53e6b7</td>
+                  <td>ProductMenuAPIBot</td>
+                  <td><a href="javascript:void(0)" onclick="show_api_request_modal('3')"><u>Click Here</u></td>
+                  <td><a href="javascript:void(0)" onclick="show_api_response_modal('3')"><u>Click Here</u></td>
+                    <td>0.003</td>
+                    <td>Passed(200)</td>
+                    <td>{{ display_date.2 }}</td>
+                </tr>
+
+                <!-- API Request -->
+                <div id="API-Request-3" class="easychat-modal">
+                          <div class="easychat-modal-content" style="max-height: 80vh;min-height: 60vh; width: 50%; overflow-y: unset; border: 0.15em solid black;">
+                             <div class="row" style="padding-left: 11px; padding-right: 11px;">
+                               <h5 style="margin: 0rem 0 .656rem 0 !important;"><center>API Request&nbsp;&nbsp;
+                                <a href="javascript:void(0)" onclick="copyToClipboardfromPreTag('api-request-3', 'Request')"><i class="material-icons black-text prefix inline-icon">content_copy</i></a>&nbsp;&nbsp;
+                                <a href="javascript:void(0)" onclick="DownloadStaticJSON('3', 'request')"><i class="material-icons black-text prefix inline-icon">file_download</i></a>
+                                <a href="javascript:void(0)" onclick="hide_api_request_modal('3')" class="modal-close right black-text" style="margin-right: 1em;">x</a></center></h4>
+                                <hr>
+                                <div class="scrollbar row" style="position: absolute; overflow-x: scroll;">
+<pre id="api-request-3">
+{
+   "url": ""
+}
+</pre>
+
+                                </div>
+                              </div>
+                          </div>
+                        </div>
+
+                        <!-- API Response -->
+
+                        <div id="API-Response-3" class="easychat-modal">
+                          <div class="easychat-modal-content" style="max-height: 80vh;min-height: 60vh; width: 50%; overflow-y: unset; border: 0.15em solid black;">
+                            <div class="row" style="padding-left: 11px; padding-right: 11px;">
+                               <h5 style="margin: 0rem 0 .656rem 0 !important;"><center>API Response&nbsp;&nbsp;
+                                <a href="javascript:void(0)" onclick="copyToClipboardfromPreTag('api-response-3', 'Response')"><i class="material-icons black-text prefix inline-icon">content_copy</i></a>&nbsp;&nbsp;
+                                <a href="javascript:void(0)" onclick="DownloadStaticJSON('3', 'response')"><i class="material-icons black-text prefix inline-icon">file_download</i></a>
+                               <a href="javascript:void(0)" onclick="hide_api_response_modal('3')" class="modal-close right black-text" style="margin-right: 1em;">x</a></center></h4>
+                               <hr>
+                               <div class="scrollbar row" style="position: absolute; overflow-x: scroll;">
+<pre id="api-response-3">
+{
+   "url": ""
+}
+</pre>
+                               </div>
+                              </div>
+                          </div>
+                        </div>
+                <tr>
+                  <td>1ff61549-5a54-4f7b-92d3-acf6bf53e6b7</td>
+                  <td>CheckKYCAPI</td>
+                  <td><a href="javascript:void(0)" onclick="show_api_request_modal('4')"><u>Click Here</u></td>
+                  <td><a href="javascript:void(0)" onclick="show_api_response_modal('4')"><u>Click Here</u></td>
+                    <td>5.531</td>
+                    <td>Passed(200)</td>
+                    <td>{{ display_date.3 }}</td>
+                </tr>
+
+                <!-- API Request -->
+                <div id="API-Request-4" class="easychat-modal">
+                          <div class="easychat-modal-content" style="max-height: 80vh;min-height: 60vh; width: 50%; overflow-y: unset; border: 0.15em solid black;">
+                             <div class="row" style="padding-left: 11px; padding-right: 11px;">
+                               <h5 style="margin: 0rem 0 .656rem 0 !important;"><center>API Request&nbsp;&nbsp;
+                                <a href="javascript:void(0)" onclick="copyToClipboardfromPreTag('api-request-4', 'Request')"><i class="material-icons black-text prefix inline-icon">content_copy</i></a>&nbsp;&nbsp;
+                                <a href="javascript:void(0)" onclick="DownloadStaticJSON('4', 'request')"><i class="material-icons black-text prefix inline-icon">file_download</i></a>
+                                <a href="javascript:void(0)" onclick="hide_api_request_modal('4')" class="modal-close right black-text" style="margin-right: 1em;">x</a></center></h4>
+                                <hr>
+                                <div class="scrollbar row" style="position: absolute; overflow-x: scroll;">
+<pre id="api-request-4">
+{
+   "data": "ABCDE8891Q"
+}
+</pre>
+
+                                </div>
+                              </div>
+                          </div>
+                        </div>
+
+                        <!-- API Response -->
+
+                        <div id="API-Response-4" class="easychat-modal">
+                          <div class="easychat-modal-content" style="max-height: 80vh;min-height: 60vh; width: 50%; overflow-y: unset; border: 0.15em solid black;">
+                            <div class="row" style="padding-left: 11px; padding-right: 11px;">
+                               <h5 style="margin: 0rem 0 .656rem 0 !important;"><center>API Response&nbsp;&nbsp;
+                                <a href="javascript:void(0)" onclick="copyToClipboardfromPreTag('api-response-4', 'Response')"><i class="material-icons black-text prefix inline-icon">content_copy</i></a>&nbsp;&nbsp;
+                                <a href="javascript:void(0)" onclick="DownloadStaticJSON('4', 'response')"><i class="material-icons black-text prefix inline-icon">file_download</i></a>
+                               <a href="javascript:void(0)" onclick="hide_api_response_modal('4')" class="modal-close right black-text" style="margin-right: 1em;">x</a></center></h4>
+                               <hr>
+                               <div class="scrollbar row" style="position: absolute; overflow-x: scroll;">
+<pre id="api-response-4">
+{
+   "data": "ABCDE8891Q"
+}
+</pre>
+                               </div>
+                              </div>
+                          </div>
+                        </div>
+                <tr>
+                  <td>1ff61549-5a54-4f7b-92d3-acf6bf53e6b7</td>
+                  <td>AskPanAPI</td>
+                  <td><a href="javascript:void(0)" onclick="show_api_request_modal('5')"><u>Click Here</u></td>
+                  <td><a href="javascript:void(0)" onclick="show_api_response_modal('5')"><u>Click Here</u></td>
+                    <td>0.0</td>
+                    <td>Passed(200)</td>
+                    <td>{{ display_date.4 }}</td>
+                </tr>
+
+                <!-- API Request -->
+                <div id="API-Request-5" class="easychat-modal">
+                          <div class="easychat-modal-content" style="max-height: 80vh;min-height: 60vh; width: 50%; overflow-y: unset; border: 0.15em solid black;">
+                             <div class="row" style="padding-left: 11px; padding-right: 11px;">
+                               <h5 style="margin: 0rem 0 .656rem 0 !important;"><center>API Request&nbsp;&nbsp;
+                                <a href="javascript:void(0)" onclick="copyToClipboardfromPreTag('api-request-5', 'Request')"><i class="material-icons black-text prefix inline-icon">content_copy</i></a>&nbsp;&nbsp;
+                                <a href="javascript:void(0)" onclick="DownloadStaticJSON('5', 'request')"><i class="material-icons black-text prefix inline-icon">file_download</i></a>
+                                <a href="javascript:void(0)" onclick="hide_api_request_modal('5')" class="modal-close right black-text" style="margin-right: 1em;">x</a></center></h4>
+                                <hr>
+                                <div class="scrollbar row" style="position: absolute; overflow-x: scroll;">
+<pre id="api-request-1">
+{
+    "url": ""
+}
+</pre>
+
+                                </div>
+                              </div>
+                          </div>
+                        </div>
+
+                        <!-- API Response -->
+
+                        <div id="API-Response-5" class="easychat-modal">
+                          <div class="easychat-modal-content" style="max-height: 80vh;min-height: 60vh; width: 50%; overflow-y: unset; border: 0.15em solid black;">
+                            <div class="row" style="padding-left: 11px; padding-right: 11px;">
+                               <h5 style="margin: 0rem 0 .656rem 0 !important;"><center>API Response&nbsp;&nbsp;
+                                <a href="javascript:void(0)" onclick="copyToClipboardfromPreTag('api-response-5', 'Response')"><i class="material-icons black-text prefix inline-icon">content_copy</i></a>&nbsp;&nbsp;
+                                <a href="javascript:void(0)" onclick="DownloadStaticJSON('5', 'response')"><i class="material-icons black-text prefix inline-icon">file_download</i></a>
+                               <a href="javascript:void(0)" onclick="hide_api_response_modal('5')" class="modal-close right black-text" style="margin-right: 1em;">x</a></center></h4>
+                               <hr>
+                               <div class="scrollbar row" style="position: absolute; overflow-x: scroll;">
+<pre id="api-response-5">
+{
+    "url": ""
+}
+</pre>
+                               </div>
+                              </div>
+                          </div>
+                        </div>
+			    </tbody>
+			</table>
+
+		{% else %}
+			<br>
+			<br>
+			<p style="padding:1em;text-align:center;" class="green lighten-1">No record found</p>
+		{% endif %}
+	</div>
+    <div class="col s12 right-align">
+        {% if api_analytics_objs.has_other_pages %}
+          <ul class="pagination">
+
+              {% if api_analytics_objs.has_previous %}
+                  <li><a href="?bot_pk={{selected_bot_obj.pk}}&filter_type={{filter_type}}&selected_api_status={{selected_api_status}}&start_date={{start_date|date:"Y-m-d"}}&end_date={{end_date|date:"Y-m-d"}}&selected_api_name={{selected_api_name}}&page={{ api_analytics_objs.previous_page_number }}"><i class="material-icons">chevron_left</i></a></li>
+              {% else %}
+                  <li class="disabled"><span><i class="material-icons">chevron_left</i></span></li>
+              {% endif %}
+
+              {% if api_analytics_objs.number|add:'-4' > 1 %}
+                  <li><a href="?bot_pk={{selected_bot_obj.pk}}&filter_type={{filter_type}}&selected_api_status={{selected_api_status}}&start_date={{start_date|date:"Y-m-d"}}&end_date={{end_date|date:"Y-m-d"}}&selected_api_name={{selected_api_name}}&page={{ api_analytics_objs.number|add:'-5' }}">&hellip;</a></li>
+              {% endif %}
+
+              {% for i in api_analytics_objs.paginator.page_range %}
+                  {% if api_analytics_objs.number == i %}
+                      <li class="active purple darken-3"><a href="?bot_pk={{selected_bot_obj.pk}}&filter_type={{filter_type}}&selected_api_status={{selected_api_status}}&start_date={{start_date|date:"Y-m-d"}}&end_date={{end_date|date:"Y-m-d"}}&selected_api_name={{selected_api_name}}&page={{ i }}">{{ i }}</a></li>
+                  {% elif i > api_analytics_objs.number|add:'-5' and i < api_analytics_objs.number|add:'5' %}
+                      <li><a href="?bot_pk={{selected_bot_obj.pk}}&filter_type={{filter_type}}&selected_api_status={{selected_api_status}}&start_date={{start_date|date:"Y-m-d"}}&end_date={{end_date|date:"Y-m-d"}}&selected_api_name={{selected_api_name}}&page={{ i }}">{{ i }}</a></li>
+                  {% endif %}
+              {% endfor %}
+
+              {% if api_analytics_objs.paginator.num_pages > api_analytics_objs.number|add:'4' %}
+                  <li><a href="?bot_pk={{selected_bot_obj.pk}}&filter_type={{filter_type}}&selected_api_status={{selected_api_status}}&start_date={{start_date|date:"Y-m-d"}}&end_date={{end_date|date:"Y-m-d"}}&selected_api_name={{selected_api_name}}&page={{ api_analytics_objs.number|add:'5' }}">&hellip;</a></li>
+              {% endif %}
+
+              {% if api_analytics_objs.has_next %}
+                  <li><a href="?bot_pk={{selected_bot_obj.pk}}&filter_type={{filter_type}}&selected_api_status={{selected_api_status}}&start_date={{start_date|date:"Y-m-d"}}&end_date={{end_date|date:"Y-m-d"}}&selected_api_name={{selected_api_name}}&page={{ api_analytics_objs.next_page_number }}"><i class="material-icons">chevron_right</i></a></li>
+              {% else %}
+                  <li class="disabled"><span><i class="material-icons">chevron_right</i></span></li>
+              {% endif %}
+          </ul>
+        {% endif %}
+    </div>
+
+    <div id="apply-filter-api-analytics" class="modal" style="max-height:100%; width: 50%; overflow:visible;width: 40%;">
+        <div class="modal-content">
+            <div class="row">
+              <div class="col s12">
+                <p><b>Filter by API name</b></p>
+                <select id="select-api-name" style="display: block;" autocomplete="new-password">
+                  <option value="All">All</option>
+                  {% for api_obj in api_objs_name_list %}
+                      {% if api_obj == selected_api_name %}
+                          <option value="{{ api_obj }}" selected>{{ api_obj }}</option>
+                        {% else %}
+                          <option value="{{ api_obj }}">{{ api_obj }}</option>
+                        {% endif %}
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col s12">
+                <p><b>Filter by API status</b></p>
+                <select id="select-api-status" style="display: block;">
+                	{% if selected_api_status == "Passed" %}
+                		<option value="All">All</option>
+                		<option value="Passed" selected>Passed</option>
+                		<option value="Failed">Failed</option>
+                	{% elif selected_api_status == "Failed" %}
+                		<option value="All">All</option>
+	            		<option value="Passed">Passed</option>
+	            	    <option value="Failed" selected>Failed</option>
+	            	{% else %}
+	            		<option value="All" selected>All</option>
+                		<option value="Passed">Passed</option>
+                		<option value="Failed">Failed</option>
+                	{% endif %}
+                 </select>
+              </div>
+              <div class="col s12">
+                <p><b>Filter by date</b></p>
+                <br>
+                <select id="modal-api-analytics">
+                  {% for item in filter_type_list %}
+                    {% if item.key == filter_type %}
+                        <option value="{{item.key}}" selected>{{item.value}}</option>
+                    {% else %}
+                        <option value="{{item.key}}">{{item.value}}</option>
+                    {% endif %}
+                  {% endfor %}
+                </select>
+                <div class="row" id="modal-api-analytics-custom-date" style="display: none;">
+                  <br>
+                  <div class="col s6">
+                    Start Date
+                    <input type="date" id="api-analytics-default-start-date" value="{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}" value_last_month="{{ LAST_MONTH_START_DATETIME|date:"Y-m-d" }}" value_last_week="{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}" value_golive="{{ go_live_date|date:"Y-m-d" }}">
+                  </div>
+                  <div class="col s6">
+                    End Date
+                    <input type="date" id="api-analytics-default-end-date" value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" value_last_month="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" value_last_week="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" value_golive="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}">
+                  </div>  
+                </div>
+              </div>               
+            </div>
+        </div>
+        <div class="modal-footer">
+          <a class="waves-effect waves-light btn black-text right" id="submit-filter" style="background-color: #038456 !important;margin-left: 2em;margin-right: 1em;" onclick="submit_api_analytics_filter('{{selected_bot_obj.pk}}')">Submit</a>
+          <a href="javascript:void(0)" class="btn modal-close transparent-btn right black-text">Cancel</a>
+        </div>
+    </div>
+
+</div>
+<script type="text/javascript">
+  window.SELECTED_BOT_PK = '{{selected_bot_obj.pk}}'
+  if('{{filter_type}}' == 'custom_date'){
+
+    document.getElementById("modal-api-analytics-custom-date").style.display = "block"
+  }
+  function show_api_request_modal(bot_pk,request){
+    console.log(request)
+    $("#API-Request-"+bot_pk).show();
+  }
+  function DownloadStaticJSON(api_pk, type){
+
+    window.location = '/files/static-api-json/' + type + '/api-'+ type + '-packet-' + api_pk+'.json'
+  }
+</script>
+
+{% endblock %}

@@ -1,0 +1,178 @@
+{% load static %}
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+  <title>EasyChat</title>
+  {% if request.user.enable_s3_bucket %}
+  <link rel="shortcut icon" type="image/png" href="https://static.allincall.in/static/EasyChatApp/img/favicon.svg"/>
+  {% else %}
+  <link rel="shortcut icon" type="image/png" href="{% static 'EasyChatApp/img/favicon.svg' %}"/>
+  {% endif %}
+
+
+  {% if request.user.enable_s3_bucket %}
+  <link href="https://static.allincall.in/static/EasyChatApp/css/select2.min.css" rel="stylesheet"/>
+  <link href="https://static.allincall.in/static/EasyChatApp/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  {% else %}
+  <link href="{% static 'EasyChatApp/css/select2.min.css' %}" rel="stylesheet"/>
+  <link href="{% static 'EasyChatApp/css/materialize.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  {% endif %}
+
+  
+
+
+  <link href="{% static 'EasyChatApp/css/style3.css' %}?v={% random_int 1 100 %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="{% static 'EasyChatApp/css/Treant.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  
+
+  <!-- <link href="{% static 'EasyChatApp/css/agent_chatbox.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/> -->
+   {% if request.user.enable_s3_bucket %}     
+
+      <link href="https://static.allincall.in/static/EasyChatApp/css/jquery.dataTables.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+      <link href="https://static.allincall.in/static/EasyChatApp/css/style.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+      <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/jquery.min.js"></script>
+    {% else %}
+
+      <link href="{% static 'EasyChatApp/css/jquery.dataTables.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+      <link href="{% static 'EasyChatApp/css/style.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+       <script type="text/javascript" src="{% static 'EasyChatApp/js/jquery.min.js' %}"></script>
+    {% endif %}
+
+  
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/Chart.min.js' %}"></script>
+    <!-- trumbowyg changes -->
+<link rel="stylesheet" href="{% static 'EasyChatApp/trumbowyg/dist/ui/trumbowyg.min.css' %}">
+<link rel="stylesheet" href="{% static 'EasyChatApp/trumbowyg/dist/plugins/emoji/ui/trumbowyg.emoji.css' %}">
+
+<script type="text/javascript" src="{% static 'EasyChatApp/trumbowyg/dist/trumbowyg.min.js' %}"></script>
+<script src="{% static 'EasyChatApp/trumbowyg/dist/plugins/emoji/trumbowyg.emoji.js' %}"></script>
+
+  {% if request.user.enable_s3_bucket %}
+  <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/jstree.min.js"></script>
+  <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/jscolor.js"></script>
+
+  {% else %}
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/jstree.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/jscolor.js' %}"></script>
+
+  {% endif %}
+
+  
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/agent_chatbox.js' %}?v={% random_int 1 100 %}"></script>
+
+  <link href="{% static 'EasyChatApp/css/material_icons.css' %}?v={% random_int 1 100 %}" rel="stylesheet">
+
+</head>
+<body class="grey lighten-4">
+  {% csrf_token %}
+
+  <div class="navbar-fixed">
+
+    <nav class="white lighten-1" role="navigation">
+      <div class="nav-wrapper">
+        <a href="#" class="brand-logo red-text">
+
+         <div class="row">
+
+            <div class="col center-align purple darken-3" style="width: 4.16%;">
+            <br>
+              <a href="/chat/customer-care" class="white-text tooltipped" data-position="right" data-tooltip="Home">
+                <i class="material-icons" id="home-button">home</i>
+              </a>
+            </div>
+            
+            <div class="col s3 "></div>
+
+            <div class="col s4 ">
+              <h5 style="color: purple;"> Customer Care Agent Console </h5>
+            </div>
+
+            <div class="col s4">
+              
+              <div class="col s2 right">
+                <a href="/chat/logout-customer-agent/" class="black-text" data-position="bottom" title="Logout"><i class="material-icons">exit_to_app</i></a>
+              </div>
+              
+              <div class="col s2 right">
+                <a href="#" class="black-text" data-position="bottom" title="{{ request.user.username }}"><i class="material-icons">person</i></a>               
+              </div>
+            
+            </div>
+          </div>
+        </a>
+      </div>
+    </nav>
+
+    
+  </div>
+
+
+<div class="row">
+  <div class="col s-half" style="position: fixed;">
+    <div class="row">
+      <div class="col s12 center-align" style="height: 100vh; background-color: #3A3F51;">
+       <!--  <div class="row">
+        </div> -->
+      </div>
+    </div>
+  </div>
+
+    {% for livechat_session in livechat_sessions_list %}
+         
+      <div class="col s3-half right">
+        <iframe id="allincall_chat_box" src="/chat/agent-bot/?user_id={{ livechat_session.profile.user_id }}" style=""></iframe>          
+      </div>
+    
+    {% endfor %}
+    
+  </div>
+
+  {% if request.user.enable_s3_bucket %}
+  <script type="text/javascript" src="/static/EasyChatApp/js/easychat-crypto.js"></script>
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/select2.min.js">
+    </script>
+  {% else %}
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/easychat-crypto.js' %}"></script>
+    <script type="text/javascript" src="{% static 'EasyChatApp/js/select2.min.js' %}">
+    </script>
+  {% endif %}
+
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/materialize.js' %}"></script>
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/security_checks.js' %}?v={% random_int 1 100 %}"></script>
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/console.js' %}?v={% random_int 1 100 %}"></script>
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/analytics.js' %}?v={% random_int 1 100 %}"></script>
+  <!-- <script type="text/javascript" src="{% static 'EasyChatApp/js/ace/ace.js' %}"></script>
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/ace/theme-twilight.js' %}"></script>
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/jquery-ace.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/ace/mode-ruby.js' %}"></script> -->
+  {% if request.user.enable_s3_bucket %}
+  <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/canvasjs.min.js"></script>
+  <script type="text/javascript" src="https://static.allincall.in/static/EasyChatApp/js/jquery.dataTables.min.js"></script>
+  {% else %}
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/canvasjs.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'EasyChatApp/js/jquery.dataTables.min.js' %}"></script>
+  {% endif %}
+
+  
+
+  <script type="text/javascript">
+    $("#home-button").click(function() {
+      if ($("#panel").is(":visible") == true) {
+        $("#panel").hide(100);  
+      } else {
+        $("#panel").show(100);
+      }
+    });
+
+  </script>
+
+</body>
+</html>
+
+
+

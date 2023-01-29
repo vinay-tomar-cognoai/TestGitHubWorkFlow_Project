@@ -1,0 +1,208 @@
+{% extends 'EasyTMSApp/console.html' %} {% block content %} {% load static %}
+
+<style type="text/css">
+    body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background-color: #f3f6ff !important;
+    }
+</style>
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow get-analytics">
+                <div class="d-sm-flex align-items-center justify-content-between">
+                    <div class="row" style="width: 100%;">
+                        <div class="col-md-3 col-sm-12 mt-1 mb-1" style="display: none; align-items: center;">
+                            <select id="visited-title-select-option" class="form-control">
+                                <option value="none">No visited pages</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 col-sm-12 analytic-calendar-div" style="align-items: center;">
+                            <div class="col-md-5 mt-1 mb-1">
+                                <input class="form-control datepicker easyassist-date-picker" data-date-format="dd/mm/yyyy" placeholder="Start Date" id="start-date" autocomplete="off" value="{{ datetime_start|date:'d/m/Y' }}">
+                            </div>
+                            <div class="col-md-1 mt-1 mb-1 between-to-text" style="display: flex; align-items: center; justify-content: center;">
+                                To
+                            </div>
+                            <div class="col-md-5 mt-1 mb-1">
+                                <input class="form-control datepicker easyassist-date-picker" data-date-format="dd/mm/yyyy" placeholder="End Date" id="end-date" autocomplete="off" value="{{ datetime_end|date:'d/m/Y' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-12 mt-1 mb-1 analytics-btn-wrapper">
+                            <button class="btn btn-primary btn-block" onclick="get_all_analytics()">Get Analytics</button>
+                        </div>
+                        {% if active_agent.role == "admin" or active_agent.role == "supervisor" %}
+                        <div class="col-md-3 col-sm-12 mt-1 mb-1 analytics-btn-wrapper">
+                            <button class="btn btn-primary btn-block" data-toggle="modal" data-target="#export_modal">Export</button>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Content Row -->
+    <div class="row">
+        <div class="card shadow" style="margin: 12px;margin-bottom: 20px !important; padding-top: 3.37em;width: 100%;">
+            <div class="row card-collection">
+                <!-- Earnings (Monthly) Card Example -->
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card border-left-info shadow h-100 py-2 card-cobrowse">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="col-auto">
+                                        <div class="h5 mb-0  font-weight-bold stats-cobrowse" id="div-total-tickets-generated">...</div>
+                                    </div>
+                                    <div class=" mb-1 text-cobrowse" style="color: #806ef3">
+                                        Total Ticket Generated</div>
+                                </div>
+                                <div class="icon-cobrowse">
+                                    <svg width="116" height="116" viewBox="0 0 116 116" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="58" cy="58" r="58" fill="white" fill-opacity="0.3"/>
+                                        <path d="M73.4 62.5C77.0451 62.5 80 65.5221 80 69.25V70.8579C80 78.9079 70.7368 85 58 85C45.2632 85 36 79.2249 36 70.8579V69.25C36 65.5221 38.9549 62.5 42.6 62.5H73.4ZM73.4 65.875H42.6C40.8847 65.875 39.475 67.2135 39.3151 68.925L39.3 69.25V70.8579C39.3 76.8753 46.7553 81.625 58 81.625C68.8371 81.625 76.3805 76.8889 76.6901 71.2209L76.7 70.8579V69.25C76.7 67.4957 75.3912 66.054 73.7178 65.8904L73.4 65.875ZM58 31C65.2902 31 71.2 37.0442 71.2 44.5C71.2 51.9558 65.2902 58 58 58C50.7098 58 44.8 51.9558 44.8 44.5C44.8 37.0442 50.7098 31 58 31ZM58 34.375C52.5324 34.375 48.1 38.9081 48.1 44.5C48.1 50.0919 52.5324 54.625 58 54.625C63.4676 54.625 67.9 50.0919 67.9 44.5C67.9 38.9081 63.4676 34.375 58 34.375Z" fill="white"/>
+                                    </svg>                                                                       
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% if active_agent.role == "admin" %}
+                    <div class="col-xl-4 col-md-6 mb-4 ">
+                        <div class="card border-left-warning shadow h-100 py-2 card-cobrowse" data-toggle="tooltip" data-placement="bottom" title="Number of Customers who clicked on “Request for Support” button but did not initiate a Cobrowsing session">
+                            <div class="card-body">
+                                <div class="col mr-2">
+                                    <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="div-total-tickets-unassigned">
+                                        ...</div>
+                                    <div class=" mb-1 text-cobrowse" style="color: #16A1AA;">
+                                        Unassigned
+                                </div>
+                                </div>
+                                <div class="icon-cobrowse">
+                                    <svg width="39" height="39" viewBox="0 0 39 39" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M19.5 39C30.2696 39 39 30.2696 39 19.5C39 8.73045 30.2696 0 19.5 0C8.73045 0 0 8.73045 0 19.5C0 30.2696 8.73045 39 19.5 39Z" fill="white" fill-opacity="0.15"/>
+                                        <path d="M24.5039 18.4172C24.5039 18.7894 24.2023 19.0911 23.8301 19.0911C23.4581 19.0911 23.1562 18.7894 23.1562 18.4172C23.1562 18.0452 23.4581 17.7434 23.8301 17.7434C24.2023 17.7434 24.5039 18.0452 24.5039 18.4172Z" fill="white"/>
+                                        <path d="M23.8294 11.2478C22.4616 11.2478 21.3521 12.3547 21.3521 13.7252V13.7261C21.3521 14.0981 21.6537 14.3995 22.0259 14.3995C22.3981 14.3995 22.6997 14.0974 22.6997 13.7252C22.6997 13.1022 23.2035 12.5955 23.8303 12.5955C24.4536 12.5955 24.9607 13.1026 24.9607 13.7261C24.9607 14.3493 24.4536 14.8565 23.8303 14.8565C23.4581 14.8565 23.1565 15.1583 23.1565 15.5303V16.252C23.1565 16.6242 23.4581 16.9259 23.8303 16.9259C24.2023 16.9259 24.5041 16.6242 24.5041 16.252V16.1111C25.5442 15.8168 26.3084 14.8589 26.3084 13.7261C26.3084 12.3594 25.1967 11.2478 23.8294 11.2478Z" fill="white"/>
+                                        <path d="M14.4659 25.1967C15.3033 24.5446 15.8434 23.5279 15.8434 22.3869C15.8434 20.4235 14.2459 18.8262 12.2825 18.8262C10.3191 18.8262 8.72173 20.4235 8.72173 22.3869C8.72173 23.5279 9.26185 24.5446 10.099 25.1967C8.91739 25.8996 8 27.2273 8 28.8827V30.3262C8 30.6984 8.30164 31 8.67383 31H15.8913C16.2633 31 16.5652 30.6984 16.5652 30.3262V28.8827C16.5652 27.2276 15.6479 25.8998 14.4659 25.1967ZM10.0694 22.3869C10.0694 21.1667 11.0622 20.1738 12.2827 20.1738C13.5029 20.1738 14.4958 21.1667 14.4958 22.3869C14.4958 23.6074 13.5029 24.6002 12.2827 24.6002C11.0622 24.6002 10.0694 23.6074 10.0694 22.3869ZM15.2175 29.6523H9.34766V28.8827C9.34766 27.2617 10.6592 25.9479 12.2825 25.9479C13.9035 25.9479 15.2173 27.2594 15.2173 28.8827V29.6523H15.2175Z" fill="white"/>
+                                        <path d="M28.1606 8H19.4997C17.9316 8 16.6606 9.26869 16.6606 10.839V23.8304C16.6606 24.3816 17.2927 24.7039 17.7388 24.3695L20.446 22.339H28.1606C29.7287 22.339 30.9997 21.0703 30.9997 19.5V10.839C30.9997 9.27097 29.731 8 28.1606 8ZM29.652 19.5C29.652 20.3244 28.9854 20.9914 28.1606 20.9914H20.2214C20.0756 20.9914 19.9338 21.0388 19.8171 21.1261L18.0083 22.4827V10.839C18.0083 10.0146 18.6749 9.34766 19.4997 9.34766H28.1606C28.985 9.34766 29.652 10.0143 29.652 10.839V19.5Z" fill="white"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                <div class="col-xl-4 col-md-6 mb-4 ">
+                    <div class="card border-left-warning shadow h-100 py-2 card-cobrowse">
+                        <div class="card-body">
+                            <div class="col mr-2">
+                                <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="div-total-tickets-pending">
+                                    ...</div>
+                                <div class=" mb-1 text-cobrowse" style="color: #16A1AA;">
+                                    Pending</div>
+                            </div>
+                            <div class="icon-cobrowse">
+                                <svg width="116" height="116" viewBox="0 0 116 116" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="58" cy="58" r="58" fill="white" fill-opacity="0.3"/>
+                                    <path d="M35.5 61.5217L60.25 61.5241C62.6211 61.5241 64.5658 63.4387 64.7376 65.8692L64.75 66.2197V72.087C64.7477 81.9478 55.1042 85 47.875 85C40.7903 85 31.3849 82.0687 31.0115 72.6705L31 72.087V66.2174C31 63.7432 32.8369 61.714 35.1643 61.5346L35.5 61.5217ZM80.5 61.5217L80.8357 61.5346C83.0467 61.705 84.8151 63.5449 84.9864 65.8498L85 66.2174V70.913C84.9977 79.7385 77.2825 82.6522 71.5 82.6522C69.1195 82.6522 66.4173 82.1474 64.0547 80.95C64.7702 80.0625 65.3755 79.0764 65.848 77.973C68.0026 78.959 70.3277 79.1127 71.3105 79.1288L71.9598 79.1218C74.2901 79.0381 81.2532 78.2187 81.6107 71.4591L81.625 70.913V66.2174C81.625 65.6414 81.225 65.1619 80.7015 65.0624L80.5 65.0435L66.8853 65.0458C66.6962 63.8687 66.2247 62.7976 65.5476 61.8986L65.245 61.5241L80.5 61.5217ZM35.5 65.0435L35.2735 65.067C34.9937 65.1263 34.8025 65.2848 34.7035 65.3863C34.6063 65.4896 34.4544 65.6875 34.3975 65.9802L34.375 66.2174V72.087C34.375 75.2307 35.6958 77.555 38.4138 79.1891C40.6556 80.5408 43.7898 81.356 47.1066 81.4656L47.875 81.4783L48.8535 81.4543C52.2748 81.2949 60.9566 80.1475 61.3604 72.6323L61.375 72.0846V66.2197C61.375 65.6458 60.975 65.1647 60.4515 65.0648L60.25 65.0458L35.5 65.0435ZM47.875 31C54.7105 31 60.25 36.7827 60.25 43.913C60.25 51.0434 54.7105 56.8261 47.875 56.8261C41.0395 56.8261 35.5 51.0434 35.5 43.913C35.5 36.7827 41.0395 31 47.875 31ZM72.625 35.6957C78.2163 35.6957 82.75 40.4265 82.75 46.2609C82.75 52.0952 78.2163 56.8261 72.625 56.8261C67.0337 56.8261 62.5 52.0952 62.5 46.2609C62.5 40.4265 67.0337 35.6957 72.625 35.6957ZM47.875 34.5217C42.9115 34.5217 38.875 38.7337 38.875 43.913C38.875 49.0923 42.9115 53.3043 47.875 53.3043C52.8385 53.3043 56.875 49.0923 56.875 43.913C56.875 38.7337 52.8385 34.5217 47.875 34.5217ZM72.625 39.2174C68.9035 39.2174 65.875 42.3776 65.875 46.2609C65.875 50.1442 68.9035 53.3043 72.625 53.3043C76.3465 53.3043 79.375 50.1442 79.375 46.2609C79.375 42.3776 76.3465 39.2174 72.625 39.2174Z" fill="white"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-md-6 mb-4 ">
+                    <div class="card border-left-warning shadow h-100 py-2 card-cobrowse">
+                        <div class="card-body">
+                            <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="div-total-tickets-resolved">...
+                            </div>
+                            <div class="col mr-2">
+                                <div class=" mb-1 text-cobrowse" style="color: #1caf3d">
+                                    Resolved</div>
+                            </div>
+                            <div class="icon-cobrowse">
+                                <svg width="116" height="116" viewBox="0 0 116 116" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="58" cy="58" r="58" fill="white" fill-opacity="0.3"/>
+                                    <path d="M70.8548 56.7081C78.667 56.7081 85 63.0414 85 70.854C85 78.6666 78.667 85 70.8548 85C63.0426 85 56.7095 78.6666 56.7095 70.854C56.7095 63.0414 63.0426 56.7081 70.8548 56.7081ZM64.0485 69.9447C63.5463 69.4425 62.7321 69.4425 62.2299 69.9447C61.7277 70.4469 61.7277 71.2612 62.2299 71.7634L67.3736 76.9074C67.8758 77.4096 68.69 77.4096 69.1922 76.9074L79.4796 66.6194C79.9818 66.1172 79.9818 65.3029 79.4796 64.8007C78.9775 64.2985 78.1632 64.2985 77.6611 64.8007L68.2829 74.1793L64.0485 69.9447ZM56.7668 61.8503C56.0037 63.0419 55.3877 64.3367 54.9442 65.7091L36.7838 65.7098C35.7201 65.7098 34.8578 66.5722 34.8578 67.6359V69.1217C34.8578 70.4995 35.3493 71.832 36.2439 72.8797C39.4673 76.6546 44.5233 78.5728 51.5658 78.5728C53.0997 78.5728 54.5397 78.4818 55.8871 78.3004C56.5177 79.5732 57.3087 80.7527 58.2314 81.8146C56.1855 82.2267 53.9611 82.4308 51.5658 82.4308C43.4751 82.4308 37.3386 80.1026 33.3103 75.385C31.8192 73.6388 31 71.418 31 69.1217V67.6359C31 64.4415 33.5895 61.8518 36.7838 61.8518L56.7668 61.8503ZM51.5658 31C58.6678 31 64.4251 36.7576 64.4251 43.86C64.4251 50.9623 58.6678 56.7199 51.5658 56.7199C44.4638 56.7199 38.7065 50.9623 38.7065 43.86C38.7065 36.7576 44.4638 31 51.5658 31ZM51.5658 34.858C46.5944 34.858 42.5643 38.8883 42.5643 43.86C42.5643 48.8316 46.5944 52.862 51.5658 52.862C56.5372 52.862 60.5673 48.8316 60.5673 43.86C60.5673 38.8883 56.5372 34.858 51.5658 34.858Z" fill="white"/>
+                                </svg>                                                            
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Service Request Analytics</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="javascript:void(0)" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <em class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></em>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Timeline:</div>
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="show_daily_service_request_analytics()">Daily</a>
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="show_weeekly_service_request_analytics()">Weekly</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="show_monthly_service_request_analytics()">Monthly</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body card-body-sm">
+                    <div class="chart-area">
+                        <canvas id="service-request-analytics"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="export_modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" >Export Analytics</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h6>Select date range</h6>
+                            <div>
+                                <select id="select-date-range" onchange="check_select_date_range(this)">
+                                    <option value="0" selected="selected">Choose date range</option>
+                                    <option value="1">Last day</option>
+                                    <option value="2">Last 7 days</option>
+                                    <option value="3">Last 1 month</option>
+                                    <option value="4">Custom Range</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 mt-4" id="from-date-div" style="display: none;">
+                            <h6>From Date</h6>
+                            <input id="startdate" placeholder="From Date" class="filter-parameter form-control datepicker" autocomplete="off" data-date-format="dd-mm-yyyy">
+                        </div>
+                        <div class="col-sm-6 mt-4" id="to-date-div" style="display: none;">
+                            <h6>To Date</h6>
+                            <input id="enddate" placeholder="To Date" class="filter-parameter form-control datepicker" autocomplete="off" data-date-format="dd-mm-yyyy">
+                        </div>
+                        <div class="col-sm-12" id="email-id-div" style="display: none; padding-top: 25px;">
+                            <h6>Email ID*</h6>
+                            <input class="form-control" id="filter-data-email" value="{{ request.user.email }}">
+                            <p class="mt-4">Note: You will receive the anaytics report data dump on the above email ID within 24 hours.</p>
+                        </div>
+                        <div class="col-sm-12 mt-3" id="general-error-message" style="color: red;">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-text-only" type="button" data-dismiss="modal">Cancel</button>
+                  <button class="btn btn-primary btn-width-100" type="button" onclick="export_request(this)">Export</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script type="text/javascript" src="{% static 'EasyTMSApp/js/analytics.js' %}"></script>
+{% endblock %}
+

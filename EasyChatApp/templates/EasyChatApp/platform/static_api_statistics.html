@@ -1,0 +1,157 @@
+{% extends 'EasyChatApp/console.html' %}
+{% block consolecontent %}
+{% load static %}
+<style type="text/css">
+.dataTables_filter {
+   float: left !important;
+}
+body{
+  overflow-x: hidden;
+}
+</style>
+<div class="row" style="padding:1em;">
+	
+		<div class="col s12" style="margin-top: 1em;">
+      <!-- <div class="col s6"></div> -->
+      <div class="switch col s6" style="display: inline-block;">
+        <label>
+          API logs
+          {% if status == "0" %}
+            <input type="checkbox" id="logs-to-statistics-switch">
+            <span class="lever"></span>
+          {% else %}
+            <input type="checkbox" checked id="logs-to-statistics-switch">
+            <span class="lever"></span>
+          {% endif %}
+          API statistics
+        </label>
+      </div>
+      <div class="col s6" style="display: inline-block;">
+        <a href="#apply-filter-api-statistics" class="right btn modal-trigger black-text" style="background-color: white;"><i class="material-icons inline-icon">filter_list</i> &nbsp;Apply filters</a>
+      </div>
+	 </div>
+	
+	<div class="col s12">
+
+		{% if True %}
+
+			<table id="api-statistics-table" class="display">
+			    <thead>
+			        <tr>
+			        	<th>API Name</th>
+		            <th>Successfull API Calls</th>
+		            <th>Failed API Calls</th>
+		            <th>Total number of API Calls</th>
+			        </tr>
+			    </thead>
+			    <tbody>
+                <tr>
+                  <td>AskPanAPI</td>
+                  <td>2</td>
+                  <td>0</td>
+                  <td>2</td>
+                </tr>
+				        <tr>
+				        	<td>CheckKYCAPI</td>
+				        	<td>2</td>
+				        	<td>0</td>
+				          <td>2</td>
+				        </tr>
+                <tr>
+                  <td>ProductMenuAPIBot</td>
+                  <td>1</td>
+                  <td>0</td>
+                  <td>1</td>
+                </tr>
+			    </tbody>
+			</table>
+
+		{% else %}
+			<br>
+			<br>
+			<p style="padding:1em;text-align:center;" class="green lighten-1">No record found</p>
+		{% endif %}
+
+	</div>
+
+    <div class="col s12 right-align">
+        {% if api_analytics_objs.has_other_pages %}
+          <ul class="pagination">
+            {% if api_analytics_objs.has_previous %}
+              <li><a href="?start_date={{start_date}}&end_date={{end_date}}&selected_api_name={{selected_api_name}}&page={{ api_analytics_objs.previous_page_number }}"><i class="material-icons">chevron_left</i></a></li>
+            {% else %}
+              <li class="disabled"><i class="material-icons">chevron_left</i></li>
+            {% endif %}
+            {% for i in api_analytics_objs.paginator.page_range %}
+              {% if api_analytics_objs.number == i %}
+                <li class="active purple darken-3"><a href="?start_date={{start_date}}&end_date={{end_date}}&selected_api_name={{selected_api_name}}&page={{ i }}">{{ i }}</a></li>
+              {% else %}
+                <li><a href="?start_date={{start_date}}&end_date={{end_date}}&selected_api_name={{selected_api_name}}&page={{ i }}">{{ i }}</a></li>
+              {% endif %}
+            {% endfor %}
+            {% if api_analytics_objs.has_next %}
+              <li><a href="?start_date={{start_date}}&end_date={{end_date}}&selected_api_name={{selected_api_name}}&page={{ api_analytics_objs.next_page_number }}"><i class="material-icons">chevron_right</i></a></li>
+            {% else %}
+              <li class="disabled"><i class="material-icons">chevron_right</i></li>
+            {% endif %}
+          </ul>          
+        {% endif %}
+    </div>
+
+    <div id="apply-filter-api-statistics" class="modal" style="max-height:100%; width: 50%; overflow:visible;width: 40%;">
+        <div class="modal-content">
+            <div class="row">
+              <div class="col s12">
+                <p><b>Filter by API name</b></p>
+                <select id="select-api-name-statistics" style="display: block;" autocomplete="new-password">
+                  <option value="All">All</option>
+                  {% for api_name in api_objs_name_list %}
+                      {% if api_name == selected_api_name %}
+                          <option value="{{ api_name }}" selected>{{ api_name }}</option>
+                        {% else %}
+                          <option value="{{ api_name }}">{{ api_name }}</option>
+                        {% endif %}
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col s12">
+                <p><b>Filter by date</b></p>
+                <select id="modal-api-statistics">
+                  {% for item in filter_type_list %}
+                    {% if item.key == filter_type %}
+                        <option value="{{item.key}}" selected>{{item.value}}</option>
+                    {% else %}
+                        <option value="{{item.key}}">{{item.value}}</option>
+                    {% endif %}
+                  {% endfor %}
+                </select>
+                <div class="row" id="modal-api-statistics-custom-date" style="display: none;">
+                  <br>
+                  <div class="col s6">
+                    Start Date
+                    <input type="date" id="api-statistics-start-date" value="{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}" value_last_month="{{ LAST_MONTH_START_DATETIME|date:"Y-m-d" }}" value_last_week="{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}" value_golive="{{ go_live_date|date:"Y-m-d" }}">
+                  </div>
+                  <div class="col s6">
+                    End Date
+                    <input type="date" id="api-statistics-end-date" value="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" value_last_month="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" value_last_week="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}" value_golive="{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}">
+                  </div>  
+                </div>
+              </div>                
+            </div>
+        </div>
+        <div class="modal-footer">
+          <a class="waves-effect waves-light btn black-text right" id="submit-filter" style="background-color:#81C784;margin-left: 2em;margin-right: 1em;" onclick="submit_api_statistics_filter()">Submit</a>
+          <a href="javascript:void(0)" class="btn modal-close transparent-btn right black-text" >Cancel</a>
+        </div>
+    </div>
+
+</div>
+<script type="text/javascript">
+  window.SELECTED_BOT_PK = '{{selected_bot_obj.pk}}'
+  if('{{filter_type}}' == 'custom_date'){
+
+    document.getElementById("modal-api-statistics-custom-date").style.display = "block"
+  }
+</script>
+
+{% endblock %}

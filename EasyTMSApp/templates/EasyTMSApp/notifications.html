@@ -1,0 +1,73 @@
+{% extends 'EasyTMSApp/console.html' %}
+
+{% block content %}
+{% load static %}
+
+<style>
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+</style>
+
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active new_notification_tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-home" aria-selected="true" onclick="show_new_notifications()">New</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link old_notification_tab" data-toggle="pill" href="#pills-integration" role="tab" aria-controls="pills-profile" aria-selected="false" onclick="show_cleared_notifications()">Cleared</a>
+        </li>
+        <div class="tms-new-notification" style="display: none;" onclick="show_new_notifications()">
+            <div class="tms-new-notification-border">
+                Load new notifications
+            </div>
+        </div>
+    </ul>
+    <div class="card mb-4" style="background: transparent;">
+        <div class="card-body">
+            <div id="unchecked_notification_container" style="display: none;"></div>
+            <div id="no_notification_div_message" style="display: none; margin-left: -17px;"> 
+                No notifications to show
+            </div>
+            <div id="no_notification_div_quote" style="display: none;"> 
+                <div _ngcontent-nut-c840="" class="cu-notification__nothing ng-tns-c840-107 ng-trigger ng-trigger-loading ng-star-inserted"><div _ngcontent-nut-c840="" class="cu-mind ng-tns-c840-107"><div _ngcontent-nut-c840="" class="cu-mind__header ng-tns-c840-107"></div><div _ngcontent-nut-c840="" class="cu-mind__content ng-tns-c840-107"><div _ngcontent-nut-c840="" class="cu-mind__quotes cu-mind__quotes_open ng-tns-c840-107"><svg _ngcontent-nut-c840="" width="116px" height="92px" viewBox="449 454 116 92" version="1.1" class="ng-tns-c840-107"><path _ngcontent-nut-c840="" d="M449.1,513.55 C449.1,533.85 461.7,545.4 476.05,545.4 C489.35,545.4 499.85,534.55 499.85,
+                    521.6 C499.85,508.65 490.75,499.55 479.2,499.55 C476.75,499.55 473.95,499.9 473.25,500.25 C475.35,
+                    488.35 487.25,474 498.45,467.35 L481.65,454.05 C462.4,467.7 449.1,489.4 449.1,513.55 L449.1,
+                    513.55 Z M513.85,513.55 C513.85,533.85 526.45,545.4 540.8,545.4 C554.1,545.4 564.6,534.55 564.6,
+                    521.6 C564.6,508.65 555.5,499.55 543.95,499.55 C541.5,499.55 538.7,499.9 538,500.25 C540.1,
+                    488.35 552,474 563.2,467.35 L546.4,454.05 C527.15,467.7 513.85,489.4 513.85,513.55 L513.85,513.55 Z" id="“" stroke="none" fill-opacity="0.0758888134" fill="#9688AE" fill-rule="evenodd" class="ng-tns-c840-107"></path></svg></div><blockquote _ngcontent-nut-c840="" class="cu-mind__text ng-tns-c840-107" id="tms-no-notification-quote"> You can’t just sit there and wait for people to give you that golden dream. You’ve got to get out there and make it happen for yourself. <cite _ngcontent-nut-c840="" class="ng-tns-c840-107">Diana Ross</cite></blockquote><div _ngcontent-nut-c840="" class="cu-mind__quotes cu-mind__quotes_close ng-tns-c840-107"><svg _ngcontent-nut-c840="" width="117px" height="92px" viewBox="876 492 117 92" version="1.1" class="ng-tns-c840-107"><path _ngcontent-nut-c840="" d="M903.6,584 C916.9,584 927.4,573.15 927.4,560.2 C927.4,547.25 918.3,538.15 906.75,
+                    538.15 C904.3,538.15 901.5,538.5 900.8,538.85 C902.9,526.95 914.8,512.6 926,505.95 L909.2,
+                    492.65 C889.95,506.3 876.65,528 876.65,552.15 C876.65,572.45 889.25,584 903.6,584 Z M941.4,
+                    552.15 C941.4,572.45 954,584 968.35,584 C981.65,584 992.15,573.15 992.15,560.2 C992.15,
+                    547.25 983.05,538.15 971.5,538.15 C969.05,538.15 966.25,538.5 965.55,538.85 C967.65,526.95 979.55,
+                    512.6 990.75,505.95 L973.95,492.65 C954.7,506.3 941.4,528 941.4,552.15 L941.4,552.15 Z" id="“" stroke="none" fill-opacity="0.0758888134" fill="#9688AE" fill-rule="evenodd" transform="translate(934.400000, 538.325000) rotate(-180.000000) translate(-934.400000, -538.325000) " class="ng-tns-c840-107"></path></svg></div></div></div></div>
+            </div>
+            <div class="load_more_button_container" style="display: none;">
+                <button class="btn btn-primary mr-sm-2" id="load_more_notifications" >Load More</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function show_new_notifications(){
+        document.querySelector(".new_notification_tab").classList.add("active");
+        document.querySelector(".old_notification_tab").classList.remove("active");
+        document.querySelector(".tms-new-notification").style.display = "none";
+        window.TMS_USER_NOTIFICATION_MANAGER.is_checked = false;
+        window.TMS_USER_NOTIFICATION_MANAGER.reinitialize();
+    }
+
+    function show_cleared_notifications(){
+        document.querySelector(".new_notification_tab").classList.remove("active");
+        document.querySelector(".old_notification_tab").classList.add("active");
+        window.TMS_USER_NOTIFICATION_MANAGER.is_checked = true;
+        window.TMS_USER_NOTIFICATION_MANAGER.reinitialize();
+    }
+</script>
+
+{% endblock %}

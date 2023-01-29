@@ -1,0 +1,246 @@
+{% extends 'EasyChatApp/base.html' %}
+{% block content %}
+{% load static %}
+<style>
+	.dataTables_filter {
+		float: left !important;
+	} 
+  .custom-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .tooltipped {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+</style>
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/new_data_table.css' %}?v={% random_int 1 100 %}">
+
+<div class="add-scrolling processor-background-color">
+
+  <div class="easychat-data-table-div">
+
+      <div class="easychat-data-table-header">
+          <h5>
+              Whatsapp History
+          </h5>
+          <p>
+            Developers can track the request packet coming from WhatsApp and the response packet sent from the web.
+          </p>
+      </div>
+
+      <div class="row" style="padding:1.25em 0.5em;">
+
+      <div class="col s12 easychat-data-table-wrapper-div">
+           <!-- add div easychat-data-table-search-filter-div -->
+          <div class="easychat-data-table-search-filter-div">
+              <div id="data-model-table_filter" class="dataTables_filter">
+                  <label>
+                      <div class="search-filter-div">
+                          <svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path fill-rule="evenodd" clip-rule="evenodd" d="M14.9043 13.9534L18.7827 17.8328C19.0724 18.123 19.0724 18.5931 18.7827 18.8833C18.4906 19.1683 18.0246 19.1683 17.7324 18.8833L13.854 15.0039C11.5449 16.761 8.26951 16.4279 6.36104 14.242C4.45258 12.0561 4.56373 8.76489 6.61531 6.71278C8.6669 4.66066 11.9573 4.54948 14.1426 6.45844C16.328 8.3674 16.6609 11.6436 14.9043 13.9534ZM10.5352 6.62114C8.32072 6.62114 6.52551 8.41681 6.52551 10.6319C6.52813 12.8459 8.3218 14.64 10.5352 14.6426C12.7497 14.6426 14.5449 12.8469 14.5449 10.6319C14.5449 8.41681 12.7497 6.62114 10.5352 6.62114Z" fill="#7B7A7B"/>
+                          </svg>
+                              
+                          <input type="search" id="whatsapp-history-search-bar" class="input browser-default" onkeyup="search_from_whatsapp_history_table()" placeholder="Search" aria-controls="data-model-table"autocomplete="off">
+                      </div>
+                     
+                  </label>
+              </div>
+              <div class="table-length-filter-div">
+                <div class="dataTables_length" id="example_length">
+                  <label>
+                      Show 
+                      <select name="example_length" aria-controls="example" class="" id="easychat-data-table-length-select" onchange="handle_no_of_records_to_show()">
+                          <option value="10" selected>10</option>
+                          <option value="25">25</option>
+                          <option value="50">50</option>
+                          <option value="100">100</option>
+                      </select> 
+                  </label>
+                </div>
+  
+                <div class="easychat-data-table-filter-btn-div">
+                  <button class="filter-btn modal-trigger" href="#modal-whatsapp-history-filter">
+                      <svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 7L16 7" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                          <path d="M5.5 10L14.5 10" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                          <path d="M7.75 13L12.25 13" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                      </svg>
+                      Filter
+                  </button>
+                </div>
+              </div>
+          </div>
+          
+          {% if whatsapp_history_objs %}
+                <table id="whatsapp-history-table" style="table-layout: fixed;word-wrap: break-word;" class="display" class="display">
+                  <thead>
+                      <tr>
+                        <th>WhatsApp Number</th>
+                        <th>Received datetime</th>
+                        <th>Response datetime</th>
+                          <th>Request packet</th>
+                          <th>Response packet</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                    {% for whatsapp_history_obj in whatsapp_history_objs %}
+                        <tr>
+                          <td>{{ whatsapp_history_obj.mobile_number }}</td>
+                          <td>{{ whatsapp_history_obj.received_datetime }}</td>
+                          <td>{{ whatsapp_history_obj.response_datetime }}</td>
+                          <td><pre data-position="top" class="tooltipped" data-tooltip="{{ whatsapp_history_obj.request_packet| pprint }}">{{ whatsapp_history_obj.request_packet| pprint }}</pre></td>
+                          <td><pre data-position="top" class="tooltipped" data-tooltip="{{ whatsapp_history_obj.response_packet| pprint }}">{{ whatsapp_history_obj.response_packet| pprint }}</pre></td>
+                        </tr>
+                    {% endfor %}
+                  </tbody>
+              </table>
+              <div id="whatsapp_history_no_data_found" style="display: none;" class="no-data-found-row">
+                      <div class="no-data-found-div">
+                          <svg width="120" height="85" viewBox="0 0 120 85" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <g clip-path="url(#clip0_92_14757)">
+                              <path d="M106.403 84.2114H13.5488L26.9751 8.06625H119.829L106.403 84.2114Z" fill="#F2F8FF"/>
+                              <path d="M58.754 0.180569H28.3649L26.9746 8.06628H59.4961L58.754 0.180569Z" fill="#F2F8FF"/>
+                              <path d="M59.4961 8.06628H26.9746L28.3649 0.180569H58.754L59.4961 8.06628Z" fill="#E1E7EF"/>
+                              <path d="M106.403 84.2114H13.5488L26.9751 8.06625H119.829L118.43 16.0056L115.3 33.7537L106.403 84.2114Z" fill="#E1E7EF"/>
+                              <path d="M106.267 84.2114H13.212L0 10.8307H93.0548L106.267 84.2114Z" fill="#F1F5F9"/>
+                              <path d="M36.1124 51.8212C36.1124 53.9573 34.3808 55.689 32.2447 55.689C30.1086 55.689 28.377 53.9573 28.377 51.8212C28.377 49.6852 30.1086 47.9535 32.2447 47.9535C34.3808 47.9535 36.1124 49.6852 36.1124 51.8212Z" fill="#17282F"/>
+                              <path d="M66.6889 51.8212C66.6889 53.9573 64.9569 55.689 62.8209 55.689C60.6851 55.689 58.9531 53.9573 58.9531 51.8212C58.9531 49.6852 60.6851 47.9535 62.8209 47.9535C64.9569 47.9535 66.6889 49.6852 66.6889 51.8212Z" fill="#17282F"/>
+                              <path d="M53.0882 56.3064L52.8758 55.9014C52.8566 55.8648 50.8586 52.1717 46.8382 52.1717C43.1716 52.1717 42.2777 55.649 42.2414 55.7971L42.1329 56.2403L41.2461 56.026L41.3528 55.5823C41.3631 55.5393 42.4423 51.2574 46.8382 51.2574C51.4209 51.2574 53.5953 55.3046 53.6856 55.4771L53.898 55.8819L53.0882 56.3064Z" fill="#17282F"/>
+                              </g>
+                              <defs>
+                              <clipPath id="clip0_92_14757">
+                              <rect width="120" height="84.1143" fill="white" transform="translate(0 0.0970459)"/>
+                              </clipPath>
+                              </defs>
+                          </svg>
+                        <span>No data found</span>  
+                        <button class="reload-btn" onClick="window.location.reload();">
+                          <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M13.2027 3.03802V5.25417C13.2027 5.60035 12.9136 5.88099 12.5569 5.88099H10.2736C9.91692 5.88099 9.62778 5.60035 9.62778 5.25417C9.62778 4.90798 9.91692 4.62734 10.2736 4.62734L10.8044 4.6267C9.06813 3.61868 6.78519 3.84051 5.28953 5.29219C3.52409 7.00571 3.52409 9.78388 5.28953 11.4974C7.05497 13.2109 9.91731 13.2109 11.6827 11.4974C12.7573 10.4545 13.207 8.98202 12.9248 7.56015C12.8573 7.22022 13.0865 6.89156 13.4368 6.82606C13.787 6.76057 14.1256 6.98305 14.1931 7.32298C14.5556 9.14915 13.9769 11.0436 12.5961 12.3839C10.3262 14.587 6.64606 14.587 4.37621 12.3839C2.10637 10.1808 2.10637 6.60883 4.37621 4.40573C6.42972 2.4126 9.63751 2.22264 11.9111 3.83584L11.9111 3.03802C11.9111 2.69183 12.2002 2.41119 12.5569 2.41119C12.9136 2.41119 13.2027 2.69183 13.2027 3.03802Z" fill="#7B7A7B"/>
+                          </svg>
+                              
+                          Reload
+                        </button>
+                              
+                      </div>
+              </div>
+           {% else %}
+               <div id="whatsapp_history_no_data_found" class="no-data-found-row">
+                      <div class="no-data-found-div">
+                          <svg width="120" height="85" viewBox="0 0 120 85" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <g clip-path="url(#clip0_92_14757)">
+                              <path d="M106.403 84.2114H13.5488L26.9751 8.06625H119.829L106.403 84.2114Z" fill="#F2F8FF"/>
+                              <path d="M58.754 0.180569H28.3649L26.9746 8.06628H59.4961L58.754 0.180569Z" fill="#F2F8FF"/>
+                              <path d="M59.4961 8.06628H26.9746L28.3649 0.180569H58.754L59.4961 8.06628Z" fill="#E1E7EF"/>
+                              <path d="M106.403 84.2114H13.5488L26.9751 8.06625H119.829L118.43 16.0056L115.3 33.7537L106.403 84.2114Z" fill="#E1E7EF"/>
+                              <path d="M106.267 84.2114H13.212L0 10.8307H93.0548L106.267 84.2114Z" fill="#F1F5F9"/>
+                              <path d="M36.1124 51.8212C36.1124 53.9573 34.3808 55.689 32.2447 55.689C30.1086 55.689 28.377 53.9573 28.377 51.8212C28.377 49.6852 30.1086 47.9535 32.2447 47.9535C34.3808 47.9535 36.1124 49.6852 36.1124 51.8212Z" fill="#17282F"/>
+                              <path d="M66.6889 51.8212C66.6889 53.9573 64.9569 55.689 62.8209 55.689C60.6851 55.689 58.9531 53.9573 58.9531 51.8212C58.9531 49.6852 60.6851 47.9535 62.8209 47.9535C64.9569 47.9535 66.6889 49.6852 66.6889 51.8212Z" fill="#17282F"/>
+                              <path d="M53.0882 56.3064L52.8758 55.9014C52.8566 55.8648 50.8586 52.1717 46.8382 52.1717C43.1716 52.1717 42.2777 55.649 42.2414 55.7971L42.1329 56.2403L41.2461 56.026L41.3528 55.5823C41.3631 55.5393 42.4423 51.2574 46.8382 51.2574C51.4209 51.2574 53.5953 55.3046 53.6856 55.4771L53.898 55.8819L53.0882 56.3064Z" fill="#17282F"/>
+                              </g>
+                              <defs>
+                              <clipPath id="clip0_92_14757">
+                              <rect width="120" height="84.1143" fill="white" transform="translate(0 0.0970459)"/>
+                              </clipPath>
+                              </defs>
+                          </svg>
+                        <span>No data found</span>  
+                        <button class="reload-btn" onClick="window.location.reload();">
+                          <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M13.2027 3.03802V5.25417C13.2027 5.60035 12.9136 5.88099 12.5569 5.88099H10.2736C9.91692 5.88099 9.62778 5.60035 9.62778 5.25417C9.62778 4.90798 9.91692 4.62734 10.2736 4.62734L10.8044 4.6267C9.06813 3.61868 6.78519 3.84051 5.28953 5.29219C3.52409 7.00571 3.52409 9.78388 5.28953 11.4974C7.05497 13.2109 9.91731 13.2109 11.6827 11.4974C12.7573 10.4545 13.207 8.98202 12.9248 7.56015C12.8573 7.22022 13.0865 6.89156 13.4368 6.82606C13.787 6.76057 14.1256 6.98305 14.1931 7.32298C14.5556 9.14915 13.9769 11.0436 12.5961 12.3839C10.3262 14.587 6.64606 14.587 4.37621 12.3839C2.10637 10.1808 2.10637 6.60883 4.37621 4.40573C6.42972 2.4126 9.63751 2.22264 11.9111 3.83584L11.9111 3.03802C11.9111 2.69183 12.2002 2.41119 12.5569 2.41119C12.9136 2.41119 13.2027 2.69183 13.2027 3.03802Z" fill="#7B7A7B"/>
+                          </svg>
+                              
+                          Reload
+                        </button>
+                              
+                      </div>
+              </div>
+            {% endif %}
+      </div>
+      <div class="col s12 right-align">
+					
+        <div id="datatable-info-pagination-div" class="datatable-info-pagination-div">
+          
+          
+        </div>
+      </div>
+          
+  </div>
+</div>
+
+
+
+<div id="modal-whatsapp-history-filter" class="modal easychat-new-modal-div">
+  <div class="modal-content">
+    <div class="modal-content-header">
+      <div class="modal-content-header-with-subheading">
+        <h5 style="text-align: center;">Apply Filter</h5>
+      </div>
+
+      <svg class="modal-close" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 6L6 18" stroke="#25282B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+        <path d="M6 6L18 18" stroke="#25282B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+    </div>
+
+    <div class="easychat-modal-table-div">
+      <table style="table-layout: fixed;word-wrap: break-word;">
+   
+          <tbody>
+              <tr>
+                  <td>
+                      <p>
+                          Filter by Bot
+                      </p> 
+                  </td>
+                  <td>
+                      <select  id="select-whatsapp-bot-filter" >
+                        <option value="">Choose from the following</option>
+                        {% for whatsapp_bot in whatsapp_bots %}
+                          <option value="{{ whatsapp_bot.pk }}">{{whatsapp_bot.name}}</option>
+                        {% endfor %}
+                      </select>
+                  </td>
+              </tr>
+              <tr>
+                  <td>
+                      <p>
+                          Filter by Received Date
+                      </p> 
+                  </td>
+                  <td>
+                      <input type="date" class="input browser-default" id="whatsapp-filter-date"  placeholder='Enter Whatsapp Number'>
+                  </td>
+              </tr>
+              <tr>
+                  <td>
+                      <p>
+                          Filter by Whatsapp number
+                      </p> 
+                  </td>
+                  <td>
+                      <input type="text" maxlength="15" class="input browser-default" id="filter-whatsapp-number"  placeholder='Enter Whatsapp Number'>
+                  </td>
+              </tr>
+          </tbody>
+      </table>
+  </div>
+  </div>
+  <div class="modal-footer">
+      <button class="easychat-new-modal-clear-btn" id="clear-filter-button">
+          <a href="/chat/whatsapp-history">Clear Filter </a>
+      </button>
+      <button class="btn easychat-new-modal-submit-btn-div modal-close" onclick="select_whatsapp_filter()">
+        <a href="javascript:void(0)">Apply Filter</a>
+      </button>
+  </div>
+</div>
+<script>
+  window.pagination_metadata = '{{pagination_metadata|safe}}'
+</script>
+{% endblock %}

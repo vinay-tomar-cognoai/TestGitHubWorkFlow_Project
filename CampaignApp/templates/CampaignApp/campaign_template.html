@@ -1,0 +1,948 @@
+{% extends 'CampaignApp/campaign_base.html' %}
+{% block content %}
+{% load static %}
+
+<style>
+@media only screen and (min-width: 768px) {
+    .campaign-container {
+        padding-right: 1.5rem!important;
+    }
+}
+</style>
+<link rel="stylesheet" type="text/css" href="{% static 'CampaignApp/css/whatsapp_styles.css' %}?v={% random_int 1 100 %}">
+
+<div class="container-fluid" >
+    <input type="hidden" id="campaign_id" value="{{campaign_obj.pk}}"/>
+    <div class="card shadow mb-4 campaign-table-card-wrapper-custom" id="message-template-card">
+        <div class="card-header" style=" border-top: 1px solid #f1f1f1 !important;">
+            <div class="d-flex align-items-center">
+                <a href="/campaign/tag-audience/?bot_pk={{selected_bot_obj.pk}}&campaign_id={{campaign_obj.pk}}">
+                    <svg style="cursor: pointer;" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12.6594 6.1708H3.35107L7.41774 2.10413C7.74274 1.77913 7.74274 1.2458 7.41774 0.920801C7.26205 0.764757 7.05067 0.677063 6.83024 0.677063C6.60981 0.677063 6.39843 0.764757 6.24274 0.920801L0.751074 6.41247C0.426074 6.73747 0.426074 7.26247 0.751074 7.58747L6.24274 13.0791C6.56774 13.4041 7.09274 13.4041 7.41774 13.0791C7.74274 12.7541 7.74274 12.2291 7.41774 11.9041L3.35107 7.83747H12.6594C13.1177 7.83747 13.4927 7.46247 13.4927 7.00413C13.4927 6.5458 13.1177 6.1708 12.6594 6.1708Z" fill="black"></path>
+                    </svg>
+                </a>
+                {% if channel == 'Whatsapp Business' %}
+                <svg style="margin-left: 24px!important;" width="30" height="30" viewBox="0 0 93 93" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9.43164 83.8996L14.6513 64.8442C11.4311 59.2681 9.73777 52.9403 9.7397 46.4593C9.74939 26.1834 26.2491 9.6875 46.527 9.6875C56.3676 9.69138 65.6017 13.5218 72.5476 20.4716C79.4916 27.4234 83.3163 36.6614 83.3124 46.4884C83.3046 66.7643 66.801 83.2621 46.527 83.2621C46.5251 83.2621 46.527 83.2621 46.527 83.2621H46.5115C40.3561 83.2602 34.3053 81.716 28.9326 78.7846L9.43164 83.8996Z" fill="white"/>
+                    <path d="M9.43177 84.8683C9.17602 84.8683 8.92802 84.7676 8.74396 84.5816C8.50177 84.3355 8.40683 83.9771 8.4979 83.6458L13.611 64.976C10.4412 59.3456 8.76915 52.9519 8.77302 46.4613C8.78077 25.6486 25.7165 8.71875 46.5271 8.71875C56.6215 8.72263 66.1056 12.6538 73.2336 19.7877C80.3617 26.9235 84.2851 36.4056 84.2813 46.4884C84.2735 67.2991 67.3359 84.2309 46.5271 84.2309C40.3485 84.2289 34.2356 82.7041 28.8106 79.8192L9.67783 84.8354C9.59646 84.8586 9.51508 84.8683 9.43177 84.8683Z" fill="white"/>
+                    <path d="M46.5273 9.6875C56.3679 9.69138 65.602 13.5218 72.548 20.4716C79.492 27.4234 83.3166 36.6614 83.3127 46.4884C83.3049 66.7643 66.8013 83.2621 46.5273 83.2621H46.5118C40.3564 83.2602 34.3056 81.716 28.9329 78.7846L9.43195 83.8996L14.6516 64.8442C11.4314 59.2681 9.73807 52.9403 9.74001 46.4593C9.7497 26.1834 26.2495 9.6875 46.5273 9.6875ZM46.5273 7.75C25.1838 7.75 7.8122 25.1139 7.80251 46.4593C7.80057 52.9829 9.44745 59.4115 12.5707 65.1019L7.56226 83.39C7.38014 84.0584 7.56614 84.7714 8.05439 85.2636C8.42251 85.6356 8.92045 85.839 9.43195 85.839C9.59664 85.839 9.76132 85.8177 9.92407 85.7751L28.6926 80.8538C34.1719 83.6981 40.3138 85.1996 46.5118 85.2016C67.8708 85.2016 85.2424 67.8358 85.2521 46.4903C85.256 36.146 81.2318 26.4198 73.9216 19.1038C66.6076 11.7858 56.8794 7.75388 46.5273 7.75Z" fill="#CFD8DC"/>
+                    <path d="M68.1537 24.862C62.38 19.0844 54.7055 15.901 46.537 15.8991C29.673 15.8991 15.9575 29.6089 15.9497 46.4612C15.9478 52.2369 17.5636 57.8595 20.6249 62.7285L21.3534 63.8852L18.2631 75.1634L29.8358 72.1292L30.9537 72.7919C35.6463 75.578 41.0287 77.0505 46.5157 77.0524H46.5273C63.3797 77.0524 77.0953 63.3407 77.1011 46.4864C77.103 38.3199 73.9275 30.6396 68.1537 24.862Z" fill="#40C351"/>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M37.3316 31.0872C36.6438 29.5566 35.9192 29.5256 35.2623 29.4985C34.7257 29.4752 34.1134 29.4772 33.5012 29.4772C32.8889 29.4772 31.893 29.7077 31.0502 30.628C30.2074 31.5483 27.832 33.7707 27.832 38.2928C27.832 42.8149 31.1258 47.1859 31.585 47.7982C32.0442 48.4104 37.9438 57.9875 47.2865 61.6726C55.05 64.7338 56.631 64.1255 58.3167 63.9724C60.0023 63.8193 63.7552 61.7501 64.5205 59.6033C65.2858 57.4566 65.2858 55.6179 65.0572 55.2343C64.8267 54.8507 64.2144 54.622 63.296 54.1609C62.3777 53.6998 57.8575 51.4775 57.0147 51.1713C56.1718 50.8652 55.5596 50.7122 54.9454 51.6325C54.3332 52.5508 52.572 54.622 52.0353 55.2343C51.4986 55.8485 50.9619 55.926 50.0435 55.4648C49.1252 55.0037 46.1647 54.035 42.652 50.904C39.9201 48.4685 38.0756 45.4596 37.5389 44.5393C37.0022 43.6209 37.4808 43.123 37.9419 42.6638C38.3546 42.2511 38.8603 41.5904 39.3214 41.0537C39.7806 40.517 39.9337 40.1334 40.2398 39.5212C40.5459 38.907 40.3928 38.3703 40.1623 37.9111C39.9356 37.45 38.1492 32.9046 37.3316 31.0872Z" fill="white"/>
+                </svg>
+    
+                {% elif channel == 'RCS' %}
+                <svg width="24" class="ml-4" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_32_2197)">
+                    <path d="M12.0062 23.9876C18.6302 23.9876 24 18.6178 24 11.9938C24 5.36981 18.6302 0 12.0062 0C5.38221 0 0.0123901 5.36981 0.0123901 11.9938C0.0123901 18.6178 5.38221 23.9876 12.0062 23.9876Z" fill="#1A73E8"></path>
+                    <path d="M16.3709 17.1747H8.19784C7.03555 17.1747 6.02165 16.2968 6.02165 15.1345V15.1221V15.8022C6.02165 16.9645 7.03555 17.9784 8.19779 17.9784H16.3709C17.5456 17.9784 18.5471 16.9521 18.5471 15.8022V15.1222C18.5471 16.2844 17.5332 17.1747 16.3709 17.1747ZM6.00927 11.3138V10.3864L4.48842 7.87637C4.40186 7.74037 4.36476 7.61671 4.37714 7.49304V8.55639C4.37714 8.65533 4.4142 8.75427 4.47604 8.86555L6.00927 11.3138Z" fill="#185ABC"></path>
+                    <path d="M16.371 7.08508H4.92115C4.46365 7.08508 4.20402 7.48075 4.51314 7.90115L6.00927 10.4977V15.1345C6.00927 16.3215 6.87482 17.3107 8.04945 17.3107H16.3586C17.5332 17.3107 18.5348 16.3092 18.5348 15.1345V9.27365C18.5471 8.0866 17.5456 7.08508 16.371 7.08508Z" fill="white"></path>
+                    <path d="M16.2349 10.3618H8.3338C7.98758 10.3618 7.65374 10.1516 7.65374 9.81769C7.65374 9.48385 7.98762 9.27368 8.3338 9.27368H16.2348C16.5811 9.27368 16.9149 9.48385 16.9149 9.81769C16.9149 10.1516 16.5811 10.3618 16.2348 10.3618H16.2349ZM16.2349 12.538H8.3338C7.98758 12.538 7.65374 12.3278 7.65374 11.9939C7.65374 11.66 7.98762 11.4499 8.3338 11.4499H16.2348C16.5811 11.4499 16.9149 11.6601 16.9149 11.9939C16.9149 12.3278 16.5811 12.538 16.2348 12.538H16.2349ZM14.0464 14.7265H8.32146C7.97529 14.7265 7.64145 14.5163 7.64145 14.1825C7.64145 13.8487 7.97529 13.6384 8.32146 13.6384H14.0464C14.3925 13.6384 14.7264 13.8486 14.7264 14.1825C14.7264 14.5164 14.3925 14.7265 14.0464 14.7265Z" fill="#8AB4F8"></path>
+                    <path d="M24 11.932C23.9753 17.187 20.5502 21.6507 15.8269 23.2334C14.6275 23.6414 13.3415 23.8516 12.0062 23.8516C5.40337 23.8516 0.0494379 18.5224 0.0123291 11.932V12.0062C0.0123291 18.6337 5.37865 24 12.0062 24C13.3415 24 14.6275 23.7774 15.8269 23.3818C20.5749 21.7867 24 17.2983 24 12.0062V11.932Z" fill="#185ABC"></path>
+                    <path d="M15.8145 0.618257C14.6152 0.210295 13.3292 0.000122071 11.9938 0.000122071C5.36631 7.49782e-05 0 5.36635 0 11.9939V12.0681C0.0370617 5.47763 5.39099 0.148416 11.9938 0.148416C13.3292 0.148416 14.6152 0.370975 15.8145 0.766692C20.5502 2.34937 23.9629 6.81303 23.9876 12.0681V11.9939C24 6.70175 20.5749 2.21337 15.8145 0.618257Z" fill="#8AB4F8"></path>
+                    </g>
+                    <defs>
+                    <clipPath id="clip0_32_2197">
+                    <rect width="24" height="24" fill="white"></rect>
+                    </clipPath>
+                    </defs>
+                </svg>
+                    
+                {% endif %}
+                
+            <div style="margin-left:16px;">
+                <h5 class="font-weight-bold">Select Template: <span>{{campaign_obj.name}}</span></h5>
+                <div class="tag-audience-sub-heading">
+                    <span>Upload your Meta approved templates here and select them to proceed with the campaign</span>
+                </div>
+             </div>
+            </div>
+           
+        </div>
+
+        <div class="card-body" style="min-height: calc(100vh - 15.9em);">
+            <div class="custom-btn-row">
+                <div class="custom-filter-container">
+                    <input type="search" class="campaign_search_bar" id="campaign-template-search-bar" placeholder="Search Template" onkeyup="search_campaign_template()"autocomplete="off">
+                </div>
+                <div>
+                    <button class="btn btn-primary create_campaign_btn" data-toggle="modal" data-target="#upload_template_modal" id="new_rcs_template_btn">
+                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8.4375 5.59375H5.46875V8.5625C5.46875 8.88906 5.20156 9.15625 4.875 9.15625C4.54844 9.15625 4.28125 8.88906 4.28125 8.5625V5.59375H1.3125C0.985938 5.59375 0.71875 5.32656 0.71875 5C0.71875 4.67344 0.985938 4.40625 1.3125 4.40625H4.28125V1.4375C4.28125 1.11094 4.54844 0.84375 4.875 0.84375C5.20156 0.84375 5.46875 1.11094 5.46875 1.4375V4.40625H8.4375C8.76406 4.40625 9.03125 4.67344 9.03125 5C9.03125 5.32656 8.76406 5.59375 8.4375 5.59375Z" fill="white"/>
+                        </svg>
+                        <span>New Template</span>
+                    </button>
+                </div>
+                <div>
+                    <button class="btn btn-primary custom_metadata_btn" data-toggle="modal"
+                    data-target="#campaign_meta_data_table">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M10.8631 7.5507L5.76432 12.6507C5.49075 12.9242 5.14798 13.1183 4.77265 13.2121L2.8165 13.7012C2.50383 13.7793 2.22061 13.4961 2.29878 13.1834L2.78782 11.2273C2.88165 10.852 3.07573 10.5092 3.34929 10.2356L8.44804 5.13567L10.8631 7.5507ZM12.0712 3.92876C12.7381 4.59565 12.7381 5.67689 12.0712 6.34379L11.4668 6.94694L9.0518 4.53191L9.65616 3.92876C10.3231 3.26187 11.4043 3.26187 12.0712 3.92876Z"
+                            fill="white" />
+                    </svg>
+
+                    <span>Edit Table</span>
+                </button>
+                </div>
+            </div>
+
+            <div class="data-not-found-wrapper" id="no-data-loader">
+                <div id="no_data_found_img">
+                    <div>
+                        <img id="no_data_image_loader" src="/static/EasyChatApp/images/bots_loading.gif"> 
+                        <div class="linear-activity">
+                            <div class="indeterminate"></div>
+                        </div>
+                        <div id="no_data_found_text">Fetching Data. Please Wait!</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="campaign_template_table_pagination_wrapper_div">
+                <div id="message-template-div-outer">
+                    <div class="table-responsive avtive-customer-table" id="campaign_template_table_container">
+                        <table class="table table-bordered" id="campaign_template_table" width="100%" cellspacing="0">
+                        </table>
+                    </div>
+                </div>
+                <div class="row mt-3" id="campaign_template_pagination_div"></div>
+            </div>
+            
+
+            <div id="table_no_data_found" class="table-no-data-found-div-wrapper tag-template-no-data-height">
+                <div class="no-data-svg-text-div">
+                    <svg class="no-data-svg" width="121" height="85" viewBox="0 0 121 85" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g clip-path="url(#clip0_1_1896)">
+                        <path d="M106.903 84.5572H14.0485L27.4747 8.41204H120.329L106.903 84.5572Z" fill="#F2F8FF"/>
+                        <path d="M59.2541 0.526333H28.8651L27.4747 8.41205H59.9962L59.2541 0.526333Z" fill="#F2F8FF"/>
+                        <path d="M59.9962 8.41205H27.4747L28.8651 0.526333H59.2541L59.9962 8.41205Z" fill="#E1E7EF"/>
+                        <path d="M106.903 84.5572H14.0484L27.4747 8.41204H120.329L118.929 16.3514L115.8 34.0995L106.903 84.5572Z" fill="#E1E7EF"/>
+                        <path d="M106.767 84.5572H13.712L0.5 11.1765H93.5548L106.767 84.5572Z" fill="#F1F5F9"/>
+                        <path d="M36.6133 52.167C36.6133 54.3031 34.8817 56.0348 32.7456 56.0348C30.6095 56.0348 28.8779 54.3031 28.8779 52.167C28.8779 50.0309 30.6095 48.2993 32.7456 48.2993C34.8817 48.2993 36.6133 50.0309 36.6133 52.167Z" fill="#17282F"/>
+                        <path d="M67.1889 52.167C67.1889 54.3031 65.4569 56.0348 63.3208 56.0348C61.1851 56.0348 59.4531 54.3031 59.4531 52.167C59.4531 50.0309 61.1851 48.2993 63.3208 48.2993C65.4569 48.2993 67.1889 50.0309 67.1889 52.167Z" fill="#17282F"/>
+                        <path d="M53.5886 56.6522L53.3762 56.2472C53.357 56.2106 51.3589 52.5175 47.3385 52.5175C43.6719 52.5175 42.7781 55.9948 42.7418 56.143L42.6333 56.5861L41.7464 56.3718L41.8531 55.9281C41.8635 55.8851 42.9426 51.6032 47.3385 51.6032C51.9212 51.6032 54.0957 55.6505 54.1859 55.823L54.3983 56.2277L53.5886 56.6522Z" fill="#17282F"/>
+                        </g>
+                        <defs>
+                        <clipPath id="clip0_1_1896">
+                        <rect width="120" height="84.1143" fill="white" transform="translate(0.5 0.442841)"/>
+                        </clipPath>
+                        </defs>
+                    </svg>
+                    <p class="no-data-text">No Data Found</p>
+                        
+                </div>
+            </div>
+        </div>
+        <!-- <div class="card-footer">
+            <p class="save-campaign-error" id="save-campaign-error-message"></p>
+            <div class="footer-content-right">
+                <button class="btn btn-text-only btn-width-100" data-toggle="modal" data-target="#cancel_create_campaign_modal">Cancel</button>
+                <button class="btn btn-outline-primary btn-save-outline-primary btn-width-100" onclick="add_template_to_campaign(this, [])">Save as Draft</button>
+                <button class="btn btn-primary btn-next-primary btn-width-100" id="save_template_next_btn" onclick="set_template_variables()">Next</button>
+            </div>
+        </div> -->
+    </div>
+    <footer id="campaign-footer" class="sticky-footer bg-white w-100">
+        <div class="card" id="footer-buttons" style="margin: 0 -25px;">
+            <div class="card-body py-2" >
+                <div class="d-flex justify-content-end">
+                    <button class="btn btn-outline-secondary rounded btn-width-100 rect-border" data-toggle="modal"
+                        data-target="#cancel_create_campaign_modal">Cancel</button>
+                    <button
+                        class="btn btn-outline-primary rounded btn-save-outline-primary btn-width-100 rect-border"
+                        style="margin: 0 12px !important;" onclick="add_template_to_campaign(this, [])">Save as
+                        Draft</button>
+                    <button class="btn btn-primary rounded btn-next-primary btn-width-100 rect-border"
+                        id="save_template_next_btn" onclick="set_template_variables()">Next</button>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<div class="modal fade custom_modal" id="cancel_create_campaign_modal" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row">
+                    <div class="col-10">
+                        <h5 class="modal-title">Do you want to leave this page?</h5>
+                    </div>
+                    <div class="col-2" style="text-align: right;">
+                        <button class="btn" type="button" data-dismiss="modal" style="padding: 0!important">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13.4931 0.710017C13.3063 0.522765 13.0526 0.417532 12.7881 0.417532C12.5236 0.417532 12.2699 0.522765 12.0831 0.710017L7.19309 5.59002L2.30309 0.700017C2.11625 0.512765 1.8626 0.407532 1.59809 0.407532C1.33357 0.407532 1.07992 0.512765 0.893086 0.700017C0.503086 1.09002 0.503086 1.72002 0.893086 2.11002L5.78309 7.00002L0.893086 11.89C0.503086 12.28 0.503086 12.91 0.893086 13.3C1.28309 13.69 1.91309 13.69 2.30309 13.3L7.19309 8.41002L12.0831 13.3C12.4731 13.69 13.1031 13.69 13.4931 13.3C13.8831 12.91 13.8831 12.28 13.4931 11.89L8.60309 7.00002L13.4931 2.11002C13.8731 1.73002 13.8731 1.09002 13.4931 0.710017Z" fill="black" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <p>Changes you have made may not be saved. Please click "Save as Draft" to save the changes.</p>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-danger btn-width-100" href="/campaign/dashboard/?bot_pk={{ selected_bot_obj.pk }}" style="cursor:pointer">Leave</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade custom_modal" id="campaign_meta_data_table" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row">
+                    <div class="col-10">
+                        <h5 class="modal-title">Edit Table Columns</h5>
+                    </div>
+                    <div class="col-2" style="text-align: right;">
+                        <button class="btn" type="button" data-dismiss="modal" style="padding: 0!important">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13.4931 0.710017C13.3063 0.522765 13.0526 0.417532 12.7881 0.417532C12.5236 0.417532 12.2699 0.522765 12.0831 0.710017L7.19309 5.59002L2.30309 0.700017C2.11625 0.512765 1.8626 0.407532 1.59809 0.407532C1.33357 0.407532 1.07992 0.512765 0.893086 0.700017C0.503086 1.09002 0.503086 1.72002 0.893086 2.11002L5.78309 7.00002L0.893086 11.89C0.503086 12.28 0.503086 12.91 0.893086 13.3C1.28309 13.69 1.91309 13.69 2.30309 13.3L7.19309 8.41002L12.0831 13.3C12.4731 13.69 13.1031 13.69 13.4931 13.3C13.8831 12.91 13.8831 12.28 13.4931 11.89L8.60309 7.00002L13.4931 2.11002C13.8731 1.73002 13.8731 1.09002 13.4931 0.710017Z" fill="black"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="tms-noselect" id="lead_data_table_meta_div">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary btn-width-100" type="button" data-dismiss="modal" onclick="save_campaign_template_table_metadata()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade upload_file_modal custom_modal" id="upload_template_modal" tabindex="-1" role="dialog" aria-labelledby="document_upload_modal_modal_label" aria-hidden="true">
+    {% if channel == 'RCS' %}
+    <div id="new-message-template-create-modal">
+    <div class="message-template-modal-new">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="row">
+                        <div class="col-10">
+                            <h5 class="modal-title" id="modal_title_heading">New Template</h5>
+                        </div>
+                        <div class="col-2" style="text-align: right; padding-right: 1;">
+                            <button class="btn" type="button" data-dismiss="modal" style="padding: 0!important">
+                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M13.4931 0.710017C13.3063 0.522765 13.0526 0.417532 12.7881 0.417532C12.5236 0.417532 12.2699 0.522765 12.0831 0.710017L7.19309 5.59002L2.30309 0.700017C2.11625 0.512765 1.8626 0.407532 1.59809 0.407532C1.33357 0.407532 1.07992 0.512765 0.893086 0.700017C0.503086 1.09002 0.503086 1.72002 0.893086 2.11002L5.78309 7.00002L0.893086 11.89C0.503086 12.28 0.503086 12.91 0.893086 13.3C1.28309 13.69 1.91309 13.69 2.30309 13.3L7.19309 8.41002L12.0831 13.3C12.4731 13.69 13.1031 13.69 13.4931 13.3C13.8831 12.91 13.8831 12.28 13.4931 11.89L8.60309 7.00002L13.4931 2.11002C13.8731 1.73002 13.8731 1.09002 13.4931 0.710017Z" fill="black"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <p class="mb-0 heading-text">Template Name <span class="text-danger">*</span>
+                                <sup class="ml-2">
+                                    <svg data-toggle="tooltip" data-placement="top"
+                                        title="Template Name cannot be changed once you save the template."
+                                        width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" clip-rule="evenodd"
+                                            d="M14.4001 7.99998C14.4001 9.69736 13.7258 11.3252 12.5256 12.5255C11.3253 13.7257 9.69748 14.4 8.0001 14.4C6.30271 14.4 4.67485 13.7257 3.47461 12.5255C2.27438 11.3252 1.6001 9.69736 1.6001 7.99998C1.6001 6.30259 2.27438 4.67472 3.47461 3.47449C4.67485 2.27426 6.30271 1.59998 8.0001 1.59998C9.69748 1.59998 11.3253 2.27426 12.5256 3.47449C13.7258 4.67472 14.4001 6.30259 14.4001 7.99998ZM8.0001 5.59998C7.85954 5.59984 7.72142 5.63674 7.59966 5.70696C7.47789 5.77718 7.37678 5.87825 7.3065 5.99998C7.25575 6.09428 7.18659 6.17743 7.10311 6.2445C7.01963 6.31158 6.92353 6.36121 6.82051 6.39046C6.71749 6.4197 6.60965 6.42797 6.50338 6.41476C6.39711 6.40156 6.29457 6.36715 6.20184 6.31358C6.10912 6.26002 6.02809 6.18837 5.96356 6.10291C5.89904 6.01744 5.85233 5.91989 5.8262 5.81604C5.80007 5.71219 5.79506 5.60415 5.81147 5.49832C5.82787 5.3925 5.86536 5.29104 5.9217 5.19998C6.18587 4.74247 6.59362 4.3849 7.08172 4.18275C7.56981 3.98059 8.11097 3.94512 8.62127 4.08186C9.13157 4.2186 9.5825 4.51989 9.90412 4.93901C10.2257 5.35814 10.4001 5.87167 10.4001 6.39998C10.4002 6.89647 10.2465 7.3808 9.95991 7.78626C9.67336 8.19172 9.26816 8.49837 8.8001 8.66398V8.79998C8.8001 9.01215 8.71581 9.21563 8.56578 9.36566C8.41575 9.51569 8.21227 9.59998 8.0001 9.59998C7.78792 9.59998 7.58444 9.51569 7.43441 9.36566C7.28438 9.21563 7.2001 9.01215 7.2001 8.79998V7.99998C7.2001 7.7878 7.28438 7.58432 7.43441 7.43429C7.58444 7.28426 7.78792 7.19998 8.0001 7.19998C8.21227 7.19998 8.41575 7.11569 8.56578 6.96566C8.71581 6.81563 8.8001 6.61215 8.8001 6.39998C8.8001 6.1878 8.71581 5.98432 8.56578 5.83429C8.41575 5.68426 8.21227 5.59998 8.0001 5.59998ZM8.0001 12C8.21227 12 8.41575 11.9157 8.56578 11.7657C8.71581 11.6156 8.8001 11.4121 8.8001 11.2C8.8001 10.9878 8.71581 10.7843 8.56578 10.6343C8.41575 10.4843 8.21227 10.4 8.0001 10.4C7.78792 10.4 7.58444 10.4843 7.43441 10.6343C7.28438 10.7843 7.2001 10.9878 7.2001 11.2C7.2001 11.4121 7.28438 11.6156 7.43441 11.7657C7.58444 11.9157 7.78792 12 8.0001 12Z"
+                                            fill="#2D2D2D" />
+                                    </svg>
+                                </sup>
+                            </p>
+                            <input type="text" id="rcs_template_name" class="template_input w-100"  placeholder="Template Name">
+                        </div>
+                        <div class="col-sm-12 mt-3">
+                            <p class="mb-0 heading-text">Message Type <span class="text-danger">*</span>
+                                <sup class="ml-2">
+                                    <svg data-toggle="tooltip" data-placement="top"
+                                        title="Message Type cannot be changed once you save the template."
+                                        width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" clip-rule="evenodd"
+                                            d="M14.4001 7.99998C14.4001 9.69736 13.7258 11.3252 12.5256 12.5255C11.3253 13.7257 9.69748 14.4 8.0001 14.4C6.30271 14.4 4.67485 13.7257 3.47461 12.5255C2.27438 11.3252 1.6001 9.69736 1.6001 7.99998C1.6001 6.30259 2.27438 4.67472 3.47461 3.47449C4.67485 2.27426 6.30271 1.59998 8.0001 1.59998C9.69748 1.59998 11.3253 2.27426 12.5256 3.47449C13.7258 4.67472 14.4001 6.30259 14.4001 7.99998ZM8.0001 5.59998C7.85954 5.59984 7.72142 5.63674 7.59966 5.70696C7.47789 5.77718 7.37678 5.87825 7.3065 5.99998C7.25575 6.09428 7.18659 6.17743 7.10311 6.2445C7.01963 6.31158 6.92353 6.36121 6.82051 6.39046C6.71749 6.4197 6.60965 6.42797 6.50338 6.41476C6.39711 6.40156 6.29457 6.36715 6.20184 6.31358C6.10912 6.26002 6.02809 6.18837 5.96356 6.10291C5.89904 6.01744 5.85233 5.91989 5.8262 5.81604C5.80007 5.71219 5.79506 5.60415 5.81147 5.49832C5.82787 5.3925 5.86536 5.29104 5.9217 5.19998C6.18587 4.74247 6.59362 4.3849 7.08172 4.18275C7.56981 3.98059 8.11097 3.94512 8.62127 4.08186C9.13157 4.2186 9.5825 4.51989 9.90412 4.93901C10.2257 5.35814 10.4001 5.87167 10.4001 6.39998C10.4002 6.89647 10.2465 7.3808 9.95991 7.78626C9.67336 8.19172 9.26816 8.49837 8.8001 8.66398V8.79998C8.8001 9.01215 8.71581 9.21563 8.56578 9.36566C8.41575 9.51569 8.21227 9.59998 8.0001 9.59998C7.78792 9.59998 7.58444 9.51569 7.43441 9.36566C7.28438 9.21563 7.2001 9.01215 7.2001 8.79998V7.99998C7.2001 7.7878 7.28438 7.58432 7.43441 7.43429C7.58444 7.28426 7.78792 7.19998 8.0001 7.19998C8.21227 7.19998 8.41575 7.11569 8.56578 6.96566C8.71581 6.81563 8.8001 6.61215 8.8001 6.39998C8.8001 6.1878 8.71581 5.98432 8.56578 5.83429C8.41575 5.68426 8.21227 5.59998 8.0001 5.59998ZM8.0001 12C8.21227 12 8.41575 11.9157 8.56578 11.7657C8.71581 11.6156 8.8001 11.4121 8.8001 11.2C8.8001 10.9878 8.71581 10.7843 8.56578 10.6343C8.41575 10.4843 8.21227 10.4 8.0001 10.4C7.78792 10.4 7.58444 10.4843 7.43441 10.6343C7.28438 10.7843 7.2001 10.9878 7.2001 11.2C7.2001 11.4121 7.28438 11.6156 7.43441 11.7657C7.58444 11.9157 7.78792 12 8.0001 12Z"
+                                            fill="#2D2D2D" />
+                                    </svg>
+                                </sup>
+                            </p>
+                            <div class="wrap-drop mt-3" id="select-message-type-dropdown">
+                                <span id="select-text-value">Text</span>
+                                <ul class="drop">
+                                    <li class="select-message-type-dropdown__list-item selected" data-value="1"><a>Text</a></li>
+                                    <li class="select-message-type-dropdown__list-item" data-value="2"><a>Media</a></li>
+                                    <li class="select-message-type-dropdown__list-item" data-value="3"><a>Rich Card</a></li>
+                                    <li class="select-message-type-dropdown__list-item" data-value="4"><a>Carousel</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="message-type-text-div w-100">
+                            <div class="col-sm-12  mt-3">
+                                <p class="mb-0 heading-text">Message text <span class="text-danger">*</span></p>
+                                <textarea class="w-100 message-text-input" id="message-text-user-input" maxlength="2000" placeholder="Enter your text"></textarea>
+                                <p class="mb-0 text-right input-length"><span class="font-weight-bold" id="current-text-length">0</span> <span class="text-secondary">/ 2000</span></p>
+                            </div>
+                            <div class="col-sm-12" id="uploaded_template_file_errors" style="display: none;">
+                                <p>Uploaded File contains following error(s):</p>
+                            </div>
+                        </div>
+                        <div class="message-type-media-div w-100 d-none">
+                            <div class="col-sm-12 mt-3">
+                                <p class="mb-0 heading-text">Media URL <span class="text-danger">*</span>
+                                    <sup class="ml-2">
+                                        <svg data-toggle="tooltip" data-placement="top"
+                                            title="URL types like Text and HTTP are not supported. Please use a valid URL type like JPEG, JPG, GIF, and PNG for images or H263, M4V, MP4, MPEG, MPEG4, and WebM for videos."
+                                            width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M14.4001 7.99998C14.4001 9.69736 13.7258 11.3252 12.5256 12.5255C11.3253 13.7257 9.69748 14.4 8.0001 14.4C6.30271 14.4 4.67485 13.7257 3.47461 12.5255C2.27438 11.3252 1.6001 9.69736 1.6001 7.99998C1.6001 6.30259 2.27438 4.67472 3.47461 3.47449C4.67485 2.27426 6.30271 1.59998 8.0001 1.59998C9.69748 1.59998 11.3253 2.27426 12.5256 3.47449C13.7258 4.67472 14.4001 6.30259 14.4001 7.99998ZM8.0001 5.59998C7.85954 5.59984 7.72142 5.63674 7.59966 5.70696C7.47789 5.77718 7.37678 5.87825 7.3065 5.99998C7.25575 6.09428 7.18659 6.17743 7.10311 6.2445C7.01963 6.31158 6.92353 6.36121 6.82051 6.39046C6.71749 6.4197 6.60965 6.42797 6.50338 6.41476C6.39711 6.40156 6.29457 6.36715 6.20184 6.31358C6.10912 6.26002 6.02809 6.18837 5.96356 6.10291C5.89904 6.01744 5.85233 5.91989 5.8262 5.81604C5.80007 5.71219 5.79506 5.60415 5.81147 5.49832C5.82787 5.3925 5.86536 5.29104 5.9217 5.19998C6.18587 4.74247 6.59362 4.3849 7.08172 4.18275C7.56981 3.98059 8.11097 3.94512 8.62127 4.08186C9.13157 4.2186 9.5825 4.51989 9.90412 4.93901C10.2257 5.35814 10.4001 5.87167 10.4001 6.39998C10.4002 6.89647 10.2465 7.3808 9.95991 7.78626C9.67336 8.19172 9.26816 8.49837 8.8001 8.66398V8.79998C8.8001 9.01215 8.71581 9.21563 8.56578 9.36566C8.41575 9.51569 8.21227 9.59998 8.0001 9.59998C7.78792 9.59998 7.58444 9.51569 7.43441 9.36566C7.28438 9.21563 7.2001 9.01215 7.2001 8.79998V7.99998C7.2001 7.7878 7.28438 7.58432 7.43441 7.43429C7.58444 7.28426 7.78792 7.19998 8.0001 7.19998C8.21227 7.19998 8.41575 7.11569 8.56578 6.96566C8.71581 6.81563 8.8001 6.61215 8.8001 6.39998C8.8001 6.1878 8.71581 5.98432 8.56578 5.83429C8.41575 5.68426 8.21227 5.59998 8.0001 5.59998ZM8.0001 12C8.21227 12 8.41575 11.9157 8.56578 11.7657C8.71581 11.6156 8.8001 11.4121 8.8001 11.2C8.8001 10.9878 8.71581 10.7843 8.56578 10.6343C8.41575 10.4843 8.21227 10.4 8.0001 10.4C7.78792 10.4 7.58444 10.4843 7.43441 10.6343C7.28438 10.7843 7.2001 10.9878 7.2001 11.2C7.2001 11.4121 7.28438 11.6156 7.43441 11.7657C7.58444 11.9157 7.78792 12 8.0001 12Z"
+                                                fill="#2D2D2D" />
+                                        </svg>
+                                    </sup>
+                                <span class="sub-info-text">(Min. Resolution 770*335, Max Resolution 1440*720)</span></p>
+                                <input type="text" class="template_input w-100 media-url-input" id="rcs_media_url" placeholder="Enter a valid public URL">
+                                <span class="preview-media-logo" style="display: none;">
+                                    <a href="" class="redirect-url" target="_blank">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M7.25019 4.5H10.7496C11.1638 4.5 11.4996 4.83579 11.4996 5.25C11.4996 5.6297 11.2174 5.94349 10.8513 5.99315L10.7496 6H7.24983C6.07088 5.99944 5.10359 6.90639 5.00795 8.06095L5.00037 8.21986L5.00321 16.7505C5.00352 17.9414 5.92894 18.9159 7.09975 18.9948L7.2538 18.9999L15.7519 18.9882C16.9416 18.9866 17.9146 18.0618 17.9936 16.8921L17.9988 16.7382V13.2319C17.9988 12.8177 18.3346 12.4819 18.7488 12.4819C19.1285 12.4819 19.4423 12.7641 19.4919 13.1302L19.4988 13.2319V16.7382C19.4988 18.7405 17.9294 20.3767 15.9529 20.4828L15.7539 20.4882L7.25836 20.4999L7.05504 20.4948C5.14248 20.3952 3.60904 18.8626 3.50846 16.95L3.50321 16.7509L3.50098 8.25253L3.50539 8.05003C3.60548 6.13732 5.13876 4.60432 7.05105 4.50511L7.25019 4.5H10.7496H7.25019ZM14.0037 3L20.0543 3.00146L20.1539 3.01152L20.2356 3.02756L20.3432 3.05991L20.4617 3.11196L20.5146 3.14222C20.7742 3.29719 20.9571 3.56642 20.9945 3.88033L21.0016 4V10.007C21.0016 10.5593 20.5539 11.007 20.0016 11.007C19.4888 11.007 19.0661 10.621 19.0084 10.1236L19.0016 10.007L19.001 6.413L12.7072 12.7071C12.3467 13.0676 11.7795 13.0953 11.3872 12.7903L11.293 12.7071C10.9325 12.3466 10.9048 11.7794 11.2098 11.3871L11.293 11.2929L17.585 5H14.0037C13.4909 5 13.0682 4.61396 13.0105 4.11662L13.0037 4C13.0037 3.44772 13.4514 3 14.0037 3Z" fill="#7B7A7B"/>
+                                        </svg>
+                                    </a>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="combined-message-type-container w-100 mt-4 d-none">
+                            <div class="message-type-rich-card mt-4 w-100 d-none">
+                                <div class="col-sm-12 mt-4">
+                                    <div class="d-flex justify-content-between">
+                                        <p class="mb-0 heading-text">Card Title <span
+                                                class="text-danger">*</span></p>
+                                        <p class="mb-0 text-right input-length"><span
+                                                class="font-weight-bold rich-card-title-count">0</span> <span
+                                                class="text-secondary">/ 50</span></p>
+                                    </div>
+                        
+                                    <input type="text" class="template_input w-100 mt-1 card-title-text" id="rcs_rich_card_title" placeholder="Card Title" maxlength="50">
+                                </div>
+                                <div class="col-sm-12 mt-4">
+                                    <p class="mb-0 heading-text">Image/Video URL <span
+                                            class="text-danger">*</span>
+                                            <sup class="ml-2">
+                                                <svg data-toggle="tooltip" data-placement="top"
+                                                    title="URL types like Text and HTTP are not supported. Please use a valid URL type like JPEG, JPG, GIF, and PNG for images or H263, M4V, MP4, MPEG, MPEG4, and WebM for videos."
+                                                    width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg">
+                                                    <path fill-rule="evenodd" clip-rule="evenodd"
+                                                        d="M14.4001 7.99998C14.4001 9.69736 13.7258 11.3252 12.5256 12.5255C11.3253 13.7257 9.69748 14.4 8.0001 14.4C6.30271 14.4 4.67485 13.7257 3.47461 12.5255C2.27438 11.3252 1.6001 9.69736 1.6001 7.99998C1.6001 6.30259 2.27438 4.67472 3.47461 3.47449C4.67485 2.27426 6.30271 1.59998 8.0001 1.59998C9.69748 1.59998 11.3253 2.27426 12.5256 3.47449C13.7258 4.67472 14.4001 6.30259 14.4001 7.99998ZM8.0001 5.59998C7.85954 5.59984 7.72142 5.63674 7.59966 5.70696C7.47789 5.77718 7.37678 5.87825 7.3065 5.99998C7.25575 6.09428 7.18659 6.17743 7.10311 6.2445C7.01963 6.31158 6.92353 6.36121 6.82051 6.39046C6.71749 6.4197 6.60965 6.42797 6.50338 6.41476C6.39711 6.40156 6.29457 6.36715 6.20184 6.31358C6.10912 6.26002 6.02809 6.18837 5.96356 6.10291C5.89904 6.01744 5.85233 5.91989 5.8262 5.81604C5.80007 5.71219 5.79506 5.60415 5.81147 5.49832C5.82787 5.3925 5.86536 5.29104 5.9217 5.19998C6.18587 4.74247 6.59362 4.3849 7.08172 4.18275C7.56981 3.98059 8.11097 3.94512 8.62127 4.08186C9.13157 4.2186 9.5825 4.51989 9.90412 4.93901C10.2257 5.35814 10.4001 5.87167 10.4001 6.39998C10.4002 6.89647 10.2465 7.3808 9.95991 7.78626C9.67336 8.19172 9.26816 8.49837 8.8001 8.66398V8.79998C8.8001 9.01215 8.71581 9.21563 8.56578 9.36566C8.41575 9.51569 8.21227 9.59998 8.0001 9.59998C7.78792 9.59998 7.58444 9.51569 7.43441 9.36566C7.28438 9.21563 7.2001 9.01215 7.2001 8.79998V7.99998C7.2001 7.7878 7.28438 7.58432 7.43441 7.43429C7.58444 7.28426 7.78792 7.19998 8.0001 7.19998C8.21227 7.19998 8.41575 7.11569 8.56578 6.96566C8.71581 6.81563 8.8001 6.61215 8.8001 6.39998C8.8001 6.1878 8.71581 5.98432 8.56578 5.83429C8.41575 5.68426 8.21227 5.59998 8.0001 5.59998ZM8.0001 12C8.21227 12 8.41575 11.9157 8.56578 11.7657C8.71581 11.6156 8.8001 11.4121 8.8001 11.2C8.8001 10.9878 8.71581 10.7843 8.56578 10.6343C8.41575 10.4843 8.21227 10.4 8.0001 10.4C7.78792 10.4 7.58444 10.4843 7.43441 10.6343C7.28438 10.7843 7.2001 10.9878 7.2001 11.2C7.2001 11.4121 7.28438 11.6156 7.43441 11.7657C7.58444 11.9157 7.78792 12 8.0001 12Z"
+                                                        fill="#2D2D2D" />
+                                                </svg>
+                                            </sup> <span
+                                            class="sub-info-text">(Min. Resolution 770*335, Max
+                                            Resolution 1440*720)</span></p>
+                                    <input type="text" class="template_input w-100 mt-3 media-url-input" id="rcs_rich_card_media_url" placeholder="Enter a valid public URL">
+                                    <span class="preview-media-logo" style="display: none;">
+                                        <a href="/" target="_blank" id="rich_card_url">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <path
+                                                    d="M7.25019 4.5H10.7496C11.1638 4.5 11.4996 4.83579 11.4996 5.25C11.4996 5.6297 11.2174 5.94349 10.8513 5.99315L10.7496 6H7.24983C6.07088 5.99944 5.10359 6.90639 5.00795 8.06095L5.00037 8.21986L5.00321 16.7505C5.00352 17.9414 5.92894 18.9159 7.09975 18.9948L7.2538 18.9999L15.7519 18.9882C16.9416 18.9866 17.9146 18.0618 17.9936 16.8921L17.9988 16.7382V13.2319C17.9988 12.8177 18.3346 12.4819 18.7488 12.4819C19.1285 12.4819 19.4423 12.7641 19.4919 13.1302L19.4988 13.2319V16.7382C19.4988 18.7405 17.9294 20.3767 15.9529 20.4828L15.7539 20.4882L7.25836 20.4999L7.05504 20.4948C5.14248 20.3952 3.60904 18.8626 3.50846 16.95L3.50321 16.7509L3.50098 8.25253L3.50539 8.05003C3.60548 6.13732 5.13876 4.60432 7.05105 4.50511L7.25019 4.5H10.7496H7.25019ZM14.0037 3L20.0543 3.00146L20.1539 3.01152L20.2356 3.02756L20.3432 3.05991L20.4617 3.11196L20.5146 3.14222C20.7742 3.29719 20.9571 3.56642 20.9945 3.88033L21.0016 4V10.007C21.0016 10.5593 20.5539 11.007 20.0016 11.007C19.4888 11.007 19.0661 10.621 19.0084 10.1236L19.0016 10.007L19.001 6.413L12.7072 12.7071C12.3467 13.0676 11.7795 13.0953 11.3872 12.7903L11.293 12.7071C10.9325 12.3466 10.9048 11.7794 11.2098 11.3871L11.293 11.2929L17.585 5H14.0037C13.4909 5 13.0682 4.61396 13.0105 4.11662L13.0037 4C13.0037 3.44772 13.4514 3 14.0037 3Z"
+                                                    fill="#7B7A7B" />
+                                            </svg>
+                                        </a>
+                                    </span>
+                                </div>
+                                <div class="col-sm-12 mt-4">
+                                    <p class="mb-0 heading-text">Card Description <span
+                                            class="text-danger">*</span></p>
+                        
+                                    <textarea class="w-100 message-text-input"
+                                        id="card-description-text" maxlength="1000"
+                                        placeholder="Enter card description"></textarea>
+                                    <p class="mb-0 text-right input-length"><span
+                                            class="font-weight-bold "
+                                            id="card-text-description-count">0</span> <span
+                                            class="text-secondary">/ 1000</span></p>
+                        
+                                </div>
+                                <div class="add-card-reply  mt-4 mb-3 px-3 d-flex align-items-center justify-content-between">
+                                    <p class="mb-0 heading-text" style="padding-right: 10px;">Add Card Reply
+                                        <sup class="ml-2">
+                                            <svg data-toggle="tooltip" data-placement="top"
+                                                title="To add suggested replies in rich cards/ carousels."
+                                                width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                                    d="M14.4001 7.99998C14.4001 9.69736 13.7258 11.3252 12.5256 12.5255C11.3253 13.7257 9.69748 14.4 8.0001 14.4C6.30271 14.4 4.67485 13.7257 3.47461 12.5255C2.27438 11.3252 1.6001 9.69736 1.6001 7.99998C1.6001 6.30259 2.27438 4.67472 3.47461 3.47449C4.67485 2.27426 6.30271 1.59998 8.0001 1.59998C9.69748 1.59998 11.3253 2.27426 12.5256 3.47449C13.7258 4.67472 14.4001 6.30259 14.4001 7.99998ZM8.0001 5.59998C7.85954 5.59984 7.72142 5.63674 7.59966 5.70696C7.47789 5.77718 7.37678 5.87825 7.3065 5.99998C7.25575 6.09428 7.18659 6.17743 7.10311 6.2445C7.01963 6.31158 6.92353 6.36121 6.82051 6.39046C6.71749 6.4197 6.60965 6.42797 6.50338 6.41476C6.39711 6.40156 6.29457 6.36715 6.20184 6.31358C6.10912 6.26002 6.02809 6.18837 5.96356 6.10291C5.89904 6.01744 5.85233 5.91989 5.8262 5.81604C5.80007 5.71219 5.79506 5.60415 5.81147 5.49832C5.82787 5.3925 5.86536 5.29104 5.9217 5.19998C6.18587 4.74247 6.59362 4.3849 7.08172 4.18275C7.56981 3.98059 8.11097 3.94512 8.62127 4.08186C9.13157 4.2186 9.5825 4.51989 9.90412 4.93901C10.2257 5.35814 10.4001 5.87167 10.4001 6.39998C10.4002 6.89647 10.2465 7.3808 9.95991 7.78626C9.67336 8.19172 9.26816 8.49837 8.8001 8.66398V8.79998C8.8001 9.01215 8.71581 9.21563 8.56578 9.36566C8.41575 9.51569 8.21227 9.59998 8.0001 9.59998C7.78792 9.59998 7.58444 9.51569 7.43441 9.36566C7.28438 9.21563 7.2001 9.01215 7.2001 8.79998V7.99998C7.2001 7.7878 7.28438 7.58432 7.43441 7.43429C7.58444 7.28426 7.78792 7.19998 8.0001 7.19998C8.21227 7.19998 8.41575 7.11569 8.56578 6.96566C8.71581 6.81563 8.8001 6.61215 8.8001 6.39998C8.8001 6.1878 8.71581 5.98432 8.56578 5.83429C8.41575 5.68426 8.21227 5.59998 8.0001 5.59998ZM8.0001 12C8.21227 12 8.41575 11.9157 8.56578 11.7657C8.71581 11.6156 8.8001 11.4121 8.8001 11.2C8.8001 10.9878 8.71581 10.7843 8.56578 10.6343C8.41575 10.4843 8.21227 10.4 8.0001 10.4C7.78792 10.4 7.58444 10.4843 7.43441 10.6343C7.28438 10.7843 7.2001 10.9878 7.2001 11.2C7.2001 11.4121 7.28438 11.6156 7.43441 11.7657C7.58444 11.9157 7.78792 12 8.0001 12Z"
+                                                    fill="#2D2D2D" />
+                                            </svg>
+                                        </sup>
+                                        <br>
+                                        <span style="color:#5e5b5b; font-size: 12px">Note - A flow will be triggered based on the Postback text added, so make sure you add a valid text that initiates a correct intent.</span>
+                                    </p>
+                                    <!-- sprint 5.7 -->
+                                    <div class="btn-group custom-dropdown-add-reply">
+                                        <button type="button"
+                                            class="btn btn-primary dropdown-toggle rect-border"
+                                            data-toggle="dropdown" aria-expanded="false">
+                                            Add Reply
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item" id="simple-reply-rich-card-caraousel">Simple
+                                                Reply</a>
+                                            <a class="dropdown-item" id="open-url-rich-card-caraousel">Open URL
+                                                Action</a>
+                                            <a class="dropdown-item" id="dail-action-rich-card-caraousel">Dial
+                                                Action</a>
+                                            <a class="dropdown-item" id="share-loaction-rich-card-caraousel">Share
+                                                Location Action</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="accordion mb-3" id="AccordionRichCard">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="message-type-carousel w-100 d-none">
+                                <div class="add-card-dynamic-box my-4 mx-2">
+                                    <ul class="nav nav-pills custom-nav-tab" id="pills-tab" role="tablist">
+                                        <li class="nav-item" id="card_static-card">
+                                            <a href="#static-card" id="static-cards-tab" class="custom-link"
+                                            data-toggle="pill" role="tab" aria-controls="static-card" aria-selected="false">
+                                                <button class="show-button selected" ><span class="btn_title text-truncate" id="pills_card_title_static-card">Card Title</span>
+                                                    <span class="show-button1" >
+                                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M14 10L13.7 17M10.3 17L10 10M6 6L6.87554 19.133C6.94558 20.1836 7.81818 21 8.87111 21H15.1289C16.1818 21 17.0544 20.1836 17.1245 19.133L18 6M6 6H9M6 6H4M18 6H20M18 6H15M15 6V5C15 3.89543 14.1046 3 13 3H11C9.89543 3 9 3.89543 9 5V6M15 6H9" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                        </span>
+                                                        </button>
+                                                
+                                                        <button class="hide-button selected">
+                                                        <span class="btn_title">Delete</span>
+                                                        <span class="btn_title1 hide-button1">
+                                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M4.2097 4.3871L4.29289 4.29289C4.65338 3.93241 5.22061 3.90468 5.6129 4.2097L5.70711 4.29289L12 10.585L18.2929 4.29289C18.6834 3.90237 19.3166 3.90237 19.7071 4.29289C20.0976 4.68342 20.0976 5.31658 19.7071 5.70711L13.415 12L19.7071 18.2929C20.0676 18.6534 20.0953 19.2206 19.7903 19.6129L19.7071 19.7071C19.3466 20.0676 18.7794 20.0953 18.3871 19.7903L18.2929 19.7071L12 13.415L5.70711 19.7071C5.31658 20.0976 4.68342 20.0976 4.29289 19.7071C3.90237 19.3166 3.90237 18.6834 4.29289 18.2929L10.585 12L4.29289 5.70711C3.93241 5.34662 3.90468 4.77939 4.2097 4.3871L4.29289 4.29289L4.2097 4.3871Z" fill="white"/>
+                                                        </svg>
+                                                        </span>
+                                                        <span class="btn_title1 closeCard" id="remove_static-card">
+                                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M8.5 16.5858L4.70711 12.7929C4.31658 12.4024 3.68342 12.4024 3.29289 12.7929C2.90237 13.1834 2.90237 13.8166 3.29289 14.2071L7.79289 18.7071C8.18342 19.0976 8.81658 19.0976 9.20711 18.7071L20.2071 7.70711C20.5976 7.31658 20.5976 6.68342 20.2071 6.29289C19.8166 5.90237 19.1834 5.90237 18.7929 6.29289L8.5 16.5858Z" fill="white"/>
+                                                        </svg>
+                                                
+                                                        </span>
+                                                    </button> 
+                                                </a>                                            
+                                            </li>
+                                            <div id="add_card_div">
+                                                <button class="add-card-button"
+                                                    id="add-dynamic-card-button"><svg width="14" height="14"
+                                                        viewBox="0 0 14 14" fill="none"
+                                                        xmlns="http://www.w3.org/2000/svg">
+                                                        <path
+                                                            d="M13 8H8V13C8 13.55 7.55 14 7 14C6.45 14 6 13.55 6 13V8H1C0.45 8 0 7.55 0 7C0 6.45 0.45 6 1 6H6V1C6 0.45 6.45 0 7 0C7.55 0 8 0.45 8 1V6H13C13.55 6 14 6.45 14 7C14 7.55 13.55 8 13 8Z"
+                                                            fill="#0254D7" />
+                                                    </svg>
+                                                    <span>Add Card</span>
+                                                </button>
+                                            </div>
+                                    </ul>
+                                </div>
+                                <div class="create-card-div col-sm-12 px-0">
+                                    <div class="tab-content" id="pills-tabContent">
+                                        <div class="tab-pane active" id="static-card" role="tabpanel" aria-labelledby="static-cards-tab">
+                                            <div class="col-sm-12 mt-4">
+                                                <div class="d-flex justify-content-between">
+                                                    <p class="mb-0 heading-text">Card Title <span
+                                                            class="text-danger">*</span></p>
+                                                    <p class="mb-0 text-right input-length"><span
+                                                            class="font-weight-bold card-title-count">0</span>
+                                                        <span class="text-secondary">/ 50</span></p>
+                                                </div>
+
+                                                <input type="text"
+                                                    class="template_input w-100 mt-1 card-title-text"
+                                                    placeholder="Card Title" id="caraousel_card_title_static-card">
+                                            </div>
+                                            <div class="col-sm-12 mt-4">
+                                                <p class="mb-0 heading-text">Image/Video URL <span
+                                                        class="text-danger">*</span> 
+                                                        <sup class="ml-2">
+                                                            <svg data-toggle="tooltip" data-placement="top"
+                                                                title="URL types like Text and HTTP are not supported. Please use a valid URL type like JPEG, JPG, GIF, and PNG for images or H263, M4V, MP4, MPEG, MPEG4, and WebM for videos."
+                                                                width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                                                xmlns="http://www.w3.org/2000/svg">
+                                                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                    d="M14.4001 7.99998C14.4001 9.69736 13.7258 11.3252 12.5256 12.5255C11.3253 13.7257 9.69748 14.4 8.0001 14.4C6.30271 14.4 4.67485 13.7257 3.47461 12.5255C2.27438 11.3252 1.6001 9.69736 1.6001 7.99998C1.6001 6.30259 2.27438 4.67472 3.47461 3.47449C4.67485 2.27426 6.30271 1.59998 8.0001 1.59998C9.69748 1.59998 11.3253 2.27426 12.5256 3.47449C13.7258 4.67472 14.4001 6.30259 14.4001 7.99998ZM8.0001 5.59998C7.85954 5.59984 7.72142 5.63674 7.59966 5.70696C7.47789 5.77718 7.37678 5.87825 7.3065 5.99998C7.25575 6.09428 7.18659 6.17743 7.10311 6.2445C7.01963 6.31158 6.92353 6.36121 6.82051 6.39046C6.71749 6.4197 6.60965 6.42797 6.50338 6.41476C6.39711 6.40156 6.29457 6.36715 6.20184 6.31358C6.10912 6.26002 6.02809 6.18837 5.96356 6.10291C5.89904 6.01744 5.85233 5.91989 5.8262 5.81604C5.80007 5.71219 5.79506 5.60415 5.81147 5.49832C5.82787 5.3925 5.86536 5.29104 5.9217 5.19998C6.18587 4.74247 6.59362 4.3849 7.08172 4.18275C7.56981 3.98059 8.11097 3.94512 8.62127 4.08186C9.13157 4.2186 9.5825 4.51989 9.90412 4.93901C10.2257 5.35814 10.4001 5.87167 10.4001 6.39998C10.4002 6.89647 10.2465 7.3808 9.95991 7.78626C9.67336 8.19172 9.26816 8.49837 8.8001 8.66398V8.79998C8.8001 9.01215 8.71581 9.21563 8.56578 9.36566C8.41575 9.51569 8.21227 9.59998 8.0001 9.59998C7.78792 9.59998 7.58444 9.51569 7.43441 9.36566C7.28438 9.21563 7.2001 9.01215 7.2001 8.79998V7.99998C7.2001 7.7878 7.28438 7.58432 7.43441 7.43429C7.58444 7.28426 7.78792 7.19998 8.0001 7.19998C8.21227 7.19998 8.41575 7.11569 8.56578 6.96566C8.71581 6.81563 8.8001 6.61215 8.8001 6.39998C8.8001 6.1878 8.71581 5.98432 8.56578 5.83429C8.41575 5.68426 8.21227 5.59998 8.0001 5.59998ZM8.0001 12C8.21227 12 8.41575 11.9157 8.56578 11.7657C8.71581 11.6156 8.8001 11.4121 8.8001 11.2C8.8001 10.9878 8.71581 10.7843 8.56578 10.6343C8.41575 10.4843 8.21227 10.4 8.0001 10.4C7.78792 10.4 7.58444 10.4843 7.43441 10.6343C7.28438 10.7843 7.2001 10.9878 7.2001 11.2C7.2001 11.4121 7.28438 11.6156 7.43441 11.7657C7.58444 11.9157 7.78792 12 8.0001 12Z"
+                                                                    fill="#2D2D2D" />
+                                                            </svg>
+                                                        </sup><span
+                                                        class=" sub-info-text">(Min. Resolution 770*335, Max
+                                                        Resolution 1440*720)</span></p>
+                                                <input type="text"
+                                                    class="template_input w-100 mt-3 media-url-input"
+                                                    placeholder="Enter a valid public URL" id="caraousel_media_url_static-card">
+
+                                                <span class="preview-media-logo" style="display: none;">
+                                                    <a href="/" target="_blank">
+                                                        <svg width="20" height="20" viewBox="0 0 24 24"
+                                                            fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path
+                                                                d="M7.25019 4.5H10.7496C11.1638 4.5 11.4996 4.83579 11.4996 5.25C11.4996 5.6297 11.2174 5.94349 10.8513 5.99315L10.7496 6H7.24983C6.07088 5.99944 5.10359 6.90639 5.00795 8.06095L5.00037 8.21986L5.00321 16.7505C5.00352 17.9414 5.92894 18.9159 7.09975 18.9948L7.2538 18.9999L15.7519 18.9882C16.9416 18.9866 17.9146 18.0618 17.9936 16.8921L17.9988 16.7382V13.2319C17.9988 12.8177 18.3346 12.4819 18.7488 12.4819C19.1285 12.4819 19.4423 12.7641 19.4919 13.1302L19.4988 13.2319V16.7382C19.4988 18.7405 17.9294 20.3767 15.9529 20.4828L15.7539 20.4882L7.25836 20.4999L7.05504 20.4948C5.14248 20.3952 3.60904 18.8626 3.50846 16.95L3.50321 16.7509L3.50098 8.25253L3.50539 8.05003C3.60548 6.13732 5.13876 4.60432 7.05105 4.50511L7.25019 4.5H10.7496H7.25019ZM14.0037 3L20.0543 3.00146L20.1539 3.01152L20.2356 3.02756L20.3432 3.05991L20.4617 3.11196L20.5146 3.14222C20.7742 3.29719 20.9571 3.56642 20.9945 3.88033L21.0016 4V10.007C21.0016 10.5593 20.5539 11.007 20.0016 11.007C19.4888 11.007 19.0661 10.621 19.0084 10.1236L19.0016 10.007L19.001 6.413L12.7072 12.7071C12.3467 13.0676 11.7795 13.0953 11.3872 12.7903L11.293 12.7071C10.9325 12.3466 10.9048 11.7794 11.2098 11.3871L11.293 11.2929L17.585 5H14.0037C13.4909 5 13.0682 4.61396 13.0105 4.11662L13.0037 4C13.0037 3.44772 13.4514 3 14.0037 3Z"
+                                                                fill="#7B7A7B" />
+                                                        </svg>
+                                                    </a>
+                                                </span>
+                                            </div>
+                                            <div class="col-sm-12 mt-4">
+                                                <p class="mb-0 heading-text">Card Description <span
+                                                        class="text-danger">*</span></p>
+                                                <textarea class="w-100 message-text-input"
+                                                    id="caraousel_card_description_static-card" maxlength="1000"
+                                                    placeholder="Enter card description"></textarea>
+                                                <p class="mb-0 text-right input-length"><span
+                                                        class="font-weight-bold"
+                                                        id="caraousel-card-text-description-count">0</span> <span
+                                                        class="text-secondary">/ 1000</span></p>
+                                            </div>
+                                            <div class="add-card-reply  mt-4 mb-3 px-3 d-flex align-items-center justify-content-between">
+                                                <p class="mb-0 heading-text">Add Card Reply
+                                                    <sup class="ml-2">
+                                                        <svg data-toggle="tooltip" data-placement="top"
+                                                            title="To add suggested replies in rich cards/ carousels."
+                                                            width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                                            xmlns="http://www.w3.org/2000/svg">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                d="M14.4001 7.99998C14.4001 9.69736 13.7258 11.3252 12.5256 12.5255C11.3253 13.7257 9.69748 14.4 8.0001 14.4C6.30271 14.4 4.67485 13.7257 3.47461 12.5255C2.27438 11.3252 1.6001 9.69736 1.6001 7.99998C1.6001 6.30259 2.27438 4.67472 3.47461 3.47449C4.67485 2.27426 6.30271 1.59998 8.0001 1.59998C9.69748 1.59998 11.3253 2.27426 12.5256 3.47449C13.7258 4.67472 14.4001 6.30259 14.4001 7.99998ZM8.0001 5.59998C7.85954 5.59984 7.72142 5.63674 7.59966 5.70696C7.47789 5.77718 7.37678 5.87825 7.3065 5.99998C7.25575 6.09428 7.18659 6.17743 7.10311 6.2445C7.01963 6.31158 6.92353 6.36121 6.82051 6.39046C6.71749 6.4197 6.60965 6.42797 6.50338 6.41476C6.39711 6.40156 6.29457 6.36715 6.20184 6.31358C6.10912 6.26002 6.02809 6.18837 5.96356 6.10291C5.89904 6.01744 5.85233 5.91989 5.8262 5.81604C5.80007 5.71219 5.79506 5.60415 5.81147 5.49832C5.82787 5.3925 5.86536 5.29104 5.9217 5.19998C6.18587 4.74247 6.59362 4.3849 7.08172 4.18275C7.56981 3.98059 8.11097 3.94512 8.62127 4.08186C9.13157 4.2186 9.5825 4.51989 9.90412 4.93901C10.2257 5.35814 10.4001 5.87167 10.4001 6.39998C10.4002 6.89647 10.2465 7.3808 9.95991 7.78626C9.67336 8.19172 9.26816 8.49837 8.8001 8.66398V8.79998C8.8001 9.01215 8.71581 9.21563 8.56578 9.36566C8.41575 9.51569 8.21227 9.59998 8.0001 9.59998C7.78792 9.59998 7.58444 9.51569 7.43441 9.36566C7.28438 9.21563 7.2001 9.01215 7.2001 8.79998V7.99998C7.2001 7.7878 7.28438 7.58432 7.43441 7.43429C7.58444 7.28426 7.78792 7.19998 8.0001 7.19998C8.21227 7.19998 8.41575 7.11569 8.56578 6.96566C8.71581 6.81563 8.8001 6.61215 8.8001 6.39998C8.8001 6.1878 8.71581 5.98432 8.56578 5.83429C8.41575 5.68426 8.21227 5.59998 8.0001 5.59998ZM8.0001 12C8.21227 12 8.41575 11.9157 8.56578 11.7657C8.71581 11.6156 8.8001 11.4121 8.8001 11.2C8.8001 10.9878 8.71581 10.7843 8.56578 10.6343C8.41575 10.4843 8.21227 10.4 8.0001 10.4C7.78792 10.4 7.58444 10.4843 7.43441 10.6343C7.28438 10.7843 7.2001 10.9878 7.2001 11.2C7.2001 11.4121 7.28438 11.6156 7.43441 11.7657C7.58444 11.9157 7.78792 12 8.0001 12Z"
+                                                                fill="#2D2D2D" />
+                                                        </svg>
+                                                    </sup>
+                                                </p>
+                                                <!-- sprint 5.7 -->
+                                                <div class="btn-group custom-dropdown-add-reply">
+                                                    <button type="button"
+                                                        class="btn btn-primary dropdown-toggle rect-border"
+                                                        data-toggle="dropdown" aria-expanded="false">
+                                                        Add Reply
+                                                    </button>
+                                                    <!-- <div class="dropdown-menu">
+                                                        <a class="dropdown-item" id="simple-reply-caraousel">Simple
+                                                            Reply</a>
+                                                        <a class="dropdown-item" id="open-url-caraousel">Open URL
+                                                            Action</a>
+                                                        <a class="dropdown-item" id="dail-action-caraousel">Dial
+                                                            Action</a>
+                                                        <a class="dropdown-item" id="share-loaction-caraousel">Share
+                                                            Location Action</a>
+                                                    </div> -->
+                                                    <div class="dropdown-menu">
+                                                        <a class="dropdown-item simple-reply-caraousel">Simple
+                                                            Reply</a>
+                                                        <a class="dropdown-item open-url-caraousel">Open URL
+                                                            Action</a>
+                                                        <a class="dropdown-item dail-action-caraousel">Dial
+                                                            Action</a>
+                                                        <a class="dropdown-item share-loaction-caraousel">Share
+                                                            Location Action</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 dynamic-append-div">
+                                                <div class="accordion mb-3 carouseldynamicaccordion" id="Carouselaccordion">
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="add-card-suggested-reply w-100 mt-4 d-flex align-items-center justify-content-between">
+                            <p class="mb-0 heading-text" style="padding-right: 10px;">Add Suggested Reply
+                                <sup class="ml-2">
+                                    <svg data-toggle="tooltip" data-placement="top" title="To add suggested replies in suggestion chip lists." width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M14.4001 7.99998C14.4001 9.69736 13.7258 11.3252 12.5256 12.5255C11.3253 13.7257 9.69748 14.4 8.0001 14.4C6.30271 14.4 4.67485 13.7257 3.47461 12.5255C2.27438 11.3252 1.6001 9.69736 1.6001 7.99998C1.6001 6.30259 2.27438 4.67472 3.47461 3.47449C4.67485 2.27426 6.30271 1.59998 8.0001 1.59998C9.69748 1.59998 11.3253 2.27426 12.5256 3.47449C13.7258 4.67472 14.4001 6.30259 14.4001 7.99998ZM8.0001 5.59998C7.85954 5.59984 7.72142 5.63674 7.59966 5.70696C7.47789 5.77718 7.37678 5.87825 7.3065 5.99998C7.25575 6.09428 7.18659 6.17743 7.10311 6.2445C7.01963 6.31158 6.92353 6.36121 6.82051 6.39046C6.71749 6.4197 6.60965 6.42797 6.50338 6.41476C6.39711 6.40156 6.29457 6.36715 6.20184 6.31358C6.10912 6.26002 6.02809 6.18837 5.96356 6.10291C5.89904 6.01744 5.85233 5.91989 5.8262 5.81604C5.80007 5.71219 5.79506 5.60415 5.81147 5.49832C5.82787 5.3925 5.86536 5.29104 5.9217 5.19998C6.18587 4.74247 6.59362 4.3849 7.08172 4.18275C7.56981 3.98059 8.11097 3.94512 8.62127 4.08186C9.13157 4.2186 9.5825 4.51989 9.90412 4.93901C10.2257 5.35814 10.4001 5.87167 10.4001 6.39998C10.4002 6.89647 10.2465 7.3808 9.95991 7.78626C9.67336 8.19172 9.26816 8.49837 8.8001 8.66398V8.79998C8.8001 9.01215 8.71581 9.21563 8.56578 9.36566C8.41575 9.51569 8.21227 9.59998 8.0001 9.59998C7.78792 9.59998 7.58444 9.51569 7.43441 9.36566C7.28438 9.21563 7.2001 9.01215 7.2001 8.79998V7.99998C7.2001 7.7878 7.28438 7.58432 7.43441 7.43429C7.58444 7.28426 7.78792 7.19998 8.0001 7.19998C8.21227 7.19998 8.41575 7.11569 8.56578 6.96566C8.71581 6.81563 8.8001 6.61215 8.8001 6.39998C8.8001 6.1878 8.71581 5.98432 8.56578 5.83429C8.41575 5.68426 8.21227 5.59998 8.0001 5.59998ZM8.0001 12C8.21227 12 8.41575 11.9157 8.56578 11.7657C8.71581 11.6156 8.8001 11.4121 8.8001 11.2C8.8001 10.9878 8.71581 10.7843 8.56578 10.6343C8.41575 10.4843 8.21227 10.4 8.0001 10.4C7.78792 10.4 7.58444 10.4843 7.43441 10.6343C7.28438 10.7843 7.2001 10.9878 7.2001 11.2C7.2001 11.4121 7.28438 11.6156 7.43441 11.7657C7.58444 11.9157 7.78792 12 8.0001 12Z" fill="#2D2D2D"/>
+                                    </svg>
+                                </sup>
+                                <br>
+                                <span style="color:#5e5b5b; font-size: 12px">Note - A flow will be triggered based on the Postback text added, so make sure you add a valid text that initiates a correct intent.</span>
+                            </p>
+                            <!-- sprint 5.7 -->
+                            <div class="btn-group custom-dropdown-add-reply">
+                                <button type="button" class="btn btn-primary dropdown-toggle rect-border" data-toggle="dropdown" aria-expanded="false">
+                                    Add Reply
+                                </button>
+                                <div class="dropdown-menu">
+                                <a class="dropdown-item" id="simple-reply-action">Simple Reply</a>
+                                <a class="dropdown-item" id="open-url-option">Open URL Action</a>
+                                <a class="dropdown-item" id="dail-action">Dial Action</a>
+                                <a class="dropdown-item" id="share-loaction-action">Share Location Action</a>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="accordion" id="accordiondynamic">
+                            </div>
+                        </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary rect-border" id="save_template_btn" onclick="save_rcs_campaign_template(this, false)">Save Template</button>
+            </div>
+        </div>
+    </div> </div> </div>
+    {% else %}
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row">
+                    <div class="col-10">
+                        <h5 class="modal-title">Upload Template</h5>
+                    </div>
+                    <div class="col-2" style="text-align: right;">
+                        <button class="btn" type="button" data-dismiss="modal" style="padding: 0!important">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13.4931 0.710017C13.3063 0.522765 13.0526 0.417532 12.7881 0.417532C12.5236 0.417532 12.2699 0.522765 12.0831 0.710017L7.19309 5.59002L2.30309 0.700017C2.11625 0.512765 1.8626 0.407532 1.59809 0.407532C1.33357 0.407532 1.07992 0.512765 0.893086 0.700017C0.503086 1.09002 0.503086 1.72002 0.893086 2.11002L5.78309 7.00002L0.893086 11.89C0.503086 12.28 0.503086 12.91 0.893086 13.3C1.28309 13.69 1.91309 13.69 2.30309 13.3L7.19309 8.41002L12.0831 13.3C12.4731 13.69 13.1031 13.69 13.4931 13.3C13.8831 12.91 13.8831 12.28 13.4931 11.89L8.60309 7.00002L13.4931 2.11002C13.8731 1.73002 13.8731 1.09002 13.4931 0.710017Z" fill="black"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="note-text-div">
+                        <p class="mb-0">Note : The message template format is changed to the newer version, please download and use the latest message template.</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 mt-3">
+                        <div class="campaign-file-upload-div-wrapper">
+                            <label for="campaign-template-file-upload" class="custom-file-upload">
+                                Choose Template File
+                            </label>
+                            <label class="No-File-Selected-Yet" id="no-file-selected-yet">
+                                No File Selected Yet
+                            </label>
+                        </div>
+                        <input type="file" id="campaign-template-file-upload" class="form-control" name="" style="display: none !important;" onclick="this.value=null;" accept=".xls, .xlsx">
+                    </div>
+                    <div class="col-md-12 col-sm-12 modal-upload-file"  id="file_upload_bar" style="display:none;">
+                        <div class="file-wrapper-div" id="file-wrapper-div-error-id">
+                            <div class="d-flex" style="gap:8px">
+                            <div class="d-flex center"style="align-items: center;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <mask id="mask0_112_16131" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
+                                    <rect width="24" height="24" fill="#C4C4C4"/>
+                                    </mask>
+                                    <g mask="url(#mask0_112_16131)">
+                                    <path d="M11.5 22C9.96667 22 8.66667 21.4667 7.6 20.4C6.53333 19.3333 6 18.0333 6 16.5V6C6 4.9 6.39167 3.95833 7.175 3.175C7.95833 2.39167 8.9 2 10 2C11.1 2 12.0417 2.39167 12.825 3.175C13.6083 3.95833 14 4.9 14 6V15.5C14 16.2 13.7583 16.7917 13.275 17.275C12.7917 17.7583 12.2 18 11.5 18C10.8 18 10.2083 17.7583 9.725 17.275C9.24167 16.7917 9 16.2 9 15.5V6.75C9 6.53333 9.071 6.35433 9.213 6.213C9.35433 6.071 9.53333 6 9.75 6C9.96667 6 10.146 6.071 10.288 6.213C10.4293 6.35433 10.5 6.53333 10.5 6.75V15.5C10.5 15.7833 10.596 16.0207 10.788 16.212C10.9793 16.404 11.2167 16.5 11.5 16.5C11.7833 16.5 12.021 16.404 12.213 16.212C12.4043 16.0207 12.5 15.7833 12.5 15.5V6C12.5 5.3 12.2583 4.70833 11.775 4.225C11.2917 3.74167 10.7 3.5 10 3.5C9.3 3.5 8.70833 3.74167 8.225 4.225C7.74167 4.70833 7.5 5.3 7.5 6V16.5C7.5 17.6 7.89167 18.5417 8.675 19.325C9.45833 20.1083 10.4 20.5 11.5 20.5C12.6 20.5 13.5417 20.1083 14.325 19.325C15.1083 18.5417 15.5 17.6 15.5 16.5V6.75C15.5 6.53333 15.571 6.35433 15.713 6.213C15.8543 6.071 16.0333 6 16.25 6C16.4667 6 16.646 6.071 16.788 6.213C16.9293 6.35433 17 6.53333 17 6.75V16.5C17 18.0333 16.4667 19.3333 15.4 20.4C14.3333 21.4667 13.0333 22 11.5 22Z" fill="#4d4d4d"/>
+                                    </g>
+                                    </svg>
+                                    
+                            </div>
+                            <div>
+                                <h3 class="heding-section-text file-name-div"></h3>
+                                <p class="sub-heding-section-text" id="sub-heding-section-text" style="color: #4D4D4D"></p>
+                            </div>
+                          </div>
+                            <button id="close-note"type="button" onclick="remove_uploaded_template_file();">
+                                <svg width="16"style="cursor: pointer;" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M2.2301 2L13.7699 14" stroke="#2D2D2D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M13.7699 2L2.23007 14" stroke="#2D2D2D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>  
+                            </button>
+                           
+                        </div>
+                 <div class="download-error-file-btn-wrapper" id="download-error-file-btn-id" style="display:none;">
+                    <a class="download-error-file-btn" id="download-batch-error-file"> Download Error File </a>
+                 </div> 
+                    </div>
+
+                    <div class="col-sm-12">
+                        <div class="note-text-div--red" id="campaign_template_input_error">
+
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="col-sm-12" id="uploaded_template_file_errors" style="display: none;">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" id="modal_tms_image_buttons">
+                <button class="btn btn-text-only download-template-btn" id="download_campaign_batch_template" onclick="download_sample_campaign_template()" type="button" style="color: #3662c5 !important;">Download Message Template</button>
+                <button class="btn btn-primary campaign-primary-button-custom btn-width-100" id="template_upload_btn" onclick="upload_campaign_template_file(this)">Upload</button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="modal fade upload_file_modal no-data-found-modal custom_modal" id="no-data-found-modal" tabindex="-1" role="dialog" aria-labelledby="document_upload_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row">
+                    <div class="col-10">
+                        <h5 class="modal-title" id="upload-batch-modal-title">No Data Found</h5>
+                    </div>
+                    <div class="col-2" style="text-align: right;">
+                        <button class="btn" type="button" data-dismiss="modal" style="padding: 0!important">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13.4931 0.710017C13.3063 0.522765 13.0526 0.417532 12.7881 0.417532C12.5236 0.417532 12.2699 0.522765 12.0831 0.710017L7.19309 5.59002L2.30309 0.700017C2.11625 0.512765 1.8626 0.407532 1.59809 0.407532C1.33357 0.407532 1.07992 0.512765 0.893086 0.700017C0.503086 1.09002 0.503086 1.72002 0.893086 2.11002L5.78309 7.00002L0.893086 11.89C0.503086 12.28 0.503086 12.91 0.893086 13.3C1.28309 13.69 1.91309 13.69 2.30309 13.3L7.19309 8.41002L12.0831 13.3C12.4731 13.69 13.1031 13.69 13.4931 13.3C13.8831 12.91 13.8831 12.28 13.4931 11.89L8.60309 7.00002L13.4931 2.11002C13.8731 1.73002 13.8731 1.09002 13.4931 0.710017Z" fill="black"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="row" id="upload-batch-div"> 
+                  
+                    <div class="col-sm-12">
+                        <div class="note-text-div no-data-found-div-wrapper">
+                            <p class="mb-0">Uploaded File: <span style="color:#2D2D2D;font-weight: 500;" id="no-data-found-file"></span></p>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="note-text-div--white no-data-found-div-wrapper">
+                            <p class="mb-0">There is no data available in the uploaded sheet. Please check and re-upload the correct Message Template file.</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="note-text-div--yellow no-data-found-div-wrapper">
+                            <p class="mb-0"><span style="font-weight: 700;">Note:</span> Note: Make sure you have downloaded and using the latest version of the Message Template file.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary btn-width-100" onclick="open_upload_template_modal()">Re-Upload Template File</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Batch Modal -->
+
+<div class="modal fade custom_modal" id="delete_campaign_template_modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row">
+                    <div class="col-10">
+                        <h5 class="modal-title">Delete Template</h5>
+                    </div>
+                    <div class="col-2" style="text-align: right; padding-right: 1">
+                        <button class="btn" type="button" data-dismiss="modal" style="padding: 0!important">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13.4931 0.710017C13.3063 0.522765 13.0526 0.417532 12.7881 0.417532C12.5236 0.417532 12.2699 0.522765 12.0831 0.710017L7.19309 5.59002L2.30309 0.700017C2.11625 0.512765 1.8626 0.407532 1.59809 0.407532C1.33357 0.407532 1.07992 0.512765 0.893086 0.700017C0.503086 1.09002 0.503086 1.72002 0.893086 2.11002L5.78309 7.00002L0.893086 11.89C0.503086 12.28 0.503086 12.91 0.893086 13.3C1.28309 13.69 1.91309 13.69 2.30309 13.3L7.19309 8.41002L12.0831 13.3C12.4731 13.69 13.1031 13.69 13.4931 13.3C13.8831 12.91 13.8831 12.28 13.4931 11.89L8.60309 7.00002L13.4931 2.11002C13.8731 1.73002 13.8731 1.09002 13.4931 0.710017Z" fill="black"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <p>Do you really want to delete this template?</p>
+                <p id="delete-template-error-msg"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger btn-width-100" onclick="delete_campaign_template(this)" id="delete_template_btn">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade new-batch-modal custom_modal" id="new_template_uploaded_modal" tabindex="-1" role="dialog" aria-labelledby="document_upload_modal_modal_label" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row">
+                    <div class="col-10">
+                        <h5 class="modal-title">New Template</h5>
+                    </div>
+                    <div class="col-2" style="text-align: right; padding-right: 1">
+                        <button class="btn" type="button" data-dismiss="modal" style="padding: 0!important" onclick="open_upload_template_modal()">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13.4931 0.710017C13.3063 0.522765 13.0526 0.417532 12.7881 0.417532C12.5236 0.417532 12.2699 0.522765 12.0831 0.710017L7.19309 5.59002L2.30309 0.700017C2.11625 0.512765 1.8626 0.407532 1.59809 0.407532C1.33357 0.407532 1.07992 0.512765 0.893086 0.700017C0.503086 1.09002 0.503086 1.72002 0.893086 2.11002L5.78309 7.00002L0.893086 11.89C0.503086 12.28 0.503086 12.91 0.893086 13.3C1.28309 13.69 1.91309 13.69 2.30309 13.3L7.19309 8.41002L12.0831 13.3C12.4731 13.69 13.1031 13.69 13.4931 13.3C13.8831 12.91 13.8831 12.28 13.4931 11.89L8.60309 7.00002L13.4931 2.11002C13.8731 1.73002 13.8731 1.09002 13.4931 0.710017Z" fill="black"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="new-batch-name-div align-center">
+                            <div class="new-batch-header">
+                                <p>Uploaded File:&nbsp </p>
+                                <p id="new-template-file-name"></p>
+                            </div>
+                            <svg onclick="delete_template_file()" style="cursor: pointer;" width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8.75016 0C10.1783 0 11.3442 1.12265 11.4136 2.53357L11.4168 2.66667H14.7502C15.1184 2.66667 15.4168 2.96514 15.4168 3.33333C15.4168 3.67522 15.1595 3.95701 14.8279 3.99551L14.7502 4H14.1842L13.3976 13.702C13.2923 15.0001 12.2081 16 10.9058 16H6.59456C5.29219 16 4.20799 15.0001 4.10274 13.702L3.3155 4H2.75016C2.40827 4 2.12649 3.74264 2.08798 3.41108L2.0835 3.33333C2.0835 2.99144 2.34086 2.70966 2.67242 2.67115L2.75016 2.66667H6.0835C6.0835 1.19391 7.2774 0 8.75016 0ZM7.25016 6.16667C6.99703 6.16667 6.78784 6.35477 6.75473 6.59882L6.75016 6.66667V12L6.75473 12.0678C6.78784 12.3119 6.99703 12.5 7.25016 12.5C7.50329 12.5 7.71249 12.3119 7.7456 12.0678L7.75016 12V6.66667L7.7456 6.59882C7.71249 6.35477 7.50329 6.16667 7.25016 6.16667ZM10.2502 6.16667C9.99703 6.16667 9.78784 6.35477 9.75473 6.59882L9.75016 6.66667V12L9.75473 12.0678C9.78784 12.3119 9.99703 12.5 10.2502 12.5C10.5033 12.5 10.7125 12.3119 10.7456 12.0678L10.7502 12V6.66667L10.7456 6.59882C10.7125 6.35477 10.5033 6.16667 10.2502 6.16667ZM8.75016 1.33333C8.04726 1.33333 7.47139 1.87725 7.42049 2.56716L7.41683 2.66667H10.0835L10.0798 2.56716C10.0289 1.87725 9.45307 1.33333 8.75016 1.33333Z" fill="#E53E3E"></path>
+                            </svg>
+                            <input type="hidden" id="new_template_file_path" />
+                        </div>
+                    </div>
+                    <div class="col-sm-12" style="height: 2.5rem">
+                        <p style="padding: 1rem 0rem; font-weight: 500;">Message Template Preview</p>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="note-text-div--red" id="save-template-error-message">
+
+                        </div>
+                    </div>
+                    <div class="col-sm-12 table-background-div">
+                        <div class="new-batch-table-preview-div" >
+                            <table class='table dataTable no-footer' id="new_template_table_div">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" style="background-color: white !important; width: 135px;"><p>Type </p></th>
+                                        <th scope="col" style="background-color: white !important; width: 212px;"><p class="add_alert_svg_in_template_header_lang"></p></th>
+                                        <th scope="col" style="background-color: white !important; width: 283px;"><p class="add_alert_svg_in_template_header_temp_name"></p></th>
+                                        <th scope="col" style="background-color: white !important; width: 235px;"><p>Category </p></th>
+                                        <th scope="col" style="background-color: white !important; width: 370px;"><p>Message Body Template </p></th>
+                                        <th scope="col" style="background-color: white !important; width: 300px;"><p>Message Header Template </p></th>
+                                        <th scope="col" style="background-color: white !important; width: 300px;"><p>Message Footer Template </p></th>
+                                        <th scope="col" style="background-color: white !important; width: 300px;"><p>Button Type </p></th>
+                                        <th scope="col" style="background-color: white !important; width: 300px;"><p>Website Button Text </p></th>
+                                        <th scope="col" style="background-color: white !important; width: 300px;"><p>Website URL </p></th>
+                                        <th scope="col" style="background-color: white !important; width: 300px;"><p>Call Us Button Text </p></th>
+                                        <th scope="col" style="background-color: white !important; width: 300px;"><p>Phone Number </p></th>
+                                        <th scope="col" style="background-color: white !important; width: 300px;"><p>Quick Reply 1 </p></th>
+                                        <th scope="col" style="background-color: white !important; width: 300px;"><p>Quick Reply 2 </p></th>
+                                        <th scope="col" style="background-color: white !important; width: 300px;"><p>Quick Reply 3 </p></th>
+                                        <th scope="col" style="background-color: white !important; width: 300px;"><p>Attachment URL </p></th>
+                                        <th scope="col" style="background-color: white !important; width: 300px;"><p>Document File Name </p></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary btn-save-template-btn btn-width-100" id="save_template_btn"  onclick="save_campaign_template(this)">Save Template</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade new-batch-modal custom_modal" id="edit_campaign_template_modal" tabindex="-1" role="dialog" aria-labelledby="document_upload_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row">
+                    <div class="col-10">
+                        <h5 class="modal-title">Template Details</h5>
+                    </div>
+                    <div class="col-2" style="text-align: right; padding-right: 1">
+                        <button class="btn" type="button" data-dismiss="modal" style="padding: 0!important">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13.4931 0.710017C13.3063 0.522765 13.0526 0.417532 12.7881 0.417532C12.5236 0.417532 12.2699 0.522765 12.0831 0.710017L7.19309 5.59002L2.30309 0.700017C2.11625 0.512765 1.8626 0.407532 1.59809 0.407532C1.33357 0.407532 1.07992 0.512765 0.893086 0.700017C0.503086 1.09002 0.503086 1.72002 0.893086 2.11002L5.78309 7.00002L0.893086 11.89C0.503086 12.28 0.503086 12.91 0.893086 13.3C1.28309 13.69 1.91309 13.69 2.30309 13.3L7.19309 8.41002L12.0831 13.3C12.4731 13.69 13.1031 13.69 13.4931 13.3C13.8831 12.91 13.8831 12.28 13.4931 11.89L8.60309 7.00002L13.4931 2.11002C13.8731 1.73002 13.8731 1.09002 13.4931 0.710017Z" fill="black"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12 p-0">
+                        <div class="new-batch-name-div align-center">
+                            <div class="new-batch-header">
+                                <p>Template Name:&nbsp </p>
+                                <p id="edit-template-name"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 table-background-div">
+                        <div class="new-batch-table-preview-div" id="edit_template_table_div">
+                            <table class='table'id="edit_template_table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" style="background-color: white !important;width: 135px;"><p>Type </p></th>
+                                        <th scope="col" style="background-color: white !important;width: 212px;"><p>Language </p></th>
+                                        <th scope="col" style="background-color: white !important;width: 283px;"><p>Template Name </p></th>
+                                        <th scope="col" style="background-color: white !important;width: 235px;"><p>Category </p></th>
+                                        <th scope="col" style="background-color: white !important;width: 370px;"><p>Message Body Template </p></th>
+                                        <th scope="col" style="background-color: white !important;width: 300px;"><p>Message Header Template </p></th>
+                                        <th scope="col" style="background-color: white !important;width: 300px;"><p>Message Footer Template </p></th>
+                                        <th scope="col" style="background-color: white !important;width: 300px;"><p>Button Type </p></th>
+                                        <th scope="col" style="background-color: white !important;width: 300px;"><p>Website Button Text </p></th>
+                                        <th scope="col" style="background-color: white !important;width: 300px;"><p>Website URL </p></th>
+                                        <th scope="col" style="background-color: white !important;width: 300px;"><p>Call Us Button Text </p></th>
+                                        <th scope="col" style="background-color: white !important;width: 300px;"><p>Phone Number </p></th>
+                                        <th scope="col" style="background-color: white !important;width: 300px;"><p>Quick Reply 1 </p></th>
+                                        <th scope="col" style="background-color: white !important;width: 300px;"><p>Quick Reply 2 </p></th>
+                                        <th scope="col" style="background-color: white !important;width: 300px;"><p>Quick Reply 3 </p></th>
+                                        <th scope="col" style="background-color: white !important;width: 300px;"><p>Attachment URL </p></th>
+                                        <th scope="col" style="background-color: white !important;width: 300px;"><p>Document File Name</p></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Select template variable custom modal here -->
+{% include 'CampaignApp/select_template_variable_modal.html' %}
+
+<script>
+    window.HEADER_FIELDS = {{header_fields|safe}};
+    window.VARIABLES = {{variables|safe}};
+    window.CTA_VARIABLES = {{cta_variables|safe}};
+    window.HEADER_VARIABLE = {{header_variable|safe}}
+    window.CAMPAIGN_CHANNEL = '{{channel}}'
+    window.SELECTED_TEMPLATE_PK = {{selected_template_pk|safe}};
+    $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+    })
+    if(CAMPAIGN_CHANNEL == 'RCS'){
+        $('#caraousel_card_title_static-card').focusout(function () {
+            let card_title = $('#caraousel_card_title_static-card').val()
+            if (card_title.trim() == '') {
+                $('#pills_card_title_static-card').text('Card Title')
+            } else {
+                $('#pills_card_title_static-card').text($('#caraousel_card_title_static-card').val())
+            }
+        })
+
+        $('#rcs_rich_card_title').keyup(function(e) {
+            $('.rich-card-title-count').text(this.value.length)
+        });
+        $('#card-description-text').keyup(function(e) {
+            $('#card-text-description-count').text(this.value.length)
+        });
+        $('#message-text-user-input').keyup(function(e) {
+            $('#current-text-length').text(this.value.length)
+        });
+    }
+
+</script>
+<script src="{% static 'CampaignApp/js/easyassist_custom_select2.js' %}?v={% random_int 1 100 %}" defer="true"></script>
+<script src="{% static 'CampaignApp/js/campaign_template.js' %}?v={% random_int 1 100 %}" defer="true"></script>
+<script>
+    
+    </script>
+{% if channel == 'RCS' %}
+    <script src="{% static 'CampaignApp/js/rcs_campaign_template.js' %}?v={% random_int 1 100 %}" defer="true"></script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,102 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>EasyAssist | Agent Page</title>
+	{% if request.user.enable_s3_bucket %}
+	<link rel="icon" href="https://static.allincall.in/static/EasyAssistApp/img/favicon.png" type="image/png" sizes="16x16">
+    <link type="text/css" rel="stylesheet" media="screen,projection" href="https://static.allincall.in/static/EasyAssistApp/css/materialize.min.css">
+	{% else %}
+	<link rel="icon" href="{% static 'EasyAssistApp/img/favicon.png' %}" type="image/png" sizes="16x16">
+    <link type="text/css" rel="stylesheet" media="screen,projection" href="{% static 'EasyAssistApp/css/materialize.min.css' %}">
+	{% endif %}
+
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+        <style>
+          /*table tbody, table thead
+          {
+              display: block;
+          }*/
+
+          table tbody 
+          {
+              overflow: auto;
+              height: 75vh;
+          }
+        </style>
+</head>
+<body>
+
+	<div class="row">
+
+		<div class="col s3" style="position:fixed; height:100vh; background-color: rgba(242,242,242,0.5);">
+			<span style="display: block;text-align: center;margin: 16% auto 0 auto;">
+                                {% if form_obj.image_url %}
+			        <img alt="Image" src="{{form_obj.image_url}}"  style="width: 200px;height: 100px;object-fit: contain;text-align: center;">
+   			        {% else %}
+                                <img alt="Image" src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcRMxB2BXLzyCSxVh_gpFFxUywbftMCo6IOV-fwulYRyBrlPFSlI" height="64" width="68" style="width: 150px;height: 100px;object-fit: contain;text-align: center;">                                
+                                {% endif%}
+                        </span>
+			<table class="easyassist_side_table" >
+				<thead>
+					<tr>
+						<th scope="col" colspan="2" style=" text-align: center;font-size: larger;"><hr>Customer Information</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>Customer Name</td>
+						<td>{{ screen_cast_obj.client_name }}</td>
+					</tr>
+					<tr>
+						<td>Customer Mobile Number</td>
+						<td>{{ screen_cast_obj.client_mobile_number }}</td>
+					</tr>
+					<tr>
+						<td>Customer ID</td>
+						<td>{{ screen_cast_obj.client_id }}</td>
+					</tr>
+					<tr>
+						<td>Form URL</td>
+						<td><a href="{{ screen_cast_obj.website_url }}" target="_blank"><u>click here</a></u></td>
+					</tr>
+                                        <tr>
+                                            <td colspan="2">
+                                                <a class="btn purple lighten-4 black-text center" href="/easy-assist/dashboard/?filter=unresolved">Back To Dashboard</a>
+                                            </td>
+                                        </tr>
+				</tbody>
+			</table>	
+		</div>
+			
+		<div class="col s9 offset-s3">			
+			<table class="striped easyassist_main_table">
+				<thead>
+					<tr>
+                                           {% if form_obj %}
+						<th scope="col" colspan="3"><h4 style="color: #2b3884ad;">{{form_obj.name}}</h4><hr></th>
+                                           {% else  %}
+                                                <th colspan="3"><h4 style="color: #2b3884ad;">Form</h4><hr></th>
+                                           {% endif %}
+					</tr>
+					<tr style="background-color: #282a33a3;color: white;box-shadow: 1px 2px 22px;" >
+						<th scope="col" style="width:33%;text-align:center">Field Name</th>
+						<th scope="col" style="width:33%;text-align:center ">Field Value</th>
+						<th scope="col" style="width:33%;text-align:center ">Field Options</th>
+					</tr>
+				</thead>
+				<tbody id="client-field-value-details">
+				</tbody>
+			</table>
+		</div>
+
+	</div>
+
+</body>
+
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/agent-assist.js' %}">
+</script>
+
+</html>

@@ -1,0 +1,195 @@
+{% extends 'EasyChatApp/console.html' %}
+{% block consolecontent %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/changes_placement.css' %}?v={% random_int 1 100 %}">
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/common_integrated_channel.css' %}?v={% random_int 1 100 %}">
+<div style="padding: 1em;">
+<div class="row">
+    {% include "EasyChatApp/channels/channel_components/channel_integration_document_button.html" with channel_doc_download_link="https://drive.google.com/uc?export=download&id=1DO1zTRUfcaVC3ShFjbonD-5OK4JYkvfy" channel_name="Google RCS" %}
+</div>
+
+{% include "EasyChatApp/channels/channel_components/language_dropdown_go_back.html" %}
+<div class="row">
+    {% include "EasyChatApp/channels/channel_components/custom_message.html" with area="google-rcs-textarea" %}
+<div class="col s12">
+    <div class="row">
+        {% if selected_language == "en" %}
+        {% include "EasyChatApp/channels/channel_components/language_specific.html" %}
+        <ul class="collapsible">
+            <li>
+                <div class="collapsible-header" tabindex="0">Failure Recommendations</div>
+                <div class="collapsible-body">
+                    <div class="row" style="width: 50%;" id="channel-initial-messages">
+                        *Search and select from existing Intent List
+                        <div class="input-field col s12">
+                            <select multiple="" id="multiple-select-google-rcs-failure-message-list" data-select2-id="select2-data-multiple-select-google-rcs-failure-message-list" tabindex="-1" class="select2-hidden-accessible" aria-hidden="true">
+                                {% for intent_name in intent_name_list_failure %}
+                                {% if intent_name.is_selected %}
+                                <option value="{{ intent_name.intent_pk }}" selected>{{ intent_name.intent_name }}</option>
+                                {% else %}
+                                <option value="{{ intent_name.intent_pk }}">{{ intent_name.intent_name }}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <ul class="collapsible">
+            <li>
+                <div class="collapsible-header">Webhook Setup </div>
+                <div class="collapsible-body">
+                    <div class="row" id="google-rcs-deploy">
+                        <div class="input-field col s12">
+                            <input type="text" value='https://{{ request.META.HTTP_HOST }}/chat/webhook/rcs/?id={{selected_bot_obj.pk}}' id="google-rcs-deploy-link" readonly style="width:96%;border: 0.1em solid black;padding:1em;font-family: Consolas, monaco, monospace;word-wrap: break-word;background-color:white;">
+                            <button onclick="copyToClipboard('google-rcs-deploy-link', this)">Copy Script</button>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <ul class="collapsible">
+            <li>
+              <div class="collapsible-header">Google RCS Credentials</div>
+            
+                         <div class="collapsible-body">
+            
+                                            <div class="drag-drop-container" style="
+                                            text-align: center;
+                                            background: #fff;
+                                            border: 0.7px dashed #CFD6DF;
+                                            border-radius: 3px;
+                                            padding: 15px;
+                                            width:50%;
+                                            height: 100%;
+                                            position: relative;">
+                                            {% if rcs_credentials_file_name == "" %}
+                                            <span class="drag-drop-message-rcs" id="drag_drop_message_1" style="color: rgb(15, 82, 161); flex-direction: column; display: flex;align-items: center;justify-content: center;">
+                                                <img src="{% static 'EasyChatApp/img/upload_file_icon.svg' %}">
+                                                <p style="width:90%;margin-bottom: 0;color: #A8A8A8;font-size: 12px;font-weight: 500;">
+                                                    Drop your file here<br>
+                                                    or<br>
+                                                    <a style="color: #2754F3;">Click here</a> to upload your 
+                                                </p>
+                                            </span>
+                                            {% endif %}
+                                            <span class="drag-drop-message-rcs" id="drag_drop_message" style="color: rgb(15, 82, 161); flex-direction: column; display: none;align-items: center;justify-content: center;">
+                                                <img src="{% static 'EasyChatApp/img/upload_file_icon.svg' %}">
+                                                <p style="width:90%;margin-bottom: 0;color: #A8A8A8;font-size: 12px;font-weight: 500;">
+                                                    Drop your file here<br>
+                                                    or<br>
+                                                    <a style="color: #2754F3;">Click here</a> to upload your file
+                                                </p>
+                                            </span>
+                                            <div id="file-selected-filename-rcs">
+                                                {% if rcs_credentials_file_name != "" %}
+                                                <div class="bot-excel-selected-dismiss-btn" style="display: flex;justify-content: flex-end;">
+                                                    <svg width="16" onclick="handle_file_upload_cross_btn()" style="z-index: 1000;cursor: pointer;" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M2.39705 2.55379L2.46967 2.46967C2.73594 2.2034 3.1526 2.1792 3.44621 2.39705L3.53033 2.46967L8 6.939L12.4697 2.46967C12.7626 2.17678 13.2374 2.17678 13.5303 2.46967C13.8232 2.76256 13.8232 3.23744 13.5303 3.53033L9.061 8L13.5303 12.4697C13.7966 12.7359 13.8208 13.1526 13.6029 13.4462L13.5303 13.5303C13.2641 13.7966 12.8474 13.8208 12.5538 13.6029L12.4697 13.5303L8 9.061L3.53033 13.5303C3.23744 13.8232 2.76256 13.8232 2.46967 13.5303C2.17678 13.2374 2.17678 12.7626 2.46967 12.4697L6.939 8L2.46967 3.53033C2.2034 3.26406 2.1792 2.8474 2.39705 2.55379L2.46967 2.46967L2.39705 2.55379Z" fill="#A8A8A8"></path>
+                                                    </svg>
+                                                </div>
+                                                <div class="">
+                                                    <svg width="47" height="50" viewBox="0 0 67 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M17.5 62V22.6398L38.9465 18.0205L44.8023 23.5511L46.1256 24.8744L48.1256 26.8744L48.6602 27.409L43.3964 62H17.5Z" stroke="#BED8FB" stroke-width="35" stroke-linejoin="round"></path>
+                                                        <path d="M44.3446 35.3108C46.417 36.3471 48.688 36.9199 51 36.9922V56.5H24V16H30.5705C30.6222 16.5494 30.7024 17.0961 30.8107 17.6379L31.3107 20.1379C31.7206 22.1872 32.5279 24.1363 33.6872 25.8752L34.6872 27.3752C35.2716 28.2519 35.9413 29.0687 36.6863 29.8137L38.1863 31.3137C39.4023 32.5297 40.8064 33.5418 42.3446 34.3108L44.3446 35.3108Z" stroke="#DDEAFB" stroke-width="32" stroke-linejoin="round"></path>
+                                                    </svg>
+                                                </div>
+                                                <p>
+                                                    {{rcs_credentials_file_name}}
+                                                </p>
+                                                {% endif %}
+                                            </div>
+                                            <p style="color: #FF0000;font-size: 14px; display: none;" class="import-error-message" id="error-message-rcs-json">
+                                                Please select the correct file type(.json)
+                                            </p>
+                                            <p style="color: #FF0000;font-size: 14px; display: none;" class="import-error-message" id="error-message-rcs-json_1">
+                                                Unable to upload files. File format not supported. Please do not use .(dot) in filename except for extension.
+                                            </p>
+                                            <div class="drag-drop-input-field-wrapper">
+                                                <input onchange="handle_file_upload_input_change();" id="drag-drop-input-box-rcs" style="border-bottom: none !important;border: 1px solid black;height: 100% !important;opacity: 0;cursor: pointer;" type="file" accept=".json,">
+                                            </div>
+                                        </div>
+                    
+                                        <input type="hidden" class="rcs-credentials-input"  id="rcs_api_credential_file_path" readonly type="text" class="validate" placeholder="Credentials File Path*" value="{{ rcs_credentials_file_name }}">
+                                    </li>
+                                </ul>
+                    {% endif %}
+                    <div class="progress" id="easychat_telegram_channel_preloader" style="display: none;">
+                    <div class="indeterminate"></div></div>
+                    {% if selected_language == "en" %}
+                    <a class="btn green lighten-2" style="background-color: #82C784; margin-left: 0.2em" id="save-google-rcs-channel">Save</a>
+                    {% else %}
+                    <a class="btn green lighten-2" style="background-color: #82C784; margin-left: 0.2em;" id="save-google-rcs-channel-for-non-primary-language">Save</a>
+                    {% endif %}
+                </div>
+              </div>
+              </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(".google-rcs-textarea").trumbowyg({
+                    tagsToKeep: [],
+                    allowTagsFromPaste: {
+                        allowedTags: ['h4', 'p', 'br']
+                    },
+                    minimalLinks: true,
+                    btns: [
+                        // ['viewHTML'],
+                        ['strong', 'em'], 
+                        ['emoji'],
+                        ['link'],
+                        ['unorderedList', 'orderedList'],
+                        ['underline'],
+                        ['justifyLeft'], ['justifyCenter'], ['justifyRight'], ['justifyFull'],
+                    ],
+  })
+
+function handle_file_upload_input_change() {
+    var file_name = $('#drag-drop-input-box-rcs').val();
+    file_name = file_name.replace(/.*[\/\\]/, '');
+    input_file_global = ($("#drag-drop-input-box-rcs"))[0].files[0];
+    extension = file_name.slice(file_name.lastIndexOf("."))
+    if(extension != ".json"){
+        handle_file_upload_cross_btn();
+        document.getElementById("error-message-rcs-json").style.display = "block";
+        document.getElementById("error-message-rcs-json_1").style.display = "none";
+        return;
+    }
+    document.getElementById("error-message-rcs-json").style.display = "none";
+    if (file_name) {
+        $('.drag-drop-message-rcs').hide();
+        $('#file-selected-filename-rcs').html(`
+            <div class="bot-excel-selected-dismiss-btn" style="display: flex;justify-content: flex-end;">
+                <svg width="16" onclick="handle_file_upload_cross_btn()" style="z-index: 1000;cursor: pointer;" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2.39705 2.55379L2.46967 2.46967C2.73594 2.2034 3.1526 2.1792 3.44621 2.39705L3.53033 2.46967L8 6.939L12.4697 2.46967C12.7626 2.17678 13.2374 2.17678 13.5303 2.46967C13.8232 2.76256 13.8232 3.23744 13.5303 3.53033L9.061 8L13.5303 12.4697C13.7966 12.7359 13.8208 13.1526 13.6029 13.4462L13.5303 13.5303C13.2641 13.7966 12.8474 13.8208 12.5538 13.6029L12.4697 13.5303L8 9.061L3.53033 13.5303C3.23744 13.8232 2.76256 13.8232 2.46967 13.5303C2.17678 13.2374 2.17678 12.7626 2.46967 12.4697L6.939 8L2.46967 3.53033C2.2034 3.26406 2.1792 2.8474 2.39705 2.55379L2.46967 2.46967L2.39705 2.55379Z" fill="#A8A8A8"></path>
+                </svg>
+            </div>
+            <div class="">
+                <svg width="47" height="50" viewBox="0 0 67 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17.5 62V22.6398L38.9465 18.0205L44.8023 23.5511L46.1256 24.8744L48.1256 26.8744L48.6602 27.409L43.3964 62H17.5Z" stroke="#BED8FB" stroke-width="35" stroke-linejoin="round"></path>
+                    <path d="M44.3446 35.3108C46.417 36.3471 48.688 36.9199 51 36.9922V56.5H24V16H30.5705C30.6222 16.5494 30.7024 17.0961 30.8107 17.6379L31.3107 20.1379C31.7206 22.1872 32.5279 24.1363 33.6872 25.8752L34.6872 27.3752C35.2716 28.2519 35.9413 29.0687 36.6863 29.8137L38.1863 31.3137C39.4023 32.5297 40.8064 33.5418 42.3446 34.3108L44.3446 35.3108Z" stroke="#DDEAFB" stroke-width="32" stroke-linejoin="round"></path>
+                </svg>
+            </div>
+            <p>
+                ${file_name}
+            </p>`
+        );
+    }
+    upload_rcs_credentials_file();
+}
+
+function handle_file_upload_cross_btn() {
+    $(".drag-drop-message-rcs").show();
+    $("#file-selected-filename-rcs").html("");
+    $("#drag-drop-input-box-rcs").val("");
+    document.getElementById("drag_drop_message").style.display = "flex";
+    msg_ele = document.getElementById("drag_drop_message_1");
+    if(msg_ele){
+        msg_ele.style.display = "none"
+    }
+}
+</script>
+{% endblock %}

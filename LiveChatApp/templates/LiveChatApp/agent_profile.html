@@ -1,0 +1,136 @@
+{% extends 'LiveChatApp/agent_console_settings.html' %}
+{% block consolecontent %}
+{% load static %}
+
+ <link href="{% static 'LiveChatApp/css/agent_profile.css' %}?v={% random_int 1 100 %}" rel="stylesheet">
+
+<div class="col-xl-10 col-lg-10 col-md-9 col-sm-12 col-12 py-2" id="live-chat-setting-content-p" style="height: calc(100vh - 4.375rem); background: rgb(250, 250, 250); display: block;overflow-y: auto;">
+
+
+	<div class="live-chat-setting-profile-heading ">
+        <svg width="25" height="21" viewBox="0 0 25 21" fill="none" xmlns="http://www.w3.org/2000/svg" class="back-arrow-div" id="live-chat-active-customers-opener-setting" onclick="go_back_mobile()">
+            <path d="M25 9.1376H5.19713L12.3832 1.92643L10.4635 0L0 10.5L10.4635 21L12.3832 19.0736L5.19713 11.8624H25V9.1376Z" fill="#757575"/>
+        </svg>
+		<svg width="17" height="20" viewBox="0 0 14 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M11.9 9.91667C13.0598 9.91667 14 10.8681 14 12.0417V12.5479C14 15.0821 11.0526 17 7 17C2.94737 17 0 15.1819 0 12.5479V12.0417C0 10.8681 0.940202 9.91667 2.1 9.91667H11.9ZM11.9 10.9792H2.1C1.55421 10.9792 1.10569 11.4005 1.05481 11.9393L1.05 12.0417V12.5479C1.05 14.4422 3.42215 15.9375 7 15.9375C10.4482 15.9375 12.8483 14.4465 12.9468 12.6621L12.95 12.5479V12.0417C12.95 11.4894 12.5336 11.0355 12.0011 10.984L11.9 10.9792ZM7 0C9.3196 0 11.2 1.90279 11.2 4.25C11.2 6.59721 9.3196 8.5 7 8.5C4.6804 8.5 2.8 6.59721 2.8 4.25C2.8 1.90279 4.6804 0 7 0ZM7 1.0625C5.2603 1.0625 3.85 2.48959 3.85 4.25C3.85 6.01041 5.2603 7.4375 7 7.4375C8.7397 7.4375 10.15 6.01041 10.15 4.25C10.15 2.48959 8.7397 1.0625 7 1.0625Z" fill="#4D4D4D"/>
+		</svg>			
+		<span>Profile Settings</span>
+
+	</div>
+	<div class="live-chat-profile-area">
+
+
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-md first-ele">
+					<div class="user-image-section">
+						<svg width="53" height="53" viewBox="0 0 53 53" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M26.5 29.8125C34.7295 29.8125 41.4062 23.1357 41.4062 14.9062C41.4062 6.67676 34.7295 0 26.5 0C18.2705 0 11.5938 6.67676 11.5938 14.9062C11.5938 23.1357 18.2705 29.8125 26.5 29.8125ZM39.75 33.125H34.0463C31.7482 34.1809 29.1914 34.7812 26.5 34.7812C23.8086 34.7812 21.2621 34.1809 18.9537 33.125H13.25C5.93145 33.125 0 39.0564 0 46.375V48.0312C0 50.7744 2.22559 53 4.96875 53H48.0312C50.7744 53 53 50.7744 53 48.0312V46.375C53 39.0564 47.0686 33.125 39.75 33.125Z" fill="#4D4D4D"/>
+						</svg>							
+					</div>
+					{% if user_obj.user %}
+						<h6>{{ user_obj.user.first_name}}</h6>
+					{% endif %}
+					
+					<p>Status:
+					{% if user_obj.is_online %}
+						<span class="status">Online</span>
+					{% else %}
+						<span class="status" style="color:red">Offline({{user_obj.get_current_status}})</span>
+					{% endif %}
+					 </p>
+				</div>
+				<div class="col-md second-ele">
+
+					<div class="row">
+						<div class="col-xl profile-width">
+							<p>First Name</p><br>
+							<div class="user-value-profile">{{ user_obj.user.first_name}}</div>
+						</div>
+						<div class="col-xl profile-width">
+							<p>Last Name</p><br>
+							<div class="user-value-profile">{{ user_obj.user.last_name}}</div>
+						</div>
+						<div class="col-xl profile-width">
+							<p>Mobile</p><br>
+							<div class="user-value-profile">{{ user_obj.phone_number }}</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xl content-left profile-width">
+							<p>Email ID</p><br>
+							<div class="user-value-profile">{{ user_obj.user.email }}</div>
+						</div>
+						<div class="col-xl content-left profile-width">
+							<p>Designation</p><br>
+							<div class="user-value-profile">Agent</div>
+						</div>
+						<div class="col-xl content-left profile-width">
+							<p>Category</p><br>
+							<div class="user-value-profile">{{ user_obj.get_public_category}}</div>
+
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xl content-left profile-width">
+							<p>Supervisor</p><br>
+
+							<div class="user-value-profile">{{ user_obj.get_supervisor}}</div>
+
+						</div>
+						<div class="col-xl content-left profile-width">
+							<p>Bot(s)</p><br>
+							<div class="user-value-profile">{{ user_obj.get_bot_list}}</div>
+							<br>
+						</div>
+						<div class="col-xl content-left profile-width">
+
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+
+	</div>
+
+</div>
+<div class="modal fade backdrop" id="modal-agent-current-status" tabindex="-1" role="dialog" aria-labelledby="agent_offline_reason_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h6>Set Offline</h6>
+          </div>
+          <div class="modal-body">
+              <div class="row">
+
+                  <div class="col-12 mb-2">
+                      <label>Please provide a suitable reason</label>
+                      <select name="day" class="form-control select-dropdown-icon" id="select-status-agent">
+                        <option value="0">Stop Interaction</option>
+                        <option value="1">Lunch</option>
+                        <option value="2">Coffee</option>
+                        <option value="3">Adhoc</option>
+                        <option value="4">Meeting</option>
+                        <option value="5">Training</option>
+                      </select>
+                  </div>
+
+              </div>
+          </div>
+          <div class="modal-footer">
+              <div style="float: right;">
+                  <button class="btn-close" type="button" data-dismiss="modal" onclick="mark_user_online()">Cancel</button>
+                  <button class="btn-primary" type="button" onclick="mark_user_offline()">Submit</button>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+<script type="text/javascript">
+	window.CURRENT_STATUS = '{{user_obj.current_status}}'
+</script>
+{% endblock %}

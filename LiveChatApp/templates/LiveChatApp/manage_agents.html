@@ -1,0 +1,1148 @@
+{% extends 'LiveChatApp/base.html' %}
+{% block content %}
+{% load static %}
+
+<link href="{% static 'LiveChatApp/css/manage_users.css' %}?v={% random_int 1 100 %}" rel="stylesheet">
+<style type="text/css">
+.dataTables_filter {
+   float: left !important;
+   margin-bottom: 0.7em;
+}
+.dataTables_filter input {
+  background-color: #e6e6e6 !important;
+  border-radius: 2em !important;
+  border-bottom: none !important;
+}
+.modal-backdrop {
+display: none !important;
+}
+.backdrop {
+background-color: rgba(0, 0, 0, 0.5);
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield;
+}
+.modal-content-scroll {
+	height: 375px;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+.modal-content-scroll::-webkit-scrollbar {
+    width: 9px;
+    height: 7px;
+  }
+
+.modal-content-scroll::-webkit-scrollbar:hover {
+      display: block;
+  }
+  
+  /* Track */
+.modal-content-scroll::-webkit-scrollbar-track {
+    border-radius: 10px;
+  }
+   
+  /* Handle */
+.modal-content-scroll::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+  }
+  
+  /* Handle on hover */
+ .modal-content-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.5); 
+  }
+
+  .dataTables_filter {
+	display: none;
+}
+ #table-agent-details_info {
+    font-size: 13px;
+    margin-top: 60px;
+    color: #4D4D4D;
+    width: 50%;
+    padding-left: 10px;
+    display: inline-block;
+    margin-bottom: 20px;
+
+    {% if user_obj_list.has_other_pages %}
+    position: absolute;
+    {% endif %}
+}
+
+.create-new-user-button,
+.statusActive {
+	background: linear-gradient(90deg, {{admin_config.get_livechat_theme_lighten_one }}  0%,  {{admin_config.get_livechat_theme_lighten_five }} 100%)!important;
+}
+
+.live-chat-admin-manage-user-table-area table tr td input:checked+.slider {
+	background: {{admin_config.get_livechat_theme_lighten_one }} !important;
+}
+
+.upload-excel-button,
+.file-upload-button,
+.addBtn,
+#custom-button {
+	border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }} !important;
+	color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+}
+
+.create-user-Btn,
+.uploadBtn {
+	background: linear-gradient(270deg, {{ admin_config.get_livechat_theme_lighten_six }} 0%, {{ admin_config.get_livechat_theme_lighten_one }} 100%) !important;
+	border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }} !important;
+}
+
+#download_create_agent_template {
+	color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+}
+.active-page {
+		background: {{ admin_config.get_livechat_theme_lighten_three }} !important;
+		border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }} !important;
+}
+.active-page a {
+	color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+}
+@media only screen and (min-width: 761px) {
+    .show-on-hover {
+        width: 14%;
+    }
+}
+.live-chat-report-d-interaction-table-area{
+    margin-left: 7px;
+  }
+  .bootstrap-select .dropdown-menu .inner::-webkit-scrollbar-thumb{
+        border-radius: 10px;
+        background: {{ admin_config.get_livechat_theme_lighten_six }} !important;
+    }
+    .bootstrap-select .dropdown-menu .inner {
+    scrollbar-color: {{ admin_config.get_livechat_theme_lighten_six }} #f1f1f1;
+    }
+
+.custom-checkbox-input input:checked~.checkmark {
+    background-color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+}
+
+.custom-checkbox-input  .checkmark{
+    border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }} !important;
+}
+
+.livechat-multiselect-dropdown.livechat-multiselect-filter-dropdown .multiselect-container {
+    scrollbar-color: {{ admin_config.get_livechat_theme_lighten_one }} #f1f1f1;
+}
+
+.livechat-multiselect-dropdown.livechat-multiselect-filter-dropdown ::-webkit-scrollbar-thumb {
+    background: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+}
+
+.admin-manage-user-heading-div .select-search-div .export-btn-div button.export-button {
+    background: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+}
+
+.click-disabled-show-max-limit-alert{
+    display: inline-block !important;
+}
+
+</style>
+
+<div class="container-fluid pl-1 pr-2 arange">
+	<div class="row">
+
+		<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 py-2 overflow-hidden-desktop" id="live-chat-admin-manage-users"
+			style="height: calc(100vh - 3.375rem); background: #FAFAFA; overflow-x: hidden; overflow-y: auto; max-width:99.7%; z-index: 10;">
+
+			<div class="live-chat-admin-user-status-field ">
+				<div class="user-all-status-section">
+					<button class="statusBtn statusActive button-filter" id="all" onclick="show_agent_details('all')">Total
+						<div class="status-count" id="total_agents">{{ total_agents }}</div>
+		            </button>
+		            <button class="loggedinBtn button-filter" id="logged_in" onclick="show_agent_details('logged-in')">Logged In
+		                <div class="status-count" id="logged_in_users">{{ logged_in_users }}</div>
+
+		            </button>
+		          <button class="notreadyBtn button-filter" id="not_ready" onclick="show_agent_details('not-ready')">Not Ready
+		            <div class="status-count" id="not_ready_users">{{ not_ready_users }}</div>
+
+		          </button>
+		          <button class="readyBtn button-filter" id="ready" onclick="show_agent_details('ready')">Ready
+		            <div class="status-count" id="ready_users">{{ ready_users }}</div>
+				  </button>
+				</div>
+
+				<div class="row">
+					<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-admin-manage-user-heading">
+
+                        <div class="admin-manage-user-heading-div">
+                            <div class="create-upload-btn-div">
+                                {% if not creation_allowed %} <div class="click-disabled-show-max-limit-alert" data-toggle="tooltip" title="{{ max_limit_alert_for_user_creation }}" > {% endif %}
+                                    <button class="create-new-user-button {% if not creation_allowed %} disable-btn {% endif %}" id="createuserBtn" data-toggle="modal" data-target="#modal-create-agent" onclick="open_create_user_modal()">
+                                        Create New User
+                                    </button>
+                                {% if not creation_allowed %} </div> {% endif %}
+                                {% if not creation_allowed %} <div class="click-disabled-show-max-limit-alert" data-toggle="tooltip" title="{{ max_limit_alert_for_user_creation }}" > {% endif %}
+                                    <button class="upload-excel-button {% if not creation_allowed %} disable-btn {% endif %}" id="uploadexcelBtn" data-toggle="modal" data-target="#create-agent-using-excel-modal" onclick="open_upload_agents_modal()">
+                                        Upload Excel
+                                    </button>
+                                {% if not creation_allowed %} </div> {% endif %}
+                            </div>
+
+                            <div class="select-search-div">
+                                {% if user_obj.status == '1' %}
+                                <div class="select-div">
+                                    <select class="form-control select-dropdown-icon agent-supervisor-select selectpicker create-user-select-field" id="select_user_type">
+                                    <option value="agents" {% if user_type == 'agents' %}selected{% endif %}>Agents</option>
+                                    <option value="supervisors" {% if user_type == 'supervisors' %}selected{% endif %}>Supervisors</option>
+                                </select>
+                                </div>
+                                {% endif %}
+                                <div class="search-container">
+                                    <button type="submit">
+                                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect width="13" height="13" fill="#E5E5E5"></rect>
+                                    <g clip-path="url(#clip0)">
+                                    <rect width="1440" height="660" transform="translate(-1209 -141)" fill="white"></rect>
+                                    <rect x="-962" y="-85" width="1193" height="604" fill="#FAFAFA"></rect>
+                                    <rect x="-952" y="-74" width="1174" height="114" fill="white"></rect>
+                                    <g filter="url(#filter0_d)">
+                                    <rect x="-14" y="-10" width="219" height="33" rx="5" fill="white"></rect>
+                                    </g>
+                                    <path d="M5.55942 11.1182C6.79289 11.118 7.99083 10.7051 8.96247 9.94526L12.0174 13L13 12.0174L9.9451 8.96269C10.7054 7.991 11.1185 6.79285 11.1188 5.55912C11.1188 2.49396 8.62474 0 5.55942 0C2.49409 0 0 2.49396 0 5.55912C0 8.62428 2.49409 11.1182 5.55942 11.1182ZM5.55942 1.38978C7.85893 1.38978 9.72898 3.25973 9.72898 5.55912C9.72898 7.85851 7.85893 9.72846 5.55942 9.72846C3.2599 9.72846 1.38985 7.85851 1.38985 5.55912C1.38985 3.25973 3.2599 1.38978 5.55942 1.38978Z" fill="#757575"></path>
+                                    </g>
+                                    <defs>
+                                    <filter id="filter0_d" x="-22" y="-18" width="235" height="49" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                                    <feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood>
+                                    <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"></feColorMatrix>
+                                    <feOffset></feOffset>
+                                    <feGaussianBlur stdDeviation="4"></feGaussianBlur>
+                                    <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.08 0"></feColorMatrix>
+                                    <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"></feBlend>
+                                    <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"></feBlend>
+                                    </filter>
+                                    <clipPath id="clip0">
+                                    <rect width="1440" height="660" fill="white" transform="translate(-1209 -141)"></rect>
+                                    </clipPath>
+                                    </defs>
+                                </svg>                                   
+                            </button>
+                                    <input type="text" placeholder="Search" name="search" id="table-agent-details-search">
+                                </div>
+
+                                <!-- Delete Button -->
+                                <div class="delete-button-div">
+                                    <button class="delete-button disable-btn" id="livechat-user-delete-btn" data-toggle="modal" data-target="#modal-delete-agent">Delete</button>
+                                </div>
+
+                                <!-- export btn start  -->
+                                <div class="export-btn-div">
+                                    <button class="export-button" id="exportBtn" data-target="#admin-manage-user-export-modal" data-toggle="modal">Export
+                                        <svg width="15" height="11" viewBox="0 0 15 11" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin: -3px 0px 0px 12px;">
+                                        <rect width="15" height="11" fill="{{ admin_config.get_livechat_theme_lighten_one }}"></rect>
+                                        <g clip-path="url(#clip0)">
+                                        <rect width="1440" height="660" transform="translate(-290 -95)" fill="white"></rect>
+                                        <rect x="-213" y="-39" width="1363" height="604" fill="#{{ admin_config.get_livechat_theme_lighten_one }}"></rect>
+                                        <rect x="-204" y="-28" width="1345" height="68" fill="white"></rect>
+                                        <rect x="-65" y="-12" width="95" height="35" rx="5" fill="{{ admin_config.get_livechat_theme_lighten_one }}"></rect>
+                                        <path d="M11.25 9.58965H1.5V3.24309H3.44625C3.44625 3.24309 3.963 2.61126 5.07375 1.83275H0.75C0.551088 1.83275 0.360322 1.90704 0.21967 2.03929C0.0790176 2.17153 0 2.3509 0 2.53792L0 10.2948C0 10.4819 0.0790176 10.6612 0.21967 10.7935C0.360322 10.9257 0.551088 11 0.75 11H12C12.1989 11 12.3897 10.9257 12.5303 10.7935C12.671 10.6612 12.75 10.4819 12.75 10.2948V7.65325L11.25 8.81326V9.58965ZM10.0208 4.6887V7.19277L15 3.52516L10.0208 0V2.2079C3.975 2.2079 3.975 7.82672 3.975 7.82672C5.6865 5.18373 6.7395 4.6887 10.0208 4.6887Z" fill="white"></path>
+                                        </g>
+                                        <defs>
+                                        <clipPath id="clip0">
+                                        <rect width="1440" height="660" fill="white" transform="translate(-290 -95)"></rect>
+                                        </clipPath>
+                                        </defs>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <!-- export btn end  -->
+
+                            </div>
+                        </div>
+
+					</div>
+				</div>
+
+			</div>
+            {% if user_obj_list %}
+
+                {% if user_type == 'agents' %}
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-admin-manage-user-table-area live-chat-table-parent-div-manage-user">
+                        <table role="table" id="table-agent-details" class="display">
+                            <thead role="rowgroup">
+                                <tr role="row">
+                                    <th role="columnheader">
+                                        <label class="custom-checkbox-input">
+                                            <input type="checkbox" id="livechat-user-global-checkbox">
+                                            <span class="checkmark"></span>                            
+                                        </label>
+                                    </th>
+                                    <th role="columnheader">Username</th>
+                                    <th role="columnheader">Category</th>	
+                                    <th role="columnheader">Supervisor Name</th>							
+                                    <th role="columnheader">Maximum Allowed Customers</th>						
+                                    <th role="columnheader">Mark As Active</th>
+                                    <th role="columnheader">Ongoing Chats</th>
+                                    <th role="columnheader"> </th>
+                                </tr>
+                            </thead>
+                            <tbody role="rowgroup">
+                                {% for temp_user_obj in user_obj_list %}
+                                <tr role="row" data-user-current-status="{{temp_user_obj.current_status}}" data-logged-in="{{temp_user_obj.check_livechat_status}}" data-is-active="{{temp_user_obj.is_online}}">
+                                    <td role="cell">
+                                        <label class="custom-checkbox-input">
+                                            <input type="checkbox" class="livechat-user-checkbox" style="cursor: pointer;" data-agent_id="{{temp_user_obj.pk}}">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </td>
+                                    <td role="cell">
+                                    <a href="#agent-details-{{ temp_user_obj.pk }}" class="modal-trigger agent-details-anchor" data-target="#agent-details-{{ temp_user_obj.pk }}" data-toggle="modal">
+                                        <u>{{ temp_user_obj.user.username }}</u></a></td>  
+                                    <td role="cell">{{temp_user_obj.get_public_category}}</td>
+                                    <td role="cell">{{temp_user_obj.get_supervisor}}</td>
+                                    
+                                    {% if temp_user_obj.status == "3" %}							
+                                    <td role="cell">{{ temp_user_obj.get_max_customer_count }}</td>
+                                    {% else %}
+                                    <td role="cell">-</td>
+                                    {% endif %}
+                                    
+                                    {% if temp_user_obj.status == "3" %}
+                                        <td role="cell">
+                                            <label class="switch">
+                                                {% if not temp_user_obj.is_online %}
+                                                    <input type="checkbox"
+                                                        id="toggle-agent-switch-by-admin-supervisor-{{temp_user_obj.pk}}"
+                                                        onclick="toggle_agent_switch_by_admin_supervisor('{{temp_user_obj.pk}}', '{{temp_user_obj.status}}')">
+                                                    <span class="slider round"
+                                                        id="toggle-agent-switch-by-admin-supervisor-lever-{{temp_user_obj.pk}}"></span>
+                                                {% else %}
+                                                    <input type="checkbox"
+                                                        id="toggle-agent-switch-by-admin-supervisor-{{temp_user_obj.pk}}"
+                                                        onclick="toggle_agent_switch_by_admin_supervisor('{{temp_user_obj.pk}}', '{{temp_user_obj.status}}')"
+                                                        checked>
+                                                    <span class="slider round"
+                                                        id="toggle-agent-switch-by-admin-supervisor-lever-{{temp_user_obj.pk}}"></span>
+                                                {% endif %}
+                                            </label>
+                                        </td>
+                                    {% else %}
+                                    <td role="cell">-</td>
+                                    {% endif %}
+                                    <td role="cell" id="livechat-ongoing-chats-{{ temp_user_obj.pk }}">
+                                        {% if temp_user_obj.status == "3" %}
+                                            {{ temp_user_obj.ongoing_chats }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td class="show-on-hover" role="cell" colspan="2">
+                                        <svg width="33" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" style="padding-right: 15px;" id="editUseradmin" data-username="{{ temp_user_obj.user.username }}" data-fullname="{{ temp_user_obj.user.first_name }} {{ temp_user_obj.user.last_name }}"
+                                            data-phonenumber="{{ temp_user_obj.phone_number }}" data-email="{{ temp_user_obj.user.email }}"
+                                            data-supervisor="{{temp_user_obj.get_supervisor_pk}}" 
+                                            data-max-customers-allowed={{temp_user_obj.max_customers_allowed}}
+                                            data-bots="{{ temp_user_obj.get_bot_list }}"
+                                            data-category="{{temp_user_obj.get_public_category}}" data-pk="{{temp_user_obj.pk}}" data-toggle="modal" data-target="#modal-edit-agent-info-{{temp_user_obj.pk}}" onclick="open_edit_user_modal(this, '{{temp_user_obj.pk}}','{{temp_user_obj.get_bot_list}}')">
+                                            <path d="M17.0604 0.939564C18.3132 2.19232 18.3132 4.22343 17.0604 5.47618L6.33146 16.2052C6.08325 16.4534 5.77457 16.6325 5.43593 16.7249L0.849981 17.9756C0.348084 18.1124 -0.112448 17.6519 0.0244331 17.15L1.27515 12.5641C1.3675 12.2254 1.54664 11.9167 1.79484 11.6685L12.5238 0.939564C13.7766 -0.313188 15.8077 -0.313188 17.0604 0.939564ZM11.6547 3.7104L2.74567 12.6194C2.66293 12.7021 2.60322 12.805 2.57244 12.9179L1.6313 16.3687L5.08212 15.4276C5.195 15.3968 5.2979 15.3371 5.38063 15.2543L14.2894 6.34506L11.6547 3.7104ZM13.4746 1.89039L12.6049 2.75927L15.2396 5.39482L16.1096 4.52535C16.8372 3.79773 16.8372 2.61802 16.1096 1.89039C15.382 1.16277 14.2023 1.16277 13.4746 1.89039Z" fill="#0254D7"/>
+                                        </svg>
+
+                                        <svg width="16" height="18" viewBox="0 0 16 18" fill="none" xmlns="http://www.w3.org/2000/svg" id="deleteuserBtn" data-toggle="modal" data-target="#modal-delete-agent" onclick="open_delete_agent_modal('{{temp_user_obj.pk}}', 'single')">
+                                            <path d="M8 0C9.60341 0 10.913 1.19168 10.9958 2.69116L11 2.84211H15.4C15.7314 2.84211 16 3.0966 16 3.41053C16 3.6983 15.7743 3.93612 15.4814 3.97376L15.4 3.97895H14.5528L13.5769 15.3876C13.4506 16.8633 12.1496 18 10.5867 18H5.41328C3.85044 18 2.5494 16.8633 2.42309 15.3876L1.4464 3.97895H0.6C0.296243 3.97895 0.0452071 3.7651 0.00547714 3.48766L0 3.41053C0 3.12276 0.225723 2.88493 0.518584 2.84729L0.6 2.84211H5C5 1.27245 6.34315 0 8 0ZM13.3494 3.97895H2.65062L3.61917 15.2957C3.69495 16.1812 4.47557 16.8632 5.41328 16.8632H10.5867C11.5244 16.8632 12.305 16.1812 12.3808 15.2957L13.3494 3.97895ZM6.2 6.82105C6.50376 6.82105 6.75479 7.0349 6.79452 7.31234L6.8 7.38947V13.4526C6.8 13.7666 6.53137 14.0211 6.2 14.0211C5.89624 14.0211 5.64521 13.8072 5.60548 13.5298L5.6 13.4526V7.38947C5.6 7.07554 5.86863 6.82105 6.2 6.82105ZM9.8 6.82105C10.1038 6.82105 10.3548 7.0349 10.3945 7.31234L10.4 7.38947V13.4526C10.4 13.7666 10.1314 14.0211 9.8 14.0211C9.49624 14.0211 9.24521 13.8072 9.20548 13.5298L9.2 13.4526V7.38947C9.2 7.07554 9.46863 6.82105 9.8 6.82105ZM8 1.13684C7.04731 1.13684 6.26748 1.83802 6.20415 2.72535L6.2 2.84211H9.8L9.79585 2.72535C9.73252 1.83802 8.95269 1.13684 8 1.13684Z" fill="#EE2525"/>
+                                        </svg>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        
+                        <div class="container-fluid">
+                            {% if user_obj_list.has_other_pages %}
+                            <div class="pagination-div">
+                                <ul class="pagination-content">
+                                {% for i in user_obj_list.paginator.page_range %}
+                                {% if user_obj_list.number == i %}
+                                    {% if i == 1 %}
+                                    <li class="active-page"><a style="color: #0254D7;" href="?page={{ i }}&status={{status}}">{{ i }}</a></li>
+                                    {% elif i == user_obj_list.paginator.num_pages %}
+                                    <li class="active-page" style="border-radius: 0 6px 6px 0;"><a style="color: #0254D7;" href="?page={{ i }}&status={{status}}">{{ i }}</a></li>
+                                    {% else %}
+                                    <li class="active-page" style="border-radius: 0px;"><a style="color: #0254D7;" href="?page={{ i }}&status={{status}}">{{ i }}</a></li>
+                                    {% endif %}
+                                {% elif i > user_obj_list.number|add:'-5' and i < user_obj_list.number|add:'5' %} <li><a href="?page={{ i }}&status={{status}}">{{ i }}</a></li>
+                                {% endif %}
+                                {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                
+                {% elif user_type == 'supervisors' %}
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-admin-manage-user-table-area live-chat-table-parent-div-manage-user">
+                        <table role="table" id="table-agent-details" class="display">
+                            <thead role="rowgroup">
+                                <tr role="row">
+                                    <th role="columnheader">
+                                        <label class="custom-checkbox-input">
+                                            <input type="checkbox" id="livechat-user-global-checkbox">
+                                            <span class="checkmark"></span>                            
+                                        </label>
+                                    </th>
+                                    <th role="columnheader">Username</th>
+                                    <th role="columnheader">Category</th>	
+                                    <th role="columnheader">Agents Assigned</th>							
+                                    <th role="columnheader">Active Agents</th>						
+                                    <th role="columnheader">Ongoing Chats</th>
+                                    <th role="columnheader"> </th>
+                                </tr>
+                            </thead>
+                            <tbody role="rowgroup">
+                                {% for temp_user_obj in user_obj_list %}
+                                <tr role="row" data-user-current-status="{{temp_user_obj.current_status}}" data-logged-in="{{temp_user_obj.check_livechat_status}}" data-is-active="{{temp_user_obj.is_online}}">
+                                    <td role="cell">
+                                        <label class="custom-checkbox-input">
+                                            <input type="checkbox" class="livechat-user-checkbox" style="cursor: pointer;" data-agent_id="{{temp_user_obj.pk}}">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </td>
+                                    <td role="cell">
+                                    <a href="#agent-details-{{ temp_user_obj.pk }}" class="modal-trigger agent-details-anchor" data-target="#agent-details-{{ temp_user_obj.pk }}" data-toggle="modal">
+                                        <u>{{ temp_user_obj.user.username }}</u></a></td>  
+                                    <td role="cell">{{temp_user_obj.get_public_category}}</td>
+                                    <td role="cell">{{temp_user_obj.get_agents_assigned_count}}</td>
+                                    <td role="cell">{{ temp_user_obj.get_active_agents_count }}</td>
+                                    
+
+                                    <td role="cell" id="livechat-ongoing-chats-{{ temp_user_obj.pk }}">
+                                        {{ temp_user_obj.get_ongoing_chats_count }}
+                                    </td>
+
+                                    <td class="show-on-hover" role="cell" colspan="2">
+                                        <svg width="33" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" style="padding-right: 15px;" id="editUseradmin" data-username="{{ temp_user_obj.user.username }}" data-fullname="{{ temp_user_obj.user.first_name }} {{ temp_user_obj.user.last_name }}"
+                                            data-phonenumber="{{ temp_user_obj.phone_number }}" data-email="{{ temp_user_obj.user.email }}"
+                                            data-supervisor="{{temp_user_obj.get_supervisor_pk}}" 
+                                            data-max-customers-allowed={{temp_user_obj.max_customers_allowed}}
+                                            data-bots="{{ temp_user_obj.get_bot_list }}"
+                                            data-category="{{temp_user_obj.get_public_category}}" data-pk="{{temp_user_obj.pk}}" data-toggle="modal" data-target="#modal-edit-agent-info-{{temp_user_obj.pk}}" onclick="open_edit_user_modal(this, '{{temp_user_obj.pk}}','{{temp_user_obj.get_bot_list}}')">
+                                            <path d="M17.0604 0.939564C18.3132 2.19232 18.3132 4.22343 17.0604 5.47618L6.33146 16.2052C6.08325 16.4534 5.77457 16.6325 5.43593 16.7249L0.849981 17.9756C0.348084 18.1124 -0.112448 17.6519 0.0244331 17.15L1.27515 12.5641C1.3675 12.2254 1.54664 11.9167 1.79484 11.6685L12.5238 0.939564C13.7766 -0.313188 15.8077 -0.313188 17.0604 0.939564ZM11.6547 3.7104L2.74567 12.6194C2.66293 12.7021 2.60322 12.805 2.57244 12.9179L1.6313 16.3687L5.08212 15.4276C5.195 15.3968 5.2979 15.3371 5.38063 15.2543L14.2894 6.34506L11.6547 3.7104ZM13.4746 1.89039L12.6049 2.75927L15.2396 5.39482L16.1096 4.52535C16.8372 3.79773 16.8372 2.61802 16.1096 1.89039C15.382 1.16277 14.2023 1.16277 13.4746 1.89039Z" fill="#0254D7"/>
+                                        </svg>
+
+                                        <svg width="16" height="18" viewBox="0 0 16 18" fill="none" xmlns="http://www.w3.org/2000/svg" id="deleteuserBtn" data-toggle="modal" data-target="#modal-delete-agent" onclick="open_delete_agent_modal('{{temp_user_obj.pk}}')">
+                                            <path d="M8 0C9.60341 0 10.913 1.19168 10.9958 2.69116L11 2.84211H15.4C15.7314 2.84211 16 3.0966 16 3.41053C16 3.6983 15.7743 3.93612 15.4814 3.97376L15.4 3.97895H14.5528L13.5769 15.3876C13.4506 16.8633 12.1496 18 10.5867 18H5.41328C3.85044 18 2.5494 16.8633 2.42309 15.3876L1.4464 3.97895H0.6C0.296243 3.97895 0.0452071 3.7651 0.00547714 3.48766L0 3.41053C0 3.12276 0.225723 2.88493 0.518584 2.84729L0.6 2.84211H5C5 1.27245 6.34315 0 8 0ZM13.3494 3.97895H2.65062L3.61917 15.2957C3.69495 16.1812 4.47557 16.8632 5.41328 16.8632H10.5867C11.5244 16.8632 12.305 16.1812 12.3808 15.2957L13.3494 3.97895ZM6.2 6.82105C6.50376 6.82105 6.75479 7.0349 6.79452 7.31234L6.8 7.38947V13.4526C6.8 13.7666 6.53137 14.0211 6.2 14.0211C5.89624 14.0211 5.64521 13.8072 5.60548 13.5298L5.6 13.4526V7.38947C5.6 7.07554 5.86863 6.82105 6.2 6.82105ZM9.8 6.82105C10.1038 6.82105 10.3548 7.0349 10.3945 7.31234L10.4 7.38947V13.4526C10.4 13.7666 10.1314 14.0211 9.8 14.0211C9.49624 14.0211 9.24521 13.8072 9.20548 13.5298L9.2 13.4526V7.38947C9.2 7.07554 9.46863 6.82105 9.8 6.82105ZM8 1.13684C7.04731 1.13684 6.26748 1.83802 6.20415 2.72535L6.2 2.84211H9.8L9.79585 2.72535C9.73252 1.83802 8.95269 1.13684 8 1.13684Z" fill="#EE2525"/>
+                                        </svg>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        
+                        <div class="container-fluid">
+                            {% if user_obj_list.has_other_pages %}
+                            <div class="pagination-div">
+                                <ul class="pagination-content">
+                                {% for i in user_obj_list.paginator.page_range %}
+                                {% if user_obj_list.number == i %}
+                                    {% if i == 1 %}
+                                    <li class="active-page"><a style="color: #0254D7;" href="?page={{ i }}&status={{status}}">{{ i }}</a></li>
+                                    {% elif i == user_obj_list.paginator.num_pages %}
+                                    <li class="active-page" style="border-radius: 0 6px 6px 0;"><a style="color: #0254D7;" href="?page={{ i }}&status={{status}}">{{ i }}</a></li>
+                                    {% else %}
+                                    <li class="active-page" style="border-radius: 0px;"><a style="color: #0254D7;" href="?page={{ i }}&status={{status}}">{{ i }}</a></li>
+                                    {% endif %}
+                                {% elif i > user_obj_list.number|add:'-5' and i < user_obj_list.number|add:'5' %} <li><a href="?page={{ i }}&status={{status}}">{{ i }}</a></li>
+                                {% endif %}
+                                {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                
+                {% endif %}
+            {% else %}
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-report-d-interaction-table-area" style="text-align: center; padding: 40px 40px;">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="40" height="40" fill="#E5E5E5"/>
+                        <g clip-path="url(#clip0)">
+                        <rect width="1440" height="760" transform="translate(-749 -242)" fill="white"/>
+                        <rect x="-672" y="-186" width="1363" height="704" fill="#FAFAFA"/>
+                        <rect x="-482" y="-47" width="1163" height="142" rx="8" fill="white"/>
+                        <g opacity="0.15" clip-path="url(#clip1)">
+                        <path d="M19.8234 39.9998C19.605 39.9998 19.3917 39.9132 19.2334 39.7565C19.0367 39.5598 18.95 39.2765 19.005 39.0048L20.1834 33.1132C20.2167 32.9498 20.2934 32.8015 20.4117 32.6865L33.375 19.7232C34.3484 18.7498 35.9367 18.7498 36.91 19.7232L39.2667 22.0798C40.2417 23.0548 40.2417 24.6398 39.2667 25.6148L26.3034 38.5782C26.1884 38.6948 26.04 38.7732 25.8767 38.8065L19.985 39.9848C19.9317 39.9948 19.8767 39.9998 19.8234 39.9998ZM21.77 33.6848L20.8867 38.1032L25.305 37.2198L38.09 24.4348C38.415 24.1098 38.415 23.5815 38.09 23.2565L35.7334 20.8998C35.4084 20.5748 34.88 20.5748 34.555 20.8998L21.77 33.6848ZM25.715 37.9882H25.7317H25.715Z" fill="#757575"/>
+                        <path d="M15.8333 35H4.16667C1.86833 35 0 33.1317 0 30.8333V9.16667C0 6.86833 1.86833 5 4.16667 5H7.5C7.96 5 8.33333 5.37333 8.33333 5.83333C8.33333 6.29333 7.96 6.66667 7.5 6.66667H4.16667C2.78833 6.66667 1.66667 7.78833 1.66667 9.16667V30.8333C1.66667 32.2117 2.78833 33.3333 4.16667 33.3333H15.8333C16.2933 33.3333 16.6667 33.7067 16.6667 34.1667C16.6667 34.6267 16.2933 35 15.8333 35Z" fill="#757575"/>
+                        <path d="M27.5 20C27.04 20 26.6667 19.6267 26.6667 19.1667V9.16667C26.6667 7.78833 25.545 6.66667 24.1667 6.66667H20.8333C20.3733 6.66667 20 6.29333 20 5.83333C20 5.37333 20.3733 5 20.8333 5H24.1667C26.465 5 28.3333 6.86833 28.3333 9.16667V19.1667C28.3333 19.6267 27.96 20 27.5 20Z" fill="#757575"/>
+                        <path d="M19.1667 10H9.16675C7.78841 10 6.66675 8.87833 6.66675 7.5V4.16667C6.66675 3.70667 7.04008 3.33333 7.50008 3.33333H10.0834C10.4701 1.43333 12.1551 0 14.1667 0C16.1784 0 17.8634 1.43333 18.2501 3.33333H20.8334C21.2934 3.33333 21.6667 3.70667 21.6667 4.16667V7.5C21.6667 8.87833 20.5451 10 19.1667 10ZM8.33341 5V7.5C8.33341 7.95833 8.70842 8.33333 9.16675 8.33333H19.1667C19.6251 8.33333 20.0001 7.95833 20.0001 7.5V5H17.5001C17.0401 5 16.6667 4.62667 16.6667 4.16667C16.6667 2.78833 15.5451 1.66667 14.1667 1.66667C12.7884 1.66667 11.6667 2.78833 11.6667 4.16667C11.6667 4.62667 11.2934 5 10.8334 5H8.33341Z" fill="#757575"/>
+                        <path d="M22.5 14.9997H5.83333C5.37333 14.9997 5 14.6263 5 14.1663C5 13.7063 5.37333 13.333 5.83333 13.333H22.5C22.96 13.333 23.3333 13.7063 23.3333 14.1663C23.3333 14.6263 22.96 14.9997 22.5 14.9997Z" fill="#757575"/>
+                        <path d="M22.5 19.9997H5.83333C5.37333 19.9997 5 19.6263 5 19.1663C5 18.7063 5.37333 18.333 5.83333 18.333H22.5C22.96 18.333 23.3333 18.7063 23.3333 19.1663C23.3333 19.6263 22.96 19.9997 22.5 19.9997Z" fill="#757575"/>
+                        <path d="M22.5 24.9997H5.83333C5.37333 24.9997 5 24.6263 5 24.1663C5 23.7063 5.37333 23.333 5.83333 23.333H22.5C22.96 23.333 23.3333 23.7063 23.3333 24.1663C23.3333 24.6263 22.96 24.9997 22.5 24.9997Z" fill="#757575"/>
+                        </g>
+                        </g>
+                        <defs>
+                        <clipPath id="clip0">
+                        <rect width="1440" height="760" fill="white" transform="translate(-749 -242)"/>
+                        </clipPath>
+                        <clipPath id="clip1">
+                        <rect width="40" height="40" fill="white"/>
+                        </clipPath>
+                        </defs>
+                    </svg>
+                <span style="color: rgba(134, 134, 134, 0.5); font-size:20px;">No users available</span>
+            </div>
+            {% endif %}
+			
+		</div>
+	</div>
+</div>
+<div class="modal fade backdrop" id="modal-create-agent" tabindex="-1" aria-labelledby="Admin_manage_user_Createnew_modal_label" aria-modal="true" role="dialog">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h6>Create New User</h6>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-6 mb-2">
+                                            <label>Full Name</label>
+                                            <input class="form-control" id="new-agent-name" name="start" type="text" placeholder="Enter Full Name" required>
+                                        </div>
+                                        <div class="col-6 mb-2">
+                                            <label>Phone Number</label>
+
+                                            <input class="form-control" id="new-agent-phone" name="end" type="number" placeholder="Enter Phone Number" required="">
+                                        </div>
+                                        <div class="col-6 mb-2">
+                                            <label>Email</label>
+                                            <input id="new-agent-email" type="email" class="form-control" name="start" placeholder="Enter Email" required>
+                                        </div>
+                                        {% if user_obj.status == "1" %}
+                                        <div class="col-6 mb-2">
+                                            <label>Bot</label>
+                                            <select  class="form-control select-dropdown-icon selectpicker create-user-select-field" id="livechat-user-bot-select">
+                                                
+                                                {% for bot in bot_objs %}
+                                                <option value="{{bot.pk}}-{{bot.name}}">{{bot.name}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        {% endif %}
+                                        {% if user_obj.status == "2" %}
+                                        <div class="col-6 mb-2">
+                                            <label>Support Level</label>
+                                            <select  class="form-control select-dropdown-icon selectpicker create-user-select-field" id="agent-support-level">
+                                                <option value="1">L1</option>
+                                                <option value="2">L2</option>
+                                                <option value="3">L3</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-6 mb-2">
+                                            <label>Bot</label>
+                                            <select  class="form-control select-dropdown-icon selectpicker create-user-select-field" id="livechat-user-bot-select">
+                                                {% for bot in bot_objs %}
+                                                <option value="{{bot.pk}}-{{bot.name}}">{{bot.name}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        {% endif %}
+                                        <div class="col-6 mb-2">
+                                            {% if user_obj.status == "1" %}
+                                            <label>Status</label>
+                                            <select class="form-control select-dropdown-icon selectpicker create-user-select-field" id="status-agent" onchange="check_select_agent_status(this)">
+                                                
+                                                <option value="3">Live-Chat Agent</option>
+                                                <option value="2">Live-Chat Supervisor</option>
+                                            </select>
+                                        {% else %}
+                                        <label>Status</label>
+                                        <select class="form-control selectpicker create-user-select-field" disabled>
+                                                <option value="3">Live-Chat Agent</option>
+                                        </select>
+                                        {% endif %}
+                                        </div>
+                                        {% if user_obj.status == "1" %}
+                                        <div class="col-6 mb-2" id="livechat-user-supervisor-select">
+                                            <label>Select Supervisor</label>
+                                            <select class="form-control select-dropdown-icon selectpicker create-user-select-field" id="selected-supervisor" onchange="update_bot_list('Add')">
+                                            
+                                            <option value="{{user_obj.pk}}">{{user_obj.user.username}}(self)</option>
+                                            {% for supervisor in supervisor_obj_list %}
+                                             <option value="{{supervisor.pk}}">{{supervisor.user.username}}</option>
+                                            {% endfor %}
+                                            </select>
+                                        </div>
+                                        {% endif %}
+                                        <div class="col-12 mb-2" id="agent-max-customers-allowed">
+                                         
+                                            <label>Maximum number of customers with whom an agent can chat at a time</label>
+                                            <input class="form-control livechat-agent-max-customer-allowed" id="new-agent-max-customers-allowed" type="text" min="1" max="99" maxlength="2" onkeypress="return event.charCode >= 48 && event.charCode <=57 || event.keyCode == 8 || event.keyCode == 46"  placeholder="Enter Maximum Customers Allowed">
+                                         
+                                         </div>
+                                         
+                                        <div class="col-12 mb-2" id="agent-categories">
+                                            <label>Category</label>
+                                            <select name="day" class="form-control select-dropdown-icon selectpicker create-user-select-field" id="livechat-agent-category">
+                                            <option selected hidden value="hidden">Select Category</option>
+                                            {% for item in livechat_categories %}
+                                                {% if item.title == "Others" %}
+                                                <option value="{{item.pk}}-{{item.title}}">Category: {{item.title}} -  Bot: {{item.bot.name}}</option>
+                                                {% else %}
+                                                <option value="{{item.pk}}-{{item.title}}">Category: {{item.title}}  -  Bot: {{item.bot.name}}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                        </div>
+
+                                        <div class="row mt-2">
+                                <div class="row">
+                                    <div class="col-12" style="display: flex; flex-wrap: wrap;" id="category-chips">
+                                    <!-- Added dynamically -->
+                                    </div>
+                                </div>                
+                                </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer" style="border-top: 1px solid #e3e6f0;">
+
+
+                                    <div style="float: right;">
+                                        <button class="btn-close" type="button" onclick="cancel_agent_modal()" data-dismiss="modal">Cancel</button>
+                                        <button class="btn-primary" type="button" id="create-agent-btn" onclick="create_agent('true')">Create User</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                </div>
+
+                    <div class="modal fade backdrop" id="create-agent-using-excel-modal" tabindex="-1" aria-labelledby="Admin_manage_user_Uploadexcel_modal_label" aria-modal="true" role="dialog">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h6>Add Users Via Excel</h6>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <p style="padding-left: 1em;padding-bottom: 1em;font-size: 13px;color: #2d2d2d;">You can upload both Agents and Supervisors using this</p>
+                                        <div class="col-12 mb-4 upload-excel-div">
+                                            <input type="file" id="real-file" hidden="hidden">
+                                            <button type="button" id="custom-button">Choose File </button>
+                                            <span id="custom-text">No file chosen</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+
+                                    <button class="download-template-Btn" id="download_create_agent_template" type="button" data-dismiss="modal">Download Template</button>
+                                    <div style="float: right;">
+                                        <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                                        <button class="btn-primary" type="button" id="submit_agents_excel">Upload</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal fade backdrop" id="modal-delete-agent" tabindex="-1" aria-labelledby="Admin_manage_user_Delete_user_modal_label" aria-modal="true" role="dialog">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h6>Delete User</h6>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-12 mb-4">
+                                            <p style="font-weight: 500; font-size: 13px; color: #4D4D4D;"> Are you sure you want to delete the user/s?</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <div style="float: right;">
+                                        <button class="btn-primary" type="button" id="delete-agent-btn" onclick="delete_agent()" data-delete_user_type="multiple">Yes</button>
+                                        <button class="btn-close" type="button" data-dismiss="modal">No</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% for temp_user_obj in user_obj_list %}
+                    <div class="modal backdrop fade manage-user-edit-modal-div" id="modal-edit-agent-info-{{temp_user_obj.pk}}" tabindex="-1"
+                        aria-labelledby="Admin_manage_user_edit_user_modal_label" aria-modal="true" role="dialog">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h6>Edit User</h6>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-6 mb-2">
+                                            <label>Full Name</label>
+                                            <input class="form-control" id="edit-agent-name-{{temp_user_obj.pk}}" name="start" type="text"
+                                                placeholder="Enter Full Name"
+                                                value="{{temp_user_obj.user.first_name}} {{temp_user_obj.user.last_name}}">
+                                        </div>
+                                        <div class="col-6 mb-2">
+                                            <label>Phone Number</label>
+                                            <input class="form-control" id="agent-phone-{{temp_user_obj.pk}}" name="end" type="number"
+                                                placeholder="Enter Phone Number" value="{{temp_user_obj.phone_number}}">
+                                        </div>
+                                        <div class="col-6 mb-2">
+                                            <label>Email</label>
+                                            <input id="agent-email-{{temp_user_obj.pk}}" type="email" class="form-control" name="start"
+                                                placeholder="Enter Email" value="{{temp_user_obj.user.email}}" disabled>
+                                        </div>
+                                        <div class="col-6 mb-2">
+                                            <label>Bot</label>
+
+                                            <div style="background-color: #eaecf4;
+                                                    opacity: 1;
+                                                    height: 36px;
+                                                    border: 1px solid #d1d3e2;
+                                                    border-radius: 0.35rem;">
+                                                {% for bot in bot_objs %}
+                                                {% if bot in temp_user_obj.bots.all %}	
+                                                    <input style="border: none; height: 34px;" id="livechat-user-bot-{{temp_user_obj.pk}}" type="text" class="form-control" name="start" value="{{bot.name}}" disabled>
+                                                {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                    					<!-- This piece of code will be used in future(Do not remove it) -->
+
+                                        <!-- <div class="col-6 mb-2">
+                                            {% if user_obj.status == "1" %}
+                                            <label>Status</label>
+                                            <select class="form-control select-dropdown-icon" id="status-agent-{{temp_user_obj.pk}}"
+                                                onchange="check_select_agent_status(this)">
+                    
+                                                <option value="3">Live-Chat Agent</option>
+                                                <option value="2">Live-Chat Supervisor</option>
+                                            </select>
+                                            {% else %}
+                                            <label>Status</label>
+                                            <select class="form-control select-dropdown-icon" disabled>
+                                                    <option value="3">Live-Chat Agent</option>
+                                            </select>
+                                            {% endif %}
+                                        </div>
+                                        {% if user_obj.status == "1" %}
+                                        <div class="col-6 mb-2" id="livechat-user-supervisor-select">
+                                            <label>Select supervisor</label>
+                                            <select class="form-control" id="selected-supervisor-{{temp_user_obj.pk}}"
+                                                onchange="update_bot_list({{temp_user_obj.pk}})">
+                                                {% if temp_user_obj.get_supervisor_pk == user_obj.pk %}
+                                                <option value="{{user_obj.pk}}" selected>{{user_obj.user.username}}(self)</option>
+                                                {% else %}
+                                                <option value="{{user_obj.pk}}">{{user_obj.user.username}}(self)</option>
+                                                {% endif %}
+                                                {% for supervisor in supervisor_obj_list %}
+                                                {% if temp_user_obj.get_supervisor_pk == supervisor.pk %}
+                                                <option value="{{supervisor.pk}}" selected>{{supervisor.user.username}}</option>
+                                                {% else %}
+                                                <option value="{{supervisor.pk}}">{{supervisor.user.username}}</option>
+                                                {% endif %}
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        {% endif %} -->
+                                        {% if temp_user_obj.status == "3" %}
+                                        <div class="col-12 mb-2" >
+                                        
+                                            <label>Maximum number of customers with whom an agent can chat at a time</label>
+                                            <input class="form-control livechat-agent-max-customer-allowed" id="edit-agent-max-customers-allowed-{{temp_user_obj.pk}}" type="text" maxlength="2" onkeypress="return event.charCode >= 48 && event.charCode <=57 || event.keyCode == 8 || event.keyCode == 46" placeholder="Enter Maximum Customers Allowed" value="{{temp_user_obj.get_max_customer_count}}">
+                                         
+                                        </div>
+                                        
+                                            {% if user_obj.status == "1" %}
+                                            <div class="col-12 mb-2" id="">
+                                                <label>Supervisor</label>
+                                                <select class="form-control select-dropdown-icon livechat-agent-category-edit selectpicker create-user-select-field" id="select-agents-supervisor-{{temp_user_obj.pk}}" onchange="get_livechat_user_category(event, {{temp_user_obj.pk}})">
+                                                        <option selected="" hidden="" value="hidden">Select supervisor</option>
+                                                        {% if temp_user_obj.get_supervisor_pk == user_obj.pk %}
+                                                        <option value="{{user_obj.pk}}" selected>{{user_obj.user.username}}(self)</option>
+                                                        {% else %}
+                                                        <option value="{{user_obj.pk}}">{{user_obj.user.username}}(self)</option>
+                                                        {% endif %}
+                                                        {% for supervisor in supervisor_obj_list %}
+                                                        {% check_if_supervisor_has_agents_bot temp_user_obj supervisor as is_valid %}
+                                                        {% if is_valid %}
+                                                            {% if temp_user_obj.get_supervisor_pk == supervisor.pk %}
+                                                            <option value="{{supervisor.pk}}" selected>{{supervisor.user.username}}</option>
+                                                            {% else %}
+                                                            <option value="{{supervisor.pk}}">{{supervisor.user.username}}</option>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                        {% endfor %}
+                                                </select>
+                                            </div>
+                                            {% elif user_obj.status == "2" %}
+                                                <span style="display: hidden;" data-agents-supervisor-pk="{{ temp_user_obj.get_supervisor_pk }}" id="select-agents-supervisor-{{temp_user_obj.pk}}" ></span>
+                                            {% endif %}
+                                        {% endif %}
+                                        <div class="col-12 mb-2" id="agent-categories-{{temp_user_obj.pk}}">
+                                            <label>Category</label>
+                                            <select class="form-control select-dropdown-icon livechat-agent-category-edit selectpicker create-user-select-field"
+                                                id="livechat-agent-category-{{temp_user_obj.pk}}" onchange="add_category_chips_edit_modal(this, '{{temp_user_obj.pk}}', event)">
+                    							<option selected hidden value="hidden">Select Category</option>
+                                                {% for item in livechat_categories %}
+	                                                {% if item in temp_user_obj.category.all %}
+	                                                	<option value="{{item.pk}}-{{item.title}}">Category: {{item.title}} - Bot: {{item.bot.name}}</option>
+	                                                {% else %}
+	                                                	<option value="{{item.pk}}-{{item.title}}">Category: {{item.title}} - Bot: {{item.bot.name}}</option>
+	                                                {% endif %}
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+
+                                        <div class="row mt-2">
+                                            <div class="row">
+                                                <div class="col-12" style="display: flex; flex-wrap: wrap;" id="category-chips-edit-{{temp_user_obj.pk}}">
+                                                    <!-- Added dynamically -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                    
+                                <div class="modal-footer" style="border-top: 1px solid #e3e6f0;">
+                    
+                    
+                                    <div style="float: right;">
+                                        <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                                        <button class="btn-primary" type="button" id="edit-agent-btn"
+                                            onclick="edit_agent_info('{{temp_user_obj.pk}}','{{temp_user_obj.status}}','{{user_obj.status}}')">Save Changes</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+	                <div id="agent-details-{{ temp_user_obj.pk }}" class="modal backdrop fade" tabindex="-1" role="dialog">
+	                    <div class="modal-dialog modal-lg" role="document">
+	                        <div class="modal-content">
+	                            <div class="modal-header">
+	                                <h6>
+                                    {% if temp_user_obj.status == "2" %}
+                                        Supervisor Details
+                                    {% elif temp_user_obj.status == "3" %}
+                                    	Agent Details
+                                    {% endif %}
+	                                </h6>
+	                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          								<span aria-hidden="true">&times;</span>
+        							</button>
+	                            </div>
+	                            <div class="modal-body">
+	                                <div class="row">
+	                                    <div class="col-md-6">
+	                                        <b>Name: </b> {{ temp_user_obj.user.first_name }} {{ temp_user_obj.user.last_name }}
+	                                    </div>
+	                                    <div class="col-md-6">
+	                                        <b>Bot Name: </b> {{ temp_user_obj.get_bot_list }}
+	                                    </div>
+	                                </div>
+	                                <br>
+	                                <div class="row">
+	                                    {% if user_obj.status == "1" %}
+	                                    <div class="col-md-6">
+	                                        <b>Type: </b> 
+	                                        {% if temp_user_obj.status == "2" %}
+	                                			Supervisor 
+	                            			{% elif temp_user_obj.status == "3" %}
+	                            				Agent 
+	                            			{% endif %}
+	                                    </div>
+	                                    {% endif %}
+	                                    <div class="col-md-6">
+	                                        <b>Supervisor: </b> {{ temp_user_obj.get_supervisor }}
+	                                    </div>
+	                                </div>  
+	                            </div>              
+	                        </div>    
+	                    </div>
+	                </div>
+                    
+                    {% endfor %}
+
+<!-- export modal start  -->
+<div class="modal fade backdrop " id="admin-manage-user-export-modal" tabindex="-1" aria-labelledby="Admin_manage_user_export_modal_label" aria-modal="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6>Download Details </h6>
+            </div>
+            <div class="modal-body">
+                <div class="row ">
+                    <div class="col-12 ">
+                        <div class="manage-user-export-modal-content">
+                            {% if user_obj.status == "1" %}
+                            <label class="checkbox custom-checkbox-input export-download-details-label">
+                            <input type="checkbox" class="show-users-dropdown-checkbox" value="" data-dropdown_id="select-agent-manage-user-export"> 
+                            <span class="checkmark"></span>
+                            Select agents
+                            </label>
+                            {% endif %}
+                            <div class="livechat-multiselect-dropdown     livechat-multiselect-filter-dropdown export-download-multiselect export-select-dropdown-collapse" {% if user_obj.status == "2" %} style="display: block;" {% else %} style="display: none;" {% endif %}>
+                                <select id="select-agent-manage-user-export" multiple="" class="form-control">
+                                        {% for agent in agents_list %}
+                                        <option value="{{agent.pk}}">{{agent.user.username}}</option>
+                                        {% endfor %}
+                                    </select>
+                            </div>
+                        </div>
+
+                    </div>
+                    {% if user_obj.status == "1" %}
+                    <div class="col-12 mt-3">
+                        <div class="manage-user-export-modal-content">
+                            <label class="checkbox custom-checkbox-input            export-download-details-label">
+                            <input type="checkbox" class="show-users-dropdown-checkbox" value="" data-dropdown_id="select-supervisor-manage-user-export"> 
+                            <span class="checkmark"></span>
+                           Select Supervisor  
+                            </label>
+                            <div class="livechat-multiselect-dropdown     livechat-multiselect-filter-dropdown export-download-multiselect export-select-dropdown-collapse">
+                                <select id="select-supervisor-manage-user-export" multiple="" class="form-control">
+                                        {% for supervisor in supervisors_list %}
+                                        <option value="{{supervisor.pk}}">{{supervisor.user.username}}</option>
+                                        {% endfor %}
+                                    </select>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <div style="float: right;">
+                    <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                    <button class="btn-primary" id="livechat-users-export-btn" type="button">Download</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- export modal end  -->
+
+<script src="{% static 'LiveChatApp/js/bootstrap-multiselect.js' %}"></script>
+<script type="text/javascript">
+	window.LIVECHAT_THEME_COLOR = '{{admin_config.get_livechat_theme_lighten_one}}'
+	window.LIVECHAT_USER_STATUS = '{{user_obj.status}}'
+	window.OriginalModal = $('#modal-create-agent').clone();
+    window.TOTAL_USERS = '{{total_agents}}';
+
+	$(document).ready(function() {
+		
+        $('#table-agent-details').DataTable({
+            "language": {
+              "info": "Showing _START_ to _END_ entries out of {{ total_user_objs }}",
+              "infoEmpty": "No records available",
+              "infoFiltered": "(filtered from _MAX_ total records)",
+            },
+            "bPaginate": false,
+            "ordering": false,
+            "drawCallback": function( settings ) {
+                if(settings.aiDisplay.length <= 0){
+                    $("#table-agent-details thead th .custom-checkbox-input").hide();
+                }
+                else{
+                    $("#table-agent-details thead th .custom-checkbox-input").show();
+                }
+            },
+            "infoCallback": function( settings, start, end, max, total, pre ) {
+                if (settings.oPreviousSearch["sSearch"] != ""){
+                    return pre;
+                }
+                end = ({{ start_point }} - 1) + end;
+                start = ({{ start_point }} - 1) + start;
+                return "Showing " + start + " to " + end + " entries out of {{ total_user_objs }}";
+              }
+		});	  
+
+	var table = $('#table-agent-details').DataTable();
+
+    $('#table-agent-details-search').keyup(function() {
+      let value = this.value;
+      table.search(value).draw();
+    })
+
+    url_parameters = get_url_vars();
+    url_status = url_parameters["status"];	
+    var all_buttons_filter = document.getElementsByClassName('button-filter');
+    for (var i = 0; i < all_buttons_filter.length; i++) {
+		try {
+			all_buttons_filter[i].classList.remove('statusActive');
+		} catch (err) {console.log(err)}
+    }
+
+    var table_rows;
+    try {
+        table_rows = document.getElementById("table-agent-details").rows;
+    } catch (err) {
+        table_rows = null;
+        console.log(err)
+    }
+
+        if(url_status == "total"){
+            document.getElementById("all").classList.add('statusActive')
+            if (table_rows){
+                for (row = 1; row < table_rows.length; row++) {
+                    table_rows[row].style.display = "";
+            	}
+            }
+        }
+	    else if (url_status == "logged-in") {
+		    document.getElementById("logged_in").classList.add('statusActive')
+		    if (table_rows){
+		    for (row = 1; row < table_rows.length; row++) {
+                let loggedIn = table_rows[row].dataset.loggedIn;
+                if (loggedIn == "False") {
+                    table_rows[row].style.display = "none";
+                } else {
+                    table_rows[row].style.display = "";
+                }
+            }
+        	}
+	    }
+	    else if (url_status == "not-ready") {
+		    document.getElementById("not_ready").classList.add('statusActive')
+		    if (table_rows){
+		    for (row = 1; row < table_rows.length; row++) {
+                let loggedIn = table_rows[row].dataset.loggedIn;
+                let userCurrentStatus = table_rows[row].dataset.userCurrentStatus;
+                let isActive = table_rows[row].dataset.isActive;
+                if (loggedIn == "True" && isActive == "False") {
+                    table_rows[row].style.display = "";
+                } else {
+                    table_rows[row].style.display = "none";
+                }
+            }
+        	}
+	    }
+	    else if (url_status == "ready") {
+		    document.getElementById("ready").classList.add('statusActive')
+		    if (table_rows){
+		    for (row = 1; row < table_rows.length; row++) {
+                let loggedIn = table_rows[row].dataset.loggedIn;
+                let userCurrentStatus = table_rows[row].dataset.userCurrentStatus;
+                let isActive = table_rows[row].dataset.isActive;
+                if (loggedIn == "True" && isActive == "True") {
+                    table_rows[row].style.display = "";
+                } else {
+                    table_rows[row].style.display = "none";
+                }
+
+            }
+           } 
+		}
+    });
+
+    function check_select_agent_status(element){
+        if(element.value=="3"){
+			const elem  = document.getElementById("selected-supervisor-div");
+			/* elem.classList.remove('selected-supervisor-div-disabled'); */
+			document.getElementById("agent-max-customers-allowed").style.display="block";
+			document.getElementById("selected-supervisor").disabled = false;
+        }else{
+			const elem  = document.getElementById("selected-supervisor-div");
+			/* elem.classList.add('selected-supervisor-div-disabled'); */
+		
+			document.getElementById("agent-max-customers-allowed").style.display="none";
+			
+			document.getElementById("selected-supervisor").disabled = true;
+        }
+    }
+
+	function get_url_vars() {
+    	var vars = {};
+    	var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
+        	vars[key] = value;
+    	});
+    	return vars;
+	}
+
+	function show_agent_details(status) {
+        if(status=="all"){
+                window.location.href="/livechat/manage-agents/?status=total&user_type={{user_type}}"
+        }else if(status=="logged-in"){
+                window.location.href="/livechat/manage-agents/?status=logged-in&user_type={{user_type}}"
+        }else if(status=="not-ready"){
+                window.location.href="/livechat/manage-agents/?status=not-ready&user_type={{user_type}}"
+        }else if(status=="ready"){
+                window.location.href="/livechat/manage-agents/?status=ready&user_type={{user_type}}"
+        }
+	}
+
+	function open_create_user_modal() {
+		document.getElementById('modal-create-agent').style.display = 'block';
+	}
+
+	function close_create_user_modal() {
+		document.getElementById('new-agent-name').value = '';
+		document.getElementById('new-agent-phone').value = '';
+		document.getElementById('new-agent-email').value = '';
+		document.getElementById('selected-supervisor').value = '';
+		document.getElementById('livechat-user-bot-select').value = ''
+		document.getElementById('category-chips').innerHTML = ''
+		document.getElementById('livechat-user-status-select').style.display = 'block';
+		document.getElementById('livechat-user-supervisor-select').style.marginLeft = '8px';
+		document.getElementById('create-agent-btn').style.display = 'inline-block';
+		document.getElementById('edit-agent-btn').style.display = 'none';
+		document.getElementById('modal-create-agent').style.display = 'none';
+	}
+
+	function open_edit_user_modal(elem, user_id,bot_name) {
+		
+		let categories = elem.dataset.category.split(',');
+		
+		let categories_chip_parent = document.getElementById('category-chips-edit-'+user_id);
+		categories_chip_parent.innerHTML = '';
+
+		let el = document.getElementById('livechat-agent-category');
+		for (let i=0; i<categories.length; ++i) {
+			let selected_id = '';
+			for(let j=0; j<el.length; ++j) {
+				let val = el[j].value.split('-')[1];
+				let id = el[j].value.split('-')[0]
+				if(categories[i].trim() == val && el[j].innerHTML.indexOf(" "+bot_name) > -1) {
+					selected_id = id;
+					break;
+				}
+			}
+            
+			let chip = '<div class="modal-chip-edit modal-chip-edit-'+user_id+'" id="'+user_id+'-'+selected_id+'">\
+                             <p style="padding-left:20px;">\
+                                '+categories[i].trim()+'</p>\
+                            <img src="/static/LiveChatApp/img/modal-chip-icon.svg" onclick = "remove_selected_category(this)">\
+						</div>';
+			
+			$(categories_chip_parent).append(chip);
+		}
+
+		
+	}
+
+    function check_file_name(file_name) {
+        const special_char_regex = /[-'/`~!#*$@%+=,^&(){}[\]|;:<>"?\\]/g;
+        file_name = file_name.replace(special_char_regex, '_');
+        file_name = file_name.replaceAll(" ","");
+        return file_name;
+    }
+
+	function remove_selected_category(elem) {
+		elem.parentElement.remove();
+	}
+    $('#custom-button').on("click",function () {
+        $('#real-file').click();
+    })
+    $('#real-file').change(function(){
+        var choosen_file= document.querySelector('#real-file').files[0].name;
+        choosen_file = check_file_name(choosen_file)
+        document.querySelector('#custom-text').innerHTML=choosen_file;
+        
+    })
+    $('#deleteuserBtn').click(function(){
+        $("#modal-delete-agent").modal({show:true});
+    })
+    </script>
+{% endblock %}

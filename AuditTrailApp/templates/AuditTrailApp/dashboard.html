@@ -1,0 +1,335 @@
+{% extends 'AuditTrailApp/console.html' %}
+{% block content %}
+{% load static %}
+
+<style>
+.dataTables_filter {
+    display: none!important;
+}
+</style>
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3" style="min-height: 60px;">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h6 class="m-0 font-weight-bold text-primary heading-text-primary">Audit Trail</h6>
+                </div>
+                <div class="col-sm-6" id="tms_ticket_table_card_header_right">
+                    <a title="Edit" style="cursor: pointer;" data-toggle="modal" data-target="#campaign_meta_data_table" onclick="disable_content_refresh()">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" class="svg-theme-color">
+                            <path d="M13.2692 0.730772C14.2436 1.70513 14.2436 3.28489 13.2692 4.25925L4.92447 12.604C4.73142 12.7971 4.49134 12.9364 4.22794 13.0082L0.661097 13.981C0.270732 14.0875 -0.0874597 13.7293 0.0190035 13.3389L0.99178 9.77206C1.06361 9.50867 1.20294 9.26858 1.39599 9.07553L9.74075 0.730772C10.7151 -0.243591 12.2949 -0.243591 13.2692 0.730772ZM9.06478 2.88586L2.13552 9.81506C2.07117 9.87941 2.02473 9.95944 2.00078 10.0472L1.26879 12.7312L3.95276 11.9992C4.04056 11.9753 4.12059 11.9288 4.18494 11.8645L11.114 4.93504L9.06478 2.88586ZM10.4803 1.4703L9.80385 2.1461L11.853 4.19597L12.5297 3.51972C13.0956 2.95379 13.0956 2.03623 12.5297 1.4703C11.9638 0.904373 11.0462 0.904373 10.4803 1.4703Z" fill="#0254D7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="custom-btn-row">
+                <div class="custom-filter-container">
+                    <input type="text" class="campaign_search_bar" id="audit-trail-search-bar" placeholder="Search Audit Trail">
+                </div>
+                <div>
+                    <button class="btn btn-primary custom_filter_btn" data-toggle="modal" data-target="#campaign_custom_filter_modal">
+                        <svg width="17" height="9" viewBox="0 0 17 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6.08333 8.35714C6.08333 8.18665 6.15357 8.02313 6.2786 7.90257C6.40362 7.78201 6.57319 7.71429 6.75 7.71429H10.75C10.9268 7.71429 11.0964 7.78201 11.2214 7.90257C11.3464 8.02313 11.4167 8.18665 11.4167 8.35714C11.4167 8.52764 11.3464 8.69115 11.2214 8.81171C11.0964 8.93227 10.9268 9 10.75 9H6.75C6.57319 9 6.40362 8.93227 6.2786 8.81171C6.15357 8.69115 6.08333 8.52764 6.08333 8.35714ZM3.41667 4.5C3.41667 4.3295 3.4869 4.16599 3.61193 4.04543C3.73695 3.92487 3.90652 3.85714 4.08333 3.85714H13.4167C13.5935 3.85714 13.763 3.92487 13.8881 4.04543C14.0131 4.16599 14.0833 4.3295 14.0833 4.5C14.0833 4.6705 14.0131 4.83401 13.8881 4.95457C13.763 5.07513 13.5935 5.14286 13.4167 5.14286H4.08333C3.90652 5.14286 3.73695 5.07513 3.61193 4.95457C3.4869 4.83401 3.41667 4.6705 3.41667 4.5ZM0.75 0.642857C0.75 0.472361 0.820238 0.308848 0.945262 0.188289C1.07029 0.0677295 1.23986 0 1.41667 0H16.0833C16.2601 0 16.4297 0.0677295 16.5547 0.188289C16.6798 0.308848 16.75 0.472361 16.75 0.642857C16.75 0.813353 16.6798 0.976867 16.5547 1.09743C16.4297 1.21798 16.2601 1.28571 16.0833 1.28571H1.41667C1.23986 1.28571 1.07029 1.21798 0.945262 1.09743C0.820238 0.976867 0.75 0.813353 0.75 0.642857Z" fill="#fff"/>
+                        </svg>
+                        <span>Filter</span>
+                    </button>
+                </div>
+                <div>
+                    <button class="btn btn-primary custom_export_btn" data-toggle="modal" data-target="#campaign_multi_export_modal">
+                        <span>Export</span>
+                        <svg width="16" height="11" viewBox="0 0 16 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 9.58965H2.25V3.24309H4.19625C4.19625 3.24309 4.713 2.61126 5.82375 1.83275H1.5C1.30109 1.83275 1.11032 1.90704 0.96967 2.03929C0.829018 2.17153 0.75 2.3509 0.75 2.53792L0.75 10.2948C0.75 10.4819 0.829018 10.6612 0.96967 10.7935C1.11032 10.9257 1.30109 11 1.5 11H12.75C12.9489 11 13.1397 10.9257 13.2803 10.7935C13.421 10.6612 13.5 10.4819 13.5 10.2948V7.65325L12 8.81326V9.58965ZM10.7708 4.6887V7.19277L15.75 3.52516L10.7708 0V2.2079C4.725 2.2079 4.725 7.82672 4.725 7.82672C6.4365 5.18373 7.4895 4.6887 10.7708 4.6887Z" fill="white"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive avtive-customer-table" id="audit_trail_dashboard_table">
+            </div>
+            <div class="row mt-3" id="audit_trail_table_pagination_div"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade custom_modal" id="campaign_custom_filter_modal" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row">
+                    <div class="col-10">
+                        <h5 class="modal-title">Filter Data</h5>
+                    </div>
+                    <div class="col-2" style="text-align: right; padding-right: 0">
+                        <button class="btn" type="button" data-dismiss="modal" style="padding: 0!important">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13.4931 0.710017C13.3063 0.522765 13.0526 0.417532 12.7881 0.417532C12.5236 0.417532 12.2699 0.522765 12.0831 0.710017L7.19309 5.59002L2.30309 0.700017C2.11625 0.512765 1.8626 0.407532 1.59809 0.407532C1.33357 0.407532 1.07992 0.512765 0.893086 0.700017C0.503086 1.09002 0.503086 1.72002 0.893086 2.11002L5.78309 7.00002L0.893086 11.89C0.503086 12.28 0.503086 12.91 0.893086 13.3C1.28309 13.69 1.91309 13.69 2.30309 13.3L7.19309 8.41002L12.0831 13.3C12.4731 13.69 13.1031 13.69 13.4931 13.3C13.8831 12.91 13.8831 12.28 13.4931 11.89L8.60309 7.00002L13.4931 2.11002C13.8731 1.73002 13.8731 1.09002 13.4931 0.710017Z" fill="black" fill-opacity="0.54"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <hr />
+            </div>
+            <div class="modal-body">
+                <div class="col-sm-12 campaign-filter-select-area">
+                    <div class="filter-heading">
+                        Select Date Range
+                    </div>
+                    <label>
+                    <input type="radio" name="campaign-overview-filter" id="campaign_overview_week" value="1" start_date_value="2021-07-31" end_date_value="2021-08-07" checked="" onclick="show_custom_date(this);">
+                    <div class="filter-box">
+                      <span>Last Week</span>
+                    </div>
+                  </label>
+                    <label>
+                    <input type="radio" name="campaign-overview-filter" id="campaign_overview_month" value="2" start_date_value="2021-07-08" end_date_value="2021-08-07" onclick="show_custom_date(this);">
+                    <div class=" filter-box">
+                      <span>Last Month</span>
+                    </div>
+                  </label>
+                    <label>
+                    <input type="radio" name="campaign-overview-filter" id="campaign_overview_three_month" value="3" start_date_value="2021-05-09" end_date_value="2021-08-07" onclick="show_custom_date(this);">
+                    <div class=" filter-box">
+                      <span>Last 3 Month</span>
+                    </div>
+                  </label>
+                    <label>
+                    <input type="radio" name="campaign-overview-filter" id="campaign_overview_beg" value="4" start_date_value="2021-02-07" end_date_value="2021-08-07" onclick="show_custom_date(this);">
+                    <div class=" filter-box">
+                      <span>From Beginning</span>
+                    </div>
+                  </label>
+                    <label>
+                    <input type="radio" name="campaign-overview-filter" id="campaign_overview_custom_date_btn" value="5" onclick="show_custom_date(this);">
+                    <div class=" filter-box">
+                      <span>Custom Date</span>
+                    </div>
+                  </label>
+                </div>
+
+                <div class="col-sm-12 campaign-custom-date-select-area" id="campaign-custom-date-select-area-flow" style="display: none; gap: 1em;">
+
+                    <div class="col-sm-5" style="padding: 0px; font-weight: 600;color: #4d4d4d;font-size: 14px;">
+                        Start Date
+                        <input type="date" class="form-control" id="campaign_filter_custom_start_date" value="{{default_start_date|date:"Y-m-d"}}" style="margin-top: 10px;">
+                    </div>
+                    <div class="col-sm-5" style="font-weight: 600; padding: 0px;color: #4d4d4d;font-size: 14px;">
+                        End Date
+                        <input type="date" class="form-control" id="campaign_filter_custom_end_date" value="{{default_end_date|date:"Y-m-d"}}" style="margin-top: 10px;">
+                    </div>
+                </div>
+
+                <div class="col-sm-12 campaign-filter-status-select-area">
+                    <div class="filter-heading">
+                        Select Status
+                    </div>
+                    <label>
+                        <input type="checkbox" name="campaign-overview-filter-status" value="easychatapp">
+                        <div class="status-box">
+                            <img src="/static/EasyChatApp/img/favicon.svg" alt="ChatBotIcon"/>
+                            <span>Chat Bot</span>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="checkbox" name="campaign-overview-filter-status" value="livechatapp">
+                        <div class="status-box">
+                            <img src="/static/LiveChatApp/img/favicon.svg" alt="LiveChatIcon"/>
+                            <span>Live Chat</span>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="checkbox" name="campaign-overview-filter-status" value="easyassistapp">
+                        <div class="status-box">
+                            <img src="/static/EasyAssistApp/img/cobrowseLogoShort.svg" alt="CognoCobrowseIcon"/>
+                            <span>Cobrowsing</span>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="checkbox" name="campaign-overview-filter-status" value="easytmsapp">
+                        <div class="status-box">
+                            <img src="/static/EasyTMSApp/img/cognoDeskSmall.svg" alt="CognoDeskIcon"/>
+                            <span>Cogno Desk</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-text-only" type="button" data-dismiss="modal" onclick="clear_filter()">Clear Filter</button>
+                <button class="btn btn-primary btn-width-100" type="button" data-dismiss="modal" onclick="apply_campaign_filter()">Apply Filter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade custom_modal" id="campaign_meta_data_table" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row">
+                    <div class="col-10">
+                        <h5 class="modal-title">Table Meta Data</h5>
+                    </div>
+                    <div class="col-2" style="text-align: right; padding-right: 0">
+                        <button class="btn" type="button" data-dismiss="modal" style="padding: 0!important">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13.4931 0.710017C13.3063 0.522765 13.0526 0.417532 12.7881 0.417532C12.5236 0.417532 12.2699 0.522765 12.0831 0.710017L7.19309 5.59002L2.30309 0.700017C2.11625 0.512765 1.8626 0.407532 1.59809 0.407532C1.33357 0.407532 1.07992 0.512765 0.893086 0.700017C0.503086 1.09002 0.503086 1.72002 0.893086 2.11002L5.78309 7.00002L0.893086 11.89C0.503086 12.28 0.503086 12.91 0.893086 13.3C1.28309 13.69 1.91309 13.69 2.30309 13.3L7.19309 8.41002L12.0831 13.3C12.4731 13.69 13.1031 13.69 13.4931 13.3C13.8831 12.91 13.8831 12.28 13.4931 11.89L8.60309 7.00002L13.4931 2.11002C13.8731 1.73002 13.8731 1.09002 13.4931 0.710017Z" fill="black" fill-opacity="0.54"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <hr />
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="tms-noselect" id="lead_dala_table_meta_div">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary btn-width-100" type="button" data-dismiss="modal" onclick="save_lead_data_table_metadata()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade custom_modal" id="delete_selected_campaigns_modal" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row">
+                    <div class="col-10">
+                        <h5 class="modal-title">Delete Campaign</h5>
+                    </div>
+                    <div class="col-2" style="text-align: right; padding-right: 0">
+                        <button class="btn" type="button" data-dismiss="modal" style="padding: 0!important">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13.4931 0.710017C13.3063 0.522765 13.0526 0.417532 12.7881 0.417532C12.5236 0.417532 12.2699 0.522765 12.0831 0.710017L7.19309 5.59002L2.30309 0.700017C2.11625 0.512765 1.8626 0.407532 1.59809 0.407532C1.33357 0.407532 1.07992 0.512765 0.893086 0.700017C0.503086 1.09002 0.503086 1.72002 0.893086 2.11002L5.78309 7.00002L0.893086 11.89C0.503086 12.28 0.503086 12.91 0.893086 13.3C1.28309 13.69 1.91309 13.69 2.30309 13.3L7.19309 8.41002L12.0831 13.3C12.4731 13.69 13.1031 13.69 13.4931 13.3C13.8831 12.91 13.8831 12.28 13.4931 11.89L8.60309 7.00002L13.4931 2.11002C13.8731 1.73002 13.8731 1.09002 13.4931 0.710017Z" fill="black" fill-opacity="0.54"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <hr />
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete selected campaign(s)?</p>
+                <p class="error_element"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger btn-width-100" type="button" onclick="delete_selected_campaigns(this)">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade custom_modal" id="audit_trail_info_modal" role="dialog">
+    <div class="modal-dialog" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row">
+                    <div class="col-10">
+                        <h5 class="modal-title">Audit Trail Details</h5>
+                    </div>
+                    <div class="col-2" style="text-align: right; padding-right: 0">
+                        <button class="btn" type="button" data-dismiss="modal" style="padding: 0!important">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13.4931 0.710017C13.3063 0.522765 13.0526 0.417532 12.7881 0.417532C12.5236 0.417532 12.2699 0.522765 12.0831 0.710017L7.19309 5.59002L2.30309 0.700017C2.11625 0.512765 1.8626 0.407532 1.59809 0.407532C1.33357 0.407532 1.07992 0.512765 0.893086 0.700017C0.503086 1.09002 0.503086 1.72002 0.893086 2.11002L5.78309 7.00002L0.893086 11.89C0.503086 12.28 0.503086 12.91 0.893086 13.3C1.28309 13.69 1.91309 13.69 2.30309 13.3L7.19309 8.41002L12.0831 13.3C12.4731 13.69 13.1031 13.69 13.4931 13.3C13.8831 12.91 13.8831 12.28 13.4931 11.89L8.60309 7.00002L13.4931 2.11002C13.8731 1.73002 13.8731 1.09002 13.4931 0.710017Z" fill="black" fill-opacity="0.54"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <hr/>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h6 style="color: black;">Change Object</h6>
+                        <div>
+                            <pre class="change-object" contenteditable="false"></pre>
+                        </div>
+                        <h6 style="color: black;">API end point</h6>
+                        <div>
+                            <pre class="api-end-point" contenteditable="false"></pre>
+                        </div>
+                        <h6 style="color: black;">IP Address</h6>
+                        <div>
+                            <pre class="ip-address" contenteditable="false"></pre>
+                        </div>
+                    </div>
+                </div>
+                <p class="error_element"></p>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade custom_modal" id="campaign_multi_export_modal" tabindex="-1" role="dialog" aria-labelledby="client_location_details_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row">
+                    <div class="col-10">
+                        <h5 class="modal-title">Export Campaign Report</h5>
+                    </div>
+                    <div class="col-2" style="text-align: right; padding-right: 0">
+                        <button class="btn" type="button" data-dismiss="modal" style="padding: 0!important">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13.4931 0.710017C13.3063 0.522765 13.0526 0.417532 12.7881 0.417532C12.5236 0.417532 12.2699 0.522765 12.0831 0.710017L7.19309 5.59002L2.30309 0.700017C2.11625 0.512765 1.8626 0.407532 1.59809 0.407532C1.33357 0.407532 1.07992 0.512765 0.893086 0.700017C0.503086 1.09002 0.503086 1.72002 0.893086 2.11002L5.78309 7.00002L0.893086 11.89C0.503086 12.28 0.503086 12.91 0.893086 13.3C1.28309 13.69 1.91309 13.69 2.30309 13.3L7.19309 8.41002L12.0831 13.3C12.4731 13.69 13.1031 13.69 13.4931 13.3C13.8831 12.91 13.8831 12.28 13.4931 11.89L8.60309 7.00002L13.4931 2.11002C13.8731 1.73002 13.8731 1.09002 13.4931 0.710017Z" fill="black" fill-opacity="0.54"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <hr />
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h6>Select date range</h6>
+                        <div>
+                            <select id="select-date-range-2" onchange="check_select_date_range(this)">
+                                <option value="0" selected="selected">Choose date range</option>
+                                <option value="1">Last day</option>
+                                <option value="2">Last 7 days</option>
+                                <option value="3">Last 1 month</option>
+                                <option value="4">Custom Range</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 mt-4" id="from-date-div-2" style="display: none;">
+                        <h6>From Date</h6>
+                        <input id="startdate" placeholder="From Date" class="filter-parameter form-control datepicker" autocomplete="off" data-date-format="dd-mm-yyyy">
+                    </div>
+                    <div class="col-sm-6 mt-4" id="to-date-div-2" style="display: none;">
+                        <h6>To Date</h6>
+                        <input id="enddate" placeholder="To Date" class="filter-parameter form-control datepicker" autocomplete="off" data-date-format="dd-mm-yyyy">
+                    </div>
+                    <div class="col-sm-12" id="email-id-div-2" style="display: none; padding-top: 25px;">
+                        <h6>Email ID*</h6>
+                        <input class="form-control" id="filter-data-email-2" value="{{ request.user.email }}">
+                        <p class="mt-4">Note: You will receive the campaign report data dump on the above email ID within 24 hours.</p>
+                    </div>
+                    <div class="col-sm-12 mt-3" id="general-error-message-2" style="color: red;">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-primary btn-width-100" type="button" onclick="export_multi_request(this)">Export</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    window.DEFAULT_START_DATE = '{{default_start_date|date:"Y-m-d"}}';
+    window.DEFAULT_END_DATE = '{{default_end_date|date:"Y-m-d"}}';
+
+    $(document).ready(function() {
+        let export_date_range_element = document.getElementById("select-date-range-2");
+        new EasyassistCustomSelect(export_date_range_element, null, null);
+    })
+</script>
+
+{% endblock %}

@@ -1,0 +1,415 @@
+{% extends 'LiveChatApp/report_console.html' %} {% block consolecontent %} {% load static %}
+<style type="text/css">
+    .dataTables_filter {
+      display: none;
+    }
+    #login-logout-report-table_info {
+        font-size: 13px;
+        margin-top: 60px;
+        color: #4D4D4D;
+        width: 50%;
+        padding-left: 10px;
+        display: inline-block;
+        position: absolute;
+        bottom: 2px;
+    }
+
+    .dataTables_empty {
+	    text-align: center !important;
+    }
+.ui-state-default{
+  background: #f6f6f6 !important;
+  color: #454545 !important;
+  border: 1px solid #c5c5c5 !important;
+}
+.ui-state-highlight{
+    background: #ffffff !important;
+    color: {{admin_config.get_livechat_theme_lighten_one}} !important;
+}
+.ui-state-active{
+  background: {{admin_config.get_livechat_theme_lighten_one}} !important;
+  color: #ffffff !important;
+  border: 1px solid {{admin_config.get_livechat_theme_lighten_one}} !important;
+}
+.custom-checkbox-input input:checked~.checkmark {
+    background-color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+}
+
+.custom-checkbox-input  .checkmark{
+    border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }} !important;
+}
+
+.livechat-multiselect-dropdown.livechat-multiselect-filter-dropdown .multiselect-container {
+    scrollbar-color: {{ admin_config.get_livechat_theme_lighten_one }} #f1f1f1;
+}
+
+.livechat-multiselect-dropdown.livechat-multiselect-filter-dropdown ::-webkit-scrollbar-thumb {
+    background: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+}
+</style>
+<link href="{% static 'LiveChatApp/css/dropdown.css' %}?v={% random_int 1 100 %}" rel="stylesheet">
+
+<div class="col-xl-10 col-lg-10 col-md-12 col-sm-12 col-12 py-2 overflow-hidden-desktop" id="live-chat-reports-content-login-logout" style="height: calc(100vh - 4.375rem); background: #FAFAFA; overflow-y: auto; overflow-x: hidden; max-width: 83%;">
+
+    <div class="live-chat-report-d-interaction-heading ">
+        <div class="row">
+            <!-- <img src="./img/mobile-back.svg" class="back-arrow-div" id="live-chat-active-customers-opener-setting" onclick="myFunctionArrow()"> -->
+            <svg width="15" height="15" viewBox="0 0 15 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="15" height="15" fill="#E5E5E5"/>
+                <g clip-path="url(#clip0)">
+                <rect width="1440" height="760" transform="translate(-97 -254)" fill="white"/>
+                <rect x="-20" y="-198" width="1363" height="704" fill="#FAFAFA"/>
+                <rect x="-20" y="-198" width="180" height="704" fill="white"/>
+                <path d="M11.1544 1.7166C10.9919 1.50939 10.7301 1.5114 10.5695 1.72111C10.409 1.93081 10.4106 2.2688 10.573 2.47601L13.6237 6.36677L6.31358 6.36677C6.08516 6.36677 5.9 6.60577 5.9 6.90058C5.9 7.1954 6.08516 7.43439 6.31358 7.43439L13.6227 7.43439L10.573 11.3239C10.4106 11.5312 10.409 11.8691 10.5695 12.0788C10.7301 12.2886 10.9919 12.2906 11.1544 12.0834L14.8464 7.37461C15.0512 7.1134 15.0512 6.68656 14.8464 6.42535L11.1544 1.7166Z" fill="#4D4D4D"/>
+                <path d="M8.7 3.84979V2.3248C8.7 1.92035 8.5525 1.53246 8.28995 1.24646C8.0274 0.960473 7.6713 0.799805 7.3 0.799805H2.4C2.0287 0.799805 1.6726 0.960473 1.41005 1.24646C1.1475 1.53246 1 1.92035 1 2.3248V11.4748C1 11.8792 1.1475 12.2671 1.41005 12.5531C1.6726 12.8391 2.0287 12.9998 2.4 12.9998H7.3C7.6713 12.9998 8.0274 12.8391 8.28995 12.5531C8.5525 12.2671 8.7 11.8792 8.7 11.4748V9.94977" stroke="#4D4D4D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </g>
+                <defs>
+                <clipPath id="clip0">
+                <rect width="1440" height="760" fill="white" transform="translate(-97 -254)"/>
+                </clipPath>
+                </defs>
+            </svg>
+            <span>Login-Logout</span>
+        </div>
+        <div class="row">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-report-button-section">
+    
+                <button class="filter-button" id="filterBtn-loginlogout" data-toggle="modal" data-target="#apply-filter-report">Filters
+                    <svg width="16" height="9" viewBox="0 0 16 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="16" height="9" fill="#E5E5E5"/>
+                        <g clip-path="url(#clip0)">
+                        <rect width="1440" height="660" transform="translate(-174 -97)" fill="white"/>
+                        <rect x="-97" y="-41" width="1363" height="604" fill="#FAFAFA"/>
+                        <rect x="-88" y="-30" width="1345" height="68" fill="white"/>
+                        <rect x="-72.5" y="-13.5" width="103" height="34" rx="4.5" fill="white" stroke="#E6E6E6"/>
+                        <path d="M5.33333 8.35714C5.33333 8.18665 5.40357 8.02313 5.5286 7.90257C5.65362 7.78201 5.82319 7.71429 6 7.71429H10C10.1768 7.71429 10.3464 7.78201 10.4714 7.90257C10.5964 8.02313 10.6667 8.18665 10.6667 8.35714C10.6667 8.52764 10.5964 8.69115 10.4714 8.81171C10.3464 8.93227 10.1768 9 10 9H6C5.82319 9 5.65362 8.93227 5.5286 8.81171C5.40357 8.69115 5.33333 8.52764 5.33333 8.35714ZM2.66667 4.5C2.66667 4.3295 2.7369 4.16599 2.86193 4.04543C2.98695 3.92487 3.15652 3.85714 3.33333 3.85714H12.6667C12.8435 3.85714 13.013 3.92487 13.1381 4.04543C13.2631 4.16599 13.3333 4.3295 13.3333 4.5C13.3333 4.6705 13.2631 4.83401 13.1381 4.95457C13.013 5.07513 12.8435 5.14286 12.6667 5.14286H3.33333C3.15652 5.14286 2.98695 5.07513 2.86193 4.95457C2.7369 4.83401 2.66667 4.6705 2.66667 4.5ZM0 0.642857C0 0.472361 0.070238 0.308848 0.195262 0.188289C0.320287 0.0677295 0.489856 0 0.666667 0H15.3333C15.5101 0 15.6797 0.0677295 15.8047 0.188289C15.9298 0.308848 16 0.472361 16 0.642857C16 0.813353 15.9298 0.976867 15.8047 1.09743C15.6797 1.21798 15.5101 1.28571 15.3333 1.28571H0.666667C0.489856 1.28571 0.320287 1.21798 0.195262 1.09743C0.070238 0.976867 0 0.813353 0 0.642857Z" fill="#868686"/>
+                        </g>
+                        <defs>
+                        <clipPath id="clip0">
+                        <rect width="1440" height="660" fill="white" transform="translate(-174 -97)"/>
+                        </clipPath>
+                        </defs>
+                    </svg>
+                </button>
+                <button class="export-button" id="exportBtn-loginlogout" data-toggle="modal" data-target="#modal-report-filter">Export
+                    <svg width="15" height="11" viewBox="0 0 15 11" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-left: 12px; margin-top: -3px;">
+                        <rect width="15" height="11" fill="#E5E5E5"/>
+                        <g clip-path="url(#clip0)">
+                        <rect width="1440" height="660" transform="translate(-290 -95)" fill="white"/>
+                        <rect x="-213" y="-39" width="1363" height="604" fill="#FAFAFA"/>
+                        <rect x="-204" y="-28" width="1345" height="68" fill="white"/>
+                        <rect x="-65" y="-12" width="95" height="35" rx="5" fill="{{ admin_config.get_livechat_theme_lighten_one }}"/>
+                        <path d="M11.25 9.58965H1.5V3.24309H3.44625C3.44625 3.24309 3.963 2.61126 5.07375 1.83275H0.75C0.551088 1.83275 0.360322 1.90704 0.21967 2.03929C0.0790176 2.17153 0 2.3509 0 2.53792L0 10.2948C0 10.4819 0.0790176 10.6612 0.21967 10.7935C0.360322 10.9257 0.551088 11 0.75 11H12C12.1989 11 12.3897 10.9257 12.5303 10.7935C12.671 10.6612 12.75 10.4819 12.75 10.2948V7.65325L11.25 8.81326V9.58965ZM10.0208 4.6887V7.19277L15 3.52516L10.0208 0V2.2079C3.975 2.2079 3.975 7.82672 3.975 7.82672C5.6865 5.18373 6.7395 4.6887 10.0208 4.6887Z" fill="white"/>
+                        </g>
+                        <defs>
+                        <clipPath id="clip0">
+                        <rect width="1440" height="660" fill="white" transform="translate(-290 -95)"/>
+                        </clipPath>
+                        </defs>
+                    </svg>
+                </button>
+            
+                <div class="search-container">
+                    
+                        <button type="submit">
+                          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <rect width="13" height="13" fill="#E5E5E5"/>
+                              <g clip-path="url(#clip0)">
+                              <rect width="1440" height="660" transform="translate(-1209 -141)" fill="white"/>
+                              <rect x="-962" y="-85" width="1193" height="604" fill="#FAFAFA"/>
+                              <rect x="-952" y="-74" width="1174" height="114" fill="white"/>
+                              <g filter="url(#filter0_d)">
+                              <rect x="-14" y="-10" width="219" height="33" rx="5" fill="white"/>
+                              </g>
+                              <path d="M5.55942 11.1182C6.79289 11.118 7.99083 10.7051 8.96247 9.94526L12.0174 13L13 12.0174L9.9451 8.96269C10.7054 7.991 11.1185 6.79285 11.1188 5.55912C11.1188 2.49396 8.62474 0 5.55942 0C2.49409 0 0 2.49396 0 5.55912C0 8.62428 2.49409 11.1182 5.55942 11.1182ZM5.55942 1.38978C7.85893 1.38978 9.72898 3.25973 9.72898 5.55912C9.72898 7.85851 7.85893 9.72846 5.55942 9.72846C3.2599 9.72846 1.38985 7.85851 1.38985 5.55912C1.38985 3.25973 3.2599 1.38978 5.55942 1.38978Z" fill="#757575"/>
+                              </g>
+                              <defs>
+                              <filter id="filter0_d" x="-22" y="-18" width="235" height="49" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                              <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                              <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
+                              <feOffset/>
+                              <feGaussianBlur stdDeviation="4"/>
+                              <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.08 0"/>
+                              <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+                              <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+                              </filter>
+                              <clipPath id="clip0">
+                              <rect width="1440" height="660" fill="white" transform="translate(-1209 -141)"/>
+                              </clipPath>
+                              </defs>
+                          </svg> 
+                        </button>
+                        <input type="text" placeholder="Search" name="search" id="login-logout-report-table-search">
+
+                    
+                </div>
+
+
+            </div>
+        </div>
+
+    </div>
+    {% if session_objects %}
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-report-d-interaction-table-area live-chat-table-parent-div">
+        <table role="table" id="login-logout-report-table" class="display">
+            <thead role="rowgroup">
+                <tr role="row">
+                    <th role="columnheader">Agent Username </th>
+                    <th role="columnheader">Date</th>
+                    <th role="columnheader">Duration</th>
+                    <th role="columnheader">Agent Name </th>
+                    <th role="columnheader">Login Time</th>
+                    <th role="columnheader">Logout Time</th>
+                    <th role="columnheader">Online Time</th>
+                    <th role="columnheader" class="data-tooltip" data-toggle="tooltip" title="Total amount of time agent was offline.">Total Offline Time</th>
+                    <th role="columnheader" class="data-tooltip" data-toggle="tooltip" title="Total amount of time agent was not ready in the logged in period.">Not Ready Duration</th>
+
+
+                </tr>
+            </thead>
+            <tbody role="rowgroup">
+            {% for session in session_objects %}
+                <tr role="row">
+                    <td role="cell">{{ session.user.user.username }}</td>
+                    <td role="cell">{{ session.session_starts_at|date:"d-M-Y"}}</td>
+                    <td role="cell">{{ session.get_session_duration }}</td>
+                    <td role="cell">{{ session.get_name }}</td>
+                    <td role="cell">{{ session.session_starts_at|time:"h:i a" }}</td>
+                    <td role="cell">{{ session.session_ends_at|time:"h:i a" }}</td>
+                    <td role="cell">{{ session.get_total_online_time }}</td>
+                    <td role="cell">{{ session.get_total_offline_time }}</td>
+                    <td role="cell">{{ session.get_session_stop_interaction_duration }}</td>
+                </tr>
+                {% endfor %}
+          
+            </tbody>
+        </table>
+
+        <div class="container-fluid">
+            <div class="pagination-div">
+            {% if session_objects.has_other_pages %}
+                <ul class="pagination-content">
+                {% for i in session_objects.paginator.page_range %} 
+                {% if session_objects.number == i %}
+                    {% if i == 1 %}
+                    <li class="active-page"><a style="color: #0254D7;" href="?selected_agent_pk={{selected_agent_pk}}&start_date={{start_date|date:"Y-m-d"}}&end_date={{end_date|date:"Y-m-d"}}&selected_supervisors={{selected_supervisors}}&page={{ i }}">{{ i }}</a></li>
+                    {% elif i == agent_objects.paginator.num_pages %}
+                    <li class="active-page" style="border-radius: 0 6px 6px 0;"><a style="color: #0254D7;" href="?selected_agent_pk={{selected_agent_pk}}&start_date={{start_date|date:"Y-m-d"}}&end_date={{end_date|date:"Y-m-d"}}&selected_supervisors={{selected_supervisors}}&page={{ i }}">{{ i }}</a></li>
+                    {% else %}
+                    <li class="active-page" style="border-radius: 0px;"><a style="color: #0254D7;" href="?selected_agent_pk={{selected_agent_pk}}&start_date={{start_date|date:"Y-m-d"}}&end_date={{end_date|date:"Y-m-d"}}&selected_supervisors={{selected_supervisors}}&page={{ i }}">{{ i }}</a></li>
+                    {% endif %}
+                {% elif i > session_objects.number|add:'-5' and i < session_objects.number|add:'5' %}
+                    <li><a href="?selected_agent_pk={{selected_agent_pk}}&start_date={{start_date|date:"Y-m-d"}}&end_date={{end_date|date:"Y-m-d"}}&selected_supervisors={{selected_supervisors}}&page={{ i }}">{{ i }}</a></li>
+                  {% endif %} 
+                  {% endfor %}
+                </ul>
+            {% endif %}
+
+            </div>
+          </div>
+    </div>
+    {% else %}
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-report-d-interaction-table-area" style="text-align: center; padding: 40px 40px;">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g opacity="0.15" clip-path="url(#clip0)">
+          <path d="M19.8234 39.9998C19.605 39.9998 19.3917 39.9132 19.2334 39.7565C19.0367 39.5598 18.95 39.2765 19.005 39.0048L20.1834 33.1132C20.2167 32.9498 20.2934 32.8015 20.4117 32.6865L33.375 19.7232C34.3484 18.7498 35.9367 18.7498 36.91 19.7232L39.2667 22.0798C40.2417 23.0548 40.2417 24.6398 39.2667 25.6148L26.3034 38.5782C26.1884 38.6948 26.04 38.7732 25.8767 38.8065L19.985 39.9848C19.9317 39.9948 19.8767 39.9998 19.8234 39.9998ZM21.77 33.6848L20.8867 38.1032L25.305 37.2198L38.09 24.4348C38.415 24.1098 38.415 23.5815 38.09 23.2565L35.7334 20.8998C35.4084 20.5748 34.88 20.5748 34.555 20.8998L21.77 33.6848ZM25.715 37.9882H25.7317H25.715Z" fill="#757575"/>
+          <path d="M15.8333 35H4.16667C1.86833 35 0 33.1317 0 30.8333V9.16667C0 6.86833 1.86833 5 4.16667 5H7.5C7.96 5 8.33333 5.37333 8.33333 5.83333C8.33333 6.29333 7.96 6.66667 7.5 6.66667H4.16667C2.78833 6.66667 1.66667 7.78833 1.66667 9.16667V30.8333C1.66667 32.2117 2.78833 33.3333 4.16667 33.3333H15.8333C16.2933 33.3333 16.6667 33.7067 16.6667 34.1667C16.6667 34.6267 16.2933 35 15.8333 35Z" fill="#757575"/>
+          <path d="M27.5 20C27.04 20 26.6667 19.6267 26.6667 19.1667V9.16667C26.6667 7.78833 25.545 6.66667 24.1667 6.66667H20.8333C20.3733 6.66667 20 6.29333 20 5.83333C20 5.37333 20.3733 5 20.8333 5H24.1667C26.465 5 28.3333 6.86833 28.3333 9.16667V19.1667C28.3333 19.6267 27.96 20 27.5 20Z" fill="#757575"/>
+          <path d="M19.1667 10H9.16675C7.78841 10 6.66675 8.87833 6.66675 7.5V4.16667C6.66675 3.70667 7.04008 3.33333 7.50008 3.33333H10.0834C10.4701 1.43333 12.1551 0 14.1667 0C16.1784 0 17.8634 1.43333 18.2501 3.33333H20.8334C21.2934 3.33333 21.6667 3.70667 21.6667 4.16667V7.5C21.6667 8.87833 20.5451 10 19.1667 10ZM8.33341 5V7.5C8.33341 7.95833 8.70842 8.33333 9.16675 8.33333H19.1667C19.6251 8.33333 20.0001 7.95833 20.0001 7.5V5H17.5001C17.0401 5 16.6667 4.62667 16.6667 4.16667C16.6667 2.78833 15.5451 1.66667 14.1667 1.66667C12.7884 1.66667 11.6667 2.78833 11.6667 4.16667C11.6667 4.62667 11.2934 5 10.8334 5H8.33341Z" fill="#757575"/>
+          <path d="M22.5 14.9997H5.83333C5.37333 14.9997 5 14.6263 5 14.1663C5 13.7063 5.37333 13.333 5.83333 13.333H22.5C22.96 13.333 23.3333 13.7063 23.3333 14.1663C23.3333 14.6263 22.96 14.9997 22.5 14.9997Z" fill="#757575"/>
+          <path d="M22.5 19.9997H5.83333C5.37333 19.9997 5 19.6263 5 19.1663C5 18.7063 5.37333 18.333 5.83333 18.333H22.5C22.96 18.333 23.3333 18.7063 23.3333 19.1663C23.3333 19.6263 22.96 19.9997 22.5 19.9997Z" fill="#757575"/>
+          <path d="M22.5 24.9997H5.83333C5.37333 24.9997 5 24.6263 5 24.1663C5 23.7063 5.37333 23.333 5.83333 23.333H22.5C22.96 23.333 23.3333 23.7063 23.3333 24.1663C23.3333 24.6263 22.96 24.9997 22.5 24.9997Z" fill="#757575"/>
+          </g>
+          <defs>
+          <clipPath id="clip0">
+          <rect width="40" height="40" fill="white"/>
+          </clipPath>
+          </defs>
+        </svg>
+        <span style="color: rgba(134, 134, 134, 0.5); font-size:20px;">No data found</span>
+    </div>
+    {% endif %}
+    
+    </div>
+
+    <div class="modal fade" id="apply-filter-report" tabindex="-1" role="dialog" aria-labelledby="Admin_report_performance_filter_modal_label" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h6>Filter</h6>
+                  <svg width="16" height="9" viewBox="0 0 16 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5.33333 8.35714C5.33333 8.18665 5.40357 8.02313 5.5286 7.90257C5.65362 7.78201 5.82319 7.71429 6 7.71429H10C10.1768 7.71429 10.3464 7.78201 10.4714 7.90257C10.5964 8.02313 10.6667 8.18665 10.6667 8.35714C10.6667 8.52764 10.5964 8.69115 10.4714 8.81171C10.3464 8.93227 10.1768 9 10 9H6C5.82319 9 5.65362 8.93227 5.5286 8.81171C5.40357 8.69115 5.33333 8.52764 5.33333 8.35714ZM2.66667 4.5C2.66667 4.3295 2.7369 4.16599 2.86193 4.04543C2.98695 3.92487 3.15652 3.85714 3.33333 3.85714H12.6667C12.8435 3.85714 13.013 3.92487 13.1381 4.04543C13.2631 4.16599 13.3333 4.3295 13.3333 4.5C13.3333 4.6705 13.2631 4.83401 13.1381 4.95457C13.013 5.07513 12.8435 5.14286 12.6667 5.14286H3.33333C3.15652 5.14286 2.98695 5.07513 2.86193 4.95457C2.7369 4.83401 2.66667 4.6705 2.66667 4.5ZM0 0.642857C0 0.472361 0.070238 0.308848 0.195262 0.188289C0.320287 0.0677295 0.489856 0 0.666667 0H15.3333C15.5101 0 15.6797 0.0677295 15.8047 0.188289C15.9298 0.308848 16 0.472361 16 0.642857C16 0.813353 15.9298 0.976867 15.8047 1.09743C15.6797 1.21798 15.5101 1.28571 15.3333 1.28571H0.666667C0.489856 1.28571 0.320287 1.21798 0.195262 1.09743C0.070238 0.976867 0 0.813353 0 0.642857Z" fill="#2D2D2D"></path>
+                  </svg>
+              </div>
+              <div class="modal-body">
+                  <div class="row">
+                    {% if user_obj.status == "1" %}
+                       <div class="col-12 mb-2">
+                          <label>Supervisor</label>
+                          <div class="livechat-multiselect-dropdown livechat-multiselect-filter-dropdown multiple-agent-select-div">
+                              <select id="supervisor-select-dropdown-login-logout" multiple class="form-control " data-agent-id="select-agent">
+                                  
+                                <option value="{{user_obj.pk}}" {% if user_obj in supervisor_objs %} selected="true" {% endif %}>{{user_obj.get_agent_name}} - {{user_obj.user.username}}</option>
+
+                                {% for supervisor in supervisors_list %}
+                                    <option value="{{supervisor.pk}}" {% if supervisor in supervisor_objs %} selected="true" {% endif %}>{{supervisor.get_agent_name}} - {{supervisor.user.username}}</option>
+                                {% endfor %}
+                                  
+                              </select>
+                          </div>
+                        </div>
+                      {% endif %}
+                      <div class="col-12 mb-2">
+                          <label>Agent</label>
+                          <select name="day" class="form-control select-dropdown-icon selectpicker create-user-select-field" id="select-agent">
+                            <option value="0">All</option>
+                            {% for agent in agent_list %}
+                                {% if agent.pk == selected_agent_pk %}
+                                    <option value="{{ agent.pk }}" selected>{{ agent.user.username }}</option>
+                                  {% else %}
+                                    <option value="{{ agent.pk }}">{{ agent.user.username }}</option>
+                                {% endif %}
+                            {% endfor %}
+                          </select>
+                      </div>
+                      <div class="col-6 mb-2">
+                          <label>Start Date</label>
+                          <input type="text" class="form-control" id="start-date" value="{{ start_date|date:" d-m-Y " }}" placeholder="Select">
+                      </div>
+                      <div class="col-6 mb-2">
+                          <label>End Date</label>
+                          <input type="text" class="form-control" id="end-date" value="{{ end_date|date:" d-m-Y " }}" placeholder="Select">
+                      </div>
+                  </div>
+              </div>
+              <div class="modal-footer">
+                  <div style="float: right;">
+                      <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                      <button class="btn-primary" type="button" id="submit-filter" onclick="submit_session_report_filter()">Apply</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+    </div>
+    
+    <div class="modal fade" id="modal-report-filter" tabindex="-1" role="dialog" aria-labelledby="Admin_report_export_modal_label" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h6>Select Date Range</h6>
+              </div>
+              <div class="modal-body">
+                  <div class="row">
+                      <div class="col-12 mb-2">
+                          <label>Range</label>
+                          <select name="day" class="form-control select-dropdown-icon selectpicker create-user-select-field date-range-select" id="select-date-range-export" onchange="check_select_date_range(this)">
+                            <option value="0" selected="selected">Choose date range</option>
+                            <option value="5">Today</option>
+                            <option value="1">Last day</option>
+                            <option value="2">Last 7 days</option>
+                            <option value="3">Last 1 month</option>
+                            <option value="4">Custom Range</option>
+                          </select>
+                      </div>
+                  </div>
+                  <div class="row" id="custom-range-filter-export" style="display: none;">
+                    <div class="col-12">
+                        <label>Filter by date range</label><br>
+                        <input type="text" class="form-control" id="export-default-start-date" placeholder="Start Date" value="{{ start_date|date:" d-m-Y " }}">
+                        <input type="text" class="form-control" id="export-default-end-date" placeholder="End Date" value="{{ end_date|date:" d-m-Y " }}">
+                    </div>
+                  </div>
+                    <div class="col-12" id="custom-range-filter-email" style="margin-top: 18px;padding: 0px;display: none;">
+                        <label>Email ID*</label>
+                        <input class="form-control" type="text" placeholder="Enter your email id" id="filter-data-email-export" value="{{ request.user.email }}">
+                    </div>
+                    <div class="col-12" id="report-warning-div" style="margin-top: 18px;padding: 0px;display: none;">
+                        <p id="report-warning-text" style="font-style: normal;font-weight: 500;font-size: 12px;color: #4D4D4D;"></p>
+                    </div>
+              </div>
+              <div class="modal-footer">
+                  <div style="float: right;">
+                      <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                      <button class="btn-primary" type="button"  id="login-logout-report-filter" onclick="login_logout_report_filter()">Export</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+    </div>    
+
+        <script src="{% static 'LiveChatApp/js/bootstrap-multiselect.js' %}"></script>
+        <script type="text/javascript">
+        $(document).ready(function() {
+        $('#login-logout-report-table').DataTable({
+            "language": {
+              searchPlaceholder: 'Search',
+              search: "",
+              "info": "Showing _START_ to _END_ entries out of {{ total_session_objects }}",
+              "infoEmpty": "No records available",
+              "infoFiltered": "(filtered from _MAX_ total records)",
+            },
+            "bPaginate": false,
+            "ordering": false,
+            "infoCallback": function( settings, start, end, max, total, pre ) {
+                if (settings.oPreviousSearch["sSearch"] != ""){
+                    return pre;
+                }
+                end = ({{ start_point }} - 1) + end;
+                start = ({{ start_point }} - 1) + start;
+                return "Showing " + start + " to " + end + " entries out of {{ total_session_objects }}" ;
+              }
+        });
+
+        		var table = $('#login-logout-report-table').DataTable();
+
+            $('#login-logout-report-table-search').keyup(function() {
+              let value = this.value;
+              table.search(value).draw();
+            })
+
+          try {
+            document.getElementsByClassName('dataTables_empty')[0].innerHTML = 'No record found.';
+          } catch (err) {}
+
+          var start_date = "{{start_date|date:" d-m-Y "}}";
+          var end_date = "{{end_date|date:" d-m-Y "}}";
+          var currentDate = new Date();
+          $("#start-date").datepicker({ dateFormat: 'dd-mm-yy', prevText: "Previous",maxDate: currentDate }).val(start_date.trim());
+          $('#end-date').datepicker({ dateFormat: 'dd-mm-yy', prevText: "Previous",maxDate: currentDate }).val(end_date.trim());
+          $('#export-default-start-date').datepicker({ dateFormat: 'dd-mm-yy', prevText: "Previous",maxDate: currentDate }).val(start_date.trim());
+          $('#export-default-end-date').datepicker({ dateFormat: 'dd-mm-yy', prevText: "Previous",maxDate: currentDate }).val(end_date.trim());
+
+          $('#supervisor-select-dropdown-login-logout').multiselect({
+                nonSelectedText: 'Select Supervisor',
+                enableFiltering: false,
+                enableCaseInsensitiveFiltering: false,
+                selectAll: true,
+                includeSelectAllOption: true
+
+            });
+            $(".livechat-multiselect-dropdown.livechat-multiselect-filter-dropdown .multiselect-container>li>a>label").addClass("custom-checkbox-input");
+            $(".livechat-multiselect-dropdown.livechat-multiselect-filter-dropdown .multiselect-container>li").find(".custom-checkbox-input").append("<span class='checkmark'></span>");
+
+    });
+    function check_select_date_range(element){
+        if(element.value=="4"){
+            document.getElementById("custom-range-filter-export").style.display="block";
+            document.getElementById("custom-range-filter-email").style.display="block";
+            if(window.IS_REPORT_GENERATION_VIA_KAFKA_ENABLED) {
+                document.getElementById("report-warning-div").style.display="block";
+                document.getElementById("report-warning-text").innerHTML = window.REPORT_WARNING_TEXT
+            }
+        } else if(element.value=="5" && !window.IS_REPORT_GENERATION_VIA_KAFKA_ENABLED){
+            document.getElementById("custom-range-filter-export").style.display = "none";
+            document.getElementById("custom-range-filter-email").style.display="block";
+        } else{
+            document.getElementById("custom-range-filter-export").style.display="none";
+            document.getElementById("custom-range-filter-email").style.display="none";
+        }
+    }
+
+    window.SELECTED_AGENT_PK = '{{selected_agent_pk}}';
+    window.USER_STATUS = '{{user_obj.status}}';
+    window.IS_REPORT_GENERATION_VIA_KAFKA_ENABLED = '{{is_report_generation_via_kafka_enabled}}' == 'True' ? true : false;
+        </script>
+        {% endblock %}

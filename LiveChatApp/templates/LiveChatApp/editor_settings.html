@@ -1,0 +1,517 @@
+{% extends 'LiveChatApp/base.html' %}
+{% block content %}
+{% load static %}
+<style>
+{% comment %} #content-wrapper .topbar {
+  top: 59px;
+} {% endcomment %}
+</style>
+<style>
+    /* body {
+        height: 100vh;
+        overflow: auto;
+    } */
+    .livechat-option-switch {
+        position: relative;
+        display: inline-block;
+        width: 34px;
+        height: 19px;
+        margin-top: 0.5em;
+    }
+
+    .livechat-option-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .livechat-option-switch-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: white;
+        -webkit-transition: .4s;
+        transition: .4s;
+        border: 2px solid #BECAD6;
+    }
+
+    .livechat-option-switch-slider:before {
+        position: absolute;
+        content: "";
+        height: 13px;
+        width: 13px;
+        left: 2px;
+        bottom: 0.6px;
+        background-color: #BECAD6;
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+    .accordian-div-inside-text{
+        color:{{ admin_config.get_livechat_theme_lighten_one }} !important;
+    }
+
+    input:checked + .livechat-option-switch-slider {
+        background-color: {{admin_config.get_livechat_theme_lighten_one }};
+        border: 2px solid {{admin_config.get_livechat_theme_lighten_one }};
+    }
+
+    input:checked + .livechat-option-switch-slider:before {
+        background: white;
+    }
+    input:focus + .livechat-option-switch-slider {
+        box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked + .livechat-option-switch-slider:before {
+        -webkit-transform: translateX(14px);
+        -ms-transform: translateX(14px);
+        transform: translateX(14px);
+    }
+
+    /* Rounded livechat-option-switch-sliders */
+    .livechat-option-switch-slider.round {
+        border-radius: 34px;
+    }
+
+    .livechat-option-switch-slider.round:before {
+        border-radius: 50%;
+    }
+    .checkmark {
+        border-color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+    }
+    .active-page {
+        background: {{ admin_config.get_livechat_theme_lighten_three }} !important;
+        border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }} !important;
+    }
+    .accordian-content-div .card a h6{
+        color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+    }
+    .card-body{
+        color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+    }
+    .save-processor-btn{
+        background: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+    }
+
+    </style>
+<link href="{% static 'LiveChatApp/css/sb-admin-2.min.css' %}" rel="stylesheet">
+<link href="{% static 'LiveChatApp/css/style.css' %}?v={% random_int 1 100 %}" rel="stylesheet">
+
+<div class="container-fluid pl-1 pr-2 arange" style="overflow-y: auto;">
+  <div class="row">
+     <div id="content-wrapper" class="d-flex flex-column" style="height: 100vh;">
+            <div class="container-fluid pl-1 pr-2 arange">
+                <div class="row">
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 py-2 live-chat-admin-setting-content-dev-setting-redirect" id="live-chat-admin-setting-content-dev-setting-redirect" style="height: calc(100vh - 4.375rem); padding: 0px 15px 0px 15px;  background: #FAFAFA;">
+                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12" style="background: #fff;  border-radius: 8px; ">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 p-l" style="display: flex; align-items: center; padding-top: 45px;">
+                                <a style="margin-right: 10px;" href="/livechat/developer-settings/?bot_pk={{bot_pk}}&amp;id={{type_of_processor}}"><svg style="margin-top: -3px;" width="17" height="15" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M7.73171 14.7948C8.03264 15.0795 8.50733 15.0662 8.79196 14.7653C9.07658 14.4644 9.06336 13.9897 8.76243 13.7051L3.52339 8.74995H16.2471C16.6613 8.74995 16.9971 8.41416 16.9971 7.99995C16.9971 7.58574 16.6613 7.24995 16.2471 7.24995H3.52112L8.76243 2.29269C9.06336 2.00807 9.07658 1.53338 8.79196 1.23245C8.50733 0.931511 8.03264 0.91829 7.73171 1.20291L1.31449 7.27236C1.14819 7.42964 1.04819 7.62975 1.01448 7.83854C1.00308 7.89053 0.99707 7.94454 0.99707 7.99995C0.99707 8.05754 1.00356 8.11362 1.01585 8.16749C1.05084 8.37328 1.15039 8.57019 1.31449 8.7254L7.73171 14.7948Z" fill="#4D4D4D"></path>
+                                    </svg>
+                                </a>
+                                <div class="col-md-5 col-sm-10 p-l save-processor-input">
+                                    <input type="text " placeholder="Don’t forget to put the name of your file before saving" value="{{name}}" id="name_of_processor">
+                                </div>
+                                <div class="col-md-2 ">
+                                    <button class="save-processor-btn" onclick="save_processor('{{bot_pk}}','{{type_of_processor}}')">
+                                        Save {% if type_of_processor != '3' and type_of_processor != '5' %} Processor {% endif %}
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 p-l editor-accodian-div" style="display: flex; margin-top: 30px; ">
+                                <div class="col-xl-8 col-lg-8 col-md-8 p-l" style="margin-bottom: 10em;">  
+                                    <div class="col s12 editor-fullscreen-div">
+                                        <svg id="go_full_screen" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                            viewBox="0 0 384.97 384.97" style="enable-background:new 0 0 384.97 384.97;" xml:space="preserve" width="13" height="13">
+                                        <g>
+                                            <g id="Fullscreen">
+                                            <path d="M384.97,12.03c0-6.713-5.317-12.03-12.03-12.03H264.847c-6.833,0-11.922,5.39-11.934,12.223
+                                                c0,6.821,5.101,11.838,11.934,11.838h96.062l-0.193,96.519c0,6.833,5.197,12.03,12.03,12.03c6.833-0.012,12.03-5.197,12.03-12.03
+                                                l0.193-108.369c0-0.036-0.012-0.06-0.012-0.084C384.958,12.09,384.97,12.066,384.97,12.03z"/>
+                                            <path d="M120.496,0H12.403c-0.036,0-0.06,0.012-0.096,0.012C12.283,0.012,12.247,0,12.223,0C5.51,0,0.192,5.317,0.192,12.03
+                                                L0,120.399c0,6.833,5.39,11.934,12.223,11.934c6.821,0,11.838-5.101,11.838-11.934l0.192-96.339h96.242
+                                                c6.833,0,12.03-5.197,12.03-12.03C132.514,5.197,127.317,0,120.496,0z"/>
+                                            <path d="M120.123,360.909H24.061v-96.242c0-6.833-5.197-12.03-12.03-12.03S0,257.833,0,264.667v108.092
+                                                c0,0.036,0.012,0.06,0.012,0.084c0,0.036-0.012,0.06-0.012,0.096c0,6.713,5.317,12.03,12.03,12.03h108.092
+                                                c6.833,0,11.922-5.39,11.934-12.223C132.057,365.926,126.956,360.909,120.123,360.909z"/>
+                                            <path d="M372.747,252.913c-6.833,0-11.85,5.101-11.838,11.934v96.062h-96.242c-6.833,0-12.03,5.197-12.03,12.03
+                                                s5.197,12.03,12.03,12.03h108.092c0.036,0,0.06-0.012,0.084-0.012c0.036-0.012,0.06,0.012,0.096,0.012
+                                                c6.713,0,12.03-5.317,12.03-12.03V264.847C384.97,258.014,379.58,252.913,372.747,252.913z"/>
+                                            </g>
+                                        <g>
+                                        </svg>
+                                    </div>              
+                                    
+                                    <div id="editor-code">{{code}}</div><br>
+                                    
+                                    {% if type_of_processor != '3' and type_of_processor != '5' and type_of_processor != '9' and type_of_processor != '10' and type_of_processor != '11' %}
+
+                                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 p-l" style="display: flex; margin-bottom: 30px;">
+                                        <div class="col-md-8 p-l save-processor-input">
+                                            <input type="text " placeholder="Type your client_id or easychat_user_id" id="livechat_dynamic_variable">
+                                        </div>
+                                        <div class="col-md-2 ">
+                                            <button class="save-processor-btn" onclick="run_processor_livechat()">Run Processor</button>
+                                        </div>
+
+                                    </div>
+
+                                    {% endif %}
+
+                                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 p-l" style="display: flex; margin-bottom: 30px;">
+                                        <textarea col="90" id="livechat-processor-status" disabled style="color: #F1F2EB;resize:none;height: 18em;border-radius: 0.5em;overflow: auto;display: none;background-color: #272822;width: 100%;"></textarea>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-xl-4 col-lg-4 col-md-4 p-r accordian-container" style="    margin-top: -30px;">
+                                    <div class="accordian-heading">
+                                        {% if type_of_processor == "1" %}
+                                            Customer Details Processor
+                                        {% elif type_of_processor == "2" %}
+                                            End Chat Processor
+                                        {% elif type_of_processor == '3' %}
+                                            Lead Assignment
+                                        {% elif type_of_processor == '9' %}
+                                            Raise Ticket Processor
+                                        {% elif type_of_processor == '10' %}
+                                            Search Ticket Processor
+                                        {% elif type_of_processor == '11' %}
+                                            Get Previous Tickets Processor
+                                        {% else %}
+                                            Push API
+                                        {% endif %}
+                                    </div>
+
+
+                                    {% if type_of_processor == "1" %}
+
+                                    <div class="accordian-content-div">
+                                        <div class="accordian-div-inside-text">
+                                            Use this processor to fetch customer details using client API.
+                                        </div>
+                                        
+                                        <div class="card  mb-4">
+                                            <!-- Card Header - Accordion -->
+                                            <a href="#collapseCardExample" class="d-block card-header py-3 collapsed collapse-card-class" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseCardExample">
+                                                <h6 class="m-0 font-weight-bold text-primary">Input</h6>
+                                            </a>
+                                            <!-- Card Content - Collapse -->
+                                            <div class="collapse" id="collapseCardExample" style="">
+                                                <div class="card-body">
+                                                    In f(x), the parameter <b>x</b> represents easychat_user_id if nothing is passed in client_id while creating a customer.<br>
+                                                    If client id is passed while creating a customer, <b>x</b> represents livechat client id
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="card  mb-4">
+                                            <!-- Card Header - Accordion -->
+                                            <a href="#collapseCardExample1" class="d-block card-header py-3 collapsed collapse-card-class" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseCardExample">
+                                                <h6 class="m-0 font-weight-bold text-primary">Output</h6>
+                                            </a>
+                                            <!-- Card Content - Collapse -->
+                                            <div class="collapse" id="collapseCardExample1" style="">
+                                                <div class="card-body">
+                                                    Output has to follow the following format only.
+                                                    <li>Status Code</li>
+                                                    <li>Status Message</li>
+                                                    <li>Array of User Details with key,value in the following format only.</li>
+                                                   <pre>
+        {
+            "status_code": "200", // 200 or 500
+            "status_message": "Success", // depending on req. 
+            "user_details": [
+                {
+                    "key": "Client ID",
+                    "value": "THV5678HF"
+                },
+                {
+                    "key": "Name",
+                    "value": "XYZ"
+                },
+                {
+                    "key": "Email ID",
+                    "value": "dksjh@Kjd.com"
+                },
+                {
+                    "key": "Mobile Number",
+                    "value": "9012345678"
+                }
+            ],
+
+            // We will look for User_details if status_code is 200 
+        }
+                                                    </pre>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {% elif type_of_processor == "2" %}
+
+                                    <div class="accordian-content-div">
+                                        <div class="accordian-div-inside-text">
+                                            You can use this function to send required data to Client's CRM, just before disposing the chat.
+                                        </div>
+                                        
+                                        <div class="card  mb-4">
+                                            <!-- Card Header - Accordion -->
+                                            <a href="#collapseCardExample" class="d-block card-header py-3 collapsed collapse-card-class" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseCardExample">
+                                                <h6 class="m-0 font-weight-bold text-primary">Input</h6>
+                                            </a>
+                                            <!-- Card Content - Collapse -->
+                                            <div class="collapse" id="collapseCardExample" style="">
+                                                <div class="card-body">
+                                                     In f(x), the parameter <b>x</b> represents easychat_user_id if nothing is passed in client_id while creating a customer.<br>
+                                                    If client id is passed while creating a customer, <b>x</b> represents livechat client id.
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="card  mb-4">
+                                            <!-- Card Header - Accordion -->
+                                            <a href="#collapseCardExample1" class="d-block card-header py-3 collapsed collapse-card-class" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseCardExample">
+                                                <h6 class="m-0 font-weight-bold text-primary">Output</h6>
+                                            </a>
+                                            <!-- Card Content - Collapse -->
+                                            <div class="collapse" id="collapseCardExample1" style="">
+                                                <div class="card-body">
+                                                    Output has to follow the following format only.
+                                                    <li>Status Code</li>
+                                                    <li>Status Message</li>
+                                                    <li>Array of User Details with key,value in the following format only.</li>
+                                                   <pre>
+        {
+            "status_code": "200", // 200 or 500
+            "status_message": "Success", // depending on req. 
+            // For success status_code = 200 
+        }
+                                                    </pre>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {% elif type_of_processor == '3' %}
+
+                                    <div class="accordian-content-div">
+                                        <div class="accordian-div-inside-text">
+                                            You can use this function to change lead assignment logic for this bot.
+                                        </div>
+                                        
+                                        <div class="card  mb-4">
+                                            <!-- Card Header - Accordion -->
+                                            <a href="#collapseCardExample" class="d-block card-header py-3 collapsed collapse-card-class" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseCardExample">
+                                                <h6 class="m-0 font-weight-bold text-primary">Input</h6>
+                                            </a>
+                                            <!-- Card Content - Collapse -->
+                                            <div class="collapse" id="collapseCardExample" style="">
+                                                <div class="card-body">
+                                                     In f(x), the parameter <b>x</b> represents livechat_customer_obj.
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="card  mb-4">
+                                            <!-- Card Header - Accordion -->
+                                            <a href="#collapseCardExample1" class="d-block card-header py-3 collapsed collapse-card-class" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseCardExample">
+                                                <h6 class="m-0 font-weight-bold text-primary">Output</h6>
+                                            </a>
+                                            <!-- Card Content - Collapse -->
+                                            <div class="collapse" id="collapseCardExample1" style="">
+                                                <div class="card-body">
+                                                    It will assign agent to the customer whose customer object is passed as parameter.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {% elif type_of_processor == '9' %}
+
+                                    <div class="accordian-content-div">
+                                        <div class="accordian-div-inside-text">
+                                            Use this processor to raise ticket to configured ticket management software. 
+                                        </div>
+                                        
+                                        <div class="card  mb-4">
+                                            <!-- Card Header - Accordion -->
+                                            <a href="#collapseCardExample" class="d-block card-header py-3 collapsed collapse-card-class" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseCardExample">
+                                                <h6 class="m-0 font-weight-bold text-primary">Input</h6>
+                                            </a>
+                                            <!-- Card Content - Collapse -->
+                                            <div class="collapse" id="collapseCardExample" style="">
+                                                <div class="card-body">
+                                                    In f(x), the parameter <b>x</b> contains <b>form data</b> filled by agent, <b>livechat agent object</b> and <b>customer object</b> in json format.
+                                                    <pre>
+                                                    </pre>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="card  mb-4">
+                                            <!-- Card Header - Accordion -->
+                                            <a href="#collapseCardExample1" class="d-block card-header py-3 collapsed collapse-card-class" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseCardExample">
+                                                <h6 class="m-0 font-weight-bold text-primary">Output</h6>
+                                            </a>
+                                            <!-- Card Content - Collapse -->
+                                            <div class="collapse" id="collapseCardExample1" style="">
+                                                <div class="card-body">
+                                                    Output returns ticket ID.
+                                                   <pre>
+                                                    </pre>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {% elif type_of_processor == '10' %}
+
+                                    <div class="accordian-content-div">
+                                        <div class="accordian-div-inside-text">
+                                            Use this processor to search ticket from configured ticket management software. 
+                                        </div>
+                                        
+                                        <div class="card  mb-4">
+                                            <!-- Card Header - Accordion -->
+                                            <a href="#collapseCardExample" class="d-block card-header py-3 collapsed collapse-card-class" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseCardExample">
+                                                <h6 class="m-0 font-weight-bold text-primary">Input</h6>
+                                            </a>
+                                            <!-- Card Content - Collapse -->
+                                            <div class="collapse" id="collapseCardExample" style="">
+                                                <div class="card-body">
+                                                    In f(x), the parameter <b>x</b> contains <b>Ticket ID</b> and <b>livechat agent object</b> in json format.
+                                                    <pre>
+                                                    </pre>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="card  mb-4">
+                                            <!-- Card Header - Accordion -->
+                                            <a href="#collapseCardExample1" class="d-block card-header py-3 collapsed collapse-card-class" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseCardExample">
+                                                <h6 class="m-0 font-weight-bold text-primary">Output</h6>
+                                            </a>
+                                            <!-- Card Content - Collapse -->
+                                            <div class="collapse" id="collapseCardExample1" style="">
+                                                <div class="card-body">
+                                                    Output returns status_code, status_message returned by API. It also returns ticket info in json format, which can be customized.
+                                                   <pre>
+                                                    </pre>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    {% elif type_of_processor == '11' %}
+
+                                    <div class="accordian-content-div">
+                                        <div class="accordian-div-inside-text">
+                                            Use this processor to get previously raised tickets of customer from configured ticket management software. 
+                                        </div>
+                                        
+                                        <div class="card  mb-4">
+                                            <!-- Card Header - Accordion -->
+                                            <a href="#collapseCardExample" class="d-block card-header py-3 collapsed collapse-card-class" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseCardExample">
+                                                <h6 class="m-0 font-weight-bold text-primary">Input</h6>
+                                            </a>
+                                            <!-- Card Content - Collapse -->
+                                            <div class="collapse" id="collapseCardExample" style="">
+                                                <div class="card-body">
+                                                    In f(x), the parameter <b>x</b> contains <b>Customer Mobile Number</b> in json format.
+                                                    <pre>
+                                                    </pre>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="card  mb-4">
+                                            <!-- Card Header - Accordion -->
+                                            <a href="#collapseCardExample1" class="d-block card-header py-3 collapsed collapse-card-class" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseCardExample">
+                                                <h6 class="m-0 font-weight-bold text-primary">Output</h6>
+                                            </a>
+                                            <!-- Card Content - Collapse -->
+                                            <div class="collapse" id="collapseCardExample1" style="">
+                                                <div class="card-body">
+                                                    Output returns status_code, status_message and list of previously raised ticket info in json format, which can be customized.
+                                                   <pre>
+                                                    </pre>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {% else %}
+
+                                    <div class="accordian-content-div">
+                                        <div class="accordian-div-inside-text">
+                                            Use this processor to push livechat events to client's webhook.
+                                        </div>
+                                        
+                                        <div class="card  mb-4">
+                                            <!-- Card Header - Accordion -->
+                                            <a href="#collapseCardExample" class="d-block card-header py-3 collapsed collapse-card-class" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseCardExample">
+                                                <h6 class="m-0 font-weight-bold text-primary">Input</h6>
+                                            </a>
+                                            <!-- Card Content - Collapse -->
+                                            <div class="collapse" id="collapseCardExample" style="">
+                                                <div class="card-body">
+                                                    In f(x), the parameter <b>x</b> contains <b>event_type</b>, <b>livechat_session_id</b> and other data in json format.
+                                                    <pre>
+        {
+            "event_type": "ASSIGN_AGENT",
+            "session_id": "febb571f-b6bd-4225-9966-ad3569859c5a",
+            "agent_name": "Shubham Gupta"
+            // data other than event_type and session_id 
+            // depend on type of event.
+        }
+                                                    </pre>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="card  mb-4">
+                                            <!-- Card Header - Accordion -->
+                                            <a href="#collapseCardExample1" class="d-block card-header py-3 collapsed collapse-card-class" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseCardExample">
+                                                <h6 class="m-0 font-weight-bold text-primary">Output</h6>
+                                            </a>
+                                            <!-- Card Content - Collapse -->
+                                            <div class="collapse" id="collapseCardExample1" style="">
+                                                <div class="card-body">
+                                                    Output should contain status_code only.
+                                                   <pre>
+        {
+            "status_code": "200", // 200 or 500
+        }
+                                                    </pre>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    {% block consolecontent %}
+    {% endblock  %}
+  </div>
+</div>
+
+<script src="{% static 'LiveChatApp/js/admin_settings.js' %}?v={% random_int 1 100 %}"></script>
+<script src="{% static 'EasyChatApp/js/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+
+<script>
+    var editor = ace.edit("editor-code");
+    editor.setTheme("ace/theme/monokai");
+    editor.session.setMode("ace/mode/python");
+
+    SYSTEM_COMMANDS = {{ system_commands | safe }}
+</script>
+{% endblock %}

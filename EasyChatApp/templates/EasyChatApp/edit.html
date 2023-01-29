@@ -1,0 +1,82 @@
+{% extends 'EasyChatApp/base.html' %}
+{% block content %}
+{% load static %}
+{% load custom_filters %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/theme2_embed.css' %}?v={% random_int 1 100 %}">
+
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/console.css' %}?v={% random_int 1 100 %}">
+
+  {% if language_script_type == "rtl" %}
+  <div class="easychat-main-wrapper language-right-to-left-wrapper">
+  {% else %}
+  <div class="easychat-main-wrapper">
+  {% endif %}
+          {% include "EasyChatApp/sidenavbar/sidebarnav.html" %}
+
+    <div class="easychat-content-wrapper" id="easychat-content-wrapper">
+      {% block editcontent %}
+      {% endblock %}
+    </div>          
+         
+  </div>
+
+  <div id="menu-div" style="display: none;width: 200px;z-index: 2323234;">
+    <div class="collection">
+      <a id ="create-tree-node" class="collection-item blue-text"><i class="inline-icon material-icons blue-text text-darken-3">insert_drive_file</i>  Create Child Intent</a>
+      <a id ="delete-tree-flow" class="collection-item blue-text"><i class="inline-icon material-icons blue-text text-darken-3">delete</i>  Delete whole flow</a>
+      <a id ="delete-tree-node" class="collection-item blue-text"><i class="inline-icon material-icons blue-text text-darken-3">delete</i>  Delete only node</a>
+      <a id ="insert-tree-node" class="collection-item blue-text"><i class="inline-icon material-icons blue-text text-darken-3">input</i>  Insert Child In Between</a>
+      <a href="javascript:void(0)" id="copy-tree-node" class="collection-item blue-text"><i class="inline-icon material-icons blue-text text-darken-3">content_copy</i>  Copy Tree</a>
+      <a href="javascript:void(0)" id="paste-tree-node" class="collection-item blue-text disbled-paste-btn"><i class="inline-icon material-icons blue-text text-darken-3">content_paste</i>  Paste Tree</a>
+    </div>
+  </div>
+
+  <div id="api-menu-div" style="display: none;">
+    <div class="collection">
+      <a class="collection-item modal-trigger" href="#modal-share-api"><i class="inline-icon material-icons blue-text text-darken-3">share</i>  Share API</a>
+    </div>
+  </div>
+
+  <!-- Modal Structure -->
+  <div id="modal-share-api" class="modal">
+    <div class="modal-content">
+      <div class="row">
+        *Search and select from user list
+        <div class="input-field col s12">
+          {% comment %}
+          <select multiple id="multiple-select-user-list">
+            {% for user_obj in user_objs %}
+                {% if request.user.pk != user_obj.pk %}
+                  <option value="{{ user_obj.pk }}">{{ user_obj.username }}</option>
+                {% endif %}
+            {% endfor %}
+          </select>
+          {% endcomment %}
+        </div>                  
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a href="javascript:void(0)" class="modal-close transparent-btn btn grey black-text">Cancel</a>
+      <a class="modal-close waves-effect waves-green btn green lighten-2 btn-share-api">Share</a>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+
+
+
+    $(document).on('contextmenu', '.add-api-variable', function(e){
+        e.preventDefault();
+        var d = document.getElementById('api-menu-div');
+        d.style.position = "absolute";
+        d.style.left = e.pageX+ 'px';
+        d.style.top = e.pageY + 'px';
+        var api_variable_name = this.id.split("-")[1];
+        $(".btn-share-api").attr("id","btn-share-bot-"+api_variable_name);
+        $("#api-menu-div").show();
+        return false;
+    });
+  </script>
+
+{% endblock %}

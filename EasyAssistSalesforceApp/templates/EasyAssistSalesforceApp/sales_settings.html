@@ -1,0 +1,1713 @@
+{% extends 'EasyAssistSalesforceApp/console.html' %}
+{% block content %}
+{% load static %}
+<style type="text/css" media="screen">
+  #editor-code {
+  width:100%;
+  height:10em;
+  overflow:auto;
+  }
+  #editor-code-cjs {
+  width:100%;
+  height:10em;
+  overflow:auto;
+}
+
+#product-category-li{
+      display: inline-block;
+      color: #fff;
+      border-radius: 10px;
+      padding: 0rem 0.6rem;
+      margin-right: 5px;
+      margin-top: 5px;
+}
+
+#predefined-remark-li,#support-language-li{
+      display: inline-block;
+      color: #fff;
+      border-radius: 10px;
+      padding: 0rem 0.6rem;
+      margin-right: 5px;
+      margin-top: 5px;
+}
+#cobrowse-toggle + .easyassist-switch-slider {
+  width: 42px !important;
+  height: 22px !important;
+}
+
+#cognomeet-toggle + .easyassist-switch-slider {
+  width: 42px !important;
+  height: 22px !important;
+}
+
+#cobrowse-toggle + .easyassist-switch-slider:before {
+  width: 15.53px !important;
+  height: 15.63px !important;
+}
+
+#cognomeet-toggle + .easyassist-switch-slider:before {
+  width: 15.53px !important;
+  height: 15.63px !important;
+}
+
+#cognomeet-toggle:checked + .easyassist-switch-slider:before {
+  -webkit-transform: translateX(20px);
+  -ms-transform: translateX(20px);
+  transform: translateX(20px);
+}
+
+#cobrowse-toggle:checked + .easyassist-switch-slider:before {
+  -webkit-transform: translateX(20px);
+  -ms-transform: translateX(20px);
+  transform: translateX(20px);
+}
+#pills-options {
+  display: flex;
+  justify-content: flex-end;
+}
+{% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+#pills-options-tab .nav-item .nav-link.active {
+  border-bottom: 3px solid   {{ access_token_obj.get_cobrowsing_console_theme_color.hex }} !important;
+  color: {{ access_token_obj.get_cobrowsing_console_theme_color.hex }} !important;
+  background-color: inherit;
+  border: none;
+}
+{% else %}
+#pills-options-tab .nav-item .nav-link.active {
+  border-bottom: 3px solid  #435ac6 !important;
+  color: #435ac6 !important;
+  background-color: inherit;
+  border: none;
+}
+{% endif %}
+
+#pills-options-tab .nav-item .nav-link {
+  color :black;
+  border:none !important;
+}
+
+#cobrowse_logo_upload_button {
+  border: none;
+  background-color: inherit;
+  /* display: inline; */
+  cursor: pointer !important;
+  justify-content: right !important;
+  outline:none;
+}
+#change_console_color_button {
+  border: none;
+  background-color: inherit;
+  cursor: pointer !important;
+  justify-content: right !important;
+  outline:none;
+}
+
+/* .tab-content {
+
+  height: 75vh;
+} */
+
+@media only screen and (min-width: 760px){
+ #save-btn-admin{
+   margin-bottom: 10rem;
+ }
+ #copy-cjs-script{
+   margin-bottom: 8rem;
+ }
+  
+}
+
+</style>
+<script type="text/javascript" src="{% static 'EasyAssistSalesforceApp/js/ace.js' %}"></script>
+<script type="text/javascript" src="{% static 'EasyAssistSalesforceApp/js/jscolor.min.js' %}"></script>
+<!-- Begin Page Content -->
+<div class="container-fluid">
+<div class="col-md-12 mb">
+  <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-home" aria-selected="true">Profile</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-integration" role="tab" aria-controls="pills-profile" aria-selected="false">Integration</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="pills-options-tab" data-toggle="pill" href="#pills-options-settings" role="tab" aria-controls="pills-contact" aria-selected="false">Options</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="pills-settings-tab" data-toggle="pill" href="#pills-advanced-settings" role="tab" aria-controls="pills-contact" aria-selected="false">Advanced Settings</a>
+    </li>
+  </ul>
+  <div class="tab-content" id="pills-tabContent">
+    <!-- PROFILE TAB -->
+    <div class="tab-pane fade show active" id="pills-profile" role="tabpanel" aria-labelledby="pills-home-tab">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="input-group input-group-sm mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="inputGroup-sizing-sm">Email</span>
+            </div>
+            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" value="{{ cobrowse_agent.user.email }}" disabled>
+          </div>
+          <div class="input-group input-group-sm mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="inputGroup-sizing-sm">Name</span>
+            </div>
+            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="admin-name"
+              value="{{ cobrowse_agent.user.first_name }}">
+          </div>
+          <div class="input-group input-group-sm mb-3">
+            <button type="button" class="btn btn-info" onclick="show_change_password(this)">Change password</button>
+          </div>
+          <div class="input-group input-group-sm mb-3">
+            <p style="color:green;" id="save-details-error"></p>
+          </div>
+        </div>
+        <div class="col-md-6" style="display:none;" id="change-password-div">
+          <div class="input-group input-group-sm mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="inputGroup-sizing-sm">Old password</span>
+            </div>
+            <input type="password" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="old-password" value="">
+          </div>
+          <div class="input-group input-group-sm mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="inputGroup-sizing-sm">New password</span>
+            </div>
+            <input type="password" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="new-password"
+              value="">
+          </div>
+          <p>*Please leave these fields empty if you do not wish to change password.</p>
+        </div>
+        <div class="col-md-12" id="save-btn-admin">
+          <button type="button" class="btn btn-success" onclick="save_admin_details(this)">Save</button>
+          <!-- <button type="button" class="btn btn-danger float-right">Delete Account</button> -->
+        </div>
+      </div>
+    </div>
+    <!-- INTEGRATION TAB -->
+    <div class="tab-pane fade" id="pills-integration" role="tabpanel" aria-labelledby="pills-integration-tab">
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-12">
+              <div id="editor-code"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br><a href="javascript:void(0)" class="btn btn-light btn-icon-split" onclick="copy_script()">
+      <span class="icon text-gray-600">
+      <i class="fas fa-arrow-right"></i>
+      </span>
+      <span class="text">Copy script</span><br>
+      </a><br><br>
+      <div class="card">
+        <div class="card-body">
+          <div id="editor-code-cjs"></div>
+        </div>
+      </div>
+      <br><a href="javascript:void(0)" class="btn btn-light btn-icon-split" id="copy-cjs-script"onclick="copy_cjs_script()">
+      <span class="icon text-gray-600">
+      <i class="fas fa-arrow-right"></i>
+      </span>
+      <span class="text">Copy cjs script</span>
+      </a>
+    </div>
+    <!-- OPTIONS TAB -->
+    <div class="tab-pane fade" id="pills-options-settings" role="tabpanel" aria-labelledby="pills-options-settings-tab">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card shadow mb-4">
+            <div class="card-header py-3" style="padding: 0.5em 1.25em 0em 1.25em !important;">
+              <div class="row">
+                  <div class="col-md-7 col-sm-12" style="display: none;">
+                    <label style="margin: 0px;">
+                      <b style="color: black;font-size: 15px;">Cobrowse&nbsp;&nbsp;</b>
+                      <label class="easyassist-switch">
+                        {% if access_token_obj.allow_video_meeting_only %}
+                          <input type="checkbox" id="cobrowse-toggle">
+                        {% else %}
+                          <input type="checkbox" id="cobrowse-toggle" checked>
+                        {% endif %}
+                        <span class="easyassist-switch-slider round"></span>
+                      </label>
+                    </label>
+                    <label style="margin: 0px;">
+                      <b style="color: black; font-size: 15px;">Video Calling&nbsp;&nbsp;</b>
+                      <label class="easyassist-switch">
+                        {% if access_token_obj.allow_generate_meeting %}
+                          <input type="checkbox" id="cognomeet-toggle" checked>
+                        {% else %}
+                          <input type="checkbox" id="cognomeet-toggle">
+                        {% endif %}
+                        <span class="easyassist-switch-slider round"></span>
+                      </label>
+                    </label>
+                  </div>
+                <div class="col-md-7 col-sm-12" id="pills-options">
+                  <ul class="nav nav-tabs nav-fill" id="pills-options-tab" role="tablist">
+                    <li class="nav-item">
+                      <a class="nav-link active" id="pills-cobrowse-tab" data-toggle="pill" href="#pills-cobrowse-options" role="tab" aria-controls="pills-options-cobrowse" aria-selected="true">Cobrowse</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" id="pills-cognomeet-tab" data-toggle="pill" href="#pills-cognomeet-options" role="tab" aria-controls="pills-options-cognomeet" aria-selected="false">Cognomeet</a>
+                    </li>
+                  </ul>
+                </div>
+                <div class="col-md-5 col-sm-12 text-right">
+                  <button data-toggle="modal" data-target="#cobrowse_logo_upload_modal" id="cobrowse_logo_upload_button">
+                    <svg  width="12" height="10" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M10.8889 1.53846H9L8.55 0.291209C8.51891 0.205863 8.46194 0.13209 8.38686 0.0799692C8.31179 0.0278481 8.22228 -8.003e-05 8.13056 1.72257e-07H3.86944C3.68194 1.72257e-07 3.51389 0.116758 3.45139 0.291209L3 1.53846H1.11111C0.497222 1.53846 0 2.03022 0 2.63736V8.9011C0 9.50824 0.497222 10 1.11111 10H10.8889C11.5028 10 12 9.50824 12 8.9011V2.63736C12 2.03022 11.5028 1.53846 10.8889 1.53846ZM6 7.8022C4.77222 7.8022 3.77778 6.81868 3.77778 5.6044C3.77778 4.39011 4.77222 3.40659 6 3.40659C7.22778 3.40659 8.22222 4.39011 8.22222 5.6044C8.22222 6.81868 7.22778 7.8022 6 7.8022ZM4.66667 5.6044C4.66667 5.95413 4.80714 6.28954 5.05719 6.53684C5.30724 6.78414 5.64638 6.92308 6 6.92308C6.35362 6.92308 6.69276 6.78414 6.94281 6.53684C7.19286 6.28954 7.33333 5.95413 7.33333 5.6044C7.33333 5.25466 7.19286 4.91925 6.94281 4.67195C6.69276 4.42465 6.35362 4.28571 6 4.28571C5.64638 4.28571 5.30724 4.42465 5.05719 4.67195C4.80714 4.91925 4.66667 5.25466 4.66667 5.6044Z" fill="#4D4D4D"/>
+                    </svg>&nbsp;&nbsp;
+                    {% if access_token_obj.source_easyassist_cobrowse_logo %}
+                      <span style="color: black;font-size: 11px;">Change Logo</span>
+                    {% else %}
+                      <span style="color: black;font-size: 11px;">Upload Logo</span>
+                    {% endif %}
+                  </button>
+                  <svg width="2" height="24" viewBox="0 0 2 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 0L1 24" stroke="#E6E6E6"/>
+                  </svg>
+                  <button data-toggle="modal" data-target="#console-theme-colorpicker-modal" id="change_console_color_button">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M6 0C2.68666 0 0 2.68666 0 6C0 9.31334 2.68666 12 6 12C6.55334 12 7 11.5533 7 11C7 10.74 6.90334 10.5067 6.74 10.33C6.58334 10.1533 6.49 9.92334 6.49 9.66666C6.49 9.11331 6.93666 8.66666 7.49 8.66666H8.66666C10.5067 8.66666 12 7.17331 12 5.33331C12 2.38666 9.31334 0 6 0ZM2.33334 6C1.78 6 1.33334 5.55334 1.33334 5C1.33334 4.44666 1.78 4 2.33334 4C2.88669 4 3.33334 4.44666 3.33334 5C3.33334 5.55334 2.88666 6 2.33334 6ZM4.33334 3.33334C3.78 3.33334 3.33334 2.88669 3.33334 2.33334C3.33334 1.78 3.78 1.33334 4.33334 1.33334C4.88669 1.33334 5.33334 1.78 5.33334 2.33334C5.33334 2.88669 4.88666 3.33334 4.33334 3.33334ZM7.66666 3.33334C7.11331 3.33334 6.66666 2.88669 6.66666 2.33334C6.66666 1.78 7.11331 1.33334 7.66666 1.33334C8.22 1.33334 8.66666 1.78 8.66666 2.33334C8.66666 2.88669 8.22 3.33334 7.66666 3.33334ZM9.66666 6C9.11331 6 8.66666 5.55334 8.66666 5C8.66666 4.44666 9.11331 4 9.66666 4C10.22 4 10.6667 4.44666 10.6667 5C10.6667 5.55334 10.22 6 9.66666 6Z" fill="#4D4D4D"/>
+                    </svg>
+                    <span style="color: black;font-size: 11px;">Change Console Color</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="tab-content" id="pills-options-tabContent">
+              <div class="tab-pane fade show active" id="pills-cobrowse-options" role="tabpanel" aria-labelledby="pills-cobrowse-tab">
+                <div class="card-body">
+                <div class="card shadow mb-4">
+                  <div class="card-header py-3" style="padding: 0.5em 1.25em 0.5em 1.25em !important;">
+                    <div class="row">
+                      <div class="col-mb-5" style="margin-top: 5px;">
+                        <h6 class="m-0 font-weight-bold text-primary">Admin Settings</h6>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="table-responsive">
+                  <table class="table table-borderless gy-settings-table">
+                    <tbody>
+                      <tr>
+                        <th scope="row">Enable 'Edit access'</th>
+                        <td style="vertical-align: inherit;">
+                          {% if access_token_obj.enable_edit_access %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" checked id="enable_edit_access_checkbox">
+                          {% else %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="enable_edit_access_checkbox">
+                          {% endif %}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Enable 'Connect with an Agent' auto-popup after inactivity</th>
+                        <td style="vertical-align: inherit;">
+                          {% if access_token_obj.field_stuck_event_handler %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" checked id="enable_field_stuck_timer_checkbox">
+                          {% else %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="enable_field_stuck_timer_checkbox">
+                          {% endif %}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Set inactivity time interval (in seconds)</th>
+                        <td style="vertical-align: inherit;">
+                          <input type="number" aria-label="Checkbox for following text input" value="{{ access_token_obj.field_stuck_timer }}" id="field_stuck_timer" min="0">
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Field Recursive stuck timer on form</th>
+                        <td style="vertical-align: inherit;">
+                          {% if access_token_obj.field_recursive_stuck_event_check %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" checked id="enable_recursive_field_stuck_timer_checkbox">
+                          {% else %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="enable_recursive_field_stuck_timer_checkbox">
+                          {% endif %}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Enable Outbound Cobrowsing</th>
+                        <td style="vertical-align: inherit;">
+                          {% if access_token_obj.lead_generation %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" checked id="lead_generation_checkbox">
+                          {% else %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="lead_generation_checkbox">
+                          {% endif %}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Select masking type for sensitive data fields</th>
+                        <td>
+                          <select class="custom-select" id="input-masking-type" style="width: 100%;">
+                            {% if access_token_obj.masking_type == "no-masking" %}
+                            <option selected="" value="no-masking">No Masking</option>
+                            {% else %}
+                            <option value="no-masking">No Masking</option>
+                            {% endif %}
+                            {% if access_token_obj.masking_type == "partial-masking" %}
+                            <option selected="" value="partial-masking">Partial Masking</option>
+                            {% else %}
+                            <option value="partial-masking">Partial Masking</option>
+                            {% endif %}
+                            {% if access_token_obj.masking_type == "full-masking" %}
+                            <option selected="" value="full-masking">Full Masking</option>
+                            {% else %}
+                            <option value="full-masking">Full Masking</option>
+                            {% endif %}
+                          </select>
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Enable Agents to only share pre-approved Documents</th>
+                        <td style="vertical-align: inherit;">
+                          {% if access_token_obj.allow_only_support_documents %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="allow-only-support-documents-input" checked>
+                          {% else %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="allow-only-support-documents-input">
+                          {% endif %}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Ask Support Code from Customers</th>
+                        <td style="vertical-align: inherit;">
+                          {% if access_token_obj.enable_verification_code_popup %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="enable-verification-code-popup" checked>
+                          {% else %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="enable-verification-code-popup">
+                          {% endif %}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Enable Screen Recording</th>
+                        <td style="vertical-align: inherit;">
+                          {% if access_token_obj.allow_screen_recording %}
+                            <input type="checkbox" aria-label="Checkbox for following text input" checked id="allow_screen_recording">
+                          {% else %}
+                            <input type="checkbox" aria-label="Checkbox for following text input" id="allow_screen_recording">
+                          {% endif %}
+                        </td>
+                      </tr>
+                      {% if access_token_obj.allow_screen_recording %}
+                        <tr id="screen-recording-expire-div">
+                            <th scope="row">Screen recording expires(in days)</th>
+                            <td style="vertical-align: inherit;">
+                                <input type="number" aria-label="Checkbox for following text input" value="{{ access_token_obj.recording_expires_in_days }}" id="recording_expires_in_days" min="0">
+                            </td>
+                        </tr>
+                      {% else %}
+                        <tr id="screen-recording-expire-div" style="display: none;">
+                            <th scope="row">Screen recording expires(in days)</th>
+                            <td style="vertical-align: inherit;">
+                                <input type="number" aria-label="Checkbox for following text input" value="{{ access_token_obj.recording_expires_in_days }}" id="recording_expires_in_days" min="0">
+                            </td>
+                        </tr>
+                      {% endif %}
+                      <tr>
+                        <th scope="row">Enable Language Support</th>
+                        <td style="vertical-align: inherit;">
+                          {% if access_token_obj.allow_language_support %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="allow_language_support" checked>
+                          {% else %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="allow_language_support">
+                          {% endif %}
+                        </td>
+                      </tr>
+                      {% if access_token_obj.allow_language_support %}
+                      <tr id="supported-language-list-div">
+                        <th scope="row">Supported languages <br>(e.g. Hindi, English)</th>
+                        <td style="vertical-align: inherit;">
+                          <div style="min-height:50px; max-width: 400px;padding: 0px;"class="container" >
+                            <p id="support_language_list" style="display: none;"></p>
+                            <ul id="support_language_tag_list" style="padding: 0;"></ul>
+                            <input type="text" style="width: 100%;"maxLength ="25"id="input_language_support" placeholder="Add Languages Supported">
+                          </div>                        
+                        </td>
+                      </tr>
+                      {% else %}
+                      <tr id="supported-language-list-div"style="display: none;">
+                        <th scope="row">Supported Languages <br>(e.g. Hindi, English)</th>
+                        <td style="vertical-align: inherit;">
+                          <div style="min-height:50px; max-width: 400px;padding: 0px;"class="container" >
+                            <p id="support_language_list" style="display: none;"></p>
+                            <ul id="support_language_tag_list" style="padding: 0;"></ul>
+                            <input type="text" style="width: 100%;"maxLength ="25"id="input_language_support" placeholder="Add Languages Supported">
+                          </div>                        
+                        </td>
+                      </tr>
+                      {% endif %}
+                      <tr>
+                        <th scope="row">Enable Cross Domain Cobrowsing
+                          <span data-toggle="tooltip" data-placement="bottom" title="If this is enabled, customers will be able to share their screen. This will allow Agents to view the customer's activity even on domains where cobrowsing JS is not embedded"><i class="fas fa-info-circle"></i></span>
+                        </th>
+                        <td style="vertical-align: inherit;">
+                          {% if access_token_obj.allow_screen_sharing_cobrowse %}
+                            <input type="checkbox" aria-label="Checkbox for following text input" checked id="allow_screen_sharing_cobrowse">
+                          {% else %}
+                            <input type="checkbox" aria-label="Checkbox for following text input" id="allow_screen_sharing_cobrowse">
+                          {% endif %}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Enable 'Screen Capture'</th>
+                        <td style="vertical-align: inherit;">
+                          {% if access_token_obj.allow_capture_screenshots_in_cobrowsing %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" checked id="allow_capture_screenshots_in_cobrowsing_checkbox">
+                          {% else %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="allow_capture_screenshots_in_cobrowsing_checkbox">
+                          {% endif %}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Allow agents to schedule meetings</th>
+                        <td style="vertical-align: inherit;">
+                          {% if access_token_obj.allow_generate_meeting %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="allow-generate-meeting-input" checked>
+                          {% else %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="allow-generate-meeting-input">
+                          {% endif %}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Enable Pre-approved 'Document sharing' </th>
+                        <td style="vertical-align: inherit;">
+                          {% if access_token_obj.allow_support_documents %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" checked id="allow_support_documents_checkbox">
+                          {% else %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="allow_support_documents_checkbox">
+                          {% endif %}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Enable ‘Document sharing’ through chatbox
+                          <span data-toggle="tooltip" data-placement="bottom" title="Enabling this will allow attatchments option in agent and customer chatbox."><i class="fas fa-info-circle"></i></span>
+                        </th>
+                        <td style="vertical-align: inherit;">
+                          {% if access_token_obj.share_document_from_livechat %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="share_document_from_livechat_checkbox" checked>
+                          {% else %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="share_document_from_livechat_checkbox">
+                          {% endif %}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Enable 'Invite Agent'</th>
+                        <td style="vertical-align: inherit;">
+                          {% if access_token_obj.enable_invite_agent_in_cobrowsing %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" checked id="enable_invite_agent_in_cobrowsing_checkbox">
+                          {% else %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="enable_invite_agent_in_cobrowsing_checkbox">
+                          {% endif %}
+                        </td>
+                      </tr>
+                      <tr style="display:none;">
+                        <th scope="row">Get Sharable link</th>
+                        <td style="vertical-align: inherit;">
+                          {% if access_token_obj.get_sharable_link %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" checked id="get_sharable_link_checkbox">
+                          {% else %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="get_sharable_link_checkbox">
+                          {% endif %}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Allow video calling in cobrowsing</th>
+                        <td style="vertical-align: inherit;">
+                          {% if access_token_obj.allow_cobrowsing_meeting %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="allow-vc-cobrowsing-input" checked>
+                          {% else %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="allow-vc-cobrowsing-input">
+                          {% endif %}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Show lobby page in cobrowsing meeting.</th>
+                        <td style="vertical-align: inherit;">
+                          {% if access_token_obj.show_cobrowsing_meeting_lobby %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="show-cobrowsing-lobby-input" checked>
+                          {% else %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="show-cobrowsing-lobby-input">
+                          {% endif %}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Enable Tag Based Assignment</th>
+                        <td style="vertical-align: inherit;">
+                          {% if access_token_obj.choose_product_category %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="choose_product_category" checked>
+                          {% else %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="choose_product_category">
+                          {% endif %}
+                        </td>
+                      </tr>
+                      {% if access_token_obj.choose_product_category %}
+                      <tr id="product-category-list-div">
+                        <th scope="row">Add Product category for the Agents <br>(Eg. Education Loan, Policy, Others)</th>
+                        <td style="vertical-align: inherit;">
+                          <!-- <textarea class="form-control" style="height:10em;" id="product_category_list">{{ access_token_obj.get_product_categories }}</textarea> -->
+                                  <div style="min-height:50px; max-width: 400px;padding: 0px;"class="container" >
+                                    <p id="product_category_list" style="display: none;"></p>
+                                    <ul id="product_category_tag_list" style="padding: 0;"></ul>
+                                    <input type="text" style="width: 100%;"maxLength ="25"id="input_product_category" placeholder="Add product category">
+                                  </div>
+                        </td>
+                      </tr>
+                      {% else %}
+                      <tr id="product-category-list-div"style="display: none;">
+                        <th scope="row">Product Categories<br>(e.g. Education Loan, Home Loan, Others)<br>Note: Add comma separated product category.</th>
+                        <td style="vertical-align: inherit;">
+                          <!-- <textarea class="form-control" style="height:10em;" id="product_category_list">{{ access_token_obj.get_product_categories }}</textarea> -->
+                          <div style="min-height:50px; max-width: 400px;padding: 0px;"class="container" >
+                            <p id="product_category_list" style="display: none;"></p>
+                            <ul id="product_category_tag_list" style="padding: 0;"></ul>
+                            <input type="text" style="width: 100%;"maxLength ="25"id="input_product_category" placeholder="Add product category">
+                          </div>
+                        </td>
+                      </tr>
+                      {% endif %}
+                      <tr>
+                        <th scope="row">Enable Predefined Remarks</th>
+                        <td style="vertical-align: inherit;">
+                          {% if access_token_obj.enable_predefined_remarks %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="enable-predefined-remarks" checked>
+                          {% else %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="enable-predefined-remarks">
+                          {% endif %}
+                        </td>
+                      </tr>
+                      {% if access_token_obj.enable_predefined_remarks %}
+                      <tr id="predefined-remarks-list-div">
+                        <th scope="row">Add Remarks to be selected by Agent <br>(Eg. Lead Closed, Internet Issue, Others)</th>
+                        <td style="vertical-align: inherit;">
+                          <div style="min-height:50px; max-width: 400px;padding: 0px;"class="container" >
+                            <p id="predefined-remarks-list" style="display: none;"></p>
+                            <ul id="predefined-remarks-tag-list" style="padding: 0;"></ul>
+                            <input type="text" style="width: 100%;"maxLength ="25"id="input-predefined-remark" placeholder="Add Predefined remark">
+                          </div>
+                        </td>
+                      </tr>
+                      {% else %}
+                      <tr id="predefined-remarks-list-div" style="display: none;">
+                        <th scope="row">Add Remarks to be selected by Agent <br>(Eg. Lead Closed, Internet Issue, Others)</th>
+                        <td style="vertical-align: inherit;">
+                                  <div style="min-height:50px; max-width: 400px;padding: 0px;"class="container" >
+                                    <p id="predefined-remarks-list" style="display: none;"></p>
+                                    <ul id="predefined-remarks-tag-list" style="padding: 0px;"></ul>
+                                    <input type="text" style="width: 100%;padding: 0px;"maxLength ="25"id="input-predefined-remark" placeholder="Add Predefined remark">
+                                  </div>
+                        </td>
+                      </tr>
+                      {% endif %}
+                      <tr>
+                        <th scope="row">Enable Masked Field Warning</th>
+                        <td style="vertical-align: inherit;">
+                          {% if access_token_obj.enable_masked_field_warning %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="enable-masked-field-warning" checked>
+                          {% else %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="enable-masked-field-warning">
+                          {% endif %}
+                        </td>
+                      </tr>
+                      {% if access_token_obj.enable_masked_field_warning %}
+                        <tr id="masked-field-warning-div">
+                          <th scope="row">Add Masked Field Warning to be shown to Customer</th>
+                          <td style="vertical-align: inherit;">
+                            <textarea class="form-control" style="height:10em;" id="masked-field-warning-text" placeholder="Add Maksed Field Warning">{{ access_token_obj.masked_field_warning_text }}</textarea>
+                          </td>
+                        </tr>
+                      {% else %}
+                        <tr id="masked-field-warning-div" style="display:none">
+                          <th scope="row">Add Masked Field Warning to be shown to Customer</th>
+                          <td style="vertical-align: inherit;">
+                            <textarea class="form-control" style="height:10em;" id="masked-field-warning-text" placeholder="Add Maksed Field Warning">{{ access_token_obj.masked_field_warning_text }}</textarea>
+                          </td>
+                        </tr>
+                      {% endif %}
+                      <tr>
+                        <th scope="row">Enable Agent Connect Message<br>(Message to be shown when Agent Connects for the first time)</th>
+                        <td style="vertical-align: inherit;">
+                          {% if access_token_obj.enable_agent_connect_message %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="enable-agent-connect-message" checked>
+                          {% else %}
+                          <input type="checkbox" aria-label="Checkbox for following text input" id="enable-agent-connect-message">
+                          {% endif %}
+                        </td>
+                      </tr>
+                      {% if access_token_obj.enable_agent_connect_message%}
+                        <tr id="agent-connect-message-div">
+                          <th scope="row"> Agent Connect Message
+                            <span data-toggle="tooltip" data-placement="bottom" title="'agent_name' keyword will be replaced by corresonding Agent name"><i class="fas fa-info-circle"></i></span>
+                          </th>
+                          <td style="vertical-align: inherit;">
+                            <textarea class="form-control" style="height:10em;" id="agent_connect_message">{{ access_token_obj.agent_connect_message }}</textarea>
+                          </td>
+                        </tr>
+                      {% else %}
+                        <tr id="agent-connect-message-div" style="display: none;">
+                          <th scope="row"> Agent Connect Message
+                            <span data-toggle="tooltip" data-placement="bottom" title="'agent_name' keyword will be replaced by corresonding Agent name"><i class="fas fa-info-circle"></i></span>
+                          </th>
+                          <td style="vertical-align: inherit;">
+                            <textarea class="form-control" style="height:10em;" id="agent_connect_message">{{ access_token_obj.agent_connect_message }}</textarea>
+                          </td>
+                        </tr>
+                      {% endif %}
+                      <tr>
+                        <th scope="row">Message to be shown on 'Connect with our Experts' modal</th>
+                        <td style="vertical-align: inherit;">
+                          <textarea class="form-control" style="height:10em;" id="connect_message">{{ access_token_obj.connect_message }}</textarea>
+                        </td>
+                      </tr>
+                        <tr>
+                          <th scope="row">Message to be shown on Customer Consent modal</th>
+                          <td style="vertical-align: inherit;">
+                            <textarea class="form-control" style="height:10em;" id="assistant_message">{{ access_token_obj.assist_message }}</textarea>
+                          </td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Whitelisted domains <br>(e.g. www.xyz.com, www.abc.com)<br><br>Note: Add '*' to activate the script in all domains</th>
+                          <td style="vertical-align: inherit;">
+                            <textarea class="form-control" style="height:10em;" id="whitelisted_domain">{{ access_token_obj.whitelisted_domain }}</textarea>
+                          </td>
+                        </tr>
+                        <tr>
+                          <th scope="row">URLs where lead is considered as converted <br>(e.g. www.xyz.com/page, www.abc.com/page1/page2)<br><br>Note: URLs will be matched exactly from the beginning</th>
+                          <td style="vertical-align: inherit;">
+                            <textarea class="form-control" style="height:10em;" id="urls_consider_lead_converted">{{ access_token_obj.urls_consider_lead_converted }}</textarea>
+                          </td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Go-Live Date</th>
+                          <td style="vertical-align: inherit;">
+                            <input type="date" data-date-format="yyyy-mm-dd" id="go_live_date" value="{{access_token_obj.go_live_date|date:'Y-m-d'}}">
+                          </td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Text to be shown in Agent Feedback modal</th>
+                          <td style="vertical-align: inherit;">
+                            <textarea class="form-control" style="height:auto;" id="lead_conversion_checkbox_text">{{ access_token_obj.lead_conversion_checkbox_text }}</textarea>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div class="card shadow mb-4">
+                    <div class="card-header py-3" style="padding: 0.5em 1.25em 0.5em 1.25em !important;">
+                      <div class="row">
+                        <div class="col-mb-5" style="margin-top: 5px;">
+                          <h6 class="m-0 font-weight-bold text-primary">Inbound Settings</h6>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="table-responsive">
+                    <table class="table table-borderless gy-settings-table">
+                      <tbody>
+                        <tr>
+                          <th scope="row">Display floating button to 'Connect with an Agent'</th>
+                          <td style="vertical-align: inherit;">
+                            {% if access_token_obj.show_floating_easyassist_button %}
+                            <input type="checkbox" aria-label="Checkbox for following text input" checked id="show_floating_button_checkbox">
+                            {% else %}
+                            <input type="checkbox" aria-label="Checkbox for following text input" id="show_floating_button_checkbox">
+                            {% endif %}
+                          </td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Floating button position</th>
+                          <td style="vertical-align: inherit;">
+                            <select id="select-floating-button-position" class="form-control" style="width:50%;" onchange="show_floating_sidenav_easyassist_button()">
+                              {% for value, position in FLOATING_BUTTON_POSITION %}
+                              {% if value == access_token_obj.floating_button_position %}
+                              <option value="{{ value }}" selected>{{ position }}</option>
+                              {% else %}
+                              <option value="{{ value }}">{{ position }}</option>
+                              {% endif %}
+                              {% endfor %}
+                            </select>
+                          </td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Cobrowsing Theme Colour</th>
+                          <td style="vertical-align: inherit;">
+                            <input type="text" class="form-control jscolor" id="floating-button-background-color" placeholder="HEX" value="{{ access_token_obj.floating_button_bg_color }}" style="width:50%;" onchange="show_floating_sidenav_easyassist_button();">
+                          </td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Display an icon to 'Connect with an Agent'</th>
+                          <td style="vertical-align: inherit;">
+                            {% if access_token_obj.show_easyassist_connect_agent_icon %}
+                            <input type="checkbox" aria-label="Checkbox for following text input" checked id="show_easyassist_connect_agent_icon_checkbox">
+                            {% else %}
+                            <input type="checkbox" aria-label="Checkbox for following text input" id="show_easyassist_connect_agent_icon_checkbox" onclick="show_upload_image()">
+                            {% endif %}
+                          </td>
+                        </tr>
+                        <tr style="display:none" id = "display_icon">
+                          <th scope="row">Upload icon for connect with agent <br>
+                          </th>
+                          <td style="vertical-align: inherit;">
+                            <div class="row">
+                              <div clss="col-md-12" style="padding-left: 0.7em;">
+                                {% if access_token_obj.source_easyassist_connect_agent_icon != "null" %}
+                                <button class="btn btn-info mb-2 mr-sm-2" data-toggle="modal" data-target="#connect_with_agent_icon_upload_modal" id="connect_with_agent_icon_upload_button">Change Icon</button>
+                                {% else %}
+                                <button class="btn btn-info mb-2 mr-sm-2" data-toggle="modal" data-target="#connect_with_agent_icon_upload_modal" id="connect_with_agent_icon_upload_button">Upload Icon</button>
+                                {% endif %}
+                              </div>
+                              <div class="col-md-12">
+                                {% if access_token_obj.source_easyassist_connect_agent_icon != "null" %}
+                                <img src="/{{ access_token_obj.source_easyassist_connect_agent_icon }}" id="connect-with-agent-image" style="height: 10em; display: inline-box;">
+                                {% endif %}
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Display 'Connect with an Agent' button only if agents are available
+                            <span data-toggle="tooltip" data-placement="bottom" title="If enabled, the ‘Connect with an Agent’ button will not be displayed on the website during non-working hours and when agents are not online."><i class="fas fa-info-circle"></i></span>
+                          </th>
+                          <td style="vertical-align: inherit;">
+                            {% if access_token_obj.show_only_if_agent_available %}
+                            <input type="checkbox" aria-label="Checkbox for following text input" checked id="show_only_if_agent_available">
+                            {% else %}
+                            <input type="checkbox" aria-label="Checkbox for following text input" id="show_only_if_agent_available">
+                            {% endif %}
+                          </td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Disable 'Connect with an Agent' button if agents are unavailable
+                            <span data-toggle="tooltip" data-placement="bottom" title="If enabled, the ‘Connect with an Agent’ button will be disabled and non clickable during non-working hours and when agents are not online."><i class="fas fa-info-circle"></i></span>
+                          </th>
+                          <td style="vertical-align: inherit;">
+                            {% if access_token_obj.disable_connect_button_if_agent_unavailable %}
+                            <input type="checkbox" aria-label="Checkbox for following text input" checked id="disable_connect_button_if_agent_unavailable">
+                            {% else %}
+                            <input type="checkbox" aria-label="Checkbox for following text input" id="disable_connect_button_if_agent_unavailable">
+                            {% endif %}
+                          </td>
+                        </tr>
+                        {% if access_token_obj.disable_connect_button_if_agent_unavailable %}
+                          <tr id="message-if-agent-unavailable-div">
+                            <th scope="row">Message to be shown if agents are unavailable</th>
+                            <td style="vertical-align: inherit;">
+                              <textarea class="form-control" style="height:10em;" id="message_if_agent_unavailable">{{ access_token_obj.message_if_agent_unavailable }}</textarea>
+                            </td>
+                          </tr>
+                        {% else %}
+                          <tr id="message-if-agent-unavailable-div" style="display: none;">
+                            <th scope="row">Message to be shown if agents are unavailable</th>
+                            <td style="vertical-align: inherit;">
+                              <textarea class="form-control" style="height:10em;" id="message_if_agent_unavailable">{{ access_token_obj.message_if_agent_unavailable }}</textarea>
+                            </td>
+                          </tr>
+                        {% endif %}
+                        <tr>
+                          <th scope="row">Start Time & End Time of working hours</th>
+                          <td style="vertical-align: inherit;">
+                            <input type="time" id="start_time" value="{{access_token_obj.get_start_time}}">
+                            <input type="time" id="end_time" value="{{access_token_obj.get_end_time}}">
+                          </td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Message to be shown during non working hours</th>
+                          <td style="vertical-align: inherit;">
+                            <textarea class="form-control" style="height:10em;" id="message_on_non_working_hours">{{ access_token_obj.message_on_non_working_hours }}</textarea>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  </div>
+                </div>
+              </div>
+                <div class="tab-pane fade" id="pills-cognomeet-options" role="tabpanel" aria-labelledby="pills-cognomeet-tab">
+                  <div class="card-body">
+                    <div class="card shadow mb-4">
+                      <div class="card-header py-3" style="padding: 0.5em 1.25em 0.5em 1.25em !important;">
+                        <div class="row">
+                          <div class="col-sm-5" style="margin-top: 5px;">
+                            <h6 class="m-0 font-weight-bold text-primary">Admin Settings</h6>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="table-responsive">
+                      <table class="table table-borderless gy-settings-table">
+                        <tbody>
+                          <tr>
+                            <th scope="row">Allow feedback in meeting</th>
+                          <td style="vertical-align: inherit;">
+                            {% if access_token_obj.allow_meeting_feedback %}
+                            <input type="checkbox" aria-label="Checkbox for following text input" id="allow-meeting-feedback-cobrowsing-input" checked>   
+                            {% else %}
+                            <input type="checkbox" aria-label="Checkbox for following text input" id="allow-meeting-feedback-cobrowsing-input">   
+                            {% endif %}
+                          </td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Provide the default meeting password</th>
+                            <td style="vertical-align: inherit;">
+                              <input type="text" aria-label="Checkbox for following text input" id="meeting-default-password" value="{{ access_token_obj.meeting_default_password }}">
+                            </td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Meeting URL where meeting will take place (e.g. xyz.com)</th>
+                            <td style="vertical-align: inherit;">
+                              <input type="text" aria-label="Checkbox for following text input" id="meeting-url-input" value="{{ access_token_obj.meeting_host_url }}">
+                            </td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Allow only video call</th>
+                            <td style="vertical-align: inherit;">
+                              {% if access_token_obj.allow_video_meeting_only %}
+                              <input type="checkbox" aria-label="Checkbox for following text input" id="allow-only-vc-input" checked>
+                              {% else %}
+                              <input type="checkbox" aria-label="Checkbox for following text input" id="allow-only-vc-input">
+                              {% endif %}
+                            </td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Allow agents set time duration for meetings</th>
+                            <td style="vertical-align: inherit;">
+                              {% if access_token_obj.allow_meeting_end_time %}
+                              <input type="checkbox" aria-label="Checkbox for following text input" id="allow-meeting-end-time-input" checked>
+                              {% else %}
+                              <input type="checkbox" aria-label="Checkbox for following text input" id="allow-meeting-end-time-input">
+                              {% endif %}
+                            </td>
+                            </tr>
+                          {% if access_token_obj.allow_meeting_end_time %}
+                          <tr id="meeting_end_time">
+                            <th scope="row">Set a maximum time duration for meetings</th>
+                            <td style="vertical-align: inherit;">
+                              <input type="text" id="meet-end-time" value="{{ access_token_obj.meeting_end_time }}" style="width:50%;">
+                            </td>
+                          </tr>
+                          <tr>
+                          {% else %}
+                            <tr id="meeting_end_time" style="display: none;">
+                              <th scope="row">Set a maximum time duration for meetings</th>
+                              <td style="vertical-align: inherit;">
+                                <input type="text" id="meet-end-time" value="{{ access_token_obj.meeting_end_time }}" style="width:50%;">
+                              </td>
+                            </tr>
+                            <tr>
+                          {% endif %}
+                            <th scope="row">Meeting background color</th>
+                            <td style="vertical-align: inherit;">
+                              <input type="text" class="form-control jscolor" id="meet-background-color" placeholder="HEX" value="{{ access_token_obj.meet_background_color }}" style="width:50%;">
+                            </td>
+                          </tr>
+                          <tr style="display:none;">
+                            <th scope="row">Proxy Server</th>
+                            <td style="vertical-align: inherit;">
+                              <input type="text" aria-label="Checkbox for following text input" id="proxy_pass_server" value="{{ access_token_obj.proxy_pass_server }}">
+                            </td>
+                          </tr>
+                          <tr> 
+                        </tbody>
+                      </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <p id="save-cobrowsing-meta-details-error"></p>
+                <div class="col-md-12">
+                  <button type="button" class="btn btn-success float-right" onclick="chip_product_category();chip_predefined_remarks();chip_language_support();save_cobrowsing_meta_details(this, 'false')">Save</button>
+                  <button type="button" class="btn btn-info float-left" onclick="save_cobrowsing_meta_details(this, 'true')">Reset All</button>
+                  <br><br>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+    <!--  ADVANCED SETTINGS TAB -->
+    <div class="tab-pane fade" id="pills-advanced-settings" role="tabpanel" aria-labelledby="pills-advanced-settings-tab">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card shadow mb-4">
+            <div class="card-header py-3" style="padding: 0.5em 1.25em 0.5em 1.25em !important;">
+              <div class="row">
+                <div class="col-sm-5" style="margin-top: 5px;">
+                  <h6 class="m-0 font-weight-bold text-primary">Masking Fields</h6>
+                </div>
+                <div class="col-sm-7" style="text-align: right;">
+                  <button class="btn btn-info mb-2 mr-sm-2" data-toggle="modal" data-target="#add_new_masking_field_modal">Add Field</button>
+                  <button class="btn btn-danger mb-2 mr-sm-2 float-right" style="display: none;" onclick="delete_masking_field(this)" id="button-delete-masking-field">Delete Field</button>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              {% if access_token_obj.obfuscated_fields.all %}
+              <div class="table-responsive">
+                <table class="table table-bordered" id="fieldTable" width="100%" cellspacing="0">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Field Key</th>
+                      <th>Field Value</th>
+                      <th>Masking Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for field in access_token_obj.obfuscated_fields.all %}
+                    <tr>
+                      <td><input type="checkbox" class="masking-field-checkbox-collection" id="checkbox-masking-field-{{ field.pk }}"></td>
+                      <td>{{ field.key }}</td>
+                      <td>{{ field.value }}</td>
+                      {% if field.masking_type == "full-masking" %}
+                      <td>Full Masking</td>
+                      {% elif field.masking_type == "partial-masking" %}
+                      <td>Partial Masking</td>
+                      {% else %}
+                      <td>No Masking</td>
+                      {% endif %}
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              {% else %}
+              <div class="table-responsive">
+                Masking fields not available
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12">
+          <div class="card shadow mb-4">
+            <div class="card-header py-3" style="padding: 0.5em 1.25em 0.5em 1.25em !important;">
+              <div class="row">
+                <div class="col-sm-5" style="margin-top: 5px;">
+                  <h6 class="m-0 font-weight-bold text-primary">Search Tag Fields</h6>
+                </div>
+                <div class="col-sm-7" style="text-align: right;">
+                  <button class="btn btn-info mb-2 mr-sm-2" data-toggle="modal" data-target="#add_new_search_tag_field_modal">Add Field</button>
+                  <button class="btn btn-danger mb-2 mr-sm-2 float-right" style="display: none;" onclick="delete_search_tag_field(this)" id="button-delete-search-tag-field">Delete Field</button>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              {% if access_token_obj.search_fields.all %}
+              <div class="table-responsive">
+                <table class="table table-bordered" id="fieldTable" width="100%" cellspacing="0">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Tag</th>
+                      <th>Tag Label</th>
+                      <th>Tag Key</th>
+                      <th>Tag Value</th>
+                      <th>Tag Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for field in access_token_obj.search_fields.all %}
+                    <tr>
+                      <td><input type="checkbox" class="search-tag-field-checkbox-collection" id="checkbox-search-tag-field-{{ field.pk }}"></td>
+                      <td>{{ field.tag }}</td>
+                      <td>{{ field.tag_label }}</td>
+                      <td>{{ field.tag_key }}</td>
+                      <td>{{ field.tag_value }}</td>
+                      <td>{{ field.tag_type }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              {% else %}
+              <div class="table-responsive">
+                Search tag fields not available
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12">
+          <div class="card shadow mb-4">
+            <div class="card-header py-3" style="padding: 0.5em 1.25em 0.5em 1.25em !important;">
+              <div class="row">
+                <div class="col-sm-5" style="margin-top: 5px;">
+                  <h6 class="m-0 font-weight-bold text-primary">Auto-fetch Fields</h6>
+                </div>
+                <div class="col-sm-7" style="text-align: right;">
+                  <button class="btn btn-info mb-2 mr-sm-2" data-toggle="modal" data-target="#add_new_auto_fetch_field_modal">Add Field</button>
+                  <button class="btn btn-danger mb-2 mr-sm-2 float-right" style="display: none;" onclick="delete_auto_fetch_field(this)" id="button-delete-auto-fetch-field">Delete Field</button>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              {% if access_token_obj.auto_fetch_fields.all %}
+              <div class="table-responsive">
+                <table class="table table-bordered" id="fieldTable" width="100%" cellspacing="0">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Fetch Field Key</th>
+                      <th>Fetch Field Value</th>
+                      <th>Modal Field Key</th>
+                      <th>Modal Field Value</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for field in access_token_obj.auto_fetch_fields.all %}
+                    <tr>
+                      <td><input type="checkbox" class="auto-fetch-field-checkbox-collection" id="checkbox-auto-fetch-field-{{ field.pk }}"></td>
+                      <td>{{ field.fetch_field_key }}</td>
+                      <td>{{ field.fetch_field_value }}</td>
+                      <td>{{ field.modal_field_key }}</td>
+                      <td>{{ field.modal_field_value }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              {% else %}
+              <div class="table-responsive">
+                Auto-fetch fields not available
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="add_new_masking_field_modal" tabindex="-1" role="dialog" aria-labelledby="add_new_masking_field_modal_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="add_new_masking_field_modal_modal_label">Add Masking Field</h5>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-sm-12">
+            <form class="form-inline" action="javascript:void(0)">
+              <div class="col-sm-6">
+                <label class="sr-only" for="inline-form-input-masking-field-key">Masking Field Key</label>
+                <input type="text" style="width: 100%;" class="form-control mb-2" id="inline-form-input-masking-field-key" placeholder="Masking Field Key">
+              </div>
+              <div class="col-sm-6">
+                <label class="sr-only" for="inline-form-input-masking-field-value">Masking Field Value</label>
+                <input type="text" style="width: 100%;" class="form-control mb-2" id="inline-form-input-masking-field-value" placeholder="Masking Field Value">
+              </div>
+              <div class="col-sm-6">
+                <select class="custom-select" id="inline-form-input-masking-type" style="width: 100%;">
+                  <option selected="" value="">Choose masking type</option>
+                  <option value="no-masking">No Masking</option>
+                  <option value="partial-masking">Partial Masking</option>
+                  <option value="full-masking">Full Masking</option>
+                </select>
+              </div>
+            </form>
+            <p id="add-new-masking-field-error"></p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <button class="btn btn-success" onclick="add_new_masking_field(this)">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="add_new_search_tag_field_modal" tabindex="-1" role="dialog" aria-labelledby="add_new_search_tag_field_modal_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="add_new_search_tag_field_modal_modal_label">Add Search Tag Field</h5>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-sm-12">
+            <form class="form-inline" action="javascript:void(0)">
+              <div class="col-sm-6">
+                <select class="custom-select" id="inline-form-input-search-tag" style="width: 100%;">
+                  <option selected="" value="">Choose tag</option>
+                  <option value="input">input</option>
+                  <option value="textarea">textarea</option>
+                  <option value="select">select</option>
+                </select>
+              </div>
+              <div class="col-sm-6">
+                <label class="sr-only" for="inline-form-input-search-tag-label">Tag Label</label>
+                <input type="text" style="width: 100%;" class="form-control mb-2" id="inline-form-input-search-tag-label" placeholder="Tag Label">
+              </div>
+              <div class="col-sm-6">
+                <label class="sr-only" for="inline-form-input-search-tag-key">Tag Key</label>
+                <input type="text" style="width: 100%;" class="form-control mb-2" id="inline-form-input-search-tag-key" placeholder="Tag Key">
+              </div>
+              <div class="col-sm-6">
+                <label class="sr-only" for="inline-form-input-search-tag-value">Tag Value</label>
+                <input type="text" style="width: 100%;" class="form-control mb-2" id="inline-form-input-search-tag-value" placeholder="Tag Value">
+              </div>
+              <div class="col-sm-6">
+                <select class="custom-select" id="inline-form-input-search-tag-type" style="width: 100%;">
+                  <option selected="" value="">Choose tag type</option>
+                  <option value="primary">primary</option>
+                  <option value="secondary">secondary</option>
+                </select>
+              </div>
+            </form>
+            <p id="add-new-search-tag-field-error"></p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <button class="btn btn-success" onclick="add_new_search_tag_field(this)">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="add_new_auto_fetch_field_modal" tabindex="-1" role="dialog" aria-labelledby="add_new_auto_fetch_field_modal_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="add_new_auto_fetch_field_modal_modal_label">Add Search Tag Field</h5>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-sm-12">
+            <form class="form-inline" action="javascript:void(0)">
+              <div class="col-sm-6">
+                <label class="sr-only" for="inline-form-input-fetch-field-key">Fetch Field Key</label>
+                <input type="text" style="width: 100%;" class="form-control mb-2" id="inline-form-input-fetch-field-key" placeholder="Fetch Field Key">
+              </div>
+              <div class="col-sm-6">
+                <label class="sr-only" for="inline-form-input-fetch-field-value"">Fetch Field Value</label>
+                <input type="text" style="width: 100%;" class="form-control mb-2" id="inline-form-input-fetch-field-value"" placeholder="Fetch Field Value">
+              </div>
+              <div class="col-sm-6">
+                <label class="sr-only" for="inline-form-input-modal-field-key">Modal Field Key</label>
+                <input type="text" style="width: 100%;" class="form-control mb-2" id="inline-form-input-modal-field-key" placeholder="Modal Field Key">
+              </div>
+              <div class="col-sm-6">
+                <label class="sr-only" for="inline-form-input-modal-field-value">Modal Field Value</label>
+                <input type="text" style="width: 100%;" class="form-control mb-2" id="inline-form-input-modal-field-value" placeholder="Modal Field Value">
+              </div>
+            </form>
+            <p id="add-new-auto-fetch-field-error"></p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <button class="btn btn-success" onclick="add_auto_fetch_field(this)">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="cobrowse_delete_upload_modal" tabindex="-1" role="dialog" aria-labelledby="document_upload_modal_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="document_upload_modal_modal_label">Delete Logo</h5>
+      </div>
+      <div class="modal-body">
+          <div class="row">
+              <div class="col-sm-12">
+                <p>Are you sure, you want to delete the logo?<p>
+              </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <button class="btn btn-danger" onclick="delete_cobrowse_logo()">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="cobrowse_logo_upload_modal" tabindex="-1" role="dialog" aria-labelledby="document_upload_modal_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="document_upload_modal_modal_label">Upload Logo</h5>
+      </div>
+      <div class="modal-body">
+          <div class="row">
+              <div class="col-sm-12">
+                <form class="form-inline" action="javascript:void(0)">
+                  <div class="col-sm-12">
+                    <input type="file" id="cobrowse_logo_input" class="form-control" name="" style="box-shadow:none !important;">
+                  </div>
+                  <div class="col-sm-12">
+                    <p style="padding-top: 1em;" id="cobrowse_logo_input_error"></p>
+                  </div>
+                </form>
+              </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger mr-auto" onclick="delete_cobrowse_logo()">Delete</button>
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <button class="btn btn-success" onclick="upload_cobrowse_logo()">Upload</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="console-theme-colorpicker-modal" tabindex="-1" role="dialog" aria-labelledby="document_upload_modal_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="document_upload_modal_modal_label">Change Console Color</h5>
+      </div>
+      <div class="modal-body" style="padding: 2rem !important">
+          <div class="row">
+              <div class="col-sm-12">
+                <form class="form-inline" action="javascript:void(0)">
+                  <div class="col-sm-12">
+                    <span style="color: black;padding: 1em;font-size: 16px;">Select Color</span>
+                    {% if access_token_obj.get_cobrowsing_console_theme_color == None %}
+                      <input type="text" class="form-control jscolor" id="cobrowsing-console-theme-color" placeholder="HEX" value="" style="width:50%;">
+                    {% else %}
+                      <input type="text" class="form-control jscolor" id="cobrowsing-console-theme-color" placeholder="HEX" value="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" style="width:50%;">
+                    {% endif %}
+                  </div>
+                  <div class="col-sm-12">
+                    <p style="padding-top: 1em;" id="cobrowse_logo_input_error"></p>
+                  </div>
+                </form>
+              </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <button class="btn btn-success" onclick="chip_product_category();chip_predefined_remarks();chip_language_support();save_cobrowsing_meta_details(this, 'false')">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="connect_with_agent_icon_upload_modal" tabindex="-1" role="dialog" aria-labelledby="document_upload_modal_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="document_upload_modal_modal_label">Upload Icon</h5>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-sm-12">
+            <form class="form-inline" action="javascript:void(0)">
+              <div class="col-sm-12">
+                <input type="file" id="connect_with_agent_icon_input" class="form-control" name="" style="box-shadow:none !important;" multiple>
+              </div>
+              <div class="col-sm-12">
+                <p style="padding-top: 1em;" id="connect_with_agent_icon_input_error"></p>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <button class="btn btn-success" onclick="upload_connect_with_agent_icon()">Upload</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+
+  var input_product_category = document.getElementById('input_product_category');
+  var product_category_tag_list = document.getElementById('product_category_tag_list');
+  var product_categories_array = {{product_category|safe}};
+  if(product_categories_array.length==1 && product_categories_array[0] =="")
+      product_categories_array = []
+
+  var input_predefined_remark = document.getElementById("input-predefined-remark");
+  var predefined_remarks_tag_list = document.getElementById("predefined-remarks-tag-list");
+  var predefined_remarks_array = "{{access_token_obj.predefined_remarks|safe}}";
+  if(predefined_remarks_array === "")
+    predefined_remarks_array = []
+  else
+    predefined_remarks_array = predefined_remarks_array.split(",")
+
+  var input_language_support = document.getElementById("input_language_support");
+  var support_language_tag_list = document.getElementById("support_language_tag_list");
+  var support_language_array = "{{access_token_obj.get_supported_languages|safe}}";
+  if(support_language_array === "")
+    support_language_array = []
+  else
+    support_language_array = support_language_array.split(",")
+
+input_product_category.addEventListener('keypress', function(e) {
+  if (e.key === 'Enter' || e.keyCode==13) {
+    let val = input_product_category.value.trim().replace( /(<([^>]+)>)/ig, '');
+    // if(val.length>30){
+    //   alert('Tag name should be less than 30 characters');
+    //   return;
+    // }
+    if (val !== '') {
+      if (product_categories_array.some(value => value.toLowerCase() === val)) {
+        show_easyassist_toast('Product category already exist');
+      } else {
+        product_categories_array.push(val);
+        render_product_category();
+        input_product_category.value = '';
+        input_product_category.focus();
+      }
+    } else {
+      show_easyassist_toast('Product category tag cannot be empty');
+    }
+  }
+});
+
+function render_product_category() {
+  product_category_tag_list.innerHTML = '';
+  product_categories_array.map((item, index) => {
+    product_category_tag_list.innerHTML += `<li class="bg-primary" id="product-category-li"><span style="font-weight: bold;">${item}</span><span style="color:white;cursor: pointer;font-weight: bold;vertical-align: text-bottom;"onclick="javascript: remove_product_category_tag(${index})"> x</span></li>`;
+  });
+}
+
+function remove_product_category_tag(index) {
+  product_categories_array = product_categories_array.filter(item => product_categories_array.indexOf(item) != index);
+  render_product_category();
+}
+
+function chip_product_category(){
+  var product_category_string = product_categories_array.join(', ');
+  document.getElementById("product_category_list").value = product_category_string;
+}
+
+  input_predefined_remark.addEventListener('keypress', function(e) {
+  if (e.key === 'Enter' || e.keyCode==13) {
+    let val = input_predefined_remark.value.trim().replace( /(<([^>]+)>)/ig, '');
+    // if(val.length>30){
+    //   alert('Tag name should be less than 30 characters');
+    //   return;
+    // }
+    if (val !== '') {
+      if (predefined_remarks_array.some(value => value === val)) {
+        show_easyassist_toast('Predefined Remark already exist');
+        input_predefined_remark.value = '';
+      } else {
+        predefined_remarks_array.push(val);
+        render_predefined_remarks();
+        input_predefined_remark.value = '';
+        input_predefined_remark.focus();
+      }
+    } else {
+      show_easyassist_toast('Predefined Remark tag cannot be empty');
+    }
+  }
+});
+
+function render_predefined_remarks() {
+  predefined_remarks_tag_list.innerHTML = '';
+  predefined_remarks_array.map((item, index) => {
+    predefined_remarks_tag_list.innerHTML += `<li class="bg-primary" id="predefined-remark-li"><span style="font-weight: bold;">${item}</span><span style="color:white;cursor: pointer;font-weight: bold;vertical-align: text-bottom;"onclick="javascript: remove_predefined_remark_tag(${index})"> x</span></li>`;
+  });
+}
+
+function remove_predefined_remark_tag(index) {
+  predefined_remarks_array = predefined_remarks_array.filter(item => predefined_remarks_array.indexOf(item) != index);
+  render_predefined_remarks();
+}
+
+function chip_predefined_remarks(){
+  var predefined_remarks_string = predefined_remarks_array.join(', ');
+  document.getElementById("predefined-remarks-list").value = predefined_remarks_string;
+}
+
+input_language_support.addEventListener('keypress', function(e) {
+  if (e.key === 'Enter' || e.keyCode==13) {
+    let val = input_language_support.value.trim().replace( /(<([^>]+)>)/ig, '');
+    // if(val.length>30){
+    //   alert('Tag name should be less than 30 characters');
+    //   return;
+    // }
+    if (val !== '') {
+      if (support_language_array.some(value => value === val)) {
+        show_easyassist_toast('Support language already exist');
+        input_language_support.value = '';
+      } else {
+        support_language_array.push(val);
+        render_language_support();
+        input_language_support.value = '';
+        input_language_support.focus();
+      }
+    } else {
+      show_easyassist_toast('Support language tag cannot be empty');
+    }
+  }
+});
+
+function render_language_support() {
+  support_language_tag_list.innerHTML = '';
+  support_language_array.map((item, index) => {
+    support_language_tag_list.innerHTML += `<li class="bg-primary" id="support-language-li"><span style="font-weight: bold;">${item}</span><span style="color:white;cursor: pointer;font-weight: bold;vertical-align: text-bottom;"onclick="javascript: remove_language_support_tag(${index})"> x</span></li>`;
+  });
+}
+
+function remove_language_support_tag(index) {
+  if(support_language_array[index].toLowerCase() == "english") {
+    show_easyassist_toast(" English is default Support Language and Can't be removed")
+  } else {
+    support_language_array = support_language_array.filter(item => support_language_array.indexOf(item) != index);
+    render_language_support();
+  }
+}
+
+function chip_language_support(){
+  var support_language_string = support_language_array.join(', ');
+  document.getElementById("support_language_list").value = support_language_string;
+}
+
+function render_cognomeet_and_cobrowse_tabs(){
+  if(document.getElementById("cobrowse-toggle").checked == false){
+      document.getElementById("pills-cobrowse-tab").style.display = "none";
+      document.getElementById("pills-cobrowse-tab").className = "nav-link";
+      document.getElementById("pills-cobrowse-options").className = "tab-pane fade";
+      document.getElementById("pills-cognomeet-tab").className = "nav-link active";
+      document.getElementById("pills-cognomeet-options").className = "tab-pane fade show active";
+  }
+  if(document.getElementById("cognomeet-toggle").checked == false){
+      document.getElementById("pills-cognomeet-tab").style.display = "none";
+      document.getElementById("pills-cognomeet-tab").className = "nav-link";
+      document.getElementById("pills-cognomeet-options").className = "tab-pane fade";
+      document.getElementById("pills-cobrowse-tab").className = "nav-link active";
+      document.getElementById("pills-cobrowse-options").className = "tab-pane fade show active";
+  }
+}
+window.addEventListener("load", function() {
+    var option_btn_id = location.hash;
+    if( option_btn_id){
+      $(option_btn_id).click();
+    }
+    render_product_category();
+    render_predefined_remarks();
+    render_cognomeet_and_cobrowse_tabs();
+    render_language_support();
+    var cobrowsingconsole_theme_color_el = document.getElementById("cobrowsing-console-theme-color");
+    cobrowsingconsole_theme_color_el.jscolor.zIndex = 1090;
+  });
+
+  if (document.getElementById("easy_assist_delete_logo") != null) {
+    var image_listener = document.getElementById("easy_assist_delete_logo");
+    image_listener.addEventListener('click', function(el){
+      $('#cobrowse_delete_upload_modal').modal('show');
+    });
+  }
+  var host_protocol = window.location.protocol;
+  var host_name = window.location.host;
+  var script = host_protocol + '//' +  host_name +'/static/EasyAssistSalesforceApp/js/easy-assist-v6.js?key=' + "{{ access_token_obj.key }}";
+
+  var load_script = '<script type="text/javascript" src="'+script+'"></scr'+'ipt>';
+  var editor = ace.edit("editor-code");
+  editor.setTheme("ace/theme/chrome");
+  editor.session.setMode("ace/mode/javascript");
+  editor.setValue(load_script);
+  editor.setFontSize("15px");
+  editor.session.setUseWorker(false);
+  editor.setReadOnly(true);
+  editor.setOption("dragEnabled", false);
+  editor.setAutoScrollEditorIntoView(true);
+  editor.setOption("maxLines", 4);
+
+  var load_script = script;
+  var editor = ace.edit("editor-code-cjs");
+  editor.setTheme("ace/theme/chrome");
+  editor.session.setMode("ace/mode/javascript");
+  editor.setValue(load_script);
+  editor.setFontSize("15px");
+  editor.session.setUseWorker(false);
+  editor.setReadOnly(true);
+  editor.setOption("dragEnabled", false);
+  editor.setAutoScrollEditorIntoView(true);
+  editor.setOption("maxLines", 4);
+
+  function show_upload_image(){
+    var show_image = document.getElementById("show_easyassist_connect_agent_icon_checkbox");
+    var display_image = document.getElementById("display_icon");
+    if(show_image.checked == true){
+      display_image.style.display = "contents";
+    }
+    else{
+      display_image.style.display = "none";
+    }
+  }
+
+  function copy_script() {
+      /* Get the text field */
+      var copyGfGText = document.getElementById("editor-code").childNodes[1];
+      /* Select the text field */
+      copyGfGText.select();
+      /* Copy the text inside the text field */
+      document.execCommand("copy");
+      show_easyassist_toast("Script copied");
+  }
+
+  function copy_cjs_script() {
+      /* Get the text field */
+      var copyGfGText = document.getElementById("editor-code-cjs").childNodes[1];
+      /* Select the text field */
+      copyGfGText.select();
+      /* Copy the text inside the text field */
+      document.execCommand("copy");
+      show_easyassist_toast("CJS script copied");
+  }
+
+  function add_floating_sidenav_easyassist_button() {
+      bg_color = "{{ access_token_obj.floating_button_bg_color }}";
+      var nav_span = document.createElement("span");
+      nav_span.id = "easyassist-side-nav-options-co-browsing";
+      nav_span.style.backgroundColor = bg_color;
+      nav_span.textContent = "Request for Support";
+      nav_span.setAttribute("onclick", "show_easyassist_browsing_modal()");
+      document.getElementsByTagName("body")[0].appendChild(nav_span);
+      if ("{{ access_token_obj.floating_button_position }}" == "left") {
+          nav_span.style.left = "-70px";
+          nav_span.style.borderRadius = "0px 0px 10px 10px";
+      } else {
+          nav_span.style.right = "-70px";
+          nav_span.style.borderRadius = "10px 10px 0px 0px";
+      }
+  }
+
+  add_floating_sidenav_easyassist_button();
+
+  function hide_floating_sidenav_easyassist_button() {
+    document.getElementById("easyassist-side-nav-options-co-browsing").style.display = "none";
+  }
+
+  function show_floating_sidenav_easyassist_button() {
+    bg_color = "#"+document.getElementById("floating-button-background-color").value;
+    position = document.getElementById("select-floating-button-position").value;
+    sidenav_element = document.getElementById("easyassist-side-nav-options-co-browsing");
+    sidenav_element.style.left = "";
+    sidenav_element.style.right = "";
+    if (position == "left") {
+      sidenav_element.style.left = "-70px";
+       sidenav_element.style.borderRadius = "0px 0px 10px 10px"
+    } else {
+      sidenav_element.style.right = "-70px";
+       sidenav_element.style.borderRadius = "10px 10px 0px 0px"
+    }
+    sidenav_element.style.backgroundColor = bg_color;
+    sidenav_element.style.display = "inline-block";
+  }
+
+  function show_change_password(element){
+      document.getElementById("change-password-div").style.display="block";
+  }
+
+  document.getElementById("disable_connect_button_if_agent_unavailable").addEventListener("click", function(){
+    if(document.getElementById("disable_connect_button_if_agent_unavailable").checked){
+      document.getElementById("message-if-agent-unavailable-div").style.display = "contents";
+    }else{
+      document.getElementById("message-if-agent-unavailable-div").style.display = "none";
+    }
+  });
+
+  document.getElementById("allow-meeting-end-time-input").addEventListener("click", function(){
+    if(document.getElementById("allow-meeting-end-time-input").checked){
+      document.getElementById("meeting_end_time").style.display = "contents";
+    }else{
+      document.getElementById("meeting_end_time").style.display = "none";
+    }
+  });
+
+  document.getElementById("allow_language_support").addEventListener("click", function(){
+    if(document.getElementById("allow_language_support").checked){
+      document.getElementById("supported-language-list-div").style.display = "contents";
+    }else{
+      document.getElementById("supported-language-list-div").style.display = "none";
+    }
+  });
+
+  document.getElementById("cobrowse-toggle").addEventListener("click", function(){
+    if(document.getElementById("cobrowse-toggle").checked){
+      document.getElementById("allow-only-vc-input").checked = false;
+      document.getElementById("pills-cobrowse-tab").style.display = "block";
+      
+    } else {
+      if(document.getElementById("cognomeet-toggle").checked == false) {
+        show_easyassist_toast("Both Cobrowse and Cognomeet can't be disabled");
+        document.getElementById("cobrowse-toggle").checked = true;
+        return;
+      }
+      document.getElementById("allow-only-vc-input").checked = true;
+      document.getElementById("pills-cobrowse-tab").style.display="none";
+      document.getElementById("pills-cobrowse-tab").className = "nav-link";
+      document.getElementById("pills-cobrowse-options").className = "tab-pane fade";
+      document.getElementById("pills-cognomeet-tab").className = "nav-link active";
+      document.getElementById("pills-cognomeet-options").className = "tab-pane fade show active";
+    }
+  });
+
+  document.getElementById("cognomeet-toggle").addEventListener("click", function(){
+    if(document.getElementById("cognomeet-toggle").checked){
+      document.getElementById("allow-generate-meeting-input").checked = true;
+      document.getElementById("pills-cognomeet-tab").style.display = "block";
+    } else {
+      if(document.getElementById("cobrowse-toggle").checked == false) {
+        show_easyassist_toast("Both Cobrowse and Cognomeet can't be disabled");
+        document.getElementById("cognomeet-toggle").checked = true;
+        return;
+      }
+      document.getElementById("allow-generate-meeting-input").checked = false;
+      document.getElementById("pills-cognomeet-tab").style.display = "none";
+      document.getElementById("pills-cobrowse-tab").className = "nav-link active";
+      document.getElementById("pills-cobrowse-options").className = "tab-pane fade show active";
+      document.getElementById("pills-cognomeet-tab").className = "nav-link";
+      document.getElementById("pills-cognomeet-options").className = "tab-pane fade";
+    }
+  });
+
+  document.getElementById("allow-generate-meeting-input").addEventListener("click", function(){
+    $("#cognomeet-toggle").click();
+  });
+
+  document.getElementById("allow-only-vc-input").addEventListener("click", function(){
+    $("#cobrowse-toggle").click();
+  });
+
+  document.getElementById("choose_product_category").addEventListener("click", function(){
+    if(document.getElementById("choose_product_category").checked){
+      document.getElementById("product-category-list-div").style.display = "contents";
+    }else{
+      document.getElementById("product-category-list-div").style.display = "none";
+    }
+  });
+
+  document.getElementById("enable-predefined-remarks").addEventListener("click", function(){
+    if(document.getElementById("enable-predefined-remarks").checked){
+      document.getElementById("predefined-remarks-list-div").style.display = "contents";
+    }else{
+      document.getElementById("predefined-remarks-list-div").style.display = "none";
+    }
+  });
+
+  document.getElementById("allow_screen_recording").addEventListener("click", function(){
+    if(document.getElementById("allow_screen_recording").checked){
+      document.getElementById("screen-recording-expire-div").style.display = "contents";
+    }else{
+      document.getElementById("screen-recording-expire-div").style.display = "none";
+    }
+  });
+
+  document.getElementById("enable-masked-field-warning").addEventListener("click", function(){
+    if(document.getElementById("enable-masked-field-warning").checked){
+      document.getElementById("masked-field-warning-div").style.display = "contents";
+    }else{
+      document.getElementById("masked-field-warning-div").style.display = "none";
+    }
+  })
+
+  document.getElementById("enable-agent-connect-message").addEventListener("click", function(){
+    if(document.getElementById("enable-agent-connect-message").checked){
+      document.getElementById("agent-connect-message-div").style.display = "contents";
+    }else{
+      document.getElementById("agent-connect-message-div").style.display = "none";
+    }
+  })
+
+</script>
+
+{% endblock %}

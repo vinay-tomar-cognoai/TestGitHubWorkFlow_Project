@@ -1,0 +1,172 @@
+{% extends 'LiveChatApp/manager_console.html' %}
+{% block consolecontent %}
+{% load static %}
+
+<link href="{% static 'LiveChatApp/css/chat_escalation.css' %}?v={% random_int 1 100 %}" rel="stylesheet">
+
+<style type="text/css">
+    
+    .chat-escalation-btn{
+        background: {{ admin_config.get_livechat_theme_lighten_one }};
+    }
+
+    .custom-control-input:checked~.custom-control-label::before {
+        border-color: {{ admin_config.get_livechat_theme_lighten_one }};
+        background-color: {{ admin_config.get_livechat_theme_lighten_one }};
+    }
+
+
+</style>
+
+<div class="col-xl-10 col-lg-10 col-md-12 col-sm-12 col-12 py-2 " id="live-chat-admin-setting-content-chat-escalation" style="height: calc(100vh - 4.375rem); background: #FAFAFA; overflow-y: auto; overflow-x: hidden; max-width: 83%">
+
+    <div class="livechat-admin-email-setting-container">
+
+        <div class="livechat-admin-email-setting-subheading pb-4">
+            <div class="chat-escalation-title">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path class="settings-chat-escalation-keyword" id="livechat-chat-escalation-keyword-sidenav" d="M7 0C3.136 0 0 3.136 0 7C0 10.864 3.136 14 7 14C10.864 14 14 10.864 14 7C14 3.136 10.864 0 7 0ZM1.4 7C1.4 3.906 3.906 1.4 7 1.4C8.295 1.4 9.485 1.841 10.43 2.583L2.583 10.43C1.81424 9.45219 1.39747 8.24382 1.4 7ZM7 12.6C5.705 12.6 4.515 12.159 3.57 11.417L11.417 3.57C12.1858 4.54781 12.6025 5.75618 12.6 7C12.6 10.094 10.094 12.6 7 12.6Z" fill="#4D4D4D"></path>
+                </svg>
+                <span>Chat Escalation Matrix</span>
+            </div>
+            {% if user_obj.status == "1" %}
+            <button class="chat-escalation-btn" id="chat-escalation-save-btn">Save</button>
+            {% endif %}
+        </div>
+
+        <div class="livechat-email-configuration-wrapper">
+
+            <div class="row align-items-center mt-3">
+                <div class="col-6 col-md-6 pl-5">
+                    <span class="livechat-email-configuration-heading-text">blacklisted keywords</span>
+                </div>
+                <div class="col-6 col-md-6">
+                    <button id="blacklist-keyword-view-btn" class="chat-escalation-view-btn">View</button>
+                </div>
+            </div>
+
+            {% if user_obj.status == "1" %}
+            <div class="row mt-1">
+                <div class="col-md-12 col-sm-12">
+                    <hr>
+                </div>
+            </div>
+
+            <div class="row align-items-center">
+                <div class="col-6 col-md-6 pl-5">
+                    <span class="livechat-email-configuration-heading-text">Enable Chat Escalation Matrix for customers</span>
+                </div>
+
+                <div class="col-6 col-md-6">
+                    <label class="livechat-option-switch livechat-conversation-email-cb">
+                        <input type="checkbox" id="is-chat-escalation-matrix-enabled" {% if admin_config.is_chat_escalation_matrix_enabled %} checked {% endif %}/>
+                        <span class="livechat-option-switch-slider round"></span>
+                    </label>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="row mt-1">
+                <div class="col-md-12 col-sm-12">
+                    <hr>
+                </div>
+            </div>
+
+            <div id="chat-escalation-details-container" style="{% if user_obj.is_chat_escalation_enabled %} display:block; {% else %} display:none; {% endif %}">
+
+            {% if user_obj.status == "1" %}
+            <div class="row align-items-center ">
+                <div class="col-6 col-md-6 pl-5">
+                    <span class="livechat-email-configuration-heading-text">Allow agents to Force report
+                        <sup style="font-size: 15px;" class="data-tooltip" data-toggle="tooltip" title="" data-original-title="Allow agents to report directly without warning" ><svg width="13" height="12" viewBox="0 0 13 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8.15234 5.42108C8.51693 5.0565 8.69922 4.619 8.69922 4.10858C8.69922 3.47056 8.47135 2.92369 8.01562 2.46796C7.5599 2.01223 7.01302 1.78436 6.375 1.78436C5.73698 1.78436 5.1901 2.01223 4.73438 2.46796C4.27865 2.92369 4.05078 3.47056 4.05078 4.10858H5.19922C5.19922 3.79869 5.31771 3.52525 5.55469 3.28827C5.79167 3.05129 6.0651 2.9328 6.375 2.9328C6.6849 2.9328 6.95833 3.05129 7.19531 3.28827C7.43229 3.52525 7.55078 3.79869 7.55078 4.10858C7.55078 4.41848 7.43229 4.69191 7.19531 4.92889L6.48438 5.66718C6.02865 6.15936 5.80078 6.70624 5.80078 7.3078V7.60858H6.94922C6.94922 7.00702 7.17708 6.46014 7.63281 5.96796L8.15234 5.42108ZM6.94922 9.9328V8.78436H5.80078V9.9328H6.94922ZM2.24609 1.75702C3.39453 0.608582 4.77083 0.0343628 6.375 0.0343628C7.97917 0.0343628 9.34635 0.608582 10.4766 1.75702C11.625 2.88723 12.1992 4.25441 12.1992 5.85858C12.1992 7.46275 11.625 8.83905 10.4766 9.98749C9.34635 11.1177 7.97917 11.6828 6.375 11.6828C4.77083 11.6828 3.39453 11.1177 2.24609 9.98749C1.11589 8.83905 0.550781 7.46275 0.550781 5.85858C0.550781 4.25441 1.11589 2.88723 2.24609 1.75702Z" fill="{{ admin_config.get_livechat_theme_lighten_one }}"></path>
+                        </svg></sup>
+                    </span>
+                </div>
+
+                <div class="col-6 col-md-6">
+                    <label class="livechat-option-switch">                        
+                        <input type="checkbox" id="is-agent-allowed-to-force-report" {% if admin_config.is_agent_allowed_to_force_report %} checked {% endif %}> 
+                        <span class="livechat-option-switch-slider round"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="row mt-1">
+                <div class="col-md-12 col-sm-12">
+                    <hr>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="row align-items-center mb-1">
+                <div class="col-6 col-md-6 pl-5">
+                    <span class="livechat-email-configuration-heading-text">List of escalated Chats (reported Users) </span>
+                </div>
+                <div class="col-6 col-md-6">
+                    <button id="blacklist_reported_user_view_btn" class="chat-escalation-view-btn">View</button>
+                </div>
+            </div>
+
+            <div class="row mt-1">
+                <div class="col-md-12 col-sm-12">
+                    <hr>
+                </div>
+            </div>
+
+            <div class="row align-items-center mb-1">
+                <div class="col-6 col-md-6 pl-5">
+                    <span class="livechat-email-configuration-heading-text">List of blocked users </span>
+                </div>
+                <div class="col-6 col-md-6">
+                    <button id="blacklist_blocked_user_view_btn" class="chat-escalation-view-btn">View</button>
+                </div>
+            </div>
+
+            <div class="row mt-1">
+                <div class="col-md-12 col-sm-12">
+                    <hr>
+                </div>
+            </div>
+
+            {% if user_obj.status == "1" %}
+
+            <div class="row  mb-1">
+                <div class="col-6 col-md-6 pl-5">
+                    <span class="livechat-email-configuration-heading-text">Warning Text for the Customer  when blacklisted keywords are used</span>
+                </div>
+                <div class="col-6 col-md-6">
+                    <textarea id="warning-text-for-customer" class="chat-esacalation-textarea" value="{{admin_config.warning_text_for_customer}}" maxlength="{{ character_limit_large_text }}">{{admin_config.warning_text_for_customer}}</textarea>
+                    <div class="livechat-char-count" style="width: 95%; margin-top: -5px;">
+                        <p id="blacklisted-keyword-char-count">{{admin_config.warning_text_for_customer|length}}</p>
+                        <p>/{{ character_limit_large_text }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-1">
+                <div class="col-md-12 col-sm-12">
+                    <hr>
+                </div>
+            </div>
+
+            <div class="row  mb-4">
+                <div class="col-6 col-md-6 pl-5">
+                    <span class="livechat-email-configuration-heading-text">End Chat Text for the Customer after reporting </span>
+                </div>
+                <div class="col-6 col-md-6">
+                    <textarea id="end-chat-text-for-reported-customer" class="chat-esacalation-textarea" value="{{admin_config.end_chat_text_for_reported_customer}}" maxlength="{{ character_limit_large_text }}">{{admin_config.end_chat_text_for_reported_customer}}</textarea>
+                    <div class="livechat-char-count" style="width: 95%; margin-top: -5px;">
+                        <p id="blacklisted-keyword-char-count">{{admin_config.end_chat_text_for_reported_customer|length}}</p>
+                        <p>/{{ character_limit_large_text }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

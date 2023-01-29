@@ -1,0 +1,143 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta name="robots" content="noindex,nofollow,noimageindex" />
+    <meta name="googlebot" content="noindex,nofollow" />
+    <meta name="googlebot-news" content="noindex,nofollow" />
+	<title>EasyAssist</title>
+
+	{% if request.user.enable_s3_bucket %}
+	<link rel="icon" href="https://static.allincall.in/static/EasyAssistApp/img/favicon.png" type="image/png" sizes="16x16">
+    <link type="text/css" rel="stylesheet" media="screen,projection" href="https://static.allincall.in/static/EasyAssistApp/css/materialize.min.css">
+    <link type="text/css" rel="stylesheet" media="screen,projection" href="https://static.allincall.in/static/EasyAssistApp/css/jquery.dataTables.min.css">
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/vendor/jquery/jquery.min.js"></script>
+	{% else %}
+	<link rel="icon" href="{% static 'EasyAssistApp/img/favicon.png' %}" type="image/png" sizes="16x16">
+    <link type="text/css" rel="stylesheet" media="screen,projection" href="{% static 'EasyAssistApp/css/materialize.min.css' %}">
+    <link type="text/css" rel="stylesheet" media="screen,projection" href="{% static 'EasyAssistApp/css/jquery.dataTables.min.css' %}">
+    <script type="text/javascript" src="{% static 'EasyAssistApp/vendor/jquery/jquery.min.js' %}"></script>
+	{% endif %}
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <style type="text/css">
+    	.sidenav{
+			margin-top:64px !important;
+			width:60px !important;  
+			background-color: #006064 !important;  		
+    	}
+
+    	.nav-wrapper{
+    		background-color: #006064 !important;
+    	}
+
+    	.btn-assist{
+    		background-color: #006064 !important;
+    	}
+
+		.sidenav li>a {
+		    padding: 0 16px !important;
+		}
+
+		.inline-icon {
+			vertical-align: bottom;
+			font-size: 22px !important;
+		}
+
+		.grey-message-field{
+			background-color: #fafafa !important;	
+			color: black;
+			padding: 1em;
+		}
+
+    </style>
+</head>
+<body>
+
+	<div class="navbar-fixed">
+		<nav>
+			<div class="nav-wrapper">
+				<a href="javascript:void(0)" class="brand-logo" style="margin-left:1em;">EasyAssist</a>
+				<ul class="right hide-on-med-and-down">
+					{% if request.user.role == "supervisor" %}
+						<li>
+							<a href="javascript:void(0)" class="btn white black-text">
+								Add Agent
+							</a>
+						</li>
+					{% endif %}
+					<li>
+						<a href="javascript:void(0)">
+							{{ request.user.username }}
+						</a>
+					</li>
+					<li>
+						<a href="/easy-assist/logout/">
+							<i class="material-icons">logout</i>
+						</a>
+					</li>
+				</ul>
+			</div>
+		</nav>
+	</div>
+
+    <ul id="slide-out" class="sidenav sidenav-fixed show-on-large">
+      	<li>
+      		<a href="{% url 'dashboard' %}">
+      			<i class="material-icons white-text">home</i>
+      		</a>
+      	</li>
+		{% if request.user.role == "supervisor" %}
+	      	<li>
+	      		<a href="{% url 'manage-forms-page' %}">
+	      			<i class="material-icons white-text">receipt</i>
+	      		</a>
+	      	</li>
+		{% endif %}
+      	<li>
+      		<a href="{% url 'settings' %}">
+      			<i class="material-icons white-text">settings</i>
+      		</a>
+      	</li>
+    </ul>
+
+    <div id="base-block-content">
+	    {% block content %}
+	    {% endblock %}    	
+    </div>
+
+
+
+</body>
+
+<script type="text/javascript">
+
+	function adjustStyle(width) {
+	  width = parseInt(width);
+	  if (width < 994){
+	    $("#base-block-content").attr("style","margin-left:0px;");
+	  } else {
+	    $("#base-block-content").attr("style","margin-left:60px;");
+	  }
+	}
+	$(function() {
+	  adjustStyle($(this).width());
+	  $(window).resize(function() {
+	    adjustStyle($(this).width());
+	  });
+	});
+
+</script>
+
+{% if request.user.enable_s3_bucket %}
+<script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/materialize.min.js"></script>
+<script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/jquery.dataTables.min.js"></script>
+{% else %}
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/materialize.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/jquery.dataTables.min.js' %}"></script>
+{% endif %}
+
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/init.js' %}"></script>
+
+</html>

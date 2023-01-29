@@ -1,0 +1,184 @@
+{% extends 'EasyChatApp/console.html' %}
+{% block consolecontent %}
+{% load static %}
+
+<style type="text/css">
+    .select2-dropdown{
+        top: 0px !important;
+    }
+</style>
+
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/fusion_editor.css' %}?v={% random_int 1 100 %}">
+
+<!-- variable apply notification alert start  -->
+<div class="ameyo-config-variable-apply-notification-div">
+    <!-- success start -->
+    <div class="fusion-select-notification-div ameyo-config-variable-apply-succes-div" id="ameyo-config-variable-apply-success">
+        <p class="fusion-select-notification">
+            <span class="alert-notification-svg">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M18.5633 4.75247C18.1968 4.29383 17.6327 4 17 4H5C3.89543 4 3 4.89543 3 6V18C3 19.1046 3.89543 20 5 20H17C18.1046 20 19 19.1046 19 18V6.57154L11.5762 15.4801L11.0504 16.1111L10.4697 15.5303L6.46967 11.5303C6.17678 11.2374 6.17678 10.7626 6.46967 10.4697C6.76256 10.1768 7.23744 10.1768 7.53033 10.4697L10.9496 13.8889L18.5633 4.75247Z" fill="#10B981"/>
+                    <path d="M7 9.00002L11 13L21 1.00002" stroke="#10B981" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </span>
+    
+            APP ID ,Host name applied succesfully
+           
+            <span class="close-svg">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.19165 1L10.8082 11" stroke="#4D4D4D" stroke-width="1.73614" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M10.8083 1L1.19183 11" stroke="#4D4D4D" stroke-width="1.73614" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+          
+            
+        </p>
+    </div>
+    <!-- success end  -->
+
+    <!-- failure start  -->
+    <div class="fusion-select-notification-div ameyo-config-variable-apply-failure-div" id="ameyo-config-variable-apply-failure">
+        <p class="fusion-select-notification">
+            <span class="alert-notification-svg">
+                <svg width="23" height="24" viewBox="0 0 23 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11.0188 4.24392C11.9539 3.74607 13.1212 4.03535 13.6947 4.88383L13.7692 5.00297L20.7466 17.1125C20.9128 17.401 21 17.7253 21 18.055C21 19.0844 20.168 19.9271 19.1152 19.9955L18.9766 20H5.02374C4.68083 20 4.34356 19.9162 4.04357 19.7565C3.10847 19.2588 2.74423 18.1542 3.18807 17.2366L3.25363 17.1127L10.2291 5.00317C10.413 4.68387 10.6867 4.42076 11.0188 4.24392ZM12.0008 15.6717C11.5048 15.6717 11.1027 16.0583 11.1027 16.5351C11.1027 17.0118 11.5048 17.3984 12.0008 17.3984C12.4968 17.3984 12.8989 17.0118 12.8989 16.5351C12.8989 16.0583 12.4968 15.6717 12.0008 15.6717ZM11.9989 8.75285C11.5377 8.75301 11.1577 9.08686 11.1059 9.51681L11.0999 9.61762L11.1015 13.9407L11.1076 14.0415C11.1597 14.4714 11.54 14.805 12.0011 14.8048C12.4623 14.8047 12.8423 14.4708 12.8941 14.0409L12.9001 13.9401L12.8985 9.617L12.8924 9.51619C12.8403 9.08628 12.46 8.75269 11.9989 8.75285Z" fill="#FF281A"/>
+                 </svg>
+                    
+            </span>
+    
+            Values not accepted. Please try a different value
+           
+            <span class="close-svg">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.19165 1L10.8082 11" stroke="#4D4D4D" stroke-width="1.73614" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M10.8083 1L1.19183 11" stroke="#4D4D4D" stroke-width="1.73614" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+          
+            
+        </p>
+    </div>
+    <!-- failure end  -->
+</div>
+<!-- variable apply notification alert end  -->
+
+<div class="container-fluid">
+    <div class="row ameyo-config-title-row">
+        <div class="col s12">
+            <div class="ameyo-fusion-configure-title-div">
+                <div class="fusion-congigure-title">
+                    <h5>
+                    	<a href="/chat/bot/edit/{{selected_bot_obj.pk}}?selected_language=en">
+                        <svg width="17" height="14" viewBox="0 0 17 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M6.35002 13.2264C6.74398 13.6134 7.37712 13.6078 7.76418 13.2139C8.15123 12.8199 8.14564 12.1868 7.75168 11.7997L3.92537 8.04047L15.5107 7.93806C16.063 7.93318 16.5067 7.48152 16.5019 6.92926C16.497 6.37699 16.0453 5.93325 15.4931 5.93814L3.76678 6.0418L7.69229 1.68268C8.06187 1.27228 8.02878 0.639977 7.61837 0.270399C7.20797 -0.0991807 6.57567 -0.0660871 6.20609 0.344315L0.763983 6.38755C0.730641 6.42405 0.699973 6.46302 0.672284 6.50416C0.566241 6.6617 0.5039 6.85099 0.502467 7.05449C0.502429 7.05988 0.502435 7.06528 0.502482 7.07069C0.503812 7.22109 0.538274 7.36343 0.598877 7.49086C0.647892 7.59414 0.715524 7.69063 0.801616 7.77521L6.35002 13.2264Z" fill="#0254D7"/>
+                        </svg>
+                        </a>
+                        Ameyo Fusion Configure page
+                    </h5>
+                    <p>
+                        These APIs are used to exchange payloads with the fusion system and hence enable the livechat functionality with Cogno's chatbot as a front
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row ameyo-config-editor-variable-row">
+        <div class="col l9 m12 s12">
+            <div class="fusion-api-select-editor-div">
+                <div class="select-api-div">
+                    <select name="" id="ameyo-config-api-select">
+                        <option value="none" selected disabled hidden>Select api</option>
+                        <option value="1" {% if type_of_processor == "1" %} selected {% endif %}>Fusion Bot Chat History API</option>
+                        <option value="2" {% if type_of_processor == "2" %} selected {% endif %}>Fusion Text Message API</option>
+                        <option value="3" {% if type_of_processor == "3" %} selected {% endif %}>Fusion Attachment Message API</option>
+                        <option value="4" {% if type_of_processor == "4" %} selected {% endif %}>Fusion Chat Disconnected API</option>
+                    </select>
+                    <div class="selected-api-save-reset-div">
+                        <button type="button" class="save-btn" id="save-ameyo-processor-btn">
+                            Save
+                        </button>
+                        <button type="button" class="reset-btn" id="reset-ameyo-processor-btn">
+                            Reset
+                        </button>
+                    </div>
+                </div>
+
+                <div class="ameyo-config-bot-name-editor-div">
+                    <div class="ameyo-fusion-config-bot-name-fullscreen-div">
+                        <div class="ameyo-fusion-config-bot-name-div">
+                            {{selected_bot_obj.name}} - Ameyo
+                        </div>
+                        <svg id="go_full_screen" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"      xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 384.97 384.97" style="enable-background:new 0 0 384.97 384.97;" xml:space="preserve" width="13"
+                        height="13">
+                        <g>
+                        <g id="Fullscreen">
+                        <path d="M384.97,12.03c0-6.713-5.317-12.03-12.03-12.03H264.847c-6.833,0-11.922,5.39-11.934,12.223
+                        c0,6.821,5.101,11.838,11.934,11.838h96.062l-0.193,96.519c0,6.833,5.197,12.03,12.03,12.03c6.833-0.012,12.03-5.197,12.03-12.03
+                        l0.193-108.369c0-0.036-0.012-0.06-0.012-0.084C384.958,12.09,384.97,12.066,384.97,12.03z"/>
+                        <path d="M120.496,0H12.403c-0.036,0-0.06,0.012-0.096,0.012C12.283,0.012,12.247,0,12.223,0C5.51,0,0.192,5.317,0.192,12.03
+                        L0,120.399c0,6.833,5.39,11.934,12.223,11.934c6.821,0,11.838-5.101,11.838-11.934l0.192-96.339h96.242
+                        c6.833,0,12.03-5.197,12.03-12.03C132.514,5.197,127.317,0,120.496,0z"/>
+                        <path d="M120.123,360.909H24.061v-96.242c0-6.833-5.197-12.03-12.03-12.03S0,257.833,0,264.667v108.092
+                        c0,0.036,0.012,0.06,0.012,0.084c0,0.036-0.012,0.06-0.012,0.096c0,6.713,5.317,12.03,12.03,12.03h108.092
+                        c6.833,0,11.922-5.39,11.934-12.223C132.057,365.926,126.956,360.909,120.123,360.909z"/>
+                        <path d="M372.747,252.913c-6.833,0-11.85,5.101-11.838,11.934v96.062h-96.242c-6.833,0-12.03,5.197-12.03,12.03
+                        s5.197,12.03,12.03,12.03h108.092c0.036,0,0.06-0.012,0.084-0.012c0.036-0.012,0.06,0.012,0.096,0.012
+                        c6.713,0,12.03-5.317,12.03-12.03V264.847C384.97,258.014,379.58,252.913,372.747,252.913z"/>
+                        </g>
+                        <g>
+                    </svg>
+                    </div>
+    
+                    <div id="editor-code" class="ameyo-fusion-config-editor">
+                    	{{code}}
+                    </div>
+                </div>
+              
+              
+               
+            </div>
+        </div>
+
+        <div class="col l3 m12 s12">
+            <div class="ameyo-config-variables-column">
+                <h5 class="ameyo-config-variable-title">
+                    Variables
+                </h5>
+
+                <div class="variable-app-id-input-div">
+                    <label for="">
+                        APP ID
+                    </label>
+                    <input id="ameyo-app-id" type="text" placeholder="Enter App ID" class="input" value="{{processor_obj.app_id}}">
+                </div>
+
+                <div class="variable-app-id-input-div">
+                    <label for="">
+                      Host Name
+                    </label>
+                    <input id="ameyo-host-name" type="text" placeholder="<host name:port>" class="input" value="{{processor_obj.host_name}}">
+                </div>
+
+                <div class="variable-apply-btn-div">
+                    <button type="button" class="apply-btn" id="ameyo-config-btn">
+                        Apply
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ameyo fusion configure end  -->
+
+<script src="{% static 'EasyChatApp/js/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+<script src="{% static 'EasyChatApp/js/fusion_editor.js' %}" type="text/javascript" charset="utf-8"></script>
+<script>
+	window.SELECTED_BOT_PK = '{{selected_bot_obj.pk}}'
+	window.TYPE_OF_PROCESSOR = '{{type_of_processor}}'
+    var editor = ace.edit("editor-code");
+    editor.setTheme("ace/theme/monokai");
+    editor.session.setMode("ace/mode/python");
+</script>
+
+{% endblock %}

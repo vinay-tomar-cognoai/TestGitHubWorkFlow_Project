@@ -1,0 +1,1526 @@
+{% extends 'EasyAssistApp/console.html' %}
+{% block content %}
+{% load static %}
+<!-- Begin Page Content -->
+<style type="text/css">
+    .custom-button-bootstrap:hover {
+        background-color: none;
+    }
+
+    #easyassist-language-support-list-div .dropdown {
+        width: 100%;
+    }
+
+    #language-support-list-div .dropdown {
+        width: 100%;
+    }
+
+    #easyassist-product-category-list-div .dropdown {
+        width: 100%;
+    }
+
+    #product-category-list-div .dropdown {
+        width: 100%;
+    }
+
+    .modal .modal-body .row{
+        display: block;
+    }
+    
+    .modal .dropdown{
+        width: inherit !important;
+    }
+
+    .custom-button-down,
+    .dataTables_length select{
+        background: url('/static/EasyAssistApp/icons/navbar-position-dropdown.svg') no-repeat right .75rem center/8px 10px;
+    }
+
+    .custom-button-down,
+    #data-table-agent_length select{
+        background: url('/static/EasyAssistApp/icons/navbar-position-dropdown.svg') no-repeat right .75rem center/8px 10px;
+    }
+
+    .custom-button-down,
+    #data-table-supervisor_length select{
+        background: url('/static/EasyAssistApp/icons/navbar-position-dropdown.svg') no-repeat right .75rem center/8px 10px;
+    }
+
+    .user-modal-custom-button-down{
+        background: url('/static/EasyAssistApp/icons/navbar-position-dropdown.svg') no-repeat right .75rem center/8px 10px;
+    }
+
+    .dropdown-menu.show{
+        width: inherit !important;
+    }
+
+    .bootstrap-select.show-tick .dropdown-menu li a span.text{
+        width: 95% !important;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .bootstrap-select button {
+        border-radius: 5px!important;
+        border: 1px solid #E6E6E6 !important;
+        box-shadow: none !important;
+        text-align: left;
+        font-size: 1rem!important;
+        width: 100%!important;
+        transform: none!important;
+        outline: none!important;
+        transition: none!important;
+    }
+
+    .bootstrap-select button:hover {
+        background-color: unset !important;
+    }
+
+    .bootstrap-select .filter-option {
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    .bootstrap-select .dropdown-item {
+        color: #6e707e!important;
+        font-size: 1rem;
+        background-color: transparent;
+        padding-left: 0.8em;
+    }
+
+    .bootstrap-select .dropdown-item:hover {
+        background-color: #F8F9F9;
+    }
+    button:focus {
+        outline:none !important; ;
+        box-shadow: none !important; ;
+    }
+
+    #selected-supervisor-div {
+        padding-top: unset!important;
+    }
+
+    #easyassist-language-support-list-div {
+        padding-top: unset!important;
+    }
+
+    .dataTable-class {
+        border-collapse: separate !important;
+        border-spacing: 0 1em !important;
+        font-size: 15px;
+    }
+
+    .dataTable-class  tbody tr:hover {
+        box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.25);
+    }
+
+    .dataTable-class tbody tr:hover  td .edit-delete-btn-class {
+        visibility: visible !important;
+    }
+
+    .table-responsive {
+        overflow-x: unset ;
+    }
+
+    @media only screen and (min-width: 768px) {
+        .dataTable-class td,th {
+            padding: 0.57rem !important;
+        }
+
+        .dataTable-class tr {
+            width: 95% !important;
+        }
+    }
+
+    .dataTable-class tbody td .edit-delete-btn-class svg:hover {
+        transform: scale(1.2);
+    }
+
+    @media only screen and (max-width: 769px) {
+
+        #user_details_upload_modal .modal-footer {
+            flex-direction: column!important;
+        }
+
+        .d-width-sm-100 {
+            display: flex;
+            flex-direction: column-reverse;
+            width: 100%!important;
+        }
+
+        .d-width-sm-100 button {
+            margin-left: 0!important;
+        }
+
+        .flex-column-sm {
+            flex-direction: column!important;
+        }
+
+        .dropdown.no-arrow.modal-arrow {
+            text-align: right;
+        }
+
+        .access-management-pills {
+            justify-content: unset !important;
+        }
+    }
+
+    #create-user-via-excel-btn {
+        width: 233px;
+        background: #fff!important;
+        color: #0254D7;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 13px;
+        align-items: center;
+        display: flex;
+        justify-content: center;
+    }
+
+    #add-new-agent-btn {
+        width: 120px;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 13px;
+    }
+
+    #refresh-btn {
+        width: 43px;
+        background: #FFFFFF!important;
+        border: 1px solid #0254D7;
+        box-sizing: border-box;
+        border-radius: 8px!important;
+        margin-left: 9px;
+    }
+
+    *[id^='resend-password-btn-'] {
+        font-style: normal;
+        font-weight: 500;
+        font-size: 14px;
+        color: #0254D7;
+    }
+
+    *[id^="view-agent-btn-"] {
+        font-family: Silka;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 14px;
+        color: #0254D7 !important;
+        cursor: pointer !important;
+    }
+
+    #export-agent-btn, #export-supervisor-btn {
+        width: 120px;
+    }
+
+
+    #user_details_upload_modal .modal-title {
+      font-family: Silka;
+      font-style: normal;
+      font-weight: 500;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      color: #2D2D2D;
+    }
+
+    #user_details_upload_modal .modal-header {
+      padding: 1em 1.5em!important;
+    }
+
+    #user_details_upload_modal .modal-body {
+      padding: 1.5em!important;
+    }
+
+    #user_details_upload_modal .btn-primary {
+      min-width: 120px!important;
+      height: 39.13px!important;
+      font-weight: 500!important;
+    }
+
+    .agent-management-status-tile {
+        height: 37px;
+        width: max-content;
+        display: flex;
+        align-items: center;
+        background: white;
+        border-radius: 50px;
+    }
+
+    .agent-management-status-tile span {
+        padding-left: 4px;
+        padding-top: 1px;
+    }
+
+    .agent-management-status-tile div {
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .agent-management-status-tile .total-tile,
+    .agent-management-status-tile .online-tile,
+    .agent-management-status-tile .offline-tile,
+    .agent-management-status-tile .available-agents-tile,
+    .agent-management-status-tile .active-tile,
+    .agent-management-status-tile .inactive-tile, 
+    .agent-management-status-tile .busy-agents-tile {
+        height: 37px;
+        border: 2px solid #E5E8FC;
+        border-right: none;
+        background: white;
+        display: flex;
+        align-items: center;
+        padding: 0px 8px;
+        font-weight: 500;
+    }
+
+    .agent-management-status-tile > div:first-child{
+        border-radius: 22px 0px 0px 22px;
+        border-left: 2px solid #E5E8FC;
+        padding-left: 15px;
+    }
+
+    .agent-management-status-tile > div:last-child{
+        border-radius: 0px 22px 22px 0px;
+        border-right: 2px solid #E5E8FC;
+        padding-right: 15px;
+    }
+    
+    .agent-management-status-tile > div.active{
+        background-color: #E6EAFF;
+    }
+
+    .agent-management-status-tile .total-tile {
+        color: #2655CB;
+    }
+
+    .agent-management-status-tile .online-tile {
+        color: #38B27F;
+    }
+
+    .agent-management-status-tile .offline-tile {
+        color: #858796;
+    }
+
+    .agent-management-status-tile .available-agents-tile {
+        color: #0254D7;
+    }
+    
+    .agent-management-status-tile .busy-agents-tile {
+        color: #F5C828;
+    }
+
+    .agent-management-status-tile .active-tile {
+        color: #38B27F;
+    }
+
+    .agent-management-status-tile .inactive-tile {
+        color: #F56565;
+        border-right: none;
+    }
+
+    .access-management-pills {
+        overflow-x: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        scrollbar-width: none;
+    }
+
+    .access-management-pills::-webkit-scrollbar {
+        display: none;
+    }
+
+    #add-new-agent {
+        height: 31px;
+        vertical-align: middle;
+        padding: 0 2em!important;
+    }
+
+    #data-table-agent_filter,
+    #dataTable-supervisor_filter {
+        display: none;
+    }
+
+    {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+        .edit-delete-btn-class svg{
+            fill: {{ access_token_obj.get_cobrowsing_console_theme_color.hex }};
+        }
+        .svg-hide-on-desktop{
+            fill: {{ access_token_obj.get_cobrowsing_console_theme_color.hex }};
+        }
+        *[id^='resend-password-btn-']{
+            color: {{ access_token_obj.get_cobrowsing_console_theme_color.hex }};
+        }
+    {% else %}
+        .edit-delete-btn-class svg{
+            fill: #0254D7;
+        }
+        .svg-hide-on-desktop{
+            fill: #0254D7;
+        }
+    {% endif %}
+</style>
+<div class="container-fluid">
+    <div class="row">
+    <div class="col-md-12 mb">
+        <div class="row">
+            <div class="col-md-12 mb-3 access-management-pills">
+                <div class="agent-management-status-tile">
+                    <div class="total-tile"
+                        id="total-agents-count" onclick="remove_searched_agent_storage_obj(); update_active_agents_details('all', 'total-agents-count')"></div>
+                    <div class="online-tile"
+                        id="online-agents-count" onclick="remove_searched_agent_storage_obj(); update_active_agents_details('online', 'online-agents-count')"></div>
+                    <div class="offline-tile"
+                        id="offline-agents-count" onclick="remove_searched_agent_storage_obj(); update_active_agents_details('offline', 'offline-agents-count')"></div>
+                    {% if not access_token_obj.allow_agent_to_customer_cobrowsing %}
+                        <div class="available-agents-tile"
+                            id="available-agents-count" onclick="remove_searched_agent_storage_obj(); update_active_agents_details('available', 'available-agents-count')"></div>
+                        <div class="busy-agents-tile"
+                            id="busy-agents-count" onclick="remove_searched_agent_storage_obj(); update_active_agents_details('busy', 'busy-agents-count')"></div> 
+                    {% endif %}       
+                    <div class="active-tile"
+                        id="active-agents-count" onclick="remove_searched_agent_storage_obj(); update_active_agents_details('active', 'active-agents-count')" ></div>
+                    <div class="inactive-tile"
+                        id="inactive-agents-count" onclick="remove_searched_agent_storage_obj(); update_active_agents_details('inactive', 'inactive-agents-count')"></div>
+                </div>
+            </div>
+            <div class="col-md-12 mt-4 mb-2 remove-margin-mobile">
+                <div class="row" id="agent-creation-div">
+                    <div class="col-md-6 col-sm-12" style="display: flex; flex-wrap: wrap;">
+                        {% if cobrowse_agent.role == "admin" or cobrowse_agent.role == "admin_ally" %}
+                            <button class="btn btn-primary mb-2 mr-sm-2 add-user-btn" id="add-new-agent-btn" data-toggle="modal" data-target="#add_new_agent_modal" onclick="populate_new_agent_modal()">Add User</button>
+                        {% elif cobrowse_agent.role == "supervisor" %}
+                            <button class="btn btn-primary mb-2 mr-sm-2 add-user-btn" id="add-new-agent-btn" data-toggle="modal" data-target="#add_new_agent_modal">Add Agent</button>
+                        {% endif %}
+                        {% if cobrowse_agent.role == "admin" or cobrowse_agent.role == "admin_ally" %}
+                            <button class="btn btn-outline-primary mb-2 add-user-btn" id="create-user-via-excel-btn" data-toggle="modal" data-target="#user_details_upload_modal">Create User via Excel</button>
+                        {% endif %}
+                        <button class="btn btn-outline-primary mb-2 mr-sm-2" id="refresh-btn" onclick="refresh_page();" data-toggle="tooltip" title="Refresh" data-placement="bottom">
+                            <svg width="18" height="23" viewBox="0 0 18 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4.94823 4.5285C5.28315 4.96765 5.19865 5.59515 4.7595 5.93007C3.03254 7.24714 2 9.28703 2 11.5C2 14.9973 4.56475 17.8956 7.916 18.4166L7.20711 17.7071C6.81658 17.3166 6.81658 16.6834 7.20711 16.2929C7.59763 15.9024 8.2308 15.9024 8.62132 16.2929L11.1213 18.7929C11.5118 19.1834 11.5118 19.8166 11.1213 20.2071L8.62132 22.7071C8.2308 23.0976 7.59763 23.0976 7.20711 22.7071C6.81658 22.3166 6.81658 21.6834 7.20711 21.2929L8.05028 20.4505C3.52615 19.976 0 16.1498 0 11.5C0 8.65644 1.32882 6.03122 3.54667 4.33978C3.98581 4.00486 4.61331 4.08936 4.94823 4.5285ZM6.87868 2.79289L9.37868 0.292893C9.7692 -0.0976311 10.4024 -0.0976311 10.7929 0.292893C11.1534 0.653377 11.1811 1.22061 10.8761 1.6129L10.7929 1.70711L9.94972 2.54951C14.4739 3.02399 18 6.85021 18 11.5C18 14.2198 16.7849 16.7432 14.7284 18.4419C14.3026 18.7936 13.6723 18.7335 13.3206 18.3077C12.9688 17.8819 13.0289 17.2516 13.4547 16.8999C15.056 15.5772 16 13.6168 16 11.5C16 8.00269 13.4352 5.10441 10.084 4.58343L10.7929 5.29289C11.1834 5.68342 11.1834 6.31658 10.7929 6.70711C10.4324 7.06759 9.86518 7.09532 9.47289 6.7903L9.37868 6.70711L6.87868 4.20711C6.5182 3.84662 6.49047 3.27939 6.79549 2.8871L6.87868 2.79289L9.37868 0.292893L6.87868 2.79289Z" fill="#0254D7"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <!-- DataTales Example -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <div class="row">
+                            <div class="col-md-3 col-sm-12 d-flex align-items-center">
+                                <a id="agent-table-back-button" class="d-none" style="padding-right: 11px; text-decoration: none; cursor: pointer;" onclick="remove_heading_title(); remove_previous_element_active_class(); clear_agent_management_storage(); remove_searched_agent_storage_obj(); update_active_agents_details()">
+                                    <svg width="14" height="12" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M6.60694 11.7482C6.52734 11.828 6.43277 11.8914 6.32866 11.9346C6.22455 11.9778 6.11294 12 6.00022 12C5.8875 12 5.77589 11.9778 5.67177 11.9346C5.56766 11.8914 5.47309 11.828 5.39349 11.7482L0.251754 6.6065C0.171949 6.5269 0.108633 6.43233 0.0654311 6.32822C0.0222292 6.22411 -8.62093e-06 6.1125 -8.63079e-06 5.99978C-8.64064e-06 5.88706 0.0222291 5.77545 0.065431 5.67133C0.108632 5.56722 0.171949 5.47265 0.251754 5.39305L5.39349 0.251314C5.5544 0.0904008 5.77265 1.04862e-06 6.00021 1.02873e-06C6.22778 1.00883e-06 6.44603 0.0904007 6.60694 0.251314C6.76785 0.412228 6.85825 0.630473 6.85825 0.858039C6.85825 1.0856 6.76785 1.30385 6.60694 1.46476L2.07021 5.99978L6.60694 10.5348C6.68675 10.6144 6.75006 10.709 6.79326 10.8131C6.83647 10.9172 6.8587 11.0288 6.8587 11.1415C6.8587 11.2542 6.83647 11.3658 6.79326 11.47C6.75006 11.5741 6.68675 11.6686 6.60694 11.7482Z" fill="#4D4D4D"/>
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M13.7128 5.99979C13.7128 6.22707 13.6225 6.44504 13.4618 6.60575C13.3011 6.76646 13.0832 6.85675 12.8559 6.85675L1.71544 6.85675C1.48816 6.85675 1.27019 6.76647 1.10948 6.60575C0.948773 6.44504 0.858488 6.22707 0.858488 5.9998C0.858488 5.77252 0.948773 5.55455 1.10948 5.39384C1.27019 5.23312 1.48816 5.14284 1.71544 5.14284L12.8559 5.14284C13.0832 5.14284 13.3011 5.23312 13.4618 5.39383C13.6225 5.55454 13.7128 5.77252 13.7128 5.99979Z" fill="#4D4D4D"/>
+                                    </svg>
+                                </a>
+                                <h6 class="m-0 font-weight-bold text-primary heading-text-primary" >
+                                    <div data-toggle="tooltip" class="truncate-card-heading" title="" data-placement="bottom" id="agent-data-table-heading">
+                                        Agents
+                                    </div>
+                                </h6>
+                            </div>
+                            <div class="col-md-9 col-sm-12 d-flex justify-content-end card-buttons-container">
+                                {% if cobrowse_agent.role == "admin" %}
+                                    <a href="javascript:void(0)" onclick="activate_user(this, true)" class="justify-content-center align-items-center activate-account-btn" id="button-activate-account">
+                                        Activate
+                                    </a>
+                                    <a href="javascript:void(0)"  onclick="deactivate_user(this, true)" class="justify-content-center align-items-center deactivate-account-btn" id="button-deactivate-account">
+                                        Deactivate
+                                    </a>
+                                    {% endif %}
+                                <div class="form-group has-search d-flex mb-0">
+                                    <span class="fa fa-search form-control-feedback"></span>
+                                    <input type="text" id="custom-agent-table-search" class="custom-table-search form-control" placeholder="Search" aria-controls="data-table-agent">
+                                </div>                                   
+                                <button class="btn btn-primary" id="export-agent-btn" onclick="export_user_excel_details(this)">Export</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pt-3 card-body">
+                        <div class="my-0 table-responsive admin-agent-management-table-area" id="admin-agent-management-table-area">
+                            <table role="row" class="table table-bordered admin-agent-management-table dataTable-class" id="data-table-agent" style="width: 100%;">
+                                <thead>
+                                    <tr>
+                                        {% if cobrowse_agent.role == "admin" %}
+                                            <th  scope="col"></th>
+                                        {% endif %}
+                                        <th scope="col">Name</th>
+                                        <th scope="col" style="white-space: nowrap;">Email ID</th>
+                                        <th scope="col">Mobile</th>
+                                        {% if cobrowse_agent.get_access_token_obj.choose_product_category or cobrowse_agent.get_access_token_obj.enable_tag_based_assignment_for_outbound %}
+                                        <th scope="col">Category</th>
+                                        {% endif %}
+                                        {% if cobrowse_agent.get_access_token_obj.allow_language_support %}
+                                        <th scope="col">Language</th>
+                                        {% endif %}
+                                        <th scope="col">Status</th>
+                                        {% if cobrowse_agent.role != "admin_ally" %}
+                                            <th class="align-middle" scope="col">Mark as active</th>
+                                        {% endif %}    
+                                        <th scope="col">Account Status</th>
+                                        {% if cobrowse_agent.role == "admin_ally" %}  
+                                        <th scope="col">Supervisors</th>   
+                                        {% endif %}
+                                        {% if cobrowse_agent.role != "agent"  %}
+                                        <th scope="col"></th>
+                                        <th scope="col"></th>
+                                        {% endif %}
+                                    </tr>
+                                </thead>
+                                <tbody id="agent-details-table-body">      
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="table-responsive admin-agent-management-table-area d-none" id="empty-table-area">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% if supervisors or cobrowse_agent.role == "admin" or cobrowse_agent.role == "admin_ally" %}
+                <div class="col-md-12" id="supervisor-admin-ally-table">
+                    <!-- DataTales Example -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <div class="row">
+                                <div class="col-md-3 col-sm-12 d-flex align-items-center">
+                                    {% if cobrowse_agent.role == "admin" %}
+                                    <h6 class="m-0 font-weight-bold text-primary heading-text-primary">Admin/Admin Ally/Supervisors</h6>
+                                    {% else %}
+                                    <h6 class="m-0 font-weight-bold text-primary heading-text-primary">Admin Ally/Supervisors</h6>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-9 col-sm-12 d-flex justify-content-end card-buttons-container">
+                                    {% if cobrowse_agent.role == "admin" %}
+                                        <a href="javascript:void(0)" onclick="activate_user(this)" class="justify-content-center align-items-center activate-account-btn" id="supervisor-button-activate-account">
+                                            Activate
+                                        </a>
+                                        <a href="javascript:void(0)"  onclick="deactivate_user(this)" class="justify-content-center align-items-center deactivate-account-btn" id="supervisor-button-deactivate-account">
+                                            Deactivate
+                                        </a>
+                                    {% endif %}
+                                    <div class="form-group has-search d-flex mb-0">
+                                        <span class="fa fa-search form-control-feedback"></span>
+                                        <input type="text" id="custom-supervisor-table-search" class="custom-table-search form-control" placeholder="Search" aria-controls="data-table-agent">
+                                    </div>                             
+                                    <button class="btn btn-primary" id="export-supervisor-btn" onclick="export_supervisor_excel_details(this)">Export</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pt-3 card-body">
+                            <div class="my-0 table-responsive admin-agent-management-table-area">
+                                <table class="table table-bordered admin-agent-management-table dataTable-class" id="dataTable-supervisor" style="width: 100%;">
+                                    <thead>
+                                        <tr>
+                                            {% if cobrowse_agent.role == "admin" %}
+                                                <th scope="col"></th>
+                                            {% endif %}
+                                            <th scope="col">Name</th>
+                                            <th scope="col">Email ID</th>
+                                            <th scope="col">Role</th>
+                                            <th scope="col">Mobile</th>
+                                            <th scope="col">Account Status</th>
+                                            <th scope="col"></th>
+                                            {% if cobrowse_agent.role == "admin" or cobrowse_agent.role == "supervisor" or cobrowse_agent.role == "admin_ally" %}
+                                            <th scope="col"></th>
+                                            <th scope="col"></th>
+                                            {% endif %}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for admin_ally in admin_allies %}
+                                        <tr>
+                                            {% if cobrowse_agent.role == "admin" %}
+                                                <td class="align-middle text-center" id="table-checkbox-td">
+                                                    <label style="padding-left: 18px;" class="easyassist-switch-checkbox-label">
+                                                        <input type="checkbox" class="easyassist-switch-checkbox-label supervisor-checkbox-collection" id="checkbox-user-{{ admin_ally.pk }}" autocomplete="off">
+                                                        <input type="hidden" value="{{ admin_ally.is_account_active }}" >
+                                                        <span class="easyassist-switch-checkbox"></span>
+                                                    </label>
+                                                </td>
+                                            {% endif %}
+                                            <td class="align-middle">
+                                                <div class="table-max-min-width">
+                                                    {{admin_ally.user.first_name}}
+                                                    <div class="d-none" id="mobile-view-edit-button">
+                                                        <a onclick="save_cobrowsing_admin_ally('{{admin_ally.pk}}')" style="margin-top: -2rem;display: inline-block;margin-right: 0.5em;">
+                                                            <svg class="svg-hide-on-desktop" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M17.0604 0.939564C18.3132 2.19232 18.3132 4.22343 17.0604 5.47618L6.33146 16.2052C6.08325 16.4534 5.77457 16.6325 5.43593 16.7249L0.849981 17.9756C0.348084 18.1124 -0.112448 17.6519 0.0244331 17.15L1.27515 12.5641C1.3675 12.2254 1.54664 11.9167 1.79484 11.6685L12.5238 0.939564C13.7766 -0.313188 15.8077 -0.313188 17.0604 0.939564ZM11.6547 3.7104L2.74567 12.6194C2.66293 12.7021 2.60322 12.805 2.57244 12.9179L1.6313 16.3687L5.08212 15.4276C5.195 15.3968 5.2979 15.3371 5.38063 15.2543L14.2894 6.34506L11.6547 3.7104ZM13.4746 1.89039L12.6049 2.75927L15.2396 5.39482L16.1096 4.52535C16.8372 3.79773 16.8372 2.61802 16.1096 1.89039C15.382 1.16277 14.2023 1.16277 13.4746 1.89039Z"/>
+                                                            </svg>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="align-middle table-max-min-width">
+                                            {% if admin_ally.user.email != "" and admin_ally.user.email != None %}
+                                                {{admin_ally.user.email}}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                            </td>
+                                            <td class="align-middle min-width">
+                                                {% if admin_ally.role != "" and admin_ally.role != None %}
+                                                    Admin Ally
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                            <td class="align-middle min-width">
+                                                {% if admin_ally.mobile_number != "" and admin_ally.mobile_number != None %}
+                                                    {{ admin_ally.mobile_number }}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                            <td class="align-middle min-width">
+                                                {% if admin_ally.is_account_active %}
+                                                <p class="mb-0" style="color:#38B27F; font-weight: 500;">Active</p>
+                                                {% else %}
+                                                <p class="mb-0" style="color:#F56565; font-weight: 500;">Inactive</p>
+                                                {% endif %}
+                                            </td>
+                                            <td class="align-middle admin-view-agent-btn">
+                                                <a class="disable-hover" onclick="remove_previous_element_active_class(); clear_agent_management_storage(); remove_searched_agent_storage_obj(); update_active_agents_details('', '', '{{ admin_ally.pk }}')" id="view-agent-btn-{{ admin_ally.pk }}">View Agents</a>
+                                            </td>
+                                            {% if cobrowse_agent.role == "admin" or cobrowse_agent.role == "supervisor" or cobrowse_agent.role == "admin_ally" %}
+                                            <td class="align-middle admin-view-agent-btn">
+                                                <a  style="white-space: nowrap;" href="javascript:void(0)" data-toggle="modal" data-target="#resend-password-modal" onclick="resend_password_agent('{{admin_ally.pk}}')" id="resend-password-btn-{{ admin_ally.pk }}">Resend Password</a>
+                                            </td>
+                                            <td class="align-middle td-hide-on-small-device">
+                                                <div class="edit-delete-btn-class" style="visibility: hidden;">
+                                                    <a data-toggle="tooltip" title="Edit" style="cursor: pointer; margin-right: 1em;" onclick="save_cobrowsing_admin_ally('{{admin_ally.pk}}')">
+                                                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M13.2692 0.730772C14.2436 1.70513 14.2436 3.28489 13.2692 4.25925L4.92447 12.604C4.73142 12.7971 4.49134 12.9364 4.22794 13.0082L0.661097 13.981C0.270732 14.0875 -0.0874597 13.7293 0.0190035 13.3389L0.99178 9.77206C1.06361 9.50867 1.20294 9.26858 1.39599 9.07553L9.74075 0.730772C10.7151 -0.243591 12.2949 -0.243591 13.2692 0.730772ZM9.06478 2.88586L2.13552 9.81506C2.07117 9.87941 2.02473 9.95944 2.00078 10.0472L1.26879 12.7312L3.95276 11.9992C4.04056 11.9753 4.12059 11.9288 4.18494 11.8645L11.114 4.93504L9.06478 2.88586ZM10.4803 1.4703L9.80385 2.1461L11.853 4.19597L12.5297 3.51972C13.0956 2.95379 13.0956 2.03623 12.5297 1.4703C11.9638 0.904373 11.0462 0.904373 10.4803 1.4703Z"/>
+                                                        </svg>                                                    
+                                                    </a>
+                                                </div>
+                                            </td>
+                                            {% endif %}
+                                        </tr>
+                                        {% endfor %}
+
+                                        {% for supervisor in supervisors %}
+                                        <tr>
+                                            {% if cobrowse_agent.role == "admin" %}
+                                            <td class="align-middle text-center" id="table-checkbox-td">
+                                                <label style="padding-left: 18px;" class="easyassist-switch-checkbox-label">
+                                                    <input type="checkbox" class="easyassist-switch-checkbox-label supervisor-checkbox-collection" id="checkbox-user-{{ supervisor.pk }}" autocomplete="off">
+                                                    <input type="hidden" value="{{ supervisor.is_account_active }}" >
+                                                    <span class="easyassist-switch-checkbox"></span>
+                                                </label>    
+                                            </td>
+                                            {% endif %}
+                                            <td class="align-middle table-max-min-width">
+                                                <div class="table-max-min-width">
+                                                    {{supervisor.user.first_name}}
+                                                    <div class="d-none" id="mobile-view-edit-button">
+                                                        <a onclick="save_cobrowsing_supervisor('{{supervisor.pk}}')" style="margin-top: -2rem;display: inline-block;margin-right: 0.5em;">
+                                                            <svg class="svg-hide-on-desktop" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M17.0604 0.939564C18.3132 2.19232 18.3132 4.22343 17.0604 5.47618L6.33146 16.2052C6.08325 16.4534 5.77457 16.6325 5.43593 16.7249L0.849981 17.9756C0.348084 18.1124 -0.112448 17.6519 0.0244331 17.15L1.27515 12.5641C1.3675 12.2254 1.54664 11.9167 1.79484 11.6685L12.5238 0.939564C13.7766 -0.313188 15.8077 -0.313188 17.0604 0.939564ZM11.6547 3.7104L2.74567 12.6194C2.66293 12.7021 2.60322 12.805 2.57244 12.9179L1.6313 16.3687L5.08212 15.4276C5.195 15.3968 5.2979 15.3371 5.38063 15.2543L14.2894 6.34506L11.6547 3.7104ZM13.4746 1.89039L12.6049 2.75927L15.2396 5.39482L16.1096 4.52535C16.8372 3.79773 16.8372 2.61802 16.1096 1.89039C15.382 1.16277 14.2023 1.16277 13.4746 1.89039Z"/>
+                                                            </svg>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="align-middle table-max-min-width">
+                                            {% if supervisor.user.email != "" and supervisor.user.email != None %}
+                                                {{supervisor.user.email}}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                            </td>
+                                            <td class="align-middle min-width">
+                                            {% if supervisor.role != "" and supervisor.role != None %}
+                                                Supervisor
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                            </td>
+                                            <td class="align-middle min-width">
+                                                {% if supervisor.mobile_number != "" and supervisor.mobile_number != None %}
+                                                    {{ supervisor.mobile_number }}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                            <td class="align-middle min-width">
+                                                {% if supervisor.is_account_active %}
+                                                <p class="mb-0" style="color:#38B27F; font-weight: 500;">Active</p>
+                                                {% else %}
+                                                <p class="mb-0" style="color:#F56565; font-weight: 500;">Inactive</p>
+                                                {% endif %}
+                                            </td>
+                                            <td class="align-middle admin-view-agent-btn">
+                                                <a class="disable-hover" onclick="remove_previous_element_active_class(); clear_agent_management_storage(); remove_searched_agent_storage_obj(); remove_searched_agent_storage_obj(); update_active_agents_details('', '',  '{{ supervisor.pk }}')" id="view-agent-btn-{{ supervisor.pk }}">View Agents</a>
+                                            </td>
+                                            {% if cobrowse_agent.role == "admin" or cobrowse_agent.role == "supervisor" or cobrowse_agent.role == "admin_ally" %}
+                                            <td class="align-middle admin-view-agent-btn">
+                                                <a  style="white-space: nowrap;" href="javascript:void(0)" data-toggle="modal" data-target="#resend-password-modal" onclick="resend_password_agent('{{supervisor.pk}}')" id="resend-password-btn-{{ supervisor.pk }}">Resend Password</a>
+                                            </td>
+                                            <td class="align-middle td-hide-on-small-device">
+                                                <div class="edit-delete-btn-class" style="visibility: hidden;">
+                                                    <a data-toggle="tooltip" title="Edit" style="cursor: pointer; margin-right: 1em;" onclick="save_cobrowsing_supervisor('{{supervisor.pk}}')">
+                                                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M13.2692 0.730772C14.2436 1.70513 14.2436 3.28489 13.2692 4.25925L4.92447 12.604C4.73142 12.7971 4.49134 12.9364 4.22794 13.0082L0.661097 13.981C0.270732 14.0875 -0.0874597 13.7293 0.0190035 13.3389L0.99178 9.77206C1.06361 9.50867 1.20294 9.26858 1.39599 9.07553L9.74075 0.730772C10.7151 -0.243591 12.2949 -0.243591 13.2692 0.730772ZM9.06478 2.88586L2.13552 9.81506C2.07117 9.87941 2.02473 9.95944 2.00078 10.0472L1.26879 12.7312L3.95276 11.9992C4.04056 11.9753 4.12059 11.9288 4.18494 11.8645L11.114 4.93504L9.06478 2.88586ZM10.4803 1.4703L9.80385 2.1461L11.853 4.19597L12.5297 3.51972C13.0956 2.95379 13.0956 2.03623 12.5297 1.4703C11.9638 0.904373 11.0462 0.904373 10.4803 1.4703Z"/>
+                                                        </svg>                                                    
+                                                    </a>
+                                                </div>
+                                            </td>
+                                            {% endif %}
+                                        </tr>
+                                        {% endfor %}
+                                        
+                                        <tr>
+                                            {% if cobrowse_agent.role == "admin" %}
+                                            <td class="align-middle"></td>
+                                            {% endif %}
+                                            <td class="align-middle table-max-min-width">
+                                            <div class="table-max-min-width">
+                                                {{cobrowse_agent.user.first_name}}
+                                            </div>    
+                                            </td>
+                                            <td class="align-middle table-max-min-width">
+                                            {% if cobrowse_agent.user.email != "" and cobrowse_agent.user.email != None %}
+                                                {{cobrowse_agent.user.email}}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                            </td>
+                                            <td class="align-middle min-width">
+                                            {% if cobrowse_agent.role == "admin" %}
+                                                Admin
+                                            {% elif cobrowse_agent.role == "supervisor" %}
+                                                Supervisor
+                                            {% elif cobrowse_agent.role == "admin_ally" %}
+                                                Admin Ally
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                            </td>
+                                            <td class="align-middle min-width">
+                                                {% if cobrowse_agent.mobile_number != "" and cobrowse_agent.mobile_number != None %}
+                                                    {{ cobrowse_agent.mobile_number }}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                            <td class="align-middle min-width">
+                                                {% if cobrowse_agent.is_account_active %}
+                                                <p class="mb-0" style="color:#38B27F; font-weight: 500;">Active</p>
+                                                {% else %}
+                                                <p class="mb-0" style="color:#F56565; font-weight: 500;">Inactive</p>
+                                                {% endif %}
+                                            </td>
+                                            <td class="align-middle admin-view-agent-btn">
+                                                <a class="disable-hover" onclick="remove_previous_element_active_class(); clear_agent_management_storage(); update_active_agents_details('', '',  '{{ cobrowse_agent.pk }}')" id="view-agent-btn-{{ cobrowse_agent.pk }}">View Agents</a>
+                                            </td>
+                                            {% if cobrowse_agent.role == "admin" or cobrowse_agent.role == "supervisor" or cobrowse_agent.role == "admin_ally" %}
+                                            <td class="align-middle admin-view-agent-btn">
+                                                <a  style="white-space: nowrap;" href="javascript:void(0)" data-toggle="modal" data-target="#resend-password-modal" onclick="resend_password_agent('{{cobrowse_agent.pk}}')" id="resend-password-btn-{{ cobrowse_agent.pk }}">Resend Password</a>
+                                            </td>
+                                            <td class="align-middle td-hide-on-small-device">
+                                                <div class="edit-delete-btn-class" style="visibility: hidden !important;">
+                                                    <a data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="save_cobrowsing_supervisor('{{supervisor.pk}}')">
+                                                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M13.2692 0.730772C14.2436 1.70513 14.2436 3.28489 13.2692 4.25925L4.92447 12.604C4.73142 12.7971 4.49134 12.9364 4.22794 13.0082L0.661097 13.981C0.270732 14.0875 -0.0874597 13.7293 0.0190035 13.3389L0.99178 9.77206C1.06361 9.50867 1.20294 9.26858 1.39599 9.07553L9.74075 0.730772C10.7151 -0.243591 12.2949 -0.243591 13.2692 0.730772ZM9.06478 2.88586L2.13552 9.81506C2.07117 9.87941 2.02473 9.95944 2.00078 10.0472L1.26879 12.7312L3.95276 11.9992C4.04056 11.9753 4.12059 11.9288 4.18494 11.8645L11.114 4.93504L9.06478 2.88586ZM10.4803 1.4703L9.80385 2.1461L11.853 4.19597L12.5297 3.51972C13.0956 2.95379 13.0956 2.03623 12.5297 1.4703C11.9638 0.904373 11.0462 0.904373 10.4803 1.4703Z"/>
+                                                        </svg>                                                    
+                                                    </a>
+                                                </div>
+                                            </td>
+                                            {% endif %}
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    </div>
+</div>
+<div class="modal fade" id="add_new_agent_modal" tabindex="-1" role="dialog" aria-labelledby="add_new_agent_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                {% if cobrowse_agent.role == "admin" or cobrowse_agent.role == "admin_ally" %}
+                <h5 class="modal-title" id="add_new_agent_modal_modal_label">Add User</h5>
+                {% else %}
+                <h5 class="modal-title" id="add_new_agent_modal_modal_label">Add Agent</h5>
+                {% endif %}
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                        <form class="form-inline" action="javascript:void(0)">
+                            {% if cobrowse_agent.role == "admin" or cobrowse_agent.role == "admin_ally" %}
+                                <div class="col-sm-6 mb-2">
+                                    <select class="custom-select user-modal-custom-button-down" id="inline-form-input-user-type" onchange="check_selected_user_status(this)" style="width: 100%;">
+                                        <option value="agent" selected>Agent</option>
+                                        <option value="supervisor">Supervisor</option>
+                                        {% if cobrowse_agent.role == "admin" %}
+                                            <option value="admin_ally">Admin Ally</option>
+                                        {% endif %}
+                                    </select>
+                                </div>
+                            {% endif %}
+                            <div class="col-sm-6 mb-2">
+                                <label class="sr-only" for="inline-form-input-agent-name">User Name</label>
+                                <input type="text" style="width: 100%;" class="form-control" id="inline-form-input-agent-name" placeholder="Agent Name" oninput="name_input_validator(this.value,this.id)">
+                            </div>
+                            <div class="col-sm-6 mb-2">
+                                <label class="sr-only" for="inline-form-input-agent-email">User Email</label>
+                                <input type="text" style="width: 100%;" class="form-control" id="inline-form-input-agent-email" placeholder="Agent Email">
+                            </div>
+                            <div class="col-sm-6 mb-2">
+                                <label class="sr-only" for="inline-form-input-agent-mobile">User Mobile No. (optional)</label>
+                                <input type="number" style="width: 100%;" class="form-control" onpaste="return false;" ondrop="return false;" id="inline-form-input-agent-mobile" placeholder="Agent Mobile No. (optional)" autocomplete="off" onpaste="easyassist_phone_number_paste_handler(event);" onkeydown="easyassist_prevent_non_numeric_characters(event);easyassist_word_limit(event, this, 10);">
+                            </div>
+                            {% if cobrowse_agent.get_access_token_obj.allow_language_support %}
+                                <div class="col-sm-6 mb-2" id="easyassist-language-support-list-div">
+                                    <select class="selectpicker" multiple data-live-search="true" data-none-results-text="No match found" title="Select Language Support" id="easyassist-language-support-selected">
+                                        {% if supported_language_objs %}
+                                            {% for language in supported_language_objs %}
+                                                {% if language.title == "English" %}
+                                                    <option value="{{ language.pk }}" selected>{{ language.title }}</option>
+                                                {% else %}
+                                                    <option value="{{ language.pk }}">{{ language.title }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            <option value="No languages found" disabled>No languages found</option>
+                                        {% endif %}
+                                    </select>
+                                </div>
+                            {% endif %}
+                            {% if cobrowse_agent.get_access_token_obj.choose_product_category or cobrowse_agent.get_access_token_obj.enable_tag_based_assignment_for_outbound %}
+                                <div class="col-sm-6 mb-2" id="easyassist-product-category-list-div">
+                                    <select class="selectpicker" data-none-results-text="No match found" multiple data-live-search="true" title="Select Product Category" id="easyassist-product-category-selected">
+                                        {% if product_category_objs %}
+                                            {% for category in product_category_objs %}
+                                                <option value="{{ category.pk }}">{{ category.title }}</option>
+                                            {% endfor %}
+                                        {% else %}
+                                            <option value="No categories found" disabled>No categories found</option>
+                                        {% endif %}
+                                    </select>
+                                </div>
+                            {% endif %}
+                            <div class="col-sm-6 mb-2">
+                                <select class="custom-select user-modal-custom-button-down" id="inline-form-input-agent-support-level" style="width:100%;">
+                                    <option selected="" value="None">Choose Support Level</option>
+                                    {% for agent_support_name, agent_support_value in COBROWSING_AGENT_SUPPORT %}
+                                        <option value="{{ agent_support_value }}">{{ agent_support_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% if cobrowse_agent.role == "admin" or cobrowse_agent.role == "admin_ally" %}
+                                <div class="col-sm-6 mb-2" id="selected-supervisor-div">
+                                    <select class="selectpicker" data-none-results-text="No match found" title="Choose Supervisor" multiple id="inline-form-input-supervisor-pk" style="width: 100%;">
+                                        {% if supervisors %}
+                                            {% for supervisor in supervisors %}
+                                                <option value="{{ supervisor.pk }}">{{ supervisor.user.email }}</option>
+                                            {% endfor %}
+                                        {% else %}
+                                            <option value="No supervisors found" disabled>No supervisors found</option>
+                                        {% endif %}
+                                    </select>
+                                </div>
+                            {% else %}
+                                <div class="col-sm-6 mb-2" id="selected-supervisor-div" style="display:none;width: 100%;">
+                                    <select class="selectpicker" data-none-results-text="No match found" title="Choose Supervisor" multiple id="inline-form-input-supervisor-pk">
+                                        <option value="{{ cobrowse_agent.pk }}">{{ cobrowse_agent.user.email }}(Self)</option>
+                                    </select>
+                                </div>
+                            {% endif %}
+                            {% if cobrowse_agent.get_access_token_obj.enable_followup_leads_tab %}
+                                <div class="col-sm-6 mb-2 px-3 mt-2" id="assign_followup_lead_div">
+                                    <div class="cobrowse-assign-leads-text-div">
+                                        <span>Assign Follow-up leads</span>
+                                        <label class="easyassist-option-switch">
+                                            <input type="checkbox" id="assign_followup_lead_to_agent" checked="">
+                                            <span class="easyassist-option-switch-slider round"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </form>
+                    <p id="add-new-agent-error" style="margin-left: 13px;"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-success" id = "add-new-agent" onclick="add_new_agent(this)">Add</button>
+                <button class="btn btn-success" id="save-agent-details" onclick="add_new_agent(this)" style="display: none;">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="save-agent-modal" tabindex="-1" role="dialog" aria-labelledby="edit_agent_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                {% if cobrowse_agent.role == "admin" or cobrowse_agent.role == "admin_ally" %}
+                    <h5 class="modal-title" id="edit_agent_modal_modal_label">&nbsp;Edit User</h5>
+                {% else %}
+                    <h5 class="modal-title" id="edit_agent_modal_modal_label">&nbsp;Edit Agent</h5>
+                {% endif %}
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                        <form class="form-inline" action="javascript:void(0)">
+                            {% if cobrowse_agent.role == "admin" or cobrowse_agent.role == "admin_ally" %}
+                            <div class="col-sm-6 mb-2">
+                                <select class="custom-select user-modal-custom-button-down" id="input-user-type" onchange="show_hide_supervisor_dropdown(this)" style="width: 100%;">
+                                    <option value="agent" selected>Agent</option>
+                                    <option value="supervisor">Supervisor</option>
+                                </select>
+                            </div>
+                            {% endif %}
+                            <div class="col-sm-6 mb-2">
+                                <label class="sr-only" for="agent-name">User Name</label>
+                                <input type="text" style="width: 100%;" class="form-control" id="agent-name" value="" placeholder="User Name">
+                            </div>
+                            <div class="col-sm-6 mb-2 tooltip-wrapper disabled" onmouseout='toggle_tooltip_visibility()' data-title="Email ID is not editable">
+                                <label class="sr-only" for="agent-email">User Email</label>
+                                <input type="text" style="width: 100%;" class="form-control agent-email" id="agent-email" value="" readonly placeholder="User Email">
+                            </div>
+                            <div class="col-sm-6 mb-2">
+                                <label class="sr-only" for="agent-mobile">User Mobile No. (optional)</label>
+                                <input type="text" style="width: 100%;" onkeydown="easyassist_prevent_non_numeric_characters(event);easyassist_word_limit(event, this, 10);" onpaste="return false;" ondrop="return false;" class="form-control" id="agent-mobile" placeholder="User Mobile No. (optional)">
+                            </div>
+
+                            {% if cobrowse_agent.get_access_token_obj.allow_language_support %}
+                                <div class="col-sm-6 mb-2" id="easyassist-language-support-list-div">
+                                    <select class="selectpicker custom-button-bootstrap" multiple data-live-search="true" title="Select Language Support" id="language-support-selected">
+                                        {% if supported_language_objs %}
+                                            {% for language in supported_language_objs %}
+                                                <option value="{{ language.pk }}">{{ language.title }}</option>
+                                            {% endfor %}
+                                        {% else %}
+                                            <option value="No languages found" disabled>No languages found</option>
+                                        {% endif %}
+                                    </select>
+                                </div>
+                            {% endif %}
+                            {% if cobrowse_agent.get_access_token_obj.choose_product_category or cobrowse_agent.get_access_token_obj.enable_tag_based_assignment_for_outbound %}
+                                <div class="col-sm-6 mb-2" id="custom-button-bootstrap easyassist-product-category-list-div">
+                                    <select class="selectpicker custom-button-bootstrap" multiple data-live-search="true" title="Select Product Category" id="product-category-selected">
+                                        {% if product_category_objs %}
+                                            {% for category in product_category_objs %}
+                                                <option value="{{ category.pk }}">{{ category.title }}</option>
+                                            {% endfor %}
+                                        {% else %}
+                                            <option value="No categories found" disabled>No categories found</option>
+                                        {% endif %}
+                                    </select>
+                                </div>
+                            {% endif %}
+                            <div class="col-sm-6 mb-2">
+                                <select class="custom-select user-modal-custom-button-down" id="agent-support-level" style="width: 100%;">
+                                    <option selected="" value="None">Choose Support Level</option>
+                                    {% for agent_support_name, agent_support_value in COBROWSING_AGENT_SUPPORT %}
+                                        <option value="{{ agent_support_value }}">{{ agent_support_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% if cobrowse_agent.role == "admin" %}
+                                <div class="col-sm-6 mb-2" id="selected-supervisor-div-agent" style="display:inline;">
+                                    <select class="selectpicker custom-button-bootstrap" multiple title="Choose Supervisor" id="agent-supervisor-list">
+                                        <option value="{{ cobrowse_agent.pk }}">{{ cobrowse_agent.user.email }}(Self)</option>
+                                        {% if supervisors %}
+                                            {% for supervisor in supervisors %}
+                                               <option value="{{ supervisor.pk }}">{{ supervisor.user.email }}</option>
+                                            {% endfor %}
+                                        {% else %}
+                                            <option value="No supervisors found" disabled>No supervisors found</option>
+                                        {% endif %}
+                                    </select>
+                                </div>
+                            {% elif cobrowse_agent.role == "admin_ally" %}
+                                <div class="col-sm-6 mb-2" id="selected-supervisor-div-agent" style="display:inline;">
+                                    <select class="selectpicker custom-button-bootstrap" multiple title="Choose Supervisor" id="agent-supervisor-list">
+                                        {% if supervisors %}
+                                            {% for supervisor in supervisors %}
+                                                <option value="{{ supervisor.pk }}">{{ supervisor.user.email }}</option>
+                                            {% endfor %}
+                                        {% else %}
+                                            <option value="No supervisors found" disabled>No supervisors found</option>
+                                        {% endif %}
+                                    </select>
+                                </div>
+                            {% else %}
+                            <div class="col-sm-6 mb-2" id="selected-supervisor-div-agent" style="display:none;">
+                                <select class="selectpicker custom-button-bootstrap" multiple title="Choose Supervisor" id="agent-supervisor-list">
+                                    <option value="{{ cobrowse_agent.pk }}">{{ cobrowse_agent.user.email }}(Self)</option>
+                                    {% if supervisors %}
+                                        {% for supervisor in supervisors %}
+                                            <option value="{{ supervisor.pk }}">{{ supervisor.user.email }}</option>
+                                        {% endfor %}
+                                    {% else %}
+                                        <option value="No supervisors found" disabled>No supervisors found</option>
+                                    {% endif %}
+                                </select>
+                            </div>
+                            {% endif %}
+                            {% if cobrowse_agent.get_access_token_obj.enable_followup_leads_tab %}
+                                <div class="col-sm-6 mb-2">
+                                    <div class="cobrowse-assign-leads-text-div">
+                                        <span>Assign Follow-up leads</span>
+                                        <label class="easyassist-option-switch">
+                                            <input type="checkbox" id="assign-followup-lead-to-agent">
+                                            <span class="easyassist-option-switch-slider round"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </form>
+                        <p class="mt-2" id="save-agent-details-error" style="margin-left: 13px;"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-success" id="save-agent-button">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% for supervisor in supervisors %}
+<div class="modal fade" id="save-supervisor-modal-{{supervisor.pk}}" tabindex="-1" role="dialog" aria-labelledby="edit_supervisor_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                {% if cobrowse_agent.role == "admin" or cobrowse_agent.role == "admin_ally" %}
+                    <h5 class="modal-title" id="edit_supervisor_modal_modal_label">Edit User</h5>
+                {% else %}
+                    <h5 class="modal-title" id="edit_supervisor_modal_modal_label">Edit Agent</h5>
+                {% endif %}
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <form class="form-inline" action="javascript:void(0)">
+                            <div class="col-sm-6">
+                                <label class="sr-only" for="inline-form-input-agent-name-{{supervisor.pk}}">User Name</label>
+                                <input type="text" style="width: 100%;" class="form-control mb-2" id="inline-form-input-agent-name-{{supervisor.pk}}" value="{{supervisor.user.first_name}}" placeholder="User Name">
+                            </div>
+                            <div class="col-sm-6 tooltip-wrapper disabled" onmouseout='toggle_tooltip_visibility()' data-title="Email ID is not editable">
+                                <label class="sr-only" for="inline-form-input-agent-email-{{supervisor.pk}}">User Email</label>
+                                <input type="text" style="width: 100%;" readonly class="form-control mb-2 agent-email" id="inline-form-input-agent-email-{{supervisor.pk}}" value="{{supervisor.user.email}}" placeholder="User Email">
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="sr-only" for="inline-form-input-agent-mobile-{{supervisor.pk}}">User Mobile No. (optional)</label>
+                                {% if supervisor.mobile_number != None %}
+                                    <input type="text" onkeydown="easyassist_prevent_non_numeric_characters(event);easyassist_word_limit(event, this, 10);" style="width: 100%;" class="form-control mb-2" onpaste="return false;" ondrop="return false;" id="inline-form-input-agent-mobile-{{supervisor.pk}}" value="{{supervisor.mobile_number}}" placeholder="User Mobile No. (optional)">
+                                {% else %}
+                                    <input type="text" onkeydown="easyassist_prevent_non_numeric_characters(event);easyassist_word_limit(event, this, 10);" style="width: 100%;" class="form-control mb-2" onpaste="return false;" ondrop="return false;" id="inline-form-input-agent-mobile-{{supervisor.pk}}" placeholder="User Mobile No. (optional)">
+                                {% endif %}
+                            </div>
+                            {% if cobrowse_agent.role == "admin" or cobrowse_agent.role == "admin_ally" %}
+                                <div class="col-sm-6">
+                                    <select class="custom-select user-modal-custom-button-down" id="inline-form-input-user-type-{{supervisor.pk}}" onchange="check_selected_user_status(this,'{{supervisor.pk}}')" style="width: 100%;margin-bottom: .5rem;">
+                                        <option value="agent">Agent</option>
+                                        <option value="supervisor" selected>Supervisor</option>
+                                    </select>
+                                </div>
+                            {% endif %}
+                            {% if cobrowse_agent.get_access_token_obj.allow_language_support %}
+                                <div class="col-sm-6" id="easyassist-language-support-list-div-{{supervisor.pk}}">
+                                    <select class="selectpicker" multiple data-live-search="true" title="Select Language Support" id="easyassist-language-support-selected-{{supervisor.pk}}">
+                                        {% if supported_language_objs %}
+                                            {% for language in supported_language_objs %}
+                                                {% if language in supervisor.supported_language.all %}
+                                                    <option value="{{ language.pk }}" selected>{{ language.title }}</option>
+                                                {% else %}
+                                                    <option value="{{ language.pk }}">{{ language.title }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            <option value="No languages found" disabled>No languages found</option>
+                                        {% endif %}
+                                    </select>
+                                </div>
+                            {% endif %}
+                            {% if cobrowse_agent.get_access_token_obj.choose_product_category or cobrowse_agent.get_access_token_obj.enable_tag_based_assignment_for_outbound %}
+                                <div class="col-sm-6" id="easyassist-product-category-list-div-{{supervisor.pk}}">
+                                    <select class="selectpicker" multiple data-live-search="true" title="Select Product Category" id="easyassist-product-category-selected-{{supervisor.pk}}">
+                                        {% if product_category_objs %}
+                                            {% for category in product_category_objs %}
+                                                {% if category in supervisor.product_category.all %}
+                                                    <option value="{{ category.pk }}" selected>{{ category.title }}</option>
+                                                {% else %}
+                                                    <option value="{{ category.pk }}">{{ category.title }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            <option value="No categories found" disabled>No categories found</option>
+                                        {% endif %}
+                                    </select>
+                                </div>
+                            {% endif %}
+                            <div class="col-sm-6" style="padding-top: 5px;">
+                                <select class="custom-select user-modal-custom-button-down" id="inline-form-input-agent-support-level-{{supervisor.pk}}" style="width: 100%;">
+                                    <option selected="" value="None">Choose Support Level</option>
+                                    {% for agent_support_name, agent_support_value in COBROWSING_AGENT_SUPPORT %}
+                                        {% if agent_support_name == supervisor.support_level %}
+                                            <option value="{{ agent_support_value }}" selected>{{ agent_support_name }}</option>
+                                        {% else %}
+                                            <option value="{{ agent_support_value }}">{{ agent_support_name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% if cobrowse_agent.role == "admin_ally" %}
+                                <div class="col-sm-6" id="selected-supervisor-div-{{supervisor.pk}}" style="display: none;padding-top: 5px;">
+                                    <select class="selectpicker" multiple title="Select Supervisor" id="inline-form-input-supervisor-pk-{{supervisor.pk}}">
+                                        {% if supervisors %}
+                                            {% for supervise in supervisors %}
+                                                {% if supervise != supervisor %}
+                                                    <option value="{{ supervise.pk }}">{{ supervise.user.email }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            <option value="No supervisors found" disabled>No supervisors found</option>
+                                        {% endif %}
+                                    </select>
+                                </div>
+                            {% else %}
+                                <div class="col-sm-6" id="selected-supervisor-div-{{supervisor.pk}}" style="display: none;padding-top: 5px;">
+                                    <select class="selectpicker" multiple title="Select Supervisor" id="inline-form-input-supervisor-pk-{{supervisor.pk}}">
+                                        <option value="{{ cobrowse_agent.pk }}">{{ cobrowse_agent.user.email }}(Self)</option>
+                                        {% if supervisors %}
+                                            {% for supervise in supervisors %}
+                                                {% if supervise != supervisor %}
+                                                    <option value="{{ supervise.pk }}">{{ supervise.user.email }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            <option value="No supervisors found" disabled>No supervisors found</option>
+                                        {% endif %}
+                                    </select>
+                                </div>
+                            {% endif %}
+                        </form>
+                        <p class="mt-2" id="save-agent-details-error-{{supervisor.pk}}" style="margin-left: 13px;"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-success" id="save-agent-details" onclick="update_admin_ally_supervisor_details(this,'{{supervisor.pk}}')">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% for admin_ally in admin_allies %}
+<div class="modal fade" id="save-admin-ally-modal-{{admin_ally.pk}}" tabindex="-1" role="dialog" aria-labelledby="edit_admin_ally_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="edit_admin_ally_modal_modal_label">Edit User</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <form class="form-inline" action="javascript:void(0)">
+                            <div class="col-sm-6">
+                                <label class="sr-only" for="inline-form-input-agent-name-{{admin_ally.pk}}">User Name</label>
+                                <input type="text" style="width: 100%;" class="form-control mb-2" id="inline-form-input-agent-name-{{admin_ally.pk}}" value="{{admin_ally.user.first_name}}" placeholder="User Name">
+                            </div>
+                            <div class="col-sm-6 tooltip-wrapper disabled" onmouseout='toggle_tooltip_visibility()' data-title="Email ID is not editable">
+                                <label class="sr-only" for="inline-form-input-agent-email-{{admin_ally.pk}}">User Email</label>
+                                <input type="text" style="width: 100%;" readonly class="form-control mb-2" id="inline-form-input-agent-email-{{admin_ally.pk}}" value="{{admin_ally.user.email}}" placeholder="User Email">
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="sr-only" for="inline-form-input-agent-mobile-{{admin_ally.pk}}">User Mobile No. (optional)</label>
+                                {% if admin_ally.mobile_number != None %}
+                                    <input type="text" onkeydown="easyassist_prevent_non_numeric_characters(event);easyassist_word_limit(event, this, 10);" style="width: 100%;" onpaste="return false;" ondrop="return false;" class="form-control mb-2" id="inline-form-input-agent-mobile-{{admin_ally.pk}}" value="{{admin_ally.mobile_number}}" placeholder="User Mobile No. (optional)">
+                                {% else %}
+                                    <input type="text" onkeydown="easyassist_prevent_non_numeric_characters(event);easyassist_word_limit(event, this, 10);" style="width: 100%;" onpaste="return false;" ondrop="return false;" class="form-control mb-2" id="inline-form-input-agent-mobile-{{admin_ally.pk}}" placeholder="User Mobile No. (optional)">
+                                {% endif %}
+                            </div>
+                            <div class="col-sm-6" style="display: none!important;">
+                                <select class="custom-select" id="inline-form-input-user-type-{{admin_ally.pk}}" onchange="check_selected_user_status(this,'{{admin_ally.pk}}')" style="width: 100%;margin-bottom: .5rem;">
+                                    <option value="admin_ally" selected>Admin Ally</option>
+                                </select>
+                            </div>
+                            {% if cobrowse_agent.get_access_token_obj.allow_language_support %}
+                                <div class="col-sm-6" id="easyassist-language-support-list-div-{{admin_ally.pk}}">
+                                    <select class="selectpicker" multiple data-live-search="true" title="Select Language Support" id="easyassist-language-support-selected-{{admin_ally.pk}}">
+                                        {% if supported_language_objs %}
+                                            {% for language in supported_language_objs %}
+                                                {% if language in admin_ally.supported_language.all %}
+                                                    <option value="{{ language.pk }}" selected>{{ language.title }}</option>
+                                                {% else %}
+                                                    <option value="{{ language.pk }}">{{ language.title }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            <option value="No Language Found" disabled>No languages found</option>
+                                        {% endif %}
+                                    </select>
+                                </div>
+                            {% endif %}
+                            {% if cobrowse_agent.get_access_token_obj.choose_product_category or cobrowse_agent.get_access_token_obj.enable_tag_based_assignment_for_outbound %}
+                                <div class="col-sm-6" id="easyassist-product-category-list-div-{{admin_ally.pk}}">
+                                    <select class="selectpicker" multiple data-live-search="true" title="Select Product Category" id="easyassist-product-category-selected-{{admin_ally.pk}}">
+                                        {% if product_category_objs %}
+                                            {% for category in product_category_objs %}
+                                                {% if category in admin_ally.product_category.all %}
+                                                    <option value="{{ category.pk }}" selected>{{ category.title }}</option>
+                                                {% else %}
+                                                    <option value="{{ category.pk }}">{{ category.title }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            <option value="No categories found" disabled>No categories found</option>
+                                        {% endif %}
+                                    </select>
+                                </div>
+                            {% endif %}
+                            <div class="col-sm-6" style="display: none; padding-top: 5px;">
+                                <select class="custom-select user-modal-custom-button-down" id="inline-form-input-agent-support-level-{{admin_ally.pk}}" style="width: 100%;">
+                                    <option selected="" value="None">Choose Support Level</option>
+                                    {% for agent_support_name, agent_support_value in COBROWSING_AGENT_SUPPORT %}
+                                        {% if agent_support_name == admin_ally.support_level %}
+                                            <option value="{{ agent_support_value }}" selected>{{ agent_support_name }}</option>
+                                        {% else %}
+                                            <option value="{{ agent_support_value }}">{{ agent_support_name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-sm-6" id="selected-admin-ally-div-{{admin_ally.pk}}" style="display: none;padding-top: 5px;">
+                                <select class="custom-select " multiple title="Select admin_ally" id="inline-form-input-admin_ally-pk-{{admin_ally.pk}}">
+                                    <option value="{{ cobrowse_agent.pk }}">{{ cobrowse_agent.user.email }}(Self)</option>
+                                    {% if admin_allys %}
+                                        {% for supervise in admin_allys %}
+                                            {% if supervise != admin_ally %}
+                                                <option value="{{ supervise.pk }}">{{ supervise.user.email }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        <option value="No supervisors found" disabled>No supervisors found</option>
+                                    {% endif %}
+                                </select>
+                            </div>
+                            <div class="col-sm-6 mb-2" id="selected-supervisor-div-{{admin_ally.pk}} style="display: block;padding-top: 5px;"">
+                                <select class="selectpicker" data-none-results-text="No match found" title="Choose Supervisor" multiple id="inline-form-input-supervisor-pk-{{admin_ally.pk}}" style="width: 100%;">
+                                    {% if supervisors %}
+                                        {% for supervisor in supervisors %}
+                                            {% if supervisor in admin_ally.agents.all %}
+                                                <option value="{{ supervisor.pk }}" selected>{{ supervisor.user.email }}</option>
+                                            {% else %}
+                                                <option value="{{ supervisor.pk }}">{{ supervisor.user.email }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        <option value="No supervisors found" disabled>No supervisors found</option>
+                                    {% endif %}
+                                </select>
+                            </div>
+                        </form>
+                        <p class="mt-2" id="save-agent-details-error-{{admin_ally.pk}}" style="margin-left: 13px;"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-success" id="save-agent-details" onclick="update_admin_ally_supervisor_details(this,'{{admin_ally.pk}}')">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+<div class="modal fade upload_file_modal" id="user_details_upload_modal" tabindex="-1" role="dialog" aria-labelledby="document_upload_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="document_upload_modal_modal_label">Add Users Via Excel</h5>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                  <div class="col-sm-12">
+                    <label for="user_details_upload_input" class="custom-file-upload">
+                        Choose File
+                    </label>
+                    <input type="file" id="user_details_upload_input" class="form-control" name="" style="display: none !important;" accept=".xls, .xlsx">
+                  </div>
+                  <div class="col-sm-11">
+                      <div class="col-md-12 col-sm-12 modal-upload-file mt-4" style="display: none;">
+                        <div class="col-md-1 col-sm-1 width-auto-sm pd-mg">
+                          <svg width="24" height="32" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M14 0V8.50667C14 9.33333 14.6667 10 15.4933 10H24V30.5067C24 31.3333 23.3333 32 22.5067 32H1.49333C0.666665 32 0 31.3333 0 30.5067V1.49333C0 0.666667 0.666665 0 1.49333 0H14ZM17.4404 0.426667L23.5471 6.56C23.8404 6.85333 24.0004 7.22667 24.0004 7.62667V8H16.0004V0H16.3737C16.7737 0 17.147 0.16 17.4404 0.426667Z" fill="url(#paint0_linear)"/>
+                            <defs>
+                              <linearGradient id="paint0_linear" x1="2.39111" y1="3" x2="23.3908" y2="32.0002" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#E08F8D"/>
+                                <stop offset="1" stop-color="#FE736F"/>
+                              </linearGradient>
+                            </defs>
+                          </svg>
+                        </div>
+                        <div class="col-md-10 col-sm-10 file-name-container">
+                          <div class="file-name-div">
+                          </div>
+                          <div class="progress">
+                            <div class="indeterminate"></div>
+                          </div>
+                        </div>
+                        <div class="col-md-1 col-sm-1 width-auto-sm pr-sm-0">
+                          <button class="upload-file-cross-btn" type="button" onclick="remove_uploaded_file();">
+                            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6.48438 4.98438L9.85938 1.64062C10.0469 1.45312 10.0469 1.10938 9.85938 0.921875L9.07812 0.140625C8.89062 -0.046875 8.54688 -0.046875 8.35938 0.140625L5.01562 3.51562L1.64062 0.140625C1.45312 -0.046875 1.10938 -0.046875 0.921875 0.140625L0.140625 0.921875C-0.046875 1.10938 -0.046875 1.45312 0.140625 1.64062L3.51562 4.98438L0.140625 8.35938C-0.046875 8.54688 -0.046875 8.89062 0.140625 9.07812L0.921875 9.85938C1.10938 10.0469 1.45312 10.0469 1.64062 9.85938L5.01562 6.48438L8.35938 9.85938C8.54688 10.0469 8.89062 10.0469 9.07812 9.85938L9.85938 9.07812C10.0469 8.89062 10.0469 8.54688 9.85938 8.35938L6.48438 4.98438Z" fill="#E08F8D"/>
+                              </svg>
+                          </button>
+                        </div>
+                      </div>
+                  </div>
+                  <div class="col-sm-12">
+                    <p style="padding-top: 1em;" id="user_details_upload_input_error"></p>
+                </div>
+              </div>
+          </div>
+            <div class="modal-footer" style="display: flex; align-items: center; justify-content: space-between;">
+                <button class="btn btn-outline-primary" onclick="download_user_details_excel_template(this)" id="user-details-download-template-button">Download template</button>
+                <div class="d-width-sm-100">
+                    <button class="btn btn-text-only" type="button" data-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary" onclick="upload_user_excel_details(this)">Upload</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="resend-password-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Resend Password?</h5>
+        </div>
+        <div class="modal-body">Click Resend below if you want to resend password.</div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+          <button class="btn btn-primary" onclick="resend_password_agent()">Resend</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var remove_agent_pk = null;
+    var resend_password_agent_pk = null;
+    window.agent_role = "{{cobrowse_agent.role}}";
+    window.allow_agent_to_customer_cobrowsing = "{{ access_token_obj.allow_agent_to_customer_cobrowsing }}";
+    $(document).ready(function(){
+        on_agent_management_page = true;
+        setTimeout(function(){
+            $('.bootstrap-select button').removeClass();
+            $('.bootstrap-select button').addClass('custom-select custom-button-down');
+        }, 1000);
+
+        {% if supervisors|length %}
+        $("#dataTable-supervisor").DataTable({
+        "ordering": false,
+        "paging": true,
+        "pagingType": "simple_numbers"
+        });
+        {% else %}
+        $("#dataTable-supervisor").DataTable({
+        "ordering": false,
+        "searching": false,
+        "paging": false
+        });
+        {% endif %}
+
+        if(document.getElementById("dataTable-supervisor_length")) {
+            document.getElementById("dataTable-supervisor_length").classList.add("d-none");
+        }
+        
+        remove_searched_agent_storage_obj();
+        
+        update_active_agents_details();
+        setInterval(update_active_agents_details, UPDATE_AGENT_DETAILS_INTERVAL_TIME);
+                        
+        $("#custom-agent-table-search").keyup(function() {
+            window.localStorage.setItem("searched_agent", this.value);
+            $('#data-table-agent').dataTable().fnFilter(this.value);
+            remove_page_storage_obj();
+        });
+
+        $("#custom-supervisor-table-search").keyup(function() {
+            $('#dataTable-supervisor').dataTable().fnFilter(this.value);
+        });
+
+        $('#data-table-agent').on( 'page.dt', function () { 
+            let current_page = $('#data-table-agent').DataTable().page.info().page; 
+            window.localStorage.setItem("agent_table_current_page", current_page);
+        }).dataTable();
+
+    });
+
+    function remove_searched_agent_storage_obj() {
+        $('#custom-agent-table-search').val("");
+        window.localStorage.removeItem("searched_agent");
+        remove_page_storage_obj();
+    }
+
+    function remove_page_storage_obj() {
+        window.localStorage.removeItem("agent_table_current_page");
+    }
+
+    function check_selected_user_status(element,pk=""){
+        var selected_supervisor_div = "selected-supervisor-div";
+        var assign_followup_toggle = document.getElementById("assign_followup_lead_div");
+        if(pk !== "")
+            selected_supervisor_div += '-' + pk;
+        if(element.value=="agent"){
+            document.getElementById(selected_supervisor_div).style.display="block";
+            if(assign_followup_toggle) {
+                assign_followup_toggle.style.display = "block";
+            }
+            var select = document.getElementById("inline-form-input-supervisor-pk");
+            var option;
+            for (var i=0; i<select.options.length; i++) {
+                option = select.options[i];
+                option.selected = false;
+            }
+            document.getElementById("inline-form-input-agent-support-level").style.display="block";
+            document.getElementById("inline-form-input-agent-name").placeholder = "Agent Name";
+            document.getElementById("inline-form-input-agent-email").placeholder = "Agent Email";
+            document.getElementById("inline-form-input-agent-mobile").placeholder = "Agent Mobile No. (optional)";
+        }
+        else if(element.value=="supervisor") {
+            document.getElementById(selected_supervisor_div).style.display="none";
+            if(assign_followup_toggle) {
+                assign_followup_toggle.style.display = "none";
+            }
+            var select = document.getElementById("inline-form-input-supervisor-pk");
+            var option;
+            for (var i=0; i<select.options.length; i++) {
+                option = select.options[i];
+                option.selected = false;
+            }
+            document.getElementById("inline-form-input-agent-support-level").style.display="block";
+            document.getElementById("inline-form-input-agent-name").placeholder = "Supervisor Name";
+            document.getElementById("inline-form-input-agent-email").placeholder = "Supervisor Email";
+            document.getElementById("inline-form-input-agent-mobile").placeholder = "Supervisor Mobile No. (optional)";
+        }
+        else{
+            document.getElementById(selected_supervisor_div).style.display="block";
+            if(assign_followup_toggle) {
+                assign_followup_toggle.style.display = "none";
+            }
+            var select = document.getElementById("inline-form-input-supervisor-pk");
+            var option;
+            for (var i=0; i<select.options.length; i++) {
+                option = select.options[i];
+                option.selected = true;
+            }
+            document.getElementById("inline-form-input-agent-support-level").style.display="none";
+            document.getElementById("inline-form-input-agent-name").placeholder = "Admin Ally Name";
+            document.getElementById("inline-form-input-agent-email").placeholder = "Admin Ally Email";
+            document.getElementById("inline-form-input-agent-mobile").placeholder = "Admin Ally Mobile No. (optional)";
+        }
+        $('.selectpicker').selectpicker('refresh');
+    }
+
+    function show_hide_supervisor_dropdown(element) {
+        if(element.value == "agent") {
+            document.getElementById("selected-supervisor-div-agent").style.display = "inline";
+        } else {
+            document.getElementById("selected-supervisor-div-agent").style.display = "none";
+        }
+    }
+
+    function populate_new_agent_modal(){
+        document.getElementById('selected-supervisor-div').style.display="block";
+    }
+
+    function save_cobrowsing_supervisor(supervisor_pk){
+        $("#save-supervisor-modal-"+supervisor_pk).modal('show');
+    }
+
+    function save_cobrowsing_admin_ally(supervisor_pk){
+        $("#save-admin-ally-modal-"+supervisor_pk).modal('show');
+    }
+
+    function save_cobrowsing_agent(agent_pk){
+        $("#save-agent-modal-"+agent_pk).modal('show');
+    }
+
+    function resend_password_agent(pk=null) {
+        if(pk == null) {
+            resend_password(resend_password_agent_pk);
+            $("#resend-password-modal").modal('hide');
+        } else {
+            resend_password_agent_pk = pk;
+        }
+    }
+
+    function refresh_page() {
+        window.location.reload();
+    }
+
+    var user_details_upload_input_file_global = undefined;
+    document.getElementById("user_details_upload_input").addEventListener('change', function(event) {
+        var file = document.getElementById("user_details_upload_input").files[0];
+        if(file) {
+            user_details_upload_input_file_global = ($("#user_details_upload_input"))[0].files[0];
+            if(check_file_name(user_details_upload_input_file_global.name)) {
+                show_easyassist_toast("Please don't use special characters other than hyphen (-) and underscore (_) in the file name");
+                remove_uploaded_file();
+                return;
+            }
+            $('#user_details_upload_modal .file-name-div').html(file.name);
+            $('#user_details_upload_modal .modal-upload-file').show();
+            $('#user_details_upload_modal .progress').show();
+
+            var progress_div = $('#user_details_upload_modal .progress')[0].children[0];
+            progress_div.classList.remove('determinate');
+            progress_div.classList.add('indeterminate');
+
+            setTimeout(function() {
+                progress_div.classList.remove('indeterminate');
+                progress_div.classList.add('determinate');
+            }, 300);
+
+            var error_element = document.getElementById("user_details_upload_input_error");
+            error_element.innerHTML = "";
+            try {
+                error_element.nextElementSibling.remove();
+            } catch(err) {}
+        } else {
+            if(user_details_upload_input_file_global == undefined){
+                $('#user_details_upload_modal .file-name-div').html("No file selected");
+                $('#user_details_upload_modal .progress').hide();
+            }
+        }
+        document.getElementById("user_details_upload_input").value = "";
+    });
+
+    function remove_uploaded_file() {
+        $('#user_details_upload_modal .file-name-div').html("");
+        $('#user_details_upload_modal .modal-upload-file').hide();
+        document.getElementById("user_details_upload_input").value = "";
+        user_details_upload_input_file_global = undefined;
+    }
+
+    function remove_heading_title() {
+        if(document.getElementById("agent-data-table-heading")) {
+            document.getElementById("agent-data-table-heading").setAttribute("title", "");
+        }
+    }
+
+    $(function() {
+        $('.tooltip-wrapper').tooltip();
+    });
+
+    function toggle_tooltip_visibility() {
+        $(".tooltip-wrapper").tooltip("hide");
+    }
+</script>
+{% endblock %}

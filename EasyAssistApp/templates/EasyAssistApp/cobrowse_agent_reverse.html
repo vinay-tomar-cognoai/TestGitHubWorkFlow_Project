@@ -1,0 +1,1700 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" style="overflow:hidden;">
+<head>
+
+  {% if is_agent == True%}
+    <title>Agent | Cobrowsing</title>
+  {% else %}
+    <title>Customer | Cobrowsing</title>
+  {% endif %}
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <link href="{% static 'EasyAssistApp/css/animate.css' %}" rel="stylesheet">
+  {% if cobrowse_config_obj.cobrowsing_favicon %}
+    <link rel="shortcut icon" type="image/x-icon" href="{{ cobrowse_config_obj.cobrowsing_favicon }}">
+  {% else %}
+    {% if cobrowse_agent.get_access_token_obj and cobrowse_agent.get_access_token_obj.agent.user.enable_s3_bucket %}
+      <link rel="shortcut icon" type="image/x-icon" href="https://static.allincall.in/static/EasyAssistApp/img/cobrowseLogoShort.svg">
+    {% else %}
+      <link rel="shortcut icon" type="image/x-icon" href="{% static 'EasyAssistApp/img/cobrowseLogoShort.svg' %}">
+    {% endif %}
+  {% endif %}
+
+  {% if cobrowse_agent.get_access_token_obj and cobrowse_agent.get_access_token_obj.agent.user.enable_s3_bucket %}
+  <link href="https://static.allincall.in/static/EasyAssistApp/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+  <link href="https://static.allincall.in/static/EasyAssistApp/css/sb-admin-2.min.css" rel="stylesheet">
+  {% else %}
+  <link href="{% static 'EasyAssistApp/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+  <link href="{% static 'EasyAssistApp/css/sb-admin-2.min.css' %}" rel="stylesheet">
+  {% endif %}
+
+  {% if DEVELOPMENT %}
+    <link rel="stylesheet" type="text/css" href="{% static 'EasyAssistApp/css/client.reverse.css' %}">
+  {% else %}
+    <link rel="stylesheet" type="text/css" href="/static/EasyAssistApp/css/{{access_token}}/client.reverse.css">
+  {% endif %}
+
+  <script type="text/javascript" src="{% static 'EasyAssistApp/js/validations.js' %}"></script>
+  {% if cobrowse_agent.get_access_token_obj and cobrowse_agent.get_access_token_obj.agent.user.enable_s3_bucket %}
+  <script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/vendor/jquery/jquery.min.js"></script>
+
+  <script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/bootstrap-multiselect.js"></script>
+
+  <link rel="stylesheet" href="https://static.allincall.in/static/EasyAssistApp/css/bootstrap-multiselect.css">
+  {% else %}
+  <script type="text/javascript" src="{% static 'EasyAssistApp/vendor/jquery/jquery.min.js' %}"></script>
+
+  <script type="text/javascript" src="{% static 'EasyAssistApp/js/bootstrap-multiselect.js' %}"></script>
+
+  <link rel="stylesheet" href="{% static 'EasyAssistApp/css/bootstrap-multiselect.css' %}">
+  {% endif %}
+
+  {% if easyassist_font_family != 'Silka' %}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family={{easyassist_font_family}}">
+  {% endif %}
+
+  <style type="text/css">
+
+    {% if easyassist_font_family == 'Silka' %}
+      *{
+        font-family: Silka, sans-serif !important;
+      }
+    {% else %}
+      *{
+        font-family: {{easyassist_font_family}} !important;
+      }
+    {% endif %}
+
+  </style>
+</head>
+<style>
+  svg + label{
+      background-color: {{ floating_button_bg_color }} !important;
+  }
+    
+  .bounce2 {
+      animation: bounce2 2s ;
+    }
+    @keyframes bounce2 {
+      0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+      40% {transform: translateY(-40px);}
+      60% {transform: translateY(-25px);}
+      }
+      
+    .easyassist-tickmarks {
+      display: flex;
+      justify-items: center !important;
+      flex-direction: row;
+      align-items: center;
+      width: 100% !important;
+      margin-top: 30px;
+      font-size: 90%;
+      font-weight: bold;
+      padding: unset !important;
+      flex-wrap: wrap!important;
+    }
+    .easyassist-tickmarks span {
+      cursor: pointer;
+      margin: 2px;
+      height: 40px;
+      width: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 500;
+      font-size: 18px;
+      border: 1px solid #E6E6E6;
+      color: #2D2D2D;
+    }
+
+    #close_session_modal .modal-footer .btn-primary {
+      background-color: {{ floating_button_bg_color }} !important;
+    }
+
+    #close_session_modal .modal-footer .btn-secondary {
+      color: {{ floating_button_bg_color }} !important;
+    }
+
+    svg + label{
+      background-color: {{ floating_button_bg_color }} !important;
+    }
+    .easyassist-custom-dropdown-container li.easyassist-option-selected {
+        background: {{ floating_button_bg_color }} !important;
+    }
+
+    .modal-footer .btn-primary {
+      background: {{ floating_button_bg_color }} !important;
+      border-color: {{ floating_button_bg_color }} !important;
+    }
+
+    .modal-footer .btn-primary {
+      background: {{ floating_button_bg_color }} !important;
+      border-color: {{ floating_button_bg_color }} !important;
+    }
+
+    .modal-footer .btn-primary:hover {
+      background: {{ floating_button_bg_color }} !important;
+    }
+
+    .modal-footer .btn-secondary {
+      color: {{ floating_button_bg_color }} !important;
+    }
+
+    .loader-container {
+      height: 100%;
+      width: 100%;
+      position: absolute;
+      background: white;
+      font-size: 10px;
+    }
+
+    .loader-container .line {
+      width: 10px!important;
+      height: 10px!important;
+      background-color: {{ floating_button_bg_color }} !important;
+    }
+
+    .bg-grey{
+            background: grey;
+        }
+
+        #chat-minimize-icon-wrapper{
+        position: fixed;
+        right: 50px;
+        bottom: 50px;
+        cursor: pointer;
+        }
+
+        .minimize-chat-box-div{
+            width: 72px;
+            height: 72px;
+            position: fixed;
+            right: 50px;
+            bottom: 50px;
+            border-radius: 18px;
+            cursor: pointer;
+        }
+        .minimize-chat-box-div img{
+        max-width: 72px;
+        max-height: 72px;
+        }
+
+        .minimize-chat-box-div .default-icon{
+        width: 100%;
+        height: 100%;
+        background: {{floating_button_bg_color}};
+        border: 2.5px solid #FFFFFF;
+        box-shadow: 0px 8px 8px rgba(0, 32, 51, 0.04), 0px 12px 28px rgba(0, 32, 51, 0.12);
+        border-radius: 18px;
+        display: flex;
+        align-items:center;
+        justify-content: center;
+        }
+
+        .chat-svg-icon{
+            height: 36px;
+            width: 36px;
+        }
+
+        /* css for right side button/icon------- */
+
+        #chat-minimize-icon-wrapper .chat-talk-bubble {
+            display: block;
+            width: 240px;
+            height: auto;
+            background-color: #ffffff;
+            position: fixed;
+            bottom: 120px;
+            right: 135px;
+        }
+        #chat-minimize-icon-wrapper .border{
+            border: 2px solid {{floating_button_bg_color}} !important;;
+        }
+        #chat-minimize-icon-wrapper .round{
+            border-radius: 10px;
+                -webkit-border-radius: 10px;
+                -moz-border-radius: 10px;
+            }
+        
+        #chat-minimize-icon-wrapper .tri-right.border.btm-right-in:before {
+            content: ' ';
+            position: absolute;
+            width: 0;
+            height: 0;
+            left: auto;
+            right: -16px;
+            bottom: -2px;
+            border: 14px solid;
+            border-color: transparent transparent {{floating_button_bg_color}} transparent;
+        }
+        #chat-minimize-icon-wrapper .tri-right.btm-right-in:after {
+            content: ' ';
+            position: absolute;
+            width: 0;
+            height: 0;
+            left: auto;
+            right: -11px;
+            top: auto;
+            bottom: 0px;
+            border: 12px solid;
+            border-color: transparent transparent #ffffff transparent;
+        }
+        
+        #chat-minimize-icon-wrapper .tri-left.border.btm-left-in:before {
+            content: ' ';
+            position: absolute;
+            width: 0;
+            height: 0;
+            left: auto;
+            right: 222px;
+            bottom: -2px;
+            border: 14px solid;
+            border-color: transparent transparent {{floating_button_bg_color}} transparent;
+        }
+        #chat-minimize-icon-wrapper .tri-left.btm-left-in:after {
+            content: ' ';
+            position: absolute;
+            width: 0;
+            height: 0;
+            left: auto;
+            right: 223px;
+            top: auto;
+            bottom: 0px;
+            border: 12px solid;
+            border-color: transparent transparent #ffffff transparent;
+        }
+
+
+        /* talk bubble contents */
+        #chat-minimize-icon-wrapper .talktext{
+            padding: 8px 12px;
+            text-align: left;
+            font-size: 15px;
+            color: {{floating_button_bg_color}}!important;
+            display: flex;
+        }
+        
+        #chat-minimize-icon-wrapper .talktext p{
+            /* remove webkit p margins */
+            -webkit-margin-before: 0em;
+            -webkit-margin-after: 0em;
+            word-break: break-all;
+            word-wrap: break-word;
+            hyphens: auto;
+        }
+
+        /* open chat */
+        .animate__slideInUp {
+          -webkit-animation-name: slideInUp;
+          animation-name: slideInUp;
+        }
+        @keyframes slideInUp {
+          0% {
+              -webkit-transform: translate3d(0,100%,0);
+              transform: translate3d(0,100%,0);
+              visibility: visible;
+            }
+
+            100% {
+              -webkit-transform: translateZ(0);
+              transform: translateZ(0);
+              }
+            }
+
+            .allincall-scale-out-br {
+               -webkit-animation: allincall-scale-out-br 1s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
+                animation: allincall-scale-out-br 1s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
+            }
+                        
+            @keyframes allincall-scale-out-br {
+            0% {
+             -webkit-transform: scale(1);
+             transform: scale(1);
+             -webkit-transform-origin: 100% 100%;
+             transform-origin: 100% 100%;
+            opacity: 1;
+          }
+                        
+          100% {
+           -webkit-transform: scale(0);
+          transform: scale(0);
+           -webkit-transform-origin: 85% 90%;
+           transform-origin: 85% 90%;
+           opacity: 1;
+            }
+          }
+
+          /* close chat */
+          .allincall-scale-out-br-right-side {
+            -webkit-animation: allincall-scale-out-br-right-side 1s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
+            animation: allincall-scale-out-br-right-side 1s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
+            
+          }
+          
+          @keyframes allincall-scale-out-br-right-side {
+          0% {
+            -webkit-transform: scale(1);
+            transform: scale(1);
+            -webkit-transform-origin: -0% 100%;
+            transform-origin: 0% 100%;
+            opacity: 1;
+          }
+          
+          100% {
+            -webkit-transform: scale(0);
+            transform: scale(0);
+            -webkit-transform-origin: 15% 85%;
+            transform-origin: 15% 85%;
+            opacity: 1;
+          }
+          }
+        
+        #chat-minimize-icon-wrapper .close-bubble-container{
+            position: absolute;
+            width: 23px;
+            height: 23px;
+            right: -15px;
+            top: -32px;
+            border-radius: 13px;
+            background: #ffffff;
+            border: 1px solid {{floating_button_bg_color}}!important;
+            cursor: pointer;
+        }
+                
+        #chat-minimize-icon-wrapper .talk-bubble-icon {
+            display: block;
+            max-width: 247px;
+            height: auto;
+            background-color: #ffffff;
+            position: fixed;
+            bottom: 52%;
+            right: 60px;
+            margin-right: 1rem;
+        }
+
+        @media (max-width:520px) {
+            .chat-svg-icon{
+                height: 36px;
+                width: 36px;
+            }
+            #chat-minimize-icon-wrapper .chat-talk-bubble{
+            bottom: 65px;
+            right: 70px;
+            }
+            
+            .minimize-chat-box-div{
+            right: 30px;
+            bottom: 40px;
+            }
+        }
+
+        @media (max-width:440px) {
+            #chat-minimize-icon-wrapper .chat-talk-bubble {
+                max-width: 170px;
+            }
+        }
+
+        /* @media (min-width:520px) and (max-height:800px) {
+        .minimize-chat-box-div{
+            width: 64px;
+            height: 64px;
+        }
+
+        #chat-minimize-icon-wrapper .talk-bubble{
+            bottom: 115px;
+            right: 130px;
+        }
+        } */
+
+
+        /* css for setting page */
+
+        .default-chat-icon{
+        width: 90px !important;
+        height: 90px !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        margin: 15px 0;
+        }
+
+        .default-chat-icon img{
+        width: 90px;
+        height: 90px;
+        padding: 10px;
+        }
+
+        #new-image-div img{
+        cursor: pointer;
+        }
+
+        #new-image-div{
+        border: 1px solid #2F80ED;
+        }
+
+        /* .remove-uploaded-icon{
+        display: flex;
+        cursor: pointer;
+        } */
+
+        .remove-uploaded-icon{
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items:center;
+        justify-content: center;
+        background: #f8f8f8;
+        filter: drop-shadow(0px 0px 2px rgba(0, 0, 0, 0.13));
+        border-radius: 12px;
+        cursor: pointer;
+        position: absolute;
+        top: -10px;
+        right: 27px;
+        /* display: none; */
+        }
+
+        .minimize-chat-div{
+        width: 30px;
+        height: 30px;
+        border-radius: 15px;
+        background: #f8f8f8;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        position: absolute !important;
+        right: 20px;
+        bottom: 20px;
+        opacity: 1 !important;
+        }
+
+        .agent-name{
+        width: 100px;
+        }
+
+        .truncate {
+        display: inline-block;
+        /* width: 10px; */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-bottom: 0;
+        }
+
+    {% if is_mobile %}
+       @media (orientation: landscape) {
+        .easyassist-custom-nav-bar_wrapper #cobrowse-voip-container {
+            margin-top: 0em!important;
+            top: 5em!important;
+            position: absolute;
+        }
+      }
+
+      @media (orientation: portrait) {
+        #cobrowse-voip-container {
+          margin-top: 0em!important;
+          top: 5em!important;
+          position: absolute;
+        }
+      }
+    {% endif %}
+
+    .menu-end-session-btn {
+      background: {{ floating_button_bg_color }}!important;
+    }
+
+    .easyassist-custom-dropdown-container li:hover {
+      background:  {{ floating_button_bg_color }} !important;
+    }
+</style>
+<body style="margin: unset;" oncontextmenu="return false">
+<input type = "hidden" value = {{agent_name}} id = "agent_name">
+{% csrf_token %}
+<div class="easyassist-custom-{{ floating_button_position }}-nav-bar_wrapper">
+  {% if is_mobile == True %}
+
+  {% else %}
+
+    {% if floating_button_position == "top" or floating_button_position == "bottom" %}
+      <div id="mySidenav" class="easyassist-custom-{{ floating_button_position }}-nav-bar" onmouseover="on_agent_mouse_over_nav_bar(this)" onmouseout="on_agent_mouse_out_nav_bar(this)">
+          <a href="javascript:void(0)" class="closebtn" onclick="closeNav()" onmouseover="easyassistChangeTooltipShow(this)" onmouseout="easyassistChangeTooltipHide(this)">
+              <svg class="minimize-icon-rotate" width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M11.6044 8L6.76923 3L1.93407 8L-4.37114e-08 7L6.76923 -2.95892e-07L13.5385 7L11.6044 8Z" fill="{{floating_button_bg_color}}"/>
+              </svg>
+              <label>
+                  <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M-2.62268e-07 6L7.5 0.803848L7.5 11.1962L-2.62268e-07 6Z" fill="{{ floating_button_bg_color }}"/>
+                  </svg>
+                  <span>Minimise</span>
+              </label>
+          </a>
+  {% else %}
+      <div id="mySidenav" class="easyassist-custom-{{ floating_button_position }}-nav-bar" onmouseover="on_agent_mouse_over_nav_bar(this)" onmouseout="on_agent_mouse_out_nav_bar(this)">
+          <a href="javascript:void(0)" class="closebtn" onclick="closeNav()" onmouseover="easyassistChangeTooltipShow(this)" onmouseout="easyassistChangeTooltipHide(this)">
+              <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M11.6044 8L6.76923 3L1.93407 8L-4.37114e-08 7L6.76923 -2.95892e-07L13.5385 7L11.6044 8Z" fill="{{floating_button_bg_color}}"/>
+              </svg>
+              <label>
+                  <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M-2.62268e-07 6L7.5 0.803848L7.5 11.1962L-2.62268e-07 6Z" fill="{{ floating_button_bg_color }}"/>
+                  </svg>
+                  <span>Minimise</span>
+              </label>
+          </a>
+  {% endif %}
+
+    {% if enable_chat_functionality and enable_chat_bubble == False %}
+    <a href="javascript:void(0)" onclick="open_livechat_agent_window()" onmouseover="easyassistChangeTooltipShow(this)" onmouseout="easyassistChangeTooltipHide(this)">
+      <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg" >
+        <path d="M8.5 0C13.1944 0 17 3.80501 17 8.49873C17 13.1925 13.1944 16.9975 8.5 16.9975C7.10562 16.9975 5.75889 16.6609 4.55241 16.0271L0.905575 16.9765C0.519433 17.0771 0.124868 16.8456 0.0242893 16.4595C-0.00681194 16.3401 -0.00681557 16.2148 0.0242652 16.0954L0.973164 12.4509C0.337619 11.2433 0 9.89489 0 8.49873C0 3.80501 3.80558 0 8.5 0ZM9.56395 9.3486H5.7375L5.651 9.35442C5.33983 9.39663 5.1 9.66331 5.1 9.98601C5.1 10.3087 5.33983 10.5754 5.651 10.6176L5.7375 10.6234H9.56395L9.65045 10.6176C9.96162 10.5754 10.2014 10.3087 10.2014 9.98601C10.2014 9.66331 9.96162 9.39663 9.65045 9.35442L9.56395 9.3486ZM11.2625 6.37405H5.7375L5.651 6.37987C5.33983 6.42207 5.1 6.68876 5.1 7.01145C5.1 7.33415 5.33983 7.60083 5.651 7.64304L5.7375 7.64886H11.2625L11.349 7.64304C11.6602 7.60083 11.9 7.33415 11.9 7.01145C11.9 6.68876 11.6602 6.42207 11.349 6.37987L11.2625 6.37405Z" fill="{{floating_button_bg_color}}"/>
+      </svg>
+      <label>
+        <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M-2.62268e-07 6L7.5 0.803848L7.5 11.1962L-2.62268e-07 6Z" fill="{{ floating_button_bg_color }}"/>
+        </svg>
+        {% if is_agent == True%}
+        <span>Chat with the Customer</span>
+        {% else %}
+        <span>Chat with the Agent</span>
+        {% endif %}
+      </label>
+    </a>
+    {% endif %}
+    {% if is_agent == True %}
+      {% if enable_voip_with_video_calling %}
+        <a href="javascript:void(0)" data-toggle="modal" style="display: none;" id="request-cobrowsing-meeting-btn-invited-agent" onclick="hide_cobrowsing_modals(this);open_call_joining_modal();" onmouseover="easyassistChangeTooltipShow(this)" onmouseout="easyassistChangeTooltipHide(this)">
+          <svg width="17" height="13" viewBox="0 0 17 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11.9 10.1833C11.9 11.7389 10.6632 13 9.1375 13H2.7625C1.23681 13 0 11.7389 0 10.1833V2.81667C0 1.26106 1.23681 0 2.7625 0H9.1375C10.6632 0 11.9 1.26106 11.9 2.81667V10.1833ZM16.7977 1.20756C16.9283 1.36425 17 1.56319 17 1.76883V11.231C17 11.7096 16.6194 12.0976 16.15 12.0976C15.9483 12.0976 15.7532 12.0245 15.5995 11.8913L12.75 9.42148V3.57754L15.5995 1.10846C15.9572 0.798477 16.4937 0.842848 16.7977 1.20756Z" fill="{{floating_button_bg_color}}"/>
+          </svg>
+          <label>
+              <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M-2.62268e-07 6L7.5 0.803848L7.5 11.1962L-2.62268e-07 6Z" fill="{{ floating_button_bg_color }}"/>
+              </svg>
+              <span>Video Call</span>
+          </label>
+        </a>
+      {% elif enable_voip_calling %}
+        <a href="javascript:void(0)" data-toggle="modal" style="display: none;" id="request-cobrowsing-meeting-btn-invited-agent" onclick="hide_cobrowsing_modals(this);open_call_joining_modal();" onmouseover="easyassistChangeTooltipShow(this)" onmouseout="easyassistChangeTooltipHide(this)">
+          <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg" id="voip-call-icon">
+              <path d="M16.065 11.6922C14.9033 11.6922 13.7794 11.5033 12.7311 11.1633C12.5669 11.1077 12.3903 11.0994 12.2216 11.1395C12.0529 11.1796 11.8989 11.2664 11.7772 11.39L10.2944 13.2506C7.62167 11.9756 5.11889 9.56722 3.78722 6.8L5.62889 5.23222C5.88389 4.96778 5.95944 4.59944 5.85556 4.26889C5.50611 3.22056 5.32667 2.09667 5.32667 0.935C5.32667 0.425 4.90167 0 4.39167 0H1.12389C0.613889 0 0 0.226667 0 0.935C0 9.70889 7.30056 17 16.065 17C16.7356 17 17 16.405 17 15.8856V12.6272C17 12.1172 16.575 11.6922 16.065 11.6922Z" fill="{{floating_button_bg_color}}"/>
+          </svg>
+          <svg width="17" height="17" viewBox="0 0 22 21" fill="none" xmlns="http://www.w3.org/2000/svg" id="voip-calling-icon" style="display: none;">
+              <path d="M16.065 15.6922C14.9033 15.6922 13.7794 15.5033 12.7311 15.1633C12.5669 15.1077 12.3903 15.0994 12.2216 15.1395C12.0529 15.1796 11.8989 15.2664 11.7772 15.39L10.2944 17.2506C7.62167 15.9756 5.11889 13.5672 3.78722 10.8L5.62889 9.23222C5.88389 8.96778 5.95944 8.59944 5.85556 8.26889C5.50611 7.22056 5.32667 6.09667 5.32667 4.935C5.32667 4.425 4.90167 4 4.39167 4H1.12389C0.613889 4 0 4.22667 0 4.935C0 13.7089 7.30056 21 16.065 21C16.7356 21 17 20.405 17 19.8856V16.6272C17 16.1172 16.575 15.6922 16.065 15.6922Z" fill="{{ floating_button_bg_color }}"/>
+              <path d="M19.2891 11.0679C18.6949 5.772 14.0939 1.87804 8.77448 2.16523C8.57445 2.17603 8.42184 2.35187 8.43718 2.55176L8.51883 3.61444C8.53335 3.80515 8.69642 3.94702 8.88731 3.93754C13.2516 3.72289 17.0146 6.90819 17.5226 11.249C17.5447 11.4389 17.7117 11.5761 17.902 11.5592L18.9636 11.4645C19.1631 11.4465 19.3114 11.267 19.2891 11.0679ZM11.1886 9.97458C10.5984 9.47489 9.70688 9.55798 9.197 10.1602C8.68712 10.7624 8.75218 11.6554 9.34233 12.1551C9.93248 12.6548 10.824 12.5717 11.3339 11.9695C11.8438 11.3673 11.7787 10.4743 11.1886 9.97458ZM15.7777 11.4154C15.3237 8.04975 12.4014 5.57866 9.01076 5.6858C8.80758 5.69218 8.65116 5.86947 8.66733 6.07211L8.75203 7.13796C8.76681 7.32362 8.92231 7.46698 9.10861 7.46327C11.5569 7.41367 13.6546 9.19448 14.0083 11.6118C14.0354 11.7962 14.2023 11.9261 14.388 11.9099L15.4532 11.8177C15.6559 11.8004 15.8049 11.6165 15.7777 11.4154Z" fill="{{ floating_button_bg_color }}"/>
+          </svg>
+          <label>
+              <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M-2.62268e-07 6L7.5 0.803848L7.5 11.1962L-2.62268e-07 6Z" fill="{{ floating_button_bg_color }}"/>
+              </svg>
+              <span>Voice Call</span>
+          </label>
+        </a>
+      {% elif allow_cobrowsing_meeting %}
+        <a href="javascript:void(0)" data-toggle="modal" style="display: none;" id="request-cobrowsing-meeting-btn-invited-agent" onclick="hide_cobrowsing_modals(this);open_call_joining_modal();" onmouseover="easyassistChangeTooltipShow(this)" onmouseout="easyassistChangeTooltipHide(this)">
+          <svg width="17" height="13" viewBox="0 0 17 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11.9 10.1833C11.9 11.7389 10.6632 13 9.1375 13H2.7625C1.23681 13 0 11.7389 0 10.1833V2.81667C0 1.26106 1.23681 0 2.7625 0H9.1375C10.6632 0 11.9 1.26106 11.9 2.81667V10.1833ZM16.7977 1.20756C16.9283 1.36425 17 1.56319 17 1.76883V11.231C17 11.7096 16.6194 12.0976 16.15 12.0976C15.9483 12.0976 15.7532 12.0245 15.5995 11.8913L12.75 9.42148V3.57754L15.5995 1.10846C15.9572 0.798477 16.4937 0.842848 16.7977 1.20756Z" fill="{{floating_button_bg_color}}"/>
+          </svg>
+          <label>
+              <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M-2.62268e-07 6L7.5 0.803848L7.5 11.1962L-2.62268e-07 6Z" fill="{{ floating_button_bg_color }}"/>
+              </svg>
+              <span>Video Call</span>
+          </label>
+        </a>
+      {% endif %}
+    {% endif %}
+
+    {% if enable_edit_access and is_agent == False %}
+    <a href="javascript:void(0)" id="easyassist-edit-access-icon" data-toggle="modal" data-target="#request_for_edit_access_modal" onmouseover="easyassistChangeTooltipShow(this)" onmouseout="easyassistChangeTooltipHide(this)">
+      <svg width="15" height="18" viewBox="0 0 15 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M1.67131 0C0.752089 0 0 0.771429 0 1.71429V15.4286C0 16.3714 0.752089 17.1429 1.67131 17.1429H5.01393V15.5143L13.3705 6.94286V5.14286L8.35655 0H1.67131ZM7.52089 1.28571L12.117 6H7.52089V1.28571ZM13.454 9.42857C13.3705 9.42857 13.2033 9.51429 13.1198 9.6L12.2841 10.4571L14.039 12.2571L14.8747 11.4C15.0418 11.2286 15.0418 10.8857 14.8747 10.7143L13.7883 9.6C13.7047 9.51429 13.6212 9.42857 13.454 9.42857ZM11.7827 10.9714L6.68524 16.2V18H8.44011L13.5376 12.7714L11.7827 10.9714Z" fill="{{floating_button_bg_color}}"/>
+      </svg>
+      <label>
+        <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M-2.62268e-07 6L7.5 0.803848L7.5 11.1962L-2.62268e-07 6Z" fill="{{ floating_button_bg_color }}"/>
+        </svg>
+        <span>Request for edit access</span>
+      </label>
+    </a>
+    {% endif %}
+
+    <hr style="color: black;width: 30px;margin: 0.3rem auto;">
+
+    <a href="javascript:void(0)"  onmouseover="easyassistChangeTooltipShow(this)" onmouseout="easyassistChangeTooltipHide(this)">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"
+      onclick="open_close_session_modal()">
+      <path fill="#D70000" d="M11 1.83325C16.0626 1.83325 20.1666 5.93731 20.1666 10.9999C20.1666 16.0625 16.0626 20.1666 11 20.1666C5.93737 20.1666 1.83331 16.0625 1.83331 10.9999C1.83331 5.93731 5.93737 1.83325 11 1.83325ZM14.2361 7.76378L14.159 7.69722C13.9198 7.51971 13.5914 7.51751 13.35 7.69064L13.2638 7.76378L11 10.0273L8.73612 7.76378L8.65901 7.69722C8.41977 7.51971 8.0914 7.51751 7.84997 7.69064L7.76384 7.76378L7.69728 7.84089C7.51977 8.08013 7.51757 8.40849 7.6907 8.64993L7.76384 8.73605L10.0274 10.9999L7.76384 13.2638L7.69728 13.3409C7.51977 13.5801 7.51757 13.9085 7.6907 14.1499L7.76384 14.2361L7.84095 14.3026C8.08019 14.4801 8.40855 14.4823 8.64999 14.3092L8.73612 14.2361L11 11.9725L13.2638 14.2361L13.341 14.3026C13.5802 14.4801 13.9086 14.4823 14.15 14.3092L14.2361 14.2361L14.3027 14.1589C14.4802 13.9197 14.4824 13.5913 14.3093 13.3499L14.2361 13.2638L11.9726 10.9999L14.2361 8.73605L14.3027 8.65895C14.4802 8.41971 14.4824 8.09134 14.3093 7.8499L14.2361 7.76378L14.159 7.69722L14.2361 7.76378Z" easyassist_avoid_sync="true"></path>
+      </svg>
+      <label style="background-color: #D70000 !important">
+        <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M-2.62268e-07 6L7.5 0.803848L7.5 11.1962L-2.62268e-07 6Z" fill="#D70000"/>
+        </svg>
+        {% if is_agent == True %}
+        <span>Leave Session</span>
+        {% else %}
+        <span>End Session</span>
+        {% endif %}
+      </label>
+    </a>
+  </div>
+
+  {% if floating_button_position == "top" or floating_button_position == "bottom" %}
+    <div id="maximise-button" class="inner" style="display:none; background: none;">
+        <div id="minimize-button" class="easyassist-custom-{{ floating_button_position }}-nav-bar">
+            <a href="javascript:void(0)" class="closebtn" onclick="openNav()"  onmouseover="easyassistChangeTooltipShow(this)" onmouseout="easyassistChangeTooltipHide(this)">
+                <svg class="maximize-icon-rotate" width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.93418 -5.07244e-07L6.76934 5L11.6045 -8.45407e-08L13.5386 1L6.76934 8L0.000113444 0.999999L1.93418 -5.07244e-07Z" fill="{{ floating_button_bg_color }}"/>
+                </svg>
+                <label>
+                    <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M-2.62268e-07 6L7.5 0.803848L7.5 11.1962L-2.62268e-07 6Z" fill="{{ floating_button_bg_color }}"/>
+                    </svg>
+                    <span>Maximise</span>
+                </label>
+            </a>
+        </div>
+    </div>
+  {% else %}
+    <div id="maximise-button" class="inner" style="display:none; background: none;">
+        <div id="minimize-button" class="easyassist-custom-{{ floating_button_position }}-nav-bar">
+            <a href="javascript:void(0)" class="closebtn" onclick="openNav()" onmouseover="easyassistChangeTooltipShow(this)" onmouseout="easyassistChangeTooltipHide(this)">
+                <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.93418 -5.07244e-07L6.76934 5L11.6045 -8.45407e-08L13.5386 1L6.76934 8L0.000113444 0.999999L1.93418 -5.07244e-07Z" fill="{{ floating_button_bg_color }}"/>
+                </svg>
+                <label>
+                    <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M-2.62268e-07 6L7.5 0.803848L7.5 11.1962L-2.62268e-07 6Z" fill="{{ floating_button_bg_color }}"/>
+                    </svg>
+                    <span>Maximise</span>
+                </label>
+            </a>
+        </div>
+    </div>
+  {% endif %}
+
+{% endif %}
+</div>
+
+{% if enable_voip_with_video_calling %}
+<div id="cobrowse-voip-container" style="display: none;">
+  <button class="agent-meeting-mic-btn" type="button" id="agent-meeting-mic-on-btn" onclick="toggle_agent_voice(this, true)" style="display: none;" onmouseover="easyassistChangeTooltipShow(this)" onmouseout="easyassistChangeTooltipHide(this)">
+    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M1.33597 0.721564C1.16629 0.55188 0.891186 0.551878 0.721503 0.721557C0.551819 0.891237 0.551816 1.16635 0.721496 1.33603L4.07021 4.68481V6.38759C4.07021 7.66741 5.10771 8.70491 6.38753 8.70491C6.87038 8.70491 7.31874 8.55723 7.6899 8.30457L8.35376 8.96844C7.84603 9.34868 7.2155 9.5739 6.53236 9.5739H6.2427L6.11733 9.57136C4.4957 9.50562 3.20122 8.17019 3.20122 6.53242V6.24276L3.19725 6.1838C3.16848 5.97172 2.98669 5.80826 2.76672 5.80826C2.52676 5.80826 2.33223 6.00279 2.33223 6.24276V6.53242L2.33458 6.66934C2.40339 8.66902 3.9736 10.2874 5.95304 10.4323L5.95303 11.7464L5.957 11.8053C5.98577 12.0174 6.16756 12.1809 6.38753 12.1809C6.62749 12.1809 6.82203 11.9864 6.82203 11.7464L6.82259 10.4323C7.63306 10.3728 8.3749 10.0663 8.97313 9.58783L11.439 12.0537C11.6086 12.2234 11.8837 12.2234 12.0534 12.0537C12.2231 11.884 12.2231 11.6089 12.0534 11.4392L1.33597 0.721564ZM7.05738 7.67204C6.85706 7.77672 6.62921 7.83591 6.38753 7.83591C5.58764 7.83591 4.93921 7.18748 4.93921 6.38759V5.55382L7.05738 7.67204Z" fill="white"/>
+        <path d="M7.83585 2.91162V5.9926L8.66436 6.82113C8.69094 6.68069 8.70484 6.53576 8.70484 6.38759V2.91162C8.70484 1.6318 7.66735 0.594299 6.38753 0.594299C5.31701 0.594299 4.41603 1.32021 4.14997 2.30665L4.93921 3.0959V2.91162C4.93921 2.11173 5.58764 1.46329 6.38753 1.46329C7.18742 1.46329 7.83585 2.11173 7.83585 2.91162Z" fill="white"/>
+        <path d="M9.39781 7.55459L10.0617 8.21848C10.306 7.70796 10.4428 7.13617 10.4428 6.53242V6.24276L10.4389 6.1838C10.4101 5.97172 10.2283 5.80826 10.0083 5.80826C9.76837 5.80826 9.57384 6.00279 9.57384 6.24276V6.53242L9.5713 6.65779C9.55859 6.97128 9.49843 7.27254 9.39781 7.55459Z" fill="white"/>
+    </svg>
+    <label>
+      <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M-2.62268e-07 6L7.5 0.803848L7.5 11.1962L-2.62268e-07 6Z" fill="{{ floating_button_bg_color }}"/>
+      </svg>
+      <span>Turn on microphone</span>
+    </label>
+  </button>
+  
+  <button class="agent-meeting-mic-btn" type="button" id="agent-meeting-mic-off-btn" onclick="toggle_agent_voice(this, false)" onmouseover="easyassistChangeTooltipShow(this)" onmouseout="easyassistChangeTooltipHide(this)">
+    <svg width="9" height="12" viewBox="0 0 9 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4.5 0C3.10203 0 1.96875 1.00736 1.96875 2.25001V6.25003C1.96875 7.49268 3.10203 8.50004 4.5 8.50004C5.89797 8.50004 7.03125 7.49268 7.03125 6.25003V2.25001C7.03125 1.00736 5.89797 0 4.5 0ZM2.8125 2.25001C2.8125 1.42158 3.56802 0.750004 4.5 0.750004C5.43198 0.750004 6.1875 1.42158 6.1875 2.25001V6.25003C6.1875 7.07846 5.43198 7.75004 4.5 7.75004C3.56802 7.75004 2.8125 7.07846 2.8125 6.25003V2.25001Z" fill="white"/>
+        <path d="M0.84375 5.87527C0.84375 5.66817 0.65487 5.50027 0.421875 5.50027C0.18888 5.50027 0 5.66838 0 5.87548V6.24999C0 8.33268 1.79067 10.0436 4.07813 10.2327V11.625C4.07813 11.8321 4.26701 12 4.5 12C4.733 12 4.92188 11.8321 4.92188 11.625V10.2327C7.20934 10.0436 9 8.33268 9 6.24999V5.87528C9 5.66817 8.81112 5.50028 8.57812 5.50028C8.34513 5.50028 8.15625 5.6683 8.15625 5.8754V6.24999C8.15625 8.04492 6.51929 9.50001 4.5 9.50001C2.48071 9.50001 0.84375 8.04471 0.84375 6.24978V5.87527Z" fill="white"/>
+    </svg>
+    <label>
+      <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M-2.62268e-07 6L7.5 0.803848L7.5 11.1962L-2.62268e-07 6Z" fill="{{ floating_button_bg_color }}"/>
+      </svg>
+      <span>Turn off microphone</span>
+    </label>
+  </button>
+  {% if is_agent == False %}
+  <button class="agent-meeting-end-btn" type="button" onclick="end_cobrowse_video_meet()" onmouseover="easyassistChangeTooltipShow(this)" onmouseout="easyassistChangeTooltipHide(this)">
+    <svg width="13" height="5" viewBox="0 0 13 5" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12.1528 3.3789L12.0384 3.97941C11.9313 4.54213 11.4055 4.92001 10.8098 4.86244L9.62424 4.74788C9.10762 4.69796 8.66745 4.33102 8.53601 3.84069L8.17026 2.47623C7.62889 2.25423 7.03222 2.15276 6.38025 2.17182C5.72828 2.19088 5.12184 2.32752 4.56093 2.58175L4.33437 3.85902C4.24849 4.34316 3.84901 4.70429 3.34307 4.75516L2.16441 4.87366C1.5763 4.93279 1.01242 4.55857 0.845229 3.99819L0.66606 3.39764C0.487718 2.79987 0.64687 2.17079 1.08386 1.74619C2.11552 0.743789 3.83556 0.241029 6.24398 0.237899C8.6559 0.234793 10.4295 0.734491 11.5648 1.73701C12.0424 2.15885 12.2661 2.78345 12.1528 3.3789Z" fill="white"/>
+    </svg>
+    <label>
+      <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M-2.62268e-07 6L7.5 0.803848L7.5 11.1962L-2.62268e-07 6Z" fill="{{ floating_button_bg_color }}"/>
+      </svg>
+      <span>End Call</span>
+    </label>
+  </button>
+  {% endif %}
+
+  <button class="agent-meeting-mic-btn" type="button" id="agent-meeting-video-on-btn" onclick="toggle_agent_video(this, true)" onmouseover="easyassistChangeTooltipShow(this)" onmouseout="easyassistChangeTooltipHide(this)">
+    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M1.33573 1.06458C1.16605 0.894898 0.890942 0.894895 0.721258 1.06457C0.551575 1.23425 0.551572 1.50936 0.721252 1.67905L1.62904 2.58685C1.01503 2.89701 0.593994 3.53357 0.593994 4.26846V9.19276C0.593994 10.2326 1.43696 11.0756 2.47681 11.0756H7.40111C8.13596 11.0756 8.77249 10.6546 9.08267 10.0406L11.4387 12.3967C11.6084 12.5664 11.8835 12.5664 12.0532 12.3967C12.2229 12.227 12.2229 11.9519 12.0532 11.7823L1.33573 1.06458ZM8.40133 9.35927C8.32189 9.83997 7.90431 10.2066 7.40111 10.2066H2.47681C1.91689 10.2066 1.46299 9.75268 1.46299 9.19276V4.26846C1.46299 3.76522 1.82965 3.34761 2.3104 3.26823L8.40133 9.35927Z" fill="white"/>
+        <path d="M8.41494 6.91496V4.26846C8.41494 3.70854 7.96103 3.25463 7.40111 3.25463H4.75468L3.88571 2.38564H7.40111C8.44096 2.38564 9.28393 3.22861 9.28393 4.26846V4.36868L11.5224 3.0258C11.812 2.85192 12.1806 3.06052 12.1806 3.39831V10.0617C12.1806 10.2364 12.0821 10.3765 11.9469 10.447L11.3116 9.81166V4.16598L9.28393 5.38338V7.78397L8.41494 6.91496Z" fill="white"/>
+    </svg>
+    <label>
+      <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M-2.62268e-07 6L7.5 0.803848L7.5 11.1962L-2.62268e-07 6Z" fill="{{ floating_button_bg_color }}"/>
+      </svg>
+      <span>Turn on camera</span>
+    </label>
+  </button>
+
+  <button class="agent-meeting-mic-btn" type="button" id="agent-meeting-video-off-btn" onclick="toggle_agent_video(this, false)" style="display: none;" onmouseover="easyassistChangeTooltipShow(this)" onmouseout="easyassistChangeTooltipHide(this)">
+    <svg width="14" height="11" viewBox="0 0 14 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8.225 0C9.48145 0 10.5 1.06705 10.5 2.38333V2.5102L13.2048 0.810331C13.5547 0.590233 14 0.854285 14 1.28187V9.71667C14 10.1442 13.5548 10.4082 13.2049 10.1883L10.5 8.48833V8.61667C10.5 9.93295 9.48145 11 8.225 11H2.275C1.01855 11 0 9.93295 0 8.61667V2.38333C0 1.06705 1.01855 0 2.275 0H8.225ZM8.225 1.1H2.275C1.59845 1.1 1.05 1.67457 1.05 2.38333V8.61667C1.05 9.32543 1.59845 9.9 2.275 9.9H8.225C8.90155 9.9 9.45 9.32543 9.45 8.61667V2.38333C9.45 1.67457 8.90155 1.1 8.225 1.1ZM12.95 2.25361L10.5 3.79463V7.20526L12.95 8.74526V2.25361Z" fill="white"/>
+    </svg>
+    <label>
+      <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M-2.62268e-07 6L7.5 0.803848L7.5 11.1962L-2.62268e-07 6Z" fill="{{ floating_button_bg_color }}"/>
+      </svg>
+      <span>Turn off camera</span>
+    </label>
+  </button>
+
+  <button onclick="toggle_meeting_iframe_visibility();" class="show-cobrowse-meeting-btn">
+    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10 10L5.9375 10L7.5 8.4375L5.625 6.5625L6.5625 5.625L8.4375 7.5L10 5.9375L10 10ZM3.4375 4.375L1.5625 2.5L-1.77578e-07 4.0625L0 -4.37114e-07L4.0625 -2.59536e-07L2.5 1.5625L4.375 3.4375L3.4375 4.375Z" fill="#B4B4B4"/>
+    </svg>
+  </button>
+
+  <div id="cobrowse-meeting-iframe-container" style="display: none;">
+    <iframe title="CoBroswing meeting iframe" style="width: 100%; height: 100%;" allow="camera *;microphone *">
+    </iframe>
+
+    <div class="cobrowse-meeting-video-container">
+      <video autoplay="true" id="cobrowse-meeting-video-element">
+      </video>
+    </div>
+  </div>
+  <div class="gy-loader loader-container" id="easyassist-voip-loader" style="display: none;">
+    <div>
+      <div class="line"></div>
+      <div class="line"></div>
+      <div class="line"></div>
+    </div>
+  </div>
+</div>
+{% elif enable_voip_calling %}
+<div id="cobrowse-voip-container" style="display: none;">
+    <button class="agent-meeting-mic-btn" type="button" id="agent-meeting-mic-on-btn" onclick="toggle_agent_voice(this, true)" style="display: none;">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M1.33597 0.721564C1.16629 0.55188 0.891186 0.551878 0.721503 0.721557C0.551819 0.891237 0.551816 1.16635 0.721496 1.33603L4.07021 4.68481V6.38759C4.07021 7.66741 5.10771 8.70491 6.38753 8.70491C6.87038 8.70491 7.31874 8.55723 7.6899 8.30457L8.35376 8.96844C7.84603 9.34868 7.2155 9.5739 6.53236 9.5739H6.2427L6.11733 9.57136C4.4957 9.50562 3.20122 8.17019 3.20122 6.53242V6.24276L3.19725 6.1838C3.16848 5.97172 2.98669 5.80826 2.76672 5.80826C2.52676 5.80826 2.33223 6.00279 2.33223 6.24276V6.53242L2.33458 6.66934C2.40339 8.66902 3.9736 10.2874 5.95304 10.4323L5.95303 11.7464L5.957 11.8053C5.98577 12.0174 6.16756 12.1809 6.38753 12.1809C6.62749 12.1809 6.82203 11.9864 6.82203 11.7464L6.82259 10.4323C7.63306 10.3728 8.3749 10.0663 8.97313 9.58783L11.439 12.0537C11.6086 12.2234 11.8837 12.2234 12.0534 12.0537C12.2231 11.884 12.2231 11.6089 12.0534 11.4392L1.33597 0.721564ZM7.05738 7.67204C6.85706 7.77672 6.62921 7.83591 6.38753 7.83591C5.58764 7.83591 4.93921 7.18748 4.93921 6.38759V5.55382L7.05738 7.67204Z" fill="white"/>
+          <path d="M7.83585 2.91162V5.9926L8.66436 6.82113C8.69094 6.68069 8.70484 6.53576 8.70484 6.38759V2.91162C8.70484 1.6318 7.66735 0.594299 6.38753 0.594299C5.31701 0.594299 4.41603 1.32021 4.14997 2.30665L4.93921 3.0959V2.91162C4.93921 2.11173 5.58764 1.46329 6.38753 1.46329C7.18742 1.46329 7.83585 2.11173 7.83585 2.91162Z" fill="white"/>
+          <path d="M9.39781 7.55459L10.0617 8.21848C10.306 7.70796 10.4428 7.13617 10.4428 6.53242V6.24276L10.4389 6.1838C10.4101 5.97172 10.2283 5.80826 10.0083 5.80826C9.76837 5.80826 9.57384 6.00279 9.57384 6.24276V6.53242L9.5713 6.65779C9.55859 6.97128 9.49843 7.27254 9.39781 7.55459Z" fill="white"/>
+      </svg>
+      <label>
+        <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M-2.62268e-07 6L7.5 0.803848L7.5 11.1962L-2.62268e-07 6Z" fill="{{ floating_button_bg_color }}"/>
+        </svg>
+        <span>Turn on microphone</span>
+      </label>
+    </button>
+    
+    <button class="agent-meeting-mic-btn" type="button" id="agent-meeting-mic-off-btn" onclick="toggle_agent_voice(this, false)">
+      <svg width="9" height="12" viewBox="0 0 9 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4.5 0C3.10203 0 1.96875 1.00736 1.96875 2.25001V6.25003C1.96875 7.49268 3.10203 8.50004 4.5 8.50004C5.89797 8.50004 7.03125 7.49268 7.03125 6.25003V2.25001C7.03125 1.00736 5.89797 0 4.5 0ZM2.8125 2.25001C2.8125 1.42158 3.56802 0.750004 4.5 0.750004C5.43198 0.750004 6.1875 1.42158 6.1875 2.25001V6.25003C6.1875 7.07846 5.43198 7.75004 4.5 7.75004C3.56802 7.75004 2.8125 7.07846 2.8125 6.25003V2.25001Z" fill="white"/>
+          <path d="M0.84375 5.87527C0.84375 5.66817 0.65487 5.50027 0.421875 5.50027C0.18888 5.50027 0 5.66838 0 5.87548V6.24999C0 8.33268 1.79067 10.0436 4.07813 10.2327V11.625C4.07813 11.8321 4.26701 12 4.5 12C4.733 12 4.92188 11.8321 4.92188 11.625V10.2327C7.20934 10.0436 9 8.33268 9 6.24999V5.87528C9 5.66817 8.81112 5.50028 8.57812 5.50028C8.34513 5.50028 8.15625 5.6683 8.15625 5.8754V6.24999C8.15625 8.04492 6.51929 9.50001 4.5 9.50001C2.48071 9.50001 0.84375 8.04471 0.84375 6.24978V5.87527Z" fill="white"/>
+      </svg>
+      <label>
+        <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M-2.62268e-07 6L7.5 0.803848L7.5 11.1962L-2.62268e-07 6Z" fill="{{ floating_button_bg_color }}"/>
+        </svg>
+        <span>Turn off microphone</span>
+      </label>
+    </button>
+    
+    {% if is_agent == False %}
+    <button class="agent-meeting-end-btn" type="button" onclick="end_cobrowse_video_meet()" onmouseover="easyassistChangeTooltipShow(this)" onmouseout="easyassistChangeTooltipHide(this)">
+      <svg width="13" height="5" viewBox="0 0 13 5" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12.1528 3.3789L12.0384 3.97941C11.9313 4.54213 11.4055 4.92001 10.8098 4.86244L9.62424 4.74788C9.10762 4.69796 8.66745 4.33102 8.53601 3.84069L8.17026 2.47623C7.62889 2.25423 7.03222 2.15276 6.38025 2.17182C5.72828 2.19088 5.12184 2.32752 4.56093 2.58175L4.33437 3.85902C4.24849 4.34316 3.84901 4.70429 3.34307 4.75516L2.16441 4.87366C1.5763 4.93279 1.01242 4.55857 0.845229 3.99819L0.66606 3.39764C0.487718 2.79987 0.64687 2.17079 1.08386 1.74619C2.11552 0.743789 3.83556 0.241029 6.24398 0.237899C8.6559 0.234793 10.4295 0.734491 11.5648 1.73701C12.0424 2.15885 12.2661 2.78345 12.1528 3.3789Z" fill="white"/>
+      </svg>
+      <label>
+        <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M-2.62268e-07 6L7.5 0.803848L7.5 11.1962L-2.62268e-07 6Z" fill="{{ floating_button_bg_color }}"/>
+        </svg>
+        <span>End Call</span>
+      </label>
+    </button>
+    {% endif %}
+
+    <div id="cobrowse-meeting-iframe-container" style="display: none;">
+      <iframe title="CoBroswing meeting iframe" style="width: 100%; height: 100%;" allow="camera *;microphone *">
+      </iframe>
+    </div>
+    <div class="gy-loader loader-container" id="easyassist-voip-loader" style="display: none;">
+      <div>
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+<span id="easyassist-snackbar"></span>
+{% if enable_chat_bubble and not is_mobile %}
+            <div id="chat-minimize-icon-wrapper" style="z-index: 2147483647;">
+              {% if floating_button_position == "right" %}
+                <div class="minimize-chat-box-div d-flex align-items-center justify-content-center" style="left: 50px;" onclick="hide_cobrowsing_modals(this);open_livechat_agent_window()">
+              {% else %}
+                <div class="minimize-chat-box-div d-flex align-items-center justify-content-center" onclick="hide_cobrowsing_modals(this);open_livechat_agent_window()">
+              {% endif %}
+
+                    {% if chat_bubble_icon_source %}
+                        <img  src="/{{ chat_bubble_icon_source}}" alt="Chat Icon">
+                    {% else %}
+                        <div class="default-icon">    
+                            <svg class="chat-svg-icon" width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M11.7863 35.1339C9.27699 34.0647 5.99995 32.6685 6 28.663V12.7989C6 9.29217 9.16944 6 12.5454 6H36.4421C39.7148 6 42 9.17283 42 12.7989V28.663C42 30.9293 41.1273 35.4619 37.6364 35.4619H20.1819L14.7273 39.9945C9.73827 43.9669 10.5415 41.5381 12.0207 37.0651L12.0208 37.0649L12.0209 37.0645C12.1895 36.5547 12.3669 36.0184 12.5454 35.4619C12.3039 35.3544 12.0494 35.2459 11.7863 35.1339ZM14.7267 24.1303C15.9317 24.1303 16.9085 23.1156 16.9085 21.864C16.9085 20.6123 15.9317 19.5977 14.7267 19.5977C13.5218 19.5977 12.5449 20.6123 12.5449 21.864C12.5449 23.1156 13.5218 24.1303 14.7267 24.1303ZM34.3636 21.864C34.3636 23.1156 33.3868 24.1303 32.1818 24.1303C30.9768 24.1303 30 23.1156 30 21.864C30 20.6123 30.9768 19.5977 32.1818 19.5977C33.3868 19.5977 34.3636 20.6123 34.3636 21.864ZM23.4543 24.1303C24.6593 24.1303 25.6361 23.1156 25.6361 21.864C25.6361 20.6123 24.6593 19.5977 23.4543 19.5977C22.2493 19.5977 21.2725 20.6123 21.2725 21.864C21.2725 23.1156 22.2493 24.1303 23.4543 24.1303Z" fill="white"/>
+                            </svg> 
+                       </div>  
+                    {% endif %}
+                </div>
+
+                {% if floating_button_position == "right" %}
+                  <div class="chat-talk-bubble tri-left border round btm-left-in" style="display:none; left: 135px;">
+                {% else %}
+                  <div class="chat-talk-bubble tri-right border round btm-right-in" style="display:none">
+                {% endif %}
+
+                    <div class="talktext" onclick="hide_cobrowsing_modals(this);open_livechat_agent_window()">
+                        <p id="talktext-p" class="mb-0"></p>
+                    </div>
+                    <div class="close-bubble-container d-flex align-items-center justify-content-center" onclick="hide_chat_bubble_greeting_div()">
+                        <span id="close-bubble">
+                            <svg width="9" height="9" viewBox="0 0 9 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8.18294 8.2916L4.85662 4.96221L4.5029 4.60817L4.14919 4.96221L0.821579 8.29285L0.707617 8.17897L4.03996 4.85394L4.39469 4.5L4.03996 4.14606L0.70761 0.821061L0.821587 0.707156L4.14919 4.03779L4.50262 4.39155L4.85634 4.03807L8.1839 0.712656L8.29266 0.821344L4.96556 4.14633L4.61167 4.5L4.96556 4.85366L8.29391 8.17993L8.18294 8.2916Z" fill="{{floating_button_bg_color}}" stroke="{{floating_button_bg_color}}"/>
+                            </svg>
+                        </span>
+                    </div>
+                </div> 
+            </div>
+{% endif %}
+<div class="gy-loader" id="easyassist-loader">
+  <div class="loading-image">
+    {% if cobrowse_config_obj.cobrowsing_logo %}
+      <img src="{{ cobrowse_config_obj.cobrowsing_logo }}" alt="Loading Image" width="220px">
+    {% else %}
+      {% if cobrowse_agent.get_access_token_obj and cobrowse_agent.get_access_token_obj.agent.user.enable_s3_bucket %}
+        <img src="https://static.allincall.in/static/EasyAssistApp/img/loadingImage.svg" alt="Loading Image" width="220px">
+      {% else %}
+        <img src="{% static 'EasyAssistApp/img/loadingImage.svg' %}" alt="Loading Image" width="220px">
+      {% endif %}
+    {% endif %}
+  </div>
+  <div class="loading-lines">
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+  </div>
+  <br>
+  <br>
+
+  <div class="loading-message">
+    Loading Customer Experiences at Scale.
+  </div>
+</div>
+
+
+<div id="transaction-payment-loader" style="display: none;top: 45%;left: 45%;position: fixed;z-index: 2147483647;color: black;"><p>Redirected to Payment Page...</p></div>
+
+<div style="position: relative;">
+{% if is_mobile and is_client_in_mobile == False %}
+<div id="frames-container" style="overflow: hidden;"></div>
+{% else %}
+<div id="frames-container" style="overflow: hidden;"></div>
+{% endif %}
+</div>
+
+{% if enable_cobrowsing_annotation %}
+<canvas id="easyassist-drawing-canvas" class="easyassist-drawing-canvas" style="pointer-events: none;"></canvas>
+</div>
+{% endif %}
+
+<!-- LiveChat Iframe Starts -->
+{% if not is_mobile and floating_button_position == "right" %}
+  <iframe title="CoBroswing LiveChat iframe" id="allincall-chat-box" src="/easy-assist/sales-ai/livechat/?session_id={{ session_id }}&is_agent={{is_agent}}&agent_code={{agent_identifier}}" style="display: none; left: 1em !important;" allow="microphone *"></iframe>
+{% else %}
+  <iframe title="CoBroswing LiveChat iframe" id="allincall-chat-box" src="/easy-assist/sales-ai/livechat/?session_id={{ session_id }}&is_agent={{is_agent}}&agent_code={{agent_identifier}}" style="display: none; right: 2em;" allow="microphone *"></iframe>
+{% endif %}
+<iframe title="CoBroswing LiveChat iframe" id="allincall-chat-box" src="/easy-assist/sales-ai/livechat/?session_id={{ session_id }}&is_agent={{is_agent}}&agent_code={{agent_identifier}}" style="display: none;" allow="microphone *"></iframe>
+<!-- LiveChat Iframe Ends -->
+
+{% if DEVELOPMENT %}
+  <img alt="Agent cursor" src="/static/EasyAssistApp/img/Agent_cursor.svg" style="z-index: 2147483647;top: 0%;right: 0%;position: absolute;width: 80px;" id="client-mouse-pointer">
+{% else %}
+  <img alt="Agent cursor" src="/static/EasyAssistApp/img/{{access_token}}/Agent_cursor.svg" style="z-index: 2147483647;top: 0%;right: 0%;position: absolute;width: 80px;" id="client-mouse-pointer">
+{% endif %}
+
+
+<div class="modal fade" id="capture_screenshot_confirm_modal" tabindex="-1" role="dialog" aria-labelledby="capture_client_screenshot_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="capture_client_screenshot_modal_label">Ready to capture client screenshot?</h5>
+      </div>
+      <div class="modal-body">Select "Capture" below if you want to capture client screenshot?</div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <a class="btn btn-primary" href="javascript:void(0)" onclick="capture_client_screenshot_confirm()" data-dismiss="modal">Capture</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="capture_pageshot_confirm_modal" tabindex="-1" role="dialog" aria-labelledby="capture_client_pageshot_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="capture_client_pageshot_modal_label">Ready to capture screenshot?</h5>
+      </div>
+      <div class="modal-body">Select "Capture" below if you want to capture screenshot?</div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <a class="btn btn-primary" href="javascript:void(0)" onclick="capture_client_pageshot_confirm()" data-dismiss="modal">Capture</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="request_for_edit_access_modal" tabindex="-1" role="dialog" aria-labelledby="request_for_edit_access_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Request for edit access?</h5>
+        <span class="modal-text">Are you sure, you want to request Agent for providing you edit access?</span>
+      </div>
+      <div class="modal-body mt-4"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary" onclick="capture_request_edit_access()" data-dismiss="modal">Request</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="captured_information_modal" tabindex="-1" role="dialog" aria-labelledby="captured_information_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="captured_information_modal_label">Captured Screenshots</h5>
+      </div>
+      <div class="modal-body">
+          <div class="row">
+              <table class="table table-borderless" style="max-height: 305px;overflow-y: scroll;">
+                  <thead>
+                      <tr>
+                        <th scope="col">Data</th>
+                        <th scope="col">DateTime</th>
+                        <th scope="col">Download</th>
+                      </tr>
+                  </thead>
+                  <tbody id="meta_information_body"></tbody>
+              </table>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade eassyassist-custom-in-session-modal" id="request_voip_meeting_modal" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="request_voip_meeting_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        {% comment %} {% if enable_voip_calling %}
+          <div class="d-flex align-items-center pb-3">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="32" height="32" rx="7" fill="{{ floating_button_bg_color }}"/>
+                  <path d="M23.12 19.0044C22.0266 19.0044 20.9688 18.8266 19.9822 18.5066C19.8277 18.4543 19.6615 18.4465 19.5027 18.4842C19.3439 18.522 19.199 18.6037 19.0844 18.72L17.6888 20.4712C15.1733 19.2712 12.8178 17.0044 11.5644 14.4L13.2978 12.9244C13.5378 12.6756 13.6089 12.3289 13.5111 12.0178C13.1822 11.0311 13.0133 9.97334 13.0133 8.88C13.0133 8.4 12.6133 8 12.1333 8H9.05778C8.57778 8 8 8.21333 8 8.88C8 17.1378 14.8711 24 23.12 24C23.7512 24 24 23.44 24 22.9512V19.8844C24 19.4044 23.6 19.0044 23.12 19.0044Z" fill="white"/>
+              </svg>
+              <h5 class="modal-title ml-3" id="support_material_modal_label">Voice Call</h5>
+          </div>
+        {% endif %} {% endcomment %}
+        {% if enable_voip_with_video_calling %}
+          <div class="d-flex align-items-center pb-3">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="32" height="32" rx="7" fill="{{ floating_button_bg_color }}"/>
+              <path d="M19 12.5C19 11.1193 17.8807 10 16.5 10H10.5C9.11929 10 8 11.1193 8 12.5V19.5C8 20.8807 9.11929 22 10.5 22H16.5C17.8807 22 19 20.8807 19 19.5V12.5Z" fill="white"/>
+              <path d="M20 13.9308V18.0815L22.7642 20.4319C23.2512 20.8461 24 20.4999 24 19.8606V12.1931C24 11.5568 23.2575 11.2096 22.7692 11.6176L20 13.9308Z" fill="white"/>
+            </svg>
+            <h5 class="modal-title ml-3">Video Call</h5>
+          </div>
+          <span class="modal-text">{{ voip_with_video_calling_message }}</span>
+        {% elif enable_voip_calling %}
+          <div class="d-flex align-items-center pb-3">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="32" height="32" rx="7" fill="{{ floating_button_bg_color }}"/>
+              <path d="M23.12 19.0044C22.0266 19.0044 20.9688 18.8266 19.9822 18.5066C19.8277 18.4543 19.6615 18.4465 19.5027 18.4842C19.3439 18.522 19.199 18.6037 19.0844 18.72L17.6888 20.4712C15.1733 19.2712 12.8178 17.0044 11.5644 14.4L13.2978 12.9244C13.5378 12.6756 13.6089 12.3289 13.5111 12.0178C13.1822 11.0311 13.0133 9.97334 13.0133 8.88C13.0133 8.4 12.6133 8 12.1333 8H9.05778C8.57778 8 8 8.21333 8 8.88C8 17.1378 14.8711 24 23.12 24C23.7512 24 24 23.44 24 22.9512V19.8844C24 19.4044 23.6 19.0044 23.12 19.0044Z" fill="white"/>
+            </svg>
+            <h5 class="modal-title ml-3">Voice Call</h5>
+          </div>
+          <span class="modal-text">{{ voip_calling_message }}</span>
+        {% else %}
+          <div class="d-flex align-items-center pb-3">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="32" height="32" rx="7" fill="{{ floating_button_bg_color }}"/>
+              <path d="M19 12.5C19 11.1193 17.8807 10 16.5 10H10.5C9.11929 10 8 11.1193 8 12.5V19.5C8 20.8807 9.11929 22 10.5 22H16.5C17.8807 22 19 20.8807 19 19.5V12.5Z" fill="white"/>
+              <path d="M20 13.9308V18.0815L22.7642 20.4319C23.2512 20.8461 24 20.4999 24 19.8606V12.1931C24 11.5568 23.2575 11.2096 22.7692 11.6176L20 13.9308Z" fill="white"/>
+            </svg>
+            <h5 class="modal-title ml-3">Video Call</h5>
+          </div>
+          <span class="modal-text">Would you like to connect on a video call?</span>
+        {% endif %}
+      </div>
+      <div class="modal-body">
+        <div class="small" id="request_meeting_error" style="color:green;"></div>
+      </div>
+      <div id="request_meeting_button" class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal" onclick="update_agent_meeting_request('false')">No</button>
+        <button class="btn btn-primary" id="request_button" type="button" onclick="update_agent_meeting_request('true')">Yes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if is_agent == True %}
+{% if enable_voip_with_video_calling %}
+  <div class="modal fade" id="request_meeting_modal_invited_agent" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="request_voip_meeting_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="d-flex align-items-center pb-4">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="7" fill="{{ floating_button_bg_color }}"/>
+            <path d="M19 12.5C19 11.1193 17.8807 10 16.5 10H10.5C9.11929 10 8 11.1193 8 12.5V19.5C8 20.8807 9.11929 22 10.5 22H16.5C17.8807 22 19 20.8807 19 19.5V12.5Z" fill="white"/>
+            <path d="M20 13.9308V18.0815L22.7642 20.4319C23.2512 20.8461 24 20.4999 24 19.8606V12.1931C24 11.5568 23.2575 11.2096 22.7692 11.6176L20 13.9308Z" fill="white"/>
+            </svg>
+            <h5 class="modal-title" style="margin-left: 1rem;">Video Call</h5>
+            </div>
+            <span class="modal-text">Would you like to connect on a video call?</span>
+        </div>
+        <div class="modal-body mt-4">
+          <div class="small" id="request_meeting_error" style="color:green;"></div>
+        </div>
+        <div id="request_meeting_button" class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">No</button>
+          <button class="btn btn-primary" id="request_button" type="button" onclick="join_meeting_invited_agent();">Yes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="inform_voip_meeting_modal" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="inform_voip_meeting_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="d-flex align-items-center pb-4">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="32" height="32" rx="7" fill="{{ floating_button_bg_color }}"/>
+                <path d="M19 12.5C19 11.1193 17.8807 10 16.5 10H10.5C9.11929 10 8 11.1193 8 12.5V19.5C8 20.8807 9.11929 22 10.5 22H16.5C17.8807 22 19 20.8807 19 19.5V12.5Z" fill="white"/>
+                <path d="M20 13.9308V18.0815L22.7642 20.4319C23.2512 20.8461 24 20.4999 24 19.8606V12.1931C24 11.5568 23.2575 11.2096 22.7692 11.6176L20 13.9308Z" fill="white"/>
+            </svg>                                    
+            <h5 class="modal-title pl-2" id="support_material_modal_label">Video Call</h5>
+          </div>
+          <span class="modal-text">Agent {{agent_name}} and Customer are already on a video call. Would you like to join the call?</span>
+        </div>
+        <div class="modal-body mt-4">
+          <div class="small" id="request_meeting_error" style="color:green;"></div>
+        </div>
+        <div id="request_meeting_button" class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal" onclick="gain_focus();">No</button>
+          <a class="btn btn-primary" href="javascript:void(0)" onclick="join_meeting_invited_agent(false)" style="width: 130px !important;">Connect</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% elif enable_voip_calling %}
+  <div class="modal fade" id="request_meeting_modal_invited_agent" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="request_voip_meeting_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="d-flex align-items-center pb-4">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="7" fill="{{ floating_button_bg_color }}"/>
+            <path d="M23.12 19.0044C22.0266 19.0044 20.9688 18.8266 19.9822 18.5066C19.8277 18.4543 19.6615 18.4465 19.5027 18.4842C19.3439 18.522 19.199 18.6037 19.0844 18.72L17.6888 20.4712C15.1733 19.2712 12.8178 17.0044 11.5644 14.4L13.2978 12.9244C13.5378 12.6756 13.6089 12.3289 13.5111 12.0178C13.1822 11.0311 13.0133 9.97334 13.0133 8.88C13.0133 8.4 12.6133 8 12.1333 8H9.05778C8.57778 8 8 8.21333 8 8.88C8 17.1378 14.8711 24 23.12 24C23.7512 24 24 23.44 24 22.9512V19.8844C24 19.4044 23.6 19.0044 23.12 19.0044Z" fill="white"/>
+            </svg>
+            <h5 class="modal-title" style="margin-left: 1rem;">Voice Call</h5>
+            </div>            
+            <span class="modal-text">Would you like to connect on a voice call?</span>
+        </div>
+        <div class="modal-body mt-4">
+          <div class="small" id="request_meeting_error" style="color:green;"></div>
+        </div>
+        <div id="request_meeting_button" class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">No</button>
+          <button class="btn btn-primary" id="request_button" type="button" onclick="join_meeting_invited_agent();">Yes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="inform_voip_meeting_modal" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="inform_voip_meeting_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="d-flex align-items-center pb-4">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="32" height="32" rx="7" fill="{{ floating_button_bg_color }}"/>
+              <path d="M23.12 19.0044C22.0266 19.0044 20.9688 18.8266 19.9822 18.5066C19.8277 18.4543 19.6615 18.4465 19.5027 18.4842C19.3439 18.522 19.199 18.6037 19.0844 18.72L17.6888 20.4712C15.1733 19.2712 12.8178 17.0044 11.5644 14.4L13.2978 12.9244C13.5378 12.6756 13.6089 12.3289 13.5111 12.0178C13.1822 11.0311 13.0133 9.97334 13.0133 8.88C13.0133 8.4 12.6133 8 12.1333 8H9.05778C8.57778 8 8 8.21333 8 8.88C8 17.1378 14.8711 24 23.12 24C23.7512 24 24 23.44 24 22.9512V19.8844C24 19.4044 23.6 19.0044 23.12 19.0044Z" fill="white"/>
+          </svg>
+          <h5 class="modal-title pl-2" id="support_material_modal_label">Voice Call</h5>
+          </div>
+          <span class="modal-text">Agent {{agent_name}} and Customer are already on a voice call. Would you like to join the call?</span>
+        </div>
+        <div class="modal-body mt-4">
+          <div class="small" id="request_meeting_error" style="color:green;"></div>
+        </div>
+        <div id="request_meeting_button" class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal" onclick="gain_focus();">No</button>
+          <a class="btn btn-primary" href="javascript:void(0)" onclick="join_meeting_invited_agent(false)" style="width: 130px !important;">Connect</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% elif allow_cobrowsing_meeting %}
+  <div class="modal fade" id="request_meeting_modal_invited_agent" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="request_voip_meeting_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="d-flex align-items-center pb-4">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="7" fill="{{ floating_button_bg_color }}"/>
+            <path d="M19 12.5C19 11.1193 17.8807 10 16.5 10H10.5C9.11929 10 8 11.1193 8 12.5V19.5C8 20.8807 9.11929 22 10.5 22H16.5C17.8807 22 19 20.8807 19 19.5V12.5Z" fill="white"/>
+            <path d="M20 13.9308V18.0815L22.7642 20.4319C23.2512 20.8461 24 20.4999 24 19.8606V12.1931C24 11.5568 23.2575 11.2096 22.7692 11.6176L20 13.9308Z" fill="white"/>
+            </svg>
+            <h5 class="modal-title" style="margin-left: 1rem;">Video Call</h5>
+            </div>
+            <span class="modal-text">Would you like to connect on a video call?</span>
+        </div>
+        <div class="modal-body mt-4">
+          <div class="small" id="request_meeting_error" style="color:green;"></div>
+        </div>
+        <div id="request_meeting_button" class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">No</button>
+          <button class="btn btn-primary" id="request_button" type="button" onclick="join_meeting_invited_agent();">Yes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="inform_voip_meeting_modal" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="inform_voip_meeting_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="d-flex align-items-center pb-4">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="32" height="32" rx="7" fill="{{ floating_button_bg_color }}"/>
+                <path d="M19 12.5C19 11.1193 17.8807 10 16.5 10H10.5C9.11929 10 8 11.1193 8 12.5V19.5C8 20.8807 9.11929 22 10.5 22H16.5C17.8807 22 19 20.8807 19 19.5V12.5Z" fill="white"/>
+                <path d="M20 13.9308V18.0815L22.7642 20.4319C23.2512 20.8461 24 20.4999 24 19.8606V12.1931C24 11.5568 23.2575 11.2096 22.7692 11.6176L20 13.9308Z" fill="white"/>
+            </svg>                                    
+            <h5 class="modal-title pl-2" id="support_material_modal_label">Video Call</h5>
+          </div>
+          <span class="modal-text">Agent {{agent_name}} and Customer are already on a video call. Would you like to join the call?</span>
+        </div>
+        <div class="modal-body mt-4">
+          <div class="small" id="request_meeting_error" style="color:green;"></div>
+        </div>
+        <div id="request_meeting_button" class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal" onclick="gain_focus();">No</button>
+          <a class="btn btn-primary" href="javascript:void(0)" onclick="join_meeting_invited_agent(false)" style="width: 130px !important;">Connect</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+{% endif %}
+
+{% comment %} <div class="modal fade" id="inform_voip_meeting_modal" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="inform_voip_meeting_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        {% if enable_voip_calling %}
+        <div class="d-flex align-items-center pb-4">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="32" height="32" rx="7" fill="{{ floating_button_bg_color }}"/>
+                <path d="M23.12 19.0044C22.0266 19.0044 20.9688 18.8266 19.9822 18.5066C19.8277 18.4543 19.6615 18.4465 19.5027 18.4842C19.3439 18.522 19.199 18.6037 19.0844 18.72L17.6888 20.4712C15.1733 19.2712 12.8178 17.0044 11.5644 14.4L13.2978 12.9244C13.5378 12.6756 13.6089 12.3289 13.5111 12.0178C13.1822 11.0311 13.0133 9.97334 13.0133 8.88C13.0133 8.4 12.6133 8 12.1333 8H9.05778C8.57778 8 8 8.21333 8 8.88C8 17.1378 14.8711 24 23.12 24C23.7512 24 24 23.44 24 22.9512V19.8844C24 19.4044 23.6 19.0044 23.12 19.0044Z" fill="white"/>
+            </svg>
+            <h5 class="modal-title pl-2" id="support_material_modal_label">Voice Call</h5>
+        </div>
+        {% endif %}
+        {% if enable_voip_with_video_calling %}
+          <h5 class="modal-title">Video Call</h5>
+          <span class="modal-text">Agent {{agent_name}} and Customer are already on a video call. Would you like to join the call?</span>
+        {% elif enable_voip_calling %}
+          <h5 class="modal-title">Voice Call</h5>
+          <span class="modal-text">Agent {{agent_name}} and Customer are already on a voice call. Would you like to join the call?</span>
+        {% else %}
+          <h5 class="modal-title">Video Call</h5>
+          <span class="modal-text">Agent {{agent_name}} and Customer are already on a video call. Would you like to join the call?</span>
+        {% endif %}
+      </div>
+      <div class="modal-body mt-4">
+        <div class="small" id="request_meeting_error" style="color:green;"></div>
+      </div>
+      <div id="request_meeting_button" class="modal-footer">
+        {% if enable_voip_calling %}
+          <button class="btn btn-secondary mr-4" type="button" data-dismiss="modal">No</button>
+          <button class="btn btn-primary " id="request_button" type="button" onclick="join_meeting_invited_agent()">Yes</button>
+        {% else %}
+        <button class="btn btn-secondary" type="button" data-dismiss="modal" onclick="gain_focus();">No</button>
+        <a class="btn btn-primary" href="javascript:void(0)" onclick="join_meeting_invited_agent()" style="width: 130px !important;">Connect</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div> {% endcomment %}
+
+{% if is_agent == False %}
+<div class="modal fade" id="close_session_modal" tabindex="-1" role="dialog" aria-labelledby="close_session_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h6 class="modal-title"> Feedback </h6>
+        <div data-dismiss="modal" onclick="easyassist_show_chat_bubble()" style="cursor: pointer">
+          <svg width="23" height="23" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M0 11.5C0 5.14873 5.14873 0 11.5 0C17.8513 0 23 5.14873 23 11.5C23 17.8513 17.8513 23 11.5 23C5.14873 23 0 17.8513 0 11.5ZM16.1434 6.80013C16.5075 7.16427 16.5075 7.75465 16.1434 8.11879L12.7904 11.4718L16.1434 14.8247C16.5075 15.1889 16.5075 15.7792 16.1434 16.1434C15.7792 16.5075 15.1889 16.5075 14.8247 16.1434L11.4718 12.7904L8.11879 16.1434C7.75465 16.5075 7.16427 16.5075 6.80013 16.1434C6.43599 15.7792 6.43599 15.1889 6.80013 14.8247L10.1531 11.4718L6.80013 8.11879C6.43599 7.75465 6.43599 7.16427 6.80013 6.80013C7.16427 6.43599 7.75465 6.43599 8.11879 6.80013L11.4718 10.1531L14.8247 6.80013C15.1889 6.43599 15.7792 6.43599 16.1434 6.80013Z" fill="#717274" />
+          </svg>
+        </div>
+      </div>
+      <div class="modal-body">
+        <label>
+            <p style="font-size: 15px; text-align: left;">On a scale of 0-10, how likely are you to recommend Cobrowse to a friend or colleague?</p>
+            <div class="easyassist-tickmarks">
+                <span onclick="rateAgent(this);" onmouseover="show_emoji_by_user_rating(this, 0)" onmouseout="changeColor(this)">0</span>
+                <span onclick="rateAgent(this);" onmouseover="show_emoji_by_user_rating(this, 1)" onmouseout="changeColor(this)">1</span>
+                <span onclick="rateAgent(this);" onmouseover="show_emoji_by_user_rating(this, 2)" onmouseout="changeColor(this)">2</span>
+                <span onclick="rateAgent(this);" onmouseover="show_emoji_by_user_rating(this, 3)" onmouseout="changeColor(this)">3</span>
+                <span onclick="rateAgent(this);" onmouseover="show_emoji_by_user_rating(this, 4)" onmouseout="changeColor(this)">4</span>
+                <span onclick="rateAgent(this);" onmouseover="show_emoji_by_user_rating(this, 5)" onmouseout="changeColor(this)">5</span>
+                <span onclick="rateAgent(this);" onmouseover="show_emoji_by_user_rating(this, 6)" onmouseout="changeColor(this)">6</span>
+                <span onclick="rateAgent(this);" onmouseover="show_emoji_by_user_rating(this, 7)" onmouseout="changeColor(this)">7</span>
+                <span onclick="rateAgent(this);" onmouseover="show_emoji_by_user_rating(this, 8)" onmouseout="changeColor(this)">8</span>
+                <span onclick="rateAgent(this);" onmouseover="show_emoji_by_user_rating(this, 9)" onmouseout="changeColor(this)">9</span>
+                <span onclick="rateAgent(this);" onmouseover="show_emoji_by_user_rating(this, 10)" onmouseout="changeColor(this)">10</span>
+            </div>
+        </label>
+        <div class="row" style="padding-top:0.5em;margin: 0px;">
+            <div style="width: 100%; padding-top: 1em; ">
+                <textarea class="form-control" placeholder="Remarks" id="close-session-remarks"></textarea>
+                <label id="colose-session-remarks-error" style="display: none;color:red; padding-top: 1em; text-align: center;">adsf</label> 
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" onclick="close_agent_confirm_session(this, false)">No Thanks</button>
+        <a class="btn btn-primary" href="javascript:void(0)" onclick="close_agent_confirm_session(this, true)">Submit</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="modal fade" id="close_session_modal" tabindex="-1" role="dialog" aria-labelledby="close_session_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content" style="width: 454px;">
+      <div class="modal-header" style="justify-content: left;">
+        <h5 class="modal-title" id="close_session_modal_label">Leave session</h5>
+      </div>
+      <div class="modal-body" style="padding: 1rem 2rem 0rem 2rem!important;">
+        <div class="row">
+          <div class="col-12 mt-1">
+            <span class="modal-end-session-text">Select Leave session below if you want to leave this session.</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal" id="end_session_cancel_btn" onclick="gain_focus();easyassist_show_chat_bubble();">Cancel</button>
+        <a class="btn btn-primary" href="javascript:void(0)" onclick="close_agent_leave_session(this);" style="width: 130px !important;">Leave Session</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+<div class="modal fade" id="support_material_modal" tabindex="-1" role="dialog" aria-labelledby="support_material_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="support_material_modal_label">Support Document</h5>
+      </div>
+      <div class="modal-body">
+          <div class="row" style="display: flex;justify-content: center;align-items: center;">
+              <p id="support_material_modal_info"></p>
+              <table id="support_material_table" class="table table-borderless" style="display: none; max-height: 305px;overflow-y: scroll;">
+                  <thead>
+                    <tr>
+                      <th scope="col">Document</th>
+                      <th scope="col">Your Message</th>
+                      <th scope="col">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="support_material_table_body"></tbody>
+              </table>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+  <div id="cobrowsing-greeting-bubble-popup-sound">
+      <audio id="easyassist-greeting-bubble-popup-sound" src="/files/EasyAssistApp/sounds/greeting_bubble_popup.mp3" type"audio/mpeg"></audio>
+  </div>
+
+
+{% if allow_cobrowsing_meeting %}
+<div class="modal fade" id="request_meeting_modal" tabindex="-1" role="dialog" aria-labelledby="request_meeting_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="d-flex align-items-center pb-4">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="32" height="32" rx="7" fill="{{ floating_button_bg_color }}"/>
+              <path d="M19 12.5C19 11.1193 17.8807 10 16.5 10H10.5C9.11929 10 8 11.1193 8 12.5V19.5C8 20.8807 9.11929 22 10.5 22H16.5C17.8807 22 19 20.8807 19 19.5V12.5Z" fill="white"/>
+              <path d="M20 13.9308V18.0815L22.7642 20.4319C23.2512 20.8461 24 20.4999 24 19.8606V12.1931C24 11.5568 23.2575 11.2096 22.7692 11.6176L20 13.9308Z" fill="white"/>
+          </svg>                                    
+          <h5 class="modal-title pl-2" id="support_material_modal_label">Connect with the Customer on Video Call</h5>
+        </div>
+      </div>
+      <div class="modal-body">
+          <div class="row"  style="padding:1em;">
+            A request will be sent to the customer and you will be connected with him/her on virtual meeting.
+          </div>
+      </div>
+      <div id="request_meeting_error" style="color:green;padding:1em;"></div>
+      <div id="request_meeting_button" class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+        <button class="btn btn-primary" id="request_button" type="button" onclick="request_for_meeting('{{ session_id }}')">Request</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+<div class="modal fade" id="check_for_internet_modal" tabindex="-1" role="dialog" aria-labelledby="close_session_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="align-items: center; justify-content: center;">
+              <svg width="106" height="100" viewBox="0 0 106 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M96.8752 30.7418C105.787 47.6841 104.912 68.6831 95.6816 81.9665C86.3722 95.2499 68.5489 100.738 53.3514 99.3065C38.1539 97.7952 25.5026 89.2843 14.9201 75.285C4.33751 61.2857 -4.17627 41.798 2.18918 26.2875C8.47505 10.7769 29.6402 -0.756642 49.5322 0.0387729C69.4242 0.754646 87.9635 13.7199 96.8752 30.7418Z" fill="{{ floating_button_bg_color }}" fill-opacity="0.1"/>
+                  <path d="M10.7548 35.3876C10.7548 32.8966 8.73168 30.8747 6.23421 30.8747C3.73674 30.8747 1.71582 32.8966 1.71582 35.3876C1.71582 37.8785 3.73895 39.9004 6.23642 39.9004C8.73389 39.9004 10.7548 37.8785 10.7548 35.3876ZM4.04782 35.414C4.06988 34.2775 5.09138 33.3106 6.25848 33.3238C7.41896 33.3371 8.42942 34.3502 8.40736 35.4756C8.3853 36.6099 7.3594 37.579 6.1945 37.5658C5.03622 37.5548 4.02576 36.5416 4.04782 35.414Z" fill="{{ floating_button_bg_color }}"/>
+                  <path d="M91.5332 22.3094C89.0379 22.3094 87.0126 24.3291 87.0126 26.8223C87.0126 29.3155 89.0357 31.3351 91.5332 31.3351C94.0306 31.3351 96.0538 29.3155 96.0538 26.8223C96.0538 24.3291 94.0284 22.3094 91.5332 22.3094ZM91.6391 28.9433C90.4168 28.9785 89.3446 27.9962 89.3556 26.8487C89.3666 25.6858 90.3286 24.7167 91.4868 24.6991C92.6407 24.6815 93.6688 25.6351 93.7085 26.7584C93.7482 27.9279 92.8172 28.9102 91.6391 28.9433Z" fill="{{ floating_button_bg_color }}"/>
+                  <path d="M13.1144 75.6662C10.4426 75.6574 7.77087 75.6574 5.0991 75.6662C3.96068 75.6706 3.39147 76.1419 3.3672 77.0537C3.34293 77.9656 3.91214 78.4589 5.04615 78.4699C6.38093 78.4831 7.71792 78.4721 9.05269 78.4721C10.3875 78.4721 11.7245 78.4787 13.0592 78.4699C14.2837 78.4611 14.8463 78.0008 14.8309 77.0405C14.8198 76.1177 14.2749 75.6706 13.1144 75.6662Z" fill="{{ floating_button_bg_color }}"/>
+                  <path d="M105.252 54.8154H103.829V53.3838C103.829 52.9719 103.491 52.6371 103.081 52.6371C102.671 52.6371 102.333 52.9741 102.333 53.3838V54.8154H100.886C100.473 54.8154 100.138 55.1524 100.138 55.562C100.138 55.9739 100.475 56.3087 100.886 56.3087H102.333V57.7403C102.333 58.1521 102.671 58.4869 103.081 58.4869C103.491 58.4869 103.829 58.1499 103.829 57.7403V56.3087H105.252C105.664 56.3087 106 55.9717 106 55.562C106 55.1502 105.664 54.8154 105.252 54.8154Z" fill="{{ floating_button_bg_color }}"/>
+                  <path d="M18.1114 19.9945C18.1114 20.5979 18.6056 21.0891 19.2079 21.0891C19.8124 21.0891 20.3044 20.5957 20.3044 19.9945V17.8933H22.3915C22.996 17.8933 23.488 17.4 23.488 16.7987C23.488 16.1952 22.9938 15.7041 22.3915 15.7041H20.3044V13.6007C20.3044 12.9972 19.8102 12.5061 19.2079 12.5061C18.6034 12.5061 18.1114 12.9994 18.1114 13.6007V15.7019H15.989C15.3844 15.7019 14.8925 16.1952 14.8925 16.7965C14.8925 17.4 15.3867 17.8911 15.989 17.8911H18.1114V19.9945Z" fill="{{ floating_button_bg_color }}"/>
+                  <path d="M14.1646 60.522H12.7371V59.0838C12.7371 58.6719 12.3996 58.335 11.987 58.335C11.5744 58.335 11.2369 58.6719 11.2369 59.0838V60.522H9.78296C9.37039 60.522 9.03284 60.859 9.03284 61.2709C9.03284 61.6827 9.37039 62.0197 9.78296 62.0197H11.2369V63.4579C11.2369 63.8698 11.5744 64.2067 11.987 64.2067C12.3996 64.2067 12.7371 63.8698 12.7371 63.4579V62.0197H14.1646C14.5771 62.0197 14.9147 61.6827 14.9147 61.2709C14.9169 60.859 14.5793 60.522 14.1646 60.522Z" fill="{{ floating_button_bg_color }}"/>
+                  <path d="M53 78C37.5603 78 25 65.4397 25 50C25 34.5603 37.5603 22 53 22C68.4397 22 81 34.5603 81 50C81 65.4397 68.4397 78 53 78ZM53 26.6667C40.134 26.6667 29.6667 37.134 29.6667 50C29.6667 62.866 40.134 73.3333 53 73.3333C65.866 73.3333 76.3333 62.866 76.3333 50C76.3333 37.134 65.866 26.6667 53 26.6667Z" fill="{{ floating_button_bg_color }}"/>
+                  <path d="M34.856 70.4773C34.2587 70.4773 33.6613 70.2487 33.2063 69.7937C32.294 68.8813 32.294 67.4067 33.2063 66.4943L69.4943 30.2063C70.4067 29.294 71.8813 29.294 72.7937 30.2063C73.706 31.1187 73.706 32.5957 72.7937 33.5057L36.5057 69.7937C36.0483 70.251 35.451 70.4773 34.856 70.4773Z" fill="{{ floating_button_bg_color }}"/>
+                  <path d="M55.7393 53.8617L48.156 61.445C49.115 63.146 50.9163 64.3127 53 64.3127C56.0777 64.3127 58.586 61.7997 58.586 58.7127C58.586 56.6267 57.4287 54.8253 55.7393 53.8617Z" fill="{{ floating_button_bg_color }}"/>
+                  <path d="M43.1627 53.171C43.4077 52.926 43.6667 52.6997 43.9257 52.4757L51.95 44.4513C47.386 44.708 43.1207 46.598 39.8564 49.8787C38.9464 50.7933 38.951 52.2703 39.8657 53.1803C40.7757 54.088 42.2574 54.0833 43.1627 53.171Z" fill="{{ floating_button_bg_color }}"/>
+                  <path d="M62.534 47.067L59.1017 50.4993C60.4644 51.1713 61.729 52.0603 62.8374 53.171C63.2924 53.6283 63.892 53.857 64.4917 53.857C65.0867 53.857 65.684 53.6307 66.1367 53.178C67.0514 52.268 67.056 50.791 66.146 49.8763C65.0494 48.775 63.829 47.8487 62.534 47.067Z" fill="{{ floating_button_bg_color }}"/>
+                  <path d="M68.8083 40.7927L65.4717 44.1293C66.7177 44.9623 67.8913 45.9237 68.9717 47.0087C69.4267 47.466 70.0264 47.6947 70.626 47.6947C71.221 47.6947 71.8184 47.4683 72.271 47.0133C73.1857 46.1033 73.1904 44.6287 72.2804 43.714C71.2 42.629 70.0287 41.67 68.8083 40.7927Z" fill="{{ floating_button_bg_color }}"/>
+                  <path d="M37.026 47.0086C41.296 42.7176 46.9683 40.3563 53 40.3563C53.9613 40.3563 54.9086 40.438 55.8466 40.557L59.8203 36.5833C57.6153 36.014 55.3356 35.6896 53 35.6896C45.72 35.6896 38.8716 38.541 33.7173 43.7163C32.8073 44.631 32.812 46.1056 33.7266 47.0156C34.639 47.9256 36.1206 47.921 37.026 47.0086Z" fill="{{ floating_button_bg_color }}"/>
+                </svg>
+            </div>
+            <div class="modal-body mt-4" style="text-align: center;">
+                <h6 class="modal-title">Weak connection detected!</h6>
+                <span class="modal-text"> The quality and user experience of the session may be affected due to low bandwidth.</span>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="button" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="client_disconnected_message_modal" tabindex="-1" role="dialog" aria-labelledby="client_disconnected_message_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-text"> Looks like we are not receiving any updates from the agent side. Kindly check your internet connectivity or check whether the agent is still connected or not. </span>
+            </div>
+            <div class="modal-body mt-1">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="button" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="client_internet_connection_weak_message_modal" tabindex="-1" role="dialog" aria-labelledby="client_internet_connection_weak_message_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="justify-content: center; align-items: center;">
+              <svg width="106" height="100" viewBox="0 0 106 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M96.8752 30.7418C105.787 47.6841 104.912 68.6831 95.6816 81.9665C86.3722 95.2499 68.5489 100.738 53.3514 99.3065C38.1539 97.7952 25.5026 89.2843 14.9201 75.285C4.33751 61.2857 -4.17627 41.798 2.18918 26.2875C8.47505 10.7769 29.6402 -0.756642 49.5322 0.0387729C69.4242 0.754646 87.9635 13.7199 96.8752 30.7418Z" fill="{{ floating_button_bg_color }}" fill-opacity="0.1"/>
+                <path d="M10.7551 35.3876C10.7551 32.8966 8.73192 30.8747 6.23445 30.8747C3.73698 30.8747 1.71606 32.8966 1.71606 35.3876C1.71606 37.8785 3.73919 39.9004 6.23666 39.9004C8.73413 39.9004 10.7551 37.8785 10.7551 35.3876ZM4.04807 35.414C4.07013 34.2775 5.09162 33.3106 6.25872 33.3238C7.41921 33.3371 8.42967 34.3502 8.40761 35.4756C8.38554 36.6099 7.35964 37.579 6.19474 37.5658C5.03646 37.5548 4.026 36.5416 4.04807 35.414Z" fill="{{ floating_button_bg_color }}"/>
+                <path d="M91.5333 22.3094C89.038 22.3094 87.0127 24.3291 87.0127 26.8223C87.0127 29.3155 89.0358 31.3351 91.5333 31.3351C94.0308 31.3351 96.0539 29.3155 96.0539 26.8223C96.0539 24.3291 94.0286 22.3094 91.5333 22.3094ZM91.6392 28.9433C90.4169 28.9785 89.3447 27.9962 89.3557 26.8487C89.3668 25.6858 90.3287 24.7167 91.487 24.6991C92.6408 24.6815 93.6689 25.6351 93.7087 26.7584C93.7484 27.9279 92.8173 28.9102 91.6392 28.9433Z" fill="{{ floating_button_bg_color }}"/>
+                <path d="M13.1146 75.6662C10.4429 75.6574 7.77111 75.6574 5.09935 75.6662C3.96092 75.6706 3.39171 76.1419 3.36744 77.0537C3.34318 77.9656 3.91239 78.4589 5.0464 78.4699C6.38118 78.4831 7.71816 78.4721 9.05294 78.4721C10.3877 78.4721 11.7247 78.4787 13.0595 78.4699C14.2839 78.4611 14.8465 78.0008 14.8311 77.0405C14.8201 76.1177 14.2751 75.6706 13.1146 75.6662Z" fill="{{ floating_button_bg_color }}"/>
+                <path d="M105.252 54.8154H103.829V53.3838C103.829 52.9719 103.491 52.6371 103.081 52.6371C102.671 52.6371 102.333 52.9741 102.333 53.3838V54.8154H100.886C100.473 54.8154 100.138 55.1524 100.138 55.562C100.138 55.9739 100.475 56.3087 100.886 56.3087H102.333V57.7403C102.333 58.1521 102.671 58.4869 103.081 58.4869C103.491 58.4869 103.829 58.1499 103.829 57.7403V56.3087H105.252C105.665 56.3087 106 55.9717 106 55.562C106 55.1502 105.665 54.8154 105.252 54.8154Z" fill="{{ floating_button_bg_color }}"/>
+                <path d="M18.1115 19.9945C18.1115 20.5979 18.6057 21.0891 19.208 21.0891C19.8125 21.0891 20.3045 20.5957 20.3045 19.9945V17.8933H22.3916C22.9961 17.8933 23.4881 17.4 23.4881 16.7987C23.4881 16.1952 22.9939 15.7041 22.3916 15.7041H20.3045V13.6007C20.3045 12.9972 19.8103 12.5061 19.208 12.5061C18.6035 12.5061 18.1115 12.9994 18.1115 13.6007V15.7019H15.9891C15.3846 15.7019 14.8926 16.1952 14.8926 16.7965C14.8926 17.4 15.3868 17.8911 15.9891 17.8911H18.1115V19.9945Z" fill="{{ floating_button_bg_color }}"/>
+                <path d="M14.1647 60.522H12.7372V59.0838C12.7372 58.6719 12.3997 58.335 11.9871 58.335C11.5746 58.335 11.237 58.6719 11.237 59.0838V60.522H9.78308C9.37051 60.522 9.03296 60.859 9.03296 61.2709C9.03296 61.6827 9.37051 62.0197 9.78308 62.0197H11.237V63.4579C11.237 63.8698 11.5746 64.2067 11.9871 64.2067C12.3997 64.2067 12.7372 63.8698 12.7372 63.4579V62.0197H14.1647C14.5773 62.0197 14.9148 61.6827 14.9148 61.2709C14.917 60.859 14.5795 60.522 14.1647 60.522Z" fill="{{ floating_button_bg_color }}"/>
+                <g clip-path="url(#clip0)">
+                <path d="M25.0308 7.1517L65.259 8.04566L78.9664 25.6269L80.4564 78.6686H25.0308V7.1517Z" fill="white"/>
+                <path d="M75.0925 77.4767V28.5898L80.4563 25.6269V77.4767H75.0925Z" fill="#E6EEFB"/>
+                <path d="M58.1074 60.1934C64.6631 60.7894 64.0672 53.9357 63.1732 51.2538L66.4511 51.5518L67.047 52.4458C66.9477 54.1344 66.7491 57.5711 66.7491 57.8095C66.7491 58.0479 65.7558 59.8954 65.2591 60.7894C64.0672 61.286 59.5378 61.3854 58.1074 60.1934Z" fill="#E6EEFB"/>
+                <path d="M25.0308 7.172C25.5185 7.172 25.9092 7.172 26.2998 7.172C39.1869 7.172 52.074 7.18552 64.9588 7.15173C66.3475 7.14723 67.3908 7.68779 68.1788 8.6991C72.108 13.7241 76.0032 18.7717 79.8984 23.8237C80.734 24.9071 81.0546 26.1707 81.0523 27.5288C81.0365 38.9213 81.0207 50.316 81.0094 61.7084C81.0049 66.9046 81.0072 72.103 81.0072 77.2992C81.0072 77.7249 81.0072 78.1506 81.0072 78.6687C62.3552 78.6687 43.7438 78.6687 25.0308 78.6687C25.0308 54.904 25.0308 31.1101 25.0308 7.172ZM27.7111 9.86357C27.7111 32.0381 27.7111 54.0864 27.7111 76.1573C44.6493 76.1573 61.5061 76.1573 78.3494 76.1573C78.3494 60.3637 78.3494 44.6468 78.3494 28.7969C73.8377 28.7969 69.4366 28.7969 64.9475 28.7969C64.9475 28.2789 64.9475 27.8937 64.9475 27.5086C64.9475 22.952 64.9497 18.3933 64.9475 13.8367C64.9475 10.9289 63.8726 9.86357 60.9303 9.86357C50.2584 9.86132 39.5843 9.86357 28.9125 9.86357C28.5308 9.86357 28.1492 9.86357 27.7111 9.86357Z" fill="{{ floating_button_bg_color }}"/>
+                <path d="M54.1107 50.7779C50.9651 51.0076 47.9799 51.1315 45.0172 51.4671C41.4652 51.868 38.0035 52.7262 34.6818 54.0776C33.5776 54.5258 32.8528 54.3411 32.5005 53.546C32.1505 52.7577 32.5457 52.0595 33.6296 51.6113C37.3125 50.0887 41.1649 49.2148 45.1076 48.7373C53.0877 47.771 60.9866 48.1224 68.75 50.3432C70.0146 50.7058 71.2543 51.1698 72.4804 51.6473C73.5282 52.0527 73.8714 52.7307 73.5418 53.519C73.2098 54.3141 72.4917 54.5236 71.4756 54.1407C70.4143 53.742 69.3484 53.3591 68.0907 52.8996C68.0907 54.2668 68.1245 55.4628 68.0839 56.6543C67.9665 60.2693 65.3674 63.0668 61.7905 63.4654C58.4237 63.8416 55.2488 61.6793 54.3726 58.3346C54.1604 57.5215 54.14 56.6475 54.1197 55.7984C54.0836 54.2353 54.1107 52.6721 54.1107 50.7779ZM56.8723 51.0482C56.8723 53.1992 56.7052 55.2668 56.9175 57.294C57.1478 59.4945 59.2298 60.9653 61.4292 60.8122C63.597 60.6613 65.3064 58.8616 65.3764 56.643C65.3945 56.0754 65.3809 55.5056 65.3809 54.938C65.3809 52.037 65.3809 52.037 62.4747 51.6766C62.407 51.6676 62.337 51.6991 62.1563 51.7329C62.1563 53.305 62.2038 54.8997 62.1247 56.4899C62.1021 56.9404 61.8244 57.5507 61.4654 57.776C60.7857 58.2039 60.0608 57.6048 60.045 56.6475C60.0179 54.911 60.0382 53.1721 60.0382 51.3185C58.9521 51.2239 57.9427 51.1383 56.8723 51.0482Z" fill="{{ floating_button_bg_color }}"/>
+                <path d="M40.3565 41.4892C39.5436 40.6468 38.9791 40.0634 38.3287 39.3922C39.4668 38.3584 40.6117 37.3155 41.8672 36.1736C40.5033 34.9325 39.3562 33.8897 38.2249 32.8604C39.0333 32.1013 39.6452 31.527 40.3565 30.8603C41.2823 31.8851 42.3233 33.0383 43.4885 34.3244C44.7305 32.9797 45.7805 31.8423 46.8644 30.6688C47.5735 31.4346 48.1402 32.0495 48.7906 32.7523C47.7609 33.7478 46.6476 34.8244 45.4915 35.9438C46.7109 37.0858 47.8196 38.1286 49.0345 39.2661C48.199 39.9215 47.5396 40.4396 46.8531 40.9756C46.0086 40.0589 44.9586 38.9215 43.834 37.7029C42.5446 39.1084 41.4969 40.2481 40.3565 41.4892Z" fill="{{ floating_button_bg_color }}"/>
+                <path d="M57.2625 39.189C58.2696 38.2408 59.3784 37.1934 60.6203 36.0245C59.3806 34.905 58.229 33.8644 57.1338 32.8757C57.8835 32.0806 58.4616 31.4679 59.1887 30.6954C60.2071 31.8486 61.239 33.0176 62.4517 34.3915C63.6665 33.0198 64.7007 31.8531 65.7801 30.6368C66.4824 31.3846 67.0401 31.9792 67.6702 32.6504C66.5682 33.655 65.4211 34.7001 64.1994 35.815C65.5656 37.0718 66.7082 38.1237 67.8779 39.198C67.0695 39.9976 66.4711 40.59 65.7417 41.3107C64.7052 40.1598 63.662 39.0043 62.5262 37.7408C61.3136 39.0516 60.2748 40.1756 59.1977 41.34C58.5248 40.5922 57.967 39.9706 57.2625 39.189Z" fill="{{ floating_button_bg_color }}"/>
+                </g>
+                <defs>
+                <clipPath id="clip0">
+                <rect width="56.0216" height="71.5169" fill="white" transform="translate(25.0308 7.1517)"/>
+                </clipPath>
+                </defs>
+              </svg>
+            </div>
+            <div class="modal-body mt-4" style="text-align: center;">
+                <span class="modal-text"> Looks like the agent is facing internet connectivity issues. </span>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="button" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="askfor_support_modal" tabindex="-1" role="dialog" aria-labelledby="close_session_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="close_session_modal_label">Invite an Agent to this session</h5>
+      </div>
+      <div class="modal-body">
+        <div class="row" style="padding:0.5em;">
+          {% if allow_language_support %}
+            <div id="all-supported-language-div">
+              <strong>Select language:</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<select class="custom-select" data-live-search="true" id="easyassist-language-support-selected" style="width: 50%;" onchange="get_list_of_support_agents()">
+                  <option value="-1" selected>Select language</option>
+                  {% for language in supported_language_objs %}
+                      <option value="{{ language.pk }}">{{ language.title }}</option>
+                  {% endfor %}
+              </select>
+            </div>
+          {% endif %}
+          {% if choose_product_category %}
+            <div id="all-product-category-div">
+              <strong>Select product category:</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<select class="custom-select" data-live-search="true" id="easyassist-product-category-selected" style="width: 50%;" onchange="get_list_of_support_agents()">
+                  <option value="-1" selected>Select product category</option>
+                  {% for category in product_category_objs %}
+                      <option value="{{ category.pk }}">{{ category.title }}</option>
+                  {% endfor %}
+              </select>
+            </div>
+          {% endif %}
+          <div id="div-support-agents-container"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+            <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+            <a class="btn btn-primary" href="javascript:void(0)" onclick="share_cobrowsing_session(this)" style="display: none;" id="btn-share-cobrowsing-session">Request for support</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="easyassist_function_fail_modal" tabindex="-1" role="dialog" aria-labelledby="easyassist_function_fail_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-text" id="easyassist_function_fail_code"> Ooops! </span>
+                <span class="modal-text" id="easyassist_function_fail_message"> OK </span>
+            </div>
+            <div class="modal-body mt-1">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary" type="button" data-dismiss="modal" onclick="window.location.reload()">Refresh</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="auto_rotate_modal" tabindex="-1" role="dialog" aria-labelledby="auto_rotate_modal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" style="border-radius: 10px;">
+            <div class="modal-header">
+            </div>
+            <div class="modal-body">
+                <img alt="Rotate phone gif" class="gif-image-responsive" src="{% static 'EasyAssistApp/img/cobrowsing-auto-rotate.gif' %}">
+                <div class="auto-rotate-text">Rotate your phone for a better Cobrowsing experience.
+                </div>
+            </div>
+            <div class="modal-footer" style="border: none;">
+                <button type="button" class="ok-btn" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="easyassist-client-end-page-loader" id="easyassist-client-end-page-loader" style="display: none;">
+    <img alt="Client Page Illustrator" src="{% static 'EasyAssistApp/img/client_page_illustrator.svg' %}" />
+    <span> Looks like agent has navigated to a page outside of the co-browsing journey.
+      If required, request the agent to navigate to a page within the co-browsing journey.</span>
+</div>
+
+{% if cobrowse_agent.get_access_token_obj and cobrowse_agent.get_access_token_obj.agent.user.enable_s3_bucket %}
+<script src="https://static.allincall.in/static/EasyAssistApp/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="https://static.allincall.in/static/EasyAssistApp/vendor/jquery-easing/jquery.easing.min.js"></script>
+<script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/sb-admin-2.min.js"></script>
+<script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/crypto-js.min.js"></script>
+<script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/lz-string.min.js"></script>
+{% else %}
+<script src="{% static 'EasyAssistApp/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'EasyAssistApp/vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/sb-admin-2.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/crypto-js.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/lz-string.min.js' %}"></script>
+{% endif %}
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/encrypt.js' %}"></script>
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/easyassist_mutation_summary.js' %}"></script>
+
+{% if enable_optimized_cobrowsing %}
+  {% if DEVELOPMENT %}
+    <script type="text/javascript" src="{% static 'EasyAssistApp/js/easyassist_tree_mirror.js' %}"></script>
+    <script type="text/javascript" src="{% static 'EasyAssistApp/js/client.reverse.socket.optimized.js' %}?v=1.0"></script>
+  {% else %}
+    <script type="text/javascript" src="/static/EasyAssistApp/js/{{access_token}}/easyassist_tree_mirror.js"></script>
+    <script type="text/javascript" src="/static/EasyAssistApp/js/{{access_token}}/client.reverse.socket.optimized.js"></script>
+  {% endif %}
+{% else %}
+  {% if DEVELOPMENT %}
+    <script type="text/javascript" src="{% static 'EasyAssistApp/js/client.reverse.socket.js' %}?v=1.0"></script>
+  {% else %}
+    <script type="text/javascript" src="/static/EasyAssistApp/js/{{access_token}}/client.reverse.socket.js"></script>
+  {% endif %}
+{% endif %}
+
+{% if is_mobile %}
+  <script type="text/javascript" src="{% static 'EasyAssistApp/js/agent_reverse_sidenav_menu.js' %}"></script>
+{% endif %}
+
+
+<script type="text/javascript">
+  window.COBROWSE_SESSION_ID = "{{session_id}}";
+  window.ALLOW_LANGUAGE_SUPPORT = '{{allow_language_support}}';
+  window.CHOOSE_PRODUCT_CATEGORY = '{{choose_product_category}}';
+  window.ALLOW_SCREENSHARING_COBROWSE = 'false';
+  window.AGENT_NAME = "{{agent_name}}";
+  window.CLIENT_NAME = "{{client_name}}";
+  window.FLOATING_BUTTON_BG_COLOR = "{{floating_button_bg_color}}";
+  window.ENABLE_VOIP_WITH_VIDEO_CALLING = "{{ enable_voip_with_video_calling }}";
+  window.ENABLE_VOIP_CALLING = "{{ enable_voip_calling }}";
+  window.ALLOW_COBROWSING_MEETING = "{{ allow_cobrowsing_meeting }}";
+  window.IS_MOBILE = "{{ is_mobile }}";
+  window.IS_AGENT = "{{is_agent}}"
+  window.INVITED_AGENT_NAME = "{{invited_agent_name}}"
+  window.ADMIN_AGENT_USERNAME = "{{admin_agent_username}}"
+  window.INVITED_AGENT_USERNAME = "{{invited_agent_username}}"
+  window.AGENT_IDENTIFIER = "{{agent_identifier}}"
+  window.AGENT_JOINED_FIRST_TIME = "{{agent_joined_first_time}}"
+  window.DISPLAY_AGENT_PROFILE = "{{ display_agent_profile }}"
+  window.ADMIN_AGENT_PROFILE_PIC_SOURCE = "{{ admin_agent_profile_pic_source }}"
+  window.INVITED_AGENT_PROFILE_PIC_SOURCE = "{{ invited_agent_profile_pic_source }}"
+  window.COBROWSE_LOGO = "{{ cobrowse_config_obj.cobrowsing_logo }}";
+  window.ENABLE_CHAT_BUBBLE = "{{ enable_chat_bubble }}";
+  window.CHAT_ICON_SOURCE = "{{ chat_bubble_icon_source }}";
+  window.ENABLE_EDIT_ACCESS = "{{ enable_edit_access }}"
+  window.FLOATING_BUTTON_POSITION = "{{ floating_button_position }}"
+  
+</script>
+<script type="text/javascript">
+  function easyassistChangeTooltipShow(el){el.querySelector('label').style.display = "inline-block"}
+  function easyassistChangeTooltipHide(el){el.querySelector('label').style.display = "none"}
+  function on_agent_mouse_over_nav_bar(){clear_close_nav_timeout();}
+  function on_agent_mouse_out_nav_bar(){create_close_nav_timeout();}
+
+    $(document).ready(function() {
+      {% if is_mobile and is_client_in_mobile == False %}
+        if(is_landscape_view()) {
+            $('#auto_rotate_modal').modal('show');
+        }
+      {% endif %}
+
+      try {
+        $("#multiple-support-agent").multiselect({
+          includeSelectAllOption: true,
+        });
+      } catch(err) {}
+
+    });
+
+  function show_easyassist_toast(message){
+    var x = document.getElementById("easyassist-snackbar");
+    x.innerHTML = message;
+    x.className = "show";
+    setTimeout(function(){ x.className = x.className.replace("show", ""); }, parseInt('{{ toast_timeout }}'));
+  }
+
+  setInterval(function() {
+    close_session_modal = document.getElementById("close_session_modal");
+    if (close_session_modal != null && close_session_modal != undefined) {
+      if (close_session_modal.classList.contains("show") == true) {
+        $("#capture_screenshot_confirm_modal").modal("hide");
+        $("#capture_pageshot_confirm_modal").modal("hide");
+        $("#request_for_edit_access_modal").modal("hide");
+        $("#captured_information_modal").modal("hide");
+        $("#support_material_modal").modal("hide");
+        $("#request_meeting_modal").modal("hide");
+        $("#check_for_internet_modal").modal("hide");
+        $("#askfor_support_modal").modal("hide");
+      }
+    }
+  }, 500);
+
+  function hide_mobile_modal_btn(el) {
+    el.style.display = "none";
+  }
+
+  function show_mobile_modal_btn(el) {
+    try {
+      document.getElementById("sidebar-mobile-modal-btn").style.display = "flex";
+      $('#cobrowse-mobile-modal').modal('hide');
+    } catch(err) {}
+  }
+
+  {% comment %} function hide_invited_agent_voip_modal(){
+    $("#request_voip_meeting_modal_invited_agent").modal("hide");
+  } {% endcomment %}
+
+  $("#cobrowse-mobile-modal").on("hidden.bs.modal", function() {
+      document.getElementById('sidebar-mobile-modal-btn').style.display = "flex";
+  });
+
+  function hide_cobrowsing_modals(element){
+    var crr_modal = element.getAttribute("data-target");
+    var modals = [
+      "#capture_pageshot_confirm_modal",
+      "#capture_pageshot_confirm_modal",
+      "#request_for_edit_access_modal",
+      "#captured_information_modal",
+      "#support_material_modal",
+      "#request_meeting_modal",
+      "#check_for_internet_modal",
+      "#askfor_support_modal",
+      "#close_session_modal",
+      "#check_for_internet_modal",
+      "#client_internet_connection_weak_message_modal",
+      "#client_disconnected_message_modal"
+    ];
+
+    for(var modal_index = 0; modal_index < modals.length; modal_index++){
+      if(modals[modal_index] != crr_modal) {
+        try {
+          $(modals[modal_index]).modal("hide");
+        } catch(err) {}
+      }
+    }
+
+    try {
+      document.getElementById("mobile-modal-hide-btn").click();
+    } catch(err) {}
+  }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,1539 @@
+{% extends 'LiveChatApp/base.html' %}
+{% block content %}
+{% load static %}
+<!-- <link href="{% static 'LiveChatApp/css/agent_chatbot.css' %}" rel="stylesheet"> -->
+     
+ <link href="{% static 'LiveChatApp/css/agent_console.css' %}?v={% random_int 1 100 %}" rel="stylesheet">
+ <link href="{% static 'LiveChatApp/css/form_builder.css' %}?v={% random_int 1 100 %}" rel="stylesheet">
+ <link href="{% static 'LiveChatApp/css/livechat_voip.css' %}?v={% random_int 1 100 %}" rel="stylesheet">
+ <link href="{% static 'LiveChatApp/css/livechat_cobrowsing.css' %}?v={% random_int 1 100 %}" rel="stylesheet">
+ <link href="{% static 'LiveChatApp/css/bootstrap-select.css' %}" rel="stylesheet">
+ <link href="{% static 'LiveChatApp/css/video_call.css' %}?v={% random_int 1 100 %}" rel="stylesheet">
+ <link href="{% static 'LiveChatApp/css/customer_details.css' %}?v={% random_int 1 100 %}" rel="stylesheet">
+ <link href="{% static 'LiveChatApp/css/intlTelInput.css' %}?v={% random_int 1 100 %}" rel="stylesheet">
+
+ <style type="text/css">
+
+  .livechat-welcome-image {
+    fill: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+  }
+
+  .live-chat-resolve,
+  .live-chat-voip-call-initiate-button,
+  .live-chat-details-action-buttons,
+  .livechat-vc-call-btns {
+    border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }};
+    color: {{ admin_config.get_livechat_theme_lighten_one }};
+  }
+
+  .live-chat-customer-name p,
+  .live-chat-btn:hover,
+  .load-more-chats-div a,
+  .live-chat-client-name-with-message {
+    color: {{ admin_config.get_livechat_theme_lighten_one }};
+  }
+
+  .transfer-chat-model .form-popup .form-container .addBtn,
+  .resolve-chat-model .form-popup .form-container .addBtn,
+  #mobile_voip_connect_btn {
+    border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }};
+    background: linear-gradient(270deg, {{ admin_config.get_livechat_theme_lighten_five }} 0%, {{ admin_config.get_livechat_theme_lighten_one }} 100%)
+  }
+
+  .live-chat-reply {
+    color: {{ admin_config.get_livechat_theme_lighten_one }};
+    border-top: 2px solid {{ admin_config.get_livechat_theme_lighten_one }};
+  }
+
+  .tooltip-textarea .tooltiptext {
+      background: {{ admin_config.get_livechat_theme_lighten_one }}
+  }
+
+  .tooltip-textarea .tooltiptext::after {
+    border-color: {{ admin_config.get_livechat_theme_lighten_one }} transparent transparent transparent
+  }
+  
+ 
+  #file-upload-progress-bar .ui-widget-header {
+    background: {{ admin_config.get_livechat_theme_lighten_one }};
+    border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }};
+    margin: 0;
+  }
+
+  .live-chat-customer-details::-webkit-scrollbar-thumb {
+    background: {{ admin_config.get_livechat_theme_lighten_six }};
+  }
+
+  .livechat-agent-translate-chat-dropdown-wrapper button.dropdown-toggle {
+    border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }} !important;
+  }
+
+  .livechat-add-agent-container .select-box .option.agent-option span.checkmark {
+    border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }} !important;
+  }
+  .livechat-add-agent-container .select-box .option.agent-option input:checked~.checkmark {
+    background-color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+  }
+  .livechat-add-agent-container .select-box .option.agent-option input:checked~.checkmark {
+    border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }} !important;
+  }
+
+</style>
+
+  <div class="container-fluid" style="overflow: hidden;">
+    <div class="row">
+  <div class="col-xl-3 col-lg-3 col-md-3 col-sm-12 col-12 live-chat-active-customers"
+    id="live-chat-active-customers-sidebar">
+<!--     <h4 id="active-customers-head">
+      Active Customers
+    </h4> -->
+    <div id="active-customers-head">
+        <button id="livechat-customers-tab-header" class="livechat-chat-option-tab active">Active Customers</button>
+        {% if email_config_obj.is_livechat_enabled_for_email %}
+        <button id="livechat-email-customers-tab-header" class="livechat-chat-option-tab">Email Conversations</button>
+        {% endif %}
+    </div>
+    <div class="live-chat-contacts livechat-common-customers-tab">
+      <div id = "no_cust_till_now" style="display: block; padding:35px;">
+        <p>Loading chats ...</p>
+        <img src="{% static 'LiveChatApp/img/waiting1.gif' %}" style="height: 2em; margin-left: 30px;">
+      </div>
+    </div>
+    {% if email_config_obj.is_livechat_enabled_for_email %}
+    <div class="live-chat-contacts livechat-email-customers-tab" style="display: none;">
+      <div id = "no_email_cust_till_now" style="display: block; padding:35px;">
+        <p>Loading chats ...</p>
+        <img src="{% static 'LiveChatApp/img/waiting1.gif' %}" style="height: 2em; margin-left: 30px;">
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  <p class="mobile-display-no-chats-appear">
+    Active customers appear here
+</p>
+  <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12 py-0 px-0 live-chat-mobile-chat-detail" style="height: calc(100vh - 3.375rem); display: none;" id="livechat-main-console">
+    <h4 class="live-chat-mobile-display" style="margin-bottom: 0;">
+      <div class="live-chat-customer-name" >
+        <div class="live-chat-mobile-display back-arrow">
+          <svg width="25" height="21" viewBox="0 0 25 21" fill="none" xmlns="http://www.w3.org/2000/svg" alt="Back arrow" id="live-chat-active-customers-opener" onclick="close_livechat_console()">
+            <path d="M25 9.1376H5.19713L12.3832 1.92643L10.4635 0L0 10.5L10.4635 21L12.3832 19.0736L5.19713 11.8624H25V9.1376Z" fill="#757575"/>
+          </svg>
+        </div>
+        <img class="img-profile rounded-circle" src="{% static 'LiveChatApp/img/undraw_profile_2.svg' %}" width="45">
+        <span style="font-size: 22px; color: #4D4D4D; padding-left: 10px; font-weight: 500;" id="livechat-customer-name"></span>
+        
+        {% if config_obj.is_cobrowsing_enabled %}
+
+        <button class="live-chat-mobile-display mobile-voip-call-button livechat-mobile-cb-button" id="mobile_cb_normal_btn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M3 6.20162C3 4.43352 4.43352 3 6.2016 3H17.7984C19.5665 3 21 4.43352 21 6.20162V17.7984C21 19.5665 19.5665 21 17.7984 21H6.2016C4.43352 21 3 19.5665 3 17.7984V6.20162ZM8.27439 14.2795H13.2746C14.4342 14.2795 15.3746 15.2198 15.3746 16.3795C15.3746 17.5394 14.4342 18.4795 13.2746 18.4795H8.27439C7.11473 18.4795 6.17441 17.5394 6.17441 16.3795C6.17441 15.2198 7.11473 14.2795 8.27439 14.2795ZM7.05664 12.4256C7.25267 12.5002 7.24646 12.7757 7.0473 12.8415L6.54189 13.0086L7.00605 13.4827C7.10641 13.5851 7.1035 13.7484 6.99962 13.8474C6.89567 13.9463 6.73014 13.9435 6.62977 13.841L6.13468 13.3354L5.85862 13.7632C5.75235 13.9278 5.49767 13.8859 5.45148 13.696L5.04666 12.0328C5.00451 11.8596 5.17677 11.7109 5.34536 11.775L7.05664 12.4256ZM12.3543 7.79934H17.3544C18.5141 7.79934 19.4544 8.73967 19.4544 9.89935C19.4544 11.0592 18.5141 11.9993 17.3544 11.9993H12.3543C11.1946 11.9993 10.2542 11.0592 10.2542 9.89935C10.2542 8.73967 11.1946 7.79934 12.3543 7.79934ZM11.1365 5.94548C11.3325 6.01999 11.3263 6.29556 11.1271 6.36138L10.6217 6.52844L11.0859 7.00252C11.1863 7.10497 11.1833 7.26829 11.0795 7.36729C10.9755 7.46619 10.81 7.46337 10.7096 7.36086L10.2145 6.85521L9.93846 7.28303C9.83217 7.44765 9.57749 7.40572 9.53132 7.21589L9.12647 5.55267C9.08434 5.37948 9.25661 5.23076 9.42517 5.29481L11.1365 5.94548Z" fill="#7B7A7B"/>
+          </svg>
+        </button>
+
+        <button class="live-chat-mobile-display mobile-voip-call-button livechat-mobile-cb-button" id="mobile_cb_sent_btn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M3 6.20162C3 4.43352 4.43352 3 6.2016 3H17.7984C19.5665 3 21 4.43352 21 6.20162V17.7984C21 19.5665 19.5665 21 17.7984 21H6.2016C4.43352 21 3 19.5665 3 17.7984V6.20162ZM8.27439 14.2795H13.2746C14.4342 14.2795 15.3746 15.2198 15.3746 16.3795C15.3746 17.5394 14.4342 18.4795 13.2746 18.4795H8.27439C7.11473 18.4795 6.17441 17.5394 6.17441 16.3795C6.17441 15.2198 7.11473 14.2795 8.27439 14.2795ZM7.05664 12.4256C7.25267 12.5002 7.24646 12.7757 7.0473 12.8415L6.54189 13.0086L7.00605 13.4827C7.10641 13.5851 7.1035 13.7484 6.99962 13.8474C6.89567 13.9463 6.73014 13.9435 6.62977 13.841L6.13468 13.3354L5.85862 13.7632C5.75235 13.9278 5.49767 13.8859 5.45148 13.696L5.04666 12.0328C5.00451 11.8596 5.17677 11.7109 5.34536 11.775L7.05664 12.4256ZM12.3543 7.79934H17.3544C18.5141 7.79934 19.4544 8.73967 19.4544 9.89935C19.4544 11.0592 18.5141 11.9993 17.3544 11.9993H12.3543C11.1946 11.9993 10.2542 11.0592 10.2542 9.89935C10.2542 8.73967 11.1946 7.79934 12.3543 7.79934ZM11.1365 5.94548C11.3325 6.01999 11.3263 6.29556 11.1271 6.36138L10.6217 6.52844L11.0859 7.00252C11.1863 7.10497 11.1833 7.26829 11.0795 7.36729C10.9755 7.46619 10.81 7.46337 10.7096 7.36086L10.2145 6.85521L9.93846 7.28303C9.83217 7.44765 9.57749 7.40572 9.53132 7.21589L9.12647 5.55267C9.08434 5.37948 9.25661 5.23076 9.42517 5.29481L11.1365 5.94548Z" fill="#F59E0B"/>
+          </svg>
+        </button>
+
+        <button class="live-chat-mobile-display mobile-voip-call-button livechat-mobile-cb-button" id="mobile_cb_accept_btn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M3 6.20162C3 4.43352 4.43352 3 6.2016 3H17.7984C19.5665 3 21 4.43352 21 6.20162V17.7984C21 19.5665 19.5665 21 17.7984 21H6.2016C4.43352 21 3 19.5665 3 17.7984V6.20162ZM8.27439 14.2795H13.2746C14.4342 14.2795 15.3746 15.2198 15.3746 16.3795C15.3746 17.5394 14.4342 18.4795 13.2746 18.4795H8.27439C7.11473 18.4795 6.17441 17.5394 6.17441 16.3795C6.17441 15.2198 7.11473 14.2795 8.27439 14.2795ZM7.05664 12.4256C7.25267 12.5002 7.24646 12.7757 7.0473 12.8415L6.54189 13.0086L7.00605 13.4827C7.10641 13.5851 7.1035 13.7484 6.99962 13.8474C6.89567 13.9463 6.73014 13.9435 6.62977 13.841L6.13468 13.3354L5.85862 13.7632C5.75235 13.9278 5.49767 13.8859 5.45148 13.696L5.04666 12.0328C5.00451 11.8596 5.17677 11.7109 5.34536 11.775L7.05664 12.4256ZM12.3543 7.79934H17.3544C18.5141 7.79934 19.4544 8.73967 19.4544 9.89935C19.4544 11.0592 18.5141 11.9993 17.3544 11.9993H12.3543C11.1946 11.9993 10.2542 11.0592 10.2542 9.89935C10.2542 8.73967 11.1946 7.79934 12.3543 7.79934ZM11.1365 5.94548C11.3325 6.01999 11.3263 6.29556 11.1271 6.36138L10.6217 6.52844L11.0859 7.00252C11.1863 7.10497 11.1833 7.26829 11.0795 7.36729C10.9755 7.46619 10.81 7.46337 10.7096 7.36086L10.2145 6.85521L9.93846 7.28303C9.83217 7.44765 9.57749 7.40572 9.53132 7.21589L9.12647 5.55267C9.08434 5.37948 9.25661 5.23076 9.42517 5.29481L11.1365 5.94548Z" fill="#10B981"/>
+          </svg>
+        </button>
+
+        <button class="live-chat-mobile-display mobile-voip-call-button livechat-mobile-cb-button" id="mobile_cb_ongoing_btn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g opacity="0.25">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M3 6.20162C3 4.43352 4.43352 3 6.2016 3H17.7984C19.5665 3 21 4.43352 21 6.20162V17.7984C21 19.5665 19.5665 21 17.7984 21H6.2016C4.43352 21 3 19.5665 3 17.7984V6.20162ZM8.27439 14.2795H13.2746C14.4342 14.2795 15.3746 15.2198 15.3746 16.3795C15.3746 17.5394 14.4342 18.4795 13.2746 18.4795H8.27439C7.11473 18.4795 6.17441 17.5394 6.17441 16.3795C6.17441 15.2198 7.11473 14.2795 8.27439 14.2795ZM7.05664 12.4256C7.25267 12.5002 7.24646 12.7757 7.0473 12.8415L6.54189 13.0086L7.00605 13.4827C7.10641 13.5851 7.1035 13.7484 6.99962 13.8474C6.89567 13.9463 6.73014 13.9435 6.62977 13.841L6.13468 13.3354L5.85862 13.7632C5.75235 13.9278 5.49767 13.8859 5.45148 13.696L5.04666 12.0328C5.00451 11.8596 5.17677 11.7109 5.34536 11.775L7.05664 12.4256ZM12.3543 7.79934H17.3544C18.5141 7.79934 19.4544 8.73967 19.4544 9.89935C19.4544 11.0592 18.5141 11.9993 17.3544 11.9993H12.3543C11.1946 11.9993 10.2542 11.0592 10.2542 9.89935C10.2542 8.73967 11.1946 7.79934 12.3543 7.79934ZM11.1365 5.94548C11.3325 6.01999 11.3263 6.29556 11.1271 6.36138L10.6217 6.52844L11.0859 7.00252C11.1863 7.10497 11.1833 7.26829 11.0795 7.36729C10.9755 7.46619 10.81 7.46337 10.7096 7.36086L10.2145 6.85521L9.93846 7.28303C9.83217 7.44765 9.57749 7.40572 9.53132 7.21589L9.12647 5.55267C9.08434 5.37948 9.25661 5.23076 9.42517 5.29481L11.1365 5.94548Z" fill="#0254D7"/>
+          </g>
+          </svg>
+        </button>
+
+        <button class="live-chat-mobile-display mobile-voip-call-button livechat-mobile-cb-button" id="mobile_cb_disabled_btn" style="opacity: 0.5;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M3 6.20162C3 4.43352 4.43352 3 6.2016 3H17.7984C19.5665 3 21 4.43352 21 6.20162V17.7984C21 19.5665 19.5665 21 17.7984 21H6.2016C4.43352 21 3 19.5665 3 17.7984V6.20162ZM8.27439 14.2795H13.2746C14.4342 14.2795 15.3746 15.2198 15.3746 16.3795C15.3746 17.5394 14.4342 18.4795 13.2746 18.4795H8.27439C7.11473 18.4795 6.17441 17.5394 6.17441 16.3795C6.17441 15.2198 7.11473 14.2795 8.27439 14.2795ZM7.05664 12.4256C7.25267 12.5002 7.24646 12.7757 7.0473 12.8415L6.54189 13.0086L7.00605 13.4827C7.10641 13.5851 7.1035 13.7484 6.99962 13.8474C6.89567 13.9463 6.73014 13.9435 6.62977 13.841L6.13468 13.3354L5.85862 13.7632C5.75235 13.9278 5.49767 13.8859 5.45148 13.696L5.04666 12.0328C5.00451 11.8596 5.17677 11.7109 5.34536 11.775L7.05664 12.4256ZM12.3543 7.79934H17.3544C18.5141 7.79934 19.4544 8.73967 19.4544 9.89935C19.4544 11.0592 18.5141 11.9993 17.3544 11.9993H12.3543C11.1946 11.9993 10.2542 11.0592 10.2542 9.89935C10.2542 8.73967 11.1946 7.79934 12.3543 7.79934ZM11.1365 5.94548C11.3325 6.01999 11.3263 6.29556 11.1271 6.36138L10.6217 6.52844L11.0859 7.00252C11.1863 7.10497 11.1833 7.26829 11.0795 7.36729C10.9755 7.46619 10.81 7.46337 10.7096 7.36086L10.2145 6.85521L9.93846 7.28303C9.83217 7.44765 9.57749 7.40572 9.53132 7.21589L9.12647 5.55267C9.08434 5.37948 9.25661 5.23076 9.42517 5.29481L11.1365 5.94548Z" fill="#0254D7"/>
+          </svg>
+        </button>
+
+        {% endif %}
+
+        {% if config_obj.is_livechat_vc_enabled %}
+
+        <button class="live-chat-mobile-display mobile-voip-call-button livechat-mobile-voip-button" id="mobile_vc_btn">
+          <svg id="vc_call_normal_svg" width="28" height="28" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11.2705 11.8341C11.2705 13.079 10.2613 14.0882 9.01643 14.0882H4.50824C3.26334 14.0882 2.25415 13.079 2.25415 11.8341V6.19885C2.25415 4.95395 3.26334 3.94476 4.50824 3.94476H9.01643C10.2613 3.94476 11.2705 4.95395 11.2705 6.19885V11.8341Z" fill="#7B7A7B"/>
+            <path d="M12.3976 10.8894V7.14349L14.3523 5.293C14.8911 4.78292 15.7787 5.1649 15.7787 5.90685V12.1261C15.7787 12.868 14.8911 13.25 14.3523 12.7399L12.3976 10.8894Z" fill="#7B7A7B"/>
+          </svg>
+          <svg id="vc_call_sent_svg" class="livechat-voip-call-normal-svg" width="28" height="28" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M11.2705 11.8341C11.2705 13.079 10.2613 14.0882 9.01643 14.0882H4.50824C3.26334 14.0882 2.25415 13.079 2.25415 11.8341V6.19885C2.25415 4.95395 3.26334 3.94476 4.50824 3.94476H9.01643C10.2613 3.94476 11.2705 4.95395 11.2705 6.19885V11.8341Z" fill="#F59E0B"/>
+              <path d="M12.3976 10.8894V7.14349L14.3523 5.293C14.8911 4.78292 15.7787 5.1649 15.7787 5.90685V12.1261C15.7787 12.868 14.8911 13.25 14.3523 12.7399L12.3976 10.8894Z" fill="#F59E0B"/>
+          </svg>
+                
+          <svg id="vc_call_accept_svg" class="livechat-voip-call-normal-svg" width="28" height="28" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M11.2705 11.8341C11.2705 13.079 10.2613 14.0882 9.01643 14.0882H4.50824C3.26334 14.0882 2.25415 13.079 2.25415 11.8341V6.19885C2.25415 4.95395 3.26334 3.94476 4.50824 3.94476H9.01643C10.2613 3.94476 11.2705 4.95395 11.2705 6.19885V11.8341Z" fill="#F59E0B"/>
+              <path d="M12.3976 10.8894V7.14349L14.3523 5.293C14.8911 4.78292 15.7787 5.1649 15.7787 5.90685V12.1261C15.7787 12.868 14.8911 13.25 14.3523 12.7399L12.3976 10.8894Z" fill="#F59E0B"/>
+          </svg>
+
+          <svg id="vc_call_ongoing_svg" class="livechat-voip-call-normal-svg" width="28" height="28" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M11.2705 11.8341C11.2705 13.079 10.2613 14.0882 9.01643 14.0882H4.50824C3.26334 14.0882 2.25415 13.079 2.25415 11.8341V6.19885C2.25415 4.95395 3.26334 3.94476 4.50824 3.94476H9.01643C10.2613 3.94476 11.2705 4.95395 11.2705 6.19885V11.8341Z" fill="#10B981"/>
+              <path d="M12.3976 10.8894V7.14349L14.3523 5.293C14.8911 4.78292 15.7787 5.1649 15.7787 5.90685V12.1261C15.7787 12.868 14.8911 13.25 14.3523 12.7399L12.3976 10.8894Z" fill="#10B981"/>
+          </svg>
+      </button>
+        
+        {% endif %}
+
+        {% if config_obj.is_voip_enabled %}
+          
+        <button class="live-chat-mobile-display mobile-voip-call-button livechat-mobile-voip-button" id="mobile_voip_btn">
+            <svg id="voip_call_normal_svg" class="livechat-voip-call-normal-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M11.5317 12.4724C15.5208 16.4604 16.4258 11.8467 18.9656 14.3848C21.4143 16.8328 22.8216 17.3232 19.7192 20.4247C19.3306 20.737 16.8616 24.4943 8.1846 15.8197C-0.493478 7.144 3.26158 4.67244 3.57397 4.28395C6.68387 1.17385 7.16586 2.58938 9.61449 5.03733C12.1544 7.5765 7.54266 8.48441 11.5317 12.4724Z" fill="#7B7A7B"></path>
+            </svg>
+        </button>
+        
+        <button class="live-chat-mobile-display mobile-voip-call-button livechat-mobile-voip-button" id="mobile_voip_sent_btn">
+
+            <svg id="voip_call_sent_svg" class="livechat-voip-request-sent-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M11.5317 12.4724C15.5208 16.4604 16.4258 11.8467 18.9656 14.3848C21.4143 16.8328 22.8216 17.3232 19.7192 20.4247C19.3306 20.737 16.8616 24.4943 8.1846 15.8197C-0.493478 7.144 3.26158 4.67244 3.57397 4.28395C6.68387 1.17385 7.16586 2.58938 9.61449 5.03733C12.1544 7.5765 7.54266 8.48441 11.5317 12.4724Z" fill="#F59E0B"></path>
+            </svg>
+        </button>
+
+        <button class="live-chat-mobile-display mobile-voip-call-button livechat-mobile-voip-button" id="mobile_voip_accept_btn">
+            
+            <svg id="voip_call_accept_svg" class="livechat-voip-request-accept-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M11.5317 12.4724C15.5208 16.4604 16.4258 11.8467 18.9656 14.3848C21.4143 16.8328 22.8216 17.3232 19.7192 20.4247C19.3306 20.737 16.8616 24.4943 8.1846 15.8197C-0.493478 7.144 3.26158 4.67244 3.57397 4.28395C6.68387 1.17385 7.16586 2.58938 9.61449 5.03733C12.1544 7.5765 7.54266 8.48441 11.5317 12.4724Z" fill="#10B981"></path>
+            </svg>
+        </button>
+
+        <button class="live-chat-mobile-display mobile-voip-call-button livechat-mobile-voip-button" id="mobile_voip_ongoing_btn">
+
+            <svg id="voip_call_ongoing_svg" class="livechat-voip-request-end-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M11.5317 12.4724C15.5208 16.4604 16.4258 11.8467 18.9656 14.3848C21.4143 16.8328 22.8216 17.3232 19.7192 20.4247C19.3306 20.737 16.8616 24.4943 8.1846 15.8197C-0.493478 7.144 3.26158 4.67244 3.57397 4.28395C6.68387 1.17385 7.16586 2.58938 9.61449 5.03733C12.1544 7.5765 7.54266 8.48441 11.5317 12.4724Z" fill="#FF0000"></path>
+            </svg>
+        </button>
+                          
+        {% endif %}
+
+        <div class="dropdown no-arrow live-chat-mobile-display mobile-menu-dots">
+          <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+          </a>
+          <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+            <a class="dropdown-item" href="javascript:void(0)" id="live-chat-customer-details-opener" onclick="open_customer_details()">Customer Details</a>
+            <div class="dropdown-divider" id="livechat-mobile-transfer-div"></div>
+            <a class="dropdown-item" href="javascript:void(0)" onclick="transfer_chat_modal_open()" id="livechat-mobile-transfer-btn">Transfers Chat</a>
+            <div class="dropdown-divider" id="livechat-mobile-add-agent-div"></div>
+            <a class="dropdown-item" data-toggle="modal" onclick="add_agent_modal_open()" href="#" id="livechat-mobile-add-agent-btn">Add Agent</a>
+            <div class="dropdown-divider" id="livechat-mobile-resolve-div"></div>
+            <a class="dropdown-item" href="javascript:void(0)" id="livechat-mobile-resolve-btn">Resolve</a>
+            <div class="dropdown-divider" id="livechat-mobile-request-status-div"></div>
+            <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" onclick="open_request_status_modal()" id="livechat-mobile-request-status-btn">Request status</a>
+            <div class="dropdown-divider" id="livechat-mobile-exit-div"></div>
+            <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" onclick="guest_agent_exit_chat()" id="livechat-mobile-exit-btn">Exit Chat</a>
+            <div id="livechat_langauge_container_show">
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="javascript:void(0)">Language</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </h4>
+    <br>
+
+    <!-- Chat Escalation notfication -->
+    <div class="blacklist-report-toast-div" id="report-warn-user-div" style="display: none;">
+        <div id="warn-user-toast" style="display: none;">
+            <div class="chat-escalation-toast-container">
+                <div class="toast-text">
+                   <p>We saw that <b class="chat-escalation-customer-email"></b> has used a blacklisted keyword, do you want to warn this user</p>  
+                </div>
+                <div class="button-group">
+                    <button type="button" id="chat-escalation-warn-btn" data-toggle="modal">Warn Now</button>
+                    <button type="button" id="chat-escalation-warn-ignore-btn" class="ignore-btn">Ignore</button>
+                </div>
+            </div>
+        </div>
+        <div id="report-user-toast" style="display: none;">
+            <div class="chat-escalation-toast-container">
+                <div class="toast-text">
+                   <p>We saw that <b class="chat-escalation-customer-email"></b> has used a blacklisted keyword again, do you want to report this user?</p>  
+                </div>
+                <div class="button-group">
+                    <button type="button" id="chat-escalation-report-btn" data-toggle="modal" data-target="#livechat-blacklist-report-modal">Report</button>
+                    <button type="button" id="chat-escalation-report-ignore-btn" class="ignore-btn">Ignore</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Livechat primary agent header -->
+    <div class="live-chat-button-wrapper live-chat-button-wrapper-group-single-chat live-chat-desktop-display" id="livechat-primary-agent-header">
+        <a href="javascript:void(0)" class="live-chat-btn live-chat-resolve livechat-resolve-single-group-chat" id="livechat-web-resolve-btn"><span>Resolve</span></a>
+
+    <div class="livechat-agent-translate-chat-container">
+
+        {% if config_obj.is_virtual_interpretation_enabled %}
+          <div class="livechat-agent-detected-language-text-wrapper detected_language">
+              <div class="livechat-detected-language-subheading">Detected language - &nbsp;</div>
+
+
+              <div class="livechat-detected-language-text">English</div>
+          </div>
+          <div class="livechat-agent-detected-language-text-wrapper original_language">
+              <div class="livechat-detected-language-subheading">Original language - &nbsp;</div>
+
+              <div class="livechat-detected-language-text">English</div>
+              <div class="livechat-detected-language-subheading">Translated language : &nbsp;</div>
+
+          </div>
+          <div class="livechat-agent-translate-chat-dropdown-wrapper language_translate_div">
+              <select class="selectpicker agent_language_dropdown" title="Translate">
+
+                {% if to_show_bot_lang %}
+                  {% for language in bot_obj.languages_supported.all %}
+                    <option value="{{language.lang}}">{{language.name_in_english}}</option>
+                  {% endfor %}
+                {% else %}
+                  {% for language in user_obj.preferred_languages.all %}
+                    <option value="{{language.lang}}">{{language.name_in_english}}</option>
+                  {% endfor %}
+                {% endif %}
+                
+            </select>
+          </div>
+        {% endif %}
+
+        <div class="dropdown no-arrow " style="display: flex;">
+            <div class="profile-user-icon" id="primary-guest-agent-status" onclick="open_request_status_modal()" style="display: none;">
+                <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9.66006 10.87C9.56006 10.86 9.44006 10.86 9.33006 10.87C6.95006 10.79 5.06006 8.84 5.06006 6.44C5.06006 3.99 7.04006 2 9.50006 2C11.9501 2 13.9401 3.99 13.9401 6.44C13.9301 8.84 12.0401 10.79 9.66006 10.87Z" stroke="#0254D7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M16.91 4C18.85 4 20.41 5.57 20.41 7.5C20.41 9.39 18.91 10.93 17.04 11C16.96 10.99 16.87 10.99 16.78 11" stroke="#0254D7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M4.65997 14.56C2.23997 16.18 2.23997 18.82 4.65997 20.43C7.40997 22.27 11.92 22.27 14.67 20.43C17.09 18.81 17.09 16.17 14.67 14.56C11.93 12.73 7.41997 12.73 4.65997 14.56Z" stroke="#0254D7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M18.8401 20C19.5601 19.85 20.2401 19.56 20.8001 19.13C22.3601 17.96 22.3601 16.03 20.8001 14.86C20.2501 14.44 19.5801 14.16 18.8701 14" stroke="#0254D7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>  
+                <a class="users-connected-count-btn" id="guest-agents-count-status">
+                </a>                                          
+            </div>
+            <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="margin-left: 30.75px;">
+                <i class="fas fa-ellipsis-v fa-sm fa-fw " style="color:#969494;"></i>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                <a class="dropdown-item single-group-chat-modal-drop-down" data-toggle="modal" onclick="add_agent_modal_open()" href="#" id="livechat-add-agent-btn">
+                    <svg width="16" height="17" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12.0002 8.66634H8.66683V11.9997C8.66683 12.3663 8.36683 12.6663 8.00016 12.6663C7.6335 12.6663 7.3335 12.3663 7.3335 11.9997V8.66634H4.00016C3.6335 8.66634 3.3335 8.36634 3.3335 7.99967C3.3335 7.63301 3.6335 7.33301 4.00016 7.33301H7.3335V3.99967C7.3335 3.63301 7.6335 3.33301 8.00016 3.33301C8.36683 3.33301 8.66683 3.63301 8.66683 3.99967V7.33301H12.0002C12.3668 7.33301 12.6668 7.63301 12.6668 7.99967C12.6668 8.36634 12.3668 8.66634 12.0002 8.66634Z" fill="#717171"/>
+                        </svg>
+
+                    <span>  Add Agent </span> </a>
+                <div class="dropdown-divider"></div>
+
+                <a class="dropdown-item single-group-chat-modal-drop-down" data-toggle="modal" onclick="transfer_chat_modal_open()" href="#" id="livechat-transfer-chat-btn">
+                    <svg width="16" height="17" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12.39 7.15961C11.357 6.19361 10.0168 5.59961 8.5371 5.59961C6.21419 5.59961 4.21516 7.05161 3.26589 9.15761C3.08721 9.55961 3.28823 10.0396 3.68469 10.1836C4.01414 10.3036 4.37151 10.1356 4.52227 9.79961C5.24818 8.20361 6.77258 7.09961 8.5371 7.09961C9.62596 7.09961 10.6199 7.53161 11.3961 8.22761L10.3295 9.37361C9.97774 9.75161 10.2234 10.3996 10.7204 10.3996H13.8418C14.1489 10.3996 14.4002 10.1296 14.4002 9.79961V6.44561C14.4002 5.91161 13.7971 5.64161 13.4453 6.01961L12.39 7.15961Z" fill="#717171"/>
+                        </svg>
+
+                    <span> Transfer Chat</span></a>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Livechat secondary agent accept/reject header -->
+    <div class="agent-request-reject-accept-popup-div" id="livechat-secondary-agent-accept-reject-header" style="display: none">
+        <div class="row " style="height: 100%;">
+            <div class="col-md-6 col-lg-6 col-sm-12 livechat-request-agent-popup-name-text-wrapper">
+                <div class="livechat-request-agent-popup-name-text" id="primary-agent-invited-text">
+                    
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-6 col-sm-12 livechat-agent-request-accept-btn-wrapper">
+                <button class="livechat-agent-request-accept-btn" onclick="guest_agent_session_accept()"><svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg" >
+                <path d="M7.62937 12.6219L5.02688 10.0194C4.88675 9.87892 4.69651 9.8 4.49813 9.8C4.29974 9.8 4.1095 9.87892 3.96937 10.0194C3.67688 10.3119 3.67688 10.7844 3.96937 11.0769L7.10437 14.2119C7.39687 14.5044 7.86938 14.5044 8.16188 14.2119L16.0969 6.27686C16.3894 5.98436 16.3894 5.51186 16.0969 5.21936C15.9568 5.07892 15.7665 5 15.5681 5C15.3697 5 15.1795 5.07892 15.0394 5.21936L7.62937 12.6219Z" fill="#0254D7"/>
+                </svg>
+                <span>Accept</span></button>
+                <button class="livechat-agent-request-reject-btn" onclick="guest_agent_session_reject()"><svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg" >
+                <path d="M13.975 4.78253C13.8349 4.64209 13.6447 4.56316 13.4463 4.56316C13.2479 4.56316 13.0577 4.64209 12.9175 4.78253L9.25004 8.44253L5.58254 4.77503C5.44242 4.63459 5.25218 4.55566 5.05379 4.55566C4.8554 4.55566 4.66516 4.63459 4.52504 4.77503C4.23254 5.06753 4.23254 5.54003 4.52504 5.83253L8.19254 9.50003L4.52504 13.1675C4.23254 13.46 4.23254 13.9325 4.52504 14.225C4.81754 14.5175 5.29004 14.5175 5.58254 14.225L9.25004 10.5575L12.9175 14.225C13.21 14.5175 13.6825 14.5175 13.975 14.225C14.2675 13.9325 14.2675 13.46 13.975 13.1675L10.3075 9.50003L13.975 5.83253C14.26 5.54753 14.26 5.06753 13.975 4.78253Z" fill="#D70202"/>
+                </svg><span>Reject</span>
+                 </button>
+            </div>
+        </div>
+        <div class="row" style="background-color: #EFF6FF;margin: 0 -24px;justify-content: space-between;padding: 15px 0;">
+                <div class="col-md-6 col-lg-6 col-sm-12 livechat-request-agent-remaining-time-text-wrapper">
+                    <div class="livechat-request-remaining-time-name-text">
+                        Remaining time to accept/reject the request
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-6 col-sm-12 livechat-agent-request-remaining-time-timer-div">
+                    <div class="livechat-request-remaining-time-timer-text">
+                        <span id="guest-session-remaining-time"></span> sec
+                    </div>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 21.5999C14.5461 21.5999 16.9879 20.5885 18.7882 18.7881C20.5886 16.9878 21.6 14.546 21.6 11.9999C21.6 9.45382 20.5886 7.01203 18.7882 5.21168C16.9879 3.41133 14.5461 2.3999 12 2.3999C9.45395 2.3999 7.01215 3.41133 5.2118 5.21168C3.41145 7.01203 2.40002 9.45382 2.40002 11.9999C2.40002 14.546 3.41145 16.9878 5.2118 18.7881C7.01215 20.5885 9.45395 21.5999 12 21.5999ZM13.2 7.1999C13.2 6.88164 13.0736 6.57642 12.8486 6.35137C12.6235 6.12633 12.3183 5.9999 12 5.9999C11.6818 5.9999 11.3765 6.12633 11.1515 6.35137C10.9265 6.57642 10.8 6.88164 10.8 7.1999V11.9999C10.8001 12.3181 10.9266 12.6233 11.1516 12.8483L14.5452 16.2431C14.6567 16.3546 14.7891 16.443 14.9347 16.5034C15.0804 16.5637 15.2366 16.5948 15.3942 16.5948C15.5519 16.5948 15.708 16.5637 15.8537 16.5034C15.9994 16.443 16.1317 16.3546 16.2432 16.2431C16.3547 16.1316 16.4432 15.9993 16.5035 15.8536C16.5638 15.7079 16.5949 15.5518 16.5949 15.3941C16.5949 15.2364 16.5638 15.0803 16.5035 14.9346C16.4432 14.789 16.3547 14.6566 16.2432 14.5451L13.2 11.5031V7.1999Z" fill="#F9600A"/>
+                    </svg>                                            
+                </div>
+        </div>
+    </div>
+
+  <!-- VoIP Accept/Reject Modal -->
+
+  <div class="livechat-voip-call-reject-accept-popup-div" id="voip_call_accept_reject_modal">
+    <div class="row " style="height: 100%;">
+      <div class="col-md-7 col-lg-7 col-sm-12 livechat-request-voip-call-popup-name-text-wrapper">
+        <div class="livechat-voip-call-request-popup-name-text">
+          <span>
+            <svg style="margin-right: 8px;" width="18" height="19" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {% if config_obj.is_livechat_vc_enabled %}
+                <path d="M12.5 13.125C12.5 14.5057 11.3807 15.625 10 15.625H5C3.61929 15.625 2.5 14.5057 2.5 13.125V6.875C2.5 5.49429 3.61929 4.375 5 4.375H10C11.3807 4.375 12.5 5.49429 12.5 6.875V13.125Z" fill="{{admin_config.get_livechat_theme_lighten_one}}"></path>
+                <path d="M13.75 12.0773V7.92269L15.918 5.87032C16.5156 5.30459 17.5 5.72825 17.5 6.55114V13.4488C17.5 14.2717 16.5156 14.6954 15.918 14.1297L13.75 12.0773Z" fill="{{admin_config.get_livechat_theme_lighten_one}}"></path>
+              {% else %}
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M8.64881 9.85429C11.6406 12.8453 12.3193 9.38504 14.2242 11.2886C16.0607 13.1246 17.1162 13.4924 14.7894 15.8185C14.498 16.0528 12.6462 18.8707 6.13845 12.3647C-0.370109 5.858 2.44619 4.00433 2.68048 3.71296C5.0129 1.38038 5.3744 2.44204 7.21087 4.278C9.11577 6.18237 5.65699 6.86331 8.64881 9.85429Z" fill="{{admin_config.get_livechat_theme_lighten_one}}"/>
+              {% endif %}
+            </svg>
+          </span> 
+          <div id="voip_accept_reject_modal_text">Sethia has invited you for a Voice call</div>
+        </div>
+      </div>
+      <div class="col-md-5 col-lg-5 col-sm-12 livechat-voip-call-request-accept-btn-wrapper">
+        <button id="voip_call_accept_btn" class="livechat-voip-call-request-accept-btn" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="You are already in a call, to accept this please end the ongoing call">
+          <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7.62937 12.6219L5.02688 10.0194C4.88675 9.87892 4.69651 9.8 4.49813 9.8C4.29974 9.8 4.1095 9.87892 3.96937 10.0194C3.67688 10.3119 3.67688 10.7844 3.96937 11.0769L7.10437 14.2119C7.39687 14.5044 7.86938 14.5044 8.16188 14.2119L16.0969 6.27686C16.3894 5.98436 16.3894 5.51186 16.0969 5.21936C15.9568 5.07892 15.7665 5 15.5681 5C15.3697 5 15.1795 5.07892 15.0394 5.21936L7.62937 12.6219Z" fill="#0254D7"/>
+          </svg>
+        
+          <span>Accept</span>
+        </button>
+        
+        <button id="voip_call_reject_btn" class="livechat-voip-call-request-reject-btn">
+          <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M13.975 4.78253C13.8349 4.64209 13.6447 4.56316 13.4463 4.56316C13.2479 4.56316 13.0577 4.64209 12.9175 4.78253L9.25004 8.44253L5.58254 4.77503C5.44242 4.63459 5.25218 4.55566 5.05379 4.55566C4.8554 4.55566 4.66516 4.63459 4.52504 4.77503C4.23254 5.06753 4.23254 5.54003 4.52504 5.83253L8.19254 9.50003L4.52504 13.1675C4.23254 13.46 4.23254 13.9325 4.52504 14.225C4.81754 14.5175 5.29004 14.5175 5.58254 14.225L9.25004 10.5575L12.9175 14.225C13.21 14.5175 13.6825 14.5175 13.975 14.225C14.2675 13.9325 14.2675 13.46 13.975 13.1675L10.3075 9.50003L13.975 5.83253C14.26 5.54753 14.26 5.06753 13.975 4.78253Z" fill="#D70202"/>
+          </svg>
+          <span>Reject</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="livechat-voip-call-reject-accept-popup-div" id="livechat-vc-agentjoin-popup">
+    <div class="row " style="height: 100%;">
+        <div class="col-md-7 col-lg-7 col-sm-12 livechat-request-voip-call-popup-name-text-wrapper">
+            <div class="livechat-voip-call-request-popup-name-text">
+                <span>
+                  <svg style="margin-right: 10px;" width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 16.75C16 18.5449 14.5449 20 12.75 20H5.25C3.45507 20 2 18.5449 2 16.75V8.25C2 6.45507 3.45507 5 5.25 5H12.75C14.5449 5 16 6.45507 16 8.25V16.75ZM21.762 6.39334C21.9156 6.57414 22 6.80368 22 7.04096V17.9588C22 18.5111 21.5523 18.9588 21 18.9588C20.7627 18.9588 20.5332 18.8744 20.3524 18.7208L17 15.8709V9.12794L20.3524 6.27899C20.7732 5.92132 21.4043 5.97252 21.762 6.39334Z" fill="#0254D7"/>
+                  </svg>
+                </span> 
+                <p id="guest_agent_join_call_text">tcs and Agent 1 are on the call</p>
+            </div>
+        </div>
+        <div class="col-md-5 col-lg-5 col-sm-12 livechat-voip-call-request-accept-btn-wrapper">
+            <button class="livechat-voip-call-request-accept-btn" id="guest_agent_call_connect_btn"  style="justify-content: center; border-radius: 4px;" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="You are already in a call, to join this please end the ongoing call"><svg style="margin-right: 6px;" width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8.39823 3.50685L8.5 3.5C8.8797 3.5 9.19349 3.78215 9.24315 4.14823L9.25 4.25V7.75H12.75C13.1297 7.75 13.4435 8.03215 13.4932 8.39823L13.5 8.5C13.5 8.8797 13.2178 9.19349 12.8518 9.24315L12.75 9.25H9.25V12.75C9.25 13.1297 8.96785 13.4435 8.60177 13.4932L8.5 13.5C8.1203 13.5 7.80651 13.2178 7.75685 12.8518L7.75 12.75V9.25H4.25C3.8703 9.25 3.55651 8.96785 3.50685 8.60177L3.5 8.5C3.5 8.1203 3.78215 7.80651 4.14823 7.75685L4.25 7.75H7.75V4.25C7.75 3.8703 8.03215 3.55651 8.39823 3.50685L8.5 3.5L8.39823 3.50685Z" fill="#0254D7"/>
+                </svg>
+                
+            <span>Join</span></button>
+  
+        </div>
+    </div>
+  </div> 
+  
+  <div class="livechat-cobrowsing-reject-accept-popup-div">
+    <div class="row " style="height: 100%;">
+        <div class="col-md-7 col-lg-7 col-sm-12 livechat-request-voip-call-popup-name-text-wrapper">
+            <div class="livechat-voip-call-request-popup-name-text">
+                <span>
+                  <svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M2.5 5.66801C2.5 4.1946 3.6946 3 5.168 3H14.832C16.3054 3 17.5 4.1946 17.5 5.66801V15.332C17.5 16.8054 16.3054 18 14.832 18H5.168C3.6946 18 2.5 16.8054 2.5 15.332V5.66801ZM6.89532 12.3996H11.0622C12.0285 12.3996 12.8121 13.1832 12.8121 14.1496C12.8121 15.1161 12.0285 15.8996 11.0622 15.8996H6.89532C5.92894 15.8996 5.14534 15.1161 5.14534 14.1496C5.14534 13.1832 5.92894 12.3996 6.89532 12.3996ZM5.88053 10.8547C6.04389 10.9168 6.03872 11.1464 5.87275 11.2013L5.45157 11.3405L5.83838 11.7356C5.92201 11.8209 5.91958 11.957 5.83302 12.0395C5.74639 12.1219 5.60845 12.1196 5.52481 12.0342L5.11223 11.6128L4.88218 11.9693C4.79363 12.1065 4.58139 12.0716 4.5429 11.9134L4.20555 10.5274C4.17043 10.383 4.31397 10.2591 4.45447 10.3125L5.88053 10.8547ZM10.2952 6.99945H14.462C15.4284 6.99945 16.212 7.78305 16.212 8.74946C16.212 9.71603 15.4284 10.4994 14.462 10.4994H10.2952C9.32881 10.4994 8.5452 9.71603 8.5452 8.74946C8.5452 7.78305 9.32881 6.99945 10.2952 6.99945ZM9.28041 5.45457C9.44374 5.51666 9.43859 5.7463 9.27262 5.80115L8.85145 5.94036L9.23824 6.33543C9.32188 6.42081 9.31945 6.55691 9.23289 6.63941C9.14626 6.72182 9.0083 6.71947 8.92466 6.63405L8.51208 6.21268L8.28205 6.56919C8.19347 6.70638 7.98124 6.67143 7.94277 6.51324L7.60539 5.12723C7.57028 4.9829 7.71384 4.85897 7.85431 4.91234L9.28041 5.45457Z" fill="{{admin_config.get_livechat_theme_lighten_one}}"/>
+                  </svg>
+                </span> 
+                <p id="guest_agent_join_cobrowsing_text">tcs and Agent 1 are on the call</p>
+            </div>
+        </div>
+        <div class="col-md-5 col-lg-5 col-sm-12 livechat-voip-call-request-accept-btn-wrapper">
+            <button class="livechat-voip-call-request-accept-btn" id="guest_agent_cobrowse_connect_btn"  style="justify-content: center; border-radius: 4px;" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="You are already in a call, to join this please end the ongoing call"><svg style="margin-right: 6px;" width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8.39823 3.50685L8.5 3.5C8.8797 3.5 9.19349 3.78215 9.24315 4.14823L9.25 4.25V7.75H12.75C13.1297 7.75 13.4435 8.03215 13.4932 8.39823L13.5 8.5C13.5 8.8797 13.2178 9.19349 12.8518 9.24315L12.75 9.25H9.25V12.75C9.25 13.1297 8.96785 13.4435 8.60177 13.4932L8.5 13.5C8.1203 13.5 7.80651 13.2178 7.75685 12.8518L7.75 12.75V9.25H4.25C3.8703 9.25 3.55651 8.96785 3.50685 8.60177L3.5 8.5C3.5 8.1203 3.78215 7.80651 4.14823 7.75685L4.25 7.75H7.75V4.25C7.75 3.8703 8.03215 3.55651 8.39823 3.50685L8.5 3.5L8.39823 3.50685Z" fill="{{admin_config.get_livechat_theme_lighten_one}}"/>
+                </svg>
+                
+            <span style="color: {{admin_config.get_livechat_theme_lighten_one}};">Join</span></button>
+  
+        </div>
+    </div>
+  </div>  
+
+    <!-- Livechat secondary agent header -->
+    <div class="live-chat-button-wrapper live-chat-button-wrapper-group-single-chat live-chat-desktop-display" id="livechat-secondary-agent-header" style="display: none">
+    <a href="#" class="live-chat-btn live-chat-resolve livechat-resolve-single-group-chat" data-toggle="modal" onclick="guest_agent_exit_chat()"><span>Exit Chat</span></a>
+
+      <div class="livechat-agent-translate-chat-container">
+
+        {% if config_obj.is_virtual_interpretation_enabled %}
+          <div class="livechat-agent-detected-language-text-wrapper detected_language">
+              <div class="livechat-detected-language-subheading">Detected language - &nbsp;</div>
+
+
+              <div class="livechat-detected-language-text">English</div>
+          </div>
+          <div class="livechat-agent-detected-language-text-wrapper original_language">
+              <div class="livechat-detected-language-subheading">Original language - &nbsp;</div>
+
+              <div class="livechat-detected-language-text">English</div>
+              <div class="livechat-detected-language-subheading">Translated language : &nbsp;</div>
+
+          </div>
+          <div class="livechat-agent-translate-chat-dropdown-wrapper language_translate_div">
+              <select class="selectpicker agent_language_dropdown" title="Translate">
+
+                {% if to_show_bot_lang %}
+                  {% for language in bot_obj.languages_supported.all %}
+                    <option value="{{language.lang}}">{{language.name_in_english}}</option>
+                  {% endfor %}
+                {% else %}
+                  {% for language in user_obj.preferred_languages.all %}
+                    <option value="{{language.lang}}">{{language.name_in_english}}</option>
+                  {% endfor %}
+                {% endif %}
+                
+            </select>
+          </div>
+        {% endif %}
+
+        <div class="profile-user-icon"  onclick="open_request_status_modal()" >
+            <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9.66006 10.87C9.56006 10.86 9.44006 10.86 9.33006 10.87C6.95006 10.79 5.06006 8.84 5.06006 6.44C5.06006 3.99 7.04006 2 9.50006 2C11.9501 2 13.9401 3.99 13.9401 6.44C13.9301 8.84 12.0401 10.79 9.66006 10.87Z" stroke="#0254D7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M16.91 4C18.85 4 20.41 5.57 20.41 7.5C20.41 9.39 18.91 10.93 17.04 11C16.96 10.99 16.87 10.99 16.78 11" stroke="#0254D7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M4.65997 14.56C2.23997 16.18 2.23997 18.82 4.65997 20.43C7.40997 22.27 11.92 22.27 14.67 20.43C17.09 18.81 17.09 16.17 14.67 14.56C11.93 12.73 7.41997 12.73 4.65997 14.56Z" stroke="#0254D7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M18.8401 20C19.5601 19.85 20.2401 19.56 20.8001 19.13C22.3601 17.96 22.3601 16.03 20.8001 14.86C20.2501 14.44 19.5801 14.16 18.8701 14" stroke="#0254D7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>  
+            <a class="users-connected-count-btn" id="guest-agents-count-status-secondary">
+            </a>                                          
+        </div>
+      </div>
+    </div>
+
+    <!-- Language translate prompt for mobile -->
+    <div class="livechat-agent-mobile-language-container" id="livechat_mobile_language_container">
+
+        <div class="livechat-agent-detected-language-text-wrapper" id="detected_language_mobile">
+            <div class="livechat-detected-language-subheading">Detected language - &nbsp;</div>
+            <div class="livechat-detected-language-text">English</div>
+        </div>
+        <div class="livechat-agent-translate-chat-dropdown-wrapper">
+            <select class="selectpicker" title="Translate" id="agent_language_dropdown_mobile">
+              
+                {% if to_show_bot_lang %}
+                  {% for language in bot_obj.languages_supported.all %}
+                    <option value="{{language.lang}}" class="livechat_language_options_mobile">{{language.name_in_english}}</option>
+                  {% endfor %}
+                {% else %}
+                  {% for language in user_obj.preferred_languages.all %}
+                    <option value="{{language.lang}}" class="livechat_language_options_mobile">{{language.name_in_english}}</option>
+                  {% endfor %}
+                {% endif %}
+
+          </select>
+        </div>
+        <div class="livechat-agent-mobile-language-container-close-div" id="livechat_mobile_language_container_close">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.89705 2.05379L1.96967 1.96967C2.23594 1.7034 2.6526 1.6792 2.94621 1.89705L3.03033 1.96967L6 4.939L8.96967 1.96967C9.26256 1.67678 9.73744 1.67678 10.0303 1.96967C10.3232 2.26256 10.3232 2.73744 10.0303 3.03033L7.061 6L10.0303 8.96967C10.2966 9.23594 10.3208 9.6526 10.1029 9.94621L10.0303 10.0303C9.76406 10.2966 9.3474 10.3208 9.05379 10.1029L8.96967 10.0303L6 7.061L3.03033 10.0303C2.73744 10.3232 2.26256 10.3232 1.96967 10.0303C1.67678 9.73744 1.67678 9.26256 1.96967 8.96967L4.939 6L1.96967 3.03033C1.7034 2.76406 1.6792 2.3474 1.89705 2.05379L1.96967 1.96967L1.89705 2.05379Z" fill="#7B7A7B"/>
+                    </svg>
+
+        </div>
+    </div>
+
+    <div class="live-chat-area">
+      <div class="live-chat-day">Today</div>
+      <div class="live-chat-message-wrapper" id="style-2" >
+        
+      </div>
+
+      <div id="livechat-customer-typing"></div>
+<div class="live-chat-text-box-wrapper" id="livechat-text-box-div">
+  <div class="live-chat-text-box textarea-desktop" role="text-area">
+    <textarea class="live-chat-text-area" placeholder="Start with '/' to select a Canned Response
+            " autofocus="" id="query"></textarea>
+  </div>
+  <div class="live-chat-text-box textarea-mobile" role="text-area">
+    <textarea style="white-space: pre-wrap;" class="live-chat-text-area" placeholder="Type a Message" autofocus id="query-mobile"></textarea>
+  </div>
+
+
+  <div class="live-chat-text-format-icons">
+
+    <div class="live-chat-text-format-icon-wrapper attachment tooltip-textarea" onclick="append_livechat_file_upload_modal()">
+      <!-- <button type="button" id="custom-button-attach">Choose File</button> -->
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" id="custom-button-attach" class="live-chat-text-format-icon"> 
+            <path d="M9.80019 0C12.1197 0 14 1.8804 14 4.2C14 5.27611 13.5925 6.28904 12.8773 7.05847L12.7444 7.19489L6.63569 13.3037L6.5985 13.3383L6.5595 13.3698C6.09107 13.7731 5.49259 14 4.86049 14C3.42198 14 2.25584 12.8338 2.25584 11.3952C2.25584 10.7643 2.48194 10.1674 2.8827 9.7002L2.9865 9.58617L2.99706 9.57782L8.10054 4.46516C8.37365 4.19155 8.81685 4.19116 9.09044 4.46429C9.36403 4.73742 9.36442 5.18063 9.09131 5.45424L3.98783 10.5669L3.98017 10.5727C3.77277 10.7945 3.65577 11.0848 3.65577 11.3952C3.65577 12.0606 4.19515 12.6 4.86049 12.6C5.12575 12.6 5.3763 12.5146 5.58232 12.36L5.6678 12.2895L5.66834 12.2906L11.7597 6.19995L11.8707 6.08487C12.3363 5.57409 12.6001 4.90875 12.6001 4.2C12.6001 2.6536 11.3465 1.4 9.80019 1.4C9.05708 1.4 8.36203 1.69022 7.8437 2.19701L7.73538 2.30889L7.72244 2.31797L1.19503 8.84819C0.921738 9.12162 0.478543 9.12171 0.205127 8.84841C-0.0682891 8.5751 -0.0683882 8.13189 0.204905 7.85846L6.72088 1.33927L6.75351 1.30915C7.54021 0.480039 8.63244 0 9.80019 0Z" fill="#2F405B"/>
+        </svg>
+      <!-- <span id="custom-text-attach">No file chosen</span> -->
+      <span class="tooltiptext">Attach File</span>
+    </div>
+
+    <div class="live-chat-text-format-icon-wrapper mic tooltip-textarea" onclick="activate_mic()" id = "mic_agent_to_customer">
+      <svg width="12" height="15" viewBox="0 0 12 15" fill="none" xmlns="http://www.w3.org/2000/svg"
+        class ="live-chat-text-format-icon" id="custom-button-mic">
+        <path id="btn-mic-up"
+          d="M8.60545 7.01785V2.81596C8.60545 1.26337 7.35538 0 5.81889 0C5.7696 0.000296166 5.7205 0.00616947 5.67253 0.0175078C4.95348 0.0523697 4.27535 0.362311 3.77844 0.883203C3.28154 1.40409 3.00388 2.09607 3.00293 2.81596V7.01785C3.00293 8.56275 4.25929 9.81911 5.80419 9.81911C7.34908 9.81911 8.60545 8.56275 8.60545 7.01785ZM4.40356 7.01785V2.81596C4.40356 2.04352 5.03174 1.41534 5.80419 1.41534C5.84248 1.41535 5.88069 1.41183 5.91834 1.40483C6.63616 1.45735 7.20482 2.07013 7.20482 2.81596V7.01785C7.20482 7.7903 6.57664 8.41848 5.80419 8.41848C5.03174 8.41848 4.40356 7.7903 4.40356 7.01785Z"
+          fill="#2F405B" />
+        <path id="btn-mic-down"
+          d="M1.6018 7.01785H0.201172C0.201172 9.86953 2.34483 12.2254 5.10337 12.572V14.021H6.504V12.572C9.26254 12.2254 11.4062 9.87023 11.4062 7.01785H10.0056C10.0056 9.33519 8.12103 11.2197 5.80369 11.2197C3.48635 11.2197 1.6018 9.33519 1.6018 7.01785Z"
+          fill="#2F405B" />
+      </svg>
+      <span class="tooltiptext">Microphone</span>
+    </div>
+    <div class="live-chat-text-format-icon-wrapper send tooltip-textarea" onclick="send_message_to_user()" id="submit-response">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" class ="live-chat-text-format-icon">
+        <path id="fill-submit-btn"
+          d="M13.683 6.4793L0.864958 0.0616166C0.764494 0.011306 0.651648 -0.00885246 0.540008 0.00356875C0.428368 0.01599 0.322693 0.0604612 0.235708 0.131628C0.152638 0.201343 0.0906346 0.292879 0.0566685 0.395945C0.0227024 0.499011 0.0181203 0.609522 0.0434371 0.715053L1.58743 6.41512L8.17708 6.41512V7.58197L1.58743 7.58197L0.0201316 13.2645C-0.00362467 13.3527 -0.00639775 13.4451 0.0120354 13.5345C0.0304685 13.6239 0.0695937 13.7078 0.126265 13.7793C0.182935 13.8508 0.255571 13.908 0.33833 13.9462C0.42109 13.9845 0.511664 14.0028 0.602771 13.9997C0.693978 13.9991 0.783784 13.9771 0.864958 13.9355L13.683 7.51779C13.7785 7.46883 13.8586 7.39445 13.9145 7.30283C13.9704 7.21122 14 7.10592 14 6.99855C14 6.89117 13.9704 6.78587 13.9145 6.69426C13.8586 6.60264 13.7785 6.52826 13.683 6.4793Z"
+          fill="{{admin_config.get_livechat_theme_lighten_five}}" />
+      </svg>
+      <span class="tooltiptext">Send</span>
+    </div>
+  </div>
+
+</div>
+
+    </div>
+
+    <div class="display-no-internet-loader">
+      <div class="no-internet-loader-div" id="no_interet_loader_div_2" style="display: none;">
+        <p class="no-internet-notification">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 3C16.9707 3 21 7.0302 21 12C21 16.9698 16.9707 21 12 21C7.0293 21 3 16.9698 3 12C3 7.0302 7.0293 3 12 3ZM12.0016 14.7034C11.5052 14.7034 11.1028 15.1058 11.1028 15.6021C11.1028 16.0985 11.5052 16.5009 12.0016 16.5009C12.498 16.5009 12.9004 16.0985 12.9004 15.6021C12.9004 15.1058 12.498 14.7034 12.0016 14.7034ZM11.9997 7.5C11.5381 7.50017 11.1578 7.84774 11.106 8.29536L11.1 8.40032L11.1016 12.9011L11.1077 13.0061C11.1599 13.4537 11.5404 13.801 12.0019 13.8008C12.4635 13.8006 12.8438 13.4531 12.8956 13.0054L12.9016 12.9005L12.9 8.39968L12.8939 8.29472C12.8418 7.84713 12.4612 7.49983 11.9997 7.5Z" fill="#F5C828"></path>
+                </svg>
+            Seems your internet connection is slow please refresh
+        </p>
+        <div class="loader-div">
+          <div class="loader"></div>
+          <span>Loading...</span> 
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="col-xl-3 col-lg-3 col-md-3 col-sm-12 col-12 live-chat-customer-details live-chat-customer-details-height"
+    id="live-chat-customer-details-sidebar" style="display: none;">
+    
+  </div>
+
+  <div class="col-xl-7 col-lg-7 col-md-7 col-sm-12 col-12 py-2 px-0" id="live-chat-no-chat-opened" style="height: calc(100vh - 3.375rem); text-align: center;">
+    <div class="display-no-internet-loader">
+      <div class="no-internet-loader-div" id="no_interet_loader_div" style="display: none;">
+        <p class="no-internet-notification">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 3C16.9707 3 21 7.0302 21 12C21 16.9698 16.9707 21 12 21C7.0293 21 3 16.9698 3 12C3 7.0302 7.0293 3 12 3ZM12.0016 14.7034C11.5052 14.7034 11.1028 15.1058 11.1028 15.6021C11.1028 16.0985 11.5052 16.5009 12.0016 16.5009C12.498 16.5009 12.9004 16.0985 12.9004 15.6021C12.9004 15.1058 12.498 14.7034 12.0016 14.7034ZM11.9997 7.5C11.5381 7.50017 11.1578 7.84774 11.106 8.29536L11.1 8.40032L11.1016 12.9011L11.1077 13.0061C11.1599 13.4537 11.5404 13.801 12.0019 13.8008C12.4635 13.8006 12.8438 13.4531 12.8956 13.0054L12.9016 12.9005L12.9 8.39968L12.8939 8.29472C12.8418 7.84713 12.4612 7.49983 11.9997 7.5Z" fill="#F5C828"></path>
+                </svg>
+            Seems your internet connection is slow please refresh
+        </p>
+        <div class="loader-div">
+          <div class="loader"></div>
+          <span>Loading...</span> 
+        </div>
+      </div>
+    </div>
+    <div class="live-chat-empty-area">
+      <svg width="302" height="248" viewBox="0 0 302 248" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M69.2351 50.1455L70.5207 156.419L126.072 183.533L124.787 77.2593L69.2351 50.1455Z" fill="#F1F8FF"/>
+        <path d="M52.3545 41.656L10.845 127.042L67.1674 154.532L65.8818 48.2585L52.3545 41.656Z" fill="#F1F8FF"/>
+        <path d="M302 161.608L189.889 106.889L191.175 213.162L260.491 246.994L302 161.608Z" fill="#F1F8FF"/>
+        <path d="M129.809 77.2593L131.094 183.533L186.645 210.646L185.36 104.373L129.809 77.2593Z" fill="#F1F8FF"/>
+        <path d="M255.194 81.7858L248.218 82.0569L248.566 91.0439L255.542 90.7728L255.194 81.7858Z" fill="#6C63FF"/>
+        <path d="M223.726 113.26C223.726 113.26 214.066 108.635 214.22 112.629C214.375 116.624 223.958 119.251 223.958 119.251L223.726 113.26Z" fill="white"/>
+        <path d="M229.026 147.056C229.026 147.056 224.468 158.233 222.785 166.299C221.101 174.365 218.536 185.465 221.835 193.337C225.134 201.21 234.513 224.346 234.609 226.843C234.706 229.339 233.806 231.874 235.799 231.797C237.792 231.719 248.638 228.298 249.078 226.781C249.519 225.263 245.378 221.424 245.378 221.424L235.153 189.32L245.821 168.404L253.516 199.607L255.023 238.55C255.023 238.55 262.42 236.263 263.494 238.221C263.494 238.221 266.808 233.592 267.229 231.576C267.65 229.559 265.664 191.134 265.664 191.134C265.664 191.134 272.454 147.368 266.973 147.581C261.491 147.794 240.023 134.628 229.026 147.056Z" fill="#1B1B1B"/>
+        <path d="M235.722 229.8C235.722 229.8 230.666 240.997 230.187 241.515C229.708 242.034 226.413 247.162 228.904 247.066C231.396 246.969 237.278 244.24 241.608 240.072C245.938 235.903 251.647 228.681 251.13 228.201C250.612 227.721 247.066 226.359 247.066 226.359L235.722 229.8Z" fill="#2D2C2C"/>
+        <path d="M255.923 236.015C255.923 236.015 255.618 241.027 254.699 243.063C253.779 245.099 253.895 248.095 256.387 247.998C258.878 247.901 265.317 246.651 265.317 246.651C265.317 246.651 265.7 243.636 265.182 243.156C264.664 242.676 262.459 237.261 263.397 235.725C264.336 234.188 255.923 236.015 255.923 236.015Z" fill="#2D2C2C"/>
+        <path d="M259.609 73.364C259.609 73.364 264.92 81.6581 266.991 83.5777C269.061 85.4974 263.236 89.7239 263.236 89.7239L252.811 91.129C252.811 91.129 252.942 81.6234 252.405 80.6442C251.868 79.6651 259.609 73.364 259.609 73.364Z" fill="white"/>
+        <path d="M250.547 84.2166C250.547 84.2166 252.695 88.1333 254.688 88.0558C256.681 87.9784 266.991 83.5776 267.431 82.0605C267.871 80.5433 270.846 92.9283 270.846 92.9283L245.62 137.411L239.467 133.149L242.448 107.032L244.897 92.9365L250.547 84.2166Z" fill="#468DFF"/>
+        <path d="M268.361 124.027C267.355 126.136 266.727 128.335 266.814 130.587C266.818 130.687 266.821 130.787 266.83 130.886C267.069 135.507 268.768 140.852 269.377 144.738C269.82 147.526 269.694 149.561 268.066 150.039C264.118 151.193 268.641 152.017 253.368 157.111C238.096 162.204 235.431 157.808 235.392 156.809C235.353 155.811 237.555 148.225 237.037 147.745C236.52 147.265 229.795 154.026 227.763 153.105C225.731 152.184 227.531 147.114 227.531 147.114C227.531 147.114 232.108 136.436 232.012 133.939C231.915 131.443 238.945 119.669 238.945 119.669L243.726 88.482C243.726 88.482 245.565 84.4103 248.037 83.8143C250.509 83.2182 252.56 84.6386 252.56 84.6386L248.423 93.7997L244.059 109.97L244.789 115.942C244.789 115.942 249.864 105.244 253.198 101.115C256.531 96.9849 263.638 87.2083 263.638 87.2083C263.638 87.2083 265.297 81.5985 264.045 79.9221C262.792 78.2407 269.269 77.989 272.031 84.882C273.495 88.5353 275.872 93.9833 277.36 99.0557C278.687 103.549 279.314 107.75 277.999 110.151C275.991 113.82 270.937 118.641 268.361 124.027Z" fill="#468DFF"/>
+        <path opacity="0.1" d="M277.999 110.151C275.991 113.82 270.937 118.641 268.361 124.026C267.688 121.597 266.868 119.084 266.868 119.084C266.868 119.084 263.719 102.206 273.032 97.8437C274.575 97.6942 276.118 98.1263 277.36 99.0556C278.687 103.549 279.314 107.75 277.999 110.151Z" fill="black"/>
+        <path d="M241.03 109.088L233.135 111.395L222.173 111.82L221.045 121.365L239.061 122.665C239.061 122.665 243.56 109.989 241.03 109.088Z" fill="#468DFF"/>
+        <path d="M253.905 141.178C253.905 141.178 243.342 142.934 245.753 146.119C248.164 149.304 257.521 145.956 257.521 145.956L253.905 141.178Z" fill="white"/>
+        <path opacity="0.1" d="M266.83 130.886C267.069 135.507 268.768 140.851 269.378 144.738C266.013 147.929 262.813 150.743 261.607 150.79C259.116 150.887 255.11 150.542 253.635 151.1C252.159 151.657 251.294 142.19 251.294 142.19C251.294 142.19 252.175 139.156 256.103 137.503C258.754 136.385 263.837 133.353 266.83 130.886Z" fill="black"/>
+        <path d="M272.916 94.8481C272.916 94.8481 281.348 93.5204 280.893 107.539C280.437 121.557 281.781 130.505 278.39 133.137C274.999 135.769 263.983 147.698 261.491 147.795C259 147.891 254.994 147.547 253.519 148.104C252.043 148.662 251.178 139.195 251.178 139.195C251.178 139.195 252.059 136.16 255.987 134.508C259.915 132.855 269.17 126.995 269.093 124.998C269.015 123.001 266.752 116.089 266.752 116.089C266.752 116.089 263.603 99.2102 272.916 94.8481Z" fill="#468DFF"/>
+        <path d="M262.644 74.6529C262.644 80.4486 257.955 85.1452 252.173 85.1452C246.392 85.1452 241.703 80.4486 241.703 74.6529C241.703 68.8573 246.392 64.1606 252.173 64.1606C257.955 64.1606 262.644 68.8573 262.644 74.6529Z" fill="white" stroke="#E6E6E6"/>
+        <path d="M244.787 58.898C244.522 59.1264 244.205 59.2857 243.864 59.3618C243.693 59.3923 243.517 59.3538 243.374 59.2546C243.231 59.1554 243.133 59.0036 243.102 58.8323C242.851 59.3539 242.567 59.9098 242.055 60.1774C241.543 60.445 240.75 60.2206 240.676 59.6463C240.601 60.0824 240.409 60.4896 240.12 60.8238C239.802 61.1275 239.225 61.2042 238.948 60.863C239.172 62.0919 239.033 63.3557 239.104 64.6029C239.174 65.8502 239.506 67.1725 240.447 67.9927C241.818 69.1888 243.881 68.8936 245.685 68.667C245.958 68.6096 246.241 68.6251 246.506 68.712C247.181 69.0004 247.151 69.9426 247.16 70.6783C247.215 71.9692 247.725 73.1987 248.599 74.1486C249.473 75.0985 250.655 75.7072 251.934 75.8667C252.651 75.9775 253.381 75.7988 253.966 75.3699C254.478 74.9349 254.74 74.2258 255.327 73.8989C256.282 73.3673 257.44 74.1426 258.138 74.9844C258.836 75.8263 259.524 76.8618 260.605 77.0159C262.036 77.2197 263.125 75.7591 263.659 74.4143C264.397 72.5294 264.75 70.5157 264.698 68.4918C264.647 66.468 264.191 64.475 263.359 62.6303C260.372 56.1073 250.17 55.0756 244.787 58.898Z" fill="#2F2E41"/>
+        <path d="M120.839 245.907H3.13864V246.536H120.839V245.907Z" fill="#2F2E41"/>
+        <path d="M294.407 247.165H176.707V247.794H294.407V247.165Z" fill="#2F2E41"/>
+        <g filter="url(#filter0_d)">
+        <path d="M215.499 56.3699H64.2159V147.259H215.499V56.3699Z" fill="white"/>
+        </g>
+        <path d="M70.1794 61.4018C71.0462 61.4018 71.7488 60.6978 71.7488 59.8293C71.7488 58.9609 71.0462 58.2568 70.1794 58.2568C69.3127 58.2568 68.6101 58.9609 68.6101 59.8293C68.6101 60.6978 69.3127 61.4018 70.1794 61.4018Z" fill="#FF5D01"/>
+        <path d="M75.829 61.4018C76.6958 61.4018 77.3984 60.6978 77.3984 59.8293C77.3984 58.9609 76.6958 58.2568 75.829 58.2568C74.9623 58.2568 74.2597 58.9609 74.2597 59.8293C74.2597 60.6978 74.9623 61.4018 75.829 61.4018Z" fill="#FF5D01"/>
+        <path d="M81.4786 61.4018C82.3453 61.4018 83.048 60.6978 83.048 59.8293C83.048 58.9609 82.3453 58.2568 81.4786 58.2568C80.6119 58.2568 79.9093 58.9609 79.9093 59.8293C79.9093 60.6978 80.6119 61.4018 81.4786 61.4018Z" fill="#FF5D01"/>
+        <path d="M215.5 63.3459H64.3426V63.975H215.5V63.3459Z" fill="#2F2E41"/>
+        <path d="M111.134 109.509L105.618 116.14L106.178 110.243L106.282 109.148H105.183H102.492V82.844H151.966V109.148H111.903H111.434L111.134 109.509Z" fill="white" stroke="#C2DAFF" stroke-width="2"/>
+        <path opacity="0.1" d="M152.412 110.148V91.5933H143.153H133.894V110.148H152.412Z" fill="#0254D7"/>
+        <path d="M179.039 122.986H138.975V96.6816H188.449V122.986H185.757H184.658L184.762 124.081L185.322 129.977L179.808 123.347L179.508 122.986H179.039Z" fill="white" stroke="#C2DAFF" stroke-width="2"/>
+        <path opacity="0.1" d="M104.077 123.833C110.317 123.833 115.376 123.338 115.376 122.728C115.376 122.118 110.317 121.624 104.077 121.624C97.8366 121.624 92.7778 122.118 92.7778 122.728C92.7778 123.338 97.8366 123.833 104.077 123.833Z" fill="black"/>
+        <path opacity="0.1" d="M186.624 138.767C193.731 138.767 199.492 138.204 199.492 137.509C199.492 136.815 193.731 136.251 186.624 136.251C179.517 136.251 173.755 136.815 173.755 137.509C173.755 138.204 179.517 138.767 186.624 138.767Z" fill="black"/>
+        <defs>
+        <filter id="filter0_d" x="49.2159" y="41.3699" width="181.284" height="120.889" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+        <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
+        <feOffset/>
+        <feGaussianBlur stdDeviation="7.5"/>
+        <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.15 0"/>
+        <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+        <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+        </filter>
+        </defs>
+      </svg>        
+        <p> Hello {{user_obj.user.first_name}}
+          {% if user_obj.user.last_name == "" %}
+          !
+          {% else %}
+          {{user_obj.user.last_name}}!
+          {% endif %}<br> Time to ace those conversations</p>
+    </div>
+</div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Transfer chat modal -->
+<div class="modal fade" id="transfer-chat" tabindex="-1" role="dialog" aria-labelledby="agent_transfer_chat_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h6>Transfer chat</h6>
+          </div>
+          <div class="modal-body">
+              <div class="row">
+                <div class="col-12 mb-2" id="transfer-chat-category-div">
+                    <label>Category</label>
+                    <select id="category-switch-selected" class="form-control select-dropdown-icon">
+                      <option>Select from drop down</option>
+                    </select>
+                </div>
+                <div class="col-12 mb-2">
+                    <label>Transfer chat to</label>
+                    <select id="list-of-all-agents" class="form-control select-dropdown-icon">
+                      <option selected hidden>Select from drop down</option>
+                  </select>
+                </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+              <div style="float: right;">
+                  <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                  <button class="btn-primary" type="button" onclick="transfer_chat_to_another_agent()" id="transfer-chat-submit">Transfer</button>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- Add Agent modal -->
+<div class="modal fade" id="add-agent-modal" tabindex="-1" role="dialog" aria-labelledby="add_agent_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h6>Add Agent</h6>
+          </div>
+          <div class="modal-body">
+              <div class="row">
+                <div class="col-12 mb-2" id="add-agent-category-div">
+                    <label>Category</label>
+                    <select id="add-agent-category-switch-selected" class="form-control select-dropdown-icon">
+                      <option>Select from drop down</option>
+                    </select>
+                </div>
+                <div class="col-12 mb-2">
+                    <label>Agent Name</label>
+<!--                     <select id="add-agent-list-of-all-agents" class="form-control select-dropdown-icon">
+                      <option selected hidden>Select from drop down</option>
+                  </select> -->
+                        <div class="livechat-add-agent-container" id="livechat-add-guest-agent-container" style="padding-left: 0; pointer-events: none;">
+                            <div class="select-box">
+                                <div class="options-container" id="add-agent-list-of-all-agents">
+                                </div>
+                                <div id="livechat-add-agent-dropdown-wrapper" class="wrapper-box">
+                                <div class="box">
+
+                                    <div class="selected" style="max-height: 74px;overflow: auto; border: none;">Select name</div>
+                                    
+                                </div>
+                                <div id="livechat-add-agent-language-dropdown-arrow" class="arrow" style="transform: translateY(-50%) rotate(0deg);">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M8.70615 11.4137L11.2961 14.0037C11.6861 14.3937 12.3161 14.3937 12.7061 14.0037L15.2961 11.4137C15.9261 10.7837 15.4761 9.70374 14.5861 9.70374H9.40615C8.51615 9.70374 8.07615 10.7837 8.70615 11.4137Z" fill="black" fill-opacity="0.54"/>
+                                    </svg>
+                                        
+                                </div>
+                                </div>
+                            
+                                <div id="livechat-agents-options-search-box" class="search-box" style="display: none;">
+                                    <input type="text" style="border: 1px solid #e1e1e1 !important;" placeholder="&nbsp; &nbsp; &nbsp; Search agent name">
+                                    
+                                </div>
+                                
+                            </div>
+                            
+                        </div>
+                </div>
+                <div class="col-12 col-md-12 mb-12" id="livechat-agent-list-area">
+                </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+              <div style="float: right;">
+                  <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                  <button class="btn-primary" type="button" onclick="invite_guest_agent_to_chat()" id="add-agent-submit">Add</button>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- Resolve chat modal -->
+<div class="modal fade" id="end-chat-session" tabindex="-1" role="dialog" aria-labelledby="agent_resolve_chat_modal_label" aria-hidden="true" style="overflow-y:hidden;">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h6>Resolve Chat</h6>
+          </div>
+          <div class="modal-body livechat-agent-resolve-chat-scroll-body">
+              <div class="row">
+
+                  <div class="col-12 mb-2">
+                      <p style="font-weight: 500; font-size: 13px; color: #4D4D4D;"> Are you sure you want to resolve this chat?</p>
+                  </div>
+                  <div class="col-12 mb-2" id="closing-category-div">
+                      <label>Please select chat category</label>
+                      <select name="day" class="form-control select-dropdown-icon" id="category-closing-priority">
+                      </select>
+                  </div>
+
+              </div>
+              <div id="custom_dispose_chat_form">
+              </div>
+          </div>
+          <div class="modal-footer">
+              <div style="float: right;">
+                  <button class="btn-primary" type="button" onclick="mark_chat_session_expired()">Yes</button>
+                  <button class="btn-close" type="button" data-dismiss="modal">No</button>
+
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- End Cobrowsing modal -->
+<div class="modal fade" id="end-cobrowse-session" tabindex="-1" role="dialog" aria-labelledby="agent_resolve_chat_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h6>End Cobrowsing</h6>
+          </div>
+          <div class="modal-body livechat-agent-resolve-chat-scroll-body">
+              <div class="row">
+
+                  <div class="col-12 mb-2">
+                      <p style="font-weight: 500; font-size: 13px; color: #4D4D4D;"> A Cobrowsing session is in progress for this chat. Resolving this conversation will close that as well. 
+Are you sure you want to proceed?</p>
+                  </div>
+
+              </div>
+          </div>
+          <div class="modal-footer">
+              <div style="float: right;">
+                  <button class="btn-primary" type="button" id="force_end_cobrowsing_btn">Yes</button>
+                  <button class="btn-close" type="button" data-dismiss="modal">No</button>
+
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+<div class="modal fade backdrop" id="preview-livechat-customer-attachment-modal" tabindex="-1" role="dialog" aria-labelledby="preview-livechat-customer-attachment_modal_label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style role="document">
+      <div class="modal-content"> 
+        <div class="modal-header">
+          
+            <svg data-dismiss="modal" id="preview-livechat-customer-attachment-cross-button" onclick="close_livechat_attachment_image()" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 1.85364L13.1464 0L7.5 5.64636L1.85364 0L0 1.85364L5.64636 7.5L0 13.1464L1.85364 15L7.5 9.35364L13.1464 15L15 13.1464L9.35364 7.5L15 1.85364Z" fill="white"></path>
+            </svg>
+           
+       </div>
+         <img id="preview-livechat-customer-attachment">
+      </div>
+  </div>
+</div>
+
+<!-- File upload modal -->
+<div class="modal fade backdrop" id="livechat-file-upload-modal" tabindex="-1" aria-labelledby="Admin_manage_user_Uploadexcel_modal_label" aria-modal="true" role="dialog">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h6>Send document to Customer</h6>
+          </div>
+          <div class="modal-body">
+              <div class="row">
+                  <div class="col-12 mb-4">
+                      <input type="file" id="easychat-livechat-file-attchment-input" hidden="hidden" onchange="upload_file_attachment(this)">
+                      <button type="button" id="custom-button" onclick="attach_file()">Choose File </button>
+                  </div>
+
+                  <div class="live-chat-file-wrapper" id="live_chat_file_wrapper">
+
+                  </div>
+
+                  <div class="col-12" style="margin-top: 1em;">
+                    <p class="upload-message-heading">Message</p>
+                    <textarea class="file-upload-message" id="query-file" style="padding: 4px 10px 4px 10px;"></textarea>
+                  </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+              <div style="float: right;">
+                  <button class="btn-close" type="button" data-dismiss="modal" onclick="reset_file_upload_modal(true)">Cancel</button>
+                  <button class="btn-primary disabled" type="button" id="send_attachment" style="pointer-events: none;">Send Document</button>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- Request sent successful modal -->
+<div class="modal fade" id="agent-request-sent-success-modal" tabindex="-1" role="dialog" aria-labelledby="agent_transfer_chat_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            Request Successfully Sent
+
+        </div>
+    </div>
+</div>
+
+<!-- Request accepted modal -->
+<div class="modal fade" id="agent-request-accept-success-modal" tabindex="-1" role="dialog" aria-labelledby="agent_transfer_chat_modal_label" aria-hidden="true">
+    <div class="modal-dialog" style="padding: 20px 50px !important;" role="document">
+        <div class="modal-content">
+
+          <div> Request Accepted</div>
+          <div style="color: #757575;font-size:12px;line-height:14px;margin-top: 10px;" id="request-accepted-agent"></div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="agent-request-rejected-modal" tabindex="-1" role="dialog" aria-labelledby="agent_transfer_chat_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <div class="row" style="justify-content: center; align-items: center; flex-direction: column;">
+                    <div class="request-reject-text-div">
+                        Request Rejected
+                    </div>
+                    <p id="guest-agent-reject-message"></p>
+                    <button type="button" data-dismiss="modal" class="request-reject-ok-btn">
+                    Ok
+                      </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="livechat-request-status-modal" tabindex="-1" role="dialog" aria-labelledby="agent_transfer_chat_modal_label" aria-hidden="true">
+    <div class="modal-dialog" style="width: 388px;top: 6%;" role="document">
+        <div class="modal-content">
+
+            <div class="modal-body" style="padding: 20px 50px;">
+                <div class="modal-heading-text">
+                    Request status
+                </div>
+                <div class="modal-subheading-text accepted-status" id="guest-agent-accept">
+                    Accepted
+                </div>
+
+                <div class="modal-subheading-text pending-status" id="guest-agent-pending">
+                    Pending
+                </div>
+
+                <div class="modal-subheading-text rejected-status" id="guest-agent-reject">
+                    Rejected
+                </div>
+
+                <div class="modal-subheading-text exit-status" id="guest-agent-exit">
+                    Exit Chat
+                </div>
+
+                <div class="modal-subheading-text accept-reject-activity-status" id="guest-agent-no-response">
+                    No accept/reject activity
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Stop Interaction Timer -->
+
+<div id="livechat-stop-interaction-div" class="ui-widget-content stop-timer-div" style="display: none">
+  <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M35.1007 16.5235L37.2166 14.4074C37.6972 13.927 37.6972 13.1478 37.2166 12.6674L33.7363 9.18686C33.5056 8.95615 33.1925 8.82669 32.8663 8.82669C32.5401 8.82669 32.2271 8.95615 31.9964 9.18686L29.8933 11.2902C28.6683 10.5122 27.3353 9.88925 25.9222 9.45026V7.38281H27.7269C28.4062 7.38281 28.9574 6.83199 28.9574 6.15234V1.23047C28.9574 0.550827 28.4062 0 27.7269 0H14.2629C13.5832 0 13.0324 0.550827 13.0324 1.23047V6.15234C13.0324 6.83199 13.5832 7.38281 14.2629 7.38281H16.0676V9.45058C9.28619 11.5558 4.34766 17.8886 4.34766 25.3531C4.34766 34.5323 11.8154 42 20.9946 42C30.1737 42 37.6418 34.5323 37.6418 25.3531C37.6418 22.1119 36.7096 19.0844 35.1007 16.5235ZM32.8663 11.7971L34.6066 13.5374L33.6238 14.5202C33.0887 13.8969 32.5087 13.3134 31.8884 12.7754L32.8663 11.7971ZM15.4933 2.46094H26.4961V4.92188H15.4933V2.46094ZM18.5285 7.38281H23.4613V8.88918C22.656 8.76901 21.8325 8.70621 20.9949 8.70621C20.1569 8.70621 19.3334 8.76901 18.5285 8.88918V7.38281ZM31.8563 34.4672L30.457 33.0679C29.9767 32.5872 29.1977 32.5872 28.717 33.0679C28.2364 33.5482 28.2364 34.3275 28.717 34.8078L30.117 36.2078C27.9451 38.0362 25.2192 39.2257 22.2305 39.4846V37.4992C22.2305 36.8195 21.6796 36.2687 21 36.2687C20.3207 36.2687 19.7695 36.8195 19.7695 37.4992V39.4855C16.7808 39.2289 14.0539 38.0414 11.8808 36.2149L13.2801 34.8155C13.7607 34.3352 13.7607 33.5559 13.2801 33.0753C12.7998 32.5949 12.0205 32.5949 11.5401 33.0753L10.1398 34.4752C8.31175 32.3033 7.1223 29.5774 6.86307 26.589H8.8488C9.52812 26.589 10.0793 26.0379 10.0793 25.3586C10.0793 24.6789 9.52812 24.1281 8.8488 24.1281H6.86211C7.11909 21.1391 8.30663 18.4122 10.1331 16.239L11.5324 17.6383C11.7724 17.8786 12.0874 17.9988 12.4024 17.9988C12.7171 17.9988 13.0321 17.8786 13.2724 17.6383C13.7527 17.158 13.7527 16.379 13.2724 15.8984L11.8724 14.4984C14.0443 12.67 16.7703 11.4809 19.7586 11.2216V13.207C19.7586 13.8867 20.3098 14.4375 20.9891 14.4375C21.6687 14.4375 22.2196 13.8867 22.2196 13.207V11.2207C25.2086 11.4773 27.9355 12.6649 30.1087 14.4913L28.7093 15.8907C28.2287 16.371 28.2287 17.1503 28.7093 17.631C28.9493 17.871 29.2643 17.9911 29.5793 17.9911C29.894 17.9911 30.209 17.871 30.4493 17.631L31.8493 16.2307C33.6777 18.4029 34.8671 21.1288 35.126 24.1172H33.1406C32.461 24.1172 31.9102 24.668 31.9102 25.3477C31.9102 26.0273 32.461 26.5781 33.1406 26.5781H35.127C34.8703 29.5671 33.6828 32.2937 31.8563 34.4672Z" fill="{{admin_config.get_livechat_theme_lighten_one}}"/>
+      <path d="M25.3692 19.6596C24.6754 20.0163 23.7801 20.3947 22.9146 20.7609C21.201 21.4854 19.5828 22.1699 18.7048 22.9659C18.0546 23.5558 17.673 24.3633 17.63 25.2403C17.5871 26.117 17.8883 26.9581 18.4779 27.6083C19.1258 28.3229 20.0182 28.6859 20.9142 28.6859C21.7021 28.6859 22.4923 28.4049 23.1204 27.8355C23.7446 27.2696 24.4095 26.0564 25.4429 24.1245C25.969 23.1408 26.5128 22.1238 26.9659 21.4204C27.2678 20.9526 27.2171 20.3399 26.8432 19.9275C26.4692 19.5148 25.8646 19.4049 25.3692 19.6596ZM21.4672 26.0125C21.1301 26.3182 20.6069 26.2926 20.3012 25.9552C20.1528 25.7921 20.0772 25.5806 20.0881 25.3605C20.0987 25.14 20.1948 24.9372 20.3579 24.7891C20.8152 24.3745 21.9184 23.8647 23.0515 23.377C22.5042 24.396 21.7649 25.7424 21.4672 26.0125Z" fill="{{admin_config.get_livechat_theme_lighten_one}}"/>
+      </svg>
+  
+  <div id="countdown-container" class="countdown-container-div">
+      <div id="countdown">
+        <div class="timer-count-text-div">
+          <span id="stop-interaction-hour">00</span>
+          <span id="hours-text" class="countdown-text">Hours</span>
+        </div>
+        <span class="time-separation">:</span>
+
+        <div class="timer-count-text-div">
+          <span id="stop-interaction-minute">00</span> 
+          <span id="hours-text" class="countdown-text">Minutes</span>
+        </div>
+        <span class="time-separation">:</span>
+
+        <div class="timer-count-text-div">
+          <span id="stop-interaction-second">00</span>
+          <span id="hours-text" class="countdown-text">Seconds</span>
+        </div>
+      </div>
+  </div>
+  <p>Click Stop Timer to end Stop Interaction and go offline now.</p>
+  <button class="stop-timer-btn" onclick="show_offline_reasons_modal()">Stop Timer</button>
+</div>
+<!-- Video Call Request Sent Modal -->
+
+<div class="modal fade" id="livechat_video_call_request_sent_modal" tabindex="-1" role="dialog" aria-labelledby="livechat_voip_call_request_sent_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+
+          Request for Video Call Successfully Sent
+
+      </div>
+  </div>
+</div>
+
+<!-- Video Call Request Accepted Modal -->
+
+<div class="modal fade" id="livechat_video_call_request_accept_modal" tabindex="-1" role="dialog" aria-labelledby="livechat_voip_call_request_accept_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+
+      <div class="livechat-voip-request-accept-text-div">
+        Request Accepted
+      </div>
+      <p>Video Call request has been accepted.</p>
+      <button type="button" data-dismiss="modal" class="live-chat-voip-call-connect-button live-chat-voip-call-connect-button-on-mobile" id="mobile_vc_connect_btn">
+        Connect
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- VoIP Request Sent Modal -->
+
+<div class="modal fade" id="livechat_voip_call_request_sent_modal" tabindex="-1" role="dialog" aria-labelledby="livechat_voip_call_request_sent_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+
+          Request for Voice Call Successfully Sent
+
+      </div>
+  </div>
+</div>
+
+<!-- VoIP Request Accepted Modal -->
+
+<div class="modal fade" id="livechat_voip_call_request_accept_modal" tabindex="-1" role="dialog" aria-labelledby="livechat_voip_call_request_accept_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+
+      <div class="livechat-voip-request-accept-text-div">
+        Request Accepted
+      </div>
+      <p>Voice Call request has been Accepted. Click on “Connect” to join the Voice call</p>
+      <button type="button" data-dismiss="modal" class="live-chat-voip-call-connect-button live-chat-voip-call-connect-button-on-mobile" id="mobile_voip_connect_btn">
+        Connect
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- VoIP Link Generated Modal -->
+
+<div class="modal fade" id="livechat_voip_call_link_generated_modal" tabindex="-1" role="dialog" aria-labelledby="livechat_voip_call_request_sent_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document" style="width: 310px;">
+      <div class="modal-content">
+
+        Link for Voice Call generated successfully.
+
+      </div>
+  </div>
+</div>
+
+<!-- VC Link Generated Modal -->
+
+<div class="modal fade" id="livechat_vc_call_link_generated_modal" tabindex="-1" role="dialog" aria-labelledby="livechat_voip_call_request_sent_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document" style="width: 310px;">
+      <div class="modal-content">
+
+        Link for Video Call generated successfully.
+
+      </div>
+  </div>
+</div>
+
+
+<!-- VoIP Request Rejected Modal -->
+
+<div class="modal fade backdrop" id="livechat_voip_call_request_reject_modal" tabindex="-1" aria-labelledby="Admin_manage_user_Uploadexcel_modal_label" aria-modal="true" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6>Request Rejected</h6>
+            </div>
+            <div class="modal-body" style="display: flex; justify-content: flex-start; color: #4d4d4d;">
+        <p style="font-size: 16px;" id="livechat_voip_request_rejected_text"></p>
+            </div>
+            <div class="modal-footer">
+                <div style="float: right;">
+                    <button class="btn-danger" type="button" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- VoIP PIP -->
+
+<div id="livechat_VOIP_call_screen_draggable" class="ui-widget-content livechat-VOIP-call-ongoing-screen-container">
+  <div id="meet_container" style="display: none;">
+
+  </div>
+    
+  <div class="livechat-voip-call-user-name" id="pip_meet_cutomer_name">
+      Shubham Sethia
+    </div>
+
+    <button class="livechat-VOIP-call-unmute-button " id="voip_mute_audio">
+      <svg class="livechat-VOIP-call-unmute-svg" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M9.99929 7.66678C9.99929 8.77345 9.10596 9.66678 7.99929 9.66678C6.89262 9.66678 5.99929 8.77345 5.99929 7.66678V3.66678C5.99929 2.56011 6.89262 1.66678 7.99929 1.66678C9.10596 1.66678 9.99929 2.56011 9.99929 3.66678V7.66678ZM11.2858 8.23352C11.3392 7.90686 11.6125 7.66685 11.9392 7.66685C12.3458 7.66685 12.6725 8.02685 12.6058 8.42686C12.2792 10.4269 10.6792 11.9935 8.66584 12.2802V13.6669C8.66584 14.0335 8.36584 14.3335 7.99918 14.3335C7.63251 14.3335 7.33251 14.0335 7.33251 13.6669V12.2802C5.31918 11.9935 3.71918 10.4269 3.39251 8.42686C3.33251 8.02685 3.65251 7.66685 4.05918 7.66685C4.38584 7.66685 4.65918 7.90686 4.71251 8.23352C4.98584 9.80019 6.35251 11.0002 7.99918 11.0002C9.64584 11.0002 11.0125 9.80019 11.2858 8.23352Z" fill="#475569"/>
+        </svg>
+        <svg class="livechat-VOIP-call-mute-svg" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M2.30407 1.55905C2.09835 1.35333 1.76481 1.35332 1.55908 1.55904C1.35336 1.76476 1.35335 2.09831 1.55907 2.30403L5.61907 6.36411V8.42857C5.61907 9.98022 6.87694 11.2381 8.4286 11.2381C9.01401 11.2381 9.5576 11.059 10.0076 10.7527L10.8125 11.5576C10.1969 12.0186 9.43243 12.2917 8.60419 12.2917H8.253L8.101 12.2886C6.13493 12.2089 4.5655 10.5898 4.5655 8.60416V8.25297L4.56069 8.18149C4.52581 7.92436 4.30541 7.72618 4.03871 7.72618C3.74778 7.72618 3.51193 7.96203 3.51193 8.25297V8.60416L3.51478 8.77016C3.59821 11.1946 5.50194 13.1567 7.90182 13.3324L7.90181 14.9256L7.90662 14.9971C7.9415 15.2542 8.1619 15.4524 8.4286 15.4524C8.71953 15.4524 8.95538 15.2165 8.95538 14.9256L8.95607 13.3324C9.93868 13.2603 10.8381 12.8887 11.5634 12.3086L14.553 15.2982C14.7587 15.5039 15.0922 15.5039 15.298 15.2982C15.5037 15.0925 15.5037 14.7589 15.298 14.5532L2.30407 1.55905Z" fill="white"/>
+      <path d="M12.0783 9.84344L12.8832 10.6483C13.1794 10.0294 13.3453 9.33615 13.3453 8.60416V8.25297L13.3405 8.18149C13.3056 7.92436 13.0852 7.72618 12.8185 7.72618C12.5275 7.72618 12.2917 7.96203 12.2917 8.25297V8.60416L12.2886 8.75616C12.2732 9.13623 12.2003 9.50149 12.0783 9.84344Z" fill="white"/>
+      <path d="M5.71577 3.48082L11.189 8.95419C11.2213 8.78392 11.2381 8.60821 11.2381 8.42857V4.21428C11.2381 2.66262 9.98025 1.40475 8.4286 1.40475C7.13069 1.40475 6.03834 2.28485 5.71577 3.48082Z" fill="white"/>
+    </svg>      
+    </button>
+    
+  <button type="button" class="livechat-VOIP-call-end-button" id="voip_end_call">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14.4537 8.76217L14.3257 9.43444C14.2057 10.0644 13.6168 10.4874 12.9495 10.423L11.6217 10.2947C11.0431 10.2388 10.6143 9.81625 10.4326 9.21623C10.1859 8.40156 10.0272 7.79734 10.0272 7.79734C9.42085 7.54881 8.82213 7.39191 8.00016 7.39191C7.17818 7.39191 6.59117 7.56613 5.97313 7.79734C5.97313 7.79734 5.80745 8.40211 5.56773 9.21623C5.40754 9.76023 5.15904 10.2351 4.59238 10.2921L3.27228 10.4247C2.61359 10.4909 1.98204 10.072 1.79478 9.44464L1.59411 8.77234C1.39437 8.10315 1.57262 7.39891 2.06205 6.92358C3.21752 5.8014 5.29659 5.16886 7.99403 5.16536C10.6954 5.16188 12.5292 5.791 13.8007 6.91329C14.3357 7.38554 14.5807 8.09558 14.4537 8.76217Z" fill="white"/>
+        </svg>
+    </button>
+</div>
+
+<!-- Language Changer Loader Modal -->
+
+<div class="modal fade" id="livechat_language_change_modal" tabindex="-1" role="dialog" aria-labelledby="livechat_voip_call_request_sent_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <img width="300" height="200" src="{% static 'LiveChatApp/img/language_change_loader.gif' %}" alt="">
+
+        </div>
+    </div>
+</div>
+
+<!-- send transcript modal start  -->
+<div class="modal fade backdrop livechat-custom-modal-wrapper" id="livechat-send-transcript-modal" tabindex="-1" aria-labelledby="raise_ticket_modal_label" style="display: none;" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h6>Send Transcript</h6>
+          </div>
+          <div class="modal-body">
+
+              <div class="row">
+                  <div class="col-12 mb-4">
+                      <label>Enter valid email ID <b>*</b></label>
+                      <input type="text" class="form-control " placeholder="Enter Email ID" id="transcript-email-id" required>
+
+                  </div>
+
+              </div>
+            
+          </div>
+          <div class="modal-footer">
+              <div style="float: right;">
+                  <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                  <button class="btn-primary" type="button" id="transcript-submit-btn">Submit</button>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+<!-- send transcript modal end  -->
+
+<!-- Raise a Ticket Modal -->
+<div class="modal fade backdrop livechat-custom-modal-wrapper" id="livechat-raise-ticket-modal" tabindex="-1" aria-labelledby="raise_ticket_modal_label" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6>Raise a ticket</h6>
+            </div>
+            <div class="modal-body">
+
+              <div id="livechat-raise-ticket-form">
+              </div>
+
+              <div class="col-12 livechat-custom-modal-error-message" id="raise-ticket-error-message" style="display: none;">
+                  Ticket could not be raised due to some error! Please try again.*
+              </div>
+              
+            </div>
+            <div class="modal-footer">
+                <div style="float: right;">
+                    <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                    <button class="btn-primary" type="button" onclick="livechat_raise_ticket()">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Ticket Submit Successfully modal -->
+<div class="modal fade " id="ticket-submit-modal" tabindex="-1 " role="dialog " aria-labelledby="ticket-submit-modal_label " aria-hidden="true ">
+    <div class="modal-dialog " role="document ">
+        <div class="modal-content ">
+
+            <div class="modal-body ">
+                <div class="row ">
+                    <div class="col-12 mb-0 pt-2 pl-4 ">
+                        <div class="livechat-ticket-succesfull-text-heading">Ticket submitted successfully</div>
+                        <div class="livechat-ticket-succesfull-text-subheading">Please note the Ticket ID No. <span id="ticket-id-span"></span></div>
+
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer " style="    padding-top: 4px;">
+                <div style="float: right; ">
+
+                    <button class="btn-primary " style="width: 85px;" type="button" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View Ticket Modal -->
+<div class="modal fade backdrop livechat-custom-modal-wrapper" id="livechat-view-ticket-modal" tabindex="-1" aria-labelledby="raise_ticket_modal_label" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6>View Tickets</h6>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 mb-4">
+                        <label>Search Ticket  </label>
+                        <input type="search" class="form-control " placeholder="Enter ticket ID" id="livechat-ticket-id">
+
+                        <div class="livechat-ticket-details-container" id="ticket-details-container" style="display: none;">
+
+                        </div>
+
+                    </div>
+                    <div class="col-12 mb-2" style="text-align: right;">
+                        <a href="javascript:void(0);" class="previously-raised-tickets-div" onclick="livechat_get_previous_tickets()">Previously raised tickets</a>
+
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div style="float: right;">
+                    <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                    <button class="btn-primary" type="button" onclick="livechat_search_ticket()">Search</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Previously Raised Ticket Modal -->
+<div class="modal fade backdrop livechat-custom-modal-wrapper" id="livechat-previous-raised-ticket-modal" tabindex="-1" aria-labelledby="raise_ticket_modal_label" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6>View Tickets</h6>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 mb-4">
+                        <label style="margin-bottom: 0px;">Previously Raised tickets </label>
+                        <div id="ticket-info-container"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div style="float: right;">
+
+                    <button class="btn-primary" type="button" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cobrowsing Request Sent Modal -->
+
+<div class="modal fade" id="livechat_cobrowsing_request_sent_modal" tabindex="-1" role="dialog" aria-labelledby="livechat_cobrowsing_request_sent_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document" style="width: 300px;">
+      <div class="modal-content">
+
+          Request for Cobrowsing Successfully Sent
+
+      </div>
+  </div>
+</div>
+
+<!-- Cobrowsing Request Accepted Modal -->
+
+<div class="modal fade" id="livechat_cobrowsing_request_accepted_modal" tabindex="-1" role="dialog" aria-labelledby="livechat_cobrowsing_request_accepted_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document" style="width: 310px;">
+      <div class="modal-content">
+
+          Request for Cobrowsing has been accepted
+
+      </div>
+  </div>
+</div>
+
+<!-- Cobrowsing Request Accepted Modal -->
+
+<div class="modal fade" id="livechat_cobrowsing_request_accept_modal" tabindex="-1" role="dialog" aria-labelledby="livechat_voip_call_request_accept_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+
+      <div class="livechat-voip-request-accept-text-div">
+        Request Accepted
+      </div>
+      <p>Cobrowsing request has been Accepted. Click on “Connect” to join the Cobrowsing Session</p>
+      <button type="button" data-dismiss="modal" class="live-chat-voip-call-connect-button live-chat-voip-call-connect-button-on-mobile" id="mobile_cobrowsing_connect_btn">
+        Connect
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Chat Escalation User Report Modal -->
+
+<div class="modal fade backdrop livechat-blacklist-report-modal-wrapper" id="livechat-blacklist-report-modal" tabindex="-1" role="dialog" aria-labelledby="agent_canned_response_modal_label" aria-modal="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <div class="row">
+
+                    <div class="livechat-blacklist-custom-modal-icon-div mb-4">
+                        <svg width="82" height="82" viewBox="0 0 82 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M40.8395 6.83325C22.0888 6.83325 6.83337 22.1604 6.83337 40.9999C6.83337 59.8394 22.1605 75.1666 41 75.1666C59.8395 75.1666 75.1667 59.8394 75.1667 40.9999C75.1667 22.1604 59.7678 6.83325 40.8395 6.83325ZM44.4167 58.0833H37.5834V51.2499H44.4167V58.0833ZM44.4167 44.4166H37.5834V23.9166H44.4167V44.4166Z" fill="#DB2A2A"/>
+                        </svg>
+
+                    </div>
+                    <div class="livechat-blacklist-custom-modal-heading-div mb-2">
+                        Report this User?
+                    </div>
+                    <div class="livechat-blacklist-custom-modal-subheading-div mb-4 px-4">
+                        Are you sure you want to report this customer?
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+
+                <button class="btn-close livechat-blacklist-custom-modal-close-btn" type="button" data-dismiss="modal">Cancel</button>
+                <button id="chat-escalation-report-confirm-btn" class="btn-primary livechat-blacklist-custom-modal-report-btn" type="button">Report</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- custom notification start -->
+<div class="custom-notification-alert-div">
+    <div class="connection-notification-div">
+        <p>
+            <span id="custom-notification-text" class="notification-text"></span>
+            <span class="close-notification-icon-svg" onclick="hide_custom_notification()">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.19165 1L10.8082 11" stroke="#4D4D4D" stroke-width="1.73614" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <path d="M10.8083 1L1.19183 11" stroke="#4D4D4D" stroke-width="1.73614" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+            </span> 
+        </p>
+    </div>
+</div>
+<!-- custom notification end -->
+
+<script type="text/javascript" src="https://{{meeting_domain}}/external_api.js"></script>
+<script src="{% static 'LiveChatApp/js/intlTelInput.min.js' %}?v={% random_int 1 100 %}"></script>
+
+<script type="text/javascript">
+  
+  function milliseconds_to_time(duration) {
+    var milliseconds = parseInt((duration % 1000) / 100),
+      seconds = Math.floor((duration / 1000) % 60),
+      minutes = Math.floor((duration / (1000 * 60)) % 60),
+      hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+
+      hours = (hours < 10) ? "0" + hours : hours;
+      minutes = (minutes < 10) ? "0" + minutes : minutes;
+      seconds = (seconds < 10) ? "0" + seconds : seconds;
+      return [hours,minutes,seconds]
+  }
+
+  last_stop_interaction = {{ time_marked_stop_interaction |date:"U"}} * 1000
+  if({{user_obj.current_status}} == "0"){
+    try{
+        document.getElementById("livechat-stop-interaction-div").style.display = "flex";
+    }catch(err){console.log(err)}
+
+    try{
+        document.getElementById("timer-mobile").style.display = "block";
+    }catch(err){console.log(err)}
+    
+    current_time = Date.now()
+    setInterval(function(){
+        difference_in_time = Math.abs(Date.now() - last_stop_interaction)
+        time_segregated = milliseconds_to_time(difference_in_time)
+        try{
+          document.getElementById("stop-interaction-hour").innerHTML = time_segregated[0]
+          document.getElementById("stop-interaction-minute").innerHTML = time_segregated[1]
+          document.getElementById("stop-interaction-second").innerHTML = time_segregated[2]
+        }catch(err){console.log(err)}
+        
+        try{
+          document.getElementById("stop-interaction-hour-mobile").innerHTML = time_segregated[0]
+          document.getElementById("stop-interaction-minute-mobile").innerHTML = time_segregated[1]
+          document.getElementById("stop-interaction-second-mobile").innerHTML = time_segregated[2]
+        }catch(err){console.log(err)}
+        
+      },1000)
+      }
+
+  window.AGENT_FULL_NAME = '{{user_obj.user.first_name}} {{user_obj.user.last_name}}'
+  window.AGENT_USERNAME = '{{user_obj.user.username}}';
+  window.ASSIGNED_CUSTOMER_COUNT = {{ assigned_customer_count }};
+  window.IS_NOTIFICATION_ENABLE = '{{user_obj.notification}}'
+  window.LIVECHAT_THEME_COLOR = '{{admin_config.get_livechat_theme_lighten_one}}'
+  window.LIVECHAT_THEME_COLOR_LIGHT = '{{admin_config.get_livechat_theme_lighten_five}}'
+  window.LIVECHAT_THEME_COLOR_LIGHT_ONE = '{{admin_config.get_livechat_theme_lighten_six}}'
+  window.AGENT_WEBSOCKET_TOKEN = '{{agent_websocket_token}}'
+  window.CURRENT_STATUS = '{{user_obj.current_status}}'
+  window.CANNED_ARR = {{canned_response | safe}}
+  window.BLACKLISTED_KEYWORD = {{blacklisted_keyword | safe}}
+  window.AUTO_CHAT_DISPOSAL_ENABLED = '{{auto_chat_disposal_enabled}}' == 'True' ? true : false;
+  window.USER_TERMINATES_CHAT_ENABLED = '{{user_terminates_chat_enabled}}' == 'True' ? true : false;
+  window.USER_TERMINATES_CHAT_DISPOSAL_TIME = {{user_terminates_chat_dispose_time}}
+  window.SESSION_INACTIVITY_ENABLED = '{{session_inactivity_enabled}}' == 'True' ? true : false;
+  window.SESSION_INACTIVITY_CHAT_DISPOSAL_TIME = {{session_inactivity_chat_dispose_time}}
+  window.GUEST_AGENT_TIMER = '{{guest_session_timer}}';
+  window.MAX_GUEST_AGENT = '{{max_guest_agent}}';
+  window.CURRENT_GUEST_SESSIONS = '{{current_guest_sessions}}';
+  window.IS_VOIP_ENABLED = '{{config_obj.is_voip_enabled}}' == 'True' ? true : false;
+  window.VOIP_TYPE = '{{config_obj.call_type}}';
+  window.VC_ENABLED = '{{config_obj.is_livechat_vc_enabled}}' == 'True' ? true : false;
+  window.IS_VIRTUAL_INTERPRETATION_ENABLED = '{{config_obj.is_virtual_interpretation_enabled}}' == 'True' ? true : false;
+  window.IS_VOIP_FROM_CUSTOMER_END_ENABLED = '{{config_obj.is_call_from_customer_end_enabled}}' == 'True' ? true : false;
+  window.IS_AGENT_RAISE_TICKET_FUNCTIONALITY_ENABLED = '{{config_obj.is_agent_raise_ticket_functionality_enabled}}' == 'True' ? true : false;
+  window.IS_CUSTOMER_DETAILS_EDITING_ENABLED = '{{config_obj.is_customer_details_editing_enabled}}' == 'True' ? true : false;
+  
+  window.IS_MEETING_STARTED = '{{is_meeting_started}}' == 'True' ? true : false;
+  window.IS_MEETING_END_REQUIRED = '{{is_meeting_end_required}}' == 'True' ? true : false;
+  window.MEETING_ID = '{{meeting_id}}';
+  window.MEETING_SESSION_ID = '{{meeting_session_id}}';
+  window.BOT_ID = '{{bot_id}}'
+  window.MEETING_DOMAIN = '{{meeting_domain}}'
+  window.CATEGORY_LIST = {{category_list|safe}}
+  window.IS_COBROWSING_ENABLED = '{{config_obj.is_cobrowsing_enabled}}' == 'True' ? true : false;
+  window.IS_AGENT_TRANSCRIPT_ENABLED = '{{config_obj.is_transcript_enabled}}' == 'True' ? true : false;
+  window.COBROWSING_INFO = {{cobrowsing_info|safe}};
+  window.USER_PK = '{{user_obj.user.pk}}';
+  window.CUSTOMER_BLACKLISTED_KEYWORD = {{customer_blacklisted_keyword | safe}}
+  window.IS_CHAT_ESCALATION_ENABLED = '{{ admin_config.is_chat_escalation_matrix_enabled }}' == 'True' ? true : false;
+  window.IS_AGENT_REPORT_ENABLED = '{{ admin_config.is_chat_escalation_matrix_enabled }}' == 'True' && '{{ admin_config.is_agent_allowed_to_force_report }}' == 'True' ? true : false;
+  window.IS_LIVECHAT_ENABLED_FOR_EMAIL = '{{ email_config_obj.is_livechat_enabled_for_email }}' == 'True' ? true : false;
+  window.IS_SPECIAL_CHARACTER_ALLOWED_IN_FILE_NAME = '{{admin_config.is_special_character_allowed_in_file_name}}' == 'True' ? true : false;
+  window.IS_SPECIAL_CHARACTER_ALLOWED_IN_CHAT = '{{admin_config.is_special_character_allowed_in_chat}}' == 'True' ? true : false;
+  window.LIVECHAT_CHANNELS_CHAR_LIMIT = {{livechat_channels_char_limit | safe}};
+
+  localStorage.setItem('assigned_customer_count', ASSIGNED_CUSTOMER_COUNT);
+  localStorage.setItem('is_virtual_interpretation_enabled', window.IS_VIRTUAL_INTERPRETATION_ENABLED);
+  var STATIC_IMG_PATH = "/static/LiveChatApp/img";
+  // document.getElementById("id-select-chat").style.display="none";
+
+
+  function attach_file() {
+    $('#easychat-livechat-file-attchment-input').click();
+  }
+  $(function() {
+      $("#livechat-stop-interaction-div").draggable({
+          appendTo: "body",
+          cursor: "move",
+          containment: "document",
+          zIndex: 10000,
+          scroll: false
+      });
+  });
+
+const selected = document.querySelector(".livechat-add-agent-container .select-box .selected");
+const dropdown = document.getElementById("livechat-add-agent-dropdown-wrapper");
+const optionsContainer = document.querySelector(".livechat-add-agent-container .options-container");
+const searchBox = document.querySelector(".livechat-add-agent-container .search-box input");
+let open = false;
+dropdown.addEventListener("click", () => {
+    open = !open;
+    optionsContainer.classList.toggle("active");
+    if (open) {
+        document.querySelector('#livechat-add-agent-language-dropdown-arrow svg').style.transform="rotate(180deg)";
+        document.getElementById('livechat-agents-options-search-box').style.display="block";
+        document.getElementById('livechat-agent-list-area').style.display="none";
+    } else {
+        document.querySelector('#livechat-add-agent-language-dropdown-arrow svg').style.transform="rotate(0deg)";
+        document.getElementById('livechat-agents-options-search-box').style.display="none";
+        document.getElementById('livechat-agent-list-area').style.display="block";
+    }
+    if (optionsContainer.classList.contains("active"))
+        searchBox.focus();
+});
+
+searchBox.addEventListener("keyup", function(e) {
+    guest_agent_filter_list(e.target.value);
+});
+
+$("#livechat_VOIP_call_screen_draggable").draggable({
+    appendTo: "body",
+
+    cursor: "move",
+    containment: "document",
+    zIndex: 10000,
+    scroll: false
+
+});
+$('#voip_call_accept_btn').tooltip();
+$('#guest_agent_call_connect_btn').tooltip();
+$('#guest_agent_cobrowse_connect_btn').tooltip();
+
+function hide_custom_notification() {
+  $(".custom-notification-alert-div").hide();
+}
+
+
+</script>
+{% endblock %}

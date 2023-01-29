@@ -1,0 +1,1003 @@
+{% extends 'EasyAssistApp/console.html' %}
+{% block content %}
+{% load static %}
+{% load easyassist_custom_filters %}
+
+<style type="text/css">
+
+/*
+    Chat style
+*/
+
+.easychat-bot-message-div {
+    margin-top: 0em;
+    width: 100%;
+    display: inline-block;
+}
+
+.message-time-user {
+    font-size: 11px;
+    float: right;
+    text-align: right;
+    margin-left: 20px;
+    color: white;
+    padding: 0.5em 0em 0em 0.5em;
+}
+/* thead {
+    display:block;
+}
+tbody {
+    height:20em;
+    overflow-y:scroll;
+    display:block;
+} */
+
+.message-time-bot {
+    font-size: 11px;
+    text-align: right;
+    width: 100%;
+    float: right;
+    padding: 0.5em 0em 0em 0.5em;
+}
+
+.easychat-bot-message {
+    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
+    float: left;
+    width: fit-content;
+    height: auto;
+    font-size: 14px;
+    color: #262626;
+    border-radius: 0px 10px 10px 10px;
+    background-color: #ffffff;
+    padding-bottom: 10px;
+    word-wrap: break-word;
+    display: inline-block;
+}
+
+@media screen and (min-width: 425px) {
+    .easychat-bot-message {
+        width: fit-content;
+        max-width: 80%;
+    }
+}
+
+.easychat-bot-message-line {
+    line-height: 20px;
+    padding: 0.8em 0.5em 0.8em 0.5em;
+}
+
+.easychat-user-message-div {
+    margin: 0em 0em 0em 0em;
+    width: 100%;
+    display: inline-block;
+}
+
+.easychat-user-message {
+    box-shadow: -1px 1px 5px rgba(0, 0, 0, 0.2);
+    float: right;
+    height: auto;
+    max-width: 80%;
+    font-size: 14px;
+    color: white;
+    border-radius: 10px 0px 10px 10px;
+    word-wrap: break-word;
+    display: inline-block;
+    margin-right: 0.3em;
+}
+
+.easychat-user-message-line {
+    line-height: 16px;
+    padding: 0.8em 0.7em 0.8em 0.8em !important;
+}
+
+.easychat-livechat-customer-attachment {
+    width: auto;
+    max-width: 80%;
+    float: left;
+    background-color: #ffffff;
+    margin: 1em 0px 3px 0px;
+    padding: 4px 4px 1px 4px;
+    border-radius: 0em 1em 1em 1em;
+    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
+}
+
+.easychat-livechat-message {
+    height: fit-content;
+    padding: 6px;
+    word-wrap: break-word;
+}
+
+/*  Chat Style End */
+.cobrowse-msg {
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: 10px;
+}
+
+.cobrowse-msg-img {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+    background: #ddd;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    border-radius: 50%;
+}
+
+.cobrowse-msg-bubble {
+    max-width: 450px;
+    padding: 15px;
+    border-radius: 15px;
+    background: aliceblue;
+    max-width: 50%;
+}
+
+.cobrowse-msg-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.cobrowse-msg-info-name {
+    margin-right: 10px;
+}
+
+.cobrowse-msg-info-time {
+    font-size: 0.85em;
+}
+
+.right-cobrowse-msg {
+    flex-direction: row-reverse;
+}
+
+.right-cobrowse-msg .cobrowse-msg-bubble {
+    border-bottom-right-radius: 0;
+}
+
+.left-cobrowse-msg .cobrowse-msg-bubble {
+    border-bottom-left-radius: 0;
+}
+
+@media only screen and (max-width: 769px) {
+    .d-block-sm {
+        display: block!important;
+    }
+}
+
+#modal-mis-filter label {
+    font-size: 13px;
+}
+</style>
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <!-- DataTales Example -->
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <div class="row">
+                <div class="col-sm-7">
+                    <h6 class="m-0 font-weight-bold text-primary heading-text-primary">Meeting Support History</h6>
+                </div>                
+                <div class="col-sm-5" style="text-align: right;" style="display:none;" id="export-filter-div">
+                    {% if cobrowse_agent.role == "admin" or cobrowse_agent.role == "supervisor" or cobrowse_agent.role == "admin_ally"  %}                        
+                        <button class="btn btn-info btn-width-100" style="width: 120px;" data-toggle="modal" data-target="#modal-mis-filter">Export</button>                        
+                    {% endif %}
+                    <button class="btn btn-white-border btn-width-100" data-toggle="modal" data-target="#apply_filter_modal">Filter</button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+        	<div class="row filter-result-div" id="applied-filter-div" style="display: none;">
+                <div class="filter-items-container" id="applied-filter-result-container">
+                </div>
+                <div class="filtered-result-text-heading">
+                    Filtered Results
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th scope="col">Customer Details</th>
+                            <th scope="col">Meeting Date</th>
+                            {% if cobrowse_agent.role != "agent" %}
+                            <th scope="col">Agent</th>
+                            {% endif %}
+                            {% if cobrowse_agent.role == "admin_ally" %}  
+                            <th scope="col">Supervisors</th>
+                            {% endif %}
+                            <th scope="col">Total Duration</th>
+                            {% if access_token_obj.enable_meeting_recording %}
+                                <th scope="col">Meeting Recording</th>
+                            {% endif %}
+                            <th scope="col">Meeting Status</th>
+                            <th scope="col">Meeting Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="support_history_table">
+                        
+                    </tbody>
+                </table>
+            </div>
+            
+            <div id="pagination-div">
+            
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+
+<div id="custom-side-nav-bar">
+
+</div>
+
+
+<div class="modal fade" id="agent_chat_history" tabindex="-1" role="dialog" aria-labelledby="agent_chat_history_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="agent_chat_history_modal_label">Chat history</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12" id="client-agent-chat-history" style="max-height: 400px;overflow-y: auto;"></div>
+                </div>
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade client-location-details" id="client-location-details" tabindex="-1" role="dialog" aria-labelledby="client_location_details_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="client_location_details_label">Client's Location Details</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
+<div class="modal fade meeting-screencapture-details" id="meeting-screencapture-details" tabindex="-1" role="dialog" aria-labelledby="meeting_screencapture_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="meeting_screencapture_label">Captured Screenshots</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="table-responsive" style="max-height: 400px">
+                        <table class="table table-borderless" style="max-height: 305px;overflow-y: scroll;">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Screenshot</th>
+                                    <th scope="col">Download</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-captured-screenshot-details"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="apply_filter_modal" tabindex="-1" role="dialog" aria-labelledby="apply_filter_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="apply_filter_modal_modal_label">Apply custom filter</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row filter-header-row">
+                    <div class="col-md-4 col-sm-12 filter-mb-sm-4">
+                        <select class="form-control" onchange="show_filter_options(this)" id="selected-filter-parameter" style="width: 100%!important;">
+                            <option value="None">Select Filter</option>
+                            {% if cobrowse_agent.role != "agent" %}
+                            <option value="agent">Agent</option>
+                            {% endif %}
+                            {% if cobrowse_agent.role == "admin_ally" %}
+                            <option value="supervisor">Supervisor</option>
+                            {% endif %}
+                            <option value="startdate">Start Date</option>
+                            <option value="enddate">End Date</option>
+                            <option value="status">Status</option>
+                        </select>
+                    </div>
+                    <div class="col-md-5 col-sm-12 filter-mb-sm-4 easyassist-multiselect-dropdown-container" id="selected-filter-container">
+                        <select class="form-control" style="display:none;" id="selected-agent-filter" multiple>
+                            {% for agent in agents %}
+                            <option value="{{ agent.user.username }}">{{ agent.user.username }}</option>
+                            {% endfor %}
+                        </select>
+                        {% if cobrowse_agent.role == "admin_ally" %}
+                        <select class="form-control" style="display:none;" id="selected-supervisor-filter" multiple>
+                            {% for supervisor in supervisors %}
+                            <option value="{{ supervisor.user.username }}">{{ supervisor.user.username }}</option>
+                            {% endfor %}
+                        </select>
+                        {% endif %}
+                        <input id="filter-start-date" placeholder="Start Date" style="display:none;" class="filter-parameter form-control datepicker" autocomplete="off" data-date-format="dd-mm-yyyy">
+                        <input id="filter-end-date" placeholder="End Date" style="display:none;" class="filter-parameter form-control datepicker" autocomplete="off" data-date-format="dd-mm-yyyy">
+                        <select class="form-control filter-parameter" style="display:none;" id="selected-status-filter">
+                            <option value="all">All</option>
+                            <option value="completed">Completed</option>
+                            <option value="scheduled">Scheduled</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 col-sm-12" style="align-items: center; display: flex;">
+                        <button class="btn btn-success btn-icon-split" type="button" id="add-filter-btn" onclick="add_new_filter_parameter(this)" style="width: 100%;justify-content: start;" disabled>
+                            <span class="icon text-white-50">
+                                <svg width="19" height="14" viewBox="0 0 19 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M6.03809 11.0455L1.53383 6.69202L0 8.16406L6.03809 14L19 1.47204L17.477 0L6.03809 11.0455Z" fill="white"/>
+                                </svg>
+                            </span>
+                            <span class="text" style="width: 100%;">Add</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="row" id="tbody-filter-parameters">
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <button id="reset_filter" class="btn btn-white-border" style="display: none;" disabled onclick="reset_support_history_filter(this)">Reset</button>
+                <button id="apply_filter_confirm" class="btn btn-primary" disabled onclick="apply_support_history_filter(this)">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% for audit_trail_obj in audit_trail_objs %}
+<div class="modal fade" id="cobrowse-form-{{ audit_trail_obj.pk }}" tabindex="-1" role="dialog" aria-labelledby="cobrowse_form_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cobrowse_form_label">Form Details</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="table-responsive">
+                        <table class="table table-borderless" style="max-height: 305px;">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="text-center">Form Name</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cobrowse_form in audit_trail_obj.get_meeting_forms %}
+                                <tr>
+                                    <td class="text-center">
+                                        <a href="/easy-assist/cobrowse-data-collect/show/{{ audit_trail_obj.cobrowse_video.meeting_id }}/{{ cobrowse_form.pk }}/" target="_blank">{{ cobrowse_form.form_name }}</a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td class="text-center">
+                                        No Forms
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<!-- ********************************* Export data -->
+<div class="modal fade client-location-details" id="modal-mis-filter" tabindex="-1" role="dialog" aria-labelledby="client_location_details_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="export_mis_lable">Export Meeting Support History</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h6 style="color: #3e95cd">Select date range</h6>
+                        <select id="select-date-range" class="form-control" onchange="check_select_date_range(this)">
+                            <option value="0" selected="selected">Choose date range</option>
+                            <option value="1">Last day</option>
+                            <option value="2">Last 7 days</option>
+                            <option value="3">Last 1 month</option>
+                            <option value="4">Custom Range</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-6 mt-4" id="from-date-div" style="display: none;">
+                        <h6 style="color: #3e95cd">From Date</h6>
+                        <input id="startdate" placeholder="From Date" class="filter-parameter form-control datepicker" autocomplete="off" data-date-format="dd-mm-yyyy">
+                    </div>
+                    <div class="col-sm-6 mt-4" id="to-date-div" style="display: none;">
+                        <h6 style="color: #3e95cd">To Date</h6>
+                        <input id="enddate" placeholder="To Date" class="filter-parameter form-control datepicker" autocomplete="off" data-date-format="dd-mm-yyyy">
+                    </div>
+                    <div class="col-sm-12" id="email-id-div" style="display:none; padding-top: 25px;">
+                        <h6 style="color: #3e95cd">Email ID*</h6>
+                        <textarea class="form-control" id="filter-data-email" style="height:10em;">{{ request.user.email }}</textarea>
+                        <span><br><b>Note: You will receive the meeting history data dump on the above email ID within 1 hour.</b></span>
+                    </div>
+                    <div class="col-sm-12 mt-3" id="general-error-message">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-info" type="button" onclick="export_meeting_support_history_dyte(this)">Export</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Agent auto assign audit trail modal -->
+<div class="modal fade auto-assign-transfer-audit-trail" id="auto_assign_audit_trail" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+       <div class="modal-content" style="margin: auto !important;">
+          <div class="modal-header">
+             <h5 class="modal-title" id="auto_assign_audit_trail_modal_label">Auto Assign Audit Trail
+             </h5>
+             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                   <path d="M3.34525 3L20.655 21" stroke="#2D2D2D" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/>
+                   <path d="M20.6548 3L3.34502 21" stroke="#2D2D2D" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+             </button>
+          </div>
+          <div class="modal-body">
+             <div class="table-responsive" id="auto_assign_transfer_audit_trail_table_div">
+                <table id="auto_assign_transfer_audit_trail_table" class="table table-bordered" style="width: 100%;">
+                   <thead>
+                      <tr>
+                         <th scope="col">SL No.</th>
+                         <th scope="col">Date Time</th>
+                         <th scope="col">Auto Assigned Agent</th>
+                      </tr>
+                   </thead>
+                   <tbody>
+                   </tbody>
+                </table>
+             </div>
+          </div>
+       </div>
+    </div>
+ </div>
+
+
+<script type="text/javascript">
+window.start_point = '{{start_point}}';
+window.end_point = '{{end_point}}';
+window.agent_role = '{{cobrowse_agent.role}}';
+window.support_history_filters = {{support_history_filters | safe}};
+window.agents_list = {{agents_list | safe}};
+window.username = '{{request.user.username}}';
+window.is_filter_applied = false;
+window.custom_session_filter_dropdown = null;
+window.custom_filter_option_dropdown = null;
+window.applied_filter_key_value_map = {};
+window.invite_agent_in_meeting = '{{invite_agent_in_meeting}}';
+window.enable_meeting_recording = '{{enable_meeting_recording}}';
+
+
+function right_sidenav_close_event(event){
+    var parent_element = $(event.target).closest("#report_problem_icon,#report_problem_modal");
+    if(parent_element.length) {
+        return;
+    }
+
+    let bt_session=event.target.closest('.right-sidenav-session-btn');
+    if(!bt_session){
+        let container=$('.product-session-details:visible');
+        if(container && container[0]!=event.target.closest('.product-session-details')){
+            $('.product-session-details:visible').find('.sidebar-brand i').trigger('click');
+        }
+    }
+}
+
+function hide_right_sidenav(element) {
+    element.parentElement.parentElement.parentElement.style.display = "none";
+    document.removeEventListener('click',right_sidenav_close_event);
+    document.removeEventListener('keydown', function (event) {
+            var key = event.key || event.keyCode;
+            if (key === 'Escape' || key === 'Esc' || key === 27) {
+                $('.product-session-details:visible').find('.sidebar-brand i').trigger('click');
+            }
+    });
+}
+
+function show_right_sidenav(element_id) {
+    var right_sidenav = document.getElementsByClassName("product-session-details");
+    for (var index = 0; index < right_sidenav.length; index++) {
+        right_sidenav[index].style.display = "none";
+    }
+    document.getElementById("accordionSidebar-" + element_id).style.display = "block";
+    document.addEventListener('click',right_sidenav_close_event);
+    document.addEventListener('keydown', function (event) {
+            var key = event.key || event.keyCode;
+            if (key === 'Escape' || key === 'Esc' || key === 27) {
+                $('.product-session-details:visible').find('.sidebar-brand i').trigger('click');
+            }
+    });
+}
+
+function hide_right_sidenav_by_id(element_id) {
+    document.getElementById("accordionSidebar-" + element_id).style.display = "none";
+}
+
+function show_client_location_details(element_id) {
+
+    hide_all_active_modal();
+    let client_details_data = $('#client-location-details-data-' + element_id).val();
+    client_details_data = JSON.parse(client_details_data)['items'];
+
+    let promises = [];
+    for(var idx = 0; idx < client_details_data.length; idx ++) {
+        var locations = getCurrentLocation(client_details_data[idx]['latitude'], client_details_data[idx]["longitude"]);
+        promises.push(locations);
+    }
+    Promise.all(promises)
+    .then(function(results) {
+        var html = "";
+        if(results.length) {
+            for(var idx = 0; idx < results.length; idx ++) {
+                html += "<tr>";
+                html += "<td>" + client_details_data[idx]['client_name'] + "</td>";
+                html += "<td>" + results[idx] + "</td>";
+                html += "</tr>";
+            }
+        } else {
+            html += "<tr>";
+            html += "<td colspan=\"2\" class=\"text-center\">No details found</td>";
+            html += "</tr>";
+        }
+        html = "<table class=\"table table-bordered\" width=\"100%\" cellspacing=\"0\">\
+                <thead>\
+                    <tr>\
+                       <th>Name</th>\
+                        <th>Location</th>\
+                    </tr>\
+                </thead>\
+                <tbody>" + html + "</tbody>\
+             </table>";
+        $('#client-location-details .table-responsive').html(html);
+        update_table_attribute();
+        $('#client-location-details').modal('show');
+    });
+}
+
+function getCurrentLocation(latitude, longitude) {
+    if(latitude == "None" || longitude == "None") {
+        return new Promise(function(resolve, reject) {
+            resolve("Location not shared");
+        });
+    }
+    var geocoder = new google.maps.Geocoder();
+    var latlng = new google.maps.LatLng(latitude, longitude);
+    return new Promise(function(resolve, reject) {
+        geocoder.geocode({'latLng': latlng}, function(results, status) {
+            if(status == google.maps.GeocoderStatus.OK) {
+                if(results[2]) {
+                    var address = results[2].formatted_address;
+                    resolve(address);
+                } else {
+                    resolve("Location not shared");
+                }
+            } else {
+                resolve("Location not shared");
+            }
+        });
+    });
+}
+
+function show_captured_screenshots(element_id) {
+
+    hide_all_active_modal();
+    let screenshots = $('#meeting-screencapture-' + element_id).val();
+    screenshots = JSON.parse(screenshots)["items"];
+
+    if (screenshots.length == 0) {
+        var html = [
+            '<td colspan="2" class="text-center">',
+            'No captured screenshot',
+            '</td>'
+        ].join('');
+        document.getElementById("tbody-captured-screenshot-details").innerHTML = html;
+        update_table_attribute();
+        $('#meeting-screencapture-details').modal('show');
+        return;
+    }
+
+    var tbody_html = "";
+    for (var index = 0; index < screenshots.length; index++) {
+        tbody_html += [
+            '<tr>',
+            '<td><span>Screenshot</span></td>',
+            '<td><a href="/easy-assist/download-file/' + screenshots[index]['screenshot'] + '" download><i class="fas fa-fw fa-file-download"></i></a></td>',
+            '</tr>'
+        ].join('');
+    }
+    document.getElementById("tbody-captured-screenshot-details").innerHTML = tbody_html;
+    update_table_attribute();
+    $('#meeting-screencapture-details').modal('show');
+}
+
+function show_filter_options(element) {
+    $("#selected-agent-filter").next().hide();
+    if(document.querySelector("#selected-supervisor-filter")){
+        $("#selected-supervisor-filter").next().hide();
+    }
+    custom_session_filter_dropdown.hide_custom_dropdown();
+    document.getElementById("filter-start-date").style.display = "none";
+    document.getElementById("filter-end-date").style.display = "none";
+
+    if (element.value == "None") {
+        document.getElementById("add-filter-btn").disabled = true;
+    } else {
+
+        document.getElementById("selected-filter-container").style.display = "block";        
+
+        filter_parameters = document.getElementsByClassName("filter-parameter");
+        for (var index = 0; index < filter_parameters.length; index++) {
+            filter_parameters[index].style.display = "none";
+        }
+        if (element.value == "title") {
+            custom_title_filter_dropdown.show_custom_dropdown();
+        } else if (element.value == "agent") {
+            $("#selected-agent-filter").next().show();
+        } else if (element.value == "supervisor") {
+            $("#selected-supervisor-filter").next().show();
+        } else if (element.value == "startdate") {
+            document.getElementById("filter-start-date").style.display = "block";
+        } else if (element.value == "enddate") {
+            document.getElementById("filter-end-date").style.display = "block";
+        } else if (element.value == "status") {
+            custom_session_filter_dropdown.show_custom_dropdown();
+        } else {
+            show_easyassist_toast("Please select valid filter");
+        }
+        
+        document.getElementById("reset_filter").removeAttribute("disabled");
+        document.getElementById("reset_filter").style.display = "block";
+        document.getElementById("add-filter-btn").disabled = false;
+    }
+}
+
+function add_new_filter_parameter() {
+    var filter_key = null;
+    var filter_value = null;
+    element = document.getElementById("selected-filter-parameter");
+    if (element.value == "None") {
+        show_easyassist_toast("Please select valid filter parameter");
+    } else {
+        var value = "None";
+        var key = element.value;
+        if (element.value == "agent") {
+            value = $("#selected-agent-filter").val();
+            if (value.length == 0) {
+                show_easyassist_toast(NO_AGENT_SELECTED_TOAST);
+                return;
+            }
+            filter_key = "Agent"
+            filter_value = value;
+        } else if (element.value == "supervisor") {
+            value = $("#selected-supervisor-filter").val();
+            if (value.length == 0) {
+                show_easyassist_toast(NO_SUPERVISOR_SELECTED_TOAST);
+                return;
+            }
+            filter_key = "Supervisor"
+            filter_value = value;
+        } else if (element.value == "startdate") {
+            value = document.getElementById("filter-start-date").value;
+
+            if (value == "") {
+                show_easyassist_toast(EMPTY_START_DATE_ERROR_TOAST);
+                return;
+            }
+
+            var formatted_start_date = get_iso_formatted_date(value);
+            if (applied_filter_key_value_map['enddate'] != null) {
+                var formatted_end_date = get_iso_formatted_date(applied_filter_key_value_map['enddate'][0]);
+                if (formatted_end_date < formatted_start_date) {
+                    show_easyassist_toast(INVALID_START_DATE_ERROR_TOAST);
+                    return;
+                }
+            }
+
+            var today = get_today_date();
+            if (formatted_start_date > today || formatted_start_date.length > 10) {
+                show_easyassist_toast("Please select valid date.");
+                return;
+            }
+            filter_key = "Start Date"
+            filter_value = [value];
+        } else if (element.value == "enddate") {
+            value = document.getElementById("filter-end-date").value;
+            if (value == "") {
+                show_easyassist_toast(EMPTY_END_DATE_ERROR_TOAST);
+                return;
+            }
+
+            var formatted_end_date = get_iso_formatted_date(value);
+            if (applied_filter_key_value_map['startdate'] != null) {
+                var formatted_start_date = get_iso_formatted_date(applied_filter_key_value_map['startdate'][0]);
+                if (formatted_start_date > formatted_end_date) {
+                    show_easyassist_toast(INVALID_START_DATE_ERROR_TOAST);
+                    return;
+                }
+            }
+
+            var today = get_today_date();
+            if (formatted_end_date > today || formatted_end_date.length > 10) {
+                show_easyassist_toast("Please select valid date.");
+                return;
+            }
+            filter_key = "End Date";
+            filter_value = [value];
+        } else if (element.value == "status") {
+            value = document.getElementById("selected-status-filter").value;
+
+            filter_key = "Status"
+            if(value == "completed") {
+                filter_value = "Completed";
+            } else if(value == "scheduled") {
+                filter_value = "Scheduled";
+            } else {
+                filter_value = "All";
+            }
+            filter_value = [filter_value];
+        } else {
+            show_easyassist_toast("Please select valid filter parameter");
+        }
+
+        if(check_filter_already_applied(applied_filter_key_value_map[key], filter_value)) {
+            show_easyassist_toast(filter_key + " filter already applied");
+        }
+
+        if (applied_filter_key_value_map[key] != null) {
+            applied_filter_key_value_map[key] = filter_value;
+            update_applied_filter_by_key(key, filter_value);
+            return;
+        }
+        applied_filter_key_value_map[key] = filter_value;
+
+        var filter_chip_html = "";
+        filter_chip_html = generate_filter_chips(filter_key, filter_value);
+        
+        var html_filter = [
+            '<div class="col-md-12 filter-parameter-column" filter-key="' + key + '" filter-data=\'' + JSON.stringify(filter_value) + '\' style="padding: 1em;border-bottom: 1px solid #E6E6E6;">',
+                '<div class="row filter-custom-row">',
+                    '<div class="col-md-2 filter-mb-sm-2 filter-flex-column">',
+                        '<span class="filter-text">' + filter_key + '</span>',
+                        '<button type="button" class="btn remove-filter-row-btn filter-show-on-mobile" onclick="remove_selected_filter_parameter(this)">',
+                            '<svg width="16" height="18" viewBox="0 0 16 18" fill="none" xmlns="http://www.w3.org/2000/svg">',
+                                '<path d="M8 0C9.49884 0 10.7237 1.20574 10.8064 2.72496L10.8108 2.88889H15.3514C15.7096 2.88889 16 3.18737 16 3.55556C16 3.89306 15.756 4.17199 15.4394 4.21614L15.3514 4.22222H14.6629L13.5558 15.7948C13.441 16.994 12.4959 17.92 11.3406 17.9951L11.1888 18H4.81118C3.63878 18 2.64965 17.124 2.46385 15.9497L2.44423 15.7948L1.33622 4.22222H0.648649C0.320263 4.22222 0.0488727 3.97142 0.00592144 3.64602L0 3.55556C0 3.21805 0.244025 2.93912 0.560631 2.89497L0.648649 2.88889H5.18919C5.18919 1.2934 6.44763 0 8 0ZM13.3596 4.22222H2.63957L3.73529 15.6643C3.7861 16.1952 4.19488 16.6083 4.70127 16.661L4.81118 16.6667H11.1888C11.7078 16.6667 12.1478 16.289 12.2484 15.7762L12.2647 15.6643L13.3596 4.22222ZM9.51351 6.66667C9.8419 6.66667 10.1133 6.91747 10.1562 7.24287L10.1622 7.33333V13.5556C10.1622 13.9237 9.87175 14.2222 9.51351 14.2222C9.18513 14.2222 8.91374 13.9714 8.87079 13.646L8.86487 13.5556V7.33333C8.86487 6.96514 9.15528 6.66667 9.51351 6.66667ZM6.48649 6.66667C6.81487 6.66667 7.08626 6.91747 7.12921 7.24287L7.13514 7.33333V13.5556C7.13514 13.9237 6.84473 14.2222 6.48649 14.2222C6.1581 14.2222 5.88671 13.9714 5.84376 13.646L5.83784 13.5556V7.33333C5.83784 6.96514 6.12825 6.66667 6.48649 6.66667ZM8 1.33333C7.2059 1.33333 6.55464 1.96188 6.4915 2.76131L6.48649 2.88889H9.51351C9.51351 2.02978 8.83589 1.33333 8 1.33333Z" fill="#757575"/>',
+                            '</svg>',
+                        '</button>',
+                    '</div>',
+                    '<div class="col-md-8 filter-chip-column">',
+                        filter_chip_html,
+                    '</div>',
+                    '<div class="col-md-2 filter-hide-on-mobile">',
+                        '<button type="button" class="btn remove-filter-row-btn" onclick="remove_selected_filter_parameter(this)">',
+                            '<svg width="16" height="18" viewBox="0 0 16 18" fill="none" xmlns="http://www.w3.org/2000/svg">',
+                                '<path d="M8 0C9.49884 0 10.7237 1.20574 10.8064 2.72496L10.8108 2.88889H15.3514C15.7096 2.88889 16 3.18737 16 3.55556C16 3.89306 15.756 4.17199 15.4394 4.21614L15.3514 4.22222H14.6629L13.5558 15.7948C13.441 16.994 12.4959 17.92 11.3406 17.9951L11.1888 18H4.81118C3.63878 18 2.64965 17.124 2.46385 15.9497L2.44423 15.7948L1.33622 4.22222H0.648649C0.320263 4.22222 0.0488727 3.97142 0.00592144 3.64602L0 3.55556C0 3.21805 0.244025 2.93912 0.560631 2.89497L0.648649 2.88889H5.18919C5.18919 1.2934 6.44763 0 8 0ZM13.3596 4.22222H2.63957L3.73529 15.6643C3.7861 16.1952 4.19488 16.6083 4.70127 16.661L4.81118 16.6667H11.1888C11.7078 16.6667 12.1478 16.289 12.2484 15.7762L12.2647 15.6643L13.3596 4.22222ZM9.51351 6.66667C9.8419 6.66667 10.1133 6.91747 10.1562 7.24287L10.1622 7.33333V13.5556C10.1622 13.9237 9.87175 14.2222 9.51351 14.2222C9.18513 14.2222 8.91374 13.9714 8.87079 13.646L8.86487 13.5556V7.33333C8.86487 6.96514 9.15528 6.66667 9.51351 6.66667ZM6.48649 6.66667C6.81487 6.66667 7.08626 6.91747 7.12921 7.24287L7.13514 7.33333V13.5556C7.13514 13.9237 6.84473 14.2222 6.48649 14.2222C6.1581 14.2222 5.88671 13.9714 5.84376 13.646L5.83784 13.5556V7.33333C5.83784 6.96514 6.12825 6.66667 6.48649 6.66667ZM8 1.33333C7.2059 1.33333 6.55464 1.96188 6.4915 2.76131L6.48649 2.88889H9.51351C9.51351 2.02978 8.83589 1.33333 8 1.33333Z" fill="#EE2525"/>',
+                            '</svg>',
+                        '</button>',
+                    '</div>',
+                '</div>',
+            '</div>',
+        ].join('');
+
+        document.getElementById("tbody-filter-parameters").innerHTML += html_filter;
+        document.getElementById("apply_filter_confirm").removeAttribute("disabled");
+        document.getElementById("reset_filter").removeAttribute("disabled");
+        document.getElementById("reset_filter").style.display = "block";
+        scrollToBottom();
+    }
+}
+
+function remove_selected_filter_parameter(element){
+    remove_element = $(element).closest('.filter-parameter-column')[0];
+    var filter_element = $(remove_element).attr("filter-key");
+    applied_filter_key_value_map[filter_element] = null;
+
+    remove_element.parentElement.removeChild(remove_element);
+    if(document.getElementsByClassName("tr-filter-parameters").length <= 0){
+        document.getElementById("apply_filter_confirm").setAttribute("disabled", "disabled");
+        if(!is_filter_applied) {
+            document.getElementById("reset_filter").setAttribute("disabled", "disabled");
+        }
+    }
+}
+
+function apply_support_history_filter(element) {
+    selected_filter_parameters = document.getElementsByClassName("filter-parameter-column");
+    var key_value = '';
+    
+    for(var idx = 0; idx < selected_filter_parameters.length; idx ++) {
+	    var filter_key = selected_filter_parameters[idx].getAttribute('filter-key');
+	    var filter_data = selected_filter_parameters[idx].getAttribute('filter-data');
+
+	    filter_data = JSON.parse(filter_data);
+
+	    for(var index = 0; index < filter_data.length; index ++) {
+	    	key_value += filter_key + "=" + filter_data[index] + "&";
+	    }
+    }
+
+    window.location = window.location.protocol + "//" + window.location.host + window.location.pathname + "?" + key_value;
+}
+
+function reset_support_history_filter() {
+    document.getElementById("tbody-filter-parameters").innerHTML = "";
+    document.getElementById("reset_filter").setAttribute("disabled", "disabled");
+    document.getElementById("apply_filter_confirm").setAttribute("disabled", "disabled");
+    custom_filter_option_dropdown.update_value("None");
+    custom_session_filter_dropdown.update_value("all");
+    $("#selected-agent-filter").val("").multiselect('refresh');
+    if(document.querySelector("#selected-supervisor-filter")){
+        $("#selected-supervisor-filter").val("").multiselect('refresh');
+    }
+
+    $('#filter-start-date').val("").datepicker("update");
+    $('#filter-end-date').val("").datepicker("update");
+    initialize_custom_filter_map();
+}
+
+function hide_all_active_modal() {
+    $('.modal').modal('hide');
+}
+
+function show_cobrowse_form_modal(audit_trail_pk){
+    hide_all_active_modal();
+    $('#cobrowse-form-' + audit_trail_pk).modal('show');
+}
+
+$(document).ready(function() {
+    btn_tabs = document.getElementsByClassName("btn-tab");
+
+    for(var index=0; index< btn_tabs.length; index++){
+        btn_tabs[index].classList.remove("btn-tab-active");
+    }
+
+    for(var index=0; index< btn_tabs.length; index++){
+        if(btn_tabs[index].pathname==window.location.pathname){
+            btn_tabs[index].classList.add("btn-tab-active");
+        }
+    }
+    $("#auto_assign_audit_trail").on('hide.bs.modal', function(){
+        $("#auto_assign_audit_trail .modal-body").scrollTop(0);
+    });
+});
+
+function load_map_script() {
+
+    var params = JSON.stringify({});
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "/easy-assist/map-script/", true);
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.setRequestHeader('X-CSRFToken', get_csrfmiddlewaretoken());
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            response = JSON.parse(this.responseText);
+            response = easyassist_custom_decrypt(response.Response);
+            response = JSON.parse(response);
+            if (response["status"] == 200) {
+                var src = response['src'];
+                var script = document.createElement('script');
+                script.type = 'text/javascript';
+                script.defer = true;
+                script.src = src
+                document.body.appendChild(script);          
+            }
+        }
+    }
+    xhttp.send(params);
+}
+
+$(document).ready(function() {    
+    initialize_custom_filter_map();
+    load_map_script();
+    initialize_custom_dropdown();
+    update_applied_filter();
+
+    
+
+    $('#selected-agent-filter').multiselect({
+        nonSelectedText: 'Select Agent',
+        enableFiltering: true,
+        enableCaseInsensitiveFiltering: true,
+        includeSelectAllOption: true
+    });
+    $("#selected-agent-filter").next().hide();
+    if(document.querySelector("#selected-supervisor-filter")){
+        $('#selected-supervisor-filter').multiselect({
+            nonSelectedText: 'Select Supervisor',
+            enableFiltering: true,
+            enableCaseInsensitiveFiltering: true,
+            includeSelectAllOption: true
+        });
+        $("#selected-supervisor-filter").next().hide();
+    }
+});
+
+function check_select_date_range(element){
+    general_error_message = document.getElementById("general-error-message");
+    general_error_message.innerHTML = "";
+
+    if(element.value == "0") {
+        general_error_message.innerHTML = "Please select valid date range filter";
+    } else {
+        general_error_message.innerHTML = "";
+    }
+
+    if(element.value=="4"){
+        document.getElementById("from-date-div").style.display="block";
+        document.getElementById("to-date-div").style.display="block";
+        document.getElementById("email-id-div").style.display="block";
+    }else{
+        document.getElementById("from-date-div").style.display="none";
+        document.getElementById("to-date-div").style.display="none";
+        document.getElementById("email-id-div").style.display="none";
+    }
+}
+
+function initialize_custom_dropdown() {
+    var console_theme_color = getComputedStyle(document.body).getPropertyValue('--color_rgb');
+    $("#selected-agent-filter")[0].selectedIndex = -1;
+    if(document.querySelector("#selected-supervisor-filter")){
+        $("#selected-supervisor-filter")[0].selectedIndex = -1;
+    }
+
+    custom_filter_option_dropdown = new EasyassistCustomSelect("#selected-filter-parameter", "Select One", console_theme_color);
+    custom_session_filter_dropdown = new EasyassistCustomSelect("#selected-status-filter", "Select One", console_theme_color);
+}
+
+function initialize_custom_filter_map() {
+    applied_filter_key_value_map = {
+        'agent': null,
+        'startdate': null,
+        'enddate': null,
+        'status': null,
+    }
+}
+</script>
+<script src="{% static 'EasyAssistApp/js/meet_audit_trails_sync.js' %}"></script>
+{% endblock %}

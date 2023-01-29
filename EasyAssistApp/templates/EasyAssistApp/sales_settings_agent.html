@@ -1,0 +1,1364 @@
+{% extends 'EasyAssistApp/console.html' %}
+{% block content %}
+{% load static %}
+
+<style type="text/css">
+    .circle {
+    border-radius: 100% !important;
+    overflow: hidden;
+    width: 90px;
+    height: 90px;
+    background: #CBCACA;
+    }
+    .profile-svg{
+        margin: 20px;
+    }
+    .updated-svg{
+        margin: 30px;
+    }
+
+    .circle img,
+    .preview-circle img{
+        max-width: 100%;
+        height: auto;
+    }
+
+    .profile-pic {
+        width: 200px;
+        max-height: 90px;
+        display: inline-block;
+    }
+
+
+    .p-image {
+        width: 24px;
+        height: 24px;
+        border-radius: 100% !important;
+        background: #ffffff;
+        position: absolute;
+        top: 77px;
+        left: 80px;
+        text-align: center;
+    }
+    .upload-button {
+        cursor: pointer;
+        font-size: 1.2em;
+    }
+    
+
+    .profile-upload{
+        cursor: pointer;
+    }
+
+    .custom-btn{
+        width: 155px;
+        height: 47px;
+        padding: 12px 16px 11px;
+        font-size: 14px;
+        border-radius: 4px;
+        letter-spacing: 0.6px;
+    }
+    .upload-btn{
+        border: none;
+        outline: none;
+        background: #2F80ED;
+        color: #ffffff;
+    }
+
+    .remove-btn{
+        outline: none;
+        border: 1px solid #E53E3E;
+        background: #ffffff;
+        color: #FF0000;
+    }
+
+    .preview-circle{
+        border-radius: 100% !important;
+        overflow: hidden;
+        width: 120px;
+        height: 120px;
+        background: #CBCACA;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 32px;
+    }
+
+
+
+    .button-group button:focus{
+        outline: none !important;
+    }
+
+    #remove-profile-pic-Modal .remove-profile-text{
+        font-size: 18px; 
+        font-weight: 500; 
+        color:#2D2D2D !important;
+        line-height: 140%;
+        margin-top: 32px;
+        margin-bottom: 10px;
+    }
+
+    #rotate-image{
+        cursor: pointer;
+    }
+
+    .toast-wrapper{
+        position: absolute;
+        top: 10px;
+        left: 40vw;
+        z-index: 1000;
+    }
+    
+    .toast-wrapper p{
+        padding: 10px 20px;
+    }
+    
+    .toast-wrapper .hide{
+        display: none;
+    }
+
+    @media (max-width:575px) {
+        .button-group{
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+        .edit-btn{
+            margin: 0;
+        }
+        .custom-btn{
+            height: 47px;
+            padding: 12px 16px 11px;
+            font-size: 14px;
+            border-radius: 4px;
+            width: 100% !important;
+        }
+        .custom-file-upload-profile{
+            width: 100% !important;
+        }
+        .custom-btn svg{
+            margin-right: 10px;
+        }
+    }
+
+    .result img{
+        max-width: 100% !important;
+    }
+
+    #file-input{
+        background: transparent;
+    }
+
+    .custom-file-upload-profile input[type="file"] {
+        display: none;
+    }
+    .custom-file-upload-profile{
+        width: 155px;
+        height: 47px;
+        font-size: 14px;
+        border-radius: 4px;
+        border: none;
+        outline: none;
+        background: #2F80ED;
+        color: #ffffff;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        letter-spacing: 1px;
+        font-weight: normal;
+    }
+
+
+
+    #preview-profile-pic-Modal .cropper-crop-box, .cropper-view-box {
+        border-radius: 50%;
+    }
+
+    #preview-profile-pic-Modal .cropper-view-box {
+        box-shadow: 0 0 0 1px #39f;
+        outline: 0;
+        background: #000;
+    }
+
+    .hide {
+        display: none;
+    }
+
+    @media (max-width:320px){
+        .toast-wrapper{
+            left: 15vw;
+        }
+        .toast-wrapper p{
+            font-size: 10px;
+            padding: 10px 20px;
+        }
+    }
+
+    @media (max-width:770px){
+        .toast-wrapper{
+            left: 30vw;
+        }
+    }
+
+
+    @media (max-width:420px){
+        .toast-wrapper{
+            left: 15vw;
+        }
+    }
+
+    #upload-profile-pic-Modal .sub-heading{
+        font-size: 12px; 
+        letter-spacing: 0.1px;
+        font-weight: 400;
+        font-size: 16px;
+        margin: 32px 0;
+    }
+
+    #remove-profile-pic-Modal .sub-heading{
+        font-size: 12px; 
+        letter-spacing: 0.1px;
+        font-weight: 400;
+        font-size: 16px;
+    }
+
+    #upload-profile-pic-Modal .text-danger{
+        font-size: 12px; 
+        letter-spacing: 0.5px;
+        font-weight: 400;
+        margin: 10px 0;
+    }
+
+    #preview-profile-pic-Modal .cancel-btn:hover,
+    #remove-profile-pic-Modal .cancel-btn:hover,
+    #upload-profile-pic-Modal .cancel-btn:hover{
+        transform: none !important;
+        box-shadow: none !important;
+        transition: none !important;
+        background-color: none !important;
+    }
+
+    #agent-profile-toast {
+        position: absolute;
+        top: 10px;
+        left: 50vw;
+        z-index: 1000;
+        visibility: hidden;
+        background: #ECFDF5;
+        color: #10b981;
+        border-radius: 8px;
+        border: 1px solid #6EE7B7;
+        padding: 10px 20px;
+        animation-iteration-count: 1;
+        transform: translateX(-50%);
+}
+
+    #agent-profile-toast.show {
+        visibility: visible;
+    }
+
+</style>
+
+<style type="text/css" media="screen">
+
+    #product-category-li{
+          display: inline-block;
+          color: #fff;
+          border-radius: 10px;
+          padding: 0rem 0.6rem;
+          margin-right: 5px;
+          margin-top: 5px;
+    }
+
+    #predefined-remark-li, #support-language-li, #predefined-remark-li-with-buttons {
+          display: inline-block;
+          color: #fff;
+          border-radius: 10px;
+          padding: 0rem 0.6rem;
+          margin-right: 5px;
+          margin-top: 5px;
+    }
+
+    #product_category_tag_list{
+        padding: 4px 8px 4px 15px;
+        background: white;
+        border-radius: 0.2rem;
+        width: 100%;
+        border: 1px solid #d1d3e2;
+        margin-bottom: 0px;
+    }
+
+    .input-group-text{
+        width: 143px;
+        height: 31px;
+    }
+
+    .easyassist-disabled-input:hover{
+        cursor: not-allowed;
+    }
+
+    #editor-code { 
+        width:100%;
+        height:10em;
+        overflow:auto;
+    }
+    #easyassist-language-support-list-div .dropdown {
+        width: 100%;
+    }
+
+    .bootstrap-select button {
+        border-radius: 5px!important;
+        border: 0px solid #2755cb !important;
+        box-shadow: 0 0 1px #000 inset !important;
+        text-align: left;
+        font-size: 1rem!important;
+        width: 100%!important;
+    }
+
+    .bootstrap-select .filter-option {
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    .bootstrap-select .dropdown-item {
+        color: #6e707e!important;
+        font-size: 1rem;
+        background-color: transparent;
+    }
+
+    .bootstrap-select .dropdown-item:hover {
+        background-color: #F8F9F9;
+    }
+
+    #pills-home-tab{
+        cursor: default;
+    }
+
+    input.disabled {
+        color: #6E707E !important;
+        -webkit-text-fill-color: #6E707E;
+        opacity: 1;
+    }
+
+    .form-control:disabled, .form-control[readonly] {
+        color: #6e707e !important;
+        -webkit-text-fill-color: #6e707e;
+        opacity: 1;
+    }
+    .change-password-option {
+        justify-content: flex-end;
+    }
+
+    .change-password-btn {
+        border: none !important;
+        outline: none !important;
+        background: transparent !important;
+        padding-right: 0px !important;
+        width: 165px !important;
+        {% if access_token_obj.get_cobrowsing_console_theme_color != None %}
+            color: {{access_token_obj.get_cobrowsing_console_theme_color.hex}} !important;
+        {% else %}
+            color: #0254D7 !important;
+        {% endif %}
+        text-align: right !important;
+    }
+
+    #change-password-div {
+        /* margin-top: -15px !important; */
+        margin-bottom: 15px !important;
+    }
+
+    #apply_filter_modal .custom-select-options{
+        font-family: "Silka", Sans-Serif;
+        background: #FFFFFF;
+        border: 1px solid #E6E6E6;
+        border-radius: 10px;
+        padding: 9px 20px!important;
+        font-size: 14px;
+        font-weight: 500;
+        order: 0!important;
+        box-sizing: border-box!important;
+        cursor: pointer;
+        color: #2D2D2D;
+    }
+
+</style>
+
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <div class="row">
+    <div class="col-md-12 mb">
+
+        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-home" aria-selected="true">Profile</a>
+            </li>
+            {% if access_token_obj.enable_inbound %}
+            <li class="nav-item">
+                <a class="nav-link" id="pills-calendar-tab" data-toggle="pill" href="#pills-calendar" role="tab" aria-controls="pills-contact" aria-selected="false">Calendar</a>
+            </li>
+            {% endif %}
+        </ul>
+
+        <div class="tab-content" id="pills-tabContent">
+
+            <div class="tab-pane fade show active" id="pills-profile" role="tabpanel" aria-labelledby="pills-home-tab">
+
+                <div class="row" style="flex-direction: column;">
+
+                    <div class="col-md-6">
+                    {% if cobrowse_agent.role == "agent" and access_token_obj.display_agent_profile %}    
+                        <div class="profile-pic-div" style="margin: 35px 0; margin-top: 19px;">
+                            <div class="circle ">
+                                    {% if cobrowse_agent.agent_profile_pic_source == "" or cobrowse_agent.agent_profile_pic_source == "null" %}
+                                        <svg width="52" height="52" class="profile-svg" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M26 4.33334C20.3233 4.33334 15.7083 8.94834 15.7083 14.625C15.7083 20.1933 20.0633 24.7 25.74 24.895C25.9133 24.8733 26.0867 24.8733 26.2167 24.895C26.26 24.895 26.2817 24.895 26.325 24.895C26.3467 24.895 26.3467 24.895 26.3683 24.895C31.915 24.7 36.27 20.1933 36.2917 14.625C36.2917 8.94834 31.6767 4.33334 26 4.33334Z" fill="white"/>
+                                            <path d="M37.0066 30.6583C30.9616 26.6283 21.1033 26.6283 15.015 30.6583C12.2633 32.5 10.7466 34.9917 10.7466 37.6567C10.7466 40.3217 12.2633 42.7917 14.9933 44.6117C18.0266 46.6483 22.0133 47.6667 26 47.6667C29.9866 47.6667 33.9733 46.6483 37.0066 44.6117C39.7366 42.77 41.2533 40.3 41.2533 37.6133C41.2316 34.9483 39.7366 32.4783 37.0066 30.6583Z" fill="white"/>
+                                        </svg>                             
+                                        <img class="profile-pic" src="">                          
+                                    {% else %}
+                                        <img class="profile-pic" src="/{{ cobrowse_agent.agent_profile_pic_source }}">
+                                    {% endif %}
+                                </div>
+                                <div class="p-image">
+                                    <svg class="profile-upload" data-target="#upload-profile-pic-Modal" data-toggle="modal" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M7.95763 2.27481C8.35458 2.27481 8.72184 2.48501 8.92289 2.82727L9.32816 3.51717H10.3585C11.2515 3.51717 11.9755 4.24114 11.9755 5.1342V9.86092C11.9755 10.754 11.2515 11.478 10.3585 11.478H3.64154C2.74848 11.478 2.02451 10.754 2.02451 9.86092V5.1342C2.02451 4.24114 2.74848 3.51717 3.64154 3.51717H4.67665L5.1118 2.80851C5.31542 2.47689 5.67664 2.27481 6.06579 2.27481H7.95763ZM7.95763 3.02113H6.06579C5.9546 3.02113 5.85026 3.07062 5.77997 3.15437L5.74779 3.19903L5.20341 4.08559C5.13553 4.19613 5.01513 4.26349 4.88541 4.26349H3.64154C3.16066 4.26349 2.77083 4.65332 2.77083 5.1342V9.86092C2.77083 10.3418 3.16066 10.7316 3.64154 10.7316H10.3585C10.8393 10.7316 11.2292 10.3418 11.2292 9.86092V5.1342C11.2292 4.65332 10.8393 4.26349 10.3585 4.26349H9.11458C8.98226 4.26349 8.85984 4.19342 8.79282 4.07934L8.27939 3.20529C8.21237 3.0912 8.08995 3.02113 7.95763 3.02113ZM7 5.00981C8.23655 5.00981 9.23897 6.01224 9.23897 7.24878C9.23897 8.48533 8.23655 9.48776 7 9.48776C5.76345 9.48776 4.76103 8.48533 4.76103 7.24878C4.76103 6.01224 5.76345 5.00981 7 5.00981ZM7 5.75614C6.17563 5.75614 5.50735 6.42442 5.50735 7.24878C5.50735 8.07315 6.17563 8.74143 7 8.74143C7.82436 8.74143 8.49264 8.07315 8.49264 7.24878C8.49264 6.42442 7.82436 5.75614 7 5.75614Z" fill="#0254D7"/>
+                                    </svg>                          
+                                </div>
+                            </div>
+                        {% endif %}
+                        <div class="input-group input-group-sm mb-3">
+                          <div class="input-group-prepend">
+                              <span class="input-group-text" id="inputGroup-sizing-sm">Email</span>
+                          </div>
+                          <input type="text" id="agent-email" style="background-color: white !important; color:#6e707e!important;" class="form-control easyassist-disabled-input" aria-describedby="inputGroup-sizing-sm" value="{{ cobrowse_agent.user.email }}" disabled>
+                        </div>
+
+                        <div class="input-group input-group-sm mb-3">
+                          <div class="input-group-prepend">
+                               <span class="input-group-text" id="inputGroup-sizing-sm">Name</span>
+                          </div>
+                          <input type="text" style="color:#6e707e!important;" class="form-control" aria-describedby="inputGroup-sizing-sm" value="{{ cobrowse_agent.user.first_name }}" id="agent-name" autocomplete="off">
+                          <div id="name-error-message"class="invalid-feedback">
+                            Maximum Character Limit reached
+                          </div>
+                        </div>
+
+                        <div class="input-group input-group-sm mb-3">
+                          <div class="input-group-prepend">
+                               <span class="input-group-text" id="inputGroup-sizing-sm">Mobile No.</span>
+                          </div>
+                          <input type="number" style="color:#6e707e!important;" class="form-control positive_numeric mobile_number" aria-describedby="inputGroup-sizing-sm" value="{{ cobrowse_agent.mobile_number }}" id="agent-mobile-number" autocomplete="off">
+                        </div>
+                        {% if cobrowse_agent.role != "admin_ally" %}
+                        <div class="input-group input-group-sm mb-3" style="flex-wrap: nowrap;">
+                            <div class="input-group-prepend">
+                                 <span class="input-group-text" id="inputGroup-sizing-sm">Support Level</span>
+                            </div>
+                            <input type="text" style="background-color: white !important; color:#6e707e!important;" class="form-control easyassist-disabled-input" aria-describedby="inputGroup-sizing-sm" value="{{ cobrowse_agent.support_level }}" id="agent-support-level" disabled autocomplete="off">
+                        </div>
+                        {% else %}
+                        <div class="input-group input-group-sm mb-3" style="flex-wrap: nowrap; display: none;">
+                            <div class="input-group-prepend">
+                                 <span class="input-group-text" id="inputGroup-sizing-sm">Support Level</span>
+                            </div>
+                            <input type="text" style="background-color: white !important; color:#6e707e!important;" class="form-control easyassist-disabled-input" aria-describedby="inputGroup-sizing-sm" value="{{ cobrowse_agent.support_level }}" id="agent-support-level" disabled autocomplete="off">
+                        </div>
+                        {% endif %}
+                        {% if cobrowse_agent.get_access_token_obj.choose_product_category or cobrowse_agent.get_access_token_obj.enable_tag_based_assignment_for_outbound %}
+                        <div class="input-group input-group-sm mb-3" style="flex-wrap: nowrap;">
+                            <div class="input-group-prepend">
+                                 <span class="input-group-text" id="inputGroup-sizing-sm">Product Category</span>
+                            </div>
+                            <ul id="product_category_tag_list" style="color:#6e707e!important;" class="easyassist-disabled-input" disabled>
+                                {{product_category_string}}
+                            </ul>
+                        </div>
+                        {% endif %}
+
+                        {% if cobrowse_agent.get_access_token_obj.allow_language_support %}
+                        <div class="input-group input-group-sm mb-3" style="flex-wrap: nowrap;">
+                            <div class="input-group-prepend">
+                                 <span class="input-group-text" id="inputGroup-sizing-sm">Language</span>
+                            </div>
+                            <ul id="product_category_tag_list" style="color:#6e707e!important;" class="easyassist-disabled-input" disabled>
+                                {{supported_language_string}}
+                            </ul>
+                        </div>
+                        {% endif %}
+
+                        <div class="input-group input-group-sm change-password-option">
+                            <button type="button" class="change-password-btn" id="change-password-button" onclick="show_change_password()">Change Password?</button>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:none;" id="change-password-div">
+
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Old Password</span>
+                            </div>
+                            <input type="password" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="old-password" value="" autocomplete="new-password">
+                        </div>
+
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                 <span class="input-group-text" id="inputGroup-sizing-sm">New Password</span>
+                            </div>
+                            <input type="password" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="new-password"
+                            value="">
+                        </div>
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Confirm Password</span>
+                            </div>
+                            <input type="password" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="confirm-password" value="">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group input-group-sm">
+                        <p style="color:green;" id="save-details-error">
+                        </p>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <button type="button" class="btn btn-success admin-setting-btn" style="width: 100px;" onclick="save_agent_details(this)">Save</button>
+                        <button type="button" class="btn btn-outline-secondary admin-setting-btn" style="width: 100px; margin-left: 15px; visibility: hidden;" onclick="hide_change_password()" id="change_password_cancel_btn">Cancel</button>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="tab-pane fade" id="pills-calendar" role="tabpanel" aria-labelledby="pills-calendar-tab">
+
+                <!--  calendar Settings Body Start -->
+
+                <div class="card shadow mt-4">
+                <div class="card-body p-0">
+                <div class="card">
+                  <div class="card-header py-3">
+                    <div class="row">
+                        <div class="col-sm-6 d-flex align-items-center">
+                            <h6 class="m-0 font-weight-bold text-primary heading-text-primary">Calendar
+                                <span data-toggle="tooltip" data-placement="top" title="" data-original-title="This is the calendar for Inbound cobrowsing and Meeting."><i class="fas fa-info-circle"></i></span>
+                                <span class="text-secondary"> Created by {{calendar_created_by}}</span>
+                            </h6>
+                        </div>
+                        <div class="col-sm-6 d-flex justify-content-end">
+                            <button class="btn btn-white-border btn-width-100" data-toggle="modal" data-target="#apply_filter_modal">Filter</button>
+                        </div>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="row filter-result-div" id="applied-filter-div" style="display: none;">
+                      <div class="filter-items-container" id="applied-filter-result-container">
+                      </div>
+                      <div class="filtered-result-text-heading">
+                          Filtered Results
+                      </div>
+                  </div>
+                    <div class="col-sm-12 d-flex justify-content-end">
+                        <div id="support-history-table_filter" class="dataTables_filter">
+                            <label class="d-flex align-items-center">Search:
+                              <input type="text" class="form-control form-control-sm ml-2" placeholder="Search" name="search" id="table-calendar-details-search">
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <table class="table table-bordered dataTable no-footer" role="grid" id="table-calendar-details">
+                            <thead class="table-heading-row">
+                                <tr role="row">
+                                    <th scope="col" class="align-middle">Date</th>
+                                    <th scope="col" class="align-middle">Day</th>
+                                    {% if calendar_type == "1" %}
+                                        <th scope="col" class="align-middle">Start Time</th>
+                                        <th scope="col" class="align-middle">End Time</th>
+                                    {% endif %}
+                                    {% if calendar_type == "2" %}
+                                        <th scope="col" class="align-middle">Description</th>
+                                        <th scope="col" class="align-middle">Auto Response</th>
+                                    {% endif %}
+                                    <th scope="col" class="align-middle">Created Date</th>
+                                    <th scope="col" class="align-middle">Modified Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            
+                              {% for calendar_obj in calendar_objs %}
+                                
+                                <tr role="row" class="odd">
+                                    <td>{{ calendar_obj.event_date| date:"d-M-Y" }}</td>
+                                    <td>{{ calendar_obj.event_date| date:"l" }}</td>
+                                    {% if calendar_type == "1" %}
+                                        <td>{{ calendar_obj.start_time | time:'g:i A' }}</td>
+                                        <td>{{ calendar_obj.end_time | time:'g:i A' }}</td>
+                                    {% endif %}
+                                    {% if calendar_type == "2" %}
+                                        <td>{{ calendar_obj.description }}</td>
+                                        <td>{{ calendar_obj.auto_response }}</td>
+                                    {% endif %}
+                                    <td>{{ calendar_obj.created_at|date:"d-M-Y, h:i a" }}</td>
+                                    <td>
+                                        <span>{{ calendar_obj.modified_date|date:"d-M-Y, h:i a" }}</span>
+    
+                                    </td>
+                                </tr>
+                                <!-- edit work time modal-------------->
+                                <div class="modal fade" id="edit_work_timing-{{calendar_obj.pk}}" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+                                  <div class="modal-dialog" style="width: 538px !important;" role="document">
+                                      <div class="modal-content modal-content-custom">
+                                          <div class="modal-header pt-3 pb-2">
+                                              <h5 id="edit_work_timing_label" style="color: #2d2d2d;" >Edit</h5>
+                                          </div>
+                                          <div class="modal-body">
+                                              <div class="row">
+                                                  <div class="col-sm-12">
+                                                      <h6>Days <span class="text-danger">*</span></h6>
+                                                      <select id="select-work-timing-{{calendar_obj.pk}}" class="form-control" onchange="display_calender_event('{{calendar_obj.pk}}')">
+                                                        <option value="1" id="workingdays" {% if calendar_obj.event_type == "1" %}selected{% endif %} >Working Days</option>
+                                                        <option value="2" id="holidays " {% if calendar_obj.event_type == "2" %}selected{% endif %}>Holidays</option>
+                                                      </select>
+                                                  </div>
+                                              </div>
+                                              <div class="row"  id="working-day-option-input-{{calendar_obj.pk}}">
+                                              {% if calendar_obj.event_type == "1" %}
+                                                  <div class="col-sm-6 mt-4 mb-2" id="start-time-div">
+                                                    <h6>Start Time</h6>
+                                                    <input class="col-sm-12 custom-input" type="time" id="start-time-{{calendar_obj.pk}}" value="{{ calendar_obj.start_time | time:'H:i' }}">
+                                                  </div>
+                                                  <div class="col-sm-6 mt-4 mb-2" id="end-time-div">
+                                                      <h6>End Time</h6>
+                                                      <input class="col-sm-12 custom-input" type="time" id="end-time-{{calendar_obj.pk}}" value="{{ calendar_obj.end_time | time:'H:i' }}">
+                                                  </div>
+                                              {% else %}
+                                                  <div class="col-sm-6 mt-4 mb-2" id="start-time-div">
+                                                    <h6>Start Time</h6>
+                                                    <input class="col-sm-12 custom-input" type="time" id="start-time-{{calendar_obj.pk}}" value="{{ calendar_obj.start_time | time:'H:i' }}">
+                                                  </div>
+                                                  <div class="col-sm-6 mt-4 mb-2" id="end-time-div">
+                                                      <h6>End Time</h6>
+                                                      <input class="col-sm-12 custom-input" type="time" id="end-time-{{calendar_obj.pk}}" value="{{ calendar_obj.end_time | time:'H:i' }}">
+                                                  </div>
+                                              {% endif %}
+                                              </div>
+                                              <div class="row mt-2"id="holiday-option-input-{{calendar_obj.pk}}" style="display: none;">
+                                              {% if calendar_obj.event_type == "2" %}
+                                                  <div class="col-sm-12 mt-3">
+                                                      <h6>Description <span class="text-danger">*</span></h6>
+                                                      <input class="col-sm-12 custom-input" type="text" id="edit-description-text-{{calendar_obj.pk}}" value="{{calendar_obj.description}}">
+                                                  </div>
+                                                  <div class="col-sm-12 mt-3 mb-2">
+                                                    <h6>Auto Response <span class="text-danger">*</span></h6>
+                                                    <input class="col-sm-12 custom-input" type="text" id="edit-response-text-{{calendar_obj.pk}}" value="{{calendar_obj.auto_response}}">
+                                                  </div>
+                                              {% else %}
+                                                  <div class="col-sm-12 mt-3">
+                                                    <h6>Description <span class="text-danger">*</span></h6>
+                                                    <input class="col-sm-12 custom-input" type="text" id="edit-description-text-{{calendar_obj.pk}}" value="{{calendar_obj.description}}">
+                                                </div>
+                                                <div class="col-sm-12 mt-3 mb-2">
+                                                  <h6>Auto Response <span class="text-danger">*</span></h6>
+                                                  <input class="col-sm-12 custom-input" type="text" id="edit-response-text-{{calendar_obj.pk}}" value="{{calendar_obj.auto_response}}">
+                                                </div>
+                                              {% endif %}
+                                            </div>
+                                          </div>
+                                          <div class="modal-footer">
+                                            <button class="btn btn-secondary btn-custom" style="border: none !important; font-size: 14px !important;" type="button" data-dismiss="modal">Cancel</button>
+                                            <button class="btn btn-info btn-custom" type="button" onclick="edit_calendar_event('{{calendar_obj.pk}}')">Save</button>
+                                          </div>
+                                      </div>
+                                  </div>
+                                </div>
+                                {% endfor %}
+                            </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6 col-sm-12 show-pagination-entry-container" filter_default_text="Showing {{start_point}} to {{end_point}} of {{total_calendar_objs}} entries" start_point="{{start_point}}" end_point="{{end_point}}">
+                            Showing {{start_point}} to {{end_point}} of {{total_calendar_objs}} entries
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="d-flex justify-content-end">
+                                <nav aria-label="Page navigation example">
+                                    <ul class="pagination">
+
+                                        {% if calendar_objs.has_previous %}
+                                            <li class="page-item">
+                                                <a class="page-link" onclick="load_more_page('{{ calendar_objs.previous_page_number }}');" href="javascript:void(0)" aria-label="Previous">
+                                                    <span aria-hidden="true">Previous</span>
+                                                    <span class="sr-only">Previous</span>
+                                                </a>
+                                            </li>
+                                        {% else %}
+                                            <li class="disabled page-item"><span>
+                                                <a class="page-link" href="javascript:void(0)" aria-label="Previous">
+                                                    <span aria-hidden="true">Previous</span>
+                                                    <span class="sr-only">Previous</span>
+                                                </a>
+                                            </li>
+                                        {% endif %}
+              
+                                        {% if calendar_objs.number|add:'-4' > 1 %}
+                                            <li class="page-item">
+                                                <a class="page-link" onclick="load_more_page('{{ calendar_objs.number|add:'-5' }}');" href="javascript:void(0)">&hellip;</a>
+                                            </li>
+                                        {% endif %}
+              
+                                        {% for i in calendar_objs.paginator.page_range %}
+                                            {% if calendar_objs.number == i %}
+                                                <li class="active purple darken-3 page-item">
+                                                    <a onclick="load_more_page('{{ i }}');" href="javascript:void(0)" class="page-link">{{ i }}</a>
+                                                </li>
+                                            {% elif i > calendar_objs.number|add:'-5' and i < calendar_objs.number|add:'5' %}
+                                                <li class="page-item">
+                                                    <a href="javascript:void(0)" onclick="load_more_page('{{ i }}');" class="page-link">{{ i }}</a>
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+              
+                                        {% if calendar_objs.paginator.num_pages > calendar_objs.number|add:'4' %}
+                                            <li class="page-item">
+                                                <a href="javascript:void(0)" onclick="load_more_page('{{ calendar_objs.number|add:'5' }}');" class="page-link">&hellip;</a>
+                                            </li>
+                                        {% endif %}
+              
+                                        {% if calendar_objs.has_next %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="javascript:void(0)" onclick="load_more_page('{{ calendar_objs.next_page_number }}');" aria-label="Next">
+                                                    <span aria-hidden="true">Next</span>
+                                                    <span class="sr-only">Next</span>
+                                                </a>
+                                            </li>
+                                        {% else %}
+                                            <li class="disabled page-item">
+                                                <a class="page-link" href="javascript:void(0)" aria-label="Next">
+                                                    <span aria-hidden="true">Next</span>
+                                                    <span class="sr-only">Next</span>
+                                                </a>
+                                            </li>
+                                        {% endif %}
+                                      </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+              </div>
+              </div>
+            </div>
+            </div>
+<!--filter modal----------- -->
+<div class="modal fade" id="apply_filter_modal" tabindex="-1" role="dialog" aria-labelledby="apply_filter_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="apply_filter_modal_modal_label" style="color: #2d2d2d;">Apply Custom Filter</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row filter-header-row">
+                    <div class="col-md-4 col-sm-12 filter-mb-sm-4">
+                        <select class="form-control" onchange="show_filter_options(this)" id="selected-filter-parameter" style="width: 100%!important;">
+                            <option value="None">Select Filter</option>
+                            <option value="days">Day</option>
+                            <option value="month">Months</option>
+                            <option value="years">Year</option>
+                        </select>
+                    </div>
+                    <div class="col-md-5 col-sm-12 filter-mb-sm-4 easyassist-multiselect-dropdown-container" id="selected-filter-container">
+                      <select class="form-control" style="display:none;" id="selected-month-filter" multiple>
+                        <option value="Jan">Jan</option>
+                        <option value="Feb">Feb</option>
+                        <option value="Mar">Mar</option>
+                        <option value="Apr">Apr</option>
+                        <option value="May">May</option>
+                        <option value="Jun">Jun</option>
+                        <option value="Jul">Jul</option>
+                        <option value="Aug">Aug</option>
+                        <option value="Sep">Sep</option>
+                        <option value="Oct">Oct</option>
+                        <option value="Nov">Nov</option>
+                        <option value="Dec">Dec</option>
+                      </select>
+                
+                        <select class="form-control" style="display:none;" id="selected-days-filter">
+                            <option value="workingdays">Working Days</option>
+                            <option value="holidays">Holidays</option>
+                        </select>
+                        
+                        <select class="form-control" style="display:none;" id="selected-year-filter">
+                            <option value="0">Select Year</option>
+                            <option value="2021">2021</option>
+                            <option value="2022">2022</option>
+                            <option value="2023">2023</option>
+                            <option value="2024">2024</option>
+                            <option value="2025">2025</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 col-sm-12" style="align-items: center; display: flex;">
+                        <button class="btn btn-success btn-icon-split" type="button" id="add-filter-btn" onclick="add_new_filter_parameter(this)" style="width: 100%;justify-content: start;" disabled>
+                            <span class="icon text-white-50">
+                                <svg width="19" height="14" viewBox="0 0 19 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M6.03809 11.0455L1.53383 6.69202L0 8.16406L6.03809 14L19 1.47204L17.477 0L6.03809 11.0455Z" fill="white"/>
+                                </svg>
+                            </span>
+                            <span class="text" style="width: 100%;">Add</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="row" id="tbody-filter-parameters">
+  
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" style="font-size: 16px !important;" type="button" data-dismiss="modal">Cancel</button>
+                <button id="reset_filter" class="btn btn-white-border" style="display: none;" disabled onclick="reset_calendar_filter(this)">Reset</button>
+                <button id="apply_filter_confirm"  class="btn btn-primary" disabled onclick="apply_calendar_filter(this)">Submit</button>
+            </div>
+        </div>
+    </div>
+  </div>   
+  
+            <div class="tab-pane fade" id="pills-advanced-settings" role="tabpanel" aria-labelledby="pills-advanced-settings-tab">
+                <div class="row">
+                    <div class="col-md-12 pd-0-mobile">
+                        <table class="table table-borderless gy-settings-table agent-advance-setting">
+                            <tbody>
+                            
+                                {% if cobrowse_agent.get_access_token_obj.allow_language_support %}
+                                <tr>
+                                    <th scope="row">Preferred language</th>
+                                    <td style="vertical-align: inherit;">
+                                        <select class="selectpicker" multiple data-live-search="true" id="easyassist-language-support-selected">
+                                        {% for language in supported_language %}
+                                            {% if language.is_selected %}
+                                                <option value="{{language.key}}" selected>{{language.value}}</option>
+                                            {% else %}
+                                                <option value="{{language.key}}">{{language.value}}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                        </select>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                {% if cobrowse_agent.get_access_token_obj.choose_product_category or cobrowse_agent.get_access_token_obj.enable_tag_based_assignment_for_outbound %}
+                                <tr>
+                                    <th scope="row">Product Category</th>
+                                    <td style="vertical-align: inherit;">
+                                        <select class="selectpicker" id="easyassist-product-category-selected">
+                                        {% for product in product_category %}
+                                            {% if product.is_selected %}
+                                                <option value="{{product.key}}" selected>{{product.value}}</option>
+                                            {% else %}
+                                                <option value="{{product.key}}">{{product.value}}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                        </select>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                        <p id="save-cobrowsing-agent-details-error"></p>
+                    </div>
+
+                    <div class="col-md-12">
+                      <button type="button" class="btn btn-success agent-advance-setting-save-btn float-right" onclick="save_cobrowse_agent_details(this)">Save</button>
+                      <br><br>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    </div>
+</div>
+
+<!-- upload profile pic modal -->
+<div class="modal fade" id="upload-profile-pic-Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Profile Picture</h5>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col d-flex flex-column justify-content-center align-items-center">
+              <div class="profile-pic-div">
+                  <div class="preview-circle">
+                    {% if cobrowse_agent.agent_profile_pic_source == "" or cobrowse_agent.agent_profile_pic_source == "null" %}
+                        <svg width="52" height="52" class="updated-svg" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M26 4.33334C20.3233 4.33334 15.7083 8.94834 15.7083 14.625C15.7083 20.1933 20.0633 24.7 25.74 24.895C25.9133 24.8733 26.0867 24.8733 26.2167 24.895C26.26 24.895 26.2817 24.895 26.325 24.895C26.3467 24.895 26.3467 24.895 26.3683 24.895C31.915 24.7 36.27 20.1933 36.2917 14.625C36.2917 8.94834 31.6767 4.33334 26 4.33334Z" fill="white"/>
+                            <path d="M37.0066 30.6583C30.9616 26.6283 21.1033 26.6283 15.015 30.6583C12.2633 32.5 10.7466 34.9917 10.7466 37.6567C10.7466 40.3217 12.2633 42.7917 14.9933 44.6117C18.0266 46.6483 22.0133 47.6667 26 47.6667C29.9866 47.6667 33.9733 46.6483 37.0066 44.6117C39.7366 42.77 41.2533 40.3 41.2533 37.6133C41.2316 34.9483 39.7366 32.4783 37.0066 30.6583Z" fill="white"/>
+                        </svg>                             
+                        <img class="updated-profile" src="">                                                    
+                    {% else %}
+                        <img class="updated-profile" src="/{{ cobrowse_agent.agent_profile_pic_source }}">
+                    {% endif %}
+                    </div>
+              </div>
+              <div class="d-flex align-items-center sub-heading">
+                <svg width="12" height="13" viewBox="0 0 12 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6.00005 7.7C6.31831 7.7 6.62353 7.57357 6.84858 7.34853C7.07362 7.12348 7.20005 6.81826 7.20005 6.5C7.20005 6.18174 7.07362 5.87652 6.84858 5.65147C6.62353 5.42643 6.31831 5.3 6.00005 5.3C5.68179 5.3 5.37656 5.42643 5.15152 5.65147C4.92648 5.87652 4.80005 6.18174 4.80005 6.5C4.80005 6.81826 4.92648 7.12348 5.15152 7.34853C5.37656 7.57357 5.68179 7.7 6.00005 7.7Z" fill="#7B7A7B"/>
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M0.274658 6.5C1.03906 4.0658 3.31306 2.3 5.99986 2.3C8.68666 2.3 10.9607 4.0658 11.7251 6.5C10.9607 8.9342 8.68666 10.7 5.99986 10.7C3.31306 10.7 1.03906 8.9342 0.274658 6.5ZM8.39986 6.5C8.39986 7.13652 8.147 7.74697 7.69691 8.19706C7.24683 8.64714 6.63638 8.9 5.99986 8.9C5.36334 8.9 4.75289 8.64714 4.3028 8.19706C3.85271 7.74697 3.59986 7.13652 3.59986 6.5C3.59986 5.86348 3.85271 5.25303 4.3028 4.80294C4.75289 4.35286 5.36334 4.1 5.99986 4.1C6.63638 4.1 7.24683 4.35286 7.69691 4.80294C8.147 5.25303 8.39986 5.86348 8.39986 6.5Z" fill="#7B7A7B"/>
+                </svg>
+                <p class="mb-0 ml-2" style="font-size: 12px;">This will be visible to customers</p>
+              </div>
+              <div class="error-message-div text-danger" style="display: none !important;">
+              </div>
+              <div class="button-group d-flex" >
+                <label class="custom-file-upload-profile mr-3">
+                  <input type="file" id="agent-profile-input" />
+                  <svg width="20" height="19" viewBox="0 0 20 19" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 1px;">
+                    <path d="M11.9247 0.503052C12.7225 0.503052 13.4607 0.925526 13.8647 1.61342L14.6793 3H16.75C18.5449 3 20 4.45508 20 6.25V15.75C20 17.5449 18.5449 19 16.75 19H3.25C1.45507 19 0 17.5449 0 15.75V6.25C0 4.45508 1.45507 3 3.25 3H5.33042L6.205 1.57571C6.61425 0.909207 7.34026 0.503052 8.12238 0.503052H11.9247ZM11.9247 2.00305H8.12238C7.89892 2.00305 7.6892 2.10252 7.54793 2.27084L7.48325 2.3606L6.38913 4.14245C6.25271 4.36462 6.01071 4.5 5.75 4.5H3.25C2.2835 4.5 1.5 5.28351 1.5 6.25V15.75C1.5 16.7165 2.2835 17.5 3.25 17.5H16.75C17.7165 17.5 18.5 16.7165 18.5 15.75V6.25C18.5 5.28351 17.7165 4.5 16.75 4.5H14.25C13.9841 4.5 13.738 4.35918 13.6033 4.12988L12.5714 2.37318C12.4367 2.14388 12.1906 2.00305 11.9247 2.00305ZM10 6C12.4853 6 14.5 8.01472 14.5 10.5C14.5 12.9853 12.4853 15 10 15C7.51472 15 5.5 12.9853 5.5 10.5C5.5 8.01472 7.51472 6 10 6ZM10 7.5C8.34315 7.5 7 8.84315 7 10.5C7 12.1569 8.34315 13.5 10 13.5C11.6569 13.5 13 12.1569 13 10.5C13 8.84315 11.6569 7.5 10 7.5Z" fill="white"/>
+                    </svg>               
+                  <span>Upload</span>
+                </label>
+                <button class="custom-btn remove-btn" id="remove-profile-pic" data-dismiss="modal" data-target="#remove-profile-pic-Modal" data-toggle="modal" style="opacity: 0.25;" disabled>
+                  <svg width="18" height="20" style="margin-right: 0 !important;" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11 8L10.7 15M7.3 15L7 8M3 4L3.87554 17.133C3.94558 18.1836 4.81818 19 5.87111 19H12.1289C13.1818 19 14.0544 18.1836 14.1245 17.133L15 4M3 4H6M3 4H1M15 4H17M15 4H12M12 4V3C12 1.89543 11.1046 1 10 1H8C6.89543 1 6 1.89543 6 3V4M12 4H6" stroke="#FF0000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Remove</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn  cancel-btn" type="button" onclick="reset_file_input_field()">Cancel</button>
+          <button class="btn btn-primary" id="save-profile" type="button" onclick="return upload_agent_profile_picture()">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- remove profile pic modal -->
+  <div class="modal fade" id="remove-profile-pic-Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Remove Profile Picture</h5>
+        </div>
+        <div class="modal-body" style="padding: 0 !important;">
+          <div class="row">
+            <div class="col d-flex flex-column justify-content-center align-items-center">
+              <div class="profile-pic-div">
+                  <div class="preview-circle">
+                    <svg width="52" height="52" class="remove-profile-svg" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M26 4.33334C20.3233 4.33334 15.7083 8.94834 15.7083 14.625C15.7083 20.1933 20.0633 24.7 25.74 24.895C25.9133 24.8733 26.0867 24.8733 26.2167 24.895C26.26 24.895 26.2817 24.895 26.325 24.895C26.3467 24.895 26.3467 24.895 26.3683 24.895C31.915 24.7 36.27 20.1933 36.2917 14.625C36.2917 8.94834 31.6767 4.33334 26 4.33334Z" fill="white"/>
+                      <path d="M37.0066 30.6583C30.9616 26.6283 21.1033 26.6283 15.015 30.6583C12.2633 32.5 10.7466 34.9917 10.7466 37.6567C10.7466 40.3217 12.2633 42.7917 14.9933 44.6117C18.0266 46.6483 22.0133 47.6667 26 47.6667C29.9866 47.6667 33.9733 46.6483 37.0066 44.6117C39.7366 42.77 41.2533 40.3 41.2533 37.6133C41.2316 34.9483 39.7366 32.4783 37.0066 30.6583Z" fill="white"/>
+                      </svg>                             
+                    <img class="remove-profile" src="">
+                  </div>
+              </div>
+              <div class="text-center mb-2">
+                <p class="remove-profile-text">Remove Profile Picture ?</p>
+                <p class="text-secondary sub-heading">This image will be used in your profile.</p>
+              </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn  cancel-btn" type="button" data-dismiss="modal">Cancel</button>
+          <button class="btn btn-primary" id="remove-profile-btn" type="button" data-dismiss="modal" onclick="delete_agent_profile_picture()">Remove</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- preview modal -->
+  <div class="modal fade" id="preview-profile-pic-Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Profile Picture</h5>
+        </div>
+        <div class="modal-body" style="padding: 0 !important;">
+          <div class="row">
+            <div class="col d-flex flex-column justify-content-center align-items-center">
+              <div class="profile-pic-div-preview mt-3" style="height: 200px !important;">
+                <div class="result"></div>
+              </div>
+              <div class="my-3" id="rotate-image" style="font-weight: 600; letter-spacing: 0.1px;">
+                <svg width="25" class="" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12.5 3C17.4706 3 21.5 7.02944 21.5 12C21.5 15.4359 19.5581 18.4885 16.6267 20.001L18.5 20C19.0523 20 19.5 20.4477 19.5 21C19.5 21.5128 19.114 21.9355 18.6166 21.9933L18.5 22H14.5C13.9872 22 13.5645 21.614 13.5067 21.1166L13.5 21V17C13.5 16.4477 13.9477 16 14.5 16C15.0128 16 15.4355 16.386 15.4933 16.8834L15.5 17L15.5014 18.3267C17.8966 17.1903 19.5 14.753 19.5 12C19.5 8.13401 16.366 5 12.5 5C8.63401 5 5.5 8.13401 5.5 12C5.5 12.5523 5.05228 13 4.5 13C3.94772 13 3.5 12.5523 3.5 12C3.5 7.02944 7.52944 3 12.5 3ZM12.5 9C14.1569 9 15.5 10.3431 15.5 12C15.5 13.6569 14.1569 15 12.5 15C10.8431 15 9.5 13.6569 9.5 12C9.5 10.3431 10.8431 9 12.5 9ZM12.5 11C11.9477 11 11.5 11.4477 11.5 12C11.5 12.5523 11.9477 13 12.5 13C13.0523 13 13.5 12.5523 13.5 12C13.5 11.4477 13.0523 11 12.5 11Z" fill="#7B7A7B"/>
+                </svg>
+                Rotate                 
+              </div>
+              <div class="text-danger" id="file-error"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn  cancel-btn" type="button" data-dismiss="modal">Cancel</button>
+          <button class="btn btn-primary" id="save-photo" type="button" data-dismiss="modal">Save Photo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- toast message for profile upload -->
+  <div id="agent-profile-toast"></div>
+
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/cropper.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/custom2.js' %}"></script>
+<link href="{% static 'EasyAssistApp/css/cropper.min.css' %}" rel="stylesheet">
+
+<script type="text/javascript">
+
+function show_easyassist_agent_profile_toast(message,re){
+    var x = document.getElementById("agent-profile-toast");
+    if(re) {
+        x.style.color = "#FF0000";
+        x.style.border = "1px solid #E89E9E";
+        x.style.background = "#FFF9F9";
+    }
+    x.innerHTML = message;
+    x.className = "show";
+    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 5000);
+}
+
+$(document).ready(function(){
+    $('#select-add-work-timing').on('change', function(){
+        // $('#save-work-time').prop('disabled',false);
+        if(this.value == 1){
+            $('#select-monthly-option').css('display','flex');
+            $('#select-yearly-option').css('display','none');
+        }else if (this.value == 2){
+            $('#select-yearly-option').css('display','block');
+            $('#select-monthly-option').css('display','none');
+        }else{
+            $('#select-yearly-option').css('display','none');
+            $('#select-monthly-option').css('display','none');
+        }
+    })
+    
+    window.profile_picture_source = "{{ cobrowse_agent.agent_profile_pic_source }}";
+    if ("{{ cobrowse_agent.agent_profile_pic_source }}" == "null" || "{{ cobrowse_agent.agent_profile_pic_source }}" == "") {
+        document.getElementsByClassName("remove-btn")[0].disabled = true;
+        document.getElementsByClassName("remove-btn")[0].style.opacity = 0.25;
+    }
+
+})
+    $('.selectall').click(function(){
+        $(".individual").prop("checked",$(this).prop("checked"));
+    })
+
+  window.is_filter_applied = false;
+  // window.custom_month_filter_dropdown = null;
+  window.custom_day_filter_dropdown = null;
+  window.custom_year_filter_dropdown = null;
+  window.custom_filter_option_dropdown = null;
+  window.applied_filter_key_value_map = {};
+  window.agent_profile_source = "{{ cobrowse_agent.agent_profile_pic_source }}"
+
+  function show_filter_options(element) {
+      // custom_month_filter_dropdown.hide_custom_dropdown();
+      $("#selected-month-filter").next().hide();
+      custom_day_filter_dropdown.hide_custom_dropdown();
+      custom_year_filter_dropdown.hide_custom_dropdown();
+  
+      if (element.value == "None") {
+          document.getElementById("add-filter-btn").disabled = true;
+      } else {
+  
+          document.getElementById("selected-filter-container").style.display = "block";
+  
+          filter_parameters = document.getElementsByClassName("filter-parameter");
+          for (var index = 0; index < filter_parameters.length; index++) {
+              filter_parameters[index].style.display = "none";
+          }
+          if (element.value == "month") {
+            $("#selected-month-filter").next().show();
+          } else if (element.value == "days") {
+              custom_day_filter_dropdown.show_custom_dropdown();
+          } else if (element.value == "years") {
+              custom_year_filter_dropdown.show_custom_dropdown();
+          } else {
+              show_easyassist_toast("Please select valid filter");
+          }
+          
+          document.getElementById("reset_filter").removeAttribute("disabled");
+          document.getElementById("reset_filter").style.display = "block";
+          document.getElementById("add-filter-btn").disabled = false;
+      }
+  }
+  
+  function add_new_filter_parameter() {
+      var filter_key = null;
+      var filter_value = null;
+      element = document.getElementById("selected-filter-parameter");
+      if (element.value == "None") {
+          show_easyassist_toast("Please select valid filter parameter");
+      } else {
+          var value = "None";
+          var key = element.value;
+          if (element.value == "month") {
+            value = $("#selected-month-filter").val();
+            if (value.length == 0) {
+                show_easyassist_toast("Please choose valid filter");
+                return;
+            }
+            filter_key = "month"
+            filter_value = value;
+            console.log(filter_value);
+        }  else if (element.value == "days") {
+              value = document.getElementById("selected-days-filter").value;
+  
+              filter_key = "days"
+              if (value == "holidays") {
+                  filter_value = "Holidays";
+              } else {
+                filter_value = "Working Days";
+              }
+              filter_value = [filter_value];
+          } else if (element.value == "years") {
+              value = document.getElementById("selected-year-filter").value;
+  
+              filter_key = "years"
+              if (value == "2021") {
+                  filter_value = "2021";
+              } else if (value == "2022") {
+                  filter_value = "2022";
+              } else if (value == "2023") {
+                  filter_value = "2023";
+              }  else if (value == "2024") {
+                  filter_value = "2024";
+              } else if (value == "2025") {
+                  filter_value = "2025";
+              }else {
+                  show_easyassist_toast("Please select a valid year");
+                  return;
+              }
+              filter_value = [filter_value];
+          } else {
+              show_easyassist_toast("Please select valid filter parameter");
+          }
+  
+          if(check_filter_already_applied(applied_filter_key_value_map[key], filter_value)) {
+              show_easyassist_toast(filter_key + " filter already applied");
+              return;
+          }
+  
+          if (applied_filter_key_value_map[key] != null) {
+              applied_filter_key_value_map[key] = filter_value;
+              update_applied_filter_by_key(key, filter_value);
+              return;
+          }
+          applied_filter_key_value_map[key] = filter_value;
+  
+          var filter_chip_html = "";
+          filter_chip_html = generate_filter_chips(filter_key, filter_value);
+          
+          var html_filter = [
+              '<div class="col-md-12 filter-parameter-column" filter-key="' + key + '" filter-data=\'' + JSON.stringify(filter_value) + '\' style="padding: 1em;border-bottom: 1px solid #E6E6E6;">',
+                  '<div class="row filter-custom-row">',
+                      '<div class="col-md-2 filter-mb-sm-2 filter-flex-column">',
+                          '<span class="filter-text">' + filter_key + '</span>',
+                          '<button type="button" class="btn remove-filter-row-btn filter-show-on-mobile" onclick="remove_selected_filter_parameter(this)">',
+                              '<svg width="16" height="18" viewBox="0 0 16 18" fill="none" xmlns="http://www.w3.org/2000/svg">',
+                                  '<path d="M8 0C9.49884 0 10.7237 1.20574 10.8064 2.72496L10.8108 2.88889H15.3514C15.7096 2.88889 16 3.18737 16 3.55556C16 3.89306 15.756 4.17199 15.4394 4.21614L15.3514 4.22222H14.6629L13.5558 15.7948C13.441 16.994 12.4959 17.92 11.3406 17.9951L11.1888 18H4.81118C3.63878 18 2.64965 17.124 2.46385 15.9497L2.44423 15.7948L1.33622 4.22222H0.648649C0.320263 4.22222 0.0488727 3.97142 0.00592144 3.64602L0 3.55556C0 3.21805 0.244025 2.93912 0.560631 2.89497L0.648649 2.88889H5.18919C5.18919 1.2934 6.44763 0 8 0ZM13.3596 4.22222H2.63957L3.73529 15.6643C3.7861 16.1952 4.19488 16.6083 4.70127 16.661L4.81118 16.6667H11.1888C11.7078 16.6667 12.1478 16.289 12.2484 15.7762L12.2647 15.6643L13.3596 4.22222ZM9.51351 6.66667C9.8419 6.66667 10.1133 6.91747 10.1562 7.24287L10.1622 7.33333V13.5556C10.1622 13.9237 9.87175 14.2222 9.51351 14.2222C9.18513 14.2222 8.91374 13.9714 8.87079 13.646L8.86487 13.5556V7.33333C8.86487 6.96514 9.15528 6.66667 9.51351 6.66667ZM6.48649 6.66667C6.81487 6.66667 7.08626 6.91747 7.12921 7.24287L7.13514 7.33333V13.5556C7.13514 13.9237 6.84473 14.2222 6.48649 14.2222C6.1581 14.2222 5.88671 13.9714 5.84376 13.646L5.83784 13.5556V7.33333C5.83784 6.96514 6.12825 6.66667 6.48649 6.66667ZM8 1.33333C7.2059 1.33333 6.55464 1.96188 6.4915 2.76131L6.48649 2.88889H9.51351C9.51351 2.02978 8.83589 1.33333 8 1.33333Z" fill="#757575"/>',
+                              '</svg>',
+                          '</button>',
+                      '</div>',
+                      '<div class="col-md-8 filter-chip-column">',
+                          filter_chip_html,
+                      '</div>',
+                      '<div class="col-md-2 filter-hide-on-mobile">',
+                          '<button type="button" class="btn remove-filter-row-btn" onclick="remove_selected_filter_parameter(this)">',
+                              '<svg width="16" height="18" viewBox="0 0 16 18" fill="none" xmlns="http://www.w3.org/2000/svg">',
+                                  '<path d="M8 0C9.49884 0 10.7237 1.20574 10.8064 2.72496L10.8108 2.88889H15.3514C15.7096 2.88889 16 3.18737 16 3.55556C16 3.89306 15.756 4.17199 15.4394 4.21614L15.3514 4.22222H14.6629L13.5558 15.7948C13.441 16.994 12.4959 17.92 11.3406 17.9951L11.1888 18H4.81118C3.63878 18 2.64965 17.124 2.46385 15.9497L2.44423 15.7948L1.33622 4.22222H0.648649C0.320263 4.22222 0.0488727 3.97142 0.00592144 3.64602L0 3.55556C0 3.21805 0.244025 2.93912 0.560631 2.89497L0.648649 2.88889H5.18919C5.18919 1.2934 6.44763 0 8 0ZM13.3596 4.22222H2.63957L3.73529 15.6643C3.7861 16.1952 4.19488 16.6083 4.70127 16.661L4.81118 16.6667H11.1888C11.7078 16.6667 12.1478 16.289 12.2484 15.7762L12.2647 15.6643L13.3596 4.22222ZM9.51351 6.66667C9.8419 6.66667 10.1133 6.91747 10.1562 7.24287L10.1622 7.33333V13.5556C10.1622 13.9237 9.87175 14.2222 9.51351 14.2222C9.18513 14.2222 8.91374 13.9714 8.87079 13.646L8.86487 13.5556V7.33333C8.86487 6.96514 9.15528 6.66667 9.51351 6.66667ZM6.48649 6.66667C6.81487 6.66667 7.08626 6.91747 7.12921 7.24287L7.13514 7.33333V13.5556C7.13514 13.9237 6.84473 14.2222 6.48649 14.2222C6.1581 14.2222 5.88671 13.9714 5.84376 13.646L5.83784 13.5556V7.33333C5.83784 6.96514 6.12825 6.66667 6.48649 6.66667ZM8 1.33333C7.2059 1.33333 6.55464 1.96188 6.4915 2.76131L6.48649 2.88889H9.51351C9.51351 2.02978 8.83589 1.33333 8 1.33333Z" fill="#EE2525"/>',
+                              '</svg>',
+                          '</button>',
+                      '</div>',
+                  '</div>',
+              '</div>',
+          ].join('');
+  
+          document.getElementById("tbody-filter-parameters").innerHTML += html_filter;
+          document.getElementById("apply_filter_confirm").removeAttribute("disabled");
+          document.getElementById("reset_filter").removeAttribute("disabled");
+          document.getElementById("reset_filter").style.display = "block";
+          scrollToBottom();
+          
+      }
+  }
+  
+  function remove_selected_filter_parameter(element){
+      remove_element = $(element).closest('.filter-parameter-column')[0];
+      var filter_element = $(remove_element).attr("filter-key");
+      applied_filter_key_value_map[filter_element] = null;
+
+      remove_element.parentElement.removeChild(remove_element);
+      if(document.getElementsByClassName("tr-filter-parameters").length <= 0){
+          document.getElementById("apply_filter_confirm").setAttribute("disabled", "disabled");
+          if(!is_filter_applied) {
+              document.getElementById("reset_filter").setAttribute("disabled", "disabled");
+          }
+      }
+  }
+  
+  function apply_calendar_filter(element) {
+      selected_filter_parameters = document.getElementsByClassName("filter-parameter-column");
+      var key_value = '';
+      let request_params = {}
+      for(var idx = 0; idx < selected_filter_parameters.length; idx ++) {
+        var filter_key = selected_filter_parameters[idx].getAttribute('filter-key');
+        var filter_data = selected_filter_parameters[idx].getAttribute('filter-data');
+  
+        filter_data = JSON.parse(filter_data);
+        for(var index = 0; index < filter_data.length; index ++) {
+          key_value += filter_key + "=" + filter_data[index] + "&";
+        }
+      }
+      window.location = window.location.protocol + "//" + window.location.host + window.location.pathname + "?" + key_value;
+  }
+  
+  function reset_calendar_filter() {
+      document.getElementById("tbody-filter-parameters").innerHTML = "";
+      document.getElementById("reset_filter").setAttribute("disabled", "disabled");
+      document.getElementById("apply_filter_confirm").setAttribute("disabled", "disabled");
+      
+      // custom_month_filter_dropdown.update_value("None");
+      $("#selected-month-filter").val("").multiselect('refresh');
+      
+      custom_filter_option_dropdown.update_value("None");
+      custom_year_filter_dropdown.update_value("all");
+      custom_day_filter_dropdown.update_value("all");
+      
+      initialize_custom_filter_map();
+  }
+  
+  function load_map_script() {
+
+    var params = JSON.stringify({});
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "/easy-assist/map-script/", true);
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.setRequestHeader('X-CSRFToken', get_csrfmiddlewaretoken());
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            response = JSON.parse(this.responseText);
+            response = easyassist_custom_decrypt(response.Response);
+            response = JSON.parse(response);
+            if (response["status"] == 200) {
+                var src = response['src'];
+                var script = document.createElement('script');
+                script.type = 'text/javascript';
+                script.defer = true;
+                script.src = src
+                document.body.appendChild(script);          
+            }
+        }
+    }
+    xhttp.send(params);
+    }
+  
+  $(document).ready(function() {
+      initialize_custom_filter_map();
+      initialize_custom_dropdown();
+      initialize_custom_tabs();
+      load_map_script();
+      update_applied_filter();
+  
+      
+          $("#support-history-table").DataTable({
+          "ordering": false,
+          "bPaginate": false,
+          "bInfo": false,
+          "targets": 'no-sort',
+            "bSort": false,
+            "order": [],
+          });
+      
+          $("#selected-month-filter").multiselect({
+            nonSelectedText: 'Select Month',
+            // enableFiltering: true,
+            // enableCaseInsensitiveFiltering: true,
+            includeSelectAllOption: true
+          });
+          
+          $("#selected-month-filter").next().hide();
+
+  });
+  
+  function initialize_custom_dropdown() {
+      var console_theme_color = getComputedStyle(document.body).getPropertyValue('--color_rgb');
+      $("#selected-month-filter")[0].selectedIndex = -1;
+  
+      custom_filter_option_dropdown = new EasyassistCustomSelect("#selected-filter-parameter", "Select One", console_theme_color);
+      custom_day_filter_dropdown = new EasyassistCustomSelect("#selected-days-filter", "Select Days", console_theme_color);
+      
+      custom_year_filter_dropdown = new EasyassistCustomSelect("#selected-year-filter", "Select Year", console_theme_color);
+  }
+  
+  function initialize_custom_filter_map() {
+      applied_filter_key_value_map = {
+          'days': null,
+          'month': null,
+          'years': null,
+      }
+  }
+    $(document).ready(function(){
+        setTimeout(function(){
+            $('.bootstrap-select button').removeClass();
+            $('.bootstrap-select button').addClass('custom-select');
+        }, 1000);
+    });
+
+    function show_change_password() {
+        document.getElementById('change-password-button').style.display = "none";
+        document.getElementById("change-password-div").style.display = "block";
+        document.getElementById("change_password_cancel_btn").style.visibility = "visible";
+    }
+
+    function hide_change_password() {
+        document.getElementById("change_password_cancel_btn").style.visibility = "hidden";
+        document.getElementById("change-password-div").style.display = "none";
+        document.getElementById('change-password-button').style.display = "block";
+        document.getElementById("old-password").value = "";
+        document.getElementById("new-password").value = "";
+        document.getElementById("confirm-password").value = "";
+        document.getElementById("save-details-error").innerHTML = "";
+    }
+
+    document.getElementById("agent-name").addEventListener('keydown', function(e) {
+        var target_el = e.target;
+        if(target_el.value.length >= 30) {
+            if(e.key != 'Backspace' && e.key != 'Delete' && e.key != 'ArrowLeft' && e.key != 'ArrowRight') {
+                e.preventDefault();
+                document.getElementById("name-error-message").style.display = "inherit";
+            }
+            else if(e.key == 'Backspace' || e.key == 'Delete'){
+              document.getElementById("name-error-message").style.display = "none";
+            }
+        }
+        else{
+          document.getElementById("name-error-message").style.display = "none";
+        }
+    });
+
+    if(window.agent_profile_source && document.getElementById("remove-profile-pic")) {
+        document.getElementById("remove-profile-pic").disabled = false;
+        document.getElementById("remove-profile-pic").style.opacity = 1;
+    }
+
+    function reset_file_input_field() {
+        $('#upload-profile-pic-Modal').modal('hide');
+        agent_profile_input_file_global = null;
+        if(window.profile_picture_source != "" && window.profile_picture_source != undefined) {
+            document.getElementsByClassName("updated-profile")[0].src = "/" + window.profile_picture_source;
+        }
+        hide_agent_profile_errors();
+    }
+
+</script>
+{% endblock %}

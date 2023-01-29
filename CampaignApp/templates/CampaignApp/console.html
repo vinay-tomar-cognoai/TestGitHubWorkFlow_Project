@@ -1,0 +1,314 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        {% if easychat_config_obj.tab_logo %}
+            <link rel="shortcut icon" type="image/png" href="{{ easychat_config_obj.tab_logo }}"/>
+        {% else %}
+            <link rel="shortcut icon" type="image/x-icon" href="{% static 'CampaignApp/img/campaignLogoShort.svg' %}">
+        {% endif %}
+        
+        <title>{{ easychat_config_obj.title_text }}</title>
+        
+        <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+        <!-- Custom fonts for this template-->
+        <link href="{% static 'CampaignApp/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="{% static 'CampaignApp/css/bootstrap-select.css' %}" />
+        <!-- Custom styles for this template-->
+        <link href="{% static 'CampaignApp/css/sb-admin-2.min.css' %}" rel="stylesheet">
+        <link href="{% static 'CampaignApp/vendor/datatables/dataTables.bootstrap4.min.css' %}" rel="stylesheet">
+        <script type="text/javascript" src="{% static 'CampaignApp/vendor/jquery/jquery.min.js' %}"></script>
+        <script src="{% static 'CampaignApp/vendor/chart.js/Chart.min.js' %}"></script>
+        <link rel="stylesheet" type="text/css" href="{% static 'CampaignApp/css/bootstrap-datepicker.min.css' %}">
+        <script type="text/javascript" src="{% static 'CampaignApp/js/bootstrap-datepicker.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'CampaignApp/js/bootstrap-multiselect.js' %}?v={% random_int 1 100 %}"></script>
+        <link rel="stylesheet" type="text/css" href="{% static 'CampaignApp/css/bootstrap-multiselect.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'CampaignApp/css/console.css' %}?v={% random_int 1 100 %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'CampaignApp/css/campaign_changes.css' %}?v={% random_int 1 100 %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'CampaignApp/css/dropdown.css' %}?v={% random_int 1 100 %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'CampaignApp/css/campaign_responsive.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'CampaignApp/css/easyassist-custom-select.css' %}">
+    </head>
+    <body id="page-top">
+        {% csrf_token %}
+        <!-- Page Wrapper -->
+        <div id="wrapper">
+            <!-- Sidebar -->
+            <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion toggled" id="accordionSidebar" style="z-index: 0;">
+                <!-- Sidebar - Brand -->
+                <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/" >
+                    <div class="sidebar-brand-icon rotate-n-15"></div>
+                    {% if easychat_config_obj.chatbot_logo %}
+                    <img id="campaign-logo-large" src="{{easychat_config_obj.chatbot_logo}}" alt="CognoDesk" max-width = "90px" height = "50px"/>
+                    {% else %}
+                    <img id="campaign-logo-large" src="{% static 'CampaignApp/img/campaignLogoLarge.svg' %}" alt="CognoDesk" max-width = "90px" height = "50px"/>
+                    {% endif %}
+                    {% if easychat_config_obj.tab_logo %}
+                    <img id="campaign-logo-small" src="{{easychat_config_obj.tab_logo}}" alt="CognoDesk" max-width = "90px" height = "50px"/>
+                    {% else %}
+                    <img id="campaign-logo-small" src="{% static 'CampaignApp/img/campaignLogoSmall.svg' %}" alt="CognoDesk" max-width = "90px" height = "50px"/>
+                    {% endif %}
+                </a>
+                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3 sidebar-toggle-btn" amino-styles="margin: 5px 0 10px 0 !important;" style="min-height: 42px!important;">
+                <i class="fa fa-bars"></i>
+                </button>
+                <!-- Divider -->
+                <hr class="sidebar-divider my-0">
+                <!-- Nav Item - Dashboard -->
+                <li class="nav-item nav-item-menu campaign-bot-name-menu active" style="margin-top: 3px;">
+
+                    <a class="nav-link tooltip-navbar" href="javascript:void(0)" style="pointer-events: none;" id="campaign_analytics_link" data-tooltip="tooltip" data-original-title="Bot Name">
+
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M11.4303 0.585336C11.051 0.705273 10.7801 0.874697 10.5331 1.14657C9.82557 1.92496 9.83378 3.0595 10.5522 3.81098C10.8197 4.09079 11.0778 4.25794 11.3803 4.34722L11.5786 4.4058L11.5912 5.4075L11.6038 6.40916H12.0024H12.4009L12.4135 5.4075L12.4261 4.4058L12.6245 4.34722C12.9269 4.25794 13.185 4.09079 13.4525 3.81098C14.1709 3.0595 14.1791 1.92496 13.4717 1.14657C12.9644 0.58849 12.1384 0.361369 11.4303 0.585336ZM4.40712 7.25146C4.17659 7.28852 3.72326 7.468 3.49259 7.61359C2.99398 7.92827 2.58613 8.5211 2.45851 9.1167C2.36095 9.57224 2.36128 18.3211 2.45894 18.7769C2.55421 19.2214 2.7378 19.5709 3.04799 19.8978C3.50399 20.3785 4.11156 20.6612 4.70375 20.6682C4.88937 20.6704 4.95468 20.6952 5.06711 20.8064L5.20415 20.942L5.20565 22.0935C5.20673 22.9254 5.223 23.2653 5.26425 23.3185C5.34063 23.4169 5.5043 23.5 5.62184 23.5C5.67449 23.5 6.64059 22.8917 7.76881 22.1482C8.89698 21.4048 9.88844 20.7682 9.97199 20.7337C10.0963 20.6823 10.9748 20.6707 14.8022 20.6702C19.9489 20.6694 19.8012 20.677 20.3561 20.3845C20.7028 20.2016 21.1853 19.7012 21.3531 19.3504C21.6143 18.8041 21.612 18.8525 21.612 13.9458C21.612 9.00613 21.6154 9.07422 21.3403 8.5351C21.0694 8.0042 20.6041 7.59573 19.9961 7.35526L19.7148 7.24399L12.1196 7.23829C7.94219 7.23518 4.47158 7.24112 4.40712 7.25146ZM7.77851 10.8799C9.07838 11.2801 9.60526 12.7972 8.82708 13.899C8.05935 14.9861 6.39501 15.0056 5.59966 13.9368C5.31939 13.5602 5.22806 13.2717 5.22806 12.7632C5.22806 12.2554 5.31939 11.9661 5.59769 11.5921C6.09237 10.9274 6.98542 10.6357 7.77851 10.8799ZM17.4037 10.8839C17.9777 11.0593 18.4977 11.5526 18.6926 12.1066C18.8099 12.4404 18.8077 13.1009 18.6881 13.4125C18.2979 14.4286 17.2365 14.9567 16.2151 14.6427C15.654 14.4701 15.2286 14.0966 14.9691 13.5484C14.8515 13.2999 14.8389 13.224 14.8389 12.7632C14.8389 12.3023 14.8515 12.2264 14.9691 11.9779C15.4127 11.0408 16.4264 10.5854 17.4037 10.8839ZM0.820474 11.6369C0.614605 11.7088 0.332175 11.9239 0.213042 12.0996C0.0130807 12.3945 0 12.5078 0 13.9445C0 15.0573 0.0136902 15.3605 0.0716391 15.5287C0.241969 16.0232 0.676258 16.3112 1.25162 16.3112H1.59406V13.9458V11.5805L1.27759 11.5841C1.10356 11.5861 0.897833 11.6099 0.820474 11.6369ZM6.82165 11.6369C6.48587 11.7541 6.17367 12.0695 6.05571 12.4106C5.85659 12.9864 6.22702 13.6858 6.84036 13.8922C7.34966 14.0636 7.95536 13.83 8.23887 13.3529C8.35163 13.1631 8.36883 13.0851 8.36883 12.7632C8.36883 12.4412 8.35163 12.3632 8.23887 12.1734C8.0871 11.918 7.88044 11.7496 7.59787 11.651C7.36804 11.5707 7.02874 11.5646 6.82165 11.6369ZM16.3903 11.6534C16.1233 11.7502 15.9135 11.9248 15.7658 12.1734C15.6531 12.3632 15.6359 12.4412 15.6359 12.7632C15.6359 13.0851 15.6531 13.1631 15.7658 13.3529C16.2526 14.1719 17.4202 14.1328 17.8736 13.2823C18.0347 12.9802 18.0217 12.514 17.8433 12.1948C17.5546 11.6782 16.9468 11.4518 16.3903 11.6534ZM22.4107 13.9458V16.3112H22.7531C23.3339 16.3112 23.7674 16.0201 23.9365 15.5163C23.9979 15.3335 24.0075 15.0675 23.9955 13.8684L23.9813 12.4385L23.8448 12.1948C23.6108 11.7771 23.2475 11.5805 22.7095 11.5805H22.4107V13.9458ZM10.4083 15.7761C10.7992 16.1482 11.2846 16.3112 12.0024 16.3112C12.7289 16.3112 13.2071 16.1481 13.6075 15.7638C13.7889 15.5897 13.861 15.5506 14.0004 15.5506C14.2103 15.5506 14.3935 15.7346 14.3935 15.9455C14.3935 16.2981 13.5521 16.8791 12.8228 17.0301C12.402 17.1172 11.6028 17.1172 11.1819 17.0301C10.6932 16.929 10.146 16.6441 9.85445 16.3392C9.5904 16.063 9.5491 15.9095 9.68661 15.7153C9.86308 15.466 10.104 15.4863 10.4083 15.7761Z" fill="#2F80ED"></path>
+                        </svg>
+
+
+                        <span>{{selected_bot_obj.name}}</span>
+                    </a>
+                </li>
+                <li class="nav-item nav-item-submenu" style="flex-direction: column;">
+                    <a class="nav-link collapsed text-truncate tooltip-navbar" id="campaign-navbar-submenu-1" href="#submenu1" data-toggle="collapse" data-target="#submenu1" data-tooltip="tooltip" data-original-title="Campaign">
+                        <svg width="21" height="16" viewBox="0 0 21 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M16.755 7.80907C16.755 8.37358 17.2168 8.83544 17.7813 8.83544H19.8341C20.3986 8.83544 20.8604 8.37358 20.8604 7.80907C20.8604 7.24457 20.3986 6.7827 19.8341 6.7827H17.7813C17.2168 6.7827 16.755 7.24457 16.755 7.80907ZM15.3078 12.7562C15.2272 12.8613 15.1685 12.9815 15.1351 13.1097C15.1018 13.2379 15.0945 13.3715 15.1136 13.5026C15.1327 13.6337 15.1779 13.7596 15.2465 13.8729C15.3151 13.9862 15.4058 14.0846 15.513 14.1623C16.057 14.5626 16.6318 14.9937 17.1758 15.4042C17.6274 15.7429 18.2637 15.6506 18.5922 15.1989C18.5922 15.1887 18.6024 15.1887 18.6024 15.1784C18.683 15.0723 18.7417 14.9513 18.775 14.8223C18.8083 14.6934 18.8156 14.559 18.7965 14.4272C18.7774 14.2954 18.7323 14.1687 18.6637 14.0545C18.5951 13.9403 18.5045 13.8409 18.3971 13.762C17.8532 13.3515 17.2784 12.9204 16.7447 12.5201C16.6369 12.4405 16.5145 12.3828 16.3844 12.3506C16.2543 12.3183 16.1192 12.312 15.9867 12.332C15.8541 12.352 15.7269 12.398 15.6121 12.4672C15.4974 12.5365 15.3975 12.6277 15.318 12.7357C15.318 12.7459 15.3078 12.7562 15.3078 12.7562ZM18.6127 0.429461C18.6127 0.419197 18.6024 0.419197 18.6024 0.408933C18.5234 0.301781 18.4239 0.211378 18.3097 0.142966C18.1955 0.074554 18.0689 0.0294944 17.9371 0.0103998C17.8054 -0.00869482 17.6711 -0.00144437 17.5422 0.0317303C17.4133 0.064905 17.2922 0.123344 17.186 0.203659C16.6421 0.614208 16.057 1.04528 15.5233 1.45583C15.0717 1.79453 14.9896 2.43089 15.3283 2.87223C15.3283 2.88249 15.3386 2.88249 15.3386 2.89275C15.6773 3.34436 16.3033 3.43673 16.755 3.09803C17.2989 2.69774 17.8737 2.2564 18.4177 1.84585C18.859 1.51741 18.9411 0.881064 18.6127 0.429461ZM6.49124 4.72996H2.38575C1.25674 4.72996 0.333008 5.65369 0.333008 6.7827V8.83544C0.333008 9.96445 1.25674 10.8882 2.38575 10.8882H3.41212V13.9673C3.41212 14.5318 3.87399 14.9937 4.43849 14.9937C5.003 14.9937 5.46487 14.5318 5.46487 13.9673V10.8882H6.49124L11.6231 13.9673V1.65084L6.49124 4.72996ZM14.189 7.80907C14.189 6.444 13.5937 5.21235 12.6495 4.37073V11.2372C13.5937 10.4058 14.189 9.17415 14.189 7.80907Z" fill="#262F56"/>
+                        </svg>
+                        <span>Campaign</span>
+                    </a>
+                    <div class="collapse" id="submenu1" aria-expanded="false">
+                        <ul class="flex-column" style="padding: 0;">
+                            <li class="nav-item nav-item-menu">
+                                {% if access_token %}
+                                <a class="nav-link nav-link-sub-menu tooltip-navbar" href="/campaign/dashboard/?bot_pk={{ selected_bot_obj.pk }}&access_token={{access_token}}" data-tooltip="tooltip" data-original-title="Overview">
+                                {% else %}
+                                <a class="nav-link nav-link-sub-menu tooltip-navbar" href="/campaign/dashboard/?bot_pk={{ selected_bot_obj.pk }}" data-tooltip="tooltip" data-original-title="Overview">
+                                {% endif %}
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect x="1.33301" y="1.33331" width="6" height="6" rx="1.33333" fill="#262F56"/>
+                                        <rect x="8.66699" y="1.33331" width="6" height="6" rx="1.33333" fill="#262F56"/>
+                                        <rect x="1.33301" y="8.66669" width="6" height="6" rx="1.33333" fill="#262F56"/>
+                                        <rect x="8.66699" y="8.66669" width="6" height="6" rx="1.33333" fill="#262F56"/>
+                                    </svg>
+                                    <span>Overview</span>
+                                </a>
+                            </li>
+
+                            <li class="nav-item nav-item-menu" id="analytics_link">
+                                {% if access_token %}
+                                <a class="nav-link tooltip-navbar" href="/campaign/campaign-analytics/?bot_pk={{ selected_bot_obj.pk }}&access_token={{access_token}}" style="cursor: pointer;" id="campaign_analytics_link" data-tooltip="tooltip" data-original-title="Analytics">
+                                {% else %}
+                                <a class="nav-link tooltip-navbar analytics-data" href="/campaign/campaign-analytics/?bot_pk={{ selected_bot_obj.pk }}" style="cursor: pointer;" id="campaign_analytics_link" data-tooltip="tooltip" data-original-title="Analytics">
+                                {% endif %}
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M18.724 11.0394C18.9008 11.0394 19.0442 10.896 19.0442 10.7192C19.0399 7.18412 16.1753 4.31944 12.6402 4.3152C12.4633 4.3152 12.32 4.45856 12.32 4.6354V10.415C12.3203 10.7598 12.5996 11.0393 12.9444 11.04L18.724 11.0394ZM19.0442 12H12.9604C12.7664 11.9752 12.5798 12.0834 12.5049 12.2641C12.4301 12.4448 12.4855 12.6533 12.6402 12.773L16.9424 17.0752C17.0674 17.2002 17.2701 17.2002 17.3952 17.0752C18.6602 15.8167 19.3693 14.1046 19.3644 12.3202C19.3644 12.1434 19.221 12 19.0442 12ZM15.474 17.7098C14.2347 18.9698 12.5426 19.681 10.7753 19.6848C8.37198 19.6949 6.14582 18.422 4.93543 16.3457C3.72503 14.2693 3.71429 11.705 4.90725 9.61858C6.10021 7.53218 8.31563 6.2407 10.719 6.23064C10.8958 6.23064 11.0392 6.374 11.0392 6.55084V12.6346C11.0499 12.7523 11.0961 12.864 11.1717 12.9548L15.474 17.257C15.599 17.3821 15.599 17.5848 15.474 17.7098Z" fill="#262F56"/>
+                                        <mask id="mask0" mask-type="alpha" maskUnits="userSpaceOnUse" x="4" y="4" width="16" height="16">
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M18.724 11.0394C18.9008 11.0394 19.0442 10.896 19.0442 10.7192C19.0399 7.18412 16.1753 4.31944 12.6402 4.3152C12.4633 4.3152 12.32 4.45856 12.32 4.6354V10.415C12.3203 10.7598 12.5996 11.0393 12.9444 11.04L18.724 11.0394ZM19.0442 12H12.9604C12.7664 11.9752 12.5798 12.0834 12.5049 12.2641C12.4301 12.4448 12.4855 12.6533 12.6402 12.773L16.9424 17.0752C17.0674 17.2002 17.2701 17.2002 17.3952 17.0752C18.6602 15.8167 19.3693 14.1046 19.3644 12.3202C19.3644 12.1434 19.221 12 19.0442 12ZM15.474 17.7098C14.2347 18.9698 12.5426 19.681 10.7753 19.6848C8.37198 19.6949 6.14582 18.422 4.93543 16.3457C3.72503 14.2693 3.71429 11.705 4.90725 9.61858C6.10021 7.53218 8.31563 6.2407 10.719 6.23064C10.8958 6.23064 11.0392 6.374 11.0392 6.55084V12.6346C11.0499 12.7523 11.0961 12.864 11.1717 12.9548L15.474 17.257C15.599 17.3821 15.599 17.5848 15.474 17.7098Z" fill="white"/>
+                                        </mask>
+                                        <g mask="url(#mask0)">
+                                        </g>
+                                    </svg>    
+
+                                    <span>Analytics</span>
+                                </a>
+                            </li>
+
+                            <li class="nav-item nav-item-menu" id="api_integration_link">
+                                <a class="nav-link tooltip-navbar" href="/campaign/api-editor/?bot_pk={{selected_bot_obj.pk}}" style="cursor: pointer;" id="campaign_api_integration_link" data-tooltip="tooltip" data-original-title="API Integration">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M15.1321 1.61558L14.3868 0.870264C14.3586 0.842139 14.3235 0.829834 14.2866 0.829834C14.2496 0.829834 14.2145 0.843897 14.1864 0.870264L12.8487 2.20796C12.2671 1.81395 11.5806 1.60388 10.8782 1.60503C9.97816 1.60503 9.07816 1.9478 8.39085 2.63511L6.59964 4.42632C6.57347 4.45275 6.55879 4.48844 6.55879 4.52563C6.55879 4.56283 6.57347 4.59852 6.59964 4.62495L11.3756 9.40093C11.4037 9.42905 11.4389 9.44136 11.4758 9.44136C11.511 9.44136 11.5479 9.42729 11.576 9.40093L13.3672 7.60972C14.5784 6.39683 14.7207 4.52124 13.7944 3.15366L15.1321 1.81597C15.1866 1.75972 15.1866 1.67007 15.1321 1.61558ZM9.17659 8.60991C9.15016 8.58374 9.11447 8.56906 9.07728 8.56906C9.04008 8.56906 9.00439 8.58374 8.97796 8.60991L7.80726 9.78061L6.21995 8.19331L7.39241 7.02085C7.44691 6.96636 7.44691 6.87671 7.39241 6.82222L6.75257 6.18237C6.72614 6.1562 6.69045 6.14152 6.65325 6.14152C6.61606 6.14152 6.58037 6.1562 6.55394 6.18237L5.38148 7.35483L4.62562 6.59897C4.61249 6.58584 4.59686 6.57549 4.57964 6.56855C4.56242 6.5616 4.54398 6.5582 4.52542 6.55854C4.49027 6.55854 4.45335 6.57261 4.42523 6.59897L2.63577 8.39019C1.42464 9.60132 1.28226 11.4787 2.20863 12.8462L0.87093 14.1839C0.844759 14.2104 0.830078 14.2461 0.830078 14.2833C0.830078 14.3204 0.844759 14.3561 0.87093 14.3826L1.61624 15.1279C1.64437 15.156 1.67952 15.1683 1.71644 15.1683C1.75335 15.1683 1.78851 15.1542 1.81663 15.1279L3.15433 13.7902C3.74671 14.1927 4.43577 14.3931 5.12484 14.3931C6.02484 14.3931 6.92484 14.0503 7.61214 13.363L9.40335 11.5718C9.45784 11.5173 9.45784 11.4277 9.40335 11.3732L8.64749 10.6173L9.81995 9.44487C9.87445 9.39038 9.87445 9.30073 9.81995 9.24624L9.17659 8.60991Z" fill="#262F56"/>
+                                    </svg>
+
+                                    <span>API Integration</span>
+                                </a>
+                            </li>
+
+                            <li class="nav-item nav-item-menu" id="api_documentation_link">
+                                <a class="nav-link tooltip-navbar" href="/campaign/campaign-api-documentation/?bot_pk={{selected_bot_obj.pk}}" style="cursor: pointer;" id="campaign_api_documentation_link" data-tooltip="tooltip" data-original-title="API Documentation">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M8.25 1V4.9375C8.25 5.66237 8.83763 6.25 9.5625 6.25H13.5V13.6875C13.5 14.4124 12.9124 15 12.1875 15H4.3125C3.58763 15 3 14.4124 3 13.6875V2.3125C3 1.58763 3.58763 1 4.3125 1H8.25Z" fill="#2D2C2C"/>
+                                        <path d="M9.125 1.21875V4.9375C9.125 5.17912 9.32088 5.375 9.5625 5.375H13.2812L9.125 1.21875Z" fill="#2D2C2C"/>
+                                    </svg>
+                                        
+
+                                    <span>API Documentation</span>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </div>
+                </li>
+                
+                <!-- Divider -->
+                <hr class="sidebar-divider">
+                <div class="text-center d-none d-md-inline">
+                    <button class="rounded-circle border-0" id="sidebarToggle" onclick="change_sales_logo_property()"></button>
+                </div>
+            </ul>
+            <!-- End of Sidebar -->
+            <!-- Content Wrapper -->
+            <div id="content-wrapper" class="d-flex flex-column">
+                <!-- Main Content -->
+                <div id="content">
+                    <!-- Topbar -->
+                    <nav class="navbar navbar-expand navbar-light bg-white topbar  static-top shadow">
+                        <div class="warning-msg-namespace" id="warning-msg-namespace"  style="display:none"> 
+                            <svg width="24" height="24" viewBox="0 0 24 24" flex="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 3C16.9707 3 21 7.0302 21 12C21 16.9698 16.9707 21 12 21C7.0293 21 3 16.9698 3 12C3 7.0302 7.0293 3 12 3ZM12.0016 14.7034C11.5052 14.7034 11.1028 15.1058 11.1028 15.6021C11.1028 16.0985 11.5052 16.5009 12.0016 16.5009C12.498 16.5009 12.9004 16.0985 12.9004 15.6021C12.9004 15.1058 12.498 14.7034 12.0016 14.7034ZM11.9997 7.5C11.5381 7.50017 11.1578 7.84774 11.106 8.29536L11.1 8.40032L11.1016 12.9011L11.1077 13.0061C11.1599 13.4537 11.5404 13.801 12.0019 13.8008C12.4635 13.8006 12.8438 13.4531 12.8956 13.0054L12.9016 12.9005L12.9 8.39968L12.8939 8.29472C12.8418 7.84713 12.4612 7.49983 11.9997 7.5Z" fill="#F5C828"/>
+                                </svg>		
+                             <p>Namespace ID cannot be empty for the selected BSP</p>
+                        </div>
+                        <div class="sp-char-warning-msg-namespace" id="sp-char-warning-msg-namespace" style="display:none"> 
+                            <svg width="24" height="24" viewBox="0 0 24 24" flex="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 3C16.9707 3 21 7.0302 21 12C21 16.9698 16.9707 21 12 21C7.0293 21 3 16.9698 3 12C3 7.0302 7.0293 3 12 3ZM12.0016 14.7034C11.5052 14.7034 11.1028 15.1058 11.1028 15.6021C11.1028 16.0985 11.5052 16.5009 12.0016 16.5009C12.498 16.5009 12.9004 16.0985 12.9004 15.6021C12.9004 15.1058 12.498 14.7034 12.0016 14.7034ZM11.9997 7.5C11.5381 7.50017 11.1578 7.84774 11.106 8.29536L11.1 8.40032L11.1016 12.9011L11.1077 13.0061C11.1599 13.4537 11.5404 13.801 12.0019 13.8008C12.4635 13.8006 12.8438 13.4531 12.8956 13.0054L12.9016 12.9005L12.9 8.39968L12.8939 8.29472C12.8418 7.84713 12.4612 7.49983 11.9997 7.5Z" fill="#F5C828"/>
+                                </svg>		
+                             <p>Incorrect format for Namespace ID, please enter a valid Namespace ID from your WhatsApp Manager account</p>
+                        </div>
+                        <div class="warning-msg-namespace-length" id="warning-msg-namespace-length" style="display:none"> 
+                            <svg width="24" height="24" viewBox="0 0 24 24" flex="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 3C16.9707 3 21 7.0302 21 12C21 16.9698 16.9707 21 12 21C7.0293 21 3 16.9698 3 12C3 7.0302 7.0293 3 12 3ZM12.0016 14.7034C11.5052 14.7034 11.1028 15.1058 11.1028 15.6021C11.1028 16.0985 11.5052 16.5009 12.0016 16.5009C12.498 16.5009 12.9004 16.0985 12.9004 15.6021C12.9004 15.1058 12.498 14.7034 12.0016 14.7034ZM11.9997 7.5C11.5381 7.50017 11.1578 7.84774 11.106 8.29536L11.1 8.40032L11.1016 12.9011L11.1077 13.0061C11.1599 13.4537 11.5404 13.801 12.0019 13.8008C12.4635 13.8006 12.8438 13.4531 12.8956 13.0054L12.9016 12.9005L12.9 8.39968L12.8939 8.29472C12.8418 7.84713 12.4612 7.49983 11.9997 7.5Z" fill="#F5C828"/>
+                                </svg>		
+                             <p>Invalid length for Namespace ID, please enter a valid Namespace ID from your WhatsApp Manager account</p>
+                        </div>
+                        <div class="success-msg-namespace" id="success-msg-namespace" style="display:none"> 
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M18.5633 4.75247C18.1968 4.29383 17.6327 4 17 4H5C3.89543 4 3 4.89543 3 6V18C3 19.1046 3.89543 20 5 20H17C18.1046 20 19 19.1046 19 18V6.57154L11.5762 15.4801L11.0504 16.1111L10.4697 15.5303L6.46967 11.5303C6.17678 11.2374 6.17678 10.7626 6.46967 10.4697C6.76256 10.1768 7.23744 10.1768 7.53033 10.4697L10.9496 13.8889L18.5633 4.75247Z" fill="#10B981"/>
+                                <path d="M7 9.00003L11 13L21 1.00003" stroke="#10B981" stroke-width="1.5" stroke-linecap="round"/>
+                                </svg>		
+                             <p>Changes saved successfully</p>
+                        </div>
+                        <!-- Sidebar Toggle (Topbar) -->
+                        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3 sidebar-toggle-btn">
+                        <i class="fa fa-bars"></i>
+                        </button>
+                        <!-- Topbar Navbar -->
+                        <ul class="navbar-nav ml-auto">
+                            <li class="nav-item dropdown no-arrow">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ request.user.username }}</span>
+                                <img class="img-profile rounded-circle" src="/static/EasyAssistApp/img/personImg.svg">
+                                </a>
+                                <!-- Dropdown - User Information -->
+                                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                                    <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" data-target="#logoutModal">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Logout
+                                    </a>
+                                </div>
+                            </li>
+                            <!-- Nav Item - User Information -->
+                        </ul>
+                    </nav>
+                    <!-- End of Topbar -->
+                    {% block content %}
+                    {% endblock %}
+                </div>
+                <!-- End of Main Content -->
+                <footer id="campaign-footer" class="sticky-footer bg-white">
+                    <div class="container my-auto" style="display: inline-table;">
+                        <div class="copyright text-center my-auto">
+                            <span style="float: left;">Version: {{ request.session.EASYCHAT_VERSION }}</span>
+                            <span>Copyright &copy; AllinCall Research and Solutions Pvt Ltd.&nbsp;&nbsp;
+                                <!-- <i class="fas fa-info-circle" onclick="show_cobrowsing_feedback_module(this)" style="cursor:pointer;"></i> -->
+                            </span>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+            <!-- End of Content Wrapper -->
+        </div>
+        <!-- End of Page Wrapper -->
+        <!-- Scroll to Top Button-->
+        <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+        </a>
+        <!-- Logout Modal-->
+        <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    </div>
+                    <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                        <a class="btn btn-primary" href="/campaign/logout/">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="campaign-snackbar"></div>
+
+        <div class="modal fade campaign-refresh-custom-modal show" id="session_timeout_modal" tabindex="-1" role="dialog" aria-labelledby="whatsapp_config_reset_modal_label">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content p-4">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-sm-12 gif-container d-flex align-items-center justify-content-center">
+                                <img src="/static/EasyChatApp/img/session_expiry.gif" />
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="text-center modal-body-heading">
+                                    Session Timeout
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="text-center modal-body-note">
+                                    Your session have been timed out please re-login to continue.
+                                    
+                                </div>
+                                <p class="error_element"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer px-3 pt-0 m-0">
+                        <button class="btn campaign-modal-refresh-btn" type="button" data-dismiss="modal" onclick="location.reload()">Refresh</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="cogno-celebration">
+            <div class="cogno-celebration-piece"></div>
+            <div class="cogno-celebration-piece"></div>
+            <div class="cogno-celebration-piece"></div>
+            <div class="cogno-celebration-piece"></div>
+            <div class="cogno-celebration-piece"></div>
+            <div class="cogno-celebration-piece"></div>
+            <div class="cogno-celebration-piece"></div>
+            <div class="cogno-celebration-piece"></div>
+            <div class="cogno-celebration-piece"></div>
+            <div class="cogno-celebration-piece"></div>
+            <div class="cogno-celebration-piece"></div>
+            <div class="cogno-celebration-piece"></div>
+            <div class="cogno-celebration-piece"></div>
+        </div>
+
+        <script type="text/javascript">
+            window.BOT_ID = "{{ selected_bot_obj.pk }}"
+            window.DEFAULT_CAMPAIGN = ['{{ selected_campaign_obj.pk }}']
+            window.DEFAULT_START_DATE = "{{start_date}}"
+            window.DEFAULT_END_DATE = "{{end_date}}"
+            window.API_TIMEOUT = 30000
+        </script>
+        <script src="{% static 'CampaignApp/js/bootstrap.bundle.min.js' %}"></script>
+        <script src="{% static 'CampaignApp/js/bootstrap-select.min.js' %}"></script>
+        <script src="{% static 'CampaignApp/vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+        <!-- Custom scripts for all pages-->
+        <script src="{% static 'CampaignApp/js/sb-admin-2.min.js' %}"></script>
+        <script src="{% static 'CampaignApp/js/crypto-js.min.js' %}"></script>
+        <script src="/static/CampaignApp/vendor/datatables/jquery.dataTables.min.js"></script>
+        <script src="/static/CampaignApp/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+        <script type="text/javascript" src="{% static 'CampaignApp/js/html2canvas.min.js' %}"></script>
+        <script src="{% static 'CampaignApp/js/encrypt.js' %}"></script>
+        <script type="text/javascript" src="{% static 'CampaignApp/js/easyassist-custom-select.js' %}"></script>
+        <script type="text/javascript" src="{% static 'CampaignApp/js/col-resizable.js' %}"></script>
+        <script src="{% static 'CampaignApp/js/console.js' %}?v={% random_int 1 100 %}"></script>
+        <script src="{% static 'CampaignApp/js/voice_campaign_details.js' %}?v={% random_int 1 100 %}"></script>
+        <script src="{% static 'CampaignApp/js/whatsapp_campaign_details.js' %}?v={% random_int 1 100 %}"></script>
+        <script src="{% static 'CampaignApp/js/utils_validations.js' %}?v={% random_int 1 100 %}"></script>
+    </body>
+</html>

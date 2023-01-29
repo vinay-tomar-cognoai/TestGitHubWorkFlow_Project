@@ -1,0 +1,114 @@
+<div class="col s12 l8 m12 p0 pl-lg">
+    <div class="easychat-analytics-card-area-wrapper">
+        <div class="easychat-analytics-card-heading-text-wrapper">
+            <div class="easychat-analytics-card-heading-div" style="display: flex;">
+                Message Analytics
+                <div id="message-analytics-percentage-change"></div>
+            </div>
+            <div class="easychat-analytics-card-action-btns">
+                <a class="modal-trigger easychat-analytics-card-filter-btn"
+                    onclick="export_analytics_in_excel('message_analytics')" style="cursor: pointer;">
+                    {% include "EasyChatApp/analytics/export.html" %}
+
+
+                </a>
+
+                <a href="#modal-message-analytics-settings" class="modal-trigger easychat-analytics-card-filter-btn">
+                    {% include "EasyChatApp/analytics/filter.html" %}
+
+                </a>
+
+
+            </div>
+
+        </div>
+        <div class="easychat-analytics-card-heading-text-wrapper">
+            <div class="easychat-analytics-card-subheading-div" id="message-analytics-range">
+                <span>Range :</span>
+            </div>
+
+
+        </div>
+
+        <div class="easychat-analytics-graph-wrapper">
+            <div id="message-analytics-graph"></div>
+
+        </div>
+    </div>
+
+</div>
+<div id="modal-message-analytics-settings" class="modal easychat-custom-modals-container">
+
+    <div class="modal-content">
+        <div class="row" style="margin-bottom: 12px !important;">
+            <div class="modal-header">
+                <div class="modal-heading-text-div">Filter - Message Analytics</div>
+                <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                    <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473
+                            6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347
+                            19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z"
+                            fill="black" fill-opacity="0.54" />
+                    </svg>
+
+                </a>
+            </div>
+
+            <div class="modal-overflow-content-div">
+
+                <div class="col s12 analytics-filter-select-area">
+                    <div class="filter-heading">
+                        Frequency
+                    </div>
+                    <label>
+                        <input type="radio" name="message-analytics-frequency" checked value="1" />
+                        <div class="filter-box">
+                            <span>Daily</span>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="message-analytics-frequency" value="2">
+                        <div class=" filter-box">
+                            <span>Weekly</span>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="message-analytics-frequency" value="3">
+                        <div class=" filter-box">
+                            <span>Monthly</span>
+                        </div>
+                    </label>
+
+
+
+
+                </div>
+
+
+                <div class="col s11 analytics-custom-date-select-area" id="analytics-custom-date-select-area">
+
+                    <div class="col s6" style="padding-left: 2px; font-weight: 600;color: #4d4d4d; font-size: 14px;">
+                        Start Date
+                        <input type="date" class="message-default-start-date" value='{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}'
+                            id="message-analytics-start-date" placeholder="Enter start date"
+                            style="border: 2px solid #F6F6F6 !important; border-radius:4px !important;">
+                    </div>
+                    <div class="col s6"
+                        style="font-weight: 600; padding-right: 0px !important;color: #4d4d4d; font-size: 14px;">
+                        End Date
+                        <input type="date" class="message-default-end-date" value='{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}'
+                            placeholder="Enter end date" id="message-analytics-end-date"
+                            style="border: 2px solid #F6F6F6 !important; border-radius:4px !important;">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0)" class="modal-close btn filter-modal-footer-btn"
+            onclick="load_message_analytics()">Apply Filter</a>
+    </div>
+</div>
+{% include "EasyChatApp/analytics/individual_export.html" with export_id="modal-email-for-export-message-analytics" input_id="export-data-email-message-analytics" export_name="Export - Message Analytics" export_function="export_analytics_in_excel('message_analytics',true)"%}

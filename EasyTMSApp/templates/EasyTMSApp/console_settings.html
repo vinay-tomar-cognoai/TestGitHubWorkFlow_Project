@@ -1,0 +1,416 @@
+{% extends 'EasyTMSApp/console.html' %}
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'EasyTMSApp/css/console_settings.css' %}">
+<script src="{% static 'EasyTMSApp/js/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" src="{% static 'EasyTMSApp/js/jscolor.min.js' %}"></script>
+<!-- Begin Page Content -->
+
+<style type="text/css">
+    .generate-document-heading {
+        font-weight: 600;
+        font-size: 14px;
+        color: #4D4D4D;
+        margin-bottom: 20px;
+    }
+
+    .generate-document-btn-setting {
+        width: 100%;
+        height: 39px;
+        background: #0254D7;
+        border: none !important;
+        box-sizing: border-box;
+        border-radius: 10px;
+        font-weight: normal;
+        font-size: 13px;
+        color: #FFFFFF;
+        outline: none !important;
+    }
+
+    .generated-document-btn-setting,
+    .download-generated-document-btn-setting {
+        width: 100%;
+        height: 39px;
+        background: transparent;
+        border: none !important;
+        box-sizing: border-box;
+        border-radius: 10px;
+        font-weight: normal;
+        font-size: 13px;
+        color: #0254D7;
+        text-align: left !important;
+        outline: none !important;
+    }
+
+    .grnerated-document-item {
+        width: 100%;
+        height: 42px;
+        background: #FFFFFF;
+        border: 1px solid #E6E6E6;
+        box-sizing: border-box;
+        border-radius: 5px;
+        align-items: center;
+        display: flex;
+        justify-content: center;
+    }
+
+    .crm-integration-document-items {
+        margin-bottom: 10px;
+    }
+</style>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12 mb">
+            <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-home" aria-selected="true">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="pills-options-tab" data-toggle="pill" href="#pills-options-settings" role="tab" aria-controls="pills-contact" aria-selected="false">Options</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="pills-public-api-tab" data-toggle="pill" href="#pills-public-api-settings" role="tab" aria-controls="pills-contact" aria-selected="false">API Documents</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="pills-tabContent">
+
+
+                <!-- PROFILE TAB -->
+                <div class="tab-pane fade show active" id="pills-profile" role="tabpanel" aria-labelledby="pills-home-tab">
+                    <div class="row" style="flex-direction: column;">
+                        <div class="col-md-6">
+                            <div class="input-group input-group-sm mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroup-sizing-sm">Email</span>
+                                </div>
+                                <input type="text" style="background-color: white !important;" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" value="{{ active_agent.user.email }}" autocomplete="off" disabled>
+                            </div>
+                            <div class="input-group input-group-sm mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroup-sizing-sm">Name</span>
+                                </div>
+                                <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="admin-name"
+                                    value="{{ active_agent.user.first_name }}" autocomplete="off" maxlength="30">
+                                <div id="name-error-message" class="invalid-feedback">
+                                    Maximum Character Limit reached
+                                </div>
+                            </div>
+                            <div class="input-group input-group-sm change-password-option">
+                                <button type="button" class="change-password-btn" id="change-password-button" onclick="show_change_password()">Change Password?</button>
+                            </div>
+                        </div>
+                        <div class="col-md-6" style="display:none;" id="change-password-div">
+                            <div class="input-group input-group-sm mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroup-sizing-sm">Old Password</span>
+                                </div>
+                                <input type="password" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="old-password" value="" autocomplete="new-password">
+                            </div>
+                            <div class="input-group input-group-sm mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroup-sizing-sm">New Password</span>
+                                </div>
+                                <input type="password" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="new-password"
+                                    value="">
+                            </div>
+                            <div class="input-group input-group-sm mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroup-sizing-sm">Confirm Password</span>
+                                </div>
+                                <input type="password" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="confirm-password" value="">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group input-group-sm">
+                                <p style="color:green;" id="save-details-error"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-12" id="save-btn-admin">
+                            <button type="button" class="btn btn-success admin-setting-btn" style="width: 100px;" onclick="save_admin_details(this)">Save</button>
+                            <button type="button" class="btn btn-secondary admin-setting-btn" style="width: 100px; margin-left: 15px; visibility: hidden;" onclick="hide_change_password()" id="change_password_cancel_btn">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- OPTIONS TAB -->
+                <div class="tab-pane fade" id="pills-options-settings" role="tabpanel" aria-labelledby="pills-options-settings-tab">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3" style="padding: 0.5em 1.25em 0em 1.25em !important;">
+                                    <div class="row">
+                                        <div class="col-md-12 col-sm-12" id="pills-options">
+                                            <ul class="nav nav-tabs nav-fill" id="pills-options-tab" role="tablist">
+                                                <li class="nav-item">
+                                                    <a class="nav-link active" id="pills-tms-general-tab" data-toggle="pill" href="#pills-tms-general-options" role="tab" aria-controls="pills-options-tms-general" aria-selected="true"> General </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-content pills-options-tabContent">
+                                    <!--  TMS Settings -->
+                                    <div class="tab-pane fade show active" id="pills-tms-general-options" role="tabpanel" aria-labelledby="pills-tms-general-tab">
+                                        <div class="card shadow mb-4">
+                                            <div class="card-body">
+                                                <div class="card">
+                                                    <div class="card-header py-3" style="padding: 0.5em 1.25em 0.5em 1.25em !important;">
+                                                        <div class="row">
+                                                            <div class="col-mb-5" style="margin-top: 5px;">
+                                                                <h6 class="ml-3 text-primary card-heading-text">Admin Settings</h6>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body table-responsive table-card-body">
+                                                        <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;" aria-describedby="Setting Options Table">
+                                                            <tbody>
+                                                                <tr class="tr-flex-sm">
+                                                                    <th scope="row">Change Console theme color</th>
+                                                                    <td style="vertical-align: inherit;">
+                                                                        {% if access_token.get_tms_console_theme_color == None %}
+                                                                            <input type="text" class="form-control jscolor" id="tms-console-theme-color" placeholder="HEX" value="" style="width:50%;">
+                                                                        {% else %}
+                                                                            <input type="text" class="form-control jscolor" id="tms-console-theme-color" placeholder="HEX" value="{{ access_token.get_tms_console_theme_color.hex }}" style="width:50%;">
+                                                                        {% endif %}
+                                                                    </td>
+                                                                </tr>
+
+                                                                <tr class="tr-flex-sm">
+                                                                    <th scope="row">
+                                                                        Change Logo
+                                                                    </th>
+                                                                    <td style="vertical-align: inherit;" id="tms-logo-image-data">
+                                                                        {% if access_token.tms_console_logo %}
+                                                                        <div class="row">
+                                                                            <div class="col-md-6 col-sm-12" style="padding-left: 0.7em;display: flex;align-items: center;">
+                                                                                <button class="mb-2 mr-sm-2" data-toggle="modal" type="button" data-target="#tms_logo_upload_modal" id="tms_logo_upload_button">Change Logo
+                                                                                </button>
+                                                                            </div>
+                                                                            <div class="col-md-6 col-sm-12">
+                                                                                <img src="/{{ access_token.tms_console_logo }}" id="tms-logo-image" style="height: 9em; display: inline-box; width: 100%;" alt="tmslogo">
+                                                                            </div>
+                                                                        </div>
+                                                                        {% else %}
+                                                                        <button data-toggle="modal" type="button" data-target="#tms_logo_upload_modal" id="tms_logo_upload_button">Upload Logo
+                                                                        </button>
+                                                                        {% endif %}
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12" style="padding: 0 1.25em 1.25em 1.25em;">
+                                    <p id="save-tms-meta-details-error"></p>
+                                    <button type="button" class="btn btn-success float-right btn-width-100" onclick="save_tms_meta_details_general(this, 'false')">Save</button>
+                                    <button type="button" class="btn btn-info float-left btn-width-100" onclick="save_tms_meta_details_general(this, 'true')">Reset All</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="tab-pane fade" id="pills-public-api-settings" role="tabpanel" aria-labelledby="pills-public-api-settings">
+                    <div class="row">
+                        <div class="col-md-12">
+
+                            <div class="card custom-card-settings">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary heading-text-primary">Generated documents</h6>
+                                </div>
+                                <div class="card-body">
+                                    <h4 class="generate-document-heading">Auth Token Generation API
+                                        <span class="tms-tooltip" data-toggle="tooltip" data-placement="bottom" title="Auth token generated using this API will be required in all other APIs for authentication."><em class="fas fa-info-circle"></em></span>
+                                    </h4>
+                                    <div class="row crm-integration-document-items">
+                                        <div class="col-sm-7 mb-2">
+                                            <div class="grnerated-document-item">
+                                                Auth Token Generation API
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-12  mb-1" style="text-align: right;">
+                                            <button class="download-generated-document-btn-setting" style="width: 100%;"  onclick="window.open('/tms/download-crm-document/auth-token')">Download</button>
+                                        </div>
+                                    </div>
+
+                                    <h4 class="generate-document-heading">Cogno Desk APIs</h4>
+                                    <div class="row crm-integration-document-items">
+                                        <div class="col-sm-7 mb-2">
+                                            <div class="grnerated-document-item">
+                                                Generate Ticket API
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-12  mb-1" style="text-align: right;">
+                                            <button class="download-generated-document-btn-setting" style="width: 100%;"  onclick="window.open('/tms/download-crm-document/ticket_generation')">Download</button>
+                                        </div>
+                                    </div>
+                                    <div class="row crm-integration-document-items">
+                                        <div class="col-sm-7 mb-2">
+                                            <div class="grnerated-document-item">
+                                                Get Ticket Details API
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-12  mb-1" style="text-align: right;">
+                                            <button class="download-generated-document-btn-setting" style="width: 100%;"  onclick="window.open('/tms/download-crm-document/ticket_details')">Download</button>
+                                        </div>
+                                    </div>
+                                    <div class="row crm-integration-document-items">
+                                        <div class="col-sm-7 mb-2">
+                                            <div class="grnerated-document-item">
+                                                Get Ticket Activity API
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-12  mb-1" style="text-align: right;">
+                                            <button class="download-generated-document-btn-setting" style="width: 100%;"  onclick="window.open('/tms/download-crm-document/ticket_activity')">Download</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade upload_file_modal" id="tms_logo_upload_modal" tabindex="-1" role="dialog" aria-labelledby="document_upload_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" >Upload Logo</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <label for="tms_logo_input" class="custom-file-upload">
+                        Choose File
+                        </label>
+                        <input type="file" id="tms_logo_input" class="form-control" name="" style="display: none !important;" accept=".png, .jpg, .jpeg, .PNG">
+                    </div>
+                    <div class="col-sm-11">
+                        <div class="col-md-12 col-sm-12 modal-upload-file mt-4" style="display: none;" id="tms_image_file_upload_bar">
+                            <div class="col-md-1 col-sm-1 width-auto-sm pd-mg">
+                                <svg width="24" height="32" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M14 0V8.50667C14 9.33333 14.6667 10 15.4933 10H24V30.5067C24 31.3333 23.3333 32 22.5067 32H1.49333C0.666665 32 0 31.3333 0 30.5067V1.49333C0 0.666667 0.666665 0 1.49333 0H14ZM17.4404 0.426667L23.5471 6.56C23.8404 6.85333 24.0004 7.22667 24.0004 7.62667V8H16.0004V0H16.3737C16.7737 0 17.147 0.16 17.4404 0.426667Z" fill="#ef827f"/>
+                                    <defs>
+                                        <linearGradient id="paint0_linear" x1="2.39111" y1="3" x2="23.3908" y2="32.0002" gradientUnits="userSpaceOnUse">
+                                            <stop stop-color="#E08F8D"/>
+                                            <stop offset="1" stop-color="#FE736F"/>
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                            </div>
+                            <div class="col-md-10 col-sm-10 file-name-container">
+                                <div class="file-name-div">
+                                </div>
+                                <div class="progress">
+                                    <div class="indeterminate"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-1 col-sm-1 width-auto-sm pr-sm-0">
+                                <button class="upload-file-cross-btn" type="button" onclick="remove_uploaded_file();">
+                                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M6.48438 4.98438L9.85938 1.64062C10.0469 1.45312 10.0469 1.10938 9.85938 0.921875L9.07812 0.140625C8.89062 -0.046875 8.54688 -0.046875 8.35938 0.140625L5.01562 3.51562L1.64062 0.140625C1.45312 -0.046875 1.10938 -0.046875 0.921875 0.140625L0.140625 0.921875C-0.046875 1.10938 -0.046875 1.45312 0.140625 1.64062L3.51562 4.98438L0.140625 8.35938C-0.046875 8.54688 -0.046875 8.89062 0.140625 9.07812L0.921875 9.85938C1.10938 10.0469 1.45312 10.0469 1.64062 9.85938L5.01562 6.48438L8.35938 9.85938C8.54688 10.0469 8.89062 10.0469 9.07812 9.85938L9.85938 9.07812C10.0469 8.89062 10.0469 8.54688 9.85938 8.35938L6.48438 4.98438Z" fill="#E08F8D"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <p style="padding-top: 1em;" id="tms_logo_input_error"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" id="modal_tms_image_buttons">
+                {% if access_token.tms_console_logo|length %}
+                <button class="btn btn-outline-primary mr-auto" onclick="delete_tms_logo()" style="margin-right: auto !important;">Delete</button>
+                {% endif %}
+                <button class="btn btn-text-only" type="button" data-dismiss="modal" id="tms_logo_upload_modal_close">Cancel</button>
+                <button class="btn btn-primary" onclick="upload_tms_logo(this)">Upload</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        var option_btn_id = location.hash;
+        if( option_btn_id){
+            $(option_btn_id).click();
+        }
+    });
+
+    var tms_logo_input_file_global = undefined;
+    document.getElementById("tms_logo_input").addEventListener('change', function(event) {
+        var file = document.getElementById("tms_logo_input").files[0];
+        if(file) {
+        tms_logo_input_file_global = ($("#tms_logo_input"))[0].files[0];
+        var filename = file.name;
+        if(filename.length > 30) filename = filename.substr(0, 30) + "...";
+        $('#tms_logo_upload_modal .file-name-div').html(filename);
+        $('#tms_logo_upload_modal .modal-upload-file').show();
+        $('#tms_logo_upload_modal .progress').show();
+
+        var progress_div = $('#tms_logo_upload_modal .progress')[0].children[0];
+        progress_div.classList.remove('determinate');
+        progress_div.classList.add('indeterminate');
+        setTimeout(function() {
+            progress_div.classList.remove('indeterminate');
+            progress_div.classList.add('determinate');
+        }, 300);
+        } else {
+        if(tms_logo_input_file_global == undefined){
+            $('#tms_logo_upload_modal .file-name-div').html("No file selected");
+            $('#tms_logo_upload_modal .progress').hide();
+        }
+        }
+    });
+
+    function remove_uploaded_file() {
+        $('#tms_logo_upload_modal .file-name-div').html("");
+        $('#tms_logo_upload_modal .modal-upload-file').hide();
+        document.getElementById("tms_logo_input").value = "";
+        tms_logo_input_file_global = undefined;
+    }
+    
+    function show_change_password() {
+        document.getElementById('change-password-button').style.display = "none";
+        document.getElementById("change-password-div").style.display = "block";
+        document.getElementById("change_password_cancel_btn").style.visibility = "visible";
+    }
+    
+    function hide_change_password() {
+        document.getElementById("change_password_cancel_btn").style.visibility = "hidden";
+        document.getElementById("change-password-div").style.display = "none";
+        document.getElementById('change-password-button').style.display = "block";
+        document.getElementById("old-password").value = "";
+        document.getElementById("new-password").value = "";
+        document.getElementById("confirm-password").value = "";
+        document.getElementById("save-details-error").innerHTML = "";
+    }
+
+    document.getElementById("admin-name").addEventListener('keypress', function(e) {
+        var target_el = e.target;
+        if(target_el.value.length >= 30) {
+            if(e.key != 'Backspace' && e.key != 'Delete' && e.key != 'ArrowLeft' && e.key != 'ArrowRight') {
+                e.preventDefault();
+                document.getElementById("name-error-message").style.display = "inherit";
+            }
+            else if(e.key == 'Backspace' || e.key == 'Delete'){
+              document.getElementById("name-error-message").style.display = "none";
+            }
+        }
+        else{
+          document.getElementById("name-error-message").style.display = "none";
+        }
+    });
+</script>
+{% endblock %}

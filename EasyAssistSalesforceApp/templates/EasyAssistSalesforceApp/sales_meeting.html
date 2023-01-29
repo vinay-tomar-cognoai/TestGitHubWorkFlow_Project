@@ -1,0 +1,464 @@
+{% extends 'EasyAssistSalesforceApp/console.html' %}
+{% load static %}
+{% block content %}
+
+<link href="{% static 'EasyAssistSalesforceApp/css/jquery.timepicker.css' %}" rel="stylesheet" type="text/css">
+<script src="{% static 'EasyAssistSalesforceApp/js/jquery.timepicker.js' %}"></script>
+<style>
+    input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+</style>
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <!-- DataTales Example -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <div class="row">
+                <div class="col-sm">
+                    <h6 class="m-0 font-weight-bold text-primary">Customers Meetings</h6>
+                </div>
+                {% if cobrowse_agent.role == "agent" or cobrowse_agent.role == "supervisor" %}
+                <div class="col-sm">
+                    <button class="btn btn-info float-right ml-3" data-toggle="modal" data-target="#generate_link_modal" onclick="fill_random_password();">Schedule Meeting</button>
+                    <button class="btn btn-info float-right ml-3" onclick="get_scheduled_meeting_list();">Today's meetings</button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Mobile Number</th>
+                            <th>Email</th>
+                            <th>Description</th>
+                            <th>Date</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Meeting Password</th>
+                            <th>Transfer meeting</th>
+                            <th>Edit</th>
+                            <th>Join</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cognovid_obj in cognovid_objs %}
+                        <tr>
+                            <td>{{ cognovid_obj.full_name }}</td>
+                            <td>{{ cognovid_obj.mobile_number }}</td>
+                            <td>{{ cognovid_obj.email_id }}</td>
+                            <td>{{ cognovid_obj.meeting_description }}</td>
+                            <td>{{ cognovid_obj.meeting_start_date }}</td>
+                            <td>{{ cognovid_obj.meeting_start_time|time:"h:i a" }}</td>
+                            <td>{{ cognovid_obj.meeting_end_time|time:"h:i a" }}</td>
+                            <td>{{ cognovid_obj.meeting_password }}</td>
+                            <td>
+                                {% if cognovid_obj.is_expired %}
+                                    <a data-toggle="tooltip" title="Meeting has ended"><i class="fas fa-fw fa-users"></i></a>
+                                {% else %}
+                                    <a data-toggle="modal" data-target="#assign_meeting-{{ cognovid_obj.pk }}" style="cursor: pointer;"><i class="fas fa-fw fa-users"></i></a>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if cognovid_obj.is_expired %}
+                                    <a data-toggle="tooltip" title="Meeting has ended"><i class="fas fa-fw fa-edit"></i></a>
+                                {% else %}
+                                    <a data-toggle="modal" data-target="#edit_meeting-{{ cognovid_obj.pk }}" style="cursor: pointer;"><i class="fas fa-fw fa-edit"></i></a>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if cognovid_obj.is_expired %}
+                                Expired
+                                {% else %}
+                                <a class="btn" href="/easy-assist-salesforce/meeting/{{ cognovid_obj.meeting_id }}?salesforce_token={{salesforce_token}}" target="_blank"><i class="fas fa-fw fa-external-link-square-alt"></i></a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% for cognovid_obj in cognovid_objs %}
+<div class="modal fade" id="edit_meeting-{{ cognovid_obj.pk }}" tabindex="-1" role="dialog" aria-labelledby="edit_meeting_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="edit_meeting_label">Edit Meeting Details</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Customer Full Name</span>
+                            </div>
+                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="client-full-name-{{ cognovid_obj.pk }}" value="{{ cognovid_obj.full_name }}">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Customer Mobile Number</span>
+                            </div>
+                            <input type="number" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="client-modile-number-{{ cognovid_obj.pk }}" value="{{ cognovid_obj.mobile_number }}">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Customer Email</span>
+                            </div>
+                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="client-email-id-{{ cognovid_obj.pk }}" value="{{ cognovid_obj.email_id }}">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Meeting Description</span>
+                            </div>
+                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="client-meeting-description-{{ cognovid_obj.pk }}" value="{{ cognovid_obj.meeting_description }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Meeting Date</span>
+                            </div>
+                            <input type="date" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="client-meeting-start-date-{{ cognovid_obj.pk }}" , value="{{ cognovid_obj.meeting_start_date | date:'Y-m-d'  }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Meeting Password</span>
+                            </div>
+                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" autocomplete="off" id="client-meeting-password-{{ cognovid_obj.pk }}" value="{{ cognovid_obj.meeting_password }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Meeting Start Time</span>
+                            </div>
+                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="client-meeting-start-time-{{ cognovid_obj.pk }}" value="{{ cognovid_obj.meeting_start_time |time:'H:i'  }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Meeting End Time</span>
+                            </div>
+                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="client-meeting-end-time-{{ cognovid_obj.pk }}" value="{{ cognovid_obj.meeting_end_time|time:'H:i'  }}">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div style="margin-top: 1em;">
+                            <div class="tab-content">
+                                <div class="tab-pane fade show active" role="tabpanel" aria-labelledby="pills-video-conferencing-tab" style="padding:1em 1em 0em 1em;">
+                                    <div class="">
+                                        <div class="input-group input-group-sm mb-3">
+                                            <input type="text" class="form-control" value="https://{{ request.META.HTTP_HOST }}/easy-assist-salesforce/meeting/{{ cognovid_obj.meeting_id }}?salesforce_token={{salesforce_token}}" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p style="color:green;" id="generate-link-details-error-{{ cognovid_obj.pk }}"></p>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-success" onclick="save_meeting_link(this, '{{ cognovid_obj.pk }}')"><i class="fas fa-fw fa-check"></i>Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="assign_meeting-{{ cognovid_obj.pk }}" tabindex="-1" role="dialog" aria-labelledby="assign_meeting_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assign_meeting_label">Transfer Meeting To Another Agent</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <select id="select-assign-agent-{{ cognovid_obj.pk }}" class="form-control" style="width:50%;">
+                          <option value="">Select Agent</option> 
+                            {% for agent_obj in agent_objs %}
+                            <option value="{{ agent_obj.pk }}">{{ agent_obj.user.username }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-success" onclick="assign_meeting_to_another_agent(this, '{{ cognovid_obj.pk }}')">Transfer</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $('#client-meeting-start-time-{{ cognovid_obj.pk }}').timepicker({ 
+        'step': {{ meeting_end_time }},
+        'scrollDefault': 'now',
+        "timeFormat": 'h:iA'
+    });
+    $('#client-meeting-end-time-{{ cognovid_obj.pk }}').timepicker({ 
+        'step': {{ meeting_end_time }},
+        'scrollDefault': 'now',
+        "timeFormat": 'h:iA'
+    });
+</script>
+{% endfor %}
+
+<div class="modal fade" id="generate_link_modal" tabindex="-1" role="dialog" aria-labelledby="generate_link_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="generate_link_modal_label">Ready to schedule meeting?</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Customer Full Name</span>
+                            </div>
+                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="client-full-name" autocomplete="off">
+                        </div>
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Customer Mobile Number</span>
+                            </div>
+                            <input type="number" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="client-modile-number" autocomplete="off">
+                        </div>
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Customer Email</span>
+                            </div>
+                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="client-email-id" autocomplete="off">
+                        </div>
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Meeting Description</span>
+                            </div>
+                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="client-meeting-description" autocomplete="off">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-sm-12">
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="inputGroup-sizing-sm">Meeting Date</span>
+                                    </div>
+                                    <input type="date" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="client-meeting-start-date">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-12">
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="inputGroup-sizing-sm">Meeting Password</span>
+                                    </div>
+                                    <input type="text" class="form-control" value="{{ default_password }}" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" autocomplete="off" id="client-meeting-password">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-sm-12">
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="inputGroup-sizing-sm">Meeting Start Time</span>
+                                    </div>
+                                    <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="client-meeting-start-time">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-12">
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="inputGroup-sizing-sm">Meeting End Time</span>
+                                    </div>
+                                    <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="client-meeting-end-time">
+                                </div>
+                            </div>
+                        </div>
+                        <p id="schedule-meeting-text">On clicking "Schedule Meeting", a unique video conference link will be generated. Anyone on the internet with this link can join the video call.</p>
+                        <div id="video-conferencing-data-div" style="display:none;">
+                            <div class="tab-content" id="pills-tabContent">
+                                <div class="tab-pane fade show active" id="pills-video-conferencing-link" role="tabpanel" aria-labelledby="pills-video-conferencing-tab" style="padding:1em 1em 0em 1em;">
+                                    <div class="">
+                                        <div class="input-group input-group-sm mb-3">
+                                            <input type="text" value="" class="form-control" id="video-conferencing-link" onchange="generate_cobrowsing_link();" readonly>
+                                        </div>
+                                        <div class="input-group input-group-sm mb-3">
+                                            <button class="btn" data-clipboard-target="#video-conferencing-link" title="Copy Meeting Link"><i class="fas fa-fw fa-copy"></i></button>
+                                            <button class="btn" onclick="open_video_conferencing_link(this)" title="Join Video Call"><i class="fas fa-fw fa-external-link-square-alt"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade show" id="pills-cobrowsing-link" role="tabpanel" aria-labelledby="pills-home-tab" style="padding:1em 1em 0em 1em;">
+                                    <div class="">
+                                        <div class="input-group input-group-sm mb-3">
+                                            <p>Please enter product link which customer wants to purchase</p>
+                                            <input type="text" class="form-control" id="product-page-url" placeholder="Enter product page url" cobrowse-session="">
+                                        </div>
+                                        <div class="input-group input-group-sm mb-3">
+                                            <button class="btn btn-primary" onclick="generate_cobrowsing_link()">Generate Co-browsing Link</button>
+                                        </div>
+                                        <div class="input-group input-group-sm mb-3" id="generated-cobrowsing-link-div" style="display:none;">
+                                            <p>Copy below co-browsing url and share it with customer</p>
+                                            <div class="input-group input-group-sm mb-3">
+                                                <input type="text" value="" class="form-control" id="generated-cobrowsing-link" disabled>
+                                            </div>
+                                            <div class="input-group input-group-sm mb-3">
+                                                <button class="btn" data-clipboard-target="#generated-cobrowsing-link"><i class="fas fa-fw fa-copy"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p style="color:green;" id="generate-link-details-error"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal" onclick="refresh_page();">Cancel</button>
+                <button class="btn btn-success" id="generate_sharable_link_button"onclick="generate_sharable_link(this)"><i class="fas fa-fw fa-check"></i>Schedule Meeting</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="todays_meeting_modal" tabindex="-1" role="dialog" aria-labelledby="todays_meeting_modal_label" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="generate_link_modal_label">Scheduled Meetings</h5>
+            </div>
+            <div class="modal-body">
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+window.onload = function() {
+    $("#dataTable").DataTable({
+        "ordering": false
+    });
+};
+
+function show_video_conferencing_details() {
+    document.getElementById("video-conferencing-data-div").style.display = "block";
+}
+
+function hide_video_conferencing_details() {
+    document.getElementById("video-conferencing-data-div").style.display = "none";
+}
+
+function open_video_conferencing_link(element) {
+    value = document.getElementById("video-conferencing-link").value;
+    if (value != "" && value != undefined && value != null) {
+        window.open(value, "_blank");
+    }
+}
+
+function generate_cobrowsing_link() {
+    product_url = document.getElementById("product-page-url").value;
+    if (product_url != null && product_url != undefined && product_url != "") {
+        session_id = document.getElementById("product-page-url").getAttribute("cobrowse-session");
+        product_url = product_url + "#ea_id=" + session_id;
+        document.getElementById("generated-cobrowsing-link").value = product_url;
+        show_generated_cobrowsing_link_details();
+    }
+}
+
+function show_generated_cobrowsing_link_details() {
+    document.getElementById("generated-cobrowsing-link-div").style.display = "block";
+    console.log("show details");
+}
+
+function hide_generated_cobrowsing_link_details() {
+    document.getElementById("generated-cobrowsing-link-div").style.display = "none";
+}
+</script>
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/clipboard.min.js' %}">
+</script>
+<script type="text/javascript">
+var clipboard = new ClipboardJS('.btn');
+
+clipboard.on('success', function(e) {
+    e.clearSelection();
+    show_easyassist_toast("Link has been copied successfully.");
+});
+
+clipboard.on('error', function(e) {
+    show_easyassist_toast("Oop! Unable to copy the link. Please try again.");
+});
+
+$('#client-meeting-start-time').timepicker({ 
+    'step': {{ meeting_end_time }},
+    'scrollDefault': 'now',
+    "timeFormat": 'h:iA'
+
+});
+$('#client-meeting-end-time').timepicker({ 
+    'step': {{ meeting_end_time }},
+    'scrollDefault': 'now',
+    "timeFormat": 'h:iA'
+
+});
+</script>
+<script type="text/javascript">
+// Set today's date in the form
+document.getElementById('client-meeting-start-date').value = new Date().toISOString().slice(0, 10);
+
+var input_index=1;
+var inputs=$("#generate_link_modal input").slice(0,8);
+function modal_event_handler(event) {
+        var key = event.key || event.keyCode;
+        if (key === 'Enter' || key === 'enter' || key === 13) {
+            console.log('event');
+            if(input_index==8){
+                $('#generate_sharable_link_button').trigger('click');
+                document.removeEventListener('keydown', modal_event_handler);
+                input_index=1;
+                return;
+            }
+            if(input_index==5){
+                input_index++;
+                return;
+            }
+            inputs[input_index].focus();
+            input_index++;
+        }
+}
+
+$('#generate_link_modal').on('shown.bs.modal', function () {
+    $('#client-full-name').focus();
+    document.addEventListener('keydown', modal_event_handler);
+})  
+function refresh_page(){
+    window.location.reload();
+}
+
+function fill_random_password() {
+    
+    var password = Math.random().toString(36).slice(2) +  Math.random().toString(36) .toUpperCase().slice(2); 
+    var filed_pass = document.getElementById("client-meeting-password").value;
+    if(filed_pass == ""){
+        document.getElementById("client-meeting-password").value = password.substring(0,5)
+    }
+}
+</script>
+{% endblock %}

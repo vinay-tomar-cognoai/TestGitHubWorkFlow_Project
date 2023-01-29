@@ -1,0 +1,247 @@
+{% extends 'EasyChatApp/console.html' %}
+{% block consolecontent %}
+{% load static %}
+
+
+<div style="padding:1em;">
+ <div class="row upload_data">
+            <h6>Mapping certain linguistic terms to their respective meanings.</h6>
+          </div>
+  <div class="row">
+
+    <!-- <div class="col s4">
+        <select id="select-wordmapper-bot">
+          <option value="None">---Choose Bot---</option>
+          {% for bot_obj in bot_objs %}
+              {% if bot_obj ==  selected_bot_obj %}
+                <option value="{{ bot_obj.pk }}" selected="">{{ bot_obj.name }}</option>
+              {% else %}
+                <option value="{{ bot_obj.pk }}">{{ bot_obj.name }}</option>
+              {% endif %}
+          {% endfor %}
+        </select>
+    </div> -->
+
+    <div class="col s12">
+        {% if selected_bot_obj %}
+            <a href="#modal-add-word-mapper" class="right waves-effect waves-light easychat-button modal-trigger btn" onclick="initialize_add_mapper_word_list()"><i class="material-icons inline-icon">add_circle_outline</i>&nbsp;Add Word Mapper</a>      
+        
+            <a href="#modal-import-word-mapper-excel" class="right waves-effect waves-light easychat-button modal-trigger btn" style="margin-right: 10px;"><i class="material-icons inline-icon">add_circle_outline</i>&nbsp;Upload Excel</a>      
+        {% endif %}
+    </div>
+
+    <div class="col s12" style="padding:1em;">        
+
+      <div class="row">
+          
+          <div class="col s12">
+
+              {% if selected_bot_obj %}
+
+                  {% if word_mapper_objs %}
+                      <table class="highlight striped white">
+                          <thead>
+                              <tr>
+                                  <th>Mapped Words</th>
+                                  <th>Mapped To</th>
+                                  <th>Edit</th>
+                                  <th>Delete</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                            {% for word_mapper in word_mapper_objs %}
+                              <tr>
+                                  <td>
+                                    {% for word in word_mapper.get_similar_word_list %}
+                                      <div class="chip">
+                                        {{ word }}                                        
+                                      </div>
+                                    {% endfor %}
+                                  </td>
+                                  <td>{{ word_mapper.keyword }}</td>
+                                  <td><a href="#modal-edit-word-mapper-{{ word_mapper.pk }}" class="modal-trigger green-text text-darken-2" onclick="initialize_edit_mapper_word_list('{{ word_mapper.pk }}')"><i class="material-icons inline-icon">edit</i></a></td>
+                                  <td><a href="#modal-delete-word-mapper-{{ word_mapper.pk }}" class="modal-trigger"><i class="material-icons inline-icon" style="color: #C62828 !important;">delete</i></a></td>
+                              </tr>
+
+                              <!-- Modal Structure -->
+                              <div id="modal-delete-word-mapper-{{ word_mapper.pk }}" class="modal">
+                                <form action="/chat/delete-word-mapper/{{ word_mapper.pk }}/" method="POST">
+                                  {% csrf_token %}
+                                  <div class="modal-content">
+                                      <div class="row">
+                                          <div class="col s12">
+                                              <p>Are you sure, you want to delete <b>{{ word_mapper.keyword }}</b> word mapper?</p>     
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <div class="modal-footer">
+                                      <a class="btn white transparent-btn black-text modal-close" href="javascript:void(0)">Cancel</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                                      <button type="submit" class="btn white-text modal-close" style="background-color: #C62828 !important;">Delete</a>
+                                  </div>
+                                </form>
+                              </div>
+
+
+                              <!-- Modal Structure -->
+                              <div id="modal-edit-word-mapper-{{ word_mapper.pk }}" class="modal">
+                                <div class="modal-content">
+                                  <h5>Edit Word Mapper</h5>
+                                  <hr>
+                                  <div class="row">
+                                    <div class="input-field col s12">
+                                      <!-- <input id="wordtomap" type="text" class="validate" placeholder="Write comma separated single words which you want to map"> -->
+                                      Write single words which you want to map <b>(please hit enter after writing word)</b>
+                                      <div class="chips chips-initial input-field word-mappers-similar-chips" id="wordtomap-{{ word_mapper.pk }}" value="{{ word_mapper.similar_words }}">
+                                      </div>
+                                    <div class="col s12 center">
+                                      <i class="inline-icon material-icons">arrow_downward</i> map into
+                                    </div>
+                                    <div class="input-field col s12 center">
+                                      <input id="wordintomap-{{ word_mapper.pk }}" type="tel" class="validate" placeholder="Write word or sentence into which you want to map" value="{{ word_mapper.keyword }}">
+                                    </div>
+                                    <!-- 
+                                    <div class="input-field col s8">
+                                      <select id="select-add-wordmapper-bot-{{ word_mapper.pk }}">
+                                        {% for bot_obj in bot_objs %}
+                                            {% if bot_obj ==  selected_bot_obj %}
+                                              <option value="{{ bot_obj.pk }}" selected="">{{ bot_obj.name }}</option>
+                                            {% else %}
+                                              <option value="{{ bot_obj.pk }}">{{ bot_obj.name }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                      </select>
+                                    </div> -->
+                                    <div class="col s12 progress" id="easychat_word_mapper_preloader" style="display: none;">
+                                          <div class="indeterminate"></div>
+                                    </div>
+                                    <div class="col s12 right" align="right">
+                                      <br>
+                                        <a class="modal-close transparent-btn btn white black-text">Cancel</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <a class="btn black-text" style="background-color: #038456 !important;" onclick="save_edit_word_mapper('{{ word_mapper.pk }}')">Save</a>          
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+
+
+                            {% endfor %}
+                          </tbody>
+                      </table>
+
+                  {% else %}
+                      <p class="center green lighten-1 green-text text-darken-4" style="padding:1em;">
+                          No word mapper associated with selected bot.
+                      </p>
+                  {% endif %}
+              {% else %}
+                  <p class="center green lighten-1 green-text text-darken-4" style="padding:1em;">
+                      Kindly select valid bot from the list.
+                  </p>
+              {% endif %}
+
+            
+          </div>
+
+      </div>
+
+    </div>
+    
+  </div>
+  
+</div>
+
+<!-- Modal Structure -->
+<div id="modal-add-word-mapper" class="modal">
+  <div class="modal-content" style="padding-bottom: 0 !important;">
+    <h5>Add Word Mapper</h5>
+    <hr>
+    <div class="row" style="margin-bottom: 0 !important;">
+      <div class="input-field col s12">
+        <!-- <input id="wordtomap" type="text" class="validate" placeholder="Write comma separated single words which you want to map"> -->
+        Write single words which you want to map <b>(please hit enter after writing word)</b>
+        <div class="chips chips-initial" id="wordtomap">
+
+      </div>
+      <div class="col s12 center">
+        <i class="inline-icon material-icons">arrow_downward</i> map into
+      </div>
+      <div class="input-field col s12" style="padding-left: 0; padding-right: 0;">
+        <input id="wordintomap" type="tel" class="validate" placeholder="Write word or sentence into which you want to map">
+      </div>
+
+      <div class="col s12 progress" id="easychat_word_mapper_preloader" style="display: none;">
+            <div class="indeterminate"></div>
+      </div>
+      
+      <div class="col s12 right" align="right">
+        <br>
+          <a class="modal-close transparent-btn btn white black-text">Cancel</a>&nbsp;&nbsp;&nbsp;&nbsp;
+          <a class="btn black-text" id="save-word-mapper" style="background-color: #038456 !important;">Save</a>          
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Word Mapper Upload Excel Modal -->
+<div id="modal-import-word-mapper-excel" class="modal">
+  <div class="modal-content">
+      <div class="row">
+          <div class="file-field input-field col s12">
+              <div class="btn-small waves-effect btn easychat-button">
+                  <span>Select File</span>
+                  <input id="input_import_word_mapper_file" accept=".xls, .xlsx" type="file">
+              </div>
+              <div class="file-path-wrapper">
+                  <input id="input_import_word_mapper_file2" class="file-path validate" 
+                  type="text">
+              </div>
+          </div>
+
+          <div class="col s12" id="preloader-import-word-mapper" style="display:none;">
+              <div class="progress">
+                  <div class="indeterminate black-text purple lighten-4"></div>
+              </div>          
+          </div>
+      </div>
+  </div>
+  <div class="modal-footer">
+      <a class="btn transparent-btn white black-text" onclick="download_word_mapper_template()" style="border: none; float: left;">Download Template</a>
+      <a class="modal-close btn transparent-btn white black-text">Cancel</a>&nbsp;&nbsp;&nbsp;
+      <a class="waves-effect waves-green btn easychat-button" id="import-bot-word-mapper">upload</a>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+    window.API_FAIL_EMAIL_CONFIGURED = '{{api_fail_email_configured}}'
+    bot_id = window.location.href.split("/")[5].split("=")[1]
+    SERVER_URL= window.location.origin;
+    BOT_ID=bot_id
+    BOT_NAME='uat';
+    BOT_THEME='null';
+    BOT_POSITION='bottom-right';
+    bot_click_image = 'true';
+    is_form_assist='false';
+    is_easyassist_enabled='false';
+    is_lead_generation='false';
+    lead_generation_intent_id='';
+    window.NEED_TO_BUILD = "{{ selected_bot_obj.need_to_build }}";
+</script>
+<script src="{% static 'EasyChatApp/js/theme2_embed.js' %}?v={% random_int 1 100 %}"></script>
+
+<script type="text/javascript">
+    $(document).on("change", "#select-wordmapper-bot", function(e){
+        bot_id = document.getElementById("select-wordmapper-bot").value;
+        if(bot_id!="None")
+	{
+            window.location="/chat/word-mappers/?bot_pk="+bot_id;
+        }
+	else if(bot_id=="None") {
+	    window.location="/chat/word-mappers/";
+	    }
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,153 @@
+{% extends 'EasyAssistApp/base.html' %}
+{% block content %}
+{% load static %}
+
+<div class="row" style="padding:1em;">
+
+	<div class="col s12">		
+		<div class="row">
+			<div class="col s4">
+				<select id="select-filter-screen-cast" class="browser-default" onchange="render_filter_screencast(this)">
+					{% if filter_parameter == "unresolved" %}
+						<option value="unresolved" selected>Unresolved</option>
+					{% else %}
+						<option value="unresolved">Unresolved</option>
+					{% endif %}
+
+					{% if filter_parameter == "resolved" %}
+						<option value="resolved" selected>Resolved</option>
+					{% else %}
+						<option value="resolved">Resolved</option>
+					{% endif %}
+				</select>				
+			</div>
+		</div>
+	</div>
+
+	<div class="col s12">
+		{% if client_screencast_objs %}
+			<table class="striped highlight" id="easy-assist-client-details-table">
+				<thead>
+					<tr>
+						<th scope="col">Connection Active</th>
+						<th scope="col">Last updates</th>
+						<th scope="col">Customer Name</th>
+						<th scope="col">Mobile Number</th>
+            <th scope="col">Help</th>
+            <th scope="col">Mark As Resolved</th>
+						<th scope="col">Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for client_screencast_obj in client_screencast_objs %}
+					<tr>
+						<td class="center">
+							{% if client_screencast_obj.is_connection_closed %}
+								<i class="material-icons red-text">cancel</i>
+							{% else %}
+								<i class="material-icons green-text">check</i>
+							{% endif %}
+						</td>
+						<td>
+							{{ client_screencast_obj.last_update_datetime }}
+						</td>
+						<td>{{ client_screencast_obj.client_name }}</td>
+						<td>{{ client_screencast_obj.client_mobile_number }}</td>
+                                                <td><a href="#modal-form-assist-link-{{ client_screencast_obj.pk }}" class="modal-trigger"><i class="material-icons inline-icon">help</i></a></td>
+                                                <td class="center">
+                                                    {% if client_screencast_obj.status == "unresolved" %}
+                                                    <a href="#confirm-mark-as-resolved-{{ client_screencast_obj.pk }}" class="modal-trigger">
+                                                        <i class="material-icons inline-icon green-text darken-3">check</i>
+                                                    </a>
+                                                    {% endif %}
+                                                </td>
+						<td class="center">
+                                                    {% if client_screencast_obj.is_connection_closed %}
+                                                        <i class="material-icons red-text">cancel</i>
+                                                    {% else %} 
+                                                        {% if client_screencast_obj.is_agent_access_allowed and client_screencast_obj.agent %}
+                                                            {% if client_screencast_obj.agent.username == request.user.username %}
+                                                                <p>Screenshare Active</p><a href="/easy-assist/agent/assist/?session_id={{ client_screencast_obj.session_id }}">Assist <i class="material-icons inline-icon">open_in_new</i></a>
+                                                            {% else %}
+                                                                Agent: {{ client_screencast_obj.agent.username }}
+                                                            {% endif %} 
+                                                        {% else %}
+                                                        {% endif %}
+                                                    {% endif %}
+						</td>
+					</tr>
+
+
+  <!-- Modal Structure -->
+  <div id="confirm-mark-as-resolved-{{ client_screencast_obj.pk }}" class="modal">
+    <div class="modal-content">
+       <div class="row">
+          <h5>Close Ticket</h5>
+          <hr>
+          <p>Are you sure, you want to close this ticket?</p>
+       </div>
+    </div>
+    <div class="modal-footer">
+      <a href="/easy-assist/marked-as-resolved/{{ client_screencast_obj.pk }}" class="modal-close waves-effect waves-green btn-flat green darken-3 white-text">Yes</a>
+      <a href="javascript:void(0)" class="modal-close waves-effect waves-green btn-flat red darken-3 white-text">No</a>
+    </div>
+  </div>
+
+
+  <!-- Modal Structure -->
+  <div id="modal-form-assist-link-{{ client_screencast_obj.pk }}" class="modal">
+    <div class="modal-content">
+        <div class="row">
+            <h5>Form Assist URL</h5>
+            <hr>
+            <div class="col s12">
+                <input type="text" value="{{ client_screencast_obj.website_url }}?client_id={{ client_screencast_obj.pk }}" id="form-assist-url-{{ client_screencast_obj.pk }}" style="background-color:white;border-radius:0.1em;color:black;" disabled>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+      {% if client_screencast_obj.is_agent_access_allowed and client_screencast_obj.agent != None %}
+          <p class="left">Customer is assigned to <u>{{ client_screencast_obj.agent.username }}</u></p>
+      {% else %}
+          <a href="/easy-assist/request-assist/{{ client_screencast_obj.pk }}" class="modal-close waves-effect waves-green btn-flat green lighten-3 black-text left" style="border:0.1em solid black;">Request for assist</a>
+      {% endif %}
+      <a href="javascript:void(0)" class="modal-close waves-effect waves-green btn-flat grey lighten-2 black-text right" style="border:0.1em solid black;">Close</a>
+    </div>
+  </div>
+
+
+					{% endfor %}
+				</tbody>
+			</table>
+		{% else %}
+			<p class="grey-message-field">No records found</p>
+		{% endif %}
+	</div>
+
+</div>
+
+<script type="text/javascript">
+	function render_filter_screencast(element){
+		value = document.getElementById(element.id).value;
+		if(value=="unresolved"){
+			window.location = "/easy-assist/dashboard/?filter=unresolved";
+		}else if(value=="resolved"){
+			window.location = "/easy-assist/dashboard/?filter=resolved";			
+		}
+	}
+
+        function CopyFormAssistURL(screen_cast_pk) {
+               /* Get the text field */
+               console.log(screen_cast_pk);
+               var copyText = document.getElementById("form-assist-url-"+screen_cast_pk);
+               /* console.log(copyText.value); */
+               /* Select the text field */
+               copyText.select();
+               /* Copy the text inside the text field */
+               document.execCommand("copy");
+               /* Alert the copied text */
+               alert("Copied the text: " + copyText.value);
+        }
+</script>
+
+{% endblock %}

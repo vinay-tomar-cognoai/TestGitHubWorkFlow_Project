@@ -1,0 +1,293 @@
+{% extends 'EasyAssistApp/console.html' %}
+{% load easyassist_custom_filters %}
+
+{% block content %}
+{% load static %}
+
+<style>
+    .disable-select {
+        user-select: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    #active_users_table .dataTables_filter {
+        display: none;
+    }
+
+    #cobrowse-active-lead-table {
+        border-spacing: 0 1em;
+    }
+
+    #cobrowse-active-lead-table tbody tr.tr-hover:hover {
+        box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.25);
+    }
+
+    #cobrowse-active-lead-table tbody tr:hover td :last-child {
+        visibility: visible;
+    }
+
+    .tooltip-custom {
+        position: relative;
+        display: inline-block;
+        border-bottom: 1px dotted #ccc;
+        /*color: #006080;*/
+    }
+
+    .tooltip-custom .tooltiptext-custom {
+        visibility: hidden;
+        position: absolute;
+        background-color: #555;
+        color: #fff;
+        text-align: center;
+        padding: 5px 0;
+        border-radius: 6px;
+        z-index: 1;
+        opacity: 0;
+        transition: opacity 0.3s;
+        padding: 5px;
+    }
+
+    .tooltip-right-custom {
+        top: -5px;
+        left: 125%;
+    }
+
+    .tooltip-top-custom {
+        bottom: 90%;
+        left: 50%;
+        transform: translate(-50%, 0%);
+    }
+
+    .tooltip-top-custom::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: #555 transparent transparent transparent;
+    }
+
+    .tooltip-custom:hover .tooltiptext-custom {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    #transfer_lead_by_supervisor_modal span,
+    #transfer_lead_by_supervisor_modal p {
+        font-family: Silka;
+        font-style: normal;
+        font-size: 14px;
+
+        color: #4D4D4D;
+    }
+
+    .btn-danger.btn-icon-split {
+        display: inline-flex !important;
+    }
+
+    #session_end_timer_input {
+        height: 37px;
+        border-radius: 5px;
+        border: 1px solid #DADADA !important;
+    }
+
+    .trasnfer-close-lead-button-td {
+        display: flex;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+    }
+
+    .assign-lead-button {
+        padding: 0.375rem 1rem !important;
+        background: #0254D7 !important;
+        border-radius: 99px;
+    }
+
+    .assign-lead-button .btn-primary.focus,
+    .btn-primary:focus {
+        box-shadow: unset !important;
+    }
+
+    .custom-select-dropdown-arrow-icon {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background: transparent;
+        appearance: none;
+        background-image: url(./arrow-down-1.svg);
+        background-repeat: no-repeat;
+        background-position-x: 96%;
+        background-position-y: 13px;
+        font-weight: normal;
+        font-size: 16px;
+        color: #7B7A7B;
+    }
+
+    .no-agent-available-toast {
+        background: #E8F3FF;
+        border-radius: 4px;
+        padding: 12px 20px;
+        text-align: start;
+        width: 100%;
+        max-width: unset;
+        margin-bottom: 18px;
+    }
+
+    .assign-session-button {
+        padding: 0.375rem 1.5rem !important;
+    }
+
+    .transfer-session-button {
+        padding: 0.375rem 1.5rem !important;
+    }
+
+</style>
+
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+      <div class="card-header py-3">
+        <div class="row">
+          <div class="col-sm-6">
+            <h6 class="m-0 font-weight-bold text-primary heading-text-primary">Requests in Queue
+              <span data-toggle="tooltip" data-placement="top" title=""
+                data-original-title="Inbound customer requests get registered here as unassigned."><i
+                  class="fas fa-info-circle"></i></span>
+            </h6>
+          </div>
+        </div>
+      </div>
+      <div class="card-body mt-4" style="padding-top:0px;">
+        <div class="table-responsive" id="pending_lead_table">
+          <table class="table table-bordered" id="cobrowse_pending_lead_request_table" style="width: 100%;">
+            <thead>
+                <tr>          
+                    <th scope="col">Customer Details</th>
+                    <th scope="col">Product</th>
+                    {% if access_token_obj.choose_product_category %}
+                        <th scope="col">Category</th>
+                    {% endif %}
+                    {% if access_token_obj.allow_language_support %}
+                        <th scope="col">Language</th>
+                    {% endif %}
+            
+                    <th scope="col">Request Date & Time</th>
+        
+                    <th scope="col">Queue Time</th>
+        
+                    {% if cobrowse_agent.role != "admin" %}
+                        <th scope="col">Assign Lead</th>
+                    {% endif %}
+                        
+                </tr>
+            </thead>
+            <tbody id="cognoai-unassign-lead-table-body" >
+            </tbody>
+          </table>
+        </div>
+        <div id="table-pagination_div"></div>
+      </div>
+     </div>
+</div>
+
+<div class="modal fade assign_agent_session_modal" id="assign_session_modal" tabindex="-1" role="dialog"
+    aria-labelledby="assign_session_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assign_session_label">Assign session to an agent</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <select id="select-assign-agent" class="form-control">
+                            <option value="">Select Agent</option>
+                        </select>
+                    </div>
+                    <div class="col-md-12 mt-4 mb-2">
+                        <span id="assign-session-error" style="display: none; color:red;"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-success" id="assign-cobrowsing-agent-button">Assign</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+window.ALLOW_SCREEN_SHARING_COBROWSE = "{{ access_token_obj.allow_screen_sharing_cobrowse }}"
+window.onload = function() {
+    var console_theme_color = getComputedStyle(document.body).getPropertyValue('--color_rgb');
+    if(console_theme_color.length == 0) {
+        console_theme_color = "#0254D7";
+    }
+}
+
+</script>
+
+{% if request.user.enable_s3_bucket %}
+<script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/clipboard.min.js"></script>
+{% else %}
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/clipboard.min.js' %}"></script>
+{% endif %}
+
+<script>
+
+window.localStorage.setItem("request_in_queue_current_page", 0);
+
+function load_map_script() {
+    var params = JSON.stringify({});
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "/easy-assist/map-script/", true);
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.setRequestHeader('X-CSRFToken', get_csrfmiddlewaretoken());
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            response = JSON.parse(this.responseText);
+            response = easyassist_custom_decrypt(response.Response);
+            response = JSON.parse(response);
+            if (response["status"] == 200) {
+                var src = response['src'];
+                var script = document.createElement('script');
+                script.type = 'text/javascript';
+                script.defer = true;
+                script.src = src
+                document.body.appendChild(script);
+
+                if (window.navigator.geolocation) {
+                    var geolocation_options = {
+                        enableHighAccuracy: true,
+                        timeout: 15000,
+                        maximumAge: 0
+                    };
+                    window.navigator.geolocation.getCurrentPosition(accept_location_request, cancel_location_request, geolocation_options);
+                }
+            }
+        }
+    }
+    xhttp.send(params);
+}
+
+$(document).ready(function() {
+    load_map_script();
+    update_active_queue_lead_status_interval = setInterval(update_active_queue_lead_status, UPDATE_ACTIVE_QUEUE_LEAD_STATUS_INTERVAL_TIME);
+    update_active_queue_lead_status();
+});
+
+</script>
+
+{% endblock %}

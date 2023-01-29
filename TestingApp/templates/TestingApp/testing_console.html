@@ -1,0 +1,167 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Testing Console</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style>
+	/* width */
+	::-webkit-scrollbar {
+	  width: 10px;
+	}
+
+	/* Track */
+	::-webkit-scrollbar-track {
+	  background: #f1f1f1; 
+	}
+	 
+	/* Handle */
+	::-webkit-scrollbar-thumb {
+	  background: #888; 
+	}
+
+	/* Handle on hover */
+	::-webkit-scrollbar-thumb:hover {
+	  background: #555; 
+	}
+	</style>
+
+</head>
+<body style="background-color: #f3f6ff !important">
+
+{% csrf_token %}
+
+<nav class="navbar navbar-dark bg-dark">
+<!-- Navbar content -->
+</nav>
+
+<nav class="navbar navbar-dark bg-primary">
+<!-- Navbar content -->
+</nav>
+
+<nav class="navbar navbar-light" style="background-color: #e3f2fd;">
+    <a class="navbar-brand" href="#">Automated QA Testing Tool</a>
+    <button type="button" class="btn btn-primary" onclick="window.location='/automation/home/';">Go Back</button>
+</nav>
+
+<div style="padding:1em;">
+	
+	<div class="row">
+
+		<div class="col-7">
+
+			<div class="input-group">
+				<a type="button" class="btn btn-light" href="{{ qa_testing_bot.bot_domain }}" target="_blank">Open bot console</a>
+				<a type="button" class="btn btn-light ml-3" href="/automation/automation-api/" target="_blank">Automation Test API</a>
+			</div>
+
+			<br>
+
+			<table class="table">
+				<thead>
+					<tr>
+						<th scope="col">Testcase ID</th>
+						<th scope="col">Uploaded File</th>
+						<th scope="col">Parsed Data</th>
+						<th scope="col">Testing started datetime</th>
+						<th scope="col">Tested Status</th>
+						<th scope="col">Testing failed</th>
+						<th scope="col">Delete</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for qa_testcase in qa_testcases %}
+						<tr>
+							<th scope="row">{{ qa_testcase.pk }}</th>
+							{% if qa_testcase.is_uploaded %}
+								<td><a href="/{{ qa_testcase.secured_file_path }}" target="_blank"><u>download uploaded excel</u></a></td>
+							{% else %}
+								<td style="color:red;">Unable to upload excel sheet</td>
+							{% endif %}
+
+							{% if qa_testcase.is_parsed %}
+								<td><a href="/automation/testcase/{{ qa_testcase.pk }}/" target="_blank"><u>parsed json</u></a></td>
+							{% else %}
+								<td>Unable to parse uploaded data</td>
+							{% endif %}
+
+							<td>{{ qa_testcase.testing_start_datetime }}</td>
+							<td><a href="/automation/testcase/results/{{ qa_testcase.pk }}/"><u>{{ qa_testcase.total_number_of_flows_tested }}/{{ qa_testcase.total_number_of_flows  }}</u></a></td>
+							<td><a href="/automation/testcase/results/{{ qa_testcase.pk }}/"><u>{{ qa_testcase.total_number_of_flows_failed }}/{{ qa_testcase.total_number_of_flows  }}</u></a></td>
+							<td><a href="/automation/testcase/delete/{{ qa_testcase.pk }}/"><i class="fa fa-trash" style="color:red;"></i></a></td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+			
+		</div>
+
+		<div class="col-5">
+
+			<h6><b>Create New Test Case</b></h6>
+
+			<hr>
+
+			<h6>Before starting new test for selected bot, please make sure you have following things in place.</h6>
+
+			<ol>
+				<li>Click <a href="javascript:void(0)" onclick="test_automation_bot('{{ qa_testing_bot.pk }}')"><u>here</u></a> to check whether automation API is integrated with remote client console or not.</li>
+				<li>Click <a rel="noopener noreferrer" href="https://docs.google.com/spreadsheets/d/1Vns4vjziwnFBENiNG2uuYfLxbFj-ngcGtSQhVsaDHqk/edit?usp=sharing" target="_blank"><u>here</u></a> to checkout sample QA Testing flow excel sheet. Create the excel sheet as per requirement export file in the comma separated format (csv) and upload here.</li>
+			</ol>
+
+			<div class="input-group" style="display: inline-block;">
+				<h6><i>*Please export QA Testcase excel as comma separated format (csv) and upload here.</i></h6>
+				<input type="file" class="form-control" id="input-group-file-testcase-excel" 
+				style="width: auto; margin-bottom: 10px;" 
+				aria-describedby="input-group-file-upload-testcase-excel" aria-label="Upload" onchange="check_client_selected_document(this)">
+				<button class="btn btn-outline-secondary" type="button" id="input-group-file-upload-testcase-excel" onclick="start_testcase_excel(this)">Start test</button>
+			</div>
+
+			<div class="input-group mt-4">
+
+				<div class="card">
+					<ul class="list-group list-group-flush">
+						<li class="list-group-item"><span id="uploading-task"></span> Uploading excel sheet at server...</li>
+						<li class="list-group-item"><span id="validating-excel-task"></span> Validating excel sheet...</li>
+					</ul>
+				</div>
+				
+			</div>			
+			
+		</div>
+
+
+	</div>
+
+</div>
+
+
+</body>
+<script type="text/javascript" src="{% static 'TestingApp/js/jquery-3.2.1.slim.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'TestingApp/js/popper.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'TestingApp/js/bootstrap.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'TestingApp/js/crypto-js.min.js' %}"></script>
+
+<script type="text/javascript" src="{% static 'TestingApp/js/app.js' %}"></script>
+
+<script type="text/javascript">
+
+	window.selected_test_bot_id = "{{ qa_testing_bot.pk }}";
+	
+	function processing_started(element){
+		element.innerHTML = '<i class="fa fa-hourglass-start"></i>';
+	}
+
+	function processing_ended(element){
+		element.innerHTML = '<i class="fa fa-check-square"></i>';		
+	}
+
+	// setInterval(function(e){
+	// 	window.location.reload();
+	// }, 10000);
+
+</script>
+
+</html>

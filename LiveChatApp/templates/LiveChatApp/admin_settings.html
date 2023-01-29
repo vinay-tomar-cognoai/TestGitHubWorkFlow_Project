@@ -1,0 +1,674 @@
+{% extends 'LiveChatApp/manager_console.html' %}
+{% block consolecontent %}
+{% load static %}
+
+<style type="text/css">
+
+    .custom-control-input:checked~.custom-control-label::before {
+            border-color: {{ admin_config.get_livechat_theme_lighten_one }};
+            background-color: {{ admin_config.get_livechat_theme_lighten_one }};
+        }
+    .help-icon {
+        border-color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+        color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+    }
+    .lead-source-tab input:checked + span{
+        background: {{ admin_config.get_livechat_theme_lighten_one }};
+    }
+    .livechat-conversation-email-item {
+        background: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+    }
+
+</style>
+
+ <link href="{% static 'LiveChatApp/css/admin_settings.css' %}?v={% random_int 1 100 %}" type="text/css" rel="stylesheet"/>
+ <link href="{% static 'LiveChatApp/css/email_configure.css' %}?v={% random_int 1 100 %}" type="text/css" rel="stylesheet"/>
+
+<div class="col-xl-10 col-lg-10 col-md-12 col-sm-12 col-12 py-2 " id="live-chat-admin-setting-content-gs" style="height: calc(100vh - 4.375rem); background: #FAFAFA; overflow-y: auto; overflow-x: hidden; max-width: 83%">
+
+    <div class="live-chat-admin-general-setting-heading ">
+        <div class="row">
+        	<svg width="14" height="12" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin: 4px 0px;">
+				<rect width="14" height="12" fill="#E5E5E5"/>
+				<g clip-path="url(#clip0)">
+				<rect width="1440" height="841" transform="translate(-90 -242)" fill="white"/>
+				<path d="M4.725 7.125C5.80034 7.125 6.70142 7.92437 6.93885 8.99875L13.475 9C13.7649 9 14 9.25184 14 9.5625C14 9.84727 13.8025 10.0826 13.5462 10.1199L13.475 10.125L6.93901 10.1255C6.70184 11.2003 5.80059 12 4.725 12C3.64941 12 2.74816 11.2003 2.51099 10.1255L0.525 10.125C0.23505 10.125 0 9.87316 0 9.5625C0 9.27773 0.197508 9.04238 0.453761 9.00514L0.525 9L2.51099 8.9995C2.74816 7.92474 3.64941 7.125 4.725 7.125ZM4.725 8.25C4.1901 8.25 3.73528 8.61732 3.56827 9.12937L3.55387 9.17637L3.52693 9.28752C3.50928 9.3762 3.5 9.46819 3.5 9.5625C3.5 9.67863 3.51408 9.79123 3.5405 9.89846L3.56836 9.9959L3.58635 10.0475C3.76638 10.5323 4.20834 10.875 4.725 10.875C5.25963 10.875 5.71427 10.508 5.88148 9.99639L5.90953 9.89836L5.89757 9.94356C5.93167 9.82296 5.95 9.69503 5.95 9.5625C5.95 9.48388 5.94355 9.40688 5.93118 9.33206L5.91016 9.22924L5.89616 9.17647L5.86338 9.07677C5.68316 8.59235 5.2414 8.25 4.725 8.25ZM9.275 0C10.3506 0 11.2518 0.799741 11.489 1.8745L13.475 1.875C13.7649 1.875 14 2.12684 14 2.4375C14 2.72227 13.8025 2.95762 13.5462 2.99487L13.475 3L11.489 3.0005C11.2518 4.07526 10.3506 4.875 9.275 4.875C8.19941 4.875 7.29816 4.07526 7.06099 3.0005L0.525 3C0.23505 3 0 2.74816 0 2.4375C0 2.15273 0.197508 1.91738 0.453761 1.88013L0.525 1.875L7.06115 1.87375C7.29858 0.799366 8.19966 0 9.275 0ZM9.275 1.125C8.7401 1.125 8.28528 1.49232 8.11827 2.00437L8.10387 2.05137L8.07693 2.16252C8.05928 2.2512 8.05 2.34319 8.05 2.4375C8.05 2.55363 8.06408 2.66623 8.0905 2.77346L8.11836 2.8709L8.13635 2.92248C8.31638 3.4073 8.75834 3.75 9.275 3.75C9.80963 3.75 10.2643 3.38304 10.4315 2.87139L10.4595 2.77336L10.4476 2.81856C10.4817 2.69796 10.5 2.57003 10.5 2.4375C10.5 2.35888 10.4935 2.28188 10.4812 2.20706L10.4602 2.10424L10.4462 2.05147L10.4134 1.95177C10.2332 1.46735 9.7914 1.125 9.275 1.125Z" fill="#4D4D4D"/>
+				</g>
+				<defs>
+				<clipPath id="clip0">
+				<rect width="1440" height="841" fill="white" transform="translate(-90 -242)"/>
+				</clipPath>
+				</defs>
+				</svg>
+            <span style="margin-left: 4px; margin-top: -2px">General Settings</span>
+        </div>
+        <div class="row">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-admin-general-setting-dropdown">
+                <div class ="row">
+                    <div class ="col s3">
+                        {% if user_obj.bots.all.count > 1 %}
+                        <select class="form-control"  id="select-bot-obj" onchange="change_bot_obj();">
+                            {% for bot in bot_obj_list %}
+                                {% if bot.pk == bot_id %}
+                                <option value="{{bot.pk}}" selected>{{bot}}</option>
+                                {% else %}
+                                <option value="{{bot.pk}}">{{bot}}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                        {% else %}
+                        <select id="select-bot-obj">
+                            {% for bot in user_obj.bots.all %}
+                                <option value="{{bot.pk}}" selected>{{bot}}</option>
+                            {% endfor %}
+                        </select>
+                        {% endif %}
+
+                    </div>
+                    <div class="col s3">
+                        <button class="saveChangesBtn"  id ="save-admin-settings" onclick="save_admin_settings()">Save Changes</button>
+                    </div>
+
+                </div>
+            </div>    
+        </div>
+    </div>
+    <div class="live-chat-admin-general-setting-area">
+        <div class="container-fluid">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-admin-settings-area">
+                <div class="table-responsive">
+                <table role="table" id="example" class="display">
+                    <tbody role="rowgroup">
+                        <tr role="row">
+                            <th scope="row">
+                                Assign Chat to agents based on their category
+                            </th>
+                            <td>
+                                {% if config_obj.category_enabled %}
+                                <label class="livechat-option-switch" >
+                                    <input type="checkbox" id="is-livechat-category-enabled" checked/>
+                                    <span class="livechat-option-switch-slider round"></span>
+                                </label>
+                                {% else %}
+                                <label class="livechat-option-switch">
+                                    <input type="checkbox" id="is-livechat-category-enabled"/>
+                                    <span class="livechat-option-switch-slider round"></span>
+                                </label> 
+                                {% endif %}     
+                            </td>
+                            </tr>
+                            <tr role="row">
+                                <th scope="row">
+                                    Enable Chat Escalation Matrix for Customers
+                                </th>
+                                <td>
+                                    <label class="livechat-option-switch ">
+                                        <input type="checkbox" id="is-chat-escalation-matrix-enabled" {% if admin_config.is_chat_escalation_matrix_enabled %} checked {% endif %}/>
+                                        <span class="livechat-option-switch-slider round"></span>
+                                    </label>
+                                </td>
+                            </tr>
+
+                            <tr role="row">
+                                <th scope="row">
+                                    Enable LiveChat Conversations through Email Channel
+                                </th>
+                                <td style="padding-right: 10px !important;">
+                                    <div style="display: flex; align-items: center;">
+                                        <label class="livechat-option-switch livechat-conversation-email-cb">
+                                            <input type="checkbox" id="livechat-email-conversation-cb" {% if email_config_obj.is_livechat_enabled_for_email %} checked {% endif %}/>
+                                            <span class="livechat-option-switch-slider round"></span>
+                                        </label>
+                                        <div class="livechat-conversation-email-wrapper">
+                                            <div class="livechat-conversation-email-item" {% if email_config_obj.is_livechat_enabled_for_email %} style="display:inline-flex;" {% else %} style="display: none;" {% endif %}>
+                                                <span>{{email_config_id}}</span>
+                                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M1.89705 2.05379L1.96967 1.96967C2.23594 1.7034 2.6526 1.6792 2.94621 1.89705L3.03033 1.96967L6 4.939L8.96967 1.96967C9.26256 1.67678 9.73744 1.67678 10.0303 1.96967C10.3232 2.26256 10.3232 2.73744 10.0303 3.03033L7.061 6L10.0303 8.96967C10.2966 9.23594 10.3208 9.6526 10.1029 9.94621L10.0303 10.0303C9.76406 10.2966 9.3474 10.3208 9.05379 10.1029L8.96967 10.0303L6 7.061L3.03033 10.0303C2.73744 10.3232 2.26256 10.3232 1.96967 10.0303C1.67678 9.73744 1.67678 9.26256 1.96967 8.96967L4.939 6L1.96967 3.03033C1.7034 2.76406 1.6792 2.3474 1.89705 2.05379L1.96967 1.96967L1.89705 2.05379Z" fill="white"/>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr role="row">
+                                <th scope="row">
+                                    Enable Footer
+                                </th>
+                                <td>{% if not developer_console_config.enable_footer_over_entire_console %}
+                                        <label class="livechat-option-switch">
+                                            <input type="checkbox" id="show-version-footer" disabled>
+                                            <span class="livechat-option-switch-slider round"></span>
+                                        </label>
+                                    {% else %}
+                                        {% if admin_config.show_version_footer %}
+                                            <label class="livechat-option-switch">
+                                                <input type="checkbox" id="show-version-footer" checked>
+                                                <span class="livechat-option-switch-slider round"></span>
+                                            </label>
+                                        {% else %}
+                                            <label class="livechat-option-switch">
+                                                <input type="checkbox" id="show-version-footer">
+                                                <span class="livechat-option-switch-slider round"></span>
+                                            </label>
+                                        {% endif %}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr role="row">
+                                <th scope="row">
+                                    Maximum number of customers with whom an agent can chat at a time
+                                </th>
+                                <td>
+                                     <input class="form-control" type="number" placeholder="number of customer allowed" id="customer-count-id" value="{{config_obj.max_customer_count}}" min="0">
+                                </td>
+                            </tr>
+                            <tr role="row">
+                                <th scope="row">
+                                    Maximum number of agents that can be invited in a single chat 
+                                </th>
+                                <td>
+                                    <select class="form-control select-dropdown-icon livechat-custom-select " id="number-of-guest-agents">
+                                        {% if config_obj.max_guest_agent == "1" %}
+                                            <option value="1" selected>1</option>
+                                        {% else %}
+                                            <option value="1">1</option>
+                                        {% endif %}
+                                        {% if config_obj.max_guest_agent == "2" %}
+                                            <option value="2" selected>2</option>
+                                        {% else %}
+                                            <option value="2">2</option>
+                                        {% endif %}
+                                        {% if config_obj.max_guest_agent == "3" %}
+                                            <option value="3" selected>3</option>
+                                        {% else %}
+                                            <option value="3">3</option>
+                                        {% endif %}
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr role="row">
+                                <th scope="row">
+                                    Pending time for accept/reject while an agent invites another agent in the chat(In seconds)
+                                </th>
+                                <td>
+                                    <input type="number" class="form-control" id="pending-time-id" placeholder="Pending time for accept/reject" min="0"  max="600" value= "{{ config_obj.guest_agent_timer }}" />
+                                </td>
+                            </tr>
+                            <tr role="row">
+                                <th scope="row">
+                                    Queue time (in seconds)<sup><i style="font-size: 15px;" class="material-icons inline-icon help-icon" data-toggle="tooltip" data-position="top" title="Queue Time cannot be less than 30 seconds.">help</i></sup>
+                                </th>
+                                <td>
+                                    <input type="number" class="form-control" id="queue-time-id" placeholder="Queue time in seconds" min="30"  max="600" value= "{{ config_obj.queue_timer }}" />
+                                </td>
+                            </tr>
+                            <tr role="row">
+                                <th scope="row">
+                                    Enable Supervisors to Create Groups <sup><i style="font-size: 15px;" class="material-icons inline-icon help-icon" data-toggle="tooltip" data-position="top" title="Supervisors will be able to create their own groups when enabled">help</i></sup>
+                                </th>
+                                <td>
+                                    <label class="livechat-option-switch">
+                                        {% if admin_config.is_supervisor_allowed_to_create_group %}
+                                            <input type="checkbox" id="is_supervisor_allowed_to_create_group" checked>
+                                        {% else %}
+                                            <input type="checkbox" id="is_supervisor_allowed_to_create_group">
+                                        {% endif %}
+                                        <span class="livechat-option-switch-slider round"></span>
+                                    </label>
+                                </td>
+                            </tr>
+                            <tr role="row">
+                                <th scope="row">
+                                    Enable Customer Details Editing <sup><i style="font-size: 15px;" class="material-icons inline-icon help-icon" data-toggle="tooltip" data-position="top" title="Allow Agents to edit Customer details during an interaction">help</i></sup>
+                                </th>
+                                <td>
+                                    <label class="livechat-option-switch">
+                                        {% if config_obj.is_customer_details_editing_enabled %}
+                                            <input type="checkbox" id="enable-customer-details-editing" checked>
+                                        {% else %}
+                                            <input type="checkbox" id="enable-customer-details-editing">
+                                        {% endif %}
+                                        <span class="livechat-option-switch-slider round"></span>
+                                    </label>
+                                </td>
+                            </tr>
+                            <tr role="row">
+                                <th scope="row">
+                                    Enable Raise a ticket functionality for the Agent<sup><i style="font-size: 15px;" class="material-icons inline-icon help-icon" data-toggle="tooltip" data-position="top" title="Agents will be able to raise a ticket for a conversation. ">help</i></sup>
+                                </th>
+                                <td>
+                                    <label class="livechat-option-switch">
+                                        <input type="checkbox" id="enable-agent-raise-ticket" {% if config_obj.is_agent_raise_ticket_functionality_enabled %} checked {% endif %}>
+                                        <span class="livechat-option-switch-slider round"></span>
+                                    </label>
+                                </td>
+                            </tr>
+                            <tr role="row">
+                                <th scope="row">
+                                    Enable self-assign option of chats at agent’s end
+                                </th>
+                                <td>
+                                    <label class="livechat-option-switch">
+                                        {% if admin_config.is_self_assign_chat_agent_enabled %}
+                                            <input type="checkbox" id="enable-self-assign-chats-agent" checked>
+                                        {% else %}
+                                            <input type="checkbox" id="enable-self-assign-chats-agent">
+                                        {% endif %}
+                                        <span class="livechat-option-switch-slider round"></span>
+                                    </label>
+                                </td>
+                            </tr>
+
+                            <tr role="row">
+                                <th scope="row">
+                                    Enable Voice/Video Call<sup><i style="font-size: 15px;" class="material-icons inline-icon help-icon" data-toggle="tooltip" data-position="top" title="Enable Voice/Video calls between agent and users during LiveChat">help</i></sup>                                          
+                                </th>
+                                <td>
+                                    <select class="livechat-custom-select form-control select-dropdown-icon" id="livechat_call_type">
+                                        <option 
+                                            value="none"
+                                            {% if config_obj.call_type == 'none' %}
+                                                selected
+                                            {% endif %}
+                                            >None</option>
+
+                                        <option 
+                                            value="pip"
+                                            {% if config_obj.call_type == 'pip' %}
+                                                selected
+                                            {% endif %}
+                                            >PIP Voice Call</option>
+
+                                        <option 
+                                            value="new_tab"
+                                            {% if config_obj.call_type == 'new_tab' %}
+                                                selected
+                                            {% endif %}
+                                            >New Tab Voice Call</option>
+                                        
+                                        <option 
+                                            value="video_call"
+                                            {% if config_obj.call_type == 'video_call' %}
+                                                selected
+                                            {% endif %}
+                                            >Video Call</option>
+                                    </select>
+                                </td>
+                            </tr>
+
+                            <tr id="enable_initiate_call_from_customer" role="row" style="display: none;">
+                                <th scope="row">
+                                    <span>Enable the option to initiate Voice call at the customer's end</span><sup><i style="font-size: 15px;" class="material-icons inline-icon help-icon" data-toggle="tooltip" data-position="top" title="On enabling it the customer will also have an option to enable the Voice call.">help</i></sup>
+                                </th>
+                                <td>
+                                        <label class="livechat-option-switch">
+                                            <input 
+                                                type="checkbox" 
+                                                id="enable_call_from_customer_end"
+                                                {% if config_obj.is_call_from_customer_end_enabled %}checked{% endif %}>
+                                            
+                                            <span class="livechat-option-switch-slider round"></span>
+                                        </label>
+                                    
+                                </td>
+                            </tr>
+
+                            <tr role="row">
+                                <th scope="row">
+                                    Allow Agents to initiate Cobrowsing sessions<sup><i style="font-size: 15px;" class="material-icons inline-icon help-icon" data-toggle="tooltip" data-position="top" title="" data-original-title="Allows agent to send assist request to the customer by making the screen of the customer visible to the agent. ">help</i></sup>
+                                </th>     
+                                <td>
+                                    <label class="livechat-option-switch">
+                                        {% if config_obj.is_cobrowsing_enabled %}
+                                            <input type="checkbox" id="livechat_enable_cobrowsing" checked>
+                                        {% else %}
+                                            <input type="checkbox" id="livechat_enable_cobrowsing">
+                                        {% endif %}
+                                        <span class="livechat-option-switch-slider round"></span>
+                                    </label>
+                                </td>
+                            </tr>
+
+                            <tr role="row" id="enable-follow-up-row">
+                                <th scope="row">
+                                    Enable Followup Leads                                          
+                                </th>
+                                <td scope="col">
+                                    <label class="livechat-option-switch">
+                                        <input type="checkbox" id="enable_followup_lead" {% if config_obj.is_followup_lead_enabled %} checked {% endif %}>
+                                        <span class="livechat-option-switch-slider round"></span>
+                                    </label>
+                                </td>
+                                
+                            </tr>
+                            <tr role="row" id="lead-source-row" {% if config_obj.is_followup_lead_enabled %} style="display:table-row;" {% else %} style="display:none;" {% endif %}>
+                                <th scope="row">
+                                    Sources of leads                                          
+                                </th>
+                                <td scope="col">
+                                    <div class="lead-source-container">
+                                        <div class="source-lead">
+                                           
+                                            <label class="lead-source-tab" data-toggle="tooltip" data-position="top" title="Chats triggered during Non Working Hours">
+                                                <input type="checkbox" id="followup-lead-source-offline-chats" class="followup-lead-source" value="offline_chats" {% if "offline_chats" in config_obj.followup_lead_sources %} checked {% endif %}>
+                                                <span>Offline chats</span>
+                                              </label>
+                                        </div>
+                                        <div class="source-lead">
+                                            
+                                            <label class="lead-source-tab" data-toggle="tooltip" data-position="top" title="Chats which gets denied due to unavailability of agents in working hours">
+                                                <input type="checkbox" id="followup-lead-source-missed-chats" class="followup-lead-source" value="missed_chats" {% if "missed_chats" in config_obj.followup_lead_sources %} checked {% endif %} >
+                                                <span>Missed Chats</span>
+                                              </label>
+                                        </div>
+                                        <div class="source-lead">
+                                            
+                                            <label class="lead-source-tab" data-toggle="tooltip" data-position="top" title="Customer Leaves the chat while waiting in queue to connect with an agent">
+                                                <input type="checkbox" id="followup-lead-source-abandoned-chats" class="followup-lead-source" value="abandoned_chats" {% if "abandoned_chats" in config_obj.followup_lead_sources %} checked {% endif %} >
+                                                <span>Abandoned Chats</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </td>
+                                
+                            </tr>
+
+                            <tr role="row">
+                                <th scope="row">
+                                    Agent not available bot response                                            
+                                </th>
+                                <td>
+                                    <!-- <input type="text" placeholder="unavailable response" id="agnet-ua-response" value="{{agent_unavialable_response}}"> -->
+                                    <textarea class="form-control show-char-count" id="agnet-ua-response" value="{{agent_unavialable_response}}" maxlength="{{ character_limit_large_text }}">{{agent_unavialable_response}}</textarea>
+                                    <div class="livechat-char-count">
+                                        <p id="agnet-ua-response-char-count">{{agent_unavialable_response|length}}</p>
+                                        <p>/{{ character_limit_large_text }}</p>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr role="row">
+                                <th scope="row">
+                                    Auto Chat Disposal<sup><i style="font-size: 15px;" class="material-icons inline-icon help-icon" data-toggle="tooltip" data-position="top" title="Enabling this will automatically mark the chat as resolved when the following conditions meet. {% if config_obj.auto_chat_disposal_enabled == False %} (To check the conditions, enable the toggle) {% endif %}">help</i></sup>
+                                </th>
+                                <td>
+                                    {% if config_obj.auto_chat_disposal_enabled %}
+                                        <label class="livechat-option-switch">
+                                            <input type="checkbox" id="auto_chat_disposal_enabled" checked>
+                                            <span class="livechat-option-switch-slider round"></span>
+                                        </label>
+                                    {% else %}
+                                        <label class="livechat-option-switch">
+                                            <input type="checkbox" id="auto_chat_disposal_enabled">
+                                            <span class="livechat-option-switch-slider round"></span>
+                                        </label>
+                                    {% endif %}
+                                </td>
+                            </tr>
+
+                            <tr id="user_terminates_chat_enabled_row" role="row" {% if config_obj.auto_chat_disposal_enabled == False %}style="display:none;"{% endif %}>
+                                <th scope="row">
+                                    When Customer Terminates Chat<sup><i style="font-size: 15px;" class="material-icons inline-icon help-icon" data-toggle="tooltip" data-position="top" title="When the customer ends the chat, it will be marked as resolved after the specified time.">help</i></sup>
+                                </th>
+                                <td>
+                                    {% if config_obj.user_terminates_chat_enabled %}
+                                        <label class="livechat-option-switch">
+                                            <input type="checkbox" id="user_terminates_chat_enabled" checked>
+                                            <span class="livechat-option-switch-slider round"></span>
+                                        </label>
+                                    {% else %}
+                                        <label class="livechat-option-switch">
+                                            <input type="checkbox" id="user_terminates_chat_enabled">
+                                            <span class="livechat-option-switch-slider round"></span>
+                                        </label>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr id="user_terminates_chat_dispose_time_row" role="row"
+                                {% if config_obj.user_terminates_chat_enabled == False %}
+                                    style="display:none;"
+                                {% else %}
+                                    {% if config_obj.auto_chat_disposal_enabled == False %}
+                                        style="display:none;"
+                                    {% endif %}
+                                {% endif %}
+                                >
+                                <th scope="row">
+                                    Time After Which Chat Should Dispose (in minutes)
+                                </th>
+                                <td>
+                                    <input class="form-control" type="number" id="user_terminates_chat_dispose_time" min="1" max="59" value= "{{ config_obj.user_terminates_chat_dispose_time }}" />
+                                </td>
+                            </tr>
+                            <tr id="session_inactivity_enabled_row" role="row" {% if config_obj.auto_chat_disposal_enabled == False %}style="display:none;"{% endif %}>
+                                <th scope="row">
+                                    Session Inactivity<sup><i style="font-size: 15px;" class="material-icons inline-icon help-icon" data-toggle="tooltip" data-position="top" title="When there is no activity from the agent’s or customer’s end till a specified time, the chat will be marked as resolved.">help</i></sup>
+                                </th>
+                                <td>
+                                    {% if config_obj.session_inactivity_enabled %}
+                                        <label class="livechat-option-switch">
+                                            <input type="checkbox" id="session_inactivity_enabled" checked>
+                                            <span class="livechat-option-switch-slider round"></span>
+                                        </label>
+                                    {% else %}
+                                        <label class="livechat-option-switch">
+                                            <input type="checkbox" id="session_inactivity_enabled">
+                                            <span class="livechat-option-switch-slider round"></span>
+                                        </label>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr id="session_inactivity_chat_dispose_time_row" role="row" 
+                                {% if config_obj.session_inactivity_enabled == False %}
+                                    style="display:none;"
+                                {% else %}
+                                    {% if config_obj.auto_chat_disposal_enabled == False %}
+                                        style="display:none;"
+                                    {% endif %}
+                                {% endif %}
+                                >
+                                <th scope="row">
+                                    Time After Which Chat Should Dispose (in minutes)
+                                </th>
+                                <td>
+                                    <input class="form-control" type="number" id="session_inactivity_chat_dispose_time" min="1" max="59" value= "{{ config_obj.session_inactivity_chat_dispose_time }}" />
+                                </td>
+                            </tr>
+                            <tr role="row">
+                                <th scope="row">
+                                    Livechat console colour   
+                                </th>
+                                <td>
+                                    <input type="text" class="form-control jscolor" id="livechat-theme-color" placeholder="HEX" value="{{ admin_config.get_livechat_theme_lighten_one }}" style="height: 61px;" onchange="show_livechat_theme();">
+                                </td>
+                            </tr>
+                            <tr role="row">
+                                <th scope="row">
+                                    Non working hour bot response                                           
+                                </th>
+                                <td>
+                                    <textarea class="form-control show-char-count" id="auto_bot_response" maxlength="{{ character_limit_large_text }}" value="{{config_obj.auto_bot_response}}">{{config_obj.auto_bot_response}}</textarea>
+                                    <div class="livechat-char-count">
+                                        <p id="auto_bot_response-char-count">{{config_obj.auto_bot_response|length}}</p>
+                                        <p>/{{ character_limit_large_text }}</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr role="row">
+                                <th scope="row">
+                                    Masking PII<sup><i style="font-size: 15px;" class="material-icons inline-icon help-icon" data-toggle="tooltip" data-position="top" title="PII data of customer will be masked, to disable it, a mail will be sent for confirmation">help</i></sup>
+                                </th>
+                                <td>
+                                    {% if config_obj.masking_enabled %}
+                                        <label class="livechat-option-switch">
+                                            <input type="checkbox" id="masking-enabled" checked>
+                                            <span class="livechat-option-switch-slider round"></span>
+                                        </label>
+                                    {% else %}
+                                        <label class="livechat-option-switch">
+                                            <input type="checkbox" id="masking-enabled">
+                                            <span class="livechat-option-switch-slider round"></span>
+                                        </label>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="admin-otp-verification-modal" tabindex="-1" role="dialog" aria-labelledby="Admin_report_performance_filter_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6>OTP Verification</h6>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <div class="otp-send-to-div">
+                            An email will be sent to {{livechat_masking_emails_str}}. Please contact them for the code
+                        </div>
+                    </div>
+                    <div class="col-12 mb-4 px-5">
+                        <div class="d-flex flex-row mx-5">
+                            <input type="text" class=" otp-form" autofocus="" maxlength="1" pattern="[0-9]{1}">
+                            <input type="text" class=" otp-form" maxlength="1" pattern="[0-9]{1}">
+                            <input type="text" class=" otp-form" maxlength="1" pattern="[0-9]{1}">
+                            <input type="text" class=" otp-form" maxlength="1" pattern="[0-9]{1}">
+                            <input type="text" class=" otp-form" maxlength="1" pattern="[0-9]{1}">
+                            <input type="text" class=" otp-form" style="margin-right: 0px !important;" maxlength="1"></div>
+                    </div>
+                    <div class="col-12 mb-2">
+                        <div class="resend-otp-div">
+                            Didn’t receive the OTP? <a href="javascript:void(0)" style="font-weight: bold;" id="livechat-resend-otp" style="pointer-events: none;" onclick="send_otp_code()">RESEND OTP</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div style="float: right;">
+                    <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                    <button class="btn-primary" type="button" onclick="check_otp(this)">Submit</button>
+                </div> 
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="livechat-email-authentication-modal" tabindex="-1" role="dialog" aria-labelledby="Admin_report_performance_filter_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6>Email Setup</h6>
+                <button class="livechat-email-back-btn close-modal-back-btn" data-dismiss="modal"> 
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18.7914 11.0051H7.62136L12.5014 6.12508C12.8914 5.73508 12.8914 5.09508 12.5014 4.70508C12.3145 4.51783 12.0609 4.4126 11.7964 4.4126C11.5318 4.4126 11.2782 4.51783 11.0914 4.70508L4.50136 11.2951C4.11136 11.6851 4.11136 12.3151 4.50136 12.7051L11.0914 19.2951C11.4814 19.6851 12.1114 19.6851 12.5014 19.2951C12.8914 18.9051 12.8914 18.2751 12.5014 17.8851L7.62136 13.0051H18.7914C19.3414 13.0051 19.7914 12.5551 19.7914 12.0051C19.7914 11.4551 19.3414 11.0051 18.7914 11.0051Z" fill="#7B7A7B"/>
+                    </svg>
+                </button>
+                <button class="livechat-email-back-btn livechat-email-back-btn-modal" style="display: none;"> 
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18.7914 11.0051H7.62136L12.5014 6.12508C12.8914 5.73508 12.8914 5.09508 12.5014 4.70508C12.3145 4.51783 12.0609 4.4126 11.7964 4.4126C11.5318 4.4126 11.2782 4.51783 11.0914 4.70508L4.50136 11.2951C4.11136 11.6851 4.11136 12.3151 4.50136 12.7051L11.0914 19.2951C11.4814 19.6851 12.1114 19.6851 12.5014 19.2951C12.8914 18.9051 12.8914 18.2751 12.5014 17.8851L7.62136 13.0051H18.7914C19.3414 13.0051 19.7914 12.5551 19.7914 12.0051C19.7914 11.4551 19.3414 11.0051 18.7914 11.0051Z" fill="#7B7A7B"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row livechat-email-protocol-btn-wrapper">
+                    <div class="col-12 mb-4 mt-2 px-4">
+                        <button class="livechat-email-protocol-btn">
+                            IMAP
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row livechat-email-protocol-details-wrapper" style="display: none;">
+                    <div class="col-12 mb-3 mt-2 px-4">
+                        <label>Email Address</label>
+                        <input id="email-config-id" class="form-control" type="email" placeholder="Please enter email address">
+                    </div>
+                    <div class="col-12 mb-3 px-4">
+                        <label>Password</label>
+                        <input id="email-config-password" class="form-control" type="password" placeholder="Please enter password">
+                    </div>
+                    <div class="col-12 mb-3 px-4">
+                        <label>IMAP Server</label>
+                        <input id="email-config-server" class="form-control" type="text" placeholder="Please enter imap server">
+                    </div>
+                    <div class="col-12 mb-3 px-4">
+                        <label>Security</label>
+                        <select id="email-config-security" class="form-control select-dropdown-icon">
+
+                            <option value="ssl">SSL</option>
+                            <option value="tls">TLS</option>
+
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="display: none;">
+                <div style="float: right;">
+                    <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                    <button id="email-config-authenticate-btn" class="btn-primary" type="button">Authenticate</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="email-authentication-success-toast">
+    <svg width="27" height="22" viewBox="0 0 27 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20.8917 11C20.8917 16.5228 16.4388 21 10.9458 21C5.4529 21 1 16.5228 1 11C1 5.47715 5.4529 1 10.9458 1C13.3195 1 15.4989 1.83604 17.2088 3.23122" stroke="#25B139" stroke-width="2" stroke-linecap="round"/>
+        <path d="M9.38794 10.7328L13.0729 14.4378L25.0001 2.4458" stroke="#25B139" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+
+    <span>Email Successfully Authenticated</span>
+    <svg class="remove-authentication-toast" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2.39705 2.55379L2.46967 2.46967C2.73594 2.2034 3.1526 2.1792 3.44621 2.39705L3.53033 2.46967L8 6.939L12.4697 2.46967C12.7626 2.17678 13.2374 2.17678 13.5303 2.46967C13.8232 2.76256 13.8232 3.23744 13.5303 3.53033L9.061 8L13.5303 12.4697C13.7966 12.7359 13.8208 13.1526 13.6029 13.4462L13.5303 13.5303C13.2641 13.7966 12.8474 13.8208 12.5538 13.6029L12.4697 13.5303L8 9.061L3.53033 13.5303C3.23744 13.8232 2.76256 13.8232 2.46967 13.5303C2.17678 13.2374 2.17678 12.7626 2.46967 12.4697L6.939 8L2.46967 3.53033C2.2034 3.26406 2.1792 2.8474 2.39705 2.55379L2.46967 2.46967L2.39705 2.55379Z" fill="#212121"/>
+    </svg>
+</div>
+
+<div class="email-authentication-failed-toast">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10.9092 2.78216C11.949 2.20625 13.247 2.54089 13.8848 3.5224L13.9676 3.66023L21.7266 17.6685C21.9114 18.0021 22.0084 18.3773 22.0084 18.7587C22.0084 19.9495 21.0832 20.9243 19.9124 21.0035L19.7584 21.0087H4.2426C3.86129 21.0087 3.48623 20.9118 3.15265 20.7271C2.11281 20.1513 1.70777 18.8734 2.20133 17.812L2.27422 17.6687L10.031 3.66046C10.2355 3.2911 10.5399 2.98674 10.9092 2.78216ZM20.4144 18.3953L12.6555 4.38702C12.4548 4.02467 11.9983 3.89363 11.636 4.09433C11.5437 4.14547 11.4635 4.21533 11.4005 4.299L11.3433 4.3871L3.58647 18.3954C3.38582 18.7577 3.51692 19.2141 3.87928 19.4148C3.96268 19.461 4.05385 19.4907 4.14785 19.5027L4.2426 19.5087H19.7584C20.1726 19.5087 20.5084 19.1729 20.5084 18.7587C20.5084 18.6633 20.4902 18.5691 20.4551 18.4811L20.4144 18.3953L12.6555 4.38702L20.4144 18.3953ZM12.0003 16.0018C12.5518 16.0018 12.9989 16.4489 12.9989 17.0004C12.9989 17.552 12.5518 17.9991 12.0003 17.9991C11.4487 17.9991 11.0016 17.552 11.0016 17.0004C11.0016 16.4489 11.4487 16.0018 12.0003 16.0018ZM11.9961 8.49955C12.3758 8.49925 12.6898 8.78115 12.7397 9.14718L12.7467 9.24895L12.7503 13.7505C12.7506 14.1648 12.4151 14.5008 12.0009 14.5011C11.6212 14.5014 11.3072 14.2195 11.2572 13.8535L11.2503 13.7517L11.2467 9.25015C11.2463 8.83594 11.5819 8.49988 11.9961 8.49955Z" fill="#E53E3E"/>
+    </svg>
+
+    <span>Email Authentication Unsuccessful</span>
+    <svg class="remove-authentication-toast" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2.39705 2.55379L2.46967 2.46967C2.73594 2.2034 3.1526 2.1792 3.44621 2.39705L3.53033 2.46967L8 6.939L12.4697 2.46967C12.7626 2.17678 13.2374 2.17678 13.5303 2.46967C13.8232 2.76256 13.8232 3.23744 13.5303 3.53033L9.061 8L13.5303 12.4697C13.7966 12.7359 13.8208 13.1526 13.6029 13.4462L13.5303 13.5303C13.2641 13.7966 12.8474 13.8208 12.5538 13.6029L12.4697 13.5303L8 9.061L3.53033 13.5303C3.23744 13.8232 2.76256 13.8232 2.46967 13.5303C2.17678 13.2374 2.17678 12.7626 2.46967 12.4697L6.939 8L2.46967 3.53033C2.2034 3.26406 2.1792 2.8474 2.39705 2.55379L2.46967 2.46967L2.39705 2.55379Z" fill="#212121"/>
+    </svg>
+</div>
+
+<script type="text/javascript">
+
+    window.IS_SUCCESSFUL_AUTHENTICATION_COMPLETE = '{{ email_config_obj.is_successful_authentication_complete }}' == 'True' ? true : false;
+	function change_bot_obj(){
+		if(document.getElementById("select-bot-obj").value != "-1"){
+		window.location.href = "/livechat/settings/?bot_id="+document.getElementById("select-bot-obj").value;
+		}
+	}
+    $('#customer-count-id').on("input",function(){
+        if (document.getElementById('customer-count-id').value < 0){
+            document.getElementById('customer-count-id').value = 0;
+        }
+    })
+    $('#queue-time-id').on("input",function(){
+        if (document.getElementById('queue-time-id').value < 0){
+            document.getElementById('queue-time-id').value = 0;
+        }
+    })
+
+    $('#queue-time-id').on("focusout",function(){
+        if (document.getElementById('queue-time-id').value < 30){
+            document.getElementById('queue-time-id').value = 30;
+        }
+    })
+
+    $(document).ready(function() {
+        $('#livechat_call_type').trigger('change'); 
+    })
+</script>
+{% endblock %}

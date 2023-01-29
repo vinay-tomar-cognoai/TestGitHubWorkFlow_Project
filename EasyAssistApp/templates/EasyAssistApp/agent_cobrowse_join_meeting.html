@@ -1,0 +1,105 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    {% if cobrowse_config_obj.cobrowsing_favicon %}
+        <link rel="shortcut icon" type="image/x-icon" href="{{ cobrowse_config_obj.cobrowsing_favicon }}">
+    {% else %}
+        {% if cobrowse_agent.get_access_token_obj and cobrowse_agent.get_access_token_obj.agent.user.enable_s3_bucket %}
+        <link rel="shortcut icon" type="image/x-icon" href="https://static.allincall.in/static/EasyAssistApp/img/cobrowseLogoShort.svg">
+        {% else %}
+        <link rel="shortcut icon" type="image/x-icon" href="{% static 'EasyAssistApp/img/cobrowseLogoShort.svg' %}">
+        {% endif %}
+    {% endif %}
+
+    <title>Agent | Call</title>
+    <!-- Custom fonts for this template-->
+    {% if cobrowse_agent.get_access_token_obj and cobrowse_agent.get_access_token_obj.agent.user.enable_s3_bucket %}
+    <link href="https://static.allincall.in/static/EasyAssistApp/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <!-- Custom styles for this template-->
+    <link href="https://static.allincall.in/static/EasyAssistApp/css/sb-admin-2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://static.allincall.in/static/EasyAssistApp/css/bootstrap.min.css">
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/vendor/jquery/jquery.min.js"></script>
+    <script src="https://static.allincall.in/static/EasyAssistApp/js/popper.min.js"></script>
+    <script src="https://static.allincall.in/static/EasyAssistApp/js/bootstrap_4.5.min.js"></script>
+    {% else %}
+    <link href="{% static 'EasyAssistApp/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+    <!-- Custom styles for this template-->
+    <link href="{% static 'EasyAssistApp/css/sb-admin-2.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'EasyAssistApp/css/bootstrap.min.css' %}">
+    <script type="text/javascript" src="/static/EasyAssistApp/vendor/jquery/jquery.min.js"></script>
+    <script src="{% static 'EasyAssistApp/js/popper.min.js' %}"></script>
+    <script src="{% static 'EasyAssistApp/js/bootstrap_4.5.min.js' %}"></script>
+    {% endif %}
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+    <style>
+        #cobrowse-agent-meeting-iframe {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+        }
+        body {
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    {% csrf_token %}
+    <div id="cobrowse-agent-meeting-iframe"></div>
+</body>
+
+<script type="text/javascript">
+window.meeting_id = '{{ meeting_io.meeting_id }}';
+window.meeting_description = '{{ meeting_io.meeting_description}}';
+window.meeting_host_url = '{{ meeting_host_url }}';
+window.is_cobrowsing_active = '{{ is_cobrowsing_active }}';
+window.meet_background_color = '{{ meet_background_color }}';
+window.agent_name = '{{ agent_name }}';
+window.unique_id = '{{ unique_id }}';
+window.enable_voip_calling = '{{ enable_voip_calling }}';
+window.ENABLE_REVERSE_COBROWSING = '{{ enable_reverse_cobrowsing }}';
+window.socket_message_sender = "agent";
+window.INVITED_AGENT_NAME = "{{invited_agent_name}}";
+window.ADMIN_AGENT_USERNAME = "{{admin_agent_username}}";
+window.INVITED_AGENT_USERNAME = "{{invited_agent_username}}";
+window.AGENT_IDENTIFIER = "{{agent_identifier}}";
+window.IS_INVITED_AGENT = "{{is_invited_agent}}";
+
+if(ENABLE_REVERSE_COBROWSING == "True") {
+    socket_message_sender = "client";
+}
+</script>
+
+{% if cobrowse_agent.get_access_token_obj and cobrowse_agent.get_access_token_obj.agent.user.enable_s3_bucket %}
+<script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/crypto-js.min.js"></script>
+{% else %}
+<script type="text/javascript" src="/static/EasyAssistApp/js/crypto-js.min.js"></script>
+{% endif %}
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/validations.js' %}"></script>
+<script type="text/javascript" src="/static/EasyAssistApp/js/encrypt.js"></script>
+
+<script type="text/javascript" src="https://{{ meeting_host_url }}/external_api.js"></script>
+{% if DEVELOPMENT %}
+    {% if enable_voip_calling %}
+        <script type="text/javascript" src="/static/EasyAssistApp/js/agent_voip_call.js?v=1.0"></script>
+    {% else %}
+        <script type="text/javascript" src="/static/EasyAssistApp/js/agent_cobrowse_video_meeting.js?v=1.0"></script>
+    {% endif %}
+{% else %}
+    {% if enable_voip_calling %}
+        <script type="text/javascript" src="/static/EasyAssistApp/js/{{access_token_key}}/agent_voip_call.js?v=1.0"></script>
+    {% else %}
+        <script type="text/javascript" src="/static/EasyAssistApp/js/{{access_token_key}}/agent_cobrowse_video_meeting.js?v=1.0"></script>
+    {% endif %}
+{% endif %}
+
+</html>

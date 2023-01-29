@@ -1,0 +1,447 @@
+{% extends 'LiveChatApp/report_console.html' %}
+{% block consolecontent %}
+{% load static %}
+<style type="text/css">
+.dataTables_filter {
+  display: none;
+}
+#hourly-interaction-report-table_info {
+  font-size: 13px;
+      margin-top: 60px;
+      color: #4D4D4D;
+      width: 50%;
+      padding-left: 10px;
+      display: inline-block;
+      position: absolute;
+      bottom: 2px;
+}
+.ui-state-default{
+  background: #f6f6f6 !important;
+  color: #454545 !important;
+  border: 1px solid #c5c5c5 !important;
+}
+.ui-state-highlight{
+    background: #ffffff !important;
+    color: {{admin_config.get_livechat_theme_lighten_one}} !important;
+}
+.ui-state-active{
+  background: {{admin_config.get_livechat_theme_lighten_one}} !important;
+  color: #ffffff !important;
+  border: 1px solid {{admin_config.get_livechat_theme_lighten_one}} !important;
+}
+.ui-datepicker th{
+    position: unset !important;
+}
+.custom-checkbox-input input:checked~.checkmark {
+    background-color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+}
+
+.custom-checkbox-input  .checkmark{
+    border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }} !important;
+}
+
+.livechat-multiselect-dropdown.livechat-multiselect-filter-dropdown .multiselect-container {
+    scrollbar-color: {{ admin_config.get_livechat_theme_lighten_one }} #f1f1f1;
+}
+
+.livechat-multiselect-dropdown.livechat-multiselect-filter-dropdown ::-webkit-scrollbar-thumb {
+    background: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+}
+</style>
+
+<div class="col-xl-10 col-lg-10 col-md-12 col-sm-12 col-12 py-2" id="live-chat-reports-content-hourly-interaction" style="height: calc(100vh - 4.375rem); background: #FAFAFA; overflow-y: auto; overflow-x: hidden; max-width: 83%;">
+
+  <div class="live-chat-report-d-interaction-heading ">
+      <div class="row">
+          <!-- <img src="./img/mobile-back.svg" class="back-arrow-div" id="live-chat-active-customers-opener-setting" onclick="myFunctionArrow()"> -->
+          <svg width="15" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="15" height="15" fill="#E5E5E5"/>
+              <g clip-path="url(#clip0)">
+              <rect width="1440" height="760" transform="translate(-98 -211)" fill="white"/>
+              <rect x="-21" y="-155" width="1363" height="704" fill="#FAFAFA"/>
+              <rect x="-21" y="-155" width="180" height="704" fill="white"/>
+              <path d="M13.44 0H0.56C0.25025 0 0 0.268125 0 0.6V14.4C0 14.7319 0.25025 15 0.56 15H13.44C13.7498 15 14 14.7319 14 14.4V0.6C14 0.268125 13.7498 0 13.44 0ZM12.74 13.65H1.26V1.35H12.74V13.65ZM3.374 7.725H4.26125C4.326 7.725 4.38025 7.66875 4.38025 7.5975V6.11812C4.38025 5.74875 4.6585 5.45063 5.0015 5.45063H8.60125V6.45188C8.60125 6.55875 8.715 6.61688 8.792 6.55125L10.7013 4.94438C10.7625 4.89375 10.7625 4.79438 10.7013 4.74375L8.792 3.13687C8.715 3.07125 8.60125 3.13125 8.60125 3.23625V4.2375H4.99975C4.0355 4.2375 3.255 5.0775 3.255 6.11438V7.59375C3.255 7.66875 3.3075 7.725 3.374 7.725ZM3.3005 10.2544L5.20975 11.8612C5.28675 11.9269 5.4005 11.8669 5.4005 11.7619V10.7606H9.00025C9.9645 10.7606 10.745 9.92062 10.745 8.88375V7.40438C10.745 7.335 10.6925 7.27688 10.626 7.27688H9.73875C9.674 7.27688 9.61975 7.33313 9.61975 7.40438V8.88375C9.61975 9.25313 9.3415 9.55125 8.9985 9.55125H5.4005V8.55C5.4005 8.44313 5.28675 8.385 5.20975 8.45063L3.3005 10.0575C3.23925 10.1044 3.23925 10.2038 3.3005 10.2544Z" fill="#4D4D4D"/>
+              <circle cx="14" cy="13" r="5" fill="#4D4D4D"/>
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M16.5 13C16.5 13.663 16.2366 14.2989 15.7678 14.7678C15.2989 15.2366 14.663 15.5 14 15.5C13.337 15.5 12.7011 15.2366 12.2322 14.7678C11.7634 14.2989 11.5 13.663 11.5 13C11.5 12.337 11.7634 11.7011 12.2322 11.2322C12.7011 10.7634 13.337 10.5 14 10.5C14.663 10.5 15.2989 10.7634 15.7678 11.2322C16.2366 11.7011 16.5 12.337 16.5 13ZM14 11.5938C14 11.5523 13.9835 11.5126 13.9542 11.4833C13.9249 11.454 13.8852 11.4375 13.8438 11.4375C13.8023 11.4375 13.7626 11.454 13.7333 11.4833C13.704 11.5126 13.6875 11.5523 13.6875 11.5938V13.3125C13.6875 13.34 13.6948 13.3671 13.7086 13.3909C13.7225 13.4147 13.7423 13.4345 13.7662 13.4481L14.86 14.0731C14.8959 14.0925 14.938 14.0971 14.9772 14.0859C15.0164 14.0747 15.0497 14.0486 15.07 14.0132C15.0902 13.9778 15.0958 13.9358 15.0855 13.8963C15.0752 13.8569 15.0499 13.8229 15.015 13.8019L14 13.2219V11.5938Z" fill="white"/>
+              </g>
+              <defs>
+              <clipPath id="clip0">
+              <rect width="1440" height="760" fill="white" transform="translate(-98 -211)"/>
+              </clipPath>
+              </defs>
+          </svg>
+
+          <span>Hourly Interaction</span>
+      </div>
+      <div class="row">
+          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-report-button-section">
+
+              <button class="filter-button" id="filterBtn-h-interaction" data-toggle="modal" data-target="#apply-filter-interaction-report">Filters
+                  <svg width="16" height="9" viewBox="0 0 16 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect width="16" height="9" fill="#E5E5E5"/>
+                      <g clip-path="url(#clip0)">
+                      <rect width="1440" height="660" transform="translate(-174 -97)" fill="white"/>
+                      <rect x="-97" y="-41" width="1363" height="604" fill="#FAFAFA"/>
+                      <rect x="-88" y="-30" width="1345" height="68" fill="white"/>
+                      <rect x="-72.5" y="-13.5" width="103" height="34" rx="4.5" fill="white" stroke="#E6E6E6"/>
+                      <path d="M5.33333 8.35714C5.33333 8.18665 5.40357 8.02313 5.5286 7.90257C5.65362 7.78201 5.82319 7.71429 6 7.71429H10C10.1768 7.71429 10.3464 7.78201 10.4714 7.90257C10.5964 8.02313 10.6667 8.18665 10.6667 8.35714C10.6667 8.52764 10.5964 8.69115 10.4714 8.81171C10.3464 8.93227 10.1768 9 10 9H6C5.82319 9 5.65362 8.93227 5.5286 8.81171C5.40357 8.69115 5.33333 8.52764 5.33333 8.35714ZM2.66667 4.5C2.66667 4.3295 2.7369 4.16599 2.86193 4.04543C2.98695 3.92487 3.15652 3.85714 3.33333 3.85714H12.6667C12.8435 3.85714 13.013 3.92487 13.1381 4.04543C13.2631 4.16599 13.3333 4.3295 13.3333 4.5C13.3333 4.6705 13.2631 4.83401 13.1381 4.95457C13.013 5.07513 12.8435 5.14286 12.6667 5.14286H3.33333C3.15652 5.14286 2.98695 5.07513 2.86193 4.95457C2.7369 4.83401 2.66667 4.6705 2.66667 4.5ZM0 0.642857C0 0.472361 0.070238 0.308848 0.195262 0.188289C0.320287 0.0677295 0.489856 0 0.666667 0H15.3333C15.5101 0 15.6797 0.0677295 15.8047 0.188289C15.9298 0.308848 16 0.472361 16 0.642857C16 0.813353 15.9298 0.976867 15.8047 1.09743C15.6797 1.21798 15.5101 1.28571 15.3333 1.28571H0.666667C0.489856 1.28571 0.320287 1.21798 0.195262 1.09743C0.070238 0.976867 0 0.813353 0 0.642857Z" fill="#868686"/>
+                      </g>
+                      <defs>
+                      <clipPath id="clip0">
+                      <rect width="1440" height="660" fill="white" transform="translate(-174 -97)"/>
+                      </clipPath>
+                      </defs>
+                  </svg>
+              </button>
+              <button class="export-button" id="exportBtn-h-interaction" data-toggle="modal" data-target="#modal-report-filter">Export
+                <svg width="15" height="11" viewBox="0 0 15 11" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-left: 12px; margin-top: -3px;">
+                  <rect width="15" height="11" fill="#E5E5E5"/>
+                  <g clip-path="url(#clip0)">
+                  <rect width="1440" height="660" transform="translate(-290 -95)" fill="white"/>
+                  <rect x="-213" y="-39" width="1363" height="604" fill="#FAFAFA"/>
+                  <rect x="-204" y="-28" width="1345" height="68" fill="white"/>
+                  <rect x="-65" y="-12" width="95" height="35" rx="5" fill="{{ admin_config.get_livechat_theme_lighten_one }}"/>
+                  <path d="M11.25 9.58965H1.5V3.24309H3.44625C3.44625 3.24309 3.963 2.61126 5.07375 1.83275H0.75C0.551088 1.83275 0.360322 1.90704 0.21967 2.03929C0.0790176 2.17153 0 2.3509 0 2.53792L0 10.2948C0 10.4819 0.0790176 10.6612 0.21967 10.7935C0.360322 10.9257 0.551088 11 0.75 11H12C12.1989 11 12.3897 10.9257 12.5303 10.7935C12.671 10.6612 12.75 10.4819 12.75 10.2948V7.65325L11.25 8.81326V9.58965ZM10.0208 4.6887V7.19277L15 3.52516L10.0208 0V2.2079C3.975 2.2079 3.975 7.82672 3.975 7.82672C5.6865 5.18373 6.7395 4.6887 10.0208 4.6887Z" fill="white"/>
+                  </g>
+                  <defs>
+                  <clipPath id="clip0">
+                  <rect width="1440" height="660" fill="white" transform="translate(-290 -95)"/>
+                  </clipPath>
+                  </defs>
+              </svg>
+              </button>
+
+              <div class="search-container">
+                  
+                      <button type="submit">
+                          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <rect width="13" height="13" fill="#E5E5E5"/>
+                              <g clip-path="url(#clip0)">
+                              <rect width="1440" height="660" transform="translate(-1209 -141)" fill="white"/>
+                              <rect x="-962" y="-85" width="1193" height="604" fill="#FAFAFA"/>
+                              <rect x="-952" y="-74" width="1174" height="114" fill="white"/>
+                              <g filter="url(#filter0_d)">
+                              <rect x="-14" y="-10" width="219" height="33" rx="5" fill="white"/>
+                              </g>
+                              <path d="M5.55942 11.1182C6.79289 11.118 7.99083 10.7051 8.96247 9.94526L12.0174 13L13 12.0174L9.9451 8.96269C10.7054 7.991 11.1185 6.79285 11.1188 5.55912C11.1188 2.49396 8.62474 0 5.55942 0C2.49409 0 0 2.49396 0 5.55912C0 8.62428 2.49409 11.1182 5.55942 11.1182ZM5.55942 1.38978C7.85893 1.38978 9.72898 3.25973 9.72898 5.55912C9.72898 7.85851 7.85893 9.72846 5.55942 9.72846C3.2599 9.72846 1.38985 7.85851 1.38985 5.55912C1.38985 3.25973 3.2599 1.38978 5.55942 1.38978Z" fill="#757575"/>
+                              </g>
+                              <defs>
+                              <filter id="filter0_d" x="-22" y="-18" width="235" height="49" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                              <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                              <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
+                              <feOffset/>
+                              <feGaussianBlur stdDeviation="4"/>
+                              <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.08 0"/>
+                              <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+                              <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+                              </filter>
+                              <clipPath id="clip0">
+                              <rect width="1440" height="660" fill="white" transform="translate(-1209 -141)"/>
+                              </clipPath>
+                              </defs>
+                          </svg>  
+                      </button>
+                      <input type="text" placeholder="Search" name="search" id="hourly-interaction-report-table-search">
+
+              </div>
+
+
+          </div>
+      </div>
+
+  </div>
+  <!-- peak hour chart start  -->
+  <div class="peak-hours-analytics-div">
+    <div class="peak-hours-analytics-header">
+        <div class="peak-hours-title-date-div">
+          <div class="peak-hours-analytics-title">
+              <h5 class="analytics-title-h">
+                Average Hourly Interactions
+              </h5>
+          </div>
+          <div class="peak-hour-analytic-date-input-div cumulative-peak-analytic-date-range-div">
+              <input type="text" id="cumulative-peak-hours-analytic-start-date" class="analytic-date-input" value="{{ range_start|date:"d-m-Y" }}" onchange="update_cumulative_graph_date();">
+              <span class="hyphen-between-date-span"></span>
+              <input type="text" id="cumulative-peak-hours-analytic-end-date" class="analytic-date-input" value="{{ range_end|date:"d-m-Y" }}" onchange="update_cumulative_graph_date();">
+          </div>
+        </div>
+       
+    </div>
+
+    <div class="peak-hour-analytics-graph-div">
+      <canvas id="cumulative-peak-hours-analytics-graph" width="500" height="250"></canvas>
+      <div class="data-loader-div hourly-interaction-loader" id="livechat_average_peak_hours_graph_loader">
+        <div class="loader-custom">
+            <span></span>
+            <div id="loader-inside-div">
+                <div>
+                </div>
+                <div>
+                </div>
+                <div>
+                </div>
+                <div>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="cumulative-peak-hour-analytic-note-div" id="cumulative-peak-hour-analytic-selected-days">
+        Note: Above graph is calculated on the basis of average for the selected date range
+      </div>
+  </div>
+
+  <div class="peak-hours-analytics-div">
+      <div class="peak-hours-analytics-header">
+          <div class="peak-hours-title-date-div">
+            <div class="peak-hours-analytics-title">
+                <h5 class="analytics-title-h">
+                    Daily Peak Hours Analytics
+                </h5>
+            </div>
+            <div class="peak-hour-analytic-date-input-div">
+                <input type="text" id="peak-hours-analytic-date-input" class="analytic-date-input" value="{{ start_date|date:"d-m-Y" }}" onchange="update_daily_graph_date();" >
+            </div>
+          </div>
+         
+      </div>
+
+      <div class="peak-hour-analytics-graph-div">
+        <canvas id="peak-hours-analytics-graph" width="500" height="250"></canvas>
+        <div class="data-loader-div hourly-interaction-loader" id="livechat_daily_peak_hours_graph_loader">
+            <div class="loader-custom">
+                <span></span>
+                <div id="loader-inside-div">
+                    <div>
+                    </div>
+                    <div>
+                    </div>
+                    <div>
+                    </div>
+                    <div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+  </div>
+
+  <!-- peak hour chart end  -->
+  {% if not interaction_objects %}
+  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-report-d-interaction-table-area live-chat-table-parent-div hourly-interaction-report-table-no-maxheight">
+      <table role="table" id="hourly-interaction-report-table" class="display">
+
+      </table>
+  </div>
+{% else %}
+<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-report-d-interaction-table-area" style="text-align: center; padding: 40px 40px;">
+    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <g opacity="0.15" clip-path="url(#clip0)">
+      <path d="M19.8234 39.9998C19.605 39.9998 19.3917 39.9132 19.2334 39.7565C19.0367 39.5598 18.95 39.2765 19.005 39.0048L20.1834 33.1132C20.2167 32.9498 20.2934 32.8015 20.4117 32.6865L33.375 19.7232C34.3484 18.7498 35.9367 18.7498 36.91 19.7232L39.2667 22.0798C40.2417 23.0548 40.2417 24.6398 39.2667 25.6148L26.3034 38.5782C26.1884 38.6948 26.04 38.7732 25.8767 38.8065L19.985 39.9848C19.9317 39.9948 19.8767 39.9998 19.8234 39.9998ZM21.77 33.6848L20.8867 38.1032L25.305 37.2198L38.09 24.4348C38.415 24.1098 38.415 23.5815 38.09 23.2565L35.7334 20.8998C35.4084 20.5748 34.88 20.5748 34.555 20.8998L21.77 33.6848ZM25.715 37.9882H25.7317H25.715Z" fill="#757575"/>
+      <path d="M15.8333 35H4.16667C1.86833 35 0 33.1317 0 30.8333V9.16667C0 6.86833 1.86833 5 4.16667 5H7.5C7.96 5 8.33333 5.37333 8.33333 5.83333C8.33333 6.29333 7.96 6.66667 7.5 6.66667H4.16667C2.78833 6.66667 1.66667 7.78833 1.66667 9.16667V30.8333C1.66667 32.2117 2.78833 33.3333 4.16667 33.3333H15.8333C16.2933 33.3333 16.6667 33.7067 16.6667 34.1667C16.6667 34.6267 16.2933 35 15.8333 35Z" fill="#757575"/>
+      <path d="M27.5 20C27.04 20 26.6667 19.6267 26.6667 19.1667V9.16667C26.6667 7.78833 25.545 6.66667 24.1667 6.66667H20.8333C20.3733 6.66667 20 6.29333 20 5.83333C20 5.37333 20.3733 5 20.8333 5H24.1667C26.465 5 28.3333 6.86833 28.3333 9.16667V19.1667C28.3333 19.6267 27.96 20 27.5 20Z" fill="#757575"/>
+      <path d="M19.1667 10H9.16675C7.78841 10 6.66675 8.87833 6.66675 7.5V4.16667C6.66675 3.70667 7.04008 3.33333 7.50008 3.33333H10.0834C10.4701 1.43333 12.1551 0 14.1667 0C16.1784 0 17.8634 1.43333 18.2501 3.33333H20.8334C21.2934 3.33333 21.6667 3.70667 21.6667 4.16667V7.5C21.6667 8.87833 20.5451 10 19.1667 10ZM8.33341 5V7.5C8.33341 7.95833 8.70842 8.33333 9.16675 8.33333H19.1667C19.6251 8.33333 20.0001 7.95833 20.0001 7.5V5H17.5001C17.0401 5 16.6667 4.62667 16.6667 4.16667C16.6667 2.78833 15.5451 1.66667 14.1667 1.66667C12.7884 1.66667 11.6667 2.78833 11.6667 4.16667C11.6667 4.62667 11.2934 5 10.8334 5H8.33341Z" fill="#757575"/>
+      <path d="M22.5 14.9997H5.83333C5.37333 14.9997 5 14.6263 5 14.1663C5 13.7063 5.37333 13.333 5.83333 13.333H22.5C22.96 13.333 23.3333 13.7063 23.3333 14.1663C23.3333 14.6263 22.96 14.9997 22.5 14.9997Z" fill="#757575"/>
+      <path d="M22.5 19.9997H5.83333C5.37333 19.9997 5 19.6263 5 19.1663C5 18.7063 5.37333 18.333 5.83333 18.333H22.5C22.96 18.333 23.3333 18.7063 23.3333 19.1663C23.3333 19.6263 22.96 19.9997 22.5 19.9997Z" fill="#757575"/>
+      <path d="M22.5 24.9997H5.83333C5.37333 24.9997 5 24.6263 5 24.1663C5 23.7063 5.37333 23.333 5.83333 23.333H22.5C22.96 23.333 23.3333 23.7063 23.3333 24.1663C23.3333 24.6263 22.96 24.9997 22.5 24.9997Z" fill="#757575"/>
+      </g>
+      <defs>
+      <clipPath id="clip0">
+      <rect width="40" height="40" fill="white"/>
+      </clipPath>
+      </defs>
+    </svg>
+    <span style="color: rgba(134, 134, 134, 0.5); font-size:20px;">No data found</span>
+</div>
+{% endif %}
+</div>
+
+<div class="modal fade" id="apply-filter-interaction-report" tabindex="-1" role="dialog" aria-labelledby="Admin_report_performance_filter_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h6>Filter</h6>
+              <svg width="16" height="9" viewBox="0 0 16 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M5.33333 8.35714C5.33333 8.18665 5.40357 8.02313 5.5286 7.90257C5.65362 7.78201 5.82319 7.71429 6 7.71429H10C10.1768 7.71429 10.3464 7.78201 10.4714 7.90257C10.5964 8.02313 10.6667 8.18665 10.6667 8.35714C10.6667 8.52764 10.5964 8.69115 10.4714 8.81171C10.3464 8.93227 10.1768 9 10 9H6C5.82319 9 5.65362 8.93227 5.5286 8.81171C5.40357 8.69115 5.33333 8.52764 5.33333 8.35714ZM2.66667 4.5C2.66667 4.3295 2.7369 4.16599 2.86193 4.04543C2.98695 3.92487 3.15652 3.85714 3.33333 3.85714H12.6667C12.8435 3.85714 13.013 3.92487 13.1381 4.04543C13.2631 4.16599 13.3333 4.3295 13.3333 4.5C13.3333 4.6705 13.2631 4.83401 13.1381 4.95457C13.013 5.07513 12.8435 5.14286 12.6667 5.14286H3.33333C3.15652 5.14286 2.98695 5.07513 2.86193 4.95457C2.7369 4.83401 2.66667 4.6705 2.66667 4.5ZM0 0.642857C0 0.472361 0.070238 0.308848 0.195262 0.188289C0.320287 0.0677295 0.489856 0 0.666667 0H15.3333C15.5101 0 15.6797 0.0677295 15.8047 0.188289C15.9298 0.308848 16 0.472361 16 0.642857C16 0.813353 15.9298 0.976867 15.8047 1.09743C15.6797 1.21798 15.5101 1.28571 15.3333 1.28571H0.666667C0.489856 1.28571 0.320287 1.21798 0.195262 1.09743C0.070238 0.976867 0 0.813353 0 0.642857Z" fill="#2D2D2D"></path>
+              </svg>
+          </div>
+          <div class="modal-body">
+              <div class="row">
+                  <div class="col-12 mb-2">
+                      <label>Bot Name</label>
+                      <select name="day" class="form-control select-dropdown-icon selectpicker create-user-select-field" id="select-bot-name">
+                        <option value="0">All</option>
+                      {% for bot in bot_list %}
+                          {% if bot.pk == 0 %}
+                              <option value="{{ bot.pk }}" selected>{{ bot.name }}</option>
+                          {% else %}
+                              <option value="{{ bot.pk }}">{{ bot.name }}</option>
+                          {% endif %}
+                      {% endfor %}
+                      </select>
+                  </div>
+                  <div class="col-12 mb-2">
+                      <label>Channel</label>
+                      <div class="livechat-multiselect-dropdown livechat-multiselect-filter-dropdown">
+                        <select name="channel" class="form-control select-dropdown-icon" id="livechat-hourly-analytics-select-channel" multiple>
+                            {% for channel in channel_list %}
+                                <option value="{{ channel.pk }}">{{ channel.name }}</option>
+                            {% endfor %}
+                      </select>
+                     </div>
+                  </div>
+                  <div class="col-12 mb-2">
+                      <label>Category</label>
+                      <div class="livechat-multiselect-dropdown livechat-multiselect-filter-dropdown">
+                        <select name="category" class="form-control select-dropdown-icon " id="livechat-hourly-analytics-select-category" multiple>
+                            {% for category in category_obj_list %}
+                                <option value="{{ category.pk }}">{{ category.title }}</option>
+                            {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-12 mb-2">
+                      <label>Sources</label>
+                      <div class="livechat-multiselect-dropdown livechat-multiselect-filter-dropdown">
+                        <select name="sources" class="form-control select-dropdown-icon create-user-select-field" id="livechat-hourly-analytics-select-source" multiple>
+                            <option value="1">Desktop</option>
+                            <option value="2">Mobile</option>
+                            <option value="3">Others</option>
+                      </select>
+                    </div>
+                  </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+              <div style="float: right;">
+                  <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                  <button class="btn-primary" type="button" id="submit-filter" onclick="submit_hourly_interaction_report_filter()">Apply</button>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modal-report-filter" tabindex="-1" role="dialog" aria-labelledby="Admin_report_export_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h6>Select Date Range</h6>
+          </div>
+          <div class="modal-body">
+              <div class="row">
+                  <div class="col-12 mb-2">
+                      <label>Range</label>
+                      <select name="day" class="form-control select-dropdown-icon selectpicker create-user-select-field date-range-select" id="select-date-range-export" onchange="check_select_date_range(this)">
+                        <option value="0" selected="selected">Choose date range</option>
+                        <option value="5">Today</option>
+                        <option value="1">Last day</option>
+                        <option value="2">Last 7 days</option>
+                        <option value="3">Last 1 month</option>
+                        <option value="4">Custom Range</option>
+                      </select>
+                  </div>
+              </div>
+              <div class="row" id="custom-range-filter-export" style="display: none;">
+                <div class="col-12">
+                    <label>Filter by date range</label><br>
+                    <input type="text" class="form-control" id="export-default-start-date" placeholder="Start Date" value="{{ start_date|date:" d-m-Y " }}">
+                    <input type="text" class="form-control" id="export-default-end-date" placeholder="End Date" value="{{ start_date|date:" d-m-Y " }}">
+                </div>
+              </div>
+                <div class="col-12" id="custom-range-filter-email" style="margin-top: 18px;padding: 0px;display: none;">
+                    <label>Email ID*</label>
+                    <input class="form-control" type="text" placeholder="Enter your email id" id="filter-data-email-export" value="{{ request.user.email }}">
+                </div>
+                <div class="col-12" id="report-warning-div" style="margin-top: 18px;padding: 0px;display: none;">
+                    <p id="report-warning-text" style="font-style: normal;font-weight: 500;font-size: 12px;color: #4D4D4D;"></p>
+                </div>
+          </div>
+          <div class="modal-footer">
+              <div style="float: right;">
+                  <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                  <button class="btn-primary" type="button"  id="hourly-interaction-report-filter" onclick="hourly_interaction_report_filter()">Export</button>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+  <script type="text/javascript">
+    window.IS_REPORT_GENERATION_VIA_KAFKA_ENABLED = '{{is_report_generation_via_kafka_enabled}}' == 'True' ? true : false;
+    $(document).ready(function() {
+        submit_hourly_interaction_report_filter();
+        
+        let start_date = "{{start_date|date:" d-m-Y "}}";
+        let end_date = "{{start_date|date:" d-m-Y "}}";
+        let range_start = "{{range_start|date:" d-m-Y "}}";
+        let range_end = "{{range_end|date:" d-m-Y "}}";
+        var currentDate = new Date();
+        $('#export-default-start-date').datepicker({ dateFormat: 'dd-mm-yy', prevText: "Previous",maxDate: currentDate }).val(start_date.trim());
+        $('#export-default-end-date').datepicker({ dateFormat: 'dd-mm-yy', prevText: "Previous",maxDate: currentDate }).val(end_date.trim());
+
+        $('#peak-hours-analytic-date-input').datepicker({ dateFormat: 'dd-mm-yy', prevText: "Previous",maxDate: currentDate }).val(start_date.trim());
+        $('#cumulative-peak-hours-analytic-start-date').datepicker({ dateFormat: 'dd-mm-yy', prevText: "Previous",maxDate: currentDate }).val(range_start.trim());
+        $('#cumulative-peak-hours-analytic-end-date').datepicker({ dateFormat: 'dd-mm-yy', prevText: "Previous",maxDate: currentDate }).val(range_end.trim());
+    });
+    function check_select_date_range(element){
+        if(element.value=="4"){
+            document.getElementById("custom-range-filter-export").style.display="block";
+            document.getElementById("custom-range-filter-email").style.display="block";
+            if(window.IS_REPORT_GENERATION_VIA_KAFKA_ENABLED) {
+                document.getElementById("report-warning-div").style.display="block";
+                document.getElementById("report-warning-text").innerHTML = window.REPORT_WARNING_TEXT
+            }
+        }else if(element.value=="5"){
+            document.getElementById("custom-range-filter-export").style.display = "none";
+            document.getElementById("custom-range-filter-email").style.display="block";
+        }
+        else{
+            document.getElementById("custom-range-filter-export").style.display="none";
+            document.getElementById("custom-range-filter-email").style.display="none";
+        }
+    }
+    </script>
+    <script type="text/javascript" src="{% static 'LiveChatApp/js/chartjs-adapter-date-fns.bundle.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'LiveChatApp/js/chartjs-plugin-datalabels.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'LiveChatApp/js/bootstrap-multiselect.js' %}"></script>
+
+    <script>
+    $("#livechat-hourly-analytics-select-source").multiselect({
+        nonSelectedText: 'Select source',
+        enableFiltering: false,
+        includeSelectAllOption: true,
+        enableCaseInsensitiveFiltering: false
+    });
+    $("#livechat-hourly-analytics-select-source").multiselect('selectAll', false);
+    $("#livechat-hourly-analytics-select-source").multiselect('updateButtonText');
+    
+    $("#livechat-hourly-analytics-select-channel").multiselect({
+        nonSelectedText: 'Select channel',
+        enableFiltering: false,
+        includeSelectAllOption: true,
+        enableCaseInsensitiveFiltering: false
+    });
+    $("#livechat-hourly-analytics-select-channel").multiselect('selectAll', false);
+    $("#livechat-hourly-analytics-select-channel").multiselect('updateButtonText');
+
+    $("#livechat-hourly-analytics-select-category").multiselect({
+        nonSelectedText: 'Select category',
+        enableFiltering: false,
+        includeSelectAllOption: true,
+        enableCaseInsensitiveFiltering: false
+    });
+    $("#livechat-hourly-analytics-select-category").multiselect('selectAll', false);
+    $("#livechat-hourly-analytics-select-category").multiselect('updateButtonText');
+
+    $(".livechat-multiselect-dropdown.livechat-multiselect-filter-dropdown .multiselect-container>li>a>label").addClass("custom-checkbox-input");
+    $(".livechat-multiselect-dropdown.livechat-multiselect-filter-dropdown .multiselect-container>li").find(".custom-checkbox-input").append("<span class='checkmark'></span>");
+
+    function update_daily_graph_date(){
+        update_daily_peak_hour_analytics_graph_and_data_table();
+    }
+    function update_cumulative_graph_date(){
+        update_cumulative_peak_hours_analytics_graph();
+    }
+  </script>
+{% endblock %}

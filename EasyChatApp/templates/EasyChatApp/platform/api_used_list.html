@@ -1,0 +1,38 @@
+{% extends 'EasyChatApp/base.html' %}
+{% block content %}
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/api_used_list.css' %}?v={% random_int 1 100 %}">
+<div class="add-scrolling">
+<div class="row" style="margin-top:1%;">
+    <table class="striped highlight white" style="margin-top:2%;table-layout:fixed;word-wrap:break-word;">
+        <thead>
+            <tr>
+                <th>Intent Name</th>
+                <th>Tree Name</th>
+                <th>Processor Name</th>
+                <th>URLS Used</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for key,value in api_name_url_used.items %}
+            <tr>
+                <td>{{key.6}}</td>
+                <td>{{key.7}}</td>
+                <td><a href="/chat/edit-processor/?intent_pk={{key.0}}&tree_pk={{key.1}}&processor={{key.5}}&bot_pk={{key.4}}" target="_blank">{{key.3}}</a> <b>({{key.5}})</b></td>
+                <td> 
+                <select>
+                {% for item in value %}                
+                <option>{{item}}</option>
+                {% endfor %}
+                </select>
+            </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</div>
+        
+
+{% endblock %}

@@ -1,0 +1,283 @@
+{% extends 'EasyChatApp/base.html' %}
+{% block content %}
+{% load static %}
+
+<!--css containing editor_common_utils and editor_custom_js and editor_code-->
+<link rel="stylesheet" type="text/css" href="/static/EasyChatApp/css/chatbot_custom_js.css?v={% random_int 1 100 %}" media="screen">
+
+
+<div class="add-scrolling processor-background-color">
+
+  <div id="edit-processor-warning" style="display: none; text-align: center;color: #C62828; margin-top: 15px">
+  </div>
+  
+  <div class="row process-file-name-autosave-row" style="padding:2em; padding-bottom: 0px; margin-bottom: 0px;"> 
+    <div class="col s6">
+        <div class="processor-file-name-div">
+            <span class="file-name-span">File Name</span>
+            
+            {% if name == "asdhs524fdbghdagfht52eg2fc" %}
+                <input type="text" id="processor-name" class="input browser-default processor-name-input" placeholder="Don't forget to put name of your file before saving.">
+            {% else %}
+                <input type="text" id="processor-name" class="input browser-default processor-name-input" placeholder="Don't forget to put name of your file before saving." value="{{name}}">
+            {% endif %}
+
+        </div>
+    </div>
+
+
+    <div class="col s6 easychat-autosave processor-save-api-mailer-div">
+    
+        <a class="mailer-btn modal-trigger btn tooltipped" style="margin-left: 0px" data-tooltip="Email Settings not configured for API Faliure" href="#modal-api-fail-email-config" id="api-mailer-btn">
+          <span class="api-mailer-error-icon">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9.99984 18.3334C14.5832 18.3334 18.3332 14.5834 18.3332 10C18.3332 5.41669 14.5832 1.66669 9.99984 1.66669C5.4165 1.66669 1.6665 5.41669 1.6665 10C1.6665 14.5834 5.4165 18.3334 9.99984 18.3334Z" stroke="#E53E3E" stroke-width="2.0625" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M10 6.66669V10.8334" stroke="#E53E3E" stroke-width="2.0625" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M9.99561 13.3333H10.0033" stroke="#E53E3E" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>   
+          </span>
+
+          <span class="api-mailer-success-icon">
+            <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 0.5C12.4183 0.5 16 4.08172 16 8.5C16 12.9183 12.4183 16.5 8 16.5C3.58172 16.5 0 12.9183 0 8.5C0 4.08172 3.58172 0.5 8 0.5ZM8 1.5C4.13401 1.5 1 4.63401 1 8.5C1 12.366 4.13401 15.5 8 15.5C11.866 15.5 15 12.366 15 8.5C15 4.63401 11.866 1.5 8 1.5ZM11.3584 6.14645C11.532 6.32001 11.5513 6.58944 11.4163 6.78431L11.3584 6.85355L7.35355 10.8584C7.17999 11.032 6.91056 11.0513 6.71569 10.9163L6.64645 10.8584L4.64645 8.85842C4.45118 8.66316 4.45118 8.34658 4.64645 8.15131C4.82001 7.97775 5.08944 7.95846 5.28431 8.09346L5.35355 8.15131L7 9.798L10.6513 6.14645C10.8466 5.95118 11.1632 5.95118 11.3584 6.14645Z" fill="#059669"/>
+              </svg>
+              
+          </span>
+                        
+            <p>API Mailer</p>
+        </a>
+        {% if name == "asdhs524fdbghdagfht52eg2fc" %}
+            <a class="btn save-processor-btn tooltipped" style="opacity: 0.5" data-tooltip="Configure API mailer first" id="save-processor-btn"  onclick="save_processor_content('{{processor}}', '{{tree_pk}}', '{{name}}')">Save Processor</a>
+        {% else %} 
+            <a class="btn red darken-3 delete-processor-btn" id="delete-processor-btn" onclick="delete_processor_content('{{processor}}', '{{tree_pk}}', '{{name}}')">Delete Processor</a>
+
+            <a class="btn save-processor-btn tooltipped" data-tooltip="Configure API mailer first" id="save-processor-btn" style="opacity: 1" onclick="save_processor_content('{{processor}}', '{{tree_pk}}', '{{name}}')">Save Processor</a>
+        {% endif %}
+
+      <span id="easychat-autosave-span">Changes saved</span>
+    </div>
+
+  </div>
+
+  <div class="row processor-editor-post-processor-row" style="padding:1em;" id="easychat-processor-container">
+    <div class="col s8">
+
+      <div class="col s12">
+        <div class="processor-editor-header">
+          
+            <p class="editor-header-name-icon-para">
+              <svg width="17" height="20" viewBox="0 0 17 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6.6365 9.60312H9.81782C10.7026 9.60312 11.4085 8.70874 11.4085 7.62096V3.9013C11.4085 2.84275 10.6817 2.05062 9.81782 1.87175C8.75145 1.65637 7.59271 1.66731 6.6365 1.87535C5.29007 2.1674 5.04584 2.77703 5.04584 3.90497V4.70108H8.23013V5.88706H3.85134C2.92496 5.88706 2.11465 6.56965 1.86149 7.86555C1.56957 9.35122 1.55766 10.2784 1.86149 11.8298C2.08788 12.9833 2.62704 13.8082 3.55345 13.8082H4.64668V12.027C4.64665 10.7384 5.5552 9.60312 6.6365 9.60312Z" fill="#347AB4"/>
+                  <path d="M15.145 8.45712C14.9157 7.32918 14.4808 6.47864 13.5544 6.47864H12.3599V8.2089C12.3599 9.55222 11.4305 10.6838 10.3701 10.6838H7.18871C6.31887 10.6838 5.59802 11.5964 5.59802 12.6659V16.382C5.59802 17.4405 6.34867 18.061 7.18871 18.3641C8.19552 18.7254 9.1636 18.7912 10.37 18.3641C11.1714 18.0793 11.9608 17.5063 11.9608 16.382V15.6028H8.7824V14.3998H13.5544C14.4808 14.3998 14.8233 13.6077 15.145 12.4214C15.4787 11.1985 15.4638 10.0231 15.145 8.45712Z" fill="#FFCA1D"/>
+                  <path d="M6.43692 4.01228C6.11959 4.01228 5.8623 3.69347 5.8623 3.30112C5.86515 2.90523 6.11959 2.58643 6.43692 2.58643C6.75141 2.58643 7.01156 2.90872 7.01156 3.30112C7.01153 3.69347 6.75425 4.01228 6.43692 4.01228Z" fill="white"/>
+                  <path d="M10.2978 17.7607C9.98046 17.7607 9.72314 17.4419 9.72314 17.0495C9.72602 16.6536 9.98043 16.3348 10.2978 16.3348C10.6123 16.3348 10.8724 16.6571 10.8724 17.0495C10.8724 17.4419 10.6152 17.7607 10.2978 17.7607Z" fill="white"/>
+              </svg>
+              Python 3.6
+            </p>
+              <a href="javascript:void(0)" class="right tooltipped" data-position="top" data-tooltip="Full-screen mode" onclick="go_full_screen_mode()">
+                  <svg width="17" height="20" viewBox="0 0 17 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M4.26327 13.0956C4.61032 12.7486 5.173 12.7486 5.52005 13.0956C5.8671 13.4427 5.8671 14.0054 5.52005 14.3524L3.1491 16.7226H4.55766C5.01341 16.7226 5.38903 17.0657 5.44036 17.5077L5.44634 17.6113C5.44634 18.1021 5.04847 18.5 4.55766 18.5H1.00294C0.512134 18.5 0.114258 18.1021 0.114258 17.6113V14.0566C0.114258 13.5658 0.512134 13.1679 1.00294 13.1679C1.49374 13.1679 1.89162 13.5658 1.89162 14.0566V15.4669L4.26327 13.0956ZM11.6716 18.5C11.1808 18.5 10.7829 18.1021 10.7829 17.6113C10.7829 17.1205 11.1808 16.7226 11.6716 16.7226H13.0783L10.7097 14.3522C10.3894 14.0317 10.365 13.5276 10.6362 13.1791L10.7102 13.0954C11.0573 12.7485 11.62 12.7487 11.9669 13.0959L14.3376 15.4687V14.0566C14.3376 13.6008 14.6807 13.2252 15.1226 13.1739L15.2263 13.1679C15.7171 13.1679 16.115 13.5658 16.115 14.0566V17.6113C16.115 18.1021 15.7171 18.5 15.2263 18.5H11.6716ZM4.55766 2.5C5.04847 2.5 5.44634 2.89788 5.44634 3.38868C5.44634 3.87949 5.04847 4.27736 4.55766 4.27736H3.15088L5.51956 6.64851C5.83979 6.969 5.86423 7.47309 5.59302 7.82161L5.51906 7.9053C5.17188 8.25221 4.60919 8.25199 4.26228 7.90481L1.89162 5.53218V6.9434C1.89162 7.39915 1.54855 7.77477 1.10658 7.82611L1.00294 7.83208C0.512134 7.83208 0.114258 7.43421 0.114258 6.9434V3.38868C0.114258 2.89788 0.512134 2.5 1.00294 2.5H4.55766ZM15.2263 2.5C15.7171 2.5 16.115 2.89788 16.115 3.38868V6.9434C16.115 7.43421 15.7171 7.83208 15.2263 7.83208C14.7355 7.83208 14.3376 7.43421 14.3376 6.9434V5.53218L11.9668 7.90492C11.6465 8.22534 11.1424 8.25009 10.7938 7.97909L10.71 7.90518C10.3629 7.5582 10.3628 6.99552 10.7098 6.64839L13.0792 4.27736H11.6716C11.2158 4.27736 10.8402 3.9343 10.7889 3.49232L10.7829 3.38868C10.7829 2.89788 11.1807 2.5 11.6716 2.5H15.2263Z" fill="white"/>
+                  </svg>
+                      
+              </a>
+        </div>
+      </div>
+
+      <div class="col s12">
+        <div id="editor-code">{{code}}</div>
+
+        <div class="processor-input-run-button-div">
+
+            {% if processor == "post" %}
+              <input type="text" id="easychat-processor-input" placeholder="write your input here as string. Ex. 'This is easychat console'">
+            {% elif processor == "pipe" %}
+              <input type="text" id="easychat-processor-input" placeholder="write your pipe separated input here as string. Ex. 'abc|bhgy|ahvm|achb'">
+            {% elif processor == "field" %}
+              <input type="text" id="easychat-processor-input" placeholder="Write your Field Processor input here.">
+            {% endif %}
+
+            <a class="btn green lighten-2 run-processor-btn right modal-trigger" id="easychat-processor-run-btn"  onclick="run_processor('{{processor}}')">Run Processor</a>
+          
+        </div>
+
+        <div class="">
+          <textarea col="30" id="easychat-processor-status" disabled style="color: #F1F2EB;resize:none;height: 18em;border-radius: 0.5em;overflow: auto;display: none;background-color: #272822;padding:5px;"></textarea>
+        </div>
+
+      </div>
+
+      <div class="processor-errors" id="system-command-error">
+        Don't use system commands.
+      </div>
+
+    </div>
+    <div class="col s4">
+      {% block processorcontent %}
+
+      {% endblock %}
+    </div>
+
+
+    <!-- Dynamic variable modal -->
+    <div id="easychat-dynamic-variables" class="modal easychat-new-modal-div" tabindex="0" >
+      <div class="modal-content">
+          <div class="modal-content-header">
+            <h5 style="text-align: center;">Dynamic Variable</h5>
+            <svg class="modal-close" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18 6L6 18" stroke="#25282B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M6 6L18 18" stroke="#25282B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="easychat-modal-table-div">
+            <div class="row" id="easychat-dynamic-variables-content">
+          
+            </div>
+          </div>
+      </div>
+    
+      <div class="modal-footer">
+          <button class="btn easychat-new-modal-submit-btn-div modal-close" onclick="update_dynamic_variables(this)">
+            <a href="javascript:void(0)">Save</a>
+          </button>
+
+          
+      </div>
+    
+    </div>
+
+  </div>
+
+</div>
+
+<div id="modal-api-fail-email-config" class="modal open easychat-new-modal-div" tabindex="0" style="z-index: 1003; display: none; opacity: 1; top: 10%; transform: scaleX(1) scaleY(1);">
+  <div class="modal-content">
+      <div class="modal-content-header">
+        <h5 style="text-align: center;">API Fail Email Configuration</h5>
+        <svg class="modal-close" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 6L6 18" stroke="#25282B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M6 6L18 18" stroke="#25282B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="easychat-modal-table-div">
+          <table style="table-layout: fixed;word-wrap: break-word;">
+              <tbody>
+                  <tr >
+                      <td>
+                        <p>
+                          Time interval (in minutes)
+                          <span>
+                            This is the time interval between two mails that will be sent for the same API failure.
+                          </span>
+                        </p> 
+                      </td>
+                      <td>
+                          <input type="number" class="input browser-default" id="mail_sender_time_interval_input_editor"  style="text-align: center;" min="1" max="1440" step="1" onkeypress="return event.charCode >= 48" onpaste="return event.charCode >= 48">
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>
+                        <p> Email address </p>
+                          
+                      </td>
+                      <td>
+                          <input class="input browser-default" id="add-api-mailer-input" placeholder="Enter Email ID and Enter">
+                          <div id="added-email-address-div-container" class="added-email-address-div">
+
+                          </div>
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+      </div>
+  </div>
+
+  <div class="modal-footer">
+      <button class="btn easychat-new-modal-submit-btn-div modal-close" onclick="handleSaveEmail(this)">
+        <a href="#">Submit</a>
+      </button>
+  </div>
+
+</div>
+
+{% if request.user.enable_s3_bucket %}
+
+<script src="https://static.allincall.in/static/EasyChatApp/js/ace.js" type="text/javascript" charset="utf-8"></script>
+
+{% else %}
+
+<script src="{% static 'EasyChatApp/js/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+
+{% endif %}
+
+<script src="{% static 'EasyChatApp/js/ext-searchbox.js' %}" type="text/javascript" charset="utf-8"></script>
+
+<script>
+    var autosave_session_timer = null;
+    var editor = ace.edit("editor-code");
+    editor.setTheme("ace/theme/monokai");
+    editor.session.setMode("ace/mode/python");
+  
+    var is_new = false;
+    var original_processor_name = '{{name}}'
+    if('{{name}}' == "asdhs524fdbghdagfht52eg2fc"){
+      original_processor_name = ""
+      is_new = true;
+    }
+    $(".email-address-tag-div .remove-email-icon").click(function() {
+      $(this).parent(".email-address-tag-div").remove();
+    });
+
+    function processor_language_change(processor, language, tree_pk){
+
+      var json_string = JSON.stringify({
+        language: selected_lang,
+        processor: processor,
+        tree_pk: tree_pk,
+        is_new: is_new,
+      })
+      json_string = EncryptVariable(json_string);
+      json_string = encodeURIComponent(json_string);
+
+      var xhttp = new XMLHttpRequest();
+      var params = 'json_string='+json_string
+      xhttp.open("POST", "/chat/processor-language-change/", false);
+      xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+      xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+              response = JSON.parse(this.responseText);
+              response = custom_decrypt(response)
+              response = JSON.parse(response);
+              if(response["status"]==200){
+                editor.setValue(response["code"])
+                editor.clearSelection();
+                console.log(response)
+              }
+          }
+      }
+      xhttp.send(params);
+    }
+
+    ////////////////// Processor Autosave   //////////////////
+
+    function reset_auto_save_timer() {
+      
+      clearTimeout(autosave_session_timer);
+      autosave_session_timer = setTimeout(function() {
+        var processor_name = document.getElementById("processor-name").value
+        if(processor_name != ""){
+          if(is_new){
+            save_processor_content('{{processor}}', '{{tree_pk}}', '{{name}}', false)
+          }else{
+
+            save_processor_content('{{processor}}', '{{tree_pk}}', '{{name}}', true)
+          }
+        }
+      }, 15000);
+    }
+
+    document.getElementById("editor-code").addEventListener('keyup', reset_auto_save_timer);
+
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,976 @@
+{% extends 'EasyChatApp/base.html' %}
+{% block content %}
+{% load static %}
+{% load custom_filters %}
+
+<link rel="stylesheet" type="text/css" href="/static/EasyChatApp/css/nps_analytics.css?v={% random_int 1 100 %}">
+<script type="text/javascript"
+  src="{% static 'EasyChatApp/js/revised_analytics.js' %}?v={% random_int 1 100 %}"></script>
+
+<div class="easychat-analytics-custom-table-wrapper">
+  <div class="container-fluid">
+    <div class="card shadow mb-4">
+      <div class="card-header ppy-3" style="min-height: 60px;">
+        <div class="row" style="margin-top: 0;">
+          <div>
+            <a href="/chat/revised-analytics/?bot_id={{ selected_bot_obj.pk }}&selected_language=en" class="analytics-table-back-arrow-btn">
+              <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15.5117 18.0485L9.51172 12.0485L15.5117 6.04852" stroke="#0254D7" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </a>
+          </div>
+          <div>
+            <div class="m-0 font-weight-bold text-primary heading-text-primary">CSAT Analytics</div>
+
+            <div class="easychat-text-primary-subheading">Analyse how products and services provided by the bot meets or
+              surpass customer expectation.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="custom-btn-row">
+          <div class="custom-filter-container">
+            <div class="form_assist_search_bar_div">
+              <span class="form_assist_search_icon"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" clip-rule="evenodd"
+                    d="M10.7571 8.89195L14.6355 12.7714C14.9252 13.0616 14.9252 13.5317 14.6355 13.8219C14.3434 14.1069 13.8773 14.1069 13.5852 13.8219L9.70681 9.94247C7.39764 11.6996 4.12229 11.3665 2.21383 9.18062C0.305363 6.9947 0.416511 3.70349 2.4681 1.65138C4.51969 -0.40074 7.81004 -0.511917 9.9954 1.39704C12.1808 3.30599 12.5137 6.58219 10.7571 8.89195ZM6.388 1.55974C4.1735 1.55974 2.3783 3.3554 2.3783 5.57047C2.38091 7.78445 4.17459 9.57859 6.388 9.58121C8.6025 9.58121 10.3977 7.78554 10.3977 5.57047C10.3977 3.3554 8.6025 1.55974 6.388 1.55974Z"
+                    fill="#7B7A7B" />
+                </svg>
+              </span>
+              <input type="text" class="pdf_search_bar" onkeyup="search_from_table()"
+                id="csat-search-bar" placeholder="Search User ID">
+            </div>
+          </div>
+          <div class="easychat-table-record-manage-dropdown-div" id="easychat_form_assist_table_row_drop_container">
+            <p>Show&nbsp;</p>
+            <div id="easychat_form_assist_table_row_dropdown_div">
+              <select name="easychat_form_assist_table_row_dropdown" id="easychat_form_assist_table_row_dropdown"
+                data-minimum-results-for-search="Infinity" onchange="handle_count(this)">
+                {% with '10 25 50 75 100' as list %}
+                {% for page_option in list.split %}
+                {% if page_option == feedback_objs.paginator.per_page|slugify %}
+                <option value="{{page_option}}" selected="" data-select2-id="select2-data-7-ljef">{{page_option}}</option>
+                {% else %}
+                <option value="{{page_option}}">{{page_option}}</option>
+                {% endif %}
+                {% endfor %}
+                {% endwith %}
+              </select>
+            </div>
+            <p>&nbsp; Entries</p>
+          </div>
+          <div>
+            <a class="waves-effect btn easychat-button modal-trigger right" href="#modal-nps-filter">
+              <svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2.00024 6.51178L17.6588 6.51178" stroke="white" stroke-width="1.95732"
+                  stroke-linecap="round" />
+                <path d="M3.95764 10.4264L15.7015 10.4264" stroke="white" stroke-width="1.95732"
+                  stroke-linecap="round" />
+                <path d="M6.8938 14.3411L12.7658 14.3411" stroke="white" stroke-width="1.95732"
+                  stroke-linecap="round" />
+              </svg>
+
+              <span>Filter</span>
+            </a>
+          </div>
+          <div>
+            <a class="waves-effect btn easychat-button modal-trigger right" href="#modal-nps-export">
+              <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M11 12.5585H3.2V5.63497H4.757C4.757 5.63497 5.1704 4.94569 6.059 4.0964H2.6C2.44087 4.0964 2.28826 4.17745 2.17574 4.32172C2.06321 4.46599 2 4.66166 2 4.86569V13.3278C2 13.5318 2.06321 13.7275 2.17574 13.8717C2.28826 14.016 2.44087 14.097 2.6 14.097H11.6C11.7591 14.097 11.9117 14.016 12.0243 13.8717C12.1368 13.7275 12.2 13.5318 12.2 13.3278V10.446L11 11.7115V12.5585ZM10.0166 7.21199V9.9437L14 5.94268L10.0166 2.09705V4.50566C5.18 4.50566 5.18 10.6353 5.18 10.6353C6.5492 7.75202 7.3916 7.21199 10.0166 7.21199Z"
+                  fill="white" />
+              </svg>
+
+              <span>Export</span>
+            </a>
+          </div>
+        </div>
+      </div>
+      {% if feedback_objs %}
+      <div id="nps-div">
+        <div class="easychat-analytics-custom-table-parent-container">
+
+          <div class="table-responsive">
+            <table width="100%" id="nps-table">
+
+              <thead>
+                <tr role="row">
+                  <th name="Tag_ID" data-orderable="false" tabindex="0" rowspan="1" colspan="1" class="sorting_disabled"
+                    aria-controls="search_table" aria-label="Tag ID" style="max-width: 300px;">Date Time</th>
+                  <th name="Intent" data-orderable="false" tabindex="0" rowspan="1" colspan="1" class="sorting_disabled"
+                    aria-controls="search_table" aria-label="Intent" style="max-width: 300px;">User ID</th>
+                  <th name="Pop_up_time" tabindex="0" rowspan="1" colspan="1" data-orderable="false"
+                    class="sorting_disabled" aria-controls="search_table" aria-label="Pop up time">Channel</th>
+                  <th name="Action" data-orderable="false" tabindex="0" rowspan="1" colspan="1" class="sorting_disabled"
+                    aria-controls="search_table" aria-label="Action" style="width: 150px;">CSAT Score</th>
+                  <th name="Action" data-orderable="false" tabindex="0" rowspan="1" colspan="1" class="sorting_disabled"
+                    aria-controls="search_table" aria-label="Action" style="width: 150px;">Comments</th>
+                  <th name="Action" data-orderable="false" tabindex="0" rowspan="1" colspan="1" class="sorting_disabled"
+                    aria-controls="search_table" aria-label="Action" style="width: 150px;">Chat History</th>
+
+                </tr>
+              </thead>
+              <tbody>
+                {% for feedback_obj in feedback_objs %}
+                <tr role="row">
+                  <td>{{ feedback_obj.date }}</td>
+                  <td class="form_assist_intents">
+                    <span>{{ feedback_obj.user_id }}</span>
+                  </td>
+                  <td>
+                  {{ feedback_obj.channel }}
+                  </td>
+                  {% if feedback_obj.rating == -1 %}
+                  <td style="text-align: center;">NA</td>
+                  {% else %}
+                  {% if feedback_obj.scale_rating_5 %}
+                  <td>{{ feedback_obj.rating }}/5</td>
+                  {% else %}
+                  <td>{{ feedback_obj.rating }}/4</td>
+                  {% endif %}
+                  {% endif %}
+                  {% if feedback_obj.channel.name == "WhatsApp" and feedback_obj.rating != 1 and feedback_obj.rating != 2 %}
+                  <td style="text-align: center;">NA</td>
+                  {% elif feedback_obj.comments != "" or feedback_obj.phone_number != "" or feedback_obj.email_id != "" or feedback_obj.all_feedbacks != "" %}
+                  <td>
+                  <div style="position: relative;">
+                  <a href="#" class="easychat-csat-read-more">Read More</a>
+                  <div class="easychat-analytics-csat-rating-popover-wrapper">
+                    <div class="nps-extended">
+                    <div class="csat-rating-popover-heading">
+                      CSAT Feedback
+                    </div>
+                    <div class="csat-rating-popover-star-wrapper">
+                      {% if feedback_obj.scale_rating_5 %}
+                      {% if feedback_obj.rating == 5 %}
+                      <svg class="five-star-csat-svg" width="199" height="34" viewBox="0 0 199 34" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M8.04985 30.4028L11.2629 19.9L2.76392 13.8195H13.2667L16.5834 2.76392L19.9 13.8195H30.4028L21.9038 19.9L25.1169 30.4028L16.5834 23.9077L8.04985 30.4028Z"
+                          fill="#F5C828" />
+                        <path
+                          d="M49.5082 30.4028L52.7212 19.9L44.2223 13.8195H54.7251L58.0417 2.76392L61.3584 13.8195H71.8612L63.3622 19.9L66.5752 30.4028L58.0417 23.9077L49.5082 30.4028Z"
+                          fill="#F5C828" />
+                        <path
+                          d="M90.9665 30.4028L94.1795 19.9L85.6805 13.8195H96.1833L99.5 2.76392L102.817 13.8195H113.319L104.82 19.9L108.033 30.4028L99.5 23.9077L90.9665 30.4028Z"
+                          fill="#F5C828" />
+                        <path
+                          d="M132.425 30.4028L135.638 19.9L127.139 13.8195H137.642L140.958 2.76392L144.275 13.8195H154.778L146.279 19.9L149.492 30.4028L140.958 23.9077L132.425 30.4028Z"
+                          fill="#F5C828" />
+                        <path
+                          d="M173.883 30.4028L177.096 19.9L168.597 13.8195H179.1L182.417 2.76392L185.733 13.8195H196.236L187.737 19.9L190.95 30.4028L182.417 23.9077L173.883 30.4028Z"
+                          fill="#F5C828" />
+                      </svg>
+                      {% elif feedback_obj.rating == 4 %}
+                      <svg class="four-star-csat-svg" width="200" height="34"
+                        viewBox="0 0 200 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M8.09033 30.5556L11.3195 20.0001L2.77783 13.8889H13.3334L16.6667 2.77783L20.0001 13.8889H30.5556L22.0139 20.0001L25.2431 30.5556L16.6667 24.0278L8.09033 30.5556Z"
+                          fill="#16A79E" />
+                        <path
+                          d="M49.757 30.5556L52.9861 20.0001L44.4445 13.8889H55L58.3333 2.77783L61.6667 13.8889H72.2222L63.6806 20.0001L66.9097 30.5556L58.3333 24.0278L49.757 30.5556Z"
+                          fill="#16A79E" />
+                        <path
+                          d="M91.4236 30.5556L94.6528 20.0001L86.1111 13.8889H96.6666L100 2.77783L103.333 13.8889H113.889L105.347 20.0001L108.576 30.5556L100 24.0278L91.4236 30.5556Z"
+                          fill="#16A79E" />
+                        <path
+                          d="M133.09 30.5556L136.319 20.0001L127.778 13.8889H138.333L141.667 2.77783L145 13.8889H155.556L147.014 20.0001L150.243 30.5556L141.667 24.0278L133.09 30.5556Z"
+                          fill="#16A79E" />
+                        <path
+                          d="M174.757 30.5556L177.986 20.0001L169.444 13.8889H180L183.333 2.77783L186.667 13.8889H197.222L188.681 20.0001L191.91 30.5556L183.333 24.0278L174.757 30.5556Z"
+                          fill="#DADADA" />
+                      </svg>
+                      {% elif feedback_obj.rating == 3 %}
+                      <svg class="three-star-csat-svg" width="200" height="34"
+                        viewBox="0 0 200 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M8.09033 30.5556L11.3195 20.0001L2.77783 13.8889H13.3334L16.6667 2.77783L20.0001 13.8889H30.5556L22.0139 20.0001L25.2431 30.5556L16.6667 24.0278L8.09033 30.5556Z"
+                          fill="#00B9E1" />
+                        <path
+                          d="M49.757 30.5556L52.9861 20.0001L44.4445 13.8889H55L58.3333 2.77783L61.6667 13.8889H72.2222L63.6806 20.0001L66.9097 30.5556L58.3333 24.0278L49.757 30.5556Z"
+                          fill="#00B9E1" />
+                        <path
+                          d="M91.4236 30.5556L94.6528 20.0001L86.1111 13.8889H96.6666L100 2.77783L103.333 13.8889H113.889L105.347 20.0001L108.576 30.5556L100 24.0278L91.4236 30.5556Z"
+                          fill="#00B9E1" />
+                        <path
+                          d="M133.09 30.5556L136.319 20.0001L127.778 13.8889H138.333L141.667 2.77783L145 13.8889H155.556L147.014 20.0001L150.243 30.5556L141.667 24.0278L133.09 30.5556Z"
+                          fill="#DADADA" />
+                        <path
+                          d="M174.757 30.5556L177.986 20.0001L169.444 13.8889H180L183.333 2.77783L186.667 13.8889H197.222L188.681 20.0001L191.91 30.5556L183.333 24.0278L174.757 30.5556Z"
+                          fill="#DADADA" />
+                      </svg>
+                      {% elif feedback_obj.rating == 2 %}
+                      <svg class="two-star-csat-svg" width="196" height="33" viewBox="0 0 196 33"
+                        fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M7.92842 29.9444L11.093 19.5999L2.72217 13.6111H13.0666L16.3333 2.72217L19.5999 13.6111H29.9444L21.5736 19.5999L24.7381 29.9444L16.3333 23.5472L7.92842 29.9444Z"
+                          fill="#FF7A1A" />
+                        <path
+                          d="M48.7618 29.9444L51.9264 19.5999L43.5555 13.6111H53.9L57.1667 2.72217L60.4333 13.6111H70.7778L62.4069 19.5999L65.5715 29.9444L57.1667 23.5472L48.7618 29.9444Z"
+                          fill="#FF7A1A" />
+                        <path
+                          d="M89.5952 29.9444L92.7597 19.5999L84.3889 13.6111H94.7334L98 2.72217L101.267 13.6111H111.611L103.24 19.5999L106.405 29.9444L98 23.5472L89.5952 29.9444Z"
+                          fill="#DADADA" />
+                        <path
+                          d="M130.428 29.9444L133.593 19.5999L125.222 13.6111H135.567L138.833 2.72217L142.1 13.6111H152.444L144.074 19.5999L147.238 29.9444L138.833 23.5472L130.428 29.9444Z"
+                          fill="#DADADA" />
+                        <path
+                          d="M171.262 29.9444L174.426 19.5999L166.056 13.6111H176.4L179.667 2.72217L182.933 13.6111H193.278L184.907 19.5999L188.072 29.9444L179.667 23.5472L171.262 29.9444Z"
+                          fill="#DADADA" />
+                      </svg>
+                      {% elif feedback_obj.rating == 1 %}
+                      <svg class="one-star-csat-svg" width="196" height="33" viewBox="0 0 196 33"
+                        fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M7.92842 29.9444L11.093 19.5999L2.72217 13.6111H13.0666L16.3333 2.72217L19.5999 13.6111H29.9444L21.5736 19.5999L24.7381 29.9444L16.3333 23.5472L7.92842 29.9444Z"
+                          fill="#FF281A" />
+                        <path
+                          d="M48.7618 29.9444L51.9264 19.5999L43.5555 13.6111H53.9L57.1667 2.72217L60.4333 13.6111H70.7778L62.4069 19.5999L65.5715 29.9444L57.1667 23.5472L48.7618 29.9444Z"
+                          fill="#DADADA" />
+                        <path
+                          d="M89.5952 29.9444L92.7597 19.5999L84.3889 13.6111H94.7334L98 2.72217L101.267 13.6111H111.611L103.24 19.5999L106.405 29.9444L98 23.5472L89.5952 29.9444Z"
+                          fill="#DADADA" />
+                        <path
+                          d="M130.428 29.9444L133.593 19.5999L125.222 13.6111H135.567L138.833 2.72217L142.1 13.6111H152.444L144.074 19.5999L147.238 29.9444L138.833 23.5472L130.428 29.9444Z"
+                          fill="#DADADA" />
+                        <path
+                          d="M171.262 29.9444L174.426 19.5999L166.056 13.6111H176.4L179.667 2.72217L182.933 13.6111H193.278L184.907 19.5999L188.072 29.9444L179.667 23.5472L171.262 29.9444Z"
+                          fill="#DADADA" />
+                      </svg>
+                      {% endif %}
+                      {% else %}
+                      {% if feedback_obj.rating == 4 %}
+                      <svg class="four-by-four-csat-svg" width="161" height="34" viewBox="0 0 161 34" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M8.21165 31.0139L11.4892 20.3L2.81946 14.0972H13.5333L16.9167 2.81946L20.3 14.0972H31.0139L22.3441 20.3L25.6217 31.0139L16.9167 24.3882L8.21165 31.0139Z"
+                          fill="#F5C828" />
+                        <path
+                          d="M50.5033 31.0139L53.7809 20.3L45.1111 14.0972H55.825L59.2083 2.81946L62.5916 14.0972H73.3055L64.6357 20.3L67.9133 31.0139L59.2083 24.3882L50.5033 31.0139Z"
+                          fill="#F5C828" />
+                        <path
+                          d="M92.795 31.0139L96.0726 20.3L87.4028 14.0972H98.1167L101.5 2.81946L104.883 14.0972H115.597L106.927 20.3L110.205 31.0139L101.5 24.3882L92.795 31.0139Z"
+                          fill="#F5C828" />
+                        <path
+                          d="M135.087 31.0139L138.364 20.3L129.694 14.0972H140.408L143.792 2.81946L147.175 14.0972H157.889L149.219 20.3L152.497 31.0139L143.792 24.3882L135.087 31.0139Z"
+                          fill="#F5C828" />
+                      </svg>
+                      {% elif feedback_obj.rating == 3 %}
+                      <svg class="three-by-four-csat-svg" width="159" height="34" viewBox="0 0 159 34" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M8.09033 30.5556L11.3195 20.0001L2.77783 13.8889H13.3334L16.6667 2.77783L20.0001 13.8889H30.5556L22.0139 20.0001L25.2431 30.5556L16.6667 24.0278L8.09033 30.5556Z"
+                          fill="#00B9E1" />
+                        <path
+                          d="M49.757 30.5556L52.9861 20.0001L44.4445 13.8889H55L58.3333 2.77783L61.6667 13.8889H72.2222L63.6806 20.0001L66.9097 30.5556L58.3333 24.0278L49.757 30.5556Z"
+                          fill="#00B9E1" />
+                        <path
+                          d="M91.4237 30.5556L94.6529 20.0001L86.1112 13.8889H96.6668L100 2.77783L103.333 13.8889H113.889L105.347 20.0001L108.576 30.5556L100 24.0278L91.4237 30.5556Z"
+                          fill="#00B9E1" />
+                        <path
+                          d="M133.09 30.5556L136.319 20.0001L127.778 13.8889H138.333L141.667 2.77783L145 13.8889H155.556L147.014 20.0001L150.243 30.5556L141.667 24.0278L133.09 30.5556Z"
+                          fill="#DADADA" />
+                      </svg>
+                      {% elif feedback_obj.rating == 2 %}
+                      <svg class="two-by-four-csat-svg" width="156" height="33" viewBox="0 0 156 33" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M7.92842 29.9444L11.093 19.5999L2.72217 13.6111H13.0666L16.3333 2.72217L19.5999 13.6111H29.9444L21.5736 19.5999L24.7381 29.9444L16.3333 23.5472L7.92842 29.9444Z"
+                          fill="#FF7A1A" />
+                        <path
+                          d="M48.7618 29.9444L51.9264 19.5999L43.5555 13.6111H53.9L57.1667 2.72217L60.4333 13.6111H70.7778L62.4069 19.5999L65.5715 29.9444L57.1667 23.5472L48.7618 29.9444Z"
+                          fill="#FF7A1A" />
+                        <path
+                          d="M89.595 29.9444L92.7596 19.5999L84.3888 13.6111H94.7332L97.9999 2.72217L101.267 13.6111H111.611L103.24 19.5999L106.405 29.9444L97.9999 23.5472L89.595 29.9444Z"
+                          fill="#DADADA" />
+                        <path
+                          d="M130.428 29.9444L133.593 19.5999L125.222 13.6111H135.567L138.833 2.72217L142.1 13.6111H152.444L144.074 19.5999L147.238 29.9444L138.833 23.5472L130.428 29.9444Z"
+                          fill="#DADADA" />
+                      </svg>
+                      {% elif feedback_obj.rating == 1 %}
+                      <svg class="one-by-four-csat-svg" width="156" height="33" viewBox="0 0 156 33" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M7.92842 29.9444L11.093 19.5999L2.72217 13.6111H13.0666L16.3333 2.72217L19.5999 13.6111H29.9444L21.5736 19.5999L24.7381 29.9444L16.3333 23.5472L7.92842 29.9444Z"
+                          fill="#FF281A" />
+                        <path
+                          d="M48.7618 29.9444L51.9264 19.5999L43.5555 13.6111H53.9L57.1667 2.72217L60.4333 13.6111H70.7778L62.4069 19.5999L65.5715 29.9444L57.1667 23.5472L48.7618 29.9444Z"
+                          fill="#DADADA" />
+                        <path
+                          d="M89.5952 29.9444L92.7597 19.5999L84.3889 13.6111H94.7334L98 2.72217L101.267 13.6111H111.611L103.24 19.5999L106.405 29.9444L98 23.5472L89.5952 29.9444Z"
+                          fill="#DADADA" />
+                        <path
+                          d="M130.428 29.9444L133.593 19.5999L125.222 13.6111H135.567L138.833 2.72217L142.1 13.6111H152.444L144.074 19.5999L147.238 29.9444L138.833 23.5472L130.428 29.9444Z"
+                          fill="#DADADA" />
+                      </svg>
+                      {% endif %}
+                      {% endif %}
+                    </div>
+                    {% if feedback_obj.rating > 2 %}
+                    <div style="margin-bottom:12px">
+                      <div class="csat-rating-popover-subheading">
+                        Comments:
+                      </div>
+                      <div class="csat-rating-popover-comments">
+                        {% if feedback_obj.comments != "" %}
+                        {{feedback_obj.comments}}
+                        {% else %}
+                        NA
+                        {% endif %}
+                      </div>
+                    </div>
+                    {% endif %}
+                    {% if feedback_obj.rating <= 2 %}
+                    <div style="margin-bottom:12px">
+                      <div class="csat-rating-popover-subheading">
+                        Demoter Feedback Form:
+                      </div>
+                      <div class="csat-rating-popover-feedback">
+                        {% if feedback_obj.all_feedbacks %}
+                        {% with feedback_obj.all_feedbacks|split:"," as feeds %}
+                        {% for feed in feeds %}
+                        <div class="easychat-csat-feedback-item easychat-csat-valid-feedback">
+                          <span>{{feed|title}}</span>
+                        </div>
+                        {% endfor %}
+                        {% endwith %}
+                        {% else %}
+                        <div class="easychat-csat-feedback-item easychat-csat-valid-feedback">
+                          {% if feedback_obj.comments != "" %}
+                          {{feedback_obj.comments}}
+                          {% else %}
+                          NA
+                          {% endif %}
+                        </div>
+                        {% endif %}
+                      </div>
+                    </div>
+                    <div style="margin-bottom:12px">
+                      <div class="csat-rating-popover-subheading">
+                        Phone number
+                      </div>
+                      <div class="csat-rating-popover-number-email">
+                        {% if feedback_obj.phone_number != "" %}
+                          {% if feedback_obj.country_code %}{{feedback_obj.country_code}}-{% endif %}{{feedback_obj.phone_number}}
+                        {% else %}
+                        NA
+                        {% endif %}
+                      </div>
+                    </div>
+                    <div>
+                      <div class="csat-rating-popover-subheading">
+                        Email ID
+                      </div>
+                      <div class="csat-rating-popover-number-email">
+                        {% if feedback_obj.email_id != "" %}
+                        {{feedback_obj.email_id}}
+                        {% else %}
+                        NA
+                        {% endif %}
+                      </div>
+                    </div>
+                  {% endif %}
+                  </div>
+                  </div>
+                  </div>
+                  </td>
+                  {% else %}
+                  <td style="text-align: center;">NA</td>
+                  {% endif %}
+                  <td style="text-align: center;">
+                    <a href="/chat/user-filtered/?bot_id={{ selected_bot_id }}&user_id={{ feedback_obj.user_id }}"
+                      target="_blank">
+                      <img src="{% static 'EasyChatApp/images/chat_history.svg' %}" alt="">
+                    </a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+
+
+          </div>
+        </div>
+        <div class="row mt-3" id="form_assist_table_pagination_div">
+          <div class="col-md-6 col-sm-12 entries" id="table_page_info">Showing
+            {{feedback_objs.start_index}}
+            to {{feedback_objs.end_index}}
+            of {{feedback_objs.paginator.count}} entries</div>
+          <div class="col-md-6 col-sm-12">
+            <div class="d-flex justify-content-end">
+              <nav aria-label="Page navigation example" style="box-shadow: none;">
+                <ul class="pagination" style="margin-right: 16px;">
+                  {% if feedback_objs.has_previous %}
+                  <li class="page-item">
+                    <a class="page-link previous_button" aria-label="Previous"
+                      onclick="redirect_to_page('{{feedback_objs.previous_page_number}}')">
+                      <span aria-hidden="true">
+                        Previous
+                      </span>
+                    </a>
+                  </li>
+                  {% else %}
+                  <li class="page-item disabled">
+                    <a class="page-link previous_button" aria-label="Previous" style="pointer-events: none;">
+                      <span aria-hidden="true">
+                        Previous
+                      </span>
+                    </a>
+                  </li>
+                  {% endif %}
+                  {% for page in feedback_objs.paginator.page_range %}
+                  {% if feedback_objs.number|add:"-4" < page and page < feedback_objs.number %}
+                  <li class="page-item">
+                    <a data-page="{{page}}" class="page-link" onclick="redirect_to_page('{{page}}')">
+                      {{page}}
+                    </a>
+                  </li>
+                  {% elif page == feedback_objs.number %}
+                  <li class="page-item">
+                    <a data-page="{{page}}" class="active page-link">
+                      {{page}}
+                    </a>
+                  </li>
+                  {% elif feedback_objs.number < page and page < feedback_objs.number|add:"4" %}
+                  <li class="page-item">
+                    <a data-page="{{page}}" class="page-link" onclick="redirect_to_page('{{page}}')">
+                      {{page}}
+                    </a>
+                  </li>
+                  {% elif page == feedback_objs.paginator.num_pages %}
+                  <li class="page-item">
+                    <a data-page="{{page}}" class="page-link" onclick="redirect_to_page('{{page}}')">
+                      {{page}}
+                    </a>
+                  </li>
+                  {% elif page == feedback_objs.number|add:'4' %}
+                  <li class="page-item">
+                    <a style="pointer-events: none;" class="page-link">
+                      ...
+                    </a>
+                  </li>
+                  {% endif %}
+                  {% endfor %}
+                  {% if feedback_objs.has_next %}
+                  <li class="page-item" style="border-right: none;">
+                    <a class="page-link next_button" onclick="redirect_to_page('{{feedback_objs.next_page_number}}')"
+                      class="page-link" aria-label="Next" style="pointer-events: all;">
+                      <span aria-hidden="true">
+                        Next
+                      </span>
+                    </a>
+                  </li>
+                  {% else %}
+                  <li class="page-item disabled" style="border-right: none;">
+                    <a class="page-link" aria-label="Next" style="pointer-events: none;">
+                      <span aria-hidden="true">
+                        Next
+                      </span>
+                    </a>
+                  </li>
+                  {% endif %}
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="easychat-analytics-no-data-found-wrapper" style="height: 350px; display: none;" id="no-nps-div">
+      {% else %}
+      <div class="easychat-analytics-no-data-found-wrapper" style="height: 350px;" id="no-nps-div">
+        {% endif %}
+        <svg width="241" height="120" viewBox="0 0 241 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g clip-path="url(#clip0_735_24983)">
+            <path d="M166.903 84.1542H74.0488L87.4751 8.00912H180.329L166.903 84.1542Z" fill="#F2F8FF" />
+            <path d="M119.254 0.12344H88.8649L87.4746 8.00916H119.996L119.254 0.12344Z" fill="#F2F8FF" />
+            <path d="M119.996 8.00916H87.4746L88.8649 0.12344H119.254L119.996 8.00916Z" fill="#E1E7EF" />
+            <path d="M166.903 84.1542H74.0488L87.4751 8.00912H180.329L178.93 15.9485L175.8 33.6966L166.903 84.1542Z"
+              fill="#E1E7EF" />
+            <path d="M166.767 84.1542H73.712L60.5 10.7736H153.555L166.767 84.1542Z" fill="#F1F5F9" />
+            <path
+              d="M96.6134 51.7641C96.6134 53.9002 94.8817 55.6318 92.7457 55.6318C90.6096 55.6318 88.8779 53.9002 88.8779 51.7641C88.8779 49.628 90.6096 47.8964 92.7457 47.8964C94.8817 47.8964 96.6134 49.628 96.6134 51.7641Z"
+              fill="#17282F" />
+            <path
+              d="M127.189 51.7641C127.189 53.9002 125.457 55.6318 123.321 55.6318C121.185 55.6318 119.453 53.9002 119.453 51.7641C119.453 49.628 121.185 47.8964 123.321 47.8964C125.457 47.8964 127.189 49.628 127.189 51.7641Z"
+              fill="#17282F" />
+            <path
+              d="M113.588 56.2493L113.376 55.8442C113.357 55.8077 111.359 52.1146 107.338 52.1146C103.672 52.1146 102.778 55.5919 102.741 55.74L102.633 56.1831L101.746 55.9689L101.853 55.5252C101.863 55.4822 102.942 51.2003 107.338 51.2003C111.921 51.2003 114.095 55.2475 114.186 55.42L114.398 55.8247L113.588 56.2493Z"
+              fill="#17282F" />
+          </g>
+          <path
+            d="M2.09961 113.154V100.551H4.17383L10.1504 109.876H10.2559V100.551H12.1455V113.154H10.0537L4.12109 103.829H4.00684V113.154H2.09961ZM14.5801 108.452C14.5801 107.52 14.791 106.677 15.2129 105.921C15.6406 105.165 16.2354 104.573 16.9971 104.145C17.7588 103.718 18.6143 103.504 19.5635 103.504C20.5127 103.504 21.3652 103.721 22.1211 104.154C22.8828 104.588 23.4717 105.183 23.8877 105.938C24.3096 106.688 24.5205 107.526 24.5205 108.452C24.5205 109.378 24.3066 110.219 23.8789 110.975C23.457 111.725 22.8652 112.316 22.1035 112.75C21.3418 113.178 20.4893 113.392 19.5459 113.392C18.1045 113.392 16.915 112.926 15.9775 111.994C15.0459 111.057 14.5801 109.876 14.5801 108.452ZM16.5049 108.452C16.5049 109.39 16.7891 110.163 17.3574 110.772C17.9316 111.376 18.6611 111.678 19.5459 111.678C20.4365 111.678 21.166 111.373 21.7344 110.764C22.3086 110.154 22.5957 109.384 22.5957 108.452C22.5957 107.515 22.3086 106.744 21.7344 106.141C21.166 105.537 20.4365 105.235 19.5459 105.235C18.6553 105.235 17.9258 105.54 17.3574 106.149C16.7891 106.753 16.5049 107.52 16.5049 108.452ZM32.2988 112.029C31.4551 111.121 31.0332 109.937 31.0332 108.478C31.0332 107.019 31.4521 105.827 32.29 104.901C33.1279 103.97 34.2031 103.504 35.5156 103.504C35.9375 103.504 36.333 103.562 36.7021 103.68C37.0713 103.797 37.3789 103.949 37.625 104.137C37.877 104.324 38.0762 104.497 38.2227 104.655C38.3691 104.808 38.4922 104.96 38.5918 105.112H38.7236V99.6542H40.6133V113.154H38.7588V111.818H38.6445C37.9004 112.867 36.8867 113.392 35.6035 113.392C34.25 113.392 33.1484 112.937 32.2988 112.029ZM32.958 108.452C32.958 109.425 33.2246 110.207 33.7578 110.799C34.2969 111.385 35.0029 111.678 35.876 111.678C36.7549 111.678 37.458 111.37 37.9854 110.755C38.5127 110.14 38.7764 109.372 38.7764 108.452C38.7764 107.462 38.501 106.68 37.9502 106.105C37.4053 105.525 36.708 105.235 35.8584 105.235C35.0029 105.235 34.3057 105.537 33.7666 106.141C33.2275 106.738 32.958 107.509 32.958 108.452ZM43.9355 112.029C43.0918 111.121 42.6699 109.937 42.6699 108.478C42.6699 107.019 43.0889 105.827 43.9268 104.901C44.7646 103.97 45.8398 103.504 47.1523 103.504C47.5742 103.504 47.9697 103.562 48.3389 103.68C48.708 103.797 49.0156 103.949 49.2617 104.137C49.5137 104.324 49.7129 104.497 49.8594 104.655C50.0059 104.808 50.1289 104.96 50.2285 105.112H50.3604V103.741H52.25V113.154H50.3955V111.818H50.2812C49.5371 112.867 48.5234 113.392 47.2402 113.392C45.8867 113.392 44.7852 112.937 43.9355 112.029ZM44.5947 108.452C44.5947 109.425 44.8613 110.207 45.3945 110.799C45.9336 111.385 46.6396 111.678 47.5127 111.678C48.3916 111.678 49.0947 111.37 49.6221 110.755C50.1494 110.14 50.4131 109.372 50.4131 108.452C50.4131 107.462 50.1377 106.68 49.5869 106.105C49.042 105.525 48.3447 105.235 47.4951 105.235C46.6396 105.235 45.9424 105.537 45.4033 106.141C44.8643 106.738 44.5947 107.509 44.5947 108.452ZM54.2012 105.288V103.759H55.4404C55.6045 103.759 55.7393 103.703 55.8447 103.592C55.9502 103.48 56.0029 103.331 56.0029 103.143V101.078H57.7783V103.741H60.5205V105.288H57.7783V110.113C57.7783 111.074 58.2354 111.555 59.1494 111.555H60.4238V113.154H58.8594C57.9219 113.154 57.1924 112.899 56.6709 112.39C56.1494 111.874 55.8887 111.133 55.8887 110.166V105.288H54.2012ZM63.3594 112.029C62.5156 111.121 62.0938 109.937 62.0938 108.478C62.0938 107.019 62.5127 105.827 63.3506 104.901C64.1885 103.97 65.2637 103.504 66.5762 103.504C66.998 103.504 67.3936 103.562 67.7627 103.68C68.1318 103.797 68.4395 103.949 68.6855 104.137C68.9375 104.324 69.1367 104.497 69.2832 104.655C69.4297 104.808 69.5527 104.96 69.6523 105.112H69.7842V103.741H71.6738V113.154H69.8193V111.818H69.7051C68.9609 112.867 67.9473 113.392 66.6641 113.392C65.3105 113.392 64.209 112.937 63.3594 112.029ZM64.0186 108.452C64.0186 109.425 64.2852 110.207 64.8184 110.799C65.3574 111.385 66.0635 111.678 66.9365 111.678C67.8154 111.678 68.5186 111.37 69.0459 110.755C69.5732 110.14 69.8369 109.372 69.8369 108.452C69.8369 107.462 69.5615 106.68 69.0107 106.105C68.4658 105.525 67.7686 105.235 66.9189 105.235C66.0635 105.235 65.3662 105.537 64.8271 106.141C64.2881 106.738 64.0186 107.509 64.0186 108.452ZM78.3447 105.288V103.741H80.0586V102.801C80.0586 101.834 80.3662 101.069 80.9814 100.507C81.5967 99.9384 82.4053 99.6542 83.4072 99.6542H84.4707V101.254H83.5127C82.9736 101.254 82.5723 101.403 82.3086 101.702C82.0449 101.995 81.9131 102.382 81.9131 102.862V103.741H84.541V105.288H81.9307V113.154H80.041V105.288H78.3447ZM85.6133 108.452C85.6133 107.52 85.8242 106.677 86.2461 105.921C86.6738 105.165 87.2686 104.573 88.0303 104.145C88.792 103.718 89.6475 103.504 90.5967 103.504C91.5459 103.504 92.3984 103.721 93.1543 104.154C93.916 104.588 94.5049 105.183 94.9209 105.938C95.3428 106.688 95.5537 107.526 95.5537 108.452C95.5537 109.378 95.3398 110.219 94.9121 110.975C94.4902 111.725 93.8984 112.316 93.1367 112.75C92.375 113.178 91.5225 113.392 90.5791 113.392C89.1377 113.392 87.9482 112.926 87.0107 111.994C86.0791 111.057 85.6133 109.876 85.6133 108.452ZM87.5381 108.452C87.5381 109.39 87.8223 110.163 88.3906 110.772C88.9648 111.376 89.6943 111.678 90.5791 111.678C91.4697 111.678 92.1992 111.373 92.7676 110.764C93.3418 110.154 93.6289 109.384 93.6289 108.452C93.6289 107.515 93.3418 106.744 92.7676 106.141C92.1992 105.537 91.4697 105.235 90.5791 105.235C89.6885 105.235 88.959 105.54 88.3906 106.149C87.8223 106.753 87.5381 107.52 87.5381 108.452ZM97.6895 109.788V103.741H99.5791V109.445C99.5791 110.102 99.7783 110.632 100.177 111.036C100.575 111.44 101.076 111.643 101.68 111.643C102.342 111.643 102.887 111.42 103.314 110.975C103.748 110.523 103.965 109.955 103.965 109.269V103.741H105.854V113.154H104.018V111.897H103.895C103.689 112.319 103.344 112.674 102.857 112.961C102.377 113.248 101.806 113.392 101.144 113.392C100.095 113.392 99.2568 113.052 98.6299 112.372C98.0029 111.692 97.6895 110.831 97.6895 109.788ZM108.623 113.154V103.741H110.46V104.998H110.583C110.788 104.576 111.134 104.222 111.62 103.935C112.106 103.647 112.681 103.504 113.343 103.504C114.392 103.504 115.229 103.844 115.856 104.523C116.483 105.203 116.797 106.064 116.797 107.107V113.154H114.907V107.468C114.907 106.817 114.705 106.29 114.301 105.886C113.902 105.476 113.401 105.27 112.798 105.27C112.142 105.27 111.597 105.499 111.163 105.956C110.729 106.407 110.513 106.976 110.513 107.661V113.154H108.623ZM120.119 112.029C119.275 111.121 118.854 109.937 118.854 108.478C118.854 107.019 119.272 105.827 120.11 104.901C120.948 103.97 122.023 103.504 123.336 103.504C123.758 103.504 124.153 103.562 124.522 103.68C124.892 103.797 125.199 103.949 125.445 104.137C125.697 104.324 125.896 104.497 126.043 104.655C126.189 104.808 126.312 104.96 126.412 105.112H126.544V99.6542H128.434V113.154H126.579V111.818H126.465C125.721 112.867 124.707 113.392 123.424 113.392C122.07 113.392 120.969 112.937 120.119 112.029ZM120.778 108.452C120.778 109.425 121.045 110.207 121.578 110.799C122.117 111.385 122.823 111.678 123.696 111.678C124.575 111.678 125.278 111.37 125.806 110.755C126.333 110.14 126.597 109.372 126.597 108.452C126.597 107.462 126.321 106.68 125.771 106.105C125.226 105.525 124.528 105.235 123.679 105.235C122.823 105.235 122.126 105.537 121.587 106.141C121.048 106.738 120.778 107.509 120.778 108.452ZM135.104 105.288V103.741H136.818V102.801C136.818 101.834 137.126 101.069 137.741 100.507C138.356 99.9384 139.165 99.6542 140.167 99.6542H141.23V101.254H140.272C139.733 101.254 139.332 101.403 139.068 101.702C138.805 101.995 138.673 102.382 138.673 102.862V103.741H141.301V105.288H138.69V113.154H136.801V105.288H135.104ZM142.373 108.452C142.373 107.52 142.584 106.677 143.006 105.921C143.434 105.165 144.028 104.573 144.79 104.145C145.552 103.718 146.407 103.504 147.356 103.504C148.306 103.504 149.158 103.721 149.914 104.154C150.676 104.588 151.265 105.183 151.681 105.938C152.103 106.688 152.313 107.526 152.313 108.452C152.313 109.378 152.1 110.219 151.672 110.975C151.25 111.725 150.658 112.316 149.896 112.75C149.135 113.178 148.282 113.392 147.339 113.392C145.897 113.392 144.708 112.926 143.771 111.994C142.839 111.057 142.373 109.876 142.373 108.452ZM144.298 108.452C144.298 109.39 144.582 110.163 145.15 110.772C145.725 111.376 146.454 111.678 147.339 111.678C148.229 111.678 148.959 111.373 149.527 110.764C150.102 110.154 150.389 109.384 150.389 108.452C150.389 107.515 150.102 106.744 149.527 106.141C148.959 105.537 148.229 105.235 147.339 105.235C146.448 105.235 145.719 105.54 145.15 106.149C144.582 106.753 144.298 107.52 144.298 108.452ZM154.59 113.154V103.741H156.409V105.376H156.532C156.696 104.942 157.004 104.559 157.455 104.225C157.906 103.891 158.439 103.724 159.055 103.724H159.881V105.56H159.002C158.217 105.56 157.599 105.83 157.147 106.369C156.702 106.908 156.479 107.623 156.479 108.514V113.154H154.59ZM166.191 105.288V103.759H167.431C167.595 103.759 167.729 103.703 167.835 103.592C167.94 103.48 167.993 103.331 167.993 103.143V101.078H169.769V103.741H172.511V105.288H169.769V110.113C169.769 111.074 170.226 111.555 171.14 111.555H172.414V113.154H170.85C169.912 113.154 169.183 112.899 168.661 112.39C168.14 111.874 167.879 111.133 167.879 110.166V105.288H166.191ZM174.752 113.154V99.6542H176.624V104.998H176.747C176.964 104.576 177.315 104.222 177.802 103.935C178.288 103.647 178.862 103.504 179.524 103.504C180.573 103.504 181.414 103.847 182.047 104.532C182.68 105.212 182.996 106.07 182.996 107.107V113.154H181.106V107.468C181.106 106.823 180.898 106.296 180.482 105.886C180.072 105.476 179.565 105.27 178.962 105.27C178.317 105.27 177.77 105.49 177.318 105.93C176.867 106.363 176.642 106.911 176.642 107.573V113.154H174.752ZM185.431 101.06C185.431 100.715 185.548 100.431 185.782 100.208C186.017 99.9853 186.312 99.874 186.67 99.874C187.039 99.874 187.341 99.9853 187.575 100.208C187.815 100.431 187.936 100.715 187.936 101.06C187.936 101.418 187.815 101.708 187.575 101.931C187.341 102.153 187.039 102.265 186.67 102.265C186.307 102.265 186.008 102.153 185.773 101.931C185.545 101.708 185.431 101.418 185.431 101.06ZM185.721 113.154V103.741H187.61V113.154H185.721ZM189.781 110.368H191.565C191.688 111.347 192.374 111.836 193.622 111.836C194.231 111.836 194.703 111.713 195.037 111.467C195.377 111.215 195.547 110.878 195.547 110.456C195.547 110.145 195.444 109.896 195.239 109.709C195.04 109.516 194.776 109.375 194.448 109.287C194.126 109.193 193.769 109.114 193.376 109.05C192.983 108.985 192.591 108.9 192.198 108.795C191.812 108.689 191.454 108.549 191.126 108.373C190.804 108.197 190.54 107.934 190.335 107.582C190.136 107.225 190.036 106.785 190.036 106.264C190.036 105.461 190.364 104.802 191.021 104.286C191.677 103.765 192.538 103.504 193.604 103.504C194.571 103.504 195.38 103.756 196.03 104.26C196.681 104.764 197.041 105.455 197.111 106.334H195.38C195.327 105.924 195.143 105.602 194.826 105.367C194.51 105.133 194.076 105.016 193.525 105.016C193.004 105.016 192.585 105.13 192.269 105.358C191.958 105.581 191.803 105.871 191.803 106.228C191.803 106.475 191.882 106.68 192.04 106.844C192.204 107.008 192.415 107.125 192.673 107.195C192.937 107.266 193.235 107.336 193.569 107.406C193.903 107.471 194.243 107.529 194.589 107.582C194.94 107.635 195.283 107.726 195.617 107.854C195.951 107.983 196.247 108.142 196.505 108.329C196.769 108.511 196.979 108.777 197.138 109.129C197.302 109.48 197.384 109.893 197.384 110.368C197.384 111.27 197.038 112 196.347 112.557C195.661 113.113 194.735 113.392 193.569 113.392C192.403 113.392 191.495 113.122 190.845 112.583C190.2 112.038 189.846 111.3 189.781 110.368ZM204.775 113.154V99.6542H206.665V105.112H206.771C206.864 104.96 206.987 104.805 207.14 104.646C207.298 104.488 207.5 104.318 207.746 104.137C207.998 103.949 208.309 103.797 208.678 103.68C209.053 103.562 209.451 103.504 209.873 103.504C211.18 103.504 212.249 103.97 213.081 104.901C213.913 105.827 214.329 107.019 214.329 108.478C214.329 109.937 213.907 111.121 213.063 112.029C212.22 112.937 211.118 113.392 209.759 113.392C208.487 113.392 207.479 112.867 206.735 111.818H206.612V113.154H204.775ZM206.612 108.452C206.612 109.372 206.873 110.14 207.395 110.755C207.916 111.37 208.616 111.678 209.495 111.678C210.374 111.678 211.077 111.385 211.604 110.799C212.138 110.213 212.404 109.431 212.404 108.452C212.404 107.503 212.138 106.729 211.604 106.132C211.077 105.534 210.386 105.235 209.53 105.235C208.681 105.235 207.98 105.525 207.43 106.105C206.885 106.68 206.612 107.462 206.612 108.452ZM215.955 108.452C215.955 107.52 216.166 106.677 216.588 105.921C217.016 105.165 217.61 104.573 218.372 104.145C219.134 103.718 219.989 103.504 220.938 103.504C221.888 103.504 222.74 103.721 223.496 104.154C224.258 104.588 224.847 105.183 225.263 105.938C225.685 106.688 225.896 107.526 225.896 108.452C225.896 109.378 225.682 110.219 225.254 110.975C224.832 111.725 224.24 112.316 223.479 112.75C222.717 113.178 221.864 113.392 220.921 113.392C219.479 113.392 218.29 112.926 217.353 111.994C216.421 111.057 215.955 109.876 215.955 108.452ZM217.88 108.452C217.88 109.39 218.164 110.163 218.732 110.772C219.307 111.376 220.036 111.678 220.921 111.678C221.812 111.678 222.541 111.373 223.109 110.764C223.684 110.154 223.971 109.384 223.971 108.452C223.971 107.515 223.684 106.744 223.109 106.141C222.541 105.537 221.812 105.235 220.921 105.235C220.03 105.235 219.301 105.54 218.732 106.149C218.164 106.753 217.88 107.52 217.88 108.452ZM227.398 105.288V103.759H228.638C228.802 103.759 228.937 103.703 229.042 103.592C229.147 103.48 229.2 103.331 229.2 103.143V101.078H230.976V103.741H233.718V105.288H230.976V110.113C230.976 111.074 231.433 111.555 232.347 111.555H233.621V113.154H232.057C231.119 113.154 230.39 112.899 229.868 112.39C229.347 111.874 229.086 111.133 229.086 110.166V105.288H227.398ZM236.416 113.058C236.182 112.835 236.064 112.557 236.064 112.223C236.064 111.889 236.182 111.607 236.416 111.379C236.65 111.144 236.935 111.027 237.269 111.027C237.603 111.027 237.884 111.144 238.112 111.379C238.347 111.607 238.464 111.889 238.464 112.223C238.464 112.557 238.347 112.835 238.112 113.058C237.884 113.28 237.603 113.392 237.269 113.392C236.935 113.392 236.65 113.28 236.416 113.058ZM236.284 105.429V100.551H238.244V105.429L237.831 109.788H236.697L236.284 105.429Z"
+            fill="#7B7A7B" />
+          <defs>
+            <clipPath id="clip0_735_24983">
+              <rect width="120" height="84.1143" fill="white" transform="translate(60.5 0.039917)" />
+            </clipPath>
+          </defs>
+        </svg>
+
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div id="modal-nps-filter" class="modal">
+  <div class="modal-content">
+    <div class="row" style="margin-bottom: 12px !important;">
+      <div class="modal-header">
+        <h6>Apply Filter</h6>
+        <a href="javascript:void(0)" class="modal-close-btn modal-close">
+          <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z"
+              fill="black" fill-opacity="0.54" />
+          </svg>
+
+        </a>
+      </div>
+
+      <div class="modal-overflow-content-div">
+        <div class="col s12 analytics-filter-select-area">
+          <div class="filter-heading">
+            Select Date range
+          </div>
+          <label onclick="show_custom_date();">
+            {% if filter_type == "1" %}
+            <input type="radio" name="analytics-card-filter-btn" id="date_range_1" checked />
+            {% else %}
+            <input type="radio" name="analytics-card-filter-btn" id="date_range_1">
+            {% endif %}
+            <div class=" filter-box">
+              <span>Last week</span>
+            </div>
+          </label>
+          <label onclick="show_custom_date();">
+            {% if filter_type == "2" %}
+            <input type="radio" name="analytics-card-filter-btn" id="date_range_2" checked>
+            {% else %}
+            <input type="radio" name="analytics-card-filter-btn" id="date_range_2">
+            {% endif %}
+            <div class=" filter-box">
+              <span>Last Month</span>
+            </div>
+          </label>
+          <label onclick="show_custom_date();">
+            {% if filter_type == "3" %}
+            <input type="radio" name="analytics-card-filter-btn" id="date_range_3" checked>
+            {% else %}
+            <input type="radio" name="analytics-card-filter-btn" id="date_range_3">
+            {% endif %}
+            <div class=" filter-box">
+              <span>Last 3 Month</span>
+            </div>
+          </label>
+          <label onclick="show_custom_date();">
+            {% if filter_type == "4" %}
+            <input type="radio" name="analytics-card-filter-btn" id="date_range_4" checked>
+            {% else %}
+            <input type="radio" name="analytics-card-filter-btn" id="date_range_4">
+            {% endif %}
+            <div class=" filter-box">
+              <span>From beginning</span>
+            </div>
+          </label>
+          <label onclick="show_custom_date();">
+            {% if filter_type == "5" %}
+            <input type="radio" name="analytics-card-filter-btn" id="date_range_5" checked>
+            {% else %}
+            <input type="radio" name="analytics-card-filter-btn" id="date_range_5">
+            {% endif %}
+            <div class=" filter-box">
+              <span>Custom Date</span>
+            </div>
+          </label>
+
+
+
+        </div>
+        {% if filter_type == "5" %}
+        <div class="col s10 analytics-custom-date-select-area" id="analytics-custom-date-select-area"
+          style="display: block;">
+          {% else %}
+          <div class="col s10 analytics-custom-date-select-area" id="analytics-custom-date-select-area"
+            style="display: none;">
+            {% endif %}
+
+            <div class="col s6" style="padding-left: 0px; font-weight: 600;color: #4d4d4d;
+          font-size: 14px;">
+              Start Date
+              <input type="date" id="start_date" class="message-default-start-date" value="{{ start_date }}">
+            </div>
+            <div class="col s6" style="font-weight: 600; padding-right: 0px !important;color: #4d4d4d;
+          font-size: 14px;">
+              End Date
+              <input type="date" id="end_date" class="message-default-end-date" value="{{ end_date }}">
+            </div>
+          </div>
+          <!--  csat start -->
+          <div class="col s12 analytics-filter-select-area">
+            <div class="filter-heading">
+              Select CSAT
+            </div>
+            <label>
+
+              {% if nps_score == "Promoters" %}
+              <input type="radio" name="analytics-card-filter-btn-csat" id="filter_csat_promoter" checked />
+              {% else %}
+              <input type="radio" name="analytics-card-filter-btn-csat" id="filter_csat_promoter">
+              {% endif %}
+
+              <div class=" filter-box">
+                <span>Promoters</span>
+              </div>
+            </label>
+
+            <label>
+
+              {% if nps_score == "Passives" %}
+              <input type="radio" name="analytics-card-filter-btn-csat" id="filter_csat_passive" checked />
+              {% else %}
+              <input type="radio" name="analytics-card-filter-btn-csat" id="filter_csat_passive">
+              {% endif %}
+
+              <div class=" filter-box">
+                <span>Passive</span>
+              </div>
+            </label>
+
+            <label>
+
+              {% if nps_score == "Demoters" %}
+              <input type="radio" name="analytics-card-filter-btn-csat" id="filter_csat_demoter" checked />
+              {% else %}
+              <input type="radio" name="analytics-card-filter-btn-csat" id="filter_csat_demoter">
+              {% endif %}
+
+              <div class=" filter-box">
+                <span>Detractors</span>
+              </div>
+            </label>
+          </div>
+
+          <!-- channel start -->
+          <div class="col s12 analytics-channel-select-area">
+            <div class="filter-heading">
+              Select Channel
+            </div>
+
+            <div class=" channel-box">
+              {% if "Android" in channels %}
+              <input type="checkbox" id="checkbox1" name="" value="" checked>
+              {% else %}
+              <input type="checkbox" id="checkbox1" name="" value="">
+              {% endif %}
+              <label for="checkbox1">
+                <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M6.62451 14.9141C6.62451 15.1793 6.51915 15.4336 6.33162 15.6212C6.14408 15.8087 5.88973 15.9141 5.62451 15.9141C5.3593 15.9141 5.10494 15.8087 4.91741 15.6212C4.72987 15.4336 4.62451 15.1793 4.62451 14.9141V10.4141C4.62451 10.1488 4.72987 9.89449 4.91741 9.70696C5.10494 9.51942 5.3593 9.41406 5.62451 9.41406C5.88973 9.41406 6.14408 9.51942 6.33162 9.70696C6.51915 9.89449 6.62451 10.1488 6.62451 10.4141V14.9141Z"
+                    fill="#7CB342" />
+                  <path
+                    d="M20.6245 14.9141C20.6245 15.1793 20.5192 15.4336 20.3316 15.6212C20.1441 15.8087 19.8897 15.9141 19.6245 15.9141C19.3593 15.9141 19.1049 15.8087 18.9174 15.6212C18.7299 15.4336 18.6245 15.1793 18.6245 14.9141V10.4141C18.6245 10.1488 18.7299 9.89449 18.9174 9.70696C19.1049 9.51942 19.3593 9.41406 19.6245 9.41406C19.8897 9.41406 20.1441 9.51942 20.3316 9.70696C20.5192 9.89449 20.6245 10.1488 20.6245 10.4141V14.9141Z"
+                    fill="#7CB342" />
+                  <path
+                    d="M11.6245 20.4136C11.6245 20.6788 11.5192 20.9331 11.3316 21.1207C11.1441 21.3082 10.8897 21.4136 10.6245 21.4136C10.3593 21.4136 10.1049 21.3082 9.91741 21.1207C9.72987 20.9331 9.62451 20.6788 9.62451 20.4136V15.9136C9.62451 15.6484 9.72987 15.394 9.91741 15.2065C10.1049 15.0189 10.3593 14.9136 10.6245 14.9136C10.8897 14.9136 11.1441 15.0189 11.3316 15.2065C11.5192 15.394 11.6245 15.6484 11.6245 15.9136V20.4136Z"
+                    fill="#7CB342" />
+                  <path
+                    d="M15.6245 20.4136C15.6245 20.6788 15.5192 20.9331 15.3316 21.1207C15.1441 21.3082 14.8897 21.4136 14.6245 21.4136C14.3593 21.4136 14.1049 21.3082 13.9174 21.1207C13.7299 20.9331 13.6245 20.6788 13.6245 20.4136V15.9136C13.6245 15.6484 13.7299 15.394 13.9174 15.2065C14.1049 15.0189 14.3593 14.9136 14.6245 14.9136C14.8897 14.9136 15.1441 15.0189 15.3316 15.2065C15.5192 15.394 15.6245 15.6484 15.6245 15.9136V20.4136Z"
+                    fill="#7CB342" />
+                  <path
+                    d="M7.62451 9.41406V16.9136C7.62451 17.1788 7.72987 17.4331 7.91741 17.6207C8.10494 17.8082 8.3593 17.9136 8.62451 17.9136H16.6245C16.8897 17.9136 17.1441 17.8082 17.3316 17.6207C17.5192 17.4331 17.6245 17.1788 17.6245 16.9136V9.41406H7.62451Z"
+                    fill="#7CB342" />
+                  <path
+                    d="M12.6245 4.41357C9.62451 4.41357 7.79701 6.23607 7.62451 8.41357H17.6245C17.4515 6.23607 15.6245 4.41357 12.6245 4.41357ZM10.6245 7.21257C10.4919 7.21257 10.3647 7.1599 10.271 7.06613C10.1772 6.97236 10.1245 6.84518 10.1245 6.71257C10.1245 6.57997 10.1772 6.45279 10.271 6.35902C10.3647 6.26525 10.4919 6.21257 10.6245 6.21257C10.7571 6.21257 10.8843 6.26525 10.9781 6.35902C11.0718 6.45279 11.1245 6.57997 11.1245 6.71257C11.1245 6.84518 11.0718 6.97236 10.9781 7.06613C10.8843 7.1599 10.7571 7.21257 10.6245 7.21257ZM14.6245 7.21257C14.4919 7.21257 14.3647 7.1599 14.271 7.06613C14.1772 6.97236 14.1245 6.84518 14.1245 6.71257C14.1245 6.57997 14.1772 6.45279 14.271 6.35902C14.3647 6.26525 14.4919 6.21257 14.6245 6.21257C14.7571 6.21257 14.8843 6.26525 14.9781 6.35902C15.0718 6.45279 15.1245 6.57997 15.1245 6.71257C15.1245 6.84518 15.0718 6.97236 14.9781 7.06613C14.8843 7.1599 14.7571 7.21257 14.6245 7.21257Z"
+                    fill="#7CB342" />
+                  <path d="M15.6245 3.91357L14.7915 5.16307" stroke="#7CB342" stroke-width="2" stroke-linecap="round" />
+                  <path d="M9.62451 3.91357L10.291 4.95457" stroke="#7CB342" stroke-width="2" stroke-linecap="round" />
+                </svg>
+
+                <span>Android</span></label>
+
+            </div>
+
+            <div class=" channel-box">
+              {% if "iOS" in channels %}
+              <input type="checkbox" id="checkbox2" name="" value="" checked>
+              {% else %}
+              <input type="checkbox" id="checkbox2" name="" value="">
+              {% endif %}
+              <label for="checkbox2">
+                <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M11.6241 7.22201C10.7481 7.22201 9.39206 6.22601 7.96406 6.26201C6.08006 6.28601 4.35206 7.35401 3.38006 9.04601C1.42406 12.442 2.87606 17.458 4.78406 20.218C5.72006 21.562 6.82406 23.074 8.28806 23.026C9.69206 22.966 10.2201 22.114 11.9241 22.114C13.6161 22.114 14.0961 23.026 15.5841 22.99C17.0961 22.966 18.0561 21.622 18.9801 20.266C20.0481 18.706 20.4921 17.194 20.5161 17.11C20.4801 17.098 17.5761 15.982 17.5401 12.622C17.5161 9.814 19.8321 8.47001 19.9401 8.41001C18.6201 6.47801 16.5921 6.26201 15.8841 6.21401C14.0361 6.07001 12.4881 7.22201 11.6241 7.22201ZM14.7441 4.39001C15.5241 3.45401 16.0401 2.14601 15.8961 0.850006C14.7801 0.898006 13.4361 1.59401 12.6321 2.53001C11.9121 3.35801 11.2881 4.69001 11.4561 5.96201C12.6921 6.05801 13.9641 5.32601 14.7441 4.39001Z"
+                    fill="black"></path>
+                </svg>
+
+                <span>iOS</span></label>
+
+            </div>
+
+            <div class=" channel-box">
+              {% if "GoogleBusinessMessages" in channels %}
+              <input type="checkbox" id="checkbox3" name="" value="" checked>
+              {% else %}
+              <input type="checkbox" id="checkbox3" name="" value="">
+              {% endif %}
+              <label for="checkbox3">
+
+                <svg width="23" height="23" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="11.5" cy="11.5" r="11.5" fill="#3B78E7" />
+                  <path fill-rule="evenodd" clip-rule="evenodd"
+                    d="M6.07948 5.81118C5.73891 5.94894 5.75004 5.79903 5.75004 10.248V14.3485L6.9068 13.1944L8.06356 12.0402H11.0608H14.058L14.2088 11.877L14.3596 11.7139V8.91219V6.11052L14.1799 5.93026L14.0001 5.75L10.1057 5.75389C7.96375 5.75604 6.15199 5.78182 6.07948 5.81118ZM13.2381 8.91053L13.2219 10.961H10.0548H6.88774L6.87156 8.91053L6.85533 6.86004H10.0548H13.2543L13.2381 8.91053ZM15.5281 10.6835V13.2736H11.8075H8.08693V13.9547C8.08693 14.5957 8.09585 14.6449 8.23791 14.7873L8.38882 14.9387H11.6658H14.9427L16.0963 16.0943L17.25 17.25V12.8835C17.25 9.68206 17.2309 8.48106 17.1785 8.38227C17.0438 8.12869 16.9392 8.09742 16.2199 8.09539L15.5281 8.09341V10.6835Z"
+                    fill="white" />
+                  <path
+                    d="M13.2381 8.91053L13.2219 10.961H10.0548H6.88774L6.87156 8.91053L6.85533 6.86004H10.0548H13.2543L13.2381 8.91053Z"
+                    fill="white" />
+                </svg>
+
+
+                <span>GoogleBusinessMessages</span></label>
+
+            </div>
+            <div class=" channel-box">
+              {% if "Web" in channels %}
+              <input type="checkbox" id="checkbox6" name="" value="" checked>
+              {% else %}
+              <input type="checkbox" id="checkbox6" name="" value="">
+              {% endif %}
+              <label for="checkbox6">
+                <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M12.4051 1.99902C17.9288 1.99902 22.4067 6.47687 22.4067 12.0006C22.4067 17.5243 17.9288 22.0021 12.4051 22.0021C6.88141 22.0021 2.40356 17.5243 2.40356 12.0006C2.40356 6.47687 6.88141 1.99902 12.4051 1.99902ZM15.344 16.5003H9.46621C10.1183 18.9144 11.2516 20.5021 12.4051 20.5021C13.5586 20.5021 14.692 18.9144 15.344 16.5003ZM7.91342 16.5009L5.19094 16.5007C6.14928 18.0338 7.58273 19.2394 9.28511 19.9114C8.76283 19.0915 8.33184 18.0653 8.01484 16.8959L7.91342 16.5009ZM19.6193 16.5007L16.8968 16.5009C16.573 17.8346 16.1054 19.0004 15.5241 19.9114C17.121 19.2814 18.4807 18.1824 19.4341 16.7843L19.6193 16.5007ZM7.49854 9.99992H4.14093L4.13618 10.0171C3.98409 10.6535 3.90356 11.3176 3.90356 12.0006C3.90356 13.0567 4.09615 14.0679 4.44813 15.0009L7.62129 15.0005C7.47899 14.0514 7.40356 13.0432 7.40356 12.0006C7.40356 11.3166 7.43603 10.6474 7.49854 9.99992ZM15.802 9.99999H9.00819C8.94017 10.6403 8.90356 11.31 8.90356 12.0006C8.90356 13.0601 8.98971 14.0704 9.1433 15.0007H15.6669C15.8205 14.0704 15.9067 13.0601 15.9067 12.0006C15.9067 11.31 15.8701 10.6403 15.802 9.99999ZM20.6697 9.99909L17.3117 9.99994C17.3742 10.6474 17.4067 11.3166 17.4067 12.0006C17.4067 13.0432 17.3312 14.0514 17.1889 15.0005L20.3621 15.0009C20.7141 14.0679 20.9067 13.0567 20.9067 12.0006C20.9067 11.3112 20.8246 10.6409 20.6697 9.99909ZM9.28616 4.08973L9.26326 4.09844C7.21595 4.91315 5.55993 6.50046 4.65526 8.50033L7.70338 8.50069C8.01674 6.7479 8.56358 5.22198 9.28616 4.08973ZM12.4051 3.49902L12.2895 3.50432C11.024 3.62008 9.80154 5.62205 9.23383 8.50027H15.5764C15.0103 5.63011 13.7931 3.63131 12.5314 3.50534L12.4051 3.49902ZM15.5251 4.08979L15.632 4.26388C16.3012 5.37635 16.8093 6.83623 17.1068 8.50069L20.155 8.50033C19.2903 6.58892 17.7393 5.05439 15.8163 4.21106L15.5251 4.08979Z"
+                    fill="#4888C7" />
+                </svg>
+                <span>Web</span></label>
+
+            </div>
+
+            <div class=" channel-box">
+              {% if "WhatsApp" in channels %}
+              <input type="checkbox" id="checkbox8" name="" value="" checked>
+              {% else %}
+              <input type="checkbox" id="checkbox8" name="" value="">
+              {% endif %}
+              <label for="checkbox8">
+                <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M2.83923 21.6515L4.18623 16.734C3.35523 15.295 2.91823 13.662 2.91873 11.9895C2.92123 6.757 7.17923 2.5 12.4122 2.5C14.9517 2.501 17.3347 3.4895 19.1272 5.283C20.9192 7.077 21.9062 9.461 21.9052 11.997C21.9032 17.2295 17.6442 21.487 12.4122 21.487C12.4117 21.487 12.4122 21.487 12.4122 21.487H12.4082C10.8197 21.4865 9.25823 21.088 7.87173 20.3315L2.83923 21.6515Z"
+                    fill="white" />
+                  <path
+                    d="M2.83914 21.9015C2.77314 21.9015 2.70914 21.8755 2.66164 21.8275C2.59914 21.764 2.57464 21.6715 2.59814 21.586L3.91764 16.768C3.09964 15.315 2.66814 13.665 2.66914 11.99C2.67114 6.619 7.04164 2.25 12.4121 2.25C15.0171 2.251 17.4646 3.2655 19.3041 5.1065C21.1436 6.948 22.1561 9.395 22.1551 11.997C22.1531 17.3675 17.7821 21.737 12.4121 21.737C10.8176 21.7365 9.24014 21.343 7.84014 20.5985L2.90264 21.893C2.88164 21.899 2.86064 21.9015 2.83914 21.9015Z"
+                    fill="white" />
+                  <path
+                    d="M12.4121 2.5C14.9516 2.501 17.3346 3.4895 19.1271 5.283C20.9191 7.077 21.9061 9.461 21.9051 11.997C21.9031 17.2295 17.6441 21.487 12.4121 21.487H12.4081C10.8196 21.4865 9.25807 21.088 7.87157 20.3315L2.83907 21.6515L4.18607 16.734C3.35507 15.295 2.91807 13.662 2.91857 11.9895C2.92107 6.757 7.17907 2.5 12.4121 2.5ZM12.4121 2C6.90407 2 2.42107 6.481 2.41857 11.9895C2.41807 13.673 2.84307 15.332 3.64907 16.8005L2.35657 21.52C2.30957 21.6925 2.35757 21.8765 2.48357 22.0035C2.57857 22.0995 2.70707 22.152 2.83907 22.152C2.88157 22.152 2.92407 22.1465 2.96607 22.1355L7.80957 20.8655C9.22357 21.5995 10.8086 21.987 12.4081 21.9875C17.9201 21.9875 22.4031 17.506 22.4056 11.9975C22.4066 9.328 21.3681 6.818 19.4816 4.93C17.5941 3.0415 15.0836 2.001 12.4121 2Z"
+                    fill="#CFD8DC" />
+                  <path
+                    d="M17.9932 6.41603C16.5032 4.92503 14.5227 4.10353 12.4147 4.10303C8.06274 4.10303 4.52324 7.64103 4.52124 11.99C4.52074 13.4805 4.93774 14.9315 5.72774 16.188L5.91574 16.4865L5.11824 19.397L8.10474 18.614L8.39324 18.785C9.60424 19.504 10.9932 19.884 12.4092 19.8845H12.4122C16.7612 19.8845 20.3007 16.346 20.3022 11.9965C20.3027 9.88903 19.4832 7.90703 17.9932 6.41603Z"
+                    fill="#00E676" />
+                  <path fill-rule="evenodd" clip-rule="evenodd"
+                    d="M10.0391 8.02244C9.86165 7.62744 9.67465 7.61944 9.50515 7.61244C9.36665 7.60644 9.20865 7.60694 9.05065 7.60694C8.89265 7.60694 8.63565 7.66644 8.41815 7.90394C8.20065 8.14144 7.58765 8.71494 7.58765 9.88194C7.58765 11.0489 8.43765 12.1769 8.55615 12.3349C8.67465 12.4929 10.1971 14.9644 12.6081 15.9154C14.6116 16.7054 15.0196 16.5484 15.4546 16.5089C15.8896 16.4694 16.8581 15.9354 17.0556 15.3814C17.2531 14.8274 17.2531 14.3529 17.1941 14.2539C17.1346 14.1549 16.9766 14.0959 16.7396 13.9769C16.5026 13.8579 15.3361 13.2844 15.1186 13.2054C14.9011 13.1264 14.7431 13.0869 14.5846 13.3244C14.4266 13.5614 13.9721 14.0959 13.8336 14.2539C13.6951 14.4124 13.5566 14.4324 13.3196 14.3134C13.0826 14.1944 12.3186 13.9444 11.4121 13.1364C10.7071 12.5079 10.2311 11.7314 10.0926 11.4939C9.95415 11.2569 10.0776 11.1284 10.1966 11.0099C10.3031 10.9034 10.4336 10.7329 10.5526 10.5944C10.6711 10.4559 10.7106 10.3569 10.7896 10.1989C10.8686 10.0404 10.8291 9.90194 10.7696 9.78344C10.7111 9.66444 10.2501 8.49144 10.0391 8.02244Z"
+                    fill="white" />
+                </svg>
+                <span>Whatsapp</span></label>
+
+            </div>
+
+            <div class=" channel-box">
+              {% if "Viber" in channels %}
+              <input type="checkbox" id="checkbox7" name="" value="" checked>
+              {% else %}
+              <input type="checkbox" id="checkbox7" name="" value="">
+              {% endif %}
+              <label for="checkbox7">
+                <svg width="25" height="25" viewBox="0 4 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M16.2532 19.1517C15.7532 18.7506 15.5224 18.6293 14.8321 18.2346C14.5445 18.0704 14.1062 17.9286 13.8763 17.9286C13.7192 17.9286 13.5311 18.043 13.4159 18.1527C13.1207 18.4339 13.024 18.7857 12.5065 18.7857C12.0002 18.7857 11.116 18.295 10.4815 17.6607C9.81547 17.0564 9.30022 16.2143 9.30022 15.7321C9.30022 15.2393 9.66292 15.1407 9.95812 14.8591C10.0733 14.7499 10.2002 14.5707 10.2002 14.4211C10.2002 14.2021 10.0513 13.7911 9.87892 13.5173C9.46447 12.8594 9.33757 12.6396 8.91592 12.1639C8.77327 12.0027 8.61082 11.929 8.44072 11.9286C8.15317 11.9281 7.77562 12.064 7.52002 12.2453C7.13572 12.5183 6.73387 12.8899 6.62632 13.3527C6.61192 13.4157 6.60337 13.4791 6.60067 13.5426C6.57997 14.0247 6.77887 14.5141 6.99352 14.9286C7.49887 15.9053 8.16758 16.8507 8.89523 17.695C9.12788 17.965 9.38122 18.2161 9.64357 18.4587C9.89827 18.7081 10.162 18.9494 10.4455 19.1714C11.332 19.8644 12.3247 20.5013 13.3502 20.9826C13.7813 21.1849 14.2889 21.3709 14.7902 21.3571C14.8618 21.355 14.9333 21.3473 15.0049 21.3323C15.4909 21.2303 15.881 20.8471 16.1677 20.4811C16.358 20.2377 16.5007 19.8786 16.5002 19.6043C16.4998 19.4423 16.4224 19.2876 16.2532 19.1517ZM16.5002 17.0714C16.2518 17.0714 16.0502 16.8794 16.0502 16.6429V16.2143C16.0502 14.0877 14.2331 12.3571 12.0002 12.3571C11.7518 12.3571 11.5502 12.1651 11.5502 11.9286C11.5502 11.692 11.7518 11.5 12.0002 11.5C14.7295 11.5 16.9502 13.615 16.9502 16.2143V16.6429C16.9502 16.8794 16.7486 17.0714 16.5002 17.0714ZM13.7363 16.2143C13.5365 16.2143 13.3538 16.0866 13.3012 15.8937C13.1779 15.4433 12.8089 15.0914 12.3377 14.9757C12.097 14.9161 11.9525 14.6826 12.0146 14.4533C12.0767 14.2244 12.3215 14.0869 12.5632 14.1456C13.3498 14.3397 13.9663 14.9264 14.1719 15.6773C14.2345 15.9066 14.0905 16.1401 13.8502 16.2001C13.8119 16.2096 13.7737 16.2143 13.7363 16.2143ZM15.1502 16.6429C14.9018 16.6429 14.7002 16.4509 14.7002 16.2143C14.7002 14.848 13.5779 13.7209 12.1451 13.6489C11.8967 13.6364 11.7064 13.4346 11.7194 13.1984C11.7325 12.9619 11.948 12.7801 12.1924 12.793C14.1035 12.889 15.6002 14.392 15.6002 16.2143C15.6002 16.4509 15.3986 16.6429 15.1502 16.6429ZM12.0002 8.5C9.97523 8.5 6.81982 8.67743 4.89742 10.3497C3.53842 11.6384 3.00023 13.4461 3.00023 15.7857C3.00023 15.9794 2.99932 16.1954 3.00112 16.4286C2.99932 16.6613 3.00023 16.8773 3.00023 17.071C3.00023 19.4106 3.53842 21.2183 4.89742 22.507C5.62912 23.1434 6.54172 23.5621 7.50022 23.8381V25.8036C7.50022 26.4876 7.97227 26.5 8.05867 26.5H8.06272C8.28502 26.4991 8.47718 26.3954 8.66978 26.2326C8.74223 26.1713 9.57878 25.2833 10.4887 24.3121C11.0305 24.3451 11.5453 24.3571 11.9998 24.3571C14.0248 24.3571 17.1797 24.1793 19.1026 22.507C20.4611 21.2187 20.9998 19.4106 20.9998 17.071C20.9998 16.8773 21.0007 16.6613 20.9989 16.4281C21.0007 16.195 20.9998 15.9794 20.9998 15.7853C20.9998 13.4457 20.4616 11.638 19.1026 10.3493C17.1802 8.67743 14.0252 8.5 12.0002 8.5ZM19.6502 16.9219V17.071C19.6502 19.1736 19.18 20.6063 18.1715 21.5761C16.4246 23.0714 13.0969 23.0714 11.9998 23.0714C11.6659 23.0714 11.1241 23.071 10.4846 23.0286C10.3069 23.2189 8.40022 25.2499 8.40022 25.2499V22.7371C7.45342 22.5207 6.51788 22.1659 5.82893 21.5766C4.82048 20.6063 4.35022 19.1736 4.35022 17.071V16.9219C4.35022 16.7714 4.34977 16.609 4.35112 16.4191C4.34977 16.2477 4.34977 16.0857 4.35022 15.9349V15.7857C4.35022 13.6831 4.82048 12.2504 5.82893 11.2806C7.57538 9.78529 10.9036 9.78529 12.0002 9.78529C13.0969 9.78529 16.4246 9.78529 18.1711 11.2806C19.18 12.2504 19.6498 13.6831 19.6498 15.7857V15.9349C19.6498 16.0853 19.6502 16.2477 19.6489 16.4376C19.6502 16.6094 19.6502 16.7714 19.6502 16.9219Z"
+                    fill="url(#paint0_linear_207_7845)" />
+                  <defs>
+                    <linearGradient id="paint0_linear_207_7845" x1="20.3738" y1="27.5273" x2="3.47563" y2="2.89073"
+                      gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#912FBD" />
+                      <stop offset="1" stop-color="#9332BF" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <span>Viber</span></label>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+
+      <a href="/chat/nps-analytics/?bot_pk={{selected_bot_id}}&page=1"
+        class="modal-close btn filter-modal-footer-btn-cancel">Clear filter</a>
+      <a onclick="apply_nps_filter()" class="btn filter-modal-footer-btn">Apply filter</a>
+
+    </div>
+  </div>
+</div>
+
+
+<div id="console-modal-container">
+<div id="modal-nps-export" class="modal easychat-custom-modals-container">
+  <div class="modal-content">
+      <div class="row" style="margin-bottom: 12px !important;">
+
+          <div class="modal-header">
+              <div class="modal-heading-text-div">Analytics Export</div>
+              <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                  <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path
+                          d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473 6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347 19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z"
+                          fill="black" fill-opacity="0.54" />
+                  </svg>
+
+              </a>
+          </div>
+          <div class="modal-overflow-content-div">
+
+              <div class="col s12 analytics-filter-select-area">
+                  <div class="filter-heading">
+                      Select Date Range
+                  </div>
+                  <label>
+                      <input type="radio" name="analytics-export-filter" checked
+                        value="1"  
+                        onclick="check_select_date_range();" />
+                      <div class="filter-box">
+                          <span>Last Day</span>
+                      </div>
+                  </label>
+                  <label>
+                      <input type="radio" name="analytics-export-filter" 
+                        value="2"
+                        onclick="check_select_date_range();">
+                      <div class=" filter-box">
+                          <span>Last 7 Days</span>
+                      </div>
+                  </label>
+                  <label>
+                      <input type="radio" name="analytics-export-filter" 
+                        value="3"
+                        onclick="check_select_date_range();">
+                      <div class=" filter-box">
+                          <span>Last 1 Month</span>
+                      </div>
+                  </label>
+
+                  <label>
+                      <input type="radio" name="analytics-export-filter" id="analytics_filter_custom_date_btn_export"
+                        value="4"  
+                        onclick="check_select_date_range();">
+                      <div class=" filter-box">
+                          <span>Custom Date</span>
+                      </div>
+                  </label>
+              </div>
+              <div class="col s11 analytics-custom-date-select-area" id="custom-range-filter"
+                  style="display: none;">
+                  <div class="col s6" style="padding-left: 2px; font-weight: 600;color: #4d4d4d;
+font-size: 14px;">
+                      Start Date
+                      <input type="date" class="analytics-start-date" id="export-startdate"
+                          placeholder="Enter start date "
+                          value=''
+                          style="border: 2px solid #F6F6F6 !important; border-radius:4px !important;">
+                  </div>
+                  <div class="col s6" style="font-weight: 600; padding-right: 0px !important;color: #4d4d4d;
+font-size: 14px;">
+                      End Date
+                      <input type="date" class="analytics-end-date" id="export-enddate"
+                          placeholder="Enter end date "
+                          value=''
+                          style="border: 2px solid #F6F6F6 !important; border-radius:4px !important;">
+                  </div>
+                  <div class="col s12" style="font-weight: 600; padding: 0px !important;color: #4d4d4d;
+font-size: 14px;">
+                      Email ID <span style="color: red;">*</span>
+                      <input type="email" id="filter-data-email" value="{{ request.user.email }}"
+                          style="border: 2px solid #F6F6F6 !important; border-radius:4px !important; width: 95.5% !important;">
+                      <span>
+                          <div class="analytics-email-note-export">Note: You will receive the message history data
+                              dump on the above email ID within 24 hours.</div>
+                      </span>
+                  </div>
+                  <div id="selected_bot_pk" data-selected_bot_pk="{{ selected_bot_id }}">
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  <div class="modal-footer">
+      <a href="javascript:void(0)" class="modal-close btn filter-modal-footer-btn" id="export-nps-data">Export</a>
+  </div>
+</div>
+</div>
+
+<script type="text/javascript">
+  window.NEED_TO_BUILD = "{{ selected_bot_obj.need_to_build }}";
+  function show_custom_date() {
+    if (document.getElementById('date_range_5').checked) {
+      document.getElementById("analytics-custom-date-select-area").style.display = "block";
+    } else {
+      document.getElementById("analytics-custom-date-select-area").style.display = "none";
+
+    }
+  }
+  function redirect_to_page(page) {
+    search_params = window.location.search.replace('?', '')
+    search_params_list = search_params.split('&');
+    upadted_search_params = '?';
+    for (var index = 0; index < search_params_list.length; index++) {
+      if (search_params_list[index].split('=')[0] == "page") {
+        if (search_params_list.length == 1) {
+          upadted_search_params += "page=" + page;
+        }
+        else {
+          upadted_search_params += "&page=" + page;
+        }
+
+      }
+      else {
+
+        if (upadted_search_params.length == 1) {
+          upadted_search_params += search_params_list[index]
+        }
+        else {
+          upadted_search_params += '&' + search_params_list[index]
+        }
+      }
+    }
+    window.location = window.location.pathname + upadted_search_params;
+  }
+
+  function check_select_date_range() {
+    if ($("input[name=analytics-export-filter]:checked").val() == "4") {
+      document.getElementById("custom-range-filter").style.display = "block";
+    } else {
+      document.getElementById("custom-range-filter").style.display = "none";
+    }
+  }
+
+  function handle_count() {
+    window.location.href = "/chat/nps-analytics/?bot_pk={{selected_bot_id}}&page=1&count=" + $("#easychat_form_assist_table_row_dropdown").val()
+  }
+
+  $(document).on('click','.easychat-csat-read-more', function(e) {
+      $(".easychat-analytics-csat-rating-popover-wrapper").hide();
+      $(this).siblings(".easychat-analytics-csat-rating-popover-wrapper").toggle();
+  });
+
+  $('body').on('click', function (event) {
+       $(".easychat-analytics-csat-rating-popover-wrapper").hide();
+  });
+  $('.easychat-analytics-csat-rating-popover-wrapper').on('click', function (event) {
+       event.stopPropagation();
+  });
+      
+</script>
+{% endblock %}

@@ -1,0 +1,151 @@
+{% extends 'EasyAssistSalesforceApp/console.html' %}
+{% block content %}
+{% load static %}
+<style type="text/css">
+.cobrowse-msg {
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: 10px;
+}
+
+.cobrowse-msg-img {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+    background: #ddd;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    border-radius: 50%;
+}
+
+.cobrowse-msg-bubble {
+    max-width: 450px;
+    padding: 15px;
+    border-radius: 15px;
+    background: aliceblue;
+    max-width: 50%;
+}
+
+.cobrowse-msg-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.cobrowse-msg-info-name {
+    margin-right: 10px;
+}
+
+.cobrowse-msg-info-time {
+    font-size: 0.85em;
+}
+
+.right-cobrowse-msg {
+    flex-direction: row-reverse;
+}
+
+.right-cobrowse-msg .cobrowse-msg-bubble {
+    border-bottom-right-radius: 0;
+}
+
+.left-cobrowse-msg .cobrowse-msg-bubble {
+    border-bottom-left-radius: 0;
+}
+</style>
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <!-- DataTales Example -->
+    {% if cobrowse_agent.get_access_token_obj.allow_generate_meeting == True %}
+        <div class="row" style="margin: 0px 10px 10px 10px;">
+            <div class="col-sm-3">
+                <a class="btn" style="width: 100%; padding:10px 0px; color: #2755cb !important; background-color: white; border: none;" href="/easy-assist-salesforce/sales-ai/support-history/?salesforce_token={{salesforce_token}}"> Cobrowse Support History </a>
+            </div>
+            <div class="col-sm-3">
+                <a class="btn" style="width: 100%; padding:10px 0px; color: #2755cb !important; background-color: white; border: none;" href="/easy-assist-salesforce/sales-ai/meeting-audit-trail/?salesforce_token={{salesforce_token}}"> Meeting Support History </a>
+            </div>
+            <div class="col-sm-3">
+                <a class="btn" style="width: 100%; padding:10px 0px; color: #2755cb !important; background-color: white; border: none;" href="/easy-assist-salesforce/sales-ai/unattended-leads/?salesforce_token={{salesforce_token}}"> Unattended Leads </a>
+            </div>
+            <div class="col-sm-3">
+                <a class="btn" style="width: 100%; padding:10px 0px; border: 1px solid #2755cb !important; background: #f0f0fc !important; color: #2755cb !important;" href="/easy-assist-salesforce/sales-ai/screen-recording-audit-trail/?salesforce_token={{salesforce_token}}"> Screen Recording History </a>
+            </div>
+        </div>
+    {% else %}
+        <div class="row" style="margin: 0px 10px 10px 10px;">
+            <div class="col-sm-4">
+                <a class="btn" style="width: 100%; padding:10px 0px; color: #2755cb !important; background-color: white; border: none;" href="/easy-assist-salesforce/sales-ai/support-history/?salesforce_token={{salesforce_token}}"> Cobrowse Support History </a>
+            </div>
+            <div class="col-sm-4">
+                <a class="btn" style="width: 100%; padding:10px 0px; color: #2755cb !important; background-color: white; border: none;" href="/easy-assist-salesforce/sales-ai/unattended-leads/?salesforce_token={{salesforce_token}}"> Unattended Leads </a>
+            </div>
+            <div class="col-sm-4">
+                <a class="btn" style="width: 100%; padding:10px 0px; border: 1px solid #2755cb !important; background: #f0f0fc !important; color: #2755cb !important;" href="/easy-assist-salesforce/sales-ai/screen-recording-audit-trail/?salesforce_token={{salesforce_token}}"> Screen Recording History </a>
+            </div>
+        </div>
+    {% endif %}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <div class="row">
+                <div class="col-sm">
+                    <h6 class="m-0 font-weight-bold text-primary">Screen Recording Audit Trail</h6>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Agent</th>
+                            <th>Recording Date</th>
+                            <th>Recording Start Time</th>
+                            <th>Recording Duration</th>
+                            <th>Recorded file</th>
+                            <th>Expires(in days)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for screen_recording_obj in screen_recording_objs %}
+                        <tr>
+                            <td>
+                                {{ screen_recording_obj.agent.user.username }}
+                            </td>
+                            <td>
+                                {{ screen_recording_obj.recording_started | date:"Y-m-d" }}
+                            </td>
+                            <td>
+                                {{ screen_recording_obj.recording_started | time:"h:i a" }}
+                            </td>
+                            <td>
+                                {{ screen_recording_obj.get_screen_recording_duration }}
+                            </td>
+                            <td>
+                                <a href="/easy-assist-salesforce/download-file/{{ screen_recording_obj.recorded_file }}/?salesforce_token={{salesforce_token}}" download><img src="{% static 'EasyAssistApp/icons/download.svg' %}"></a>&nbsp;&nbsp;&nbsp;&nbsp;
+                            </td>
+                            <td>
+                                {% if screen_recording_obj.get_recording_expiration_time == "Today" or screen_recording_obj.get_recording_expiration_time <= 5 %}
+                                    <p style="color:red;">{{screen_recording_obj.get_recording_expiration_time}}</p>
+                                {% else %}
+                                    <p style="color:green;">{{screen_recording_obj.get_recording_expiration_time}}</p>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+window.SALESFORCE_TOKEN = '{{ salesforce_token }}';
+window.onload = function() {
+    $("#dataTable").DataTable({
+        "ordering": false
+    });
+};
+</script>
+{% endblock %}

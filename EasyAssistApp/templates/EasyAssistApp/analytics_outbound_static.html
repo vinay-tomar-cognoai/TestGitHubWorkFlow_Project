@@ -1,0 +1,282 @@
+{% extends 'EasyAssistApp/console.html' %} {% block content %} {% load static %}
+<style type="text/css">
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #f3f6ff !important;
+}
+
+.shadow {
+    /* box-shadow: 0 1px 0 rgba(0, 6, 85, 0.05), 0 10px 7px rgba(0, 30, 65, 0.06), 0 7px 70px rgba(68, 93, 184, 0.205) !important; */
+    box-shadow: 0px 0px 25px 0px rgba(0,0,0,0.15);
+}
+
+.icon-cobrowse {
+    background-color: rgba(116, 170, 252, 0.5);
+    height: 45px;
+    width: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    position: absolute;
+    left: 18px;
+    top: 18px;
+    transition: all 0.2s ease;
+}
+
+.icon-cobrowse svg {
+    width: 24px;
+    height: 24px;
+}
+.icon-download {
+    background-color: rgba(116, 170, 252, 0.5);
+    height: 30px;
+    width: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    position: absolute;
+    right: 18px;
+    top: 18px;
+    transition: all 0.2s ease;
+}
+
+.stats-cobrowse {
+    color: white;
+    text-align: center;
+    font-size: 30px;
+    font-weight: 600;
+    line-height: 95%;
+}
+
+.card-cobrowse:hover .icon-cobrowse {
+    top: 10px;
+    transition: all 0.2s ease;
+}
+
+.text-cobrowse {
+    text-align: center;
+    margin-top: 12px;
+    color: white !important;
+    font-weight: 400 !important;
+    letter-spacing: -0.04em;
+
+}
+
+.card-cobrowse {
+    height: 136px !important;
+    border-radius: 20px !important;
+    background: linear-gradient(0deg, #282DA5 0%, #445DB8 94.37%);
+    width: 90%;
+
+}
+
+@media only screen and (max-width: 600px) {
+  .chart-area {
+    height: 20rem;
+    width: 35rem;
+  }
+
+  .card-body-sm {
+    overflow: auto;
+  }
+}
+</style>
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+        <div class="col-md-1"></div>
+        <div class="col-md-3">
+            <select id="visited-title-select-option" class="form-control"></select>
+        </div>
+        <div class="col-md-8 float-right">
+            <input class="datepicker" data-date-format="dd/mm/yyyy" placeholder="Start Date" id="start-date" autocomplete="off" value="{{ datetime_start|date:"d/m/Y" }}" style="width:8em;">
+            <span> to </span>
+            <input class="datepicker" data-date-format="dd/mm/yyyy" placeholder="End Date" id="end-date" autocomplete="off" value="{{ datetime_end|date:"d/m/Y" }}" style="width:8em;">
+            <button class="btn btn-primary ml-3" onclick="show_agent_analysis()">Get Analytics</button>
+        </div>
+    </div>
+    <!-- Content Row -->
+    <div class="row">
+        {% if cobrowse_agent.role != "admin" %}
+        <!-- Earnings (Monthly) Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2 card-cobrowse">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="col-auto">
+                                <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="div-agent-nps">
+                                    ...
+                                </div>
+                            </div>
+                            <div class="mb-1 text-cobrowse" style="color: #806ef3;">
+                                NPS
+                            </div>
+                        </div>
+                        <div class="icon-cobrowse">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="3" y="4" width="8" height="8" rx="1" fill="white"/>
+                                <rect x="12" y="11" width="8" height="8" rx="1" fill="white"/>
+                                <rect x="12" y="4" width="8" height="5" rx="1" fill="white"/>
+                                <rect x="3" y="14" width="8" height="5" rx="1" fill="white"/>
+                            </svg>                                
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2 card-cobrowse">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="col-auto">
+                                <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="div-total-sr-lead-captured">
+                                    ...
+                                </div>
+                            </div>
+                            <div class="mb-1 text-cobrowse" style="color: #806ef3;">
+                                Leads Captured
+                            </div>
+                        </div>
+                        <div class="icon-cobrowse">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M14.7542 15C15.9962 15 17.003 16.0069 17.003 17.2489V18.1673C17.003 18.7407 16.8238 19.2997 16.4905 19.7662C14.9446 21.9295 12.4203 23.0011 9 23.0011C5.57903 23.0011 3.05607 21.929 1.51391 19.7646C1.18195 19.2987 1.00354 18.7409 1.00354 18.1688V17.2489C1.00354 16.0069 2.0104 15 3.25242 15H14.7542ZM19.054 1.40364C19.4136 1.19813 19.8717 1.32306 20.0773 1.6827C21.1679 3.59117 21.75 5.75412 21.75 8.00008C21.75 10.2536 21.1639 12.4235 20.0663 14.3365C19.8602 14.6958 19.4018 14.82 19.0426 14.6138C18.6833 14.4077 18.5591 13.9493 18.7653 13.5901C19.7334 11.9027 20.25 9.98993 20.25 8.00008C20.25 6.01691 19.7368 4.11023 18.7749 2.42693C18.5694 2.0673 18.6943 1.60916 19.054 1.40364ZM9 3.0047C11.7614 3.0047 14 5.24328 14 8.0047C14 10.7661 11.7614 13.0047 9 13.0047C6.23857 13.0047 4 10.7661 4 8.0047C4 5.24328 6.23857 3.0047 9 3.0047ZM15.5885 3.39951C15.9486 3.19476 16.4064 3.32068 16.6112 3.68076C17.3538 4.98671 17.75 6.46544 17.75 8.00008C17.75 9.53822 17.352 11.0202 16.6061 12.3282C16.401 12.6881 15.943 12.8135 15.5831 12.6083C15.2233 12.4031 15.0979 11.9451 15.3031 11.5853C15.9207 10.5021 16.25 9.27594 16.25 8.00008C16.25 6.72712 15.9222 5.50362 15.3072 4.4222C15.1025 4.06212 15.2284 3.60425 15.5885 3.39951Z" fill="#fff" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        <div class="col-xl-3 col-md-6 mb-4 ">
+            <div class="card border-left-warning shadow h-100 py-2 card-cobrowse">
+                <div class="card-body">
+                    <div class="col mr-2">
+                        <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="div-total-sr-attended">
+                            ...</div>
+                        <div class=" mb-1 text-cobrowse" style="color: #16A1AA;">
+                            Cobrowsing
+                            Request Attended</div>
+                    </div>
+                    <div class="icon-cobrowse">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" fill="white"/>
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M6.02789 20C5.8688 18.1818 6.31426 14.4364 9.36889 14H14.6191C15.316 14 16.3659 14.3598 17.1106 15.4735C15.8543 16.148 15 17.4742 15 19C15 19.3453 15.0438 19.6804 15.126 20H6.02789Z" fill="white"/>
+                            <path d="M9.36889 14V13.25H9.3156L9.26283 13.2575L9.36889 14ZM6.02789 20L5.28075 20.0654L5.34065 20.75H6.02789V20ZM17.1106 15.4735L17.4654 16.1343L18.1934 15.7434L17.7341 15.0566L17.1106 15.4735ZM15.126 20V20.75H16.0935L15.8523 19.8131L15.126 20ZM9.26283 13.2575C7.37834 13.5267 6.32802 14.8362 5.79416 16.2102C5.26791 17.5646 5.19431 19.0776 5.28075 20.0654L6.77504 19.9346C6.70238 19.1043 6.77197 17.8354 7.19233 16.7534C7.60509 15.6911 8.30482 14.9096 9.47496 14.7425L9.26283 13.2575ZM14.6191 13.25H9.36889V14.75H14.6191V13.25ZM17.7341 15.0566C16.8421 13.7226 15.5514 13.25 14.6191 13.25V14.75C15.0805 14.75 15.8898 14.997 16.4872 15.8904L17.7341 15.0566ZM15.75 19C15.75 17.7613 16.4427 16.6833 17.4654 16.1343L16.7559 14.8127C15.2659 15.6126 14.25 17.1871 14.25 19H15.75ZM15.8523 19.8131C15.7857 19.554 15.75 19.2817 15.75 19H14.25C14.25 19.4089 14.3018 19.8068 14.3997 20.1869L15.8523 19.8131ZM6.02789 20.75H15.126V19.25H6.02789V20.75Z" fill="white"/>
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M19 22C20.6569 22 22 20.6569 22 19C22 17.3431 20.6569 16 19 16C17.3431 16 16 17.3431 16 19C16 20.6569 17.3431 22 19 22ZM20.6867 18.1662C20.7785 18.0631 20.7693 17.905 20.6662 17.8133C20.5631 17.7215 20.405 17.7307 20.3133 17.8338L18.7169 19.6274L18.184 19.0481C18.0905 18.9465 17.9323 18.9399 17.8307 19.0334C17.7291 19.1269 17.7225 19.285 17.816 19.3867L18.536 20.1693L18.7231 20.3726L18.9067 20.1662L20.6867 18.1662Z" fill="white"/>
+                        </svg>                            
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Pending Requests Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4 ">
+            <div class="card border-left-warning shadow h-100 py-2 card-cobrowse">
+                <div class="card-body">
+                    <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="div-total-sr-closed">...
+                    </div>
+                    <div class="col mr-2">
+                        <div class=" mb-1 text-cobrowse" style="color: #1caf3d">
+                            Customers
+                            Converted</div>
+                    </div>
+                    <div class="icon-cobrowse">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17.5004 11.9998C20.5379 11.9998 23.0004 14.4622 23.0004 17.4998C23.0004 20.5373 20.5379 22.9998 17.5004 22.9998C14.4628 22.9998 12.0004 20.5373 12.0004 17.4998C12.0004 14.4622 14.4628 11.9998 17.5004 11.9998ZM12.0226 13.9991C11.3755 15.0095 11.0004 16.2108 11.0004 17.4998C11.0004 19.1301 11.6006 20.6202 12.5921 21.7613C11.7966 21.9214 10.9317 22.0008 10.0004 22.0008C6.5794 22.0008 4.05643 20.9287 2.51427 18.7643C2.18231 18.2984 2.00391 17.7406 2.00391 17.1685V16.2486C2.00391 15.0065 3.01076 13.9997 4.25278 13.9997L12.0226 13.9991ZM14.8539 17.1462C14.6587 16.951 14.3421 16.951 14.1468 17.1462C13.9515 17.3415 13.9515 17.6581 14.1468 17.8533L16.1468 19.8533C16.3421 20.0486 16.6587 20.0486 16.8539 19.8533L20.8539 15.8533C21.0492 15.6581 21.0492 15.3415 20.8539 15.1462C20.6587 14.951 20.3421 14.951 20.1468 15.1462L16.5004 18.7927L14.8539 17.1462ZM10.0004 2.00439C12.7618 2.00439 15.0004 4.24297 15.0004 7.00439C15.0004 9.76582 12.7618 12.0044 10.0004 12.0044C7.23894 12.0044 5.00036 9.76582 5.00036 7.00439C5.00036 4.24297 7.23894 2.00439 10.0004 2.00439Z" fill="#fff" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Pending Requests Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4 ">
+            <div class="card border-left-warning shadow h-100 py-2 card-cobrowse">
+                <div class="card-body">
+                    <div class="col mr-2">
+                        <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="div-total-sr-customer-denied">
+                            ...</div>
+                        <div class=" mb-1 text-cobrowse" style="color: #16A1AA;">
+                            Cobrowsing Request denied by Customer</div>
+                    </div>
+                    <div class="icon-cobrowse">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" fill="white"/>
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M6.02789 20C5.8688 18.1818 6.31426 14.4364 9.36889 14H14.6191C15.316 14 16.3659 14.3598 17.1106 15.4735C15.8543 16.148 15 17.4742 15 19C15 19.3453 15.0438 19.6804 15.126 20H6.02789Z" fill="white"/>
+                            <path d="M9.36889 14V13.25H9.3156L9.26283 13.2575L9.36889 14ZM6.02789 20L5.28075 20.0654L5.34065 20.75H6.02789V20ZM17.1106 15.4735L17.4654 16.1343L18.1934 15.7434L17.7341 15.0566L17.1106 15.4735ZM15.126 20V20.75H16.0935L15.8523 19.8131L15.126 20ZM9.26283 13.2575C7.37834 13.5267 6.32802 14.8362 5.79416 16.2102C5.26791 17.5646 5.19431 19.0776 5.28075 20.0654L6.77504 19.9346C6.70238 19.1043 6.77197 17.8354 7.19233 16.7534C7.60509 15.6911 8.30482 14.9096 9.47496 14.7425L9.26283 13.2575ZM14.6191 13.25H9.36889V14.75H14.6191V13.25ZM17.7341 15.0566C16.8421 13.7226 15.5514 13.25 14.6191 13.25V14.75C15.0805 14.75 15.8898 14.997 16.4872 15.8904L17.7341 15.0566ZM15.75 19C15.75 17.7613 16.4427 16.6833 17.4654 16.1343L16.7559 14.8127C15.2659 15.6126 14.25 17.1871 14.25 19H15.75ZM15.8523 19.8131C15.7857 19.554 15.75 19.2817 15.75 19H14.25C14.25 19.4089 14.3018 19.8068 14.3997 20.1869L15.8523 19.8131ZM6.02789 20.75H15.126V19.25H6.02789V20.75Z" fill="white"/>
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M22 19C22 20.6569 20.6569 22 19 22C17.3431 22 16 20.6569 16 19C16 17.3431 17.3431 16 19 16C20.6569 16 22 17.3431 22 19ZM17.8507 17.8507C17.9483 17.7531 18.1066 17.7531 18.2042 17.8507L18.9948 18.6413L19.7624 17.8284C19.8572 17.728 20.0154 17.7234 20.1158 17.8182C20.2162 17.913 20.2207 18.0712 20.1259 18.1716L19.3485 18.995L20.1492 19.7957C20.2468 19.8933 20.2468 20.0516 20.1492 20.1492C20.0516 20.2469 19.8933 20.2469 19.7956 20.1492L19.0051 19.3587L18.2376 20.1716C18.1428 20.272 17.9846 20.2766 17.8842 20.1818C17.7838 20.087 17.7793 19.9288 17.8741 19.8284L18.6514 19.005L17.8507 18.2043C17.7531 18.1067 17.7531 17.9484 17.8507 17.8507Z" fill="white"/>
+                        </svg>                            
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Service Request Analytics</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="javascript:void(0)" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Timeline:</div>
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="show_daily_service_request_analytics()">Daily</a>
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="show_weeekly_service_request_analytics()">Weekly</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="show_monthly_service_request_analytics()">Monthly</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body card-body-sm">
+                    <div class="chart-area">
+                        <canvas id="service-request-analytics"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if cobrowse_agent.role != "agent" %}
+        <div class="col-md-6">
+            <br>
+            <!-- Project Card Example -->
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Agent's Average NPS Score</h6>
+                </div>
+                <div class="card-body" id="agent-wise-nps-body"></div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <br>
+            <!-- Project Card Example -->
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Page Wise Analytics</h6>
+                </div>
+                <div class="card-body" id="page-wise-analytics-body"></div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <br>
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Agent Wise Session Analytics</h6>
+                </div>
+                <div class="card-body card-body-sm">
+                    <div class="chart-area">
+                        <canvas id="agent-wise-request-analytics"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    <!-- Content Row -->
+</div>
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/analytics_outbound_static.js' %}"></script>
+{% endblock %}

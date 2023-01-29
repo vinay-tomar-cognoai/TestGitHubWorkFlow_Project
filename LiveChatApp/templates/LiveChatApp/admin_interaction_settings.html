@@ -1,0 +1,299 @@
+{% extends 'LiveChatApp/manager_console.html' %}
+{% block consolecontent %}
+{% load static %}
+
+<style type="text/css">
+
+    .custom-control-input:checked~.custom-control-label::before {
+            border-color: {{ admin_config.get_livechat_theme_lighten_one }};
+            background-color: {{ admin_config.get_livechat_theme_lighten_one }};
+        }
+    .help-icon {
+        border-color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+        color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+    }
+    .lead-source-tab input:checked + span{
+        background: {{ admin_config.get_livechat_theme_lighten_one }};
+    }
+    .livechat-conversation-email-item {
+        background: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+    }
+    .bootstrap-select .dropdown-menu .inner::-webkit-scrollbar-thumb{
+        border-radius: 10px;
+        background: {{ admin_config.get_livechat_theme_lighten_six }} !important;
+    }
+    .bootstrap-select .dropdown-menu .inner {
+    scrollbar-color: {{ admin_config.get_livechat_theme_lighten_six }} #f1f1f1;
+    }
+</style>
+
+ <link href="{% static 'LiveChatApp/css/admin_settings.css' %}?v={% random_int 1 100 %}" type="text/css" rel="stylesheet"/>
+ <link href="{% static 'LiveChatApp/css/email_configure.css' %}?v={% random_int 1 100 %}" type="text/css" rel="stylesheet"/>
+
+  <div class="col-xl-10 col-lg-10 col-md-12 col-sm-12 col-12 py-2 " id="live-chat-admin-setting-content-gs" style="height: calc(100vh - 4.375rem); background: #FAFAFA; overflow-y: auto; overflow-x: hidden; max-width: 83%">
+
+    <div class="live-chat-admin-general-setting-heading admin-setting-heading-wrapper">
+        <div class="livechat-general-setting-tab-pane-wrapper">
+            <button class="livechat-general-setting-tab-btn" onclick="load_system_setting()">
+                System Setting
+            </button>
+            <button class="livechat-general-setting-tab-btn setting-active-btn">
+                Interaction Setting
+            </button>
+        </div>
+
+        <div>
+            {% if user_obj.bots.all.count > 1 %}
+            <select class="form-control selectpicker create-user-select-field setting-select-bot"  id="select-bot-obj" onchange="change_bot_obj();">
+                {% for bot in bot_obj_list %}
+                    {% if bot.pk == bot_id %}
+                    <option value="{{bot.pk}}" selected>{{bot}}</option>
+                    {% else %}
+                    <option value="{{bot.pk}}">{{bot}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            {% else %}
+            <select id="select-bot-obj" class="selectpicker create-user-select-field setting-select-bot">
+                {% for bot in user_obj.bots.all %}
+                    <option value="{{bot.pk}}" selected>{{bot}}</option>
+                {% endfor %}
+            </select>
+            {% endif %}
+        </div>
+    </div>
+    <div class="live-chat-admin-general-setting-area">
+        <div class="livechat-interaction-setting-wrapper tabcontent" id="InteractionsettingContent">
+            <div class="row align-items-center livechat-admin-setting-item-wrapper">
+                <div class="col-md-6 col-lg-6 pl-0 livechat-setting-heading-text-div">
+                    Assign Chat to agents based on their category
+                </div>
+                <div class="col-md-6 col-lg-6">
+                    {% if config_obj.category_enabled %}
+                    <label class="livechat-option-switch" >
+                        <input type="checkbox" id="is-livechat-category-enabled" checked/>
+                        <span class="livechat-option-switch-slider round"></span>
+                    </label>
+                    {% else %}
+                    <label class="livechat-option-switch">
+                        <input type="checkbox" id="is-livechat-category-enabled"/>
+                        <span class="livechat-option-switch-slider round"></span>
+                    </label> 
+                    {% endif %}    
+                </div>
+            </div>
+            <div class="row align-items-center livechat-admin-setting-item-wrapper">
+                <div class="col-md-6 col-lg-6 pl-0 livechat-setting-heading-text-div">
+                    Enable Chat Escalation Matrix for Customers
+                </div>
+                <div class="col-md-6 col-lg-6">
+                    <label class="livechat-option-switch ">
+                        <input type="checkbox" id="is-chat-escalation-matrix-enabled" {% if admin_config.is_chat_escalation_matrix_enabled %} checked {% endif %}/>
+                        <span class="livechat-option-switch-slider round"></span>
+                    </label> 
+                </div>
+            </div>
+            <div class="row align-items-center livechat-admin-setting-item-wrapper">
+                <div class="col-md-6 col-lg-6 pl-0 livechat-setting-heading-text-div">
+                    Max. number of customers with whom an agent can chat at a time
+                </div>
+                <div class="col-md-6 col-lg-6">
+                    <input class="form-control" type="number" placeholder="" id="customer-count-id" value="{{config_obj.max_customer_count}}" min="0">
+                </div>
+            </div>
+            <div class="row align-items-center livechat-admin-setting-item-wrapper">
+                <div class="col-md-6 col-lg-6 pl-0 livechat-setting-heading-text-div">
+                    Max. number of agents that can be invited in a single chat
+                </div>
+                <div class="col-md-6 col-lg-6">
+                    <select class="form-control select-dropdown-icon livechat-custom-select selectpicker create-user-select-field interaction-setting-select " id="number-of-guest-agents">
+                        {% if config_obj.max_guest_agent == "1" %}
+                            <option value="1" selected>1</option>
+                        {% else %}
+                            <option value="1">1</option>
+                        {% endif %}
+                        {% if config_obj.max_guest_agent == "2" %}
+                            <option value="2" selected>2</option>
+                        {% else %}
+                            <option value="2">2</option>
+                        {% endif %}
+                        {% if config_obj.max_guest_agent == "3" %}
+                            <option value="3" selected>3</option>
+                        {% else %}
+                            <option value="3">3</option>
+                        {% endif %}
+                    </select>
+
+                </div>
+            </div>
+            <div class="row align-items-center livechat-admin-setting-item-wrapper">
+                <div class="col-md-6 col-lg-6 pl-0 livechat-setting-heading-text-div">
+                    Enable Customer Details Editing <sup><i style="font-size: 15px;" class="material-icons inline-icon help-icon" data-toggle="tooltip" data-position="top" title="Allow Agents to edit Customer details during an interaction">help</i></sup>
+                </div>
+                <div class="col-md-6 col-lg-6">
+                    <label class="livechat-option-switch">
+                        {% if config_obj.is_customer_details_editing_enabled %}
+                            <input type="checkbox" id="enable-customer-details-editing" checked>
+                        {% else %}
+                            <input type="checkbox" id="enable-customer-details-editing">
+                        {% endif %}
+                        <span class="livechat-option-switch-slider round"></span>
+                    </label>
+
+                </div>
+            </div>
+            <div class="row align-items-center livechat-admin-setting-item-wrapper">
+                <div class="col-md-6 col-lg-6 pl-0 livechat-setting-heading-text-div">
+                    Enable Send Transcript Feature 
+                </div>
+                <div class="col-md-6 col-lg-6">
+                    <label class="livechat-option-switch">
+                        {% if config_obj.is_transcript_enabled %}
+                            <input type="checkbox" id="enable-transcript" checked>
+                        {% else %}
+                            <input type="checkbox" id="enable-transcript">
+                        {% endif %}
+                        <span class="livechat-option-switch-slider round"></span>
+                    </label>
+
+                </div>
+            </div>
+            <div class="row align-items-center livechat-admin-setting-item-wrapper">
+                <div class="col-md-6 col-lg-6 pl-0 livechat-setting-heading-text-div">
+                    Enable Raise a ticket functionality for the Agent <sup><i style="font-size: 15px;" class="material-icons inline-icon help-icon" data-toggle="tooltip" data-position="top" title="Agents will be able to raise a ticket for a conversation. ">help</i></sup>
+                </div>
+                <div class="col-md-6 col-lg-6">
+                    <label class="livechat-option-switch">
+                        <input type="checkbox" id="enable-agent-raise-ticket" {% if config_obj.is_agent_raise_ticket_functionality_enabled %} checked {% endif %}>
+                        <span class="livechat-option-switch-slider round"></span>
+                    </label>
+
+                </div>
+            </div>
+            <div class="row align-items-center livechat-admin-setting-item-wrapper">
+                <div class="col-md-6 col-lg-6 pl-0 livechat-setting-heading-text-div">
+                    Enable self-assign option of chats at agent’s end
+                </div>
+                <div class="col-md-6 col-lg-6">
+                    <label class="livechat-option-switch">
+                        {% if admin_config.is_self_assign_chat_agent_enabled %}
+                            <input type="checkbox" id="enable-self-assign-chats-agent" checked>
+                        {% else %}
+                            <input type="checkbox" id="enable-self-assign-chats-agent">
+                        {% endif %}
+                        <span class="livechat-option-switch-slider round"></span>
+                    </label>
+
+                </div>
+            </div>
+            <div class="row align-items-center livechat-admin-setting-item-wrapper">
+                <div class="col-md-6 col-lg-6 pl-0 livechat-setting-heading-text-div">
+                    Enable Voice/Video Call<sup><i style="font-size: 15px;" class="material-icons inline-icon help-icon" data-toggle="tooltip" data-position="top" title="Enable Voice/Video calls between agent and users during LiveChat">help</i></sup>
+                </div>
+                <div class="col-md-6 col-lg-6">
+                    <select class="livechat-custom-select form-control select-dropdown-icon selectpicker create-user-select-field interaction-setting-select" id="livechat_call_type">
+                        <option 
+                            value="none"
+                            {% if config_obj.call_type == 'none' %}
+                                selected
+                            {% endif %}
+                            >None</option>
+
+                        <option 
+                            value="pip"
+                            {% if config_obj.call_type == 'pip' %}
+                                selected
+                            {% endif %}
+                            >PIP Voice Call</option>
+
+                        <option 
+                            value="new_tab"
+                            {% if config_obj.call_type == 'new_tab' %}
+                                selected
+                            {% endif %}
+                            >New Tab Voice Call</option>
+                        
+                        <option 
+                            value="video_call"
+                            {% if config_obj.call_type == 'video_call' %}
+                                selected
+                            {% endif %}
+                            >Video Call</option>
+                    </select>
+
+                </div>
+                <div class="col-md-12 p-0 livechat-admin-setting-subsection-wrapper" id="enable_initiate_call_from_customer" style="display: none;">
+                    <div class="col-md-12 mt-2 my-3 livechat-admin-setting-subsection-divider-div"></div>
+                    <div class="col-md-12 pl-0 mt-3 align-items-center livechat-admin-setting-subsection-data-div">
+                        <div class="col-md-6 col-lg-6 pl-0 livechat-setting-heading-text-div">
+                            <span>Enable the option to initiate Voice Call at customer's end</span><sup><i style="font-size: 15px;" class="material-icons inline-icon help-icon" data-toggle="tooltip" data-position="top" title="" data-original-title="On enabling it the customer will also have an option to enable the Voice call.">help</i></sup>
+                        </div>
+                        <div class="col-md-6 col-lg-6" style="padding-left: 18px;">
+                            <label class="livechat-option-switch">
+                                <input 
+                                    type="checkbox" 
+                                    id="enable_call_from_customer_end"
+                                    {% if config_obj.is_call_from_customer_end_enabled %}checked{% endif %}>
+                                
+                                <span class="livechat-option-switch-slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row align-items-center livechat-admin-setting-item-wrapper">
+                <div class="col-md-6 col-lg-6 pl-0 livechat-setting-heading-text-div">
+                    Allow Agents to initiate Cobrowsing sessions<sup><i style="font-size: 15px;" class="material-icons inline-icon help-icon" data-toggle="tooltip" data-position="top" title="" data-original-title="Allows agent to send assist request to the customer by making the screen of the customer visible to the agent. ">help</i></sup>
+                </div>
+                <div class="col-md-6 col-lg-6">
+                    <label class="livechat-option-switch">
+                        {% if config_obj.is_cobrowsing_enabled %}
+                            <input type="checkbox" id="livechat_enable_cobrowsing" checked>
+                        {% else %}
+                            <input type="checkbox" id="livechat_enable_cobrowsing">
+                        {% endif %}
+                        <span class="livechat-option-switch-slider round"></span>
+                    </label>
+
+                </div>
+            </div>
+            <div class="row align-items-center livechat-admin-setting-item-wrapper">
+                <div class="col-md-6 col-lg-6 pl-0 livechat-setting-heading-text-div">
+                    Pending time for accept/reject while an agent invites another agent in the chat(In seconds)
+                </div>
+                <div class="col-md-6 col-lg-6">
+                    <input type="number" class="form-control" id="pending-time-id" placeholder="" min="0" max="600" value= "{{ config_obj.guest_agent_timer }}" />
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="livechat-admin-setting-save-reset-btns-wrapper">
+        <button class="resetBtn livechat-settings-reset-btn">Reset</button>
+        <button class="saveChangesBtn" id="save-admin-settings" onclick="save_admin_interaction_settings()">Save</button>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    function change_bot_obj(){
+        if(document.getElementById("select-bot-obj").value != "-1"){
+            window.location.href = "/livechat/interaction-settings/?bot_id="+document.getElementById("select-bot-obj").value;
+        }
+    }
+
+    $('#customer-count-id').on("input",function(){
+        if (document.getElementById('customer-count-id').value < 0){
+            document.getElementById('customer-count-id').value = 0;
+        }
+    })
+
+    $(document).ready(function() {
+        $('#livechat_call_type').trigger('change'); 
+    })
+</script>
+{% endblock %}
+
+

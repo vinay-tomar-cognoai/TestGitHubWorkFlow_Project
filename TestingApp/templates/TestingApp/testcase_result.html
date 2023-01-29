@@ -1,0 +1,156 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Testing Console</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style>
+	/* width */
+	::-webkit-scrollbar {
+	  width: 10px;
+	}
+
+	/* Track */
+	::-webkit-scrollbar-track {
+	  background: #f1f1f1; 
+	}
+	 
+	/* Handle */
+	::-webkit-scrollbar-thumb {
+	  background: #888; 
+	}
+
+	/* Handle on hover */
+	::-webkit-scrollbar-thumb:hover {
+	  background: #555; 
+	}
+	</style>
+
+
+</head>
+<body style="background-color: #f3f6ff !important">
+
+{% csrf_token %}
+
+<nav class="navbar navbar-dark bg-dark">
+<!-- Navbar content -->
+</nav>
+
+<nav class="navbar navbar-dark bg-primary">
+<!-- Navbar content -->
+</nav>
+
+<nav class="navbar navbar-light" style="background-color: #e3f2fd;">
+    <a class="navbar-brand" href="#">Automated QA Testing Tool</a>
+    <button type="button" class="btn btn-primary" onclick="window.location='/automation/test/{{ qa_testcase.bot.pk }}/';">Go Back</button>
+</nav>
+
+<div style="padding:1em;">
+	
+	<div class="row">
+
+		<div class="col-6">
+
+			<div class="input-group">
+				<button type="button" class="btn btn-light" onclick="window.location.reload();">Refresh</button>
+				<button type="button" class="btn btn-light ml-2" onclick="window.location='/automation/testcase/reset-all/{{ qa_testcase.pk }}/';">Reset all test</button>
+			</div>			
+
+			<br>
+
+			<table class="table">
+				<thead>
+					<tr>
+						<th scope="col">TestCase ID</th>
+						<th scope="col">TestCase Name</th>
+						<th scope="col">Testing failed?</th>
+						<th scope="col">Tested?</th>
+						<th scope="col">Total Execution time (secs)</th>
+						<th scope="col">Reset test</th>
+						<th scope="col">Test output</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for qa_testcase_flow in qa_testcase_flows %}
+						<tr>
+							<td scope="row">{{ qa_testcase_flow.get_intent_pk }}</td>
+							<td scope="row"><u><a href="{{ qa_testcase_flow.qa_testcase.bot.bot_domain }}/chat/edit-intent/?intent_pk={{ qa_testcase_flow.get_intent_pk }}" target="_blank">{{ qa_testcase_flow.get_flow_name }}</a></u></td>
+							<td scope="row">
+								{% if qa_testcase_flow.is_flow_testing_failed %}
+									<i class="fa fa-check-square" style="color:green;"></i>
+								{% else %}
+									<i class="fa fa-window-close"  style="color:red;"></i>
+								{% endif %}
+							</td>
+							<td scope="row">
+								{% if qa_testcase_flow.is_flow_tested %}
+									<i class="fa fa-check-square" style="color:green;"></i>
+								{% else %}
+									<i class="fa fa-window-close" style="color:red;"></i>
+								{% endif %}
+							</td>
+							<td>{{ qa_testcase_flow.get_total_execution_time }}</td>
+							<td><a href="/automation/testcase/reset/{{ qa_testcase_flow.pk }}/"><i class="fa fa-history"></i></a></td>
+							<td onclick="load_json_data('{{ qa_testcase_flow.pk }}')" style="cursor:pointer;"><i class="fa fa-arrow-circle-right"></i></td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+			
+		</div>
+
+		<div class="col-6">
+
+			<div class="input-group">
+				<h4><u><b>Flow output</b></u></h4>
+			</div>			
+
+			<br>
+			<table class="table" style="table-layout: fixed;">
+				<thead>
+					<tr>
+						<th scope="col">Input</th>
+						<th scope="col">Text Response</th>
+						<th scope="col">Recommendations/Choices</th>
+					</tr>
+				</thead>
+				<tbody id="flow-output-tbody-content">
+				</tbody>
+			</table>
+
+		</div>
+
+
+	</div>
+
+</div>
+
+
+</body>
+<script type="text/javascript" src="{% static 'TestingApp/js/jquery-3.2.1.slim.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'TestingApp/js/popper.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'TestingApp/js/bootstrap.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'TestingApp/js/crypto-js.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'TestingApp/js/app.js' %}"></script>
+
+<script type="text/javascript">
+
+	window.selected_test_bot_id = "{{ qa_testing_bot.pk }}";
+	
+	function processing_started(element){
+		element.innerHTML = '<i class="fa fa-hourglass-start"></i>';
+	}
+
+	function processing_ended(element){
+		element.innerHTML = '<i class="fa fa-check-square"></i>';		
+	}
+
+	// setInterval(function(e){
+	// 	window.location.reload();
+	// }, 10000);
+
+</script>
+
+</html>

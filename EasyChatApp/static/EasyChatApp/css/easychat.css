@@ -1,0 +1,619 @@
+        @font-face {
+          font-family: "au-font";
+          src: url("/static/EasyChatApp/fonts/Quicksand-Medium.ttf");
+        }
+
+        html{
+            font-family: "au-font", Fallback, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+            font-size: 15px;
+            background-color: #ffffff !important;
+        }
+
+        body{
+          overflow: hidden;
+        }
+
+        #easychat-navbar{
+            position: fixed;
+            height: 56px;
+            z-index: 997;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+        }
+
+        #easychat-navbar-wrapper {
+          height: 54px;
+          line-height: 54px;
+          min-height: 54px;
+          text-align: center;
+          color: #FDF3F1;
+          background-color:#6C2D77; 
+          font-size:1em;
+        }
+
+        #easychat-footer{
+          position: fixed; 
+          bottom: 0; 
+          left: 0; 
+          right: 0; 
+          background-color: white;
+          color: black; 
+          padding: 20px 10px 0px 10px;
+          height: 60px;
+        }
+
+        #easychat-user-query{
+          border:white !important;
+        }
+
+        #user_input:focus {
+          border-bottom: none !important;
+          box-shadow: none !important;
+          outline: none;
+        }
+
+        .easychat-bot-message{
+          float: left;
+          width: 314px;
+          height: auto;
+          font-size: 14px;
+          color: #6C2D77;
+          border-radius: 0.6em;
+          /* border-top-right-radius: 2.5em;
+          border-top-left-radius: 0em;
+          box-shadow: 2px 2px 2px #ef6c00;*/
+          background-color: #fff3e0;  
+          padding-bottom: 10px;
+          word-wrap: break-word;
+          display: inline-block;
+        }
+
+        @media screen and (min-width: 425px){
+          .easychat-bot-message{
+            width: 314px;
+          }
+        }
+
+        .easychat-bot-message-line{
+          line-height: 20px;
+          padding: 0.5em 1em 0em 0.5em;
+        }
+
+        .easychat-user-message{
+          float: right;
+          width: 314px;
+          height: auto;
+          font-size: 14px;
+          color: #6C2D77;
+          border-radius: 0.6em;
+          /*border-top-left-radius: 2.5em;
+          border-top-right-radius: 0em;
+          box-shadow: 2px 2px 2px #bdbdbd;*/
+          background-color:#ede7f6;  
+          word-wrap: break-word;
+          display: inline-block;
+          margin-right:0.3em;
+        }
+
+        @media screen and (min-width: 425px){
+          .easychat-user-message{
+            width: 314px;
+          }
+        }
+
+        .easychat-user-message-line{
+          line-height: 20px;
+          padding: 1em 1em 0em 1em !important;
+        }
+
+        .message-time-bot{
+           font-size:11px;
+           text-align: right;
+           display:inline-block;
+           width: 100%;
+           color: #757575;
+           margin-top: 10px;
+        }
+
+        .message-time-user{
+           font-size:11px;
+           text-align: right;
+           display:inline-block;
+           width: 100%;
+           color: #757575;
+           margin-top: 10px;
+        }
+
+        #easychat-chat-container{
+            padding:4em 0.3em 0em 0.2em;
+            overflow-y:auto;
+            position:fixed;
+            width: 100%;
+        }
+
+        #easychat-mic-div{
+          float: left; 
+          font-size: 10pt; 
+          width:10%;
+        }
+
+        #easychat-mic-div > img{
+          height:2em;padding-left:0.5em;padding-right:0.5em;
+        }
+
+        #easychat-query-submit-div{
+          float: right; 
+          font-size: 10pt; 
+          width:10%;
+        }
+
+        #easychat-mic-disable{
+          float: right;
+          padding-right: 1em;
+        }
+
+        #easychat-mic-disable > img{
+          height: 1em;
+        }
+
+        #easychat-query-submit-div > img{
+          height:2em;
+          padding-left:0.5em;
+          padding-right:0.5em;
+        }
+
+        #user_input:disabled{
+          background-color: white;
+        }
+
+        /* Tooltip container */
+        .tooltip {
+          position: relative;
+          display: inline-block;
+        }
+
+        /* Tooltip text */
+        .tooltip .tooltiptext {
+          visibility: hidden;
+          width: 120px;
+          background-color: #555;
+          color: #fff;
+          text-align: center;
+          padding: 5px 0;
+          border-radius: 6px;
+
+          /* Position the tooltip text */
+          position: absolute;
+          z-index: 1;
+          bottom: 125%;
+          left: 50%;
+          margin-left: -60px;
+
+          /* Fade in tooltip */
+          opacity: 0;
+          transition: opacity 0.3s;
+        }
+
+        /* Tooltip arrow */
+        .tooltip .tooltiptext::after {
+          content: "";
+          position: absolute;
+          top: 100%;
+          left: 50%;
+          margin-left: -5px;
+          border-width: 5px;
+          border-style: solid;
+          border-color: #555 transparent transparent transparent;
+        }
+
+        /* Show the tooltip text when you mouse over the tooltip container */
+        .tooltip:hover .tooltiptext {
+          visibility: visible;
+          opacity: 1;
+        }
+
+        .easychat-recommendation{
+            background-color:#ffffff; 
+            margin:auto;
+            border: 1px solid #F9673A ;
+            border-radius: 5px;
+            font-size:94%;
+            padding: 0.5em;
+            margin:auto;
+            margin-bottom:0.1em;
+            color:#F9673A;
+            font-size:14px;
+            width: 320px;
+            display: inline-block;
+            text-align:center;
+        }
+
+        .easychat-recommendation:hover {
+            background-color:#F9673A; 
+            color:#ffffff;
+        }
+
+        /* width */
+        ::-webkit-scrollbar {
+          width: 0.1em !important;
+        }
+
+        /* Track */
+        ::-webkit-scrollbar-track {
+          box-shadow: inset 0 0 5px grey; 
+          border-radius: 10px;
+        }
+         
+        /* Handle */
+        ::-webkit-scrollbar-thumb {
+          background: #ffcc80; 
+          border-radius: 10px;
+        }
+
+        /* Handle on hover */
+        ::-webkit-scrollbar-thumb:hover {
+          background: #b30000; 
+        }
+
+        .easychat-choices{
+          background-color:#E77E43;
+          color: #FFFFFF;
+          border:0.1em solid #E77E43;
+          padding:0.5em 3em 0.5em 3em;
+          margin: 0em 0.5em 0.5em 0em;
+          border-radius: 0.5em;
+          font-weight: 50;
+          font-family: "au-font", Fallback, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+        }
+
+        .easychat-choices:hover{
+          background-color:#FFFFFF;
+          color: #E77E43;
+          border:0.1em solid #E77E43;
+        }
+
+        .easychat-card {
+          /* Add shadows to create the "card" effect */
+          box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+          transition: 0.1s;
+          width: 9em;
+          float: left;
+          margin: 0.5em 0.5em 0.5em 0.5em;
+          background-color: white;
+          height: 13em;
+        }
+
+        /* On mouse-over, add a deeper shadow */
+        .easychat-card:hover {
+          box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+        }
+
+        /* Add some padding inside the card container */
+        .easychat-card > .container {
+          padding: 2px 16px;
+        }
+
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+          -webkit-appearance: none;
+          -moz-appearance: none;
+          appearance: none;
+          margin: 0; 
+        }
+
+        .autocomplete {
+          /*the container must be positioned relative:*/
+          position: relative;
+          display: inline-block;
+        }
+        input {
+          border: 1px solid transparent;
+          padding: 10px;
+          font-size: 16px;
+        }
+        input[type=text] {
+          width: 100%;
+        }
+        input[type=submit] {
+          color: #fff;
+        }
+        .autocomplete-items {
+          position: absolute;
+          border: 1px solid #d4d4d4;
+          border-bottom: none;
+          border-top: none;
+          z-index: 99;
+          /*position the autocomplete items to be the same width as the container:*/
+          bottom: 100%;
+          left: 0;
+          right: 0;
+        }
+        .autocomplete-items div {
+          padding: 10px;
+          cursor: pointer;
+          background-color: #fff; 
+          border-bottom: 1px solid #d4d4d4; 
+        }
+        .autocomplete-items div:hover {
+          /*when hovering an item:*/
+          background-color: #e9e9e9; 
+        }
+        .autocomplete-active {
+          /*when navigating through the items using the arrow keys:*/
+          background-color: DodgerBlue !important; 
+          color: #ffffff; 
+        }
+
+        #img-scroll-to-bottom{
+            height:2em;
+            position: fixed; 
+            bottom: 7em; 
+            right: 1.5em;
+        }
+
+        ::placeholder { /* Firefox, Chrome, Opera */ 
+          color: #B1B1B1; 
+        } 
+
+        :-ms-input-placeholder { /* Internet Explorer 10-11 */ 
+          color: #B1B1B1; 
+        } 
+
+        ::-ms-input-placeholder { /* Microsoft Edge */ 
+          color: #B1B1B1; 
+        } 
+
+        #img-mic{
+          width: 13px;
+          height: 18px; 
+          color: #808080;
+        }
+
+        #img-submit-query{
+          width: 21px;
+          height: 18px;
+          color: #808080;
+        }
+
+        #user_input{
+          width: 100%; 
+          font-family: "au-font", Fallback, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+          font-size: 14px;
+          color: #B1B1B1;
+          padding:0.3em 0.5em 0.3em 0.5em; 
+          border:white;
+        }
+
+        .easychat-slideshow-slides {
+            display: none;
+        }
+
+        .easychat-slideshow-slides > img {
+          vertical-align: middle;
+          display: block;
+          text-align: center;
+          margin-left: auto;
+          margin-right: auto;
+          width: 20em;
+          height: 10em;
+        }
+
+        /* Slideshow container */
+        .easychat-slideshow-container {
+          max-width: 100%;
+          position: relative;
+          margin: auto;
+        }
+
+        /* Next & previous buttons */
+        .easychat-slideshow-prev{
+          cursor: pointer;
+          position: fixed;
+          top: 80%;
+          left: 0;
+          width: auto;
+          padding: 16px;
+          margin-top: -22px;
+          color: white;
+          font-weight: bold;
+          font-size: 10px;
+          transition: 0.6s ease;
+          border-radius: 0 3px 3px 0;
+          user-select: none;
+          background-color: #6C2D77;
+        }
+
+        .easychat-slideshow-next {
+          cursor: pointer;
+          position: fixed;
+          top: 80%;
+          right: 0;
+          width: auto;
+          padding: 16px;
+          margin-top: -22px;
+          color: white;
+          font-weight: bold;
+          font-size: 10px;
+          transition: 0.6s ease;
+          border-radius: 0 3px 3px 0;
+          user-select: none;
+          background-color: #6C2D77;
+        }
+
+        /* Position the "next button" to the right */
+        .easychat-slideshow-next {
+          right: 0;
+          border-radius: 3px 0 0 3px;
+        }
+
+        /* On hover, add a black background color with a little bit see-through */
+        .easychat-slideshow-prev:hover, .easychat-slideshow-next:hover {
+          background-color: rgba(0,0,0,0.8);
+        }
+
+        /* Number text (1/3 etc) */
+        .easychat-slideshow-numbertext {
+          color: #6C2D77;
+          font-size: 12px;
+          padding: 8px 12px;
+          position: absolute;
+          top: 0;
+        }
+
+        /* The dots/bullets/indicators */
+        .easychat-slideshow-dot {
+          cursor: pointer;
+          height: 15px;
+          width: 15px;
+          margin: 0 2px;
+          background-color: #bbb;
+          border-radius: 50%;
+          display: inline-block;
+          transition: background-color 0.6s ease;
+        }
+
+        .active, .easychat-slideshow-dot:hover {
+          background-color: #717171;
+        }
+
+        .easychat-slideshow-dot-cards {
+          cursor: pointer;
+          height: 15px;
+          width: 15px;
+          margin: 0 2px;
+          background-color: #bbb;
+          border-radius: 50%;
+          display: inline-block;
+          transition: background-color 0.6s ease;
+        }
+
+        .active, .easychat-slideshow-dot-cards:hover {
+          background-color: #717171;
+        }
+
+        /* Fading animation */
+        .fade {
+          -webkit-animation-name: fade;
+          -webkit-animation-duration: 1.5s;
+          animation-name: fade;
+          animation-duration: 1.5s;
+        }
+
+        @-webkit-keyframes fade {
+          from {opacity: .4} 
+          to {opacity: 1}
+        }
+
+        @keyframes fade {
+          from {opacity: .4} 
+          to {opacity: 1}
+        }
+
+        /* On smaller screens, decrease text size */
+        @media only screen and (max-width: 300px) {
+          .easychat-slideshow-prev, .easychat-slideshow-next,.text {font-size: 11px}
+        }
+
+
+        .easychat-slider-choices{
+          background-color:#E77E43;
+          color: #FFFFFF;
+          border:0.1em solid #E77E43;
+          padding:0.5em 1em 0.5em 1em !important;
+          margin: 0em 0.5em 0.5em 0em !important;
+          border-radius: 0.5em;
+          font-weight: 10;
+          font-family: "au-font", Fallback, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+        }
+
+        .easychat-slider-choices:hover{
+          background-color:#FFFFFF;
+          color: #E77E43;
+          border:0.1em solid #E77E43;
+        }
+
+        div.easychat-choices-slider {
+          overflow-x: auto;
+          white-space: nowrap;
+          height: 100%;
+        }
+
+        div.easychat-choices-slider a {
+          display: inline-block;
+          color: white;
+          text-align: center;
+          padding: 14px;
+          text-decoration: none;
+        }
+
+        div.easychat-choices-slider a:hover {
+          background-color: #ffffff;
+        }
+
+
+/*########### Attachment module ###############*/
+.easychat-dragdropAlertMsgClose__XPS{padding: 0px 3px;cursor: pointer;text-align: center;background-color: white;}
+.easychat-dragdropContainer__XPS{margin: auto;width: 80%;margin-top: 1em;position: relative;}
+.easychat-dragdropContainer__XPS .easychat-dragdrop__XPS{height: 150px;border-radius: 5px;width: 100%;box-sizing:border-box;background-color: white;margin: auto;box-shadow: 4px 4px 5px rgba(0, 0, 0, 0.2);}
+.easychat-dragdropContainer__XPS .easychat-dragdrop__XPS input{height: 100%;outline: none;opacity: 0;width: 100%;box-sizing: border-box;}
+.easychat-dragdropContainer__XPS #easychat-dragdropSuccessfulMSG__XPS{}
+.easychat-dragdropContainer__XPS .easychat-dragdropMsg__XPS{display: flex;position: absolute;width: 100%;height: 100%;align-items: center;justify-content: center;box-sizing: border-box;text-align: center;}
+.easychat-dragdropContainer__XPS .easychat-dragdropafterSelect__XPS{margin-top: .7em;}
+.easychat-dragdropContainer__XPS .easychat-dragdropafterSelect__XPS #easychat-dragdropAlertMsg__XPS{width: 73%;word-break: break-all;display: none;padding: .5em;}
+.easychat-dragdropContainer__XPS .easychat-dragdropafterSelect__XPS #easychat-dragdropUploadBTN__XPS{display: none;float: right;padding: .5em;border: none;color: white;border-radius: 5px;}
+
+
+/*########################################*/
+
+/* The Modal (background) */
+.easychat-modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content Box */
+.easychat-modal-content {
+  background-color: #fefefe;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Could be more or less, depending on screen size */
+}
+
+/* The Close Button */
+.easychat-close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.easychat-close:hover,
+.easychat-close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+
+.easychat-modal-input-element{
+    width: 45%;
+    display: inline-block;
+}
+
+.easychat-modal-button{
+    padding: 0.4em 1em 0.4em 1em;
+    border-radius: 1em;
+    background-color: #6C2D77;
+    color: #FDF3F1;
+}

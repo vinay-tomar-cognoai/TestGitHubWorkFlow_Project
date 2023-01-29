@@ -1,0 +1,137 @@
+<ul class="collapsible">
+    <li>
+        <div class="collapsible-header">Add Language to your Channel</div>
+        <div class="collapsible-body" id="add-language-colapsible-body">
+            <span style="color: #6C7A93;">(*English language is supported by default)</span>
+            <hr class="dashed-line" />
+            <div class="row" id="select-channel-language-supported-container">
+              <div class="input-field col s12" style="display: grid;grid-template-columns: 1fr 5fr;margin-left: 50px !important;">
+                <div class="choose-language">
+                    <div id="circle" style="left: 0;top: 16px;">
+                    </div>
+                    <span style="margin-left: 15px;position: absolute; top: 10px;"> Choose Language </span>               
+                </div>
+                <div class="container">
+                    <div class="select-box">
+                        <div id="language-box-options-container" class="options-container">
+                            {% for lan_obj in master_languages %}
+                                {% if lan_obj in bot_channel_obj.languages_supported.all %}
+
+                                    <label for="{{lan_obj.name_in_english}}-{{ lan_obj.lang }}">
+                                        <div class="option">
+                                            <input type="radio" class="radio" id="{{lan_obj.name_in_english}}" name="category" />
+                                            <label for="{{lan_obj.name_in_english}}" >{{lan_obj.name_in_english}}</label>
+                                            {% if lan_obj.lang == "en" %}
+                                                <input type="checkbox" style="width: 10% !important;height: 0.8rem !important " disabled checked class="item-checkbox"  value="{{ lan_obj.lang }}" id="{{lan_obj.name_in_english}}-{{ lan_obj.lang }}" name="{{lan_obj.name_in_english}}">
+                                            {% else %}
+                                            <input type="checkbox" style="width: 10% !important;height: 0.8rem !important " checked class="item-checkbox"  value="{{ lan_obj.lang }}" id="{{lan_obj.name_in_english}}-{{ lan_obj.lang }}" name="{{lan_obj.name_in_english}}">
+                                            {% endif %}
+                                            <!-- <input type="checkbox" style="width: 10% !important;height: 0.8rem !important " checked class="item-checkbox"  value="{{ lan_obj.lang }}" id="{{lan_obj.name_in_english}}-{{ lan_obj.lang }}" name="{{lan_obj.name_in_english}}"> -->
+                                               
+                                        </div>
+                                    </label>
+                                {% else %}
+                                    <label for="{{lan_obj.name_in_english}}-{{ lan_obj.lang }}">
+                                        <div class="option">
+                                            <input type="radio" class="radio" id="{{lan_obj.name_in_english}}" name="category" />
+                                            <label for="{{lan_obj.name_in_english}}"  >{{lan_obj.name_in_english}}</label>
+                                            <input type="checkbox" style="width: 10% !important;height: 0.8rem !important " class="item-checkbox" value="{{ lan_obj.lang }}" id="{{lan_obj.name_in_english}}-{{ lan_obj.lang }}" name="{{lan_obj.name_in_english}}">
+                                                
+                                        </div>
+                                    </label>
+                                {% endif %}
+
+                            {% endfor %} 
+                            
+                            <div class='no-elem'>No such Language found</div>
+                        </div>
+                        <div id="selected-language-chips-wrapper" class="wrapper-box">
+                        <div class="box">
+                            <div class="selected" style="max-height: 74px;overflow: auto;border:none;" >                                        
+                            {% for lan_obj in first_three_selected_languages %}  
+                                <span class="tag">
+                                <span class="language-chip-display-name"> {{lan_obj.name_in_english}}</span>
+                                    <svg class="selected-language-cross-btn" onclick="remove_selected_language(event,this,'{{lan_obj.name_in_english}}-{{ lan_obj.lang }}')"  width="12" height="12" viewBox="0 0 7 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M6.65011 0.854978C6.55669 0.761352 6.42987 0.708735 6.29761 0.708735C6.16535 0.708735 6.03852 0.761352 5.94511 0.854978L3.50011 3.29498L1.05511 0.849978C0.961692 0.756352 0.834866 0.703735 0.702607 0.703735C0.570349 0.703735 0.443523 0.756352 0.350107 0.849978C0.155107 1.04498 0.155107 1.35998 0.350107 1.55498L2.79511 3.99998L0.350107 6.44498C0.155107 6.63998 0.155107 6.95498 0.350107 7.14998C0.545107 7.34498 0.860107 7.34498 1.05511 7.14998L3.50011 4.70498L5.94511 7.14998C6.14011 7.34498 6.45511 7.34498 6.65011 7.14998C6.84511 6.95498 6.84511 6.63998 6.65011 6.44498L4.20511 3.99998L6.65011 1.55498C6.84011 1.36498 6.84011 1.04498 6.65011 0.854978Z" fill="#2755CB"/>
+                                    </svg>
+                                </span>
+                            {% endfor %} 
+                            {% if count_of_overhead_languages > 0 %}
+                                <button id="languages-extend-button" >+{{count_of_overhead_languages}}</button>
+                            {% endif %}
+                            </div>
+                            
+                        </div>
+                        <div id="language-dropdown-arrow" class="arrow">
+                            <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0.200408 0.739665C0.48226 0.436132 0.956809 0.418556 1.26034 0.700408L5 4.22652L8.73967 0.700408C9.0432 0.418556 9.51775 0.436132 9.7996 0.739665C10.0815 1.0432 10.0639 1.51775 9.76034 1.7996L5.51034 5.7996C5.22258 6.0668 4.77743 6.0668 4.48967 5.7996L0.239665 1.7996C-0.0638681 1.51775 -0.081444 1.0432 0.200408 0.739665Z" fill="#909090"/>
+                            </svg>
+                        </div>
+                        </div>
+                    
+                        <div id="language-options-search-box" class="search-box">
+                            <input type="text" style="width: 250px !important;border: 1px solid #e1e1e1 !important;" placeholder="&nbsp; &nbsp; &nbsp; Search Language">
+                            </input>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                        
+              </div>
+
+              {% if bot_channel_obj.languages_supported.count != 1%}
+                <div class="col s12" style="display: grid;grid-template-columns: 2fr 5fr; align-items: center; justify-content: space-between; margin-bottom: 20px; margin-left: 50px;" id="bot_language_auto_detection_div">
+              {% else %}
+                <div class="col s12" style="display: none;grid-template-columns: 2fr 5fr; align-items: center; justify-content: space-between; margin-bottom: 20px; margin-left: 50px;" id="bot_language_auto_detection_div">
+              {% endif %}
+                        <div class="row-title">
+                        Enable bot language auto detection.<br/><span style="color: #4D4D4D;"></span>
+                        </div>
+
+                        <div class="row-content"  style="padding-left: 10px; margin-top: 5px;">
+                            {% if bot_channel_obj.languages_supported.count != 1%}
+                                {% if bot_channel_obj.is_language_auto_detection_enabled %}
+                                    <input type="checkbox" name="" id="is_language_auto_detection_enabled" style="position:relative;opacity:1;width: unset !important;margin-top: 0 !important;height: 1.4rem !important;pointer-events: auto;cursor: pointer;" checked>
+                                {% else %}
+                                    <input type="checkbox" name="" id="is_language_auto_detection_enabled" style="position:relative;opacity:1;width: unset !important;margin-top: 0 !important;height: 1.4rem !important;pointer-events: auto;cursor: pointer;">
+                                {% endif %}
+                            {% else %}
+                                <input type="checkbox" name="" id="is_language_auto_detection_enabled" style="position:relative;opacity:1;width: unset !important;margin-top: 0 !important;height: 1.4rem !important;pointer-events: auto;cursor: pointer;" disabled="true">
+                            {% endif %}
+                  </div>
+                </div>
+                {% if bot_channel_obj.languages_supported.count != 1 and bot_channel_obj.channel.name in "WhatsApp Telegram Alexa GoogleHome Viber" %}
+              <div class="col s12" id="enable_choose_language_welcome_response_toogle_div" style="display: grid;grid-template-columns: 2fr 5fr; align-items: center; justify-content: space-between; margin-bottom: 20px; margin-left: 50px;">
+                {% else %}
+                <div class="col s12" id="enable_choose_language_welcome_response_toogle_div" style="display: none;grid-template-columns: 2fr 5fr; align-items: center; justify-content: space-between; margin-bottom: 20px; margin-left: 50px;">
+                {% endif %}
+                <div class="row-title">
+                Enable choose a language menu for customers with the welcome message. 
+                {% if bot_channel_obj.channel.name in "Alexa GoogleHome" %}
+                <sup><i class="material-icons inline-icon tooltipped" data-position="top" data-tooltip="If initial questions are added then the list of languages will not be shown along with the welcome message">help</i></sup>
+                {% endif %}
+                <br/><span style="color: #4D4D4D;"></span>
+              </div>
+              <div class="row-content"  style="padding-left: 10px; margin-top: 5px;">
+                  {% if bot_channel_obj.languages_supported.count != 1%}
+
+                      {% if bot_channel_obj.is_enable_choose_language_flow_enabled_for_welcome_response %}
+                      <input type="checkbox" name="" id="is_enable_choose_language_flow_enabled_for_welcome_response" style="position:relative;opacity:1;width: unset !important;margin-top: 0 !important;height: 1.4rem !important;pointer-events: auto;cursor: pointer;" checked>
+
+                      {% else %}
+                      <input type="checkbox" name="" id="is_enable_choose_language_flow_enabled_for_welcome_response" style="position:relative;opacity:1;width: unset !important;margin-top: 0 !important;height: 1.4rem !important;pointer-events: auto;cursor: pointer;" >
+
+                      {% endif %}
+
+                  {% else %}
+
+                      <input type="checkbox" name="" id="is_enable_choose_language_flow_enabled_for_welcome_response" style="position:relative;opacity:1;width: unset !important;margin-top: 0 !important;height: 1.4rem !important;pointer-events: auto;cursor: pointer;" >
+                  {% endif %}
+              </div>
+                    
+              </div>
+            </div>
+        </div>
+    </li>
+</ul>

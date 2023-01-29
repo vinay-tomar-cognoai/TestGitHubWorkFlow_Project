@@ -1,0 +1,569 @@
+{% extends 'EasyAssistApp/console.html' %}
+{% block content %}
+{% load static %}
+<link href="{% static 'EasyAssistApp/css/agent_new.css' %}" rel="stylesheet" type="text/css">
+
+<div class="container-fluid">
+<div id="pills-calendar" >
+
+    <!--  calendar Settings Body Start -->
+    <div class="page-header">
+        <div class="nav nav-pills navbar-right">
+          <a class="anchor-reset back-btn"  href="/easy-assist/sales-ai/settings/">
+            <span class="mr-3 mb-auto pb-3" style="cursor: pointer;">
+              <svg class="back-arrow-svg" width="40" height="40" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="44" height="44" rx="22" transform="matrix(1 0 0 -1 0 44)" fill="white" />
+              {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+              <path
+                  d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                  fill="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" />
+                          {% else %}
+                          <path
+                  d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                  fill="#0254D7" />
+ 
+                          {% endif %} 
+              
+              </svg>
+          </span>
+          </a>
+        
+        <h5  class="nav_btn mr-2 mt-2 "> <a class="anchor-reset" href="/easy-assist/sales-ai/settings/">Settings</a></h5>
+        <span class="mr-2 pt-2">
+            <svg class="mini-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                fill="#475569" />
+            </svg>
+        </span>
+        <h5  class="nav_btn active1 mt-2">Calendar</h5>
+        </div>
+    </div>
+    <div class="card shadow mt-4">
+    <div class="card-body p-0">
+    <div class="card">
+      <div class="card-header py-3">
+        <div class="row">
+            <div class="col-sm-6 d-flex align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary heading-text-primary">Calendar
+                    <span data-toggle="tooltip" data-placement="top" title="" data-original-title="This is the calendar for Inbound cobrowsing and Meeting."><i class="fas fa-info-circle"></i></span>
+                    <span class="text-secondary"> Created by {{calendar_created_by}}</span>
+                </h6>
+            </div>
+            <div class="col-sm-6 d-flex justify-content-end card-header-left-div">
+                <div class="form-group has-search d-flex mb-0 mr-2">
+                    <span class="fa fa-search form-control-feedback"></span>
+                    <input type="text" id="table-calendar-details-search" class="custom-table-search form-control" placeholder="Search" aria-controls="table-calendar-details">
+                </div>
+                <button class="btn btn-white-border btn-width-100" data-toggle="modal" data-target="#apply_filter_modal">Filter</button>
+            </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row filter-result-div" id="applied-filter-div" style="display: none;">
+          <div class="filter-items-container" id="applied-filter-result-container">
+          </div>
+          <div class="filtered-result-text-heading">
+              Filtered Results
+          </div>
+      </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <table class="table table-bordered dataTable no-footer" role="grid" id="table-calendar-details">
+                <thead class="table-heading-row">
+                    <tr role="row">
+                        <th scope="col" class="align-middle">Date</th>
+                        <th scope="col" class="align-middle">Day</th>
+                        {% if calendar_type == "1" %}
+                            <th scope="col" class="align-middle">Start Time</th>
+                            <th scope="col" class="align-middle">End Time</th>
+                        {% endif %}
+                        {% if calendar_type == "2" %}
+                            <th scope="col" class="align-middle">Description</th>
+                            <th scope="col" class="align-middle">Auto Response</th>
+                        {% endif %}
+                        <th scope="col" class="align-middle">Created Date</th>
+                        <th scope="col" class="align-middle">Modified Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                  
+                  {% for calendar_obj in calendar_objs %}
+                  
+                    <tr role="row" class="odd">
+                        <td>{{ calendar_obj.event_date| date:"d-M-Y" }}</td>
+                        <td>{{ calendar_obj.event_date| date:"l" }}</td>
+                        {% if calendar_type == "1" %}
+                            <td>{{ calendar_obj.start_time | time:'g:i A' }}</td>
+                            <td>{{ calendar_obj.end_time | time:'g:i A' }}</td>
+                        {% endif %}
+                        {% if calendar_type == "2" %}
+                            <td>{{ calendar_obj.description }}</td>
+                            <td>{{ calendar_obj.auto_response }}</td>
+                        {% endif %}
+                        <td>{{ calendar_obj.created_at|date:"d-M-Y, h:i a" }}</td>
+                        <td>
+                            <span>{{ calendar_obj.modified_date|date:"d-M-Y, h:i a" }}</span>
+
+                        </td>
+                    </tr>
+                    <!-- edit work time modal-------------->
+                    
+           
+                    {% endfor %}
+                </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-6 col-sm-12 show-pagination-entry-container" filter_default_text="Showing {{start_point}} to {{end_point}} of {{total_calendar_objs}} entries" start_point="{{start_point}}" end_point="{{end_point}}">
+                Showing {{start_point}} to {{end_point}} of {{total_calendar_objs}} entries
+            </div>
+            <div class="col-md-6 col-sm-12">
+                <div class="d-flex justify-content-end">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+
+                            {% if calendar_objs.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" onclick="load_more_page('{{ calendar_objs.previous_page_number }}');" href="javascript:void(0)" aria-label="Previous">
+                                        <span aria-hidden="true">Previous</span>
+                                        <span class="sr-only">Previous</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="disabled page-item"><span>
+                                    <a class="page-link" href="javascript:void(0)" aria-label="Previous">
+                                        <span aria-hidden="true">Previous</span>
+                                        <span class="sr-only">Previous</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+  
+                            {% if calendar_objs.number|add:'-4' > 1 %}
+                                <li class="page-item">
+                                    <a class="page-link" onclick="load_more_page('{{ calendar_objs.number|add:'-5' }}');" href="javascript:void(0)">&hellip;</a>
+                                </li>
+                            {% endif %}
+  
+                            {% for i in calendar_objs.paginator.page_range %}
+                                {% if calendar_objs.number == i %}
+                                    <li class="active purple darken-3 page-item">
+                                        <a onclick="load_more_page('{{ i }}');" href="javascript:void(0)" class="page-link">{{ i }}</a>
+                                    </li>
+                                {% elif i > calendar_objs.number|add:'-5' and i < calendar_objs.number|add:'5' %}
+                                    <li class="page-item">
+                                        <a href="javascript:void(0)" onclick="load_more_page('{{ i }}');" class="page-link">{{ i }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+  
+                            {% if calendar_objs.paginator.num_pages > calendar_objs.number|add:'4' %}
+                                <li class="page-item">
+                                    <a href="javascript:void(0)" onclick="load_more_page('{{ calendar_objs.number|add:'5' }}');" class="page-link">&hellip;</a>
+                                </li>
+                            {% endif %}
+  
+                            {% if calendar_objs.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="javascript:void(0)" onclick="load_more_page('{{ calendar_objs.next_page_number }}');" aria-label="Next">
+                                        <span aria-hidden="true">Next</span>
+                                        <span class="sr-only">Next</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="disabled page-item">
+                                    <a class="page-link" href="javascript:void(0)" aria-label="Next">
+                                        <span aria-hidden="true">Next</span>
+                                        <span class="sr-only">Next</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                          </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+  </div>
+ </div>
+</div>
+</div>
+<!--filter modal----------- -->
+<div class="modal fade" id="apply_filter_modal" tabindex="-1" role="dialog" aria-labelledby="apply_filter_modal_modal_label" aria-hidden="true">
+<div class="modal-dialog" role="document">
+<div class="modal-content">
+    <div class="modal-header d-flex justify-content-between align-items-center">
+        <h5 id="apply_filter_modal_modal_label" class="mb-0 modal-heading">Apply Custom Filter</h5>
+        <svg class="close-modal" data-dismiss="modal"  width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1.44949 10.7827C0.96133 11.2709 0.96133 12.0623 1.44949 12.5505C1.93764 13.0386 2.7291 13.0386 3.21725 12.5505L1.44949 10.7827ZM12.5505 3.21723C13.0387 2.72907 13.0387 1.93762 12.5505 1.44946C12.0624 0.961305 11.2709 0.961305 10.7827 1.44946L12.5505 3.21723ZM10.7827 1.44946L1.44949 10.7827L3.21725 12.5505L12.5505 3.21723L10.7827 1.44946Z" fill="#404040"/>
+            <path d="M3.21725 1.44954C2.72909 0.96139 1.93764 0.961389 1.44948 1.44954C0.961327 1.9377 0.961327 2.72916 1.44948 3.21731L3.21725 1.44954ZM10.7827 12.5506C11.2709 13.0387 12.0624 13.0387 12.5505 12.5506C13.0387 12.0624 13.0387 11.271 12.5505 10.7828L10.7827 12.5506ZM12.5505 10.7828L3.21725 1.44954L1.44948 3.21731L10.7827 12.5506L12.5505 10.7828Z" fill="#404040"/>
+        </svg> 
+    </div>
+<div class="modal-body">
+    <div class="row filter-header-row">
+        <div class="col-md-4 col-sm-12 filter-mb-sm-4">
+            <select class="form-control" onchange="show_filter_options(this)" id="selected-filter-parameter" style="width: 100%!important;">
+                <option value="None">Select Filter</option>
+                <option value="days">Day</option>
+                <option value="month">Months</option>
+                <option value="years">Year</option>
+            </select>
+        </div>
+        <div class="col-md-5 col-sm-12 filter-mb-sm-4 easyassist-multiselect-dropdown-container" id="selected-filter-container">
+          <select class="form-control" style="display:none;" id="selected-month-filter" multiple>
+            <option value="Jan">Jan</option>
+            <option value="Feb">Feb</option>
+            <option value="Mar">Mar</option>
+            <option value="Apr">Apr</option>
+            <option value="May">May</option>
+            <option value="Jun">Jun</option>
+            <option value="Jul">Jul</option>
+            <option value="Aug">Aug</option>
+            <option value="Sep">Sep</option>
+            <option value="Oct">Oct</option>
+            <option value="Nov">Nov</option>
+            <option value="Dec">Dec</option>
+          </select>
+    
+            <select class="form-control" style="display:none;" id="selected-days-filter">
+                <option value="workingdays">Working Days</option>
+                <option value="holidays">Holidays</option>
+            </select>
+            
+            <select class="form-control" style="display:none;" id="selected-year-filter">
+                <option value=0>Select Year</option>
+                {% for year in filter_dropdown_year_list %}
+                    <option value={{ year }}>{{ year }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3 col-sm-12" style="align-items: center; display: flex;">
+            <button class="btn btn-success btn-icon-split" type="button" id="add-filter-btn" onclick="add_new_filter_parameter(this)" style="width: 100%;justify-content: start;" disabled>
+                <span class="icon text-white-50">
+                    <svg width="19" height="14" viewBox="0 0 19 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6.03809 11.0455L1.53383 6.69202L0 8.16406L6.03809 14L19 1.47204L17.477 0L6.03809 11.0455Z" fill="white"/>
+                    </svg>
+                </span>
+                <span class="text" style="width: 100%;">Add</span>
+            </button>
+        </div>
+    </div>
+    <div class="row" id="tbody-filter-parameters">
+
+    </div>
+</div>
+<div class="modal-footer">
+    <button id="reset_filter" class="btn btn-white-border" style="display: none;" disabled onclick="reset_calendar_filter(this)">Reset</button>
+    <button id="apply_filter_confirm"  class="btn btn-primary" disabled onclick="apply_calendar_filter(this)">Submit</button>
+</div>
+</div>
+</div>
+</div>
+
+<script type="text/javascript">
+
+    function show_easyassist_agent_profile_toast(message,re){
+        var x = document.getElementById("agent-profile-toast");
+        if(re) {
+            x.style.color = "#FF0000";
+            x.style.border = "1px solid #E89E9E";
+            x.style.background = "#FFF9F9";
+        }
+        x.innerHTML = message;
+        x.className = "show";
+        setTimeout(function(){ x.className = x.className.replace("show", ""); }, 5000);
+    }
+    
+    $(document).ready(function(){
+        $('#select-add-work-timing').on('change', function(){
+            // $('#save-work-time').prop('disabled',false);
+            if(this.value == 1){
+                $('#select-monthly-option').css('display','flex');
+                $('#select-yearly-option').css('display','none');
+            }else if (this.value == 2){
+                $('#select-yearly-option').css('display','block');
+                $('#select-monthly-option').css('display','none');
+            }else{
+                $('#select-yearly-option').css('display','none');
+                $('#select-monthly-option').css('display','none');
+            }
+        })
+        /*let params = new URLSearchParams(window.location.search)
+        if(params.has('days') || params.has('years') || params.has('month') || params.has('calendar_updated')){
+          document.getElementById('pills-calendar-tab').click();
+        }*/
+        window.profile_picture_source = "{{ cobrowse_agent.agent_profile_pic_source }}";
+        if ("{{ cobrowse_agent.agent_profile_pic_source }}" == "null" || "{{ cobrowse_agent.agent_profile_pic_source }}" == "") {
+            document.getElementsByClassName("remove-btn")[0].disabled = true;
+            document.getElementsByClassName("remove-btn")[0].style.opacity = 0.25;
+        }
+    
+    })
+        $('.selectall').click(function(){
+            $(".individual").prop("checked",$(this).prop("checked"));
+        })
+    
+      window.is_filter_applied = false;
+      // window.custom_month_filter_dropdown = null;
+      window.custom_day_filter_dropdown = null;
+      window.custom_year_filter_dropdown = null;
+      window.custom_filter_option_dropdown = null;
+      window.applied_filter_key_value_map = {};
+      
+      function show_filter_options(element) {
+          // custom_month_filter_dropdown.hide_custom_dropdown();
+          $("#selected-month-filter").next().hide();
+          custom_day_filter_dropdown.hide_custom_dropdown();
+          custom_year_filter_dropdown.hide_custom_dropdown();
+      
+          if (element.value == "None") {
+              document.getElementById("add-filter-btn").disabled = true;
+          } else {
+      
+              document.getElementById("selected-filter-container").style.display = "block";
+      
+              filter_parameters = document.getElementsByClassName("filter-parameter");
+              for (var index = 0; index < filter_parameters.length; index++) {
+                  filter_parameters[index].style.display = "none";
+              }
+              if (element.value == "month") {
+                $("#selected-month-filter").next().show();
+              } else if (element.value == "days") {
+                  custom_day_filter_dropdown.show_custom_dropdown();
+              } else if (element.value == "years") {
+                  custom_year_filter_dropdown.show_custom_dropdown();
+              } else {
+                  show_easyassist_toast("Please select valid filter");
+              }
+              
+              document.getElementById("reset_filter").removeAttribute("disabled");
+              document.getElementById("reset_filter").style.display = "block";
+              document.getElementById("add-filter-btn").disabled = false;
+          }
+      }
+      
+      function add_new_filter_parameter() {
+          var filter_key = null;
+          var filter_value = null;
+          element = document.getElementById("selected-filter-parameter");
+          if (element.value == "None") {
+              show_easyassist_toast("Please select valid filter parameter");
+          } else {
+              var value = "None";
+              var key = element.value;
+              if (element.value == "month") {
+                value = $("#selected-month-filter").val();
+                if (value.length == 0) {
+                    show_easyassist_toast("Please choose valid filter");
+                    return;
+                }
+                filter_key = "month"
+                filter_value = value;
+                console.log(filter_value);
+            }  else if (element.value == "days") {
+                  value = document.getElementById("selected-days-filter").value;
+      
+                  filter_key = "days"
+                  if (value == "holidays") {
+                      filter_value = "Holidays";
+                  } else {
+                    filter_value = "Working Days";
+                  }
+                  filter_value = [filter_value];
+              } else if (element.value == "years") {
+                    value = document.getElementById("selected-year-filter").value.trim();
+                    filter_key = "years"            
+                    if (parseInt(value)) {
+                        filter_value = value;
+                    } else {
+                        show_easyassist_toast("Please select a valid year");
+                        return;
+                    }
+                    filter_value = [filter_value];
+              } else {
+                  show_easyassist_toast("Please select valid filter parameter");
+              }
+      
+              if(check_filter_already_applied(applied_filter_key_value_map[key], filter_value)) {
+                  show_easyassist_toast(filter_key + " filter already applied");
+                  return;
+              }
+      
+              if (applied_filter_key_value_map[key] != null) {
+                  applied_filter_key_value_map[key] = filter_value;
+                  update_applied_filter_by_key(key, filter_value);
+                  return;
+              }
+              applied_filter_key_value_map[key] = filter_value;
+      
+              var filter_chip_html = "";
+              filter_chip_html = generate_filter_chips(filter_key, filter_value);
+              
+              var html_filter = [
+                  '<div class="col-md-12 filter-parameter-column" filter-key="' + key + '" filter-data=\'' + JSON.stringify(filter_value) + '\' style="padding: 1em;border-bottom: 1px solid #E6E6E6;">',
+                      '<div class="row filter-custom-row">',
+                          '<div class="col-md-2 filter-mb-sm-2 filter-flex-column">',
+                              '<span class="filter-text">' + filter_key + '</span>',
+                              '<button type="button" class="btn remove-filter-row-btn filter-show-on-mobile" onclick="remove_selected_filter_parameter(this)">',
+                                  '<svg width="16" height="18" viewBox="0 0 16 18" fill="none" xmlns="http://www.w3.org/2000/svg">',
+                                      '<path d="M8 0C9.49884 0 10.7237 1.20574 10.8064 2.72496L10.8108 2.88889H15.3514C15.7096 2.88889 16 3.18737 16 3.55556C16 3.89306 15.756 4.17199 15.4394 4.21614L15.3514 4.22222H14.6629L13.5558 15.7948C13.441 16.994 12.4959 17.92 11.3406 17.9951L11.1888 18H4.81118C3.63878 18 2.64965 17.124 2.46385 15.9497L2.44423 15.7948L1.33622 4.22222H0.648649C0.320263 4.22222 0.0488727 3.97142 0.00592144 3.64602L0 3.55556C0 3.21805 0.244025 2.93912 0.560631 2.89497L0.648649 2.88889H5.18919C5.18919 1.2934 6.44763 0 8 0ZM13.3596 4.22222H2.63957L3.73529 15.6643C3.7861 16.1952 4.19488 16.6083 4.70127 16.661L4.81118 16.6667H11.1888C11.7078 16.6667 12.1478 16.289 12.2484 15.7762L12.2647 15.6643L13.3596 4.22222ZM9.51351 6.66667C9.8419 6.66667 10.1133 6.91747 10.1562 7.24287L10.1622 7.33333V13.5556C10.1622 13.9237 9.87175 14.2222 9.51351 14.2222C9.18513 14.2222 8.91374 13.9714 8.87079 13.646L8.86487 13.5556V7.33333C8.86487 6.96514 9.15528 6.66667 9.51351 6.66667ZM6.48649 6.66667C6.81487 6.66667 7.08626 6.91747 7.12921 7.24287L7.13514 7.33333V13.5556C7.13514 13.9237 6.84473 14.2222 6.48649 14.2222C6.1581 14.2222 5.88671 13.9714 5.84376 13.646L5.83784 13.5556V7.33333C5.83784 6.96514 6.12825 6.66667 6.48649 6.66667ZM8 1.33333C7.2059 1.33333 6.55464 1.96188 6.4915 2.76131L6.48649 2.88889H9.51351C9.51351 2.02978 8.83589 1.33333 8 1.33333Z" fill="#757575"/>',
+                                  '</svg>',
+                              '</button>',
+                          '</div>',
+                          '<div class="col-md-8 filter-chip-column">',
+                              filter_chip_html,
+                          '</div>',
+                          '<div class="col-md-2 filter-hide-on-mobile">',
+                              '<button type="button" class="btn remove-filter-row-btn" onclick="remove_selected_filter_parameter(this)">',
+                                  '<svg width="16" height="18" viewBox="0 0 16 18" fill="none" xmlns="http://www.w3.org/2000/svg">',
+                                      '<path d="M8 0C9.49884 0 10.7237 1.20574 10.8064 2.72496L10.8108 2.88889H15.3514C15.7096 2.88889 16 3.18737 16 3.55556C16 3.89306 15.756 4.17199 15.4394 4.21614L15.3514 4.22222H14.6629L13.5558 15.7948C13.441 16.994 12.4959 17.92 11.3406 17.9951L11.1888 18H4.81118C3.63878 18 2.64965 17.124 2.46385 15.9497L2.44423 15.7948L1.33622 4.22222H0.648649C0.320263 4.22222 0.0488727 3.97142 0.00592144 3.64602L0 3.55556C0 3.21805 0.244025 2.93912 0.560631 2.89497L0.648649 2.88889H5.18919C5.18919 1.2934 6.44763 0 8 0ZM13.3596 4.22222H2.63957L3.73529 15.6643C3.7861 16.1952 4.19488 16.6083 4.70127 16.661L4.81118 16.6667H11.1888C11.7078 16.6667 12.1478 16.289 12.2484 15.7762L12.2647 15.6643L13.3596 4.22222ZM9.51351 6.66667C9.8419 6.66667 10.1133 6.91747 10.1562 7.24287L10.1622 7.33333V13.5556C10.1622 13.9237 9.87175 14.2222 9.51351 14.2222C9.18513 14.2222 8.91374 13.9714 8.87079 13.646L8.86487 13.5556V7.33333C8.86487 6.96514 9.15528 6.66667 9.51351 6.66667ZM6.48649 6.66667C6.81487 6.66667 7.08626 6.91747 7.12921 7.24287L7.13514 7.33333V13.5556C7.13514 13.9237 6.84473 14.2222 6.48649 14.2222C6.1581 14.2222 5.88671 13.9714 5.84376 13.646L5.83784 13.5556V7.33333C5.83784 6.96514 6.12825 6.66667 6.48649 6.66667ZM8 1.33333C7.2059 1.33333 6.55464 1.96188 6.4915 2.76131L6.48649 2.88889H9.51351C9.51351 2.02978 8.83589 1.33333 8 1.33333Z" fill="#EE2525"/>',
+                                  '</svg>',
+                              '</button>',
+                          '</div>',
+                      '</div>',
+                  '</div>',
+              ].join('');
+      
+              document.getElementById("tbody-filter-parameters").innerHTML += html_filter;
+              document.getElementById("apply_filter_confirm").removeAttribute("disabled");
+              document.getElementById("reset_filter").removeAttribute("disabled");
+              document.getElementById("reset_filter").style.display = "block";
+              scrollToBottom();
+              
+          }
+      }
+      
+      function remove_selected_filter_parameter(element){
+          remove_element = $(element).closest('.filter-parameter-column')[0];
+          var filter_element = $(remove_element).attr("filter-key");
+          applied_filter_key_value_map[filter_element] = null;
+    
+          remove_element.parentElement.removeChild(remove_element);
+          if(document.getElementsByClassName("tr-filter-parameters").length <= 0){
+              document.getElementById("apply_filter_confirm").setAttribute("disabled", "disabled");
+              if(!is_filter_applied) {
+                  document.getElementById("reset_filter").setAttribute("disabled", "disabled");
+              }
+          }
+      }
+      
+      function apply_calendar_filter(element) {
+          selected_filter_parameters = document.getElementsByClassName("filter-parameter-column");
+          var key_value = '';
+          let request_params = {}
+          for(var idx = 0; idx < selected_filter_parameters.length; idx ++) {
+            var filter_key = selected_filter_parameters[idx].getAttribute('filter-key');
+            var filter_data = selected_filter_parameters[idx].getAttribute('filter-data');
+      
+            filter_data = JSON.parse(filter_data);
+            for(var index = 0; index < filter_data.length; index ++) {
+              key_value += filter_key + "=" + filter_data[index] + "&";
+            }
+          }
+          window.location = window.location.protocol + "//" + window.location.host + window.location.pathname + "?" + key_value;
+      }
+      
+      function reset_calendar_filter() {
+          document.getElementById("tbody-filter-parameters").innerHTML = "";
+          document.getElementById("reset_filter").setAttribute("disabled", "disabled");
+          document.getElementById("apply_filter_confirm").setAttribute("disabled", "disabled");
+          
+          // custom_month_filter_dropdown.update_value("None");
+          $("#selected-month-filter").val("").multiselect('refresh');
+          
+          custom_filter_option_dropdown.update_value("None");
+          custom_year_filter_dropdown.update_value("all");
+          custom_day_filter_dropdown.update_value("all");
+          
+          initialize_custom_filter_map();
+      }
+      
+      function load_map_script() {
+    
+        var params = JSON.stringify({});
+    
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "/easy-assist/map-script/", true);
+        xhttp.setRequestHeader('Content-Type', 'application/json');
+        xhttp.setRequestHeader('X-CSRFToken', get_csrfmiddlewaretoken());
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                response = JSON.parse(this.responseText);
+                response = easyassist_custom_decrypt(response.Response);
+                response = JSON.parse(response);
+                if (response["status"] == 200) {
+                    var src = response['src'];
+                    var script = document.createElement('script');
+                    script.type = 'text/javascript';
+                    script.defer = true;
+                    script.src = src
+                    document.body.appendChild(script);          
+                }
+            }
+        }
+        xhttp.send(params);
+        }
+      
+      $(document).ready(function() {
+          initialize_custom_filter_map();
+          initialize_custom_dropdown();
+          initialize_custom_tabs();
+          load_map_script();
+          update_applied_filter();
+      
+          
+              $("#support-history-table").DataTable({
+              "ordering": false,
+              "bPaginate": true,
+              "bInfo": false,
+              "targets": 'no-sort',
+                "bSort": false,
+                "order": [],
+              });
+          
+              $("#selected-month-filter").multiselect({
+                nonSelectedText: 'Select Month',
+                // enableFiltering: true,
+                // enableCaseInsensitiveFiltering: true,
+                includeSelectAllOption: true
+              });
+              
+              $("#selected-month-filter").next().hide();
+    
+      });
+      
+      function initialize_custom_dropdown() {
+          var console_theme_color = getComputedStyle(document.body).getPropertyValue('--color_rgb');
+          $("#selected-month-filter")[0].selectedIndex = -1;
+      
+          custom_filter_option_dropdown = new EasyassistCustomSelect("#selected-filter-parameter", "Select One", console_theme_color);
+          custom_day_filter_dropdown = new EasyassistCustomSelect("#selected-days-filter", "Select Days", console_theme_color);
+          
+          custom_year_filter_dropdown = new EasyassistCustomSelect("#selected-year-filter", "Select Year", console_theme_color);
+      }
+      
+      function initialize_custom_filter_map() {
+          applied_filter_key_value_map = {
+              'days': null,
+              'month': null,
+              'years': null,
+          }
+      }
+        $(document).ready(function(){
+            setTimeout(function(){
+                $('.bootstrap-select button').removeClass();
+                $('.bootstrap-select button').addClass('custom-select');
+            }, 1000);
+        });
+    
+    $(document).ready(function() {
+		try {
+            document.getElementById("nav-settings-menu").classList.add("active")
+        } catch(err) {}
+	});
+
+    </script>
+{% endblock %}

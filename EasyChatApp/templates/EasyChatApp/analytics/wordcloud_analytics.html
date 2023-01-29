@@ -1,0 +1,126 @@
+<div class="col s12 l7 m12 p0 pr-lg">
+    <div class="easychat-analytics-card-area-wrapper">
+        <div class="easychat-analytics-card-heading-text-wrapper">
+            <div class="easychat-analytics-card-heading-div">
+                Word Cloud
+            </div>
+            <div class="easychat-analytics-card-action-btns">
+
+                <a href="#modal-wordcloud-full-window" class="modal-trigger easychat-analytics-card-filter-btn" id="open-wordcloud-full-window">
+                    <svg width="19" height="24" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M6.74691 12.0263C7.03982 11.7334 7.51473 11.7334 7.80764 12.0263C8.10055 12.3192 8.10055 12.7941 7.80764 13.087L5.80654 15.0875H6.99538C7.38003 15.0875 7.69706 15.377 7.74038 15.7501L7.74543 15.8375C7.74543 16.2518
+    7.40962 16.5876 6.99538 16.5876H3.99517C3.58093 16.5876 3.24512 16.2518 3.24512 15.8375V12.8373C3.24512 12.4231 3.58093 12.0873 3.99517 12.0873C4.40941 12.0873 4.74522 12.4231 4.74522 12.8373V14.0277L6.74691 12.0263ZM12.9995
+    16.5876C12.5853 16.5876 12.2495 16.2518 12.2495 15.8375C12.2495 15.4233 12.5853 15.0875 12.9995 15.0875H14.1869L12.1877 13.0868C11.9174 12.8163 11.8968 12.3909 12.1257 12.0967L12.1881 12.0261C12.4811 11.7333 12.956 11.7335
+    13.2488 12.0265L15.2497 14.0292V12.8373C15.2497 12.4527 15.5393 12.1357 15.9123 12.0923L15.9998 12.0873C16.414 12.0873 16.7498 12.4231 16.7498 12.8373V15.8375C16.7498 16.2518 16.414 16.5876 15.9998 16.5876H12.9995ZM6.99538
+    3.0835C7.40962 3.0835 7.74543 3.41931 7.74543 3.83355C7.74543 4.24779 7.40962 4.5836 6.99538 4.5836H5.80804L7.80722 6.58487C8.0775 6.85536 8.09813 7.28082 7.86923 7.57496L7.8068 7.6456C7.51378 7.9384 7.03887 7.93821 6.74607
+    7.64518L4.74522 5.64267V6.83376C4.74522 7.21841 4.45567 7.53543 4.08264 7.57876L3.99517 7.58381C3.58093 7.58381 3.24512 7.248 3.24512 6.83376V3.83355C3.24512 3.41931 3.58093 3.0835 3.99517 3.0835H6.99538ZM15.9997 3.0835C16.414
+    3.0835 16.7498 3.41931 16.7498 3.83355V6.83376C16.7498 7.248 16.414 7.58381 15.9997 7.58381C15.5855 7.58381 15.2497 7.248 15.2497 6.83376V5.64267L13.2487 7.64528C12.9784 7.91572 12.553 7.93661 12.2587 7.70788L12.188 7.6455C11.895
+    7.35265 11.8949 6.87774 12.1878 6.58477L14.1876 4.5836H12.9995C12.6149 4.5836 12.2979 4.29405 12.2545 3.92102L12.2495 3.83355C12.2495 3.41931 12.5853 3.0835 12.9995 3.0835H15.9997Z"
+                            fill="#CBCACA"></path>
+                    </svg>
+                </a>
+
+                <a href="#modal-wordcloud-settings" class="modal-trigger easychat-analytics-card-filter-btn">
+                    {% include "EasyChatApp/analytics/filter.html" %}
+                </a>
+            </div>
+        </div>
+        <div class="easychat-analytics-card-subheading-div" id="wordcloud-time-range">
+            <span>Range :</span> 01/01/22 - 31/02/2022
+        </div>
+
+        <div class="easychat-analytics-graph-wrapper word-cloud-graph-wrapper">
+            <div class="easychat-analytics-no-data-found-wrapper" style="height: 363px; display: none;" id="word_cloud_small_no_data">
+                {% include "EasyChatApp/analytics/no_data_1.html" %}
+                <button class="easychat-analytics-reload-data-btn" onclick="load_wordcloud_analytics()">
+                    {% include "EasyChatApp/analytics/reload.html" %}
+                    <span>Reload</span></button>
+
+            </div>
+            <canvas id="word_cloud_small"></canvas>
+
+        </div>
+    </div>
+
+</div>
+<div id="modal-wordcloud-full-window" class="modal easychat-custom-modals-container">
+    <div class="modal-content">
+        <div class="row" style="margin-bottom: 12px !important;">
+            <div class="modal-header">
+                <div class="modal-heading-text-div">Word Cloud
+
+                    <div id="wordcloud-big-time-range"><span>(Range: </span>4-May-22 to 31-May-22)</div>
+                </div>
+                <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                    <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473
+                            6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347
+                            19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z"
+                            fill="black" fill-opacity="0.54" />
+                    </svg>
+
+                </a>
+            </div>
+            <div class="modal-overflow-content-div">
+                <span id="wordcloud-big-freq-info">
+                    <div></div>
+                </span>
+                <div>
+                    <canvas id="word_cloud_big"
+                        style="height:max-content !important;max-width:100%; width:max-content !important;" width="800"
+                        height="400"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+<div id="modal-wordcloud-settings" class="modal easychat-custom-modals-container">
+
+    <div class="modal-content">
+        <div class="row" style="margin-bottom: 12px !important;">
+            <div class="modal-header">
+                <div class="modal-heading-text-div">Filter - Wordcloud</div>
+                <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                    <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473
+                            6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347
+                            19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z"
+                            fill="black" fill-opacity="0.54" />
+                    </svg>
+                </a>
+            </div>
+
+            <div class="modal-overflow-content-div">
+
+                <div class="col s11 analytics-custom-date-select-area" id="analytics-custom-date-select-area">
+
+                    <div class="col s6" style="padding-left: 2px; font-weight: 600;color: #4d4d4d; font-size: 14px;">
+                        Start Date
+                        <input type="date" class="message-default-start-date" value='{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}'
+                            id="wordcloud-analytics-start-date"
+                            placeholder="Enter start date"
+                            style="border: 2px solid #F6F6F6 !important; border-radius:4px !important;">
+                    </div>
+                    <div class="col s6"
+                        style="font-weight: 600; padding-right: 0px !important;color: #4d4d4d; font-size: 14px;">
+                        End Date
+                        <input type="date" class="message-default-end-date" value='{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}'
+                            id="wordcloud-analytics-end-date"
+                            placeholder="Enter end date"
+                            style="border: 2px solid #F6F6F6 !important; border-radius:4px !important;">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0)" class="modal-close btn filter-modal-footer-btn"
+            onclick="load_wordcloud_analytics()">Apply Filter</a>
+    </div>
+</div>

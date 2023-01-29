@@ -1,0 +1,1499 @@
+{% extends 'LiveChatApp/manager_console.html' %}
+{% block consolecontent %}
+{% load static %}
+
+<style type="text/css">
+    .modal-footer .btn-primary {
+        background: {{admin_config.get_livechat_theme_lighten_one}} !important;
+    }
+
+    .send-sample-email-btn-modal {
+        color: {{admin_config.get_livechat_theme_lighten_one}} !important;
+        border: 1px solid {{admin_config.get_livechat_theme_lighten_one}} !important;
+    }
+
+    .livechat-conversation-email-item {
+        background: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+    }
+
+    .email-configuration-btn{
+        background: {{admin_config.get_livechat_theme_lighten_one}} !important; 
+    }
+
+    .custom-checkbox-input input:checked~.checkmark {
+        background-color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+    }
+
+    .custom-checkbox-input  .checkmark{
+        border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }} !important;
+    }
+
+    .livechat-multiselect-dropdown.livechat-multiselect-filter-dropdown .multiselect-container {
+        scrollbar-color: {{ admin_config.get_livechat_theme_lighten_one }} #f1f1f1;
+    }
+
+    .livechat-multiselect-dropdown.livechat-multiselect-filter-dropdown ::-webkit-scrollbar-thumb {
+        background: {{ admin_config.get_livechat_theme_lighten_six }} !important;
+    }
+
+</style>
+<link href="{% static 'LiveChatApp/css/email_configure.css' %}?v={% random_int 1 100 %}" rel="stylesheet">
+<link href="{% static 'LiveChatApp/css/dropdown.css' %}?v={% random_int 1 100 %}" rel="stylesheet">
+
+<div class="col-xl-10 col-lg-10 col-md-12 col-sm-12 col-12 py-2 " id="live-chat-admin-setting-content-email-setting" style="height: calc(100vh - 4.375rem); background: #FAFAFA; overflow-y: auto; overflow-x: hidden; max-width: 83%">
+
+    <div class="livechat-admin-email-setting-container">
+
+        <div class="livechat-admin-email-setting-subheading pb-4 pl-1">
+            <div class="email-configuration-title">
+                <svg style="margin-right: 8px;" width="16" height="12" viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M14 0H2C1.175 0 0.5075 0.675 0.5075 1.5L0.5 10.5C0.5 11.325 1.175 12 2 12H14C14.825 12 15.5 11.325 15.5 10.5V1.5C15.5 0.675 14.825 0 14 0ZM14 9.75C14 10.1625 13.6625 10.5 13.25 10.5H2.75C2.3375 10.5 2 10.1625 2 9.75V3L7.205 6.255C7.6925 6.5625 8.3075 6.5625 8.795 6.255L14 3V9.75ZM2 1.5L8 5.25L14 1.5H2Z" fill="#7B7A7B"></path>
+                    </svg>
+                <span>Email Configurations</span>
+            </div>
+            <button class="email-configuration-btn" id="email-configuration-save-btn">Save</button>
+        </div>
+        <div class="livechat-email-configuration-wrapper">
+            <div class="row align-items-center mt-3">
+                <div class="col-6 col-md-6 pl-5">
+                    <span class="livechat-email-configuration-heading-text">Enable Mailer Analytics</span>
+                </div>
+                <div class="col-6 col-md-6">
+                    <label class="livechat-option-switch" style="display: inline-flex;     vertical-align: middle;">
+                        {% if admin_config.is_email_notification_enabled %}
+                        <input type="checkbox" id="livechat-email-setting-profile-cb" onchange="enable_disable_email_notification()" checked>
+                        {% else %}
+                        <input type="checkbox" id="livechat-email-setting-profile-cb" onchange="enable_disable_email_notification()">
+                        {% endif %}
+                        <span class="livechat-option-switch-slider round"></span>
+                    </label>
+                    <button id="livechat-email-analytics-configure-btn" class="mailer-analytics-configure-btn" {% if admin_config.is_email_notification_enabled %} style="display: inline-flex;" {% else %} style="display: none;" {% endif %}>Configure</button>
+                </div>
+            </div>
+            <div class="row mt-1">
+                <div class="col-md-12 col-sm-12">
+                    <hr>
+                </div>
+            </div>
+            <div class="row align-items-center">
+                <div class="col-6 col-md-6 pl-5">
+                    <span class="livechat-email-configuration-heading-text">Enable LiveChat Conversations through Email Channel</span>
+                </div>
+                <div class="col-6 col-md-6">
+                    <div style="display: flex; align-items: center;">
+                        <label class="livechat-option-switch livechat-conversation-email-cb">
+                            <input type="checkbox" id="livechat-email-conversation-cb" {% if email_config_obj.is_livechat_enabled_for_email %} checked {% endif %}/>
+                            <span class="livechat-option-switch-slider round"></span>
+                        </label>
+                        <div class="livechat-conversation-email-wrapper">
+                            <div class="livechat-conversation-email-item" {% if email_config_obj.is_livechat_enabled_for_email %} style="display:inline-flex;" {% else %} style="display: none;" {% endif %}>
+                                <span>{{email_config_id}}</span>
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M1.89705 2.05379L1.96967 1.96967C2.23594 1.7034 2.6526 1.6792 2.94621 1.89705L3.03033 1.96967L6 4.939L8.96967 1.96967C9.26256 1.67678 9.73744 1.67678 10.0303 1.96967C10.3232 2.26256 10.3232 2.73744 10.0303 3.03033L7.061 6L10.0303 8.96967C10.2966 9.23594 10.3208 9.6526 10.1029 9.94621L10.0303 10.0303C9.76406 10.2966 9.3474 10.3208 9.05379 10.1029L8.96967 10.0303L6 7.061L3.03033 10.0303C2.73744 10.3232 2.26256 10.3232 1.96967 10.0303C1.67678 9.73744 1.67678 9.26256 1.96967 8.96967L4.939 6L1.96967 3.03033C1.7034 2.76406 1.6792 2.3474 1.89705 2.05379L1.96967 1.96967L1.89705 2.05379Z" fill="white"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-1">
+                <div class="col-md-12 col-sm-12">
+                    <hr>
+                </div>
+            </div>
+            <div class="row align-items-center ">
+                <div class="col-6 col-md-6 pl-5">
+                    <span class="livechat-email-configuration-heading-text">Enable Email Auto Disposal</span>
+                </div>
+                <div class="col-6 col-md-6">
+                    <label class="livechat-option-switch">                                                                        
+                        <input type="checkbox" id="livechat-email-auto-disposal-cb" {% if email_config_obj.is_auto_disposal_enabled %} checked {% endif %}>
+                        <span class="livechat-option-switch-slider round"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="row mt-1">
+                <div class="col-md-12 col-sm-12">
+                    <hr>
+                </div>
+            </div>
+            <div class="email-auto-disposal-option-wrapper" {% if email_config_obj.is_auto_disposal_enabled %} style="display: block;" {% else %} style="display: none;" {% endif %}>
+                <div class="row align-items-center ">
+                    <div class="col-6 col-md-6 " style="padding-left: 4.5rem !important;">
+                        <span class="livechat-email-configuration-subheading-text">Session Inactivity</span>
+                    </div>
+                    <div class="col-6 col-md-6">
+                        <label class="livechat-option-switch">                                                                    
+                            <input type="checkbox" id="livechat-email-session-inactivity-cb" {% if email_config_obj.is_session_inactivity_enabled %} checked {% endif %}/>
+                            <span class="livechat-option-switch-slider round"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="chat-dispose-time-wrapper" {% if email_config_obj.is_session_inactivity_enabled %} style="display: block;" {% else %} style="display: none;" {% endif %} >
+                    <div class="row mt-1" style="padding: 0rem 3.8rem;">
+                        <div class="col-md-12 col-sm-12">
+                            <hr>
+                        </div>
+                    </div>
+                    <div class="row align-items-center ">
+                        <div class="col-6 col-md-6 " style="padding-left: 4.5rem !important;">
+                            <span class="livechat-email-configuration-subheading-text"> Time After Which Chat Should Dispose</span>
+                        </div>
+                        <div class="col-6 col-md-6">
+                            <div style="width: 140px;">
+                                <div class="input-group mb-2">
+                                    <input type="number" class="form-control" id="livechat-email-session-inactivity-duration" min="1" value="{{email_config_obj.chat_disposal_duration}}">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text" style="height: 36px; border-left: none; border-radius: 0px 4px 4px 0px;">Days</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-12 col-sm-12">
+                        <hr>
+                    </div>
+                </div>
+            </div>
+            <div class="row align-items-center mb-4">
+                <div class="col-6 col-md-6 pl-5">
+                    <span class="livechat-email-configuration-heading-text">Allow followup of leads over mail </span>
+                </div>
+                <div class="col-6 col-md-6">
+                    <label class="livechat-option-switch">
+                        <input type="checkbox" id="livechat-email-followup-leads-cb" {% if email_config_obj.is_followup_leads_over_mail_enabled %} checked {% endif %}>
+                        <span class="livechat-option-switch-slider round"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade backdrop" id="livechat-email-notification-modal" tabindex="-1" role="dialog" aria-labelledby="email_notification_modal_label" aria-modal="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6>Email Analytics Notification<span></span></h6>
+            </div>
+            <div class="modal-body">
+
+                <div class="row mt-4" id="livechat-email-setting-profile-container" style="display:none">
+                    <div class="col-md-12">
+                        <ul class="nav nav-tabs" id="tabs">
+                            {% if email_profile_objs %}
+                                {% for email_profile_obj in email_profile_objs %}
+                                    <li class="btn-profile-tab tab-new-profile" id="profile-tab-{{email_profile_obj.pk}}" >
+                                        <a href="javascript:void(0);" onclick="show_profile_details_tab('{{email_profile_obj.pk}}')" class="show" id="profile-heading-tab-{{email_profile_obj.pk}}">
+                                            <span>{{email_profile_obj.profile_name}}</span>
+                                            <button type="button" class="btn-delete-profile" data-toggle="modal" data-target="#modal-delete-email-profile-{{email_profile_obj.pk}}">
+                                    
+                                        <svg width="10" height="11" viewBox="0 0 10 11" fill="#767B87" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M9.72504 0.61163C9.58492 0.47119 9.39468 0.392266 9.19629 0.392266C8.9979 0.392266 8.80766 0.47119 8.66754 0.61163L5.00004 4.27163L1.33254 0.60413C1.19242 0.46369 1.00218 0.384766 0.803789 0.384766C0.605401 0.384766 0.415163 0.46369 0.275039 0.60413C-0.0174609 0.89663 -0.0174609 1.36913 0.275039 1.66163L3.94254 5.32913L0.275039 8.99663C-0.0174609 9.28913 -0.0174609 9.76163 0.275039 10.0541C0.567539 10.3466 1.04004 10.3466 1.33254 10.0541L5.00004 6.38663L8.66754 10.0541C8.96004 10.3466 9.43254 10.3466 9.72504 10.0541C10.0175 9.76163 10.0175 9.28913 9.72504 8.99663L6.05754 5.32913L9.72504 1.66163C10.01 1.37663 10.01 0.89663 9.72504 0.61163Z" ></path>
+                                        </svg>
+                                            </button>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            {% endif %}
+                            <li class="btn-profile-tab tab-new-profile" id="profile-tab-new" style="display:none">
+                                <a href="#" onclick="show_profile_details_tab('new')" class="show" id="profile-heading-tab-new">
+                                    <span>{{new_profile_name}}</span>
+                                    <button type="button" class="btn-delete-profile" data-toggle="modal" data-target="#modal-delete-email-profile-new">
+                            
+                                <svg width="10" height="11" viewBox="0 0 10 11" fill="#767B87" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9.72504 0.61163C9.58492 0.47119 9.39468 0.392266 9.19629 0.392266C8.9979 0.392266 8.80766 0.47119 8.66754 0.61163L5.00004 4.27163L1.33254 0.60413C1.19242 0.46369 1.00218 0.384766 0.803789 0.384766C0.605401 0.384766 0.415163 0.46369 0.275039 0.60413C-0.0174609 0.89663 -0.0174609 1.36913 0.275039 1.66163L3.94254 5.32913L0.275039 8.99663C-0.0174609 9.28913 -0.0174609 9.76163 0.275039 10.0541C0.567539 10.3466 1.04004 10.3466 1.33254 10.0541L5.00004 6.38663L8.66754 10.0541C8.96004 10.3466 9.43254 10.3466 9.72504 10.0541C10.0175 9.76163 10.0175 9.28913 9.72504 8.99663L6.05754 5.32913L9.72504 1.66163C10.01 1.37663 10.01 0.89663 9.72504 0.61163Z" ></path>
+                                </svg>
+                                    </button>
+                                </a>
+                            </li>
+                            <li class="btn-profile-tab">
+                                <a href="javascript:void(0);" id="add-new-tab-btn" onclick="add_new_email_profile()">
+                                    <svg width="14" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M13 8.32922H8V13.3292C8 13.8792 7.55 14.3292 7 14.3292C6.45 14.3292 6 13.8792 6 13.3292V8.32922H1C0.45 8.32922 0 7.87922 0 7.32922C0 6.77922 0.45 6.32922 1 6.32922H6V1.32922C6 0.779224 6.45 0.329224 7 0.329224C7.55 0.329224 8 0.779224 8 1.32922V6.32922H13C13.55 6.32922 14 6.77922 14 7.32922C14 7.87922 13.55 8.32922 13 8.32922Z" fill="black" fill-opacity="0.54"></path>
+                                    </svg>
+                                </a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content" id="tab-content-container">
+                            {% if email_profile_objs %}
+                                {% for email_profile_obj in email_profile_objs %}
+                            <div class="tab-pane active show" id="profile-details-tab-{{email_profile_obj.pk}}">
+                                <div class="row">
+                                    <div class="sub-heading-text-primary email-collapse-heading-div pl-3">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M9.2925 6.29376C8.9025 6.68376 8.9025 7.31376 9.2925 7.70376L13.1725 11.5838L9.2925 15.4638C8.9025 15.8538 8.9025 16.4838 9.2925 16.8738C9.6825 17.2638 10.3125 17.2638 10.7025 16.8738L15.2925 12.2838C15.6825 11.8938 15.6825 11.2638 15.2925 10.8738L10.7025 6.28376C10.3225 5.90376 9.6825 5.90376 9.2925 6.29376Z" fill="#C4C4C4"/>
+                                        </svg>
+                                        <span> Trigger Settings</span>
+                                    </div>
+
+                                    <div class="col-md-12 email-collapse-data-div" style="display: none; padding-left: 4rem;">
+
+                                        <div class="row align-items-center mt-4">
+                                            <div class="col-md-5 col-sm-12">
+                                                <span class="text">Profile Name</span>
+                                            </div>
+                                            <div class="col-md-7 col-sm-12 mt-2 mt-sm-0">
+                                                <input class="profile-name-input trigger-setting-inputs-width-handler" type="text" name="profile-name" placeholder="Profile Name" value="{{email_profile_obj.profile_name}}" autocomplete="off" id="profile-name-{{email_profile_obj.pk}}">
+                                            </div>
+                                        </div>
+
+                                        <div class="row align-items-center mt-4">
+                                            <div class="col-md-5 col-sm-12">
+                                                <span class="text">Email Frequency</span>
+                                            </div>
+                                            <div class="col-md-7 col-sm-12 mt-2 mt-sm-0">
+
+                                                <div class="livechat-multiselect-dropdown     livechat-multiselect-filter-dropdown email-freq-multiselect-div ">
+                                                    <select id="select-email-frequency-dropdown-{{email_profile_obj.pk}}" multiple="" class="form-control">
+                                                        <option value="5" {% if '5' in email_profile_obj.email_frequency %} selected="true" {% endif %}>Daily</option>
+                                                        <option value="1" {% if '1' in email_profile_obj.email_frequency %} selected="true" {% endif %}>7 days</option>
+                                                        <option value="2" {% if '2' in email_profile_obj.email_frequency %} selected="true" {% endif %}>30 days</option>
+                                                        <option value="3" {% if '3' in email_profile_obj.email_frequency %} selected="true" {% endif %}>60 days</option>
+                                                        <option value="4" {% if '4' in email_profile_obj.email_frequency %} selected="true" {% endif %}>90 days</option>
+                                                    </select>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                <div class="row align-items-center mt-4">
+                    <div class="col-md-5 col-sm-12">
+                        <span class="text">Email Address</span>
+                    </div>
+                    <div class="col-md-7 col-sm-12 mt-2 mt-sm-0">
+                        <ul name="email-id-list" class="email_id_tag_container" id="email-id-list-{{email_profile_obj.pk}}">
+                            {% for email in email_profile_obj.get_email_list %}
+                                <li class="bg-primary cognoai-tag" value="{{email}}">
+                                    <span style="font-weight: 500; word-break: break-word; line-height:1.2;">{{email}}</span>
+                                    <span class="tag-remove-btn">x</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <input class="email-id-input" type="text" id="email-id-input-{{email_profile_obj.pk}}" placeholder="Email Address (Press Enter to save)" autocomplete="off">
+                    </div>
+                </div>
+
+                    <div class="row align-items-center mt-4">
+                        <div class="col-md-5 col-sm-12">
+                            <span class="text">Email Subject</span>
+                        </div>
+                        <div class="col-md-7 col-sm-12 mt-2 mt-sm-0">
+                            <input class="email-subject-input trigger-setting-inputs-width-handler" type="text" name="email-subject" placeholder="Email Subject" value="{{email_profile_obj.email_subject}}" id="email-subject-input-{{email_profile_obj.pk}}">
+                        </div>
+                    </div>
+                    <div class="row align-items-center mt-4">
+                        <div class="col-md-5 col-sm-12">
+                            <span class="text">Agent Connection Rate %</span>
+                        </div>
+                        <div class="col-md-7 col-sm-12 mt-2 mt-sm-0">
+                            <input class="email-subject-input trigger-setting-inputs-width-handler" type="text" maxlength="3" pattern="[0-9]{3}" name="email-subject" placeholder="Agent Connection Rate %" value="{{email_profile_obj.agent_connection_rate}}" id="email-agent-connection-{{email_profile_obj.pk}}">
+                        </div>
+                    </div>
+                    </div>
+                    </div>
+
+                        <div class="row mt-4">
+                            <div class="sub-heading-text-primary email-collapse-heading-div pl-3">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9.2925 6.29376C8.9025 6.68376 8.9025 7.31376 9.2925 7.70376L13.1725 11.5838L9.2925 15.4638C8.9025 15.8538 8.9025 16.4838 9.2925 16.8738C9.6825 17.2638 10.3125 17.2638 10.7025 16.8738L15.2925 12.2838C15.6825 11.8938 15.6825 11.2638 15.2925 10.8738L10.7025 6.28376C10.3225 5.90376 9.6825 5.90376 9.2925 6.29376Z" fill="#C4C4C4"/>
+                                </svg>
+
+                                <span> Table Parameter</span>
+                            </div>
+
+                            <div class="col-md-12 pl-5 email-collapse-data-div" style="display: none;">
+                                <div class="row pl-2 mt-3">
+                                    <div class="col-5 pl-3 col-md-5">
+                                        <span class="text">Enable Table Parameter</span>
+                                    </div>
+                                    <div class="col-7 col-md-7">
+                                        <label class="livechat-option-switch">
+                                            {% if email_profile_obj.is_table_parameters_enabled %}
+                                            <input type="checkbox" id="livechat-email-table-parameter-cb-{{email_profile_obj.pk}}" checked onchange="enable_disable_table_container('{{email_profile_obj.pk}}')">
+                                            {% else %}
+                                            <input type="checkbox" id="livechat-email-table-parameter-cb-{{email_profile_obj.pk}}" onchange="enable_disable_table_container('{{email_profile_obj.pk}}')">
+                                            {% endif %}
+                                            <span class="livechat-option-switch-slider round"></span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                            {% if email_profile_obj.is_table_parameters_enabled %}
+                            <div class="col-md-12 col-sm-12 livechat-table-parameter-container" id="livechat-table-parameter-container-{{email_profile_obj.pk}}" style="display: block;">
+                            {% else %}
+                            <div class="col-md-12 col-sm-12 livechat-table-parameter-container" id="livechat-table-parameter-container-{{email_profile_obj.pk}}" style="display: none;">
+                            {% endif %}
+                                <div class="row align-items-center mt-4 px-3">
+                                    <div class="col-md-5 col-sm-12 pl-0">
+
+                                        <span class="parameter-subheading-text">Reporting Parameters</span>
+
+                                    </div>
+
+                                </div>
+                                <div class="row  mt-4 px-3">
+                                    <div class="col-md-5 col-sm-12 pl-0">
+
+                                        <span class="text">Count Variations</span>
+
+                                    </div>
+
+                                    <div class="col-md-7 col-sm-12 mt-2 mt-sm-0 livechat-email-setting-multiselect-chip">
+                                        <div class=" channel-box">
+
+                                            {% if '1' in email_profile_obj.table_parameters.count_variation %}
+                                            <input type="checkbox" id="count-1-{{email_profile_obj.pk}}" name="" value="1" checked>
+                                            {% else %}
+                                            <input type="checkbox" id="count-1-{{email_profile_obj.pk}}" name="" value="1">
+                                            {% endif%}
+
+                                            <label for="count-1-{{email_profile_obj.pk}}">
+                                            
+                                                                                    <span>Daily</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            {% if '2' in email_profile_obj.table_parameters.count_variation %}
+                                            <input type="checkbox" id="count-2-{{email_profile_obj.pk}}" name="" value="2" checked>
+                                            {% else %}
+                                            <input type="checkbox" id="count-2-{{email_profile_obj.pk}}" name="" value="2" >
+                                            {% endif %}
+
+                                            <label for="count-2-{{email_profile_obj.pk}}">
+                                               
+                                                                                    <span>Week To Date</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            {% if '3' in email_profile_obj.table_parameters.count_variation %}
+                                            <input type="checkbox" id="count-3-{{email_profile_obj.pk}}" name="" value="3" checked>
+                                            {% else %}
+                                            <input type="checkbox" id="count-3-{{email_profile_obj.pk}}" name="" value="3">
+                                            {% endif %}
+
+                                            <label for="count-3-{{email_profile_obj.pk}}">
+                                                 
+                                                                                    <span>Month To Date</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            {% if '4' in email_profile_obj.table_parameters.count_variation %}
+                                            <input type="checkbox" id="count-4-{{email_profile_obj.pk}}" name="" value="4" checked>
+                                            {% else %}
+                                            <input type="checkbox" id="count-4-{{email_profile_obj.pk}}" name="" value="4">
+                                            {% endif %}
+
+                                            <label for="count-4-{{email_profile_obj.pk}}">
+                                               
+                                                                                    <span>Year To Date</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            {% if '5' in email_profile_obj.table_parameters.count_variation %}
+                                            <input type="checkbox" id="count-5-{{email_profile_obj.pk}}" name="" value="5" checked>
+                                            {% else %}
+                                            <input type="checkbox" id="count-5-{{email_profile_obj.pk}}" name="" value="5">
+                                            {% endif %}
+
+                                            <label for="count-5-{{email_profile_obj.pk}}">
+                                                <span>Last Month Same Date</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row  mt-4 px-3">
+                                    <div class="col-md-5 col-sm-12 pl-0">
+                                        <span class="text">Select Channel</span>
+                                    </div>
+                                    <div class="col-md-7 col-sm-12 mt-2 mt-sm-0 livechat-email-setting-multiselect-chip livechat-email-setting-multiselect-chip-channel">
+                                        {% for channel in channel_list %}
+                                            <div class=" channel-box">
+                                                {% if channel.name in email_profile_obj.table_parameters.channel %}
+                                                    <input type="checkbox" id="table-channel-{{ channel.name }}-{{email_profile_obj.pk}}" name="" value="{{ channel.name }}" checked>
+                                                {% else %}
+                                                <input type="checkbox" id="table-channel-{{ channel.name }}-{{email_profile_obj.pk}}" name="" value="{{ channel.name }}">
+                                                {% endif %}
+                                                <label for="table-channel-{{ channel.name }}-{{email_profile_obj.pk}}">
+                                                    {{ channel.icon|safe }}
+                                                    <span>{{ channel.name }}</span>
+                                                </label>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="row align-items-center mt-4 px-3">
+                                    <div class="col-md-5 col-sm-12 pl-0">
+
+                                        <span class="parameter-subheading-text">Record Parameters</span>
+
+                                    </div>
+
+                                </div>
+                                <div class="row  mt-4 px-3">
+                                    <div class="col-md-5 col-sm-12 pl-0">
+
+                                        <span class="text">Select Records</span>
+
+                                    </div>
+                                    <div class="col-md-7 col-sm-12 mt-2 mt-sm-0 livechat-email-setting-multiselect-chip">
+                                        <div class=" channel-box">
+
+                                            {% if 'chats_raised' in email_profile_obj.table_parameters.table_records %}
+                                            <input type="checkbox" id="table-records-1-{{email_profile_obj.pk}}" name="" value="chats_raised" checked>
+                                            {% else %}
+                                            <input type="checkbox" id="table-records-1-{{email_profile_obj.pk}}" name="" value="chats_raised">
+                                            {% endif %}
+
+                                            <label for="table-records-1-{{email_profile_obj.pk}}">
+                                            
+                                                                                    <span>Total Chats Raised</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            {% if 'chats_resolved' in email_profile_obj.table_parameters.table_records %}
+                                            <input type="checkbox" id="table-records-2-{{email_profile_obj.pk}}" name="" value="chats_resolved" checked>
+                                            {% else %}
+                                            <input type="checkbox" id="table-records-2-{{email_profile_obj.pk}}" name="" value="chats_resolved">
+                                            {% endif %}
+
+                                            <label for="table-records-2-{{email_profile_obj.pk}}">
+                                               
+                                                                                    <span>Total Chats Resolved</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            {% if 'agents_logged_in' in email_profile_obj.table_parameters.table_records %}
+                                            <input type="checkbox" id="table-records-3-{{email_profile_obj.pk}}" name="" value="agents_logged_in" checked>
+                                            {% else %}
+                                            <input type="checkbox" id="table-records-3-{{email_profile_obj.pk}}" name="" value="agents_logged_in" >
+                                            {% endif %}
+                                            <label for="table-records-3-{{email_profile_obj.pk}}">
+                                                 
+                                                                                    <span>Agents Logged In</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            {% if 'abandoned_chats' in email_profile_obj.table_parameters.table_records %}
+                                            <input type="checkbox" id="table-records-4-{{email_profile_obj.pk}}" name="" value="abandoned_chats" checked>
+                                            {% else %}
+                                            <input type="checkbox" id="table-records-4-{{email_profile_obj.pk}}" name="" value="abandoned_chats">
+                                            {% endif %}
+                                            <label for="table-records-4-{{email_profile_obj.pk}}">
+                                               
+                                                                                    <span>Offline Chats</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            {% if 'avg_interactions' in email_profile_obj.table_parameters.table_records %}
+                                            <input type="checkbox" id="table-records-5-{{email_profile_obj.pk}}" name="" value="avg_interactions" checked>
+                                            {% else %}
+                                            <input type="checkbox" id="table-records-5-{{email_profile_obj.pk}}" name="" value="avg_interactions" >
+                                            {% endif %}
+                                            <label for="table-records-5-{{email_profile_obj.pk}}">
+                                                                                        
+                                                                                    <span>Average Interactions per chat</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            {% if 'group_chats' in email_profile_obj.table_parameters.table_records %}
+                                            <input type="checkbox" id="table-records-6-{{email_profile_obj.pk}}" name="" value="group_chats" checked>
+                                            {% else %}
+                                            <input type="checkbox" id="table-records-6-{{email_profile_obj.pk}}" name="" value="group_chats" >
+                                            {% endif %}
+                                            <label for="table-records-6-{{email_profile_obj.pk}}">
+                                                                                        
+                                                                                    <span>Group Chats Engaged in</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            {% if 'offline_chats' in email_profile_obj.table_parameters.table_records %}
+                                            <input type="checkbox" id="table-records-7-{{email_profile_obj.pk}}" name="" value="offline_chats" checked>
+                                            {% else %}
+                                            <input type="checkbox" id="table-records-7-{{email_profile_obj.pk}}" name="" value="offline_chats" >
+                                            {% endif %}
+                                            <label for="table-records-7-{{email_profile_obj.pk}}">
+                                                                                        
+                                                                                    <span>Missed Chats</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            {% if 'avg_handle_time' in email_profile_obj.table_parameters.table_records %}
+                                            <input type="checkbox" id="table-records-8-{{email_profile_obj.pk}}" name="" value="avg_handle_time" checked>
+                                            {% else %}
+                                            <input type="checkbox" id="table-records-8-{{email_profile_obj.pk}}" name="" value="avg_handle_time" >
+                                            {% endif %}
+                                            <label for="table-records-8-{{email_profile_obj.pk}}">
+                                                                                        
+                                                                                    <span>Average Handling Time</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            {% if 'declined_chats' in email_profile_obj.table_parameters.table_records %}
+                                            <input type="checkbox" id="table-records-9-{{email_profile_obj.pk}}" name="" value="declined_chats" checked>
+                                            {% else %}
+                                            <input type="checkbox" id="table-records-9-{{email_profile_obj.pk}}" name="" value="declined_chats" >
+                                            {% endif %}
+                                            <label for="table-records-9-{{email_profile_obj.pk}}">
+                                                                                        
+                                                                                    <span>Abandoned Chats</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            {% if 'avg_wait_time' in email_profile_obj.table_parameters.table_records %}
+                                            <input type="checkbox" id="table-records-10-{{email_profile_obj.pk}}" name="" value="avg_wait_time" checked>
+                                            {% else %}
+                                            <input type="checkbox" id="table-records-10-{{email_profile_obj.pk}}" name="" value="avg_wait_time" >
+                                            {% endif %}
+                                            <label for="table-records-10-{{email_profile_obj.pk}}">
+                                                                                        
+                                                                                    <span>Average Customer Wait Time</span></label>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="sub-heading-text-primary email-collapse-heading-div pl-3">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9.2925 6.29376C8.9025 6.68376 8.9025 7.31376 9.2925 7.70376L13.1725 11.5838L9.2925 15.4638C8.9025 15.8538 8.9025 16.4838 9.2925 16.8738C9.6825 17.2638 10.3125 17.2638 10.7025 16.8738L15.2925 12.2838C15.6825 11.8938 15.6825 11.2638 15.2925 10.8738L10.7025 6.28376C10.3225 5.90376 9.6825 5.90376 9.2925 6.29376Z" fill="#C4C4C4"/>
+                                    </svg>
+                                <span> Graphic Parameter</span>
+                            </div>
+
+                            <div class="col-md-12 pl-5 email-collapse-data-div" style="display: none;">
+                                <div class="row pl-2 mt-3">
+                                    <div class="col-5 pl-3 col-md-5">
+                                        <span class="text">Enable Graphic Parameters</span>
+
+                                    </div>
+                                    <div class="col-7 col-md-7">
+                                        <label class="livechat-option-switch">
+                                            {% if email_profile_obj.is_graph_parameters_enabled %}
+                                            <input type="checkbox" id="livechat-email-graphic-parameter-cb-{{email_profile_obj.pk}}" checked onchange="enable_disable_graph_container('{{email_profile_obj.pk}}')">
+                                            {% else %}
+                                            <input type="checkbox" id="livechat-email-graphic-parameter-cb-{{email_profile_obj.pk}}" onchange="enable_disable_graph_container('{{email_profile_obj.pk}}')">
+                                            {% endif %}
+                                            <span class="livechat-option-switch-slider round"></span>
+                                        </label>
+
+                                    </div>
+                                </div>
+                            {% if email_profile_obj.is_graph_parameters_enabled %}
+                            <div class="col-md-12 col-sm-12 livechat-graphic-parameter-container" id="livechat-graphic-parameter-container-{{email_profile_obj.pk}}" style="display:block">
+                            {% else %}
+                            <div class="col-md-12 col-sm-12 livechat-graphic-parameter-container" id="livechat-graphic-parameter-container-{{email_profile_obj.pk}}" style="display:none">
+                            {% endif %}
+
+                                <div class="row align-items-center mt-4 px-3">
+                                    <div class="col-md-5 col-sm-12 pl-0">
+
+                                        <span class="text">Chat Reports</span>
+
+                                    </div>
+                                    <div class="col-md-1 col-sm-12 mt-2 mt-sm-0 pr-0 livechat-email-setting-graphic-item-cb">
+
+
+
+                                        <div class="checkbox-btn-container-item">
+                                            {% if email_profile_obj.graph_parameters.is_graph_chart_reports_enabled %}
+                                            <input type="checkbox" name="" value="" id="graph-chart-reports-{{email_profile_obj.pk}}" onchange="enable_disable_graph_chat_container('{{email_profile_obj.pk}}')" checked>
+                                            {% else %}
+                                            <input type="checkbox" name="" value="" id="graph-chart-reports-{{email_profile_obj.pk}}" onchange="enable_disable_graph_chat_container('{{email_profile_obj.pk}}')">
+                                            {% endif %}
+                                            <label for="graph-chart-reports-{{email_profile_obj.pk}}"></label>
+                                        </div>
+                                    </div>
+                                    {% if email_profile_obj.graph_parameters.is_graph_chart_reports_enabled %}
+                                    <div class="col-md-6 col-sm-12 mt-2 mt-sm-0 pl-0 livechat-email-setting-multiselect-chip livechat-email-chat-report-chip-container" id="livechat-email-chat-report-chip-container-{{email_profile_obj.pk}}" style="display:block" >
+                                    {% else %}
+                                    <div class="col-md-6 col-sm-12 mt-2 mt-sm-0 pl-0 livechat-email-setting-multiselect-chip livechat-email-chat-report-chip-container" id="livechat-email-chat-report-chip-container-{{email_profile_obj.pk}}" style="display:none" >
+                                    {% endif %}
+                                        <div class=" channel-box">
+
+                                            {% if 'chats_raised' in email_profile_obj.graph_parameters.graph_chart_reports %}
+                                            <input type="checkbox" id="graph-chart-reports-1-{{email_profile_obj.pk}}" name="" value="chats_raised" checked>
+                                            {% else %}
+                                            <input type="checkbox" id="graph-chart-reports-1-{{email_profile_obj.pk}}" name="" value="chats_raised">
+                                            {% endif %}
+
+                                            <label for="graph-chart-reports-1-{{email_profile_obj.pk}}">
+                                            
+                                                                                    <span>Chats Raised</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            {% if 'chats_resolved' in email_profile_obj.graph_parameters.graph_chart_reports %}
+                                            <input type="checkbox" id="graph-chart-reports-2-{{email_profile_obj.pk}}" name="" value="chats_resolved" checked>
+                                            {% else %}
+                                            <input type="checkbox" id="graph-chart-reports-2-{{email_profile_obj.pk}}" name="" value="chats_resolved">
+                                            {% endif %}
+
+                                            <label for="graph-chart-reports-2-{{email_profile_obj.pk}}">
+                                               
+                                                                                    <span>Chats Resolved</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            {% if 'abandoned_chats' in email_profile_obj.graph_parameters.graph_chart_reports %}
+                                            <input type="checkbox" id="graph-chart-reports-3-{{email_profile_obj.pk}}" name="" value="abandoned_chats" checked>
+                                            {% else %}
+                                            <input type="checkbox" id="graph-chart-reports-3-{{email_profile_obj.pk}}" name="" value="abandoned_chats">
+                                            {% endif %}
+                                            <label for="graph-chart-reports-3-{{email_profile_obj.pk}}">
+                                                 
+                                                                                    <span>Offline Chats</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            {% if 'offline_chats' in email_profile_obj.graph_parameters.graph_chart_reports %}
+                                            <input type="checkbox" id="graph-chart-reports-4-{{email_profile_obj.pk}}" name="" value="offline_chats" checked>
+                                            {% else %}
+                                            <input type="checkbox" id="graph-chart-reports-4-{{email_profile_obj.pk}}" name="" value="offline_chats">
+                                            {% endif %}
+
+                                            <label for="graph-chart-reports-4-{{email_profile_obj.pk}}">
+                                               
+                                                                                    <span>Missed Chats</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            {% if 'declined_chats' in email_profile_obj.graph_parameters.graph_chart_reports %}
+                                            <input type="checkbox" id="graph-chart-reports-5-{{email_profile_obj.pk}}" name="" value="declined_chats" checked>
+                                            {% else %}
+                                            <input type="checkbox" id="graph-chart-reports-5-{{email_profile_obj.pk}}" name="" value="declined_chats">
+                                            {% endif %}
+
+                                            <label for="graph-chart-reports-5-{{email_profile_obj.pk}}">
+                                                                                        
+                                                                                    <span>Abandoned Chats</span></label>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row align-items-center mt-4 px-3">
+                                    <div class="col-md-5 col-sm-12 pl-0">
+
+                                        <span class="text">Interaction per chat</span>
+
+                                    </div>
+                                    <div class="col-md-7 col-sm-12 mt-2 mt-sm-0 pr-0 livechat-email-setting-graphic-item-report-cb">
+
+
+                                        <div class="checkbox-btn-container-item">
+                                            {% if email_profile_obj.graph_parameters.is_graph_interaction_enabled %}
+                                            <input type="checkbox" id="graph-interaction-{{email_profile_obj.pk}}" name="" value="" checked>
+                                            {% else %}
+                                            <input type="checkbox" id="graph-interaction-{{email_profile_obj.pk}}" name="" value="">
+                                            {% endif %}
+                                            <label for="graph-interaction-{{email_profile_obj.pk}}"></label>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row align-items-center mt-4 px-3">
+                                    <div class="col-md-5 col-sm-12 pl-0">
+
+                                        <span class="text">Average Handle Time</span>
+
+                                    </div>
+                                    <div class="col-md-7 col-sm-12 mt-2 mt-sm-0 pr-0 livechat-email-setting-graphic-item-report-cb">
+
+
+                                        <div class="checkbox-btn-container-item">
+                                            {% if email_profile_obj.graph_parameters.is_graph_avg_handle_time_enabled %}
+                                            <input type="checkbox" id="graph-handle-time-{{email_profile_obj.pk}}" name="" value="" checked>
+                                            {% else %}
+                                            <input type="checkbox" id="graph-handle-time-{{email_profile_obj.pk}}" name="" value="">
+                                            {% endif %}
+                                            <label for="graph-handle-time-{{email_profile_obj.pk}}"></label>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="sub-heading-text-primary email-collapse-heading-div pl-3">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9.2925 6.29376C8.9025 6.68376 8.9025 7.31376 9.2925 7.70376L13.1725 11.5838L9.2925 15.4638C8.9025 15.8538 8.9025 16.4838 9.2925 16.8738C9.6825 17.2638 10.3125 17.2638 10.7025 16.8738L15.2925 12.2838C15.6825 11.8938 15.6825 11.2638 15.2925 10.8738L10.7025 6.28376C10.3225 5.90376 9.6825 5.90376 9.2925 6.29376Z" fill="#C4C4C4"/>
+                                    </svg>
+
+                                <span> Attachment Parameter</span>
+                            </div>
+
+                            <div class="col-md-12 pl-5 email-collapse-data-div" style="display: none;">
+
+                                <div class="row pl-2 mt-3">
+                                    <div class="col-5 pl-3 col-md-5">
+                                        <span class="text">Enable Attachment Parameters</span>
+                                    </div>
+                                    <div class="col-7 col-md-7">
+                                        <label class="livechat-option-switch">
+                                            {% if email_profile_obj.is_attachment_parameters_enabled %}
+                                            <input type="checkbox" id="livechat-email-attachment-parameter-cb-{{email_profile_obj.pk}}" onchange="enable_disable_attachment_container('{{email_profile_obj.pk}}')" checked>
+                                            {% else %}
+                                            <input type="checkbox" id="livechat-email-attachment-parameter-cb-{{email_profile_obj.pk}}" onchange="enable_disable_attachment_container('{{email_profile_obj.pk}}')">
+                                            {% endif %}
+                                            <span class="livechat-option-switch-slider round"></span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                            {% if email_profile_obj.is_attachment_parameters_enabled %}
+                            <div class="col-md-12 col-sm-12 livechat-attachment-parameter-container" id="livechat-attachment-parameter-container-{{email_profile_obj.pk}}" style="display: block">
+                            {% else %}
+                            <div class="col-md-12 col-sm-12 livechat-attachment-parameter-container" id="livechat-attachment-parameter-container-{{email_profile_obj.pk}}" style="display: none">
+                            {% endif %}
+
+                                <div class="row align-items-center mt-4 px-3">
+                                    <div class="col-md-5 col-sm-12 pl-0">
+
+                                        <span class="text">Select Attachment</span>
+
+                                    </div>
+
+                                    <div class="col-md-7 col-sm-12 mt-2 mt-sm-0 pl-0 livechat-email-setting-multiselect-chip">
+                                        <div class=" channel-box">
+
+                                            {% if 'performance_report' in email_profile_obj.attachment_parameters.attachment_parameters %}
+                                            <input type="checkbox" id="attachment-1-{{email_profile_obj.pk}}" name="" value="performance_report" checked>
+                                            {% else %}
+                                            <input type="checkbox" id="attachment-1-{{email_profile_obj.pk}}" name="" value="performance_report">
+                                            {% endif %}
+
+                                            <label for="attachment-1-{{email_profile_obj.pk}}">
+                                            
+                                                                                    <span>Performance Report</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            {% if 'analytical_report' in email_profile_obj.attachment_parameters.attachment_parameters %}
+                                            <input type="checkbox" id="attachment-2-{{email_profile_obj.pk}}" name="" value="analytical_report" checked>
+                                            {% else %}
+                                            <input type="checkbox" id="attachment-2-{{email_profile_obj.pk}}" name="" value="analytical_report">
+                                            {% endif %}
+                                            <label for="attachment-2-{{email_profile_obj.pk}}">
+                                               
+                                                                                    <span>Combined Analytical Report</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            {% if 'customer_report' in email_profile_obj.attachment_parameters.attachment_parameters %}
+                                            <input type="checkbox" id="attachment-3-{{email_profile_obj.pk}}" name="" value="customer_report" checked>
+                                            {% else %}
+                                            <input type="checkbox" id="attachment-3-{{email_profile_obj.pk}}" name="" value="customer_report">
+                                            {% endif %}
+                                            <label for="attachment-3-{{email_profile_obj.pk}}">
+                                               
+                                                                                    <span>Customer Centric Report</span></label>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    <div class="tab-pane active show" id="profile-details-tab-new" style="display:none">
+                        <div class="row">
+                            <div class="sub-heading-text-primary email-collapse-heading-div pl-3">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9.2925 6.29376C8.9025 6.68376 8.9025 7.31376 9.2925 7.70376L13.1725 11.5838L9.2925 15.4638C8.9025 15.8538 8.9025 16.4838 9.2925 16.8738C9.6825 17.2638 10.3125 17.2638 10.7025 16.8738L15.2925 12.2838C15.6825 11.8938 15.6825 11.2638 15.2925 10.8738L10.7025 6.28376C10.3225 5.90376 9.6825 5.90376 9.2925 6.29376Z" fill="#C4C4C4"/>
+                                </svg>
+                                <span> Trigger Settings</span>
+                            </div>
+
+                            <div class="col-md-12 email-collapse-data-div" style="display: none; padding-left: 4rem;">
+
+                        <div class="row align-items-center mt-4">
+                            <div class="col-md-5 col-sm-12">
+                                <span class="text">Profile Name</span>
+                            </div>
+                            <div class="col-md-7 col-sm-12 mt-2 mt-sm-0">
+                                <input class="profile-name-input trigger-setting-inputs-width-handler" type="text" name="profile-name" placeholder="Profile Name" value="{{new_profile_name}}" autocomplete="off" id="profile-name-new">
+                            </div>
+                        </div>
+
+                        <div class="row align-items-center mt-4">
+                            <div class="col-md-5 col-sm-12">
+                                <span class="text">Email Frequency</span>
+                            </div>
+                            <div class="col-md-7 col-sm-12 mt-2 mt-sm-0">
+
+                                <div class="livechat-multiselect-dropdown     livechat-multiselect-filter-dropdown email-freq-multiselect-div ">
+                                    <select id="select-email-frequency-dropdown-new" multiple="" class="form-control">
+                                        <option value="daily">Daily</option>
+                                        <option value="7days" selected="true">7 days</option>
+                                        <option value="30days">30 days</option>
+                                        <option value="60days">60 days</option>
+                                        <option value="90days">90 days</option>
+                                    </select>
+                                </div>
+
+                            </div>
+                        </div>
+                            <div class="row align-items-center mt-4">
+                                <div class="col-md-5 col-sm-12">
+                                    <span class="text">Email Address</span>
+                                </div>
+                                <div class="col-md-7 col-sm-12 mt-2 mt-sm-0">
+                                    <ul name="email-id-list" class="email_id_tag_container" id="email-id-list-new"></ul>
+                                    <input class="email-id-input" type="text" id="email-id-input-new" placeholder="Email Address (Press Enter to save)" autocomplete="off">
+                                </div>
+                            </div>
+
+                            <div class="row align-items-center mt-4">
+                                <div class="col-md-5 col-sm-12">
+                                    <span class="text">Email Subject</span>
+                                </div>
+                                <div class="col-md-7 col-sm-12 mt-2 mt-sm-0">
+                                    <input class="email-subject-input trigger-setting-inputs-width-handler" type="text" name="email-subject" placeholder="Email Subject" value="Cogno Ai-LiveChat Report Mailer" id="email-subject-input-new">
+                                </div>
+                            </div>
+                            <div class="row align-items-center mt-4">
+                                <div class="col-md-5 col-sm-12">
+                                    <span class="text">Agent Connection Rate %</span>
+                                </div>
+                                <div class="col-md-7 col-sm-12 mt-2 mt-sm-0">
+                                    <input class="email-subject-input trigger-setting-inputs-width-handler" type="number" min="0" max="100" name="email-subject" placeholder="Agent Connection Rate %" value="" id="email-agent-connection-new">
+                                </div>
+                            </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="sub-heading-text-primary email-collapse-heading-div pl-3">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9.2925 6.29376C8.9025 6.68376 8.9025 7.31376 9.2925 7.70376L13.1725 11.5838L9.2925 15.4638C8.9025 15.8538 8.9025 16.4838 9.2925 16.8738C9.6825 17.2638 10.3125 17.2638 10.7025 16.8738L15.2925 12.2838C15.6825 11.8938 15.6825 11.2638 15.2925 10.8738L10.7025 6.28376C10.3225 5.90376 9.6825 5.90376 9.2925 6.29376Z" fill="#C4C4C4"/>
+                                </svg>
+
+                                <span> Table Parameter</span>
+                            </div>
+
+                            <div class="col-md-12 pl-5 email-collapse-data-div" style="display: none;">
+                                <div class="row pl-2 mt-3">
+                                    <div class="col-5 pl-3 col-md-5">
+                                        <span class="text">Enable Table Parameter</span>
+                                    </div>
+                                    <div class="col-7 col-md-7">
+                                        <label class="livechat-option-switch">
+                                            <input type="checkbox" id="livechat-email-table-parameter-cb-new" onchange="enable_disable_table_container('new')">
+                                            <span class="livechat-option-switch-slider round"></span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                            <div class="col-md-12 col-sm-12 livechat-table-parameter-container" id="livechat-table-parameter-container-new">
+                                <div class="row align-items-center mt-4 px-3">
+                                    <div class="col-md-5 col-sm-12 pl-0">
+
+                                        <span class="parameter-subheading-text">Reporting Parameters</span>
+
+                                    </div>
+
+                                </div>
+                                <div class="row  mt-4 px-3">
+                                    <div class="col-md-5 col-sm-12 pl-0">
+
+                                        <span class="text">Count Variations</span>
+
+                                    </div>
+
+                                    <div class="col-md-7 col-sm-12 mt-2 mt-sm-0 livechat-email-setting-multiselect-chip">
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" id="count-1-new" name="" value="1" checked>
+
+                                            <label for="count-1-new">
+                                                <span>Daily</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" id="count-2-new" name="" value="2">
+
+                                            <label for="count-2-new">
+                                               
+                                                                                    <span>Week To Date</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" id="count-3-new" name="" value="3">
+
+                                            <label for="count-3-new">
+                                                 
+                                                                                    <span>Month To Date</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" id="count-4-new" name="" value="4">
+
+                                            <label for="count-4-new">
+                                               
+                                                                                    <span>Year To Date</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" id="count-5-new" name="" value="5">
+
+                                            <label for="count-5-new">
+                                                                                        
+                                                                                    <span>Last Month Same Date</span></label>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row  mt-4 px-3">
+                                    <div class="col-md-5 col-sm-12 pl-0">
+
+                                        <span class="text">Select Channel</span>
+
+                                    </div>
+                                    <div class="col-md-7 col-sm-12 mt-2 mt-sm-0 livechat-email-setting-multiselect-chip livechat-email-setting-multiselect-chip-channel">
+                                        {% for channel in channel_list %}
+                                            <div class="channel-box">
+                                                <input type="checkbox" id="table-channel-{{ channel.name }}-new" name="" value="{{ channel.name }}">
+                                                <label for="table-channel-{{ channel.name }}-new">
+                                                    {{ channel.icon|safe }}
+                                                    <span>{{ channel.name }}</span>
+                                                </label>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="row align-items-center mt-4 px-3">
+                                    <div class="col-md-5 col-sm-12 pl-0">
+
+                                        <span class="parameter-subheading-text">Record Parameters</span>
+
+                                    </div>
+
+                                </div>
+                                <div class="row  mt-4 px-3">
+                                    <div class="col-md-5 col-sm-12 pl-0">
+
+                                        <span class="text">Select Records</span>
+
+                                    </div>
+                                    <div class="col-md-7 col-sm-12 mt-2 mt-sm-0 livechat-email-setting-multiselect-chip">
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" id="table-records-1-new" name="" value="chats_raised">
+
+                                            <label for="table-records-1-new">
+                                            
+                                                                                    <span>Total Chats Raised</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" id="table-records-2-new" name="" value="chats_resolved">
+
+                                            <label for="table-records-2-new">
+                                               
+                                                                                    <span>Total Chats Resolved</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" id="table-records-3-new" name="" value="agents_logged_in">
+
+                                            <label for="table-records-3-new">
+                                                 
+                                                                                    <span>Agents Logged In</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" id="table-records-4-new" name="" value="abandoned_chats">
+
+                                            <label for="table-records-4-new">
+                                               
+                                                                                    <span>Offline Chats</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" id="table-records-5-new" name="" value="avg_interactions">
+
+                                            <label for="table-records-5-new">
+                                                                                        
+                                                                                    <span>Average Interactions per chat</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" id="table-records-6-new" name="" value="group_chats">
+
+                                            <label for="table-records-6-new">
+                                                                                        
+                                                                                    <span>Group Chats Engaged in</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" id="table-records-7-new" name="" value="offline_chats">
+
+                                            <label for="table-records-7-new">
+                                                                                        
+                                                                                    <span>Missed Chats</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" id="table-records-8-new" name="" value="avg_handle_time">
+
+                                            <label for="table-records-8-new">
+                                                                                        
+                                                                                    <span>Average Handling Time</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" id="table-records-9-new" name="" value="declined_chats">
+
+                                            <label for="table-records-9-new">
+                                                                                        
+                                                                                    <span>Abandoned Chats</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" id="table-records-10-new" name="" value="avg_wait_time">
+
+                                            <label for="table-records-10-new">
+                                                                                        
+                                                                                    <span>Average Customer Wait Time</span></label>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="sub-heading-text-primary email-collapse-heading-div pl-3">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9.2925 6.29376C8.9025 6.68376 8.9025 7.31376 9.2925 7.70376L13.1725 11.5838L9.2925 15.4638C8.9025 15.8538 8.9025 16.4838 9.2925 16.8738C9.6825 17.2638 10.3125 17.2638 10.7025 16.8738L15.2925 12.2838C15.6825 11.8938 15.6825 11.2638 15.2925 10.8738L10.7025 6.28376C10.3225 5.90376 9.6825 5.90376 9.2925 6.29376Z" fill="#C4C4C4"/>
+                                </svg>
+                                <span> Graphic Parameter</span>
+                            </div>
+
+                            <div class="col-md-12 pl-5 email-collapse-data-div" style="display: none;">
+                                <div class="row pl-2 mt-3">
+                                    <div class="col-5 pl-3 col-md-5">
+                                        <span class="text">Enable Graphic Parameters</span>
+
+                                    </div>
+                                    <div class="col-7 col-md-7">
+                                        <label class="livechat-option-switch">
+                                            <input type="checkbox" id="livechat-email-graphic-parameter-cb-new" onchange="enable_disable_graph_container('new')">
+                                            <span class="livechat-option-switch-slider round"></span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                            <div class="col-md-12 col-sm-12 livechat-graphic-parameter-container" id="livechat-graphic-parameter-container-new">
+
+                                <div class="row align-items-center mt-4 px-3">
+                                    <div class="col-md-5 col-sm-12 pl-0">
+
+                                        <span class="text">Chat Reports</span>
+
+                                    </div>
+                                    <div class="col-md-1 col-sm-12 mt-2 mt-sm-0 pr-0 livechat-email-setting-graphic-item-cb">
+
+
+
+                                        <div class="checkbox-btn-container-item">
+                                            <input type="checkbox" name="" value="" id="graph-chart-reports-new" style="display:none" onchange="enable_disable_graph_chat_container('new')">
+                                            <label for="graph-chart-reports-new"></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 mt-2 mt-sm-0 pl-0 livechat-email-setting-multiselect-chip livechat-email-chat-report-chip-container" id="livechat-email-chat-report-chip-container-new" >
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" id="graph-chart-reports-1-new" name="" value="chats_raised">
+
+                                            <label for="graph-chart-reports-1-new">
+                                            
+                                                                                    <span>Chats Raised</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" id="graph-chart-reports-2-new" name="" value="chats_resolved">
+
+                                            <label for="graph-chart-reports-2-new">
+                                               
+                                                                                    <span>Chats Resolved</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" id="graph-chart-reports-3-new" name="" value="abandoned_chats">
+
+                                            <label for="graph-chart-reports-3-new">
+                                                 
+                                                                                    <span>Offline Chats</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" id="graph-chart-reports-4-new" name="" value="offline_chats">
+
+                                            <label for="graph-chart-reports-4-new">
+                                               
+                                                                                    <span>Missed Chats</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" id="graph-chart-reports-5-new" name="" value="declined_chats">
+
+                                            <label for="graph-chart-reports-5-new">
+                                                                                        
+                                                                                    <span>Abandoned Chats</span></label>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row align-items-center mt-4 px-3">
+                                    <div class="col-md-5 col-sm-12 pl-0">
+
+                                        <span class="text">Interaction per chat</span>
+
+                                    </div>
+                                    <div class="col-md-7 col-sm-12 mt-2 mt-sm-0 pr-0 livechat-email-setting-graphic-item-report-cb">
+
+
+                                        <div class="checkbox-btn-container-item">
+                                            <input type="checkbox" id="graph-interaction-new" name="" value="">
+                                            <label for="graph-interaction-new"></label>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row align-items-center mt-4 px-3">
+                                    <div class="col-md-5 col-sm-12 pl-0">
+
+                                        <span class="text">Average Handle Time</span>
+
+                                    </div>
+                                    <div class="col-md-7 col-sm-12 mt-2 mt-sm-0 pr-0 livechat-email-setting-graphic-item-report-cb">
+
+
+                                        <div class="checkbox-btn-container-item">
+                                            <input type="checkbox" id="graph-handle-time-new" name="" value="">
+                                            <label for="graph-handle-time-new"></label>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="sub-heading-text-primary email-collapse-heading-div pl-3">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9.2925 6.29376C8.9025 6.68376 8.9025 7.31376 9.2925 7.70376L13.1725 11.5838L9.2925 15.4638C8.9025 15.8538 8.9025 16.4838 9.2925 16.8738C9.6825 17.2638 10.3125 17.2638 10.7025 16.8738L15.2925 12.2838C15.6825 11.8938 15.6825 11.2638 15.2925 10.8738L10.7025 6.28376C10.3225 5.90376 9.6825 5.90376 9.2925 6.29376Z" fill="#C4C4C4"/>
+                                </svg>
+                                <span> Attachment Parameter</span>
+                            </div>
+
+                            <div class="col-md-12 pl-5 email-collapse-data-div" style="display: none;">
+                                <div class="row pl-2 mt-3">
+                                    <div class="col-5 pl-3 col-md-5">
+                                        <span class="text">Enable Attachment Parameters</span>
+                                    </div>
+
+                                    <div class="col-7 col-md-7">
+                                        <label class="livechat-option-switch">
+                                            <input type="checkbox" id="livechat-email-attachment-parameter-cb-new" onchange="enable_disable_attachment_container('new')">
+                                            <span class="livechat-option-switch-slider round"></span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                            <div class="col-md-12 col-sm-12 livechat-attachment-parameter-container" id="livechat-attachment-parameter-container-new">
+
+                                <div class="row align-items-center mt-4 px-3">
+                                    <div class="col-md-5 col-sm-12 pl-0">
+
+                                        <span class="text">Select Attachment</span>
+
+                                    </div>
+
+                                    <div class="col-md-7 col-sm-12 mt-2 mt-sm-0 pl-0 livechat-email-setting-multiselect-chip">
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" id="attachment-1-new" name="" value="performance_report" checked>
+
+                                            <label for="attachment-1-new">
+                                            
+                                                                                    <span>Performance Report</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" id="attachment-2-new" name="" value="analytical_report">
+
+                                            <label for="attachment-2-new">
+                                               
+                                                                                    <span>Combined Analytical Report</span></label>
+
+                                        </div>
+                                        <div class=" channel-box">
+
+                                            <input type="checkbox" id="attachment-3-new" name="" value="customer_report">
+
+                                            <label for="attachment-3-new">
+                                               
+                                                                                    <span>Customer Centric Report</span></label>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+            </div>
+            <div class="modal-footer">
+                <button id="analytics-sample-mail-btn" class="send-sample-email-btn-modal" onclick="trigger_sample_mail();">Send Sample Mailer</button>
+                <div style="float: right;">
+                    <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                    <button class="btn-primary " type="button" onclick="save_email_profile();">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% for email_profile_obj in email_profile_objs %}
+<div class="modal fade backdrop " id="modal-delete-email-profile-{{email_profile_obj.pk}}" tabindex="-1" role="dialog" aria-labelledby="Delete_email_profile_modal_label" aria-modal="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6>Delete Profile</h6>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 mb-4">
+                        <h5 style="font-weight: 500; font-size: 13px; color: #4D4D4D;"> Are you sure you want to delete this <b>Profile</b>?</h5>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div style="float: right;">
+                    <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                    <button class="btn-primary " style="background: #DB2A2A !important;" type="button" onclick="delete_email_profile('{{email_profile_obj.pk}}')">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<div class="modal fade backdrop " id="modal-delete-email-profile-new" tabindex="-1" role="dialog" aria-labelledby="Delete_email_profile_modal_label" aria-modal="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6>Delete Profile</h6>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 mb-4">
+                        <h5 style="font-weight: 500; font-size: 13px; color: #4D4D4D;"> Are you sure you want to delete this <b>Profile</b>?</h5>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div style="float: right;">
+                    <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                    <button class="btn-primary " style="background: #DB2A2A !important;" type="button" onclick="delete_email_profile('new')">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="livechat-email-authentication-modal" tabindex="-1" role="dialog" aria-labelledby="Admin_report_performance_filter_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6>Email Setup</h6>
+                <button class="livechat-email-back-btn close-modal-back-btn" data-dismiss="modal"> 
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18.7914 11.0051H7.62136L12.5014 6.12508C12.8914 5.73508 12.8914 5.09508 12.5014 4.70508C12.3145 4.51783 12.0609 4.4126 11.7964 4.4126C11.5318 4.4126 11.2782 4.51783 11.0914 4.70508L4.50136 11.2951C4.11136 11.6851 4.11136 12.3151 4.50136 12.7051L11.0914 19.2951C11.4814 19.6851 12.1114 19.6851 12.5014 19.2951C12.8914 18.9051 12.8914 18.2751 12.5014 17.8851L7.62136 13.0051H18.7914C19.3414 13.0051 19.7914 12.5551 19.7914 12.0051C19.7914 11.4551 19.3414 11.0051 18.7914 11.0051Z" fill="#7B7A7B"/>
+                    </svg>
+                </button>
+                <button class="livechat-email-back-btn livechat-email-back-btn-modal" style="display: none;"> 
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18.7914 11.0051H7.62136L12.5014 6.12508C12.8914 5.73508 12.8914 5.09508 12.5014 4.70508C12.3145 4.51783 12.0609 4.4126 11.7964 4.4126C11.5318 4.4126 11.2782 4.51783 11.0914 4.70508L4.50136 11.2951C4.11136 11.6851 4.11136 12.3151 4.50136 12.7051L11.0914 19.2951C11.4814 19.6851 12.1114 19.6851 12.5014 19.2951C12.8914 18.9051 12.8914 18.2751 12.5014 17.8851L7.62136 13.0051H18.7914C19.3414 13.0051 19.7914 12.5551 19.7914 12.0051C19.7914 11.4551 19.3414 11.0051 18.7914 11.0051Z" fill="#7B7A7B"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row livechat-email-protocol-btn-wrapper">
+                    <div class="col-12 mb-4 mt-2 px-4">
+                        <button class="livechat-email-protocol-btn">
+                            IMAP
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row livechat-email-protocol-details-wrapper" style="display: none;">
+                    <div class="col-12 mb-3 mt-2 px-4">
+                        <label>Email Address</label>
+                        <input id="email-config-id" class="form-control" type="email" placeholder="Please enter email address">
+                    </div>
+                    <div class="col-12 mb-3 px-4">
+                        <label>Password</label>
+                        <input id="email-config-password" class="form-control" type="password" placeholder="Please enter password">
+                    </div>
+                    <div class="col-12 mb-3 px-4">
+                        <label>IMAP Server</label>
+                        <input id="email-config-server" class="form-control" type="text" placeholder="Please enter imap server">
+                    </div>
+                    <div class="col-12 mb-3 px-4">
+                        <label>Security</label>
+                        <select id="email-config-security" class="form-control select-dropdown-icon">
+
+                            <option value="ssl">SSL</option>
+                            <option value="tls">TLS</option>
+
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="display: none;">
+                <div style="float: right;">
+                    <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                    <button id="email-config-authenticate-btn" class="btn-primary" type="button">Authenticate</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="email-authentication-success-toast">
+    <svg width="27" height="22" viewBox="0 0 27 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20.8917 11C20.8917 16.5228 16.4388 21 10.9458 21C5.4529 21 1 16.5228 1 11C1 5.47715 5.4529 1 10.9458 1C13.3195 1 15.4989 1.83604 17.2088 3.23122" stroke="#25B139" stroke-width="2" stroke-linecap="round"/>
+        <path d="M9.38794 10.7328L13.0729 14.4378L25.0001 2.4458" stroke="#25B139" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+
+    <span>Email Successfully Authenticated</span>
+    <svg class="remove-authentication-toast" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2.39705 2.55379L2.46967 2.46967C2.73594 2.2034 3.1526 2.1792 3.44621 2.39705L3.53033 2.46967L8 6.939L12.4697 2.46967C12.7626 2.17678 13.2374 2.17678 13.5303 2.46967C13.8232 2.76256 13.8232 3.23744 13.5303 3.53033L9.061 8L13.5303 12.4697C13.7966 12.7359 13.8208 13.1526 13.6029 13.4462L13.5303 13.5303C13.2641 13.7966 12.8474 13.8208 12.5538 13.6029L12.4697 13.5303L8 9.061L3.53033 13.5303C3.23744 13.8232 2.76256 13.8232 2.46967 13.5303C2.17678 13.2374 2.17678 12.7626 2.46967 12.4697L6.939 8L2.46967 3.53033C2.2034 3.26406 2.1792 2.8474 2.39705 2.55379L2.46967 2.46967L2.39705 2.55379Z" fill="#212121"/>
+    </svg>
+</div>
+
+<div class="email-authentication-failed-toast">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10.9092 2.78216C11.949 2.20625 13.247 2.54089 13.8848 3.5224L13.9676 3.66023L21.7266 17.6685C21.9114 18.0021 22.0084 18.3773 22.0084 18.7587C22.0084 19.9495 21.0832 20.9243 19.9124 21.0035L19.7584 21.0087H4.2426C3.86129 21.0087 3.48623 20.9118 3.15265 20.7271C2.11281 20.1513 1.70777 18.8734 2.20133 17.812L2.27422 17.6687L10.031 3.66046C10.2355 3.2911 10.5399 2.98674 10.9092 2.78216ZM20.4144 18.3953L12.6555 4.38702C12.4548 4.02467 11.9983 3.89363 11.636 4.09433C11.5437 4.14547 11.4635 4.21533 11.4005 4.299L11.3433 4.3871L3.58647 18.3954C3.38582 18.7577 3.51692 19.2141 3.87928 19.4148C3.96268 19.461 4.05385 19.4907 4.14785 19.5027L4.2426 19.5087H19.7584C20.1726 19.5087 20.5084 19.1729 20.5084 18.7587C20.5084 18.6633 20.4902 18.5691 20.4551 18.4811L20.4144 18.3953L12.6555 4.38702L20.4144 18.3953ZM12.0003 16.0018C12.5518 16.0018 12.9989 16.4489 12.9989 17.0004C12.9989 17.552 12.5518 17.9991 12.0003 17.9991C11.4487 17.9991 11.0016 17.552 11.0016 17.0004C11.0016 16.4489 11.4487 16.0018 12.0003 16.0018ZM11.9961 8.49955C12.3758 8.49925 12.6898 8.78115 12.7397 9.14718L12.7467 9.24895L12.7503 13.7505C12.7506 14.1648 12.4151 14.5008 12.0009 14.5011C11.6212 14.5014 11.3072 14.2195 11.2572 13.8535L11.2503 13.7517L11.2467 9.25015C11.2463 8.83594 11.5819 8.49988 11.9961 8.49955Z" fill="#E53E3E"/>
+    </svg>
+
+    <span>Email Authentication Unsuccessful</span>
+    <svg class="remove-authentication-toast" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2.39705 2.55379L2.46967 2.46967C2.73594 2.2034 3.1526 2.1792 3.44621 2.39705L3.53033 2.46967L8 6.939L12.4697 2.46967C12.7626 2.17678 13.2374 2.17678 13.5303 2.46967C13.8232 2.76256 13.8232 3.23744 13.5303 3.53033L9.061 8L13.5303 12.4697C13.7966 12.7359 13.8208 13.1526 13.6029 13.4462L13.5303 13.5303C13.2641 13.7966 12.8474 13.8208 12.5538 13.6029L12.4697 13.5303L8 9.061L3.53033 13.5303C3.23744 13.8232 2.76256 13.8232 2.46967 13.5303C2.17678 13.2374 2.17678 12.7626 2.46967 12.4697L6.939 8L2.46967 3.53033C2.2034 3.26406 2.1792 2.8474 2.39705 2.55379L2.46967 2.46967L2.39705 2.55379Z" fill="#212121"/>
+    </svg>
+</div>
+
+<script src="{% static 'LiveChatApp/js/bootstrap-multiselect.js' %}"></script>
+
+<script type="text/javascript">
+    window.LIVECHAT_THEME_COLOR = '{{admin_config.get_livechat_theme_lighten_one}}'
+    window.SHOW_VERSION_FOOTER = 'True'
+    window.EMAIL_PROFILE_LENGTH = '{{email_profile_length}}'
+    window.IS_EMAIL_ENABLED = '{{admin_config.is_email_notification_enabled}}'
+    window.EMAIL_PROFILE_PKS = '{{email_profile_pks}}'
+    window.LATEST_EMAIL_PK = '{{latest_profile_pk}}'
+    window.CHANNEL_NAME_LIST = {{ channel_list|safe }} 
+    window.IS_SUCCESSFUL_AUTHENTICATION_COMPLETE = '{{ email_config_obj.is_successful_authentication_complete }}' == 'True' ? true : false;
+
+    if ('True' == 'True' && '1' == '3') {
+
+        window.STATUS_CHANGED_BY_ADMIN_SUPERVISOR = false
+    } else if ('False' == 'True') {
+
+        window.STATUS_CHANGED_BY_ADMIN_SUPERVISOR = true
+        try {
+
+        } catch {}
+    } else {
+
+        window.STATUS_CHANGED_BY_ADMIN_SUPERVISOR = false
+    }
+
+
+    $("#home-button").click(function() {
+        if ($("#panel").is(":visible") == true) {
+            $("#panel").hide(100);
+        } else {
+            $("#panel").show(100);
+        }
+    });
+
+    $("[data-toggle='tooltip']").tooltip();
+
+</script>
+{% endblock %}

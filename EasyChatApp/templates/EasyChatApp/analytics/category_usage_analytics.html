@@ -1,0 +1,102 @@
+<div class="col s12 l5 m12 p0">
+    <div class="easychat-analytics-card-area-wrapper" style="height: 491px;">
+        <div class="easychat-analytics-card-heading-text-wrapper">
+            <div class="easychat-analytics-card-heading-div">
+                Category Wise Usage
+            </div>
+            <div class="easychat-analytics-card-action-btns">
+                <a href="#modal-category-analytics-settings" class="modal-trigger easychat-analytics-card-filter-btn">
+                    {% include "EasyChatApp/analytics/filter.html" %}
+                </a>
+            </div>
+
+        </div>
+        <div class="easychat-analytics-card-heading-text-wrapper">
+            <div class="easychat-analytics-card-subheading-div" id="category-analytics-date-range">
+                <span>Range :</span> 01/01/22 - 31/02/2022
+            </div>
+
+
+        </div>
+
+        <div class="easychat-analytics-graph-wrapper" style="height: 370px;">
+            <div class="easychat-analytics-no-data-found-wrapper" style="height: 363px; display: none;" id="no-category-analytics-div">
+                {% include "EasyChatApp/analytics/no_data_1.html" %}
+                <button class="easychat-analytics-reload-data-btn" onclick="load_category_analytics()">
+                    {% include "EasyChatApp/analytics/reload.html" %}
+
+                    <span>Reload</span></button>
+
+            </div>
+            <div class="graph-parent-wrapper" id="category-analytics-div">
+                <div id="category_usage_analytics_graph"></div>
+                <div class="easychat-graph-legends-option-wrapper">
+                    <div class="easychat-analytics-card-searchbar-div">
+                        <span>
+                            <svg width="17" height="16" viewBox="0 0 17 16" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M6.89801 2.46841C9.29838 2.46841 11.2443 4.4143 11.2443 6.81467C11.2443 7.80112 10.9156 8.71082 10.3619 9.44025L13.6389 12.7174C13.8704 12.9489 13.8704 13.3241 13.6389 13.5556C13.4285 13.766 13.0992 13.7851 12.8672 13.613L12.8007 13.5556L9.5236 10.2785C8.79417 10.8323 7.88447 11.1609 6.89801 11.1609C4.49764 11.1609 2.55176 9.21503 2.55176 6.81467C2.55176 4.4143 4.49764 2.46841 6.89801 2.46841ZM6.89801 3.65376C5.15229 3.65376 3.7371 5.06894 3.7371 6.81467C3.7371 8.56039 5.15229 9.97558 6.89801 9.97558C8.64373 9.97558 10.0589 8.56039 10.0589 6.81467C10.0589 5.06894 8.64373 3.65376 6.89801 3.65376Z"
+                                    fill="#7B7A7B" />
+                            </svg>
+
+
+                        </span>
+                        <input type="text" class="searchTerm" onkeyup="category_wise_legends_search()"
+                            placeholder="Search"
+                            style="border-radius: 4px !important;border: 1px solid #f9f4f4 !important; width: 100% !important; padding-left: 30px !important; background-color:
+            #ffffff; font-size: 11px !important;color: #7B7A7B !important; height: 28px !important; box-sizing: border-box; margin: 0px !important;"
+                            id="category_wise_graph_legend_search">
+                    </div>
+                    <ul class="graph-legend-items-wrapper category-wise-legend-wrapper" id="category-usage-options" onchange="update_category_analytics()">
+                    </ul>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div id="modal-category-analytics-settings" class="modal easychat-custom-modals-container">
+
+    <div class="modal-content">
+        <div class="row" style="margin-bottom: 12px !important;">
+            <div class="modal-header">
+                <div class="modal-heading-text-div">Filter - Category Usage Analytics</div>
+                <a href="javascript:void(0)" class="modal-close-btn modal-close">
+                    <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M18.9247 6.12377C18.7379 5.93652 18.4842 5.83129 18.2197 5.83129C17.9552 5.83129 17.7016 5.93652 17.5147 6.12377L12.6247 11.0038L7.73473 6.11377C7.5479 5.92652 7.29424 5.82129 7.02973 5.82129C6.76521 5.82129 6.51156 5.92652 6.32473 6.11377C5.93473
+                            6.50377 5.93473 7.13377 6.32473 7.52377L11.2147 12.4138L6.32473 17.3038C5.93473 17.6938 5.93473 18.3238 6.32473 18.7138C6.71473 19.1038 7.34473 19.1038 7.73473 18.7138L12.6247 13.8238L17.5147 18.7138C17.9047 19.1038 18.5347
+                            19.1038 18.9247 18.7138C19.3147 18.3238 19.3147 17.6938 18.9247 17.3038L14.0347 12.4138L18.9247 7.52377C19.3047 7.14377 19.3047 6.50377 18.9247 6.12377Z"
+                            fill="black" fill-opacity="0.54" />
+                    </svg>
+                </a>
+            </div>
+
+            <div class="modal-overflow-content-div">
+                <div class="col s11 analytics-custom-date-select-area" id="analytics-custom-date-select-area">
+                    <div class="col s6" style="padding-left: 2px; font-weight: 600;color: #4d4d4d; font-size: 14px;">
+                        Start Date
+                        <input type="date" class="message-default-start-date" value='{{ DEFAULT_ANALYTICS_START_DATETIME|date:"Y-m-d" }}'
+                            id="category-analytics-start-date"
+                            placeholder="Enter start date"
+                            style="border: 2px solid #F6F6F6 !important; border-radius:4px !important;">
+                    </div>
+                    <div class="col s6"
+                        style="font-weight: 600; padding-right: 0px !important;color: #4d4d4d; font-size: 14px;">
+                        End Date
+                        <input type="date" class="message-default-end-date" value='{{ DEFAULT_ANALYTICS_END_DATETIME|date:"Y-m-d" }}'
+                            id="category-analytics-end-date"
+                            placeholder="Enter end date"
+                            style="border: 2px solid #F6F6F6 !important; border-radius:4px !important;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0)" class="modal-close btn filter-modal-footer-btn"
+            onclick="load_category_analytics()">Apply Filter</a>
+    </div>
+</div>

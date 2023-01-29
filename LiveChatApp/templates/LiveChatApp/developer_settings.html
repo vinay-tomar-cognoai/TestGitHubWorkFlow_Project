@@ -1,0 +1,91 @@
+{% extends 'LiveChatApp/manager_console.html' %}
+{% block consolecontent %}
+{% load static %}
+<style type="text/css">
+    .go-button a{
+        background: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+    }
+    .custom-control-input:checked~.custom-control-label::before {
+        border-color: {{ admin_config.get_livechat_theme_lighten_one }};
+        background-color: {{ admin_config.get_livechat_theme_lighten_one }};
+    }
+    .bootstrap-select .dropdown-menu .inner::-webkit-scrollbar-thumb::-webkit-scrollbar-thumb{
+        border-radius: 10px;
+        background: {{ admin_config.get_livechat_theme_lighten_six }} !important;
+    }
+    .bootstrap-select .dropdown-menu .inner {
+        scrollbar-color: {{ admin_config.get_livechat_theme_lighten_six }} #f1f1f1;
+    }
+</style>
+<div class="col-xl-10 col-lg-10 col-md-12 col-sm-12 col-12 py-2 " id="live-chat-admin-setting-content-dev-setting" style="height: calc(100vh - 4.375rem); background: #FAFAFA;">
+
+    <div class="live-chat-setting-calender-heading ">
+        <div class="row">
+            <svg width="14" height="13" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11.0083 2.26201H13.5882C13.8157 2.26201 14 2.09074 14 1.87966C14 1.66859 13.8157 1.49731 13.5882 1.49731H11.0083C10.7808 1.49731 10.5965 1.66859 10.5965 1.87966C10.5965 2.09074 10.7808 2.26201 11.0083 2.26201Z" fill="#4D4D4D" stroke="#4D4D4D" stroke-width="0.2"/>
+            <path d="M9.53385 3.63091C10.5739 3.63091 11.4199 2.84528 11.4199 1.87964C11.4199 0.913801 10.5739 0.128174 9.53385 0.128174C8.49384 0.128174 7.64778 0.913801 7.64778 1.87964C7.64778 2.84531 8.49384 3.63091 9.53385 3.63091ZM9.53385 0.892901C10.1198 0.892901 10.5964 1.33559 10.5964 1.87964C10.5964 2.42369 10.1198 2.86618 9.53385 2.86618C8.94794 2.86618 8.4713 2.42369 8.4713 1.87964C8.4713 1.33559 8.94794 0.892901 9.53385 0.892901Z" fill="#4D4D4D" stroke="#4D4D4D" stroke-width="0.2"/>
+            <path d="M0.411822 2.26201H6.56602C6.79346 2.26201 6.97778 2.09074 6.97778 1.87966C6.97778 1.66859 6.79346 1.49731 6.56602 1.49731H0.411852C0.184414 1.49731 9.05991e-05 1.66859 9.05991e-05 1.87966C9.05991e-05 2.09074 0.184384 2.26201 0.411822 2.26201Z" fill="#4D4D4D" stroke="#4D4D4D" stroke-width="0.2"/>
+            <path d="M4.00553 8.25132C5.04557 8.25132 5.8916 7.46569 5.8916 6.50005C5.8916 5.53441 5.04554 4.74878 4.00553 4.74878C2.96551 4.74878 2.11945 5.53441 2.11945 6.50005C2.11945 7.46569 2.96548 8.25132 4.00553 8.25132ZM4.00553 5.51351C4.59143 5.51351 5.06808 5.95599 5.06808 6.50005C5.06808 7.0441 4.59143 7.48659 4.00553 7.48659C3.41962 7.48659 2.94298 7.0441 2.94298 6.50005C2.94298 5.95599 3.41962 5.51351 4.00553 5.51351Z" fill="#4D4D4D" stroke="#4D4D4D" stroke-width="0.2"/>
+            <path d="M6.97329 6.88238H13.5882C13.8157 6.88238 14 6.7111 14 6.50003C14 6.28895 13.8157 6.11768 13.5882 6.11768H6.97329C6.74585 6.11768 6.56153 6.28895 6.56153 6.50003C6.56153 6.7111 6.74585 6.88238 6.97329 6.88238Z" fill="#4D4D4D" stroke="#4D4D4D" stroke-width="0.2"/>
+            <path d="M0.411791 6.88238H2.53111C2.75855 6.88238 2.94287 6.7111 2.94287 6.50003C2.94287 6.28895 2.75855 6.11768 2.53111 6.11768H0.411791C0.184352 6.11768 2.76566e-05 6.28895 2.76566e-05 6.50003C2.76566e-05 6.7111 0.184352 6.88238 0.411791 6.88238Z" fill="#4D4D4D" stroke="#4D4D4D" stroke-width="0.2"/>
+            <path d="M9.99454 12.8716C11.0346 12.8716 11.8806 12.086 11.8806 11.1202C11.8806 10.1545 11.0346 9.3689 9.99454 9.3689C8.95453 9.3689 8.10847 10.1545 8.10847 11.1202C8.10847 12.086 8.95453 12.8716 9.99454 12.8716ZM9.99454 10.1336C10.5804 10.1336 11.0571 10.5761 11.0571 11.1202C11.0571 11.6642 10.5804 12.1069 9.99454 12.1069C9.40864 12.1069 8.93199 11.6642 8.93199 11.1202C8.93199 10.5761 9.40864 10.1336 9.99454 10.1336Z" fill="#4D4D4D" stroke="#4D4D4D" stroke-width="0.2"/>
+            <path d="M0.411762 11.5027H7.02672C7.25415 11.5027 7.43848 11.3315 7.43848 11.1204C7.43848 10.9093 7.25415 10.738 7.02672 10.738H0.411762C0.184324 10.738 0 10.9093 0 11.1204C0 11.3315 0.184324 11.5027 0.411762 11.5027Z" fill="#4D4D4D" stroke="#4D4D4D" stroke-width="0.2"/>
+            <path d="M11.4689 11.5025H13.5882C13.8157 11.5025 14 11.3312 14 11.1201C14 10.9091 13.8157 10.7378 13.5882 10.7378H11.4689C11.2415 10.7378 11.0572 10.9091 11.0572 11.1201C11.0572 11.3312 11.2415 11.5025 11.4689 11.5025Z" fill="#4D4D4D" stroke="#4D4D4D" stroke-width="0.2"/>
+            </svg>
+            <span style="padding-left: 10px; margin-top: -2px;">Developer Settings</span>
+        </div>
+
+
+    </div>
+
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-calender-area livechat-developer-setting-column" style="height: 256px; padding-top: 35px; display: flex;">
+        <div class="col-md-5 select-tag">
+            {% if user_obj.bots.all.count > 0 %}
+            <select name="month" onchange="bot_changed()" id="developer-bot" class="form-control selectpicker create-user-select-field">
+                <option value="0">Select One of the Bot</option>
+                {% for bot in bot_obj_list %}
+                {% if bot.pk == bot_pk %}
+                <option value="{{bot.pk}}" selected>{{bot}}</option>
+                {% else %}
+                <option value="{{bot.pk}}">{{bot}}</option>
+                {% endif %}
+            {% endfor %}
+             </select>
+            {% endif %}
+        </div>
+        <div class="col-md-5 select-tag" id="choose-function">
+            <select name="month" id="type_of_editor" class="form-control selectpicker create-user-select-field developer-choose-select">
+                <option value="0">Choose one</option>
+                <option value="1" {% if type_of_editor == "1" %}selected{% endif %}>Customer Details Function</option>
+                <option value="2" {% if type_of_editor == "2" %}selected{% endif %}>Send Data on End Chat</option>
+                <option value="3" {% if type_of_editor == "3" %}selected{% endif %}>Lead Assignment</option>
+                
+                <option value="4" {% if type_of_editor == "4" %}selected{% endif %}>Customize Chat Dispose Form</option>
+
+                <option value="5" {% if type_of_editor == "5" %}selected{% endif %}>Push API</option>
+                <option value="6">WhatsApp Webhook Integration</option>
+                <option value="7" {% if type_of_editor == "7" %}selected{% endif %}>API Docs</option>
+
+                <option value="8" id="customize-raise-ticket-form-option" {% if type_of_editor == "8" %}selected{% endif %}>Customize Raise a ticket form</option>
+                <option value="9" id="raise-ticket-option" {% if type_of_editor == "9" %}selected{% endif %}>Raise Ticket</option>
+                <option value="10" id="search-ticket-option" {% if type_of_editor == "10" %}selected{% endif %}>Search Ticket</option>
+                <option value="11" id="get-previous-tickets-option" {% if type_of_editor == "11" %}selected{% endif %}>Get Previous Tickets</option>
+             </select>
+        </div>
+        <div class="col-md-1 go-button" id="go-button">
+            <a onclick="go_to_developer_editor()" style="cursor: pointer;color: white;">Go <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0.916585 5.58342H7.83492L5.71742 8.12675C5.66839 8.18574 5.63146 8.2538 5.60874 8.32706C5.58602 8.40031 5.57795 8.47733 5.58499 8.55371C5.59921 8.70795 5.67412 8.85024 5.79325 8.94925C5.91238 9.04826 6.06596 9.0959 6.22021 9.08168C6.37446 9.06746 6.51674 8.99254 6.61575 8.87342L9.53242 5.37342C9.55204 5.34558 9.56959 5.31633 9.58492 5.28592C9.58492 5.25675 9.61408 5.23925 9.62575 5.21008C9.65219 5.1432 9.66603 5.072 9.66658 5.00008C9.66603 4.92816 9.65219 4.85697 9.62575 4.79008C9.62575 4.76092 9.59658 4.74342 9.58492 4.71425C9.56959 4.68383 9.55204 4.65459 9.53242 4.62675L6.61575 1.12675C6.5609 1.0609 6.49222 1.00795 6.41459 0.97165C6.33696 0.935355 6.25228 0.91661 6.16658 0.916749C6.03029 0.916483 5.8982 0.963952 5.79325 1.05092C5.73418 1.09989 5.68536 1.16003 5.64957 1.2279C5.61378 1.29577 5.59173 1.37003 5.58469 1.44643C5.57764 1.52284 5.58574 1.59988 5.60852 1.67315C5.63129 1.74642 5.6683 1.81447 5.71742 1.87342L7.83492 4.41675H0.916585C0.761876 4.41675 0.613503 4.47821 0.504106 4.5876C0.39471 4.697 0.333252 4.84537 0.333252 5.00008C0.333252 5.15479 0.39471 5.30317 0.504106 5.41256C0.613503 5.52196 0.761876 5.58342 0.916585 5.58342Z" fill="white"/>
+                </svg>
+                </a>
+        </div>
+
+
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    window.TICKET_RAISE_FUNCTIONALITY = {{ticket_raise_functionality | safe}};
+</script>
+
+{% endblock %}

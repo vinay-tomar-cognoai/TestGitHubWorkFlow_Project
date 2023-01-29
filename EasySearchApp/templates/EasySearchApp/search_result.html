@@ -1,0 +1,96 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="robots" content="noindex,nofollow,noimageindex" />
+    <meta name="googlebot" content="noindex,nofollow" />
+    <meta name="googlebot-news" content="noindex,nofollow" />
+  	<meta charset="utf-8">
+  	<title>EasySearch Result</title>
+  	<meta name="viewport" content="width=device-width, initial-scale=1">
+  	<meta name="Description" content="Search Result">
+  	<meta name="Keywords" content="search, result">
+
+  	<link rel="icon" href="{% static 'EasySearchApp/img/easysearch-logo.png' %}" type="image/gif" sizes="16x16">
+  	<link href="/static/EasySearchApp/css/searchresult.css" type="text/css" rel="stylesheet"media="screen,projection"/>
+  	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+	<script src="/static/EasySearchApp/js/jquery-3.3.1.min.js"></script> 
+  	<script src="/static/EasySearchApp/js/materialize.min.js"></script>
+</head>
+<body>
+
+<div class="main">
+  <div class="logo"><a href="?source={{ source }}&bot_id={{ bot_id }}"><img alt="Logo" src="{% static 'EasySearchApp/img/easysearch-logo-2.png' %}" height="50px"/></a></div>
+  <div class="search">
+    <div>
+        <input type="text" id="form-search" placeholder="Search here..." value="{{ query }}"><img alt="Logo" class="mag" src="{% static 'EasySearchApp/img/easysearch-logo.png' %}"/>
+      </div>
+  </div>
+</div>
+<div class="options">
+  <ul>
+    <li><p class="blue">All</p>
+    </li>
+    {% if show_documents %}
+    <li><a onclick="goToDocuments()" id="document">Documents</a></li>
+    {% endif %}
+  </ul>
+</div>
+<div class="stats">
+  <p>About {{ total_results }} results ({{ diff_time }} seconds)</p>
+</div>
+{% if results %}
+	{% if spellCheckFlag %}
+		<div class="dym">
+				  <div class="ind">Showing results for <a class="link" href="?source={{source}}&bot_id={{ bot_id }}&query={{ corrected_query }}">{{ corrected_query }}</a>
+				  	<div class="dym-1">
+				  		Search instead for  <a class="link-1" href="?source={{source}}&bot_id={{ bot_id }}&query={{ query }}&auto_correct=false">{{ query }}</a>
+				  	</div>
+				 </div>
+		</div>
+	{% endif %}
+{% endif %}
+
+{% if results %}
+	{% for result in results %}
+		<div class="results">
+		  <div class="ind"><a class="link" href="search/redirect/{{ result.url_pk }}">{{ result.title }}</a><br/><a class="url" href="search/redirect/{{ result.url_pk }}">{{ result.url }}</a>
+		    <p class="desc">{{result.content}}</p>
+		  </div>
+		</div>
+	{% endfor %}
+{% else %}
+	<div class="results">
+	  <div class="ind">
+		<p class="desc">No Result Found.</p>
+	  </div>
+	</div>
+{% endif %}
+
+<script type="text/javascript" src="{% static 'EasySearchApp/js/init.js' %}"></script>
+<script type="text/javascript" src="{% static 'EasySearchApp/js/select2.min.js' %}"></script>
+<body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

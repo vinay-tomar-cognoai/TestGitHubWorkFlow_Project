@@ -1,0 +1,520 @@
+{% extends 'EasyAssistApp/console.html' %}
+{% block content %}
+{% load static %}
+<style>
+
+#customer-support-file-upload-error {
+  padding: 1em 0 0 1em;
+}
+
+@media only screen and (max-width: 769px) {
+  .ml-sm-0 {
+    margin-left: 0!important;
+  }
+}
+
+#customer_support_document_table tbody tr td .edit-delete-btn-class {
+    visibility: hidden;
+}
+
+#customer_support_document_table tbody tr:hover  td .edit-delete-btn-class {
+    visibility: visible !important;
+    transition: none!important;
+    box-shadow: none!important;
+}
+
+#customer_support_document_table  tbody tr:hover {
+    box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.25);
+}
+
+#customer_support_document_table {
+    border-collapse: separate;
+    border-spacing: 0 1em;
+    font-size: 15px;
+}
+
+.easyassist-switch-checkbox-disabled {
+    background-color: #DADADA !important;
+    border: #DADADA !important;
+}
+
+.disable-button:hover {
+    transform: none !important;
+    box-shadow: none !important;
+    transition: none !important;
+}
+
+.easyassist-switch-checkbox-disabled input:checked ~ .easyassist-switch-checkbox {
+    background-color: #DADADA !important;
+    border: #DADADA !important;
+}
+
+.edit-delete-btn-class:hover {
+    text-decoration: unset;
+}
+
+@media only screen and (min-width: 768px) {
+    #customer_support_document_table td,th {
+        padding: 0.57rem !important;
+        border: none!important
+    }
+
+    #customer_support_document_table td {
+        vertical-align: middle;
+    }
+
+    #customer_support_document_table td:first-child {
+        max-width: 10em;
+    }
+}
+
+#customer_support_document_table tbody td .edit-delete-btn-class svg {
+    transform: scale(1.3);
+}
+
+ #customer_support_document_table tbody td .edit-delete-btn-class svg:hover {
+    transform: scale(1.4);
+}
+
+.user-checkbox-collection-filename {
+    background: #FFFFFF;
+    border: 1px solid #E6E6E6;
+    border-radius: 5px!important;
+    outline: none!important;
+    padding: 8px;
+    width: 70%;
+}
+
+.user-checkbox-collection-filename-disabled {
+    background: #EBEBEB;
+    border: 1px solid #E6E6E6;
+    border-radius: 5px!important;
+    outline: none!important;
+    padding: 8px;
+    width: 70%;
+}
+
+@media only screen and (max-width: 600px) {
+    .user-checkbox-collection-filename .user-checkbox-collection-filename-disabled {
+        width: 100%!important;
+    }
+
+}
+
+.user-checkbox-collection-usable {
+    transform: scale(1.3);
+}
+
+#save_customer_support_document:disabled {
+  pointer-events: none;
+  background: #CBCACA !important;
+  border-color: #CBCACA !important;
+}
+
+.tooltip .arrow{
+    display: none;
+}
+</style>
+
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <!-- DataTales Example -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <h6 class="m-0 font-weight-bold text-primary heading-text-primary">Support Documents
+                                <span data-toggle="tooltip" data-placement="top" title="" data-original-title="Pre approved documents uploaded by the supervisor for the agents to share with the customer during a cobrowsing session."><i class="fas fa-info-circle"></i></span>
+                            </h6>
+                        </div>
+                        <div class="col-sm-8" style="text-align: right;">
+                            <button class="btn btn-white-border mr-sm-2 btn-width-100" data-toggle="modal" data-target="#customer_support_document_modal">Upload</button>
+                            {% if support_document_objs|length %}
+                            <button class="btn btn-success btn-width-100" style="width: 120px;" id="save_customer_support_document" onclick="save_customer_support_document_details()" disabled>Save</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive customer_support_document_container">
+                        <table class="table table-bordered" id="customer_support_document_table" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Type</th>
+                                    <th scope="col">Usable</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for support_document in support_document_objs %}
+                                    {% if support_document.agent.role == "admin" and cobrowse_agent.role == "supervisor" %}
+                                        <tr>
+                                            <td>
+                                                <input type="text" readonly onclick="show_invalid_access_toast(event)" value="{{ support_document.file_name }}" class="user-checkbox-collection-filename-disabled">
+                                                <div style="position: absolute; top: 0; right: 0;"> 
+                                                    <a href="javascript:void(0)" onclick="show_invalid_access_toast(event)" style="display: inline-block; vertical-align: middle;">
+                                                        <svg class="svg-hide-on-desktop" data-toggle="tooltip" data-placement="bottom" title="Download" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M21.6732 16.5962L21.6732 11.5962C21.6732 9.38705 19.8824 7.59619 17.6732 7.59619L15.6732 7.59619L7.67322 7.59619L5.67322 7.59619C3.46408 7.59619 1.67322 9.38705 1.67322 11.5962L1.67322 16.5962C1.67322 18.8053 3.46408 20.5962 5.67322 20.5962L17.6732 20.5962C19.8824 20.5962 21.6732 18.8053 21.6732 16.5962Z" fill="#66BB6A"/>
+                                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M17.6732 6.84619C20.2966 6.84619 22.4232 8.97284 22.4232 11.5962L22.4232 16.5962C22.4232 19.2195 20.2966 21.3462 17.6732 21.3462L5.67322 21.3462C3.04986 21.3462 0.923215 19.2195 0.923215 16.5962L0.923216 11.5962C0.923216 8.97284 3.04986 6.84619 5.67322 6.84619L17.6732 6.84619ZM20.9232 11.5962C20.9232 9.80127 19.4681 8.34619 17.6732 8.34619L5.67322 8.34619C3.87829 8.34619 2.42322 9.80127 2.42322 11.5962L2.42322 16.5962C2.42322 18.3911 3.87829 19.8462 5.67322 19.8462L17.6732 19.8462C19.4681 19.8462 20.9232 18.3911 20.9232 16.5962L20.9232 11.5962Z" fill="#66BB6A"/>
+                                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M15.2033 12.0658C15.4962 12.3587 15.4962 12.8336 15.2033 13.1265L12.9104 15.4194C12.227 16.1028 11.119 16.1028 10.4355 15.4194L8.14264 13.1265C7.84975 12.8336 7.84975 12.3587 8.14264 12.0658C8.43554 11.7729 8.91041 11.7729 9.2033 12.0658L10.923 13.7855L10.923 2.59613C10.923 2.18192 11.2588 1.84613 11.673 1.84613C12.0872 1.84613 12.423 2.18192 12.423 2.59613L12.423 13.7855L14.1426 12.0658C14.4355 11.7729 14.9104 11.7729 15.2033 12.0658Z" fill="#66BB6A"/>
+                                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M15.2033 12.0657C15.4962 12.3586 15.4962 12.8335 15.2033 13.1264L12.9104 15.4193C12.227 16.1027 11.119 16.1027 10.4355 15.4193L8.14264 13.1264C7.84975 12.8335 7.84975 12.3586 8.14264 12.0657C8.43554 11.7728 8.91041 11.7728 9.2033 12.0657L10.923 13.7854L10.923 6.59605L12.423 6.59605L12.423 13.7854L14.1426 12.0657C14.4355 11.7728 14.9104 11.7728 15.2033 12.0657Z" fill="white"/>
+                                                        </svg>
+                                                    </a>
+                                                    <button onclick="show_invalid_access_toast(event)" class="btn" type="button" style="margin: 5px 4px!important;padding: 0.375rem 0.2em;">
+                                                        <svg class="svg-hide-on-desktop" data-toggle="tooltip" data-placement="bottom" title="Delete" width="14" height="16" viewBox="0 0 14 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M7 0C8.40298 0 9.54889 1.05927 9.62136 2.39215L9.625 2.52632H13.475C13.7649 2.52632 14 2.75253 14 3.03158C14 3.28737 13.8025 3.49877 13.5462 3.53223L13.475 3.53684H12.7337L11.8798 13.6779C11.7693 14.9896 10.6309 16 9.26338 16H4.73662C3.36913 16 2.23072 14.9896 2.12021 13.6779L1.2656 3.53684H0.525C0.259213 3.53684 0.0395562 3.34676 0.0047925 3.10014L0 3.03158C0 2.77578 0.197508 2.56438 0.453761 2.53093L0.525 2.52632H4.375C4.375 1.13107 5.55025 0 7 0ZM11.6807 3.53684H2.31929L3.16677 13.5962C3.23308 14.3832 3.91613 14.9895 4.73662 14.9895H9.26338C10.0839 14.9895 10.7669 14.3832 10.8332 13.5962L11.6807 3.53684ZM5.425 6.06316C5.69079 6.06316 5.91044 6.25324 5.94521 6.49986L5.95 6.56842V11.9579C5.95 12.2369 5.71495 12.4632 5.425 12.4632C5.15921 12.4632 4.93956 12.2731 4.90479 12.0265L4.9 11.9579V6.56842C4.9 6.28937 5.13505 6.06316 5.425 6.06316ZM8.575 6.06316C8.84079 6.06316 9.06044 6.25324 9.09521 6.49986L9.1 6.56842V11.9579C9.1 12.2369 8.86495 12.4632 8.575 12.4632C8.30921 12.4632 8.08956 12.2731 8.05479 12.0265L8.05 11.9579V6.56842C8.05 6.28937 8.28505 6.06316 8.575 6.06316ZM7 1.01053C6.1664 1.01053 5.48405 1.63379 5.42863 2.42254L5.425 2.52632H8.575L8.57137 2.42254C8.51595 1.63379 7.8336 1.01053 7 1.01053Z" fill="#EE2525"/>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            
+                                            <td> 
+                                                <span style="text-transform: capitalize;">{{ support_document.file_type }}</span>
+                                            </td>
+                                            
+                                            {% if support_document.is_usable %}
+                                                <td>
+                                                    <label class="easyassist-switch-checkbox-label easyassist-switch-checkbox-disabled">
+                                                        <input onclick="show_invalid_access_toast(event)" type="checkbox" id="{{support_document.pk}}" checked>
+                                                        <span class="easyassist-switch-checkbox"></span>
+                                                    </label>
+                                                </td>
+                                            {% else %}
+                                                <td>
+                                                    <label class="easyassist-switch-checkbox-label easyassist-switch-checkbox-disabled">
+                                                        <input onclick="show_invalid_access_toast(event)" type="checkbox" id="{{support_document.pk}}">
+                                                        <span class="easyassist-switch-checkbox"></span>
+                                                    </label>
+                                                </td>
+                                            {% endif %}
+                                            
+                                            <td class="td-hide-on-small-device">
+                                                <a href="javascript:void(0)" onclick="download_support_document('{{support_document.file_access_management_key}}')" class="edit-delete-btn-class">
+                                                    <svg data-toggle="tooltip" data-placement="bottom" title="Download" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M21.6732 16.5962L21.6732 11.5962C21.6732 9.38705 19.8824 7.59619 17.6732 7.59619L15.6732 7.59619L7.67322 7.59619L5.67322 7.59619C3.46408 7.59619 1.67322 9.38705 1.67322 11.5962L1.67322 16.5962C1.67322 18.8053 3.46408 20.5962 5.67322 20.5962L17.6732 20.5962C19.8824 20.5962 21.6732 18.8053 21.6732 16.5962Z" fill="#66BB6A"/>
+                                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M17.6732 6.84619C20.2966 6.84619 22.4232 8.97284 22.4232 11.5962L22.4232 16.5962C22.4232 19.2195 20.2966 21.3462 17.6732 21.3462L5.67322 21.3462C3.04986 21.3462 0.923215 19.2195 0.923215 16.5962L0.923216 11.5962C0.923216 8.97284 3.04986 6.84619 5.67322 6.84619L17.6732 6.84619ZM20.9232 11.5962C20.9232 9.80127 19.4681 8.34619 17.6732 8.34619L5.67322 8.34619C3.87829 8.34619 2.42322 9.80127 2.42322 11.5962L2.42322 16.5962C2.42322 18.3911 3.87829 19.8462 5.67322 19.8462L17.6732 19.8462C19.4681 19.8462 20.9232 18.3911 20.9232 16.5962L20.9232 11.5962Z" fill="#66BB6A"/>
+                                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M15.2033 12.0658C15.4962 12.3587 15.4962 12.8336 15.2033 13.1265L12.9104 15.4194C12.227 16.1028 11.119 16.1028 10.4355 15.4194L8.14264 13.1265C7.84975 12.8336 7.84975 12.3587 8.14264 12.0658C8.43554 11.7729 8.91041 11.7729 9.2033 12.0658L10.923 13.7855L10.923 2.59613C10.923 2.18192 11.2588 1.84613 11.673 1.84613C12.0872 1.84613 12.423 2.18192 12.423 2.59613L12.423 13.7855L14.1426 12.0658C14.4355 11.7729 14.9104 11.7729 15.2033 12.0658Z" fill="#66BB6A"/>
+                                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M15.2033 12.0657C15.4962 12.3586 15.4962 12.8335 15.2033 13.1264L12.9104 15.4193C12.227 16.1027 11.119 16.1027 10.4355 15.4193L8.14264 13.1264C7.84975 12.8335 7.84975 12.3586 8.14264 12.0657C8.43554 11.7728 8.91041 11.7728 9.2033 12.0657L10.923 13.7854L10.923 6.59605L12.423 6.59605L12.423 13.7854L14.1426 12.0657C14.4355 11.7728 14.9104 11.7728 15.2033 12.0657Z" fill="white"/>
+                                                    </svg>
+                                                </a>
+                                                <button class="btn edit-delete-btn-class disable-button" type="button" onclick="show_invalid_access_toast(event)">
+                                                    <svg data-toggle="tooltip" data-placement="bottom" title="Delete" width="14" height="16" viewBox="0 0 14 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M7 0C8.40298 0 9.54889 1.05927 9.62136 2.39215L9.625 2.52632H13.475C13.7649 2.52632 14 2.75253 14 3.03158C14 3.28737 13.8025 3.49877 13.5462 3.53223L13.475 3.53684H12.7337L11.8798 13.6779C11.7693 14.9896 10.6309 16 9.26338 16H4.73662C3.36913 16 2.23072 14.9896 2.12021 13.6779L1.2656 3.53684H0.525C0.259213 3.53684 0.0395562 3.34676 0.0047925 3.10014L0 3.03158C0 2.77578 0.197508 2.56438 0.453761 2.53093L0.525 2.52632H4.375C4.375 1.13107 5.55025 0 7 0ZM11.6807 3.53684H2.31929L3.16677 13.5962C3.23308 14.3832 3.91613 14.9895 4.73662 14.9895H9.26338C10.0839 14.9895 10.7669 14.3832 10.8332 13.5962L11.6807 3.53684ZM5.425 6.06316C5.69079 6.06316 5.91044 6.25324 5.94521 6.49986L5.95 6.56842V11.9579C5.95 12.2369 5.71495 12.4632 5.425 12.4632C5.15921 12.4632 4.93956 12.2731 4.90479 12.0265L4.9 11.9579V6.56842C4.9 6.28937 5.13505 6.06316 5.425 6.06316ZM8.575 6.06316C8.84079 6.06316 9.06044 6.25324 9.09521 6.49986L9.1 6.56842V11.9579C9.1 12.2369 8.86495 12.4632 8.575 12.4632C8.30921 12.4632 8.08956 12.2731 8.05479 12.0265L8.05 11.9579V6.56842C8.05 6.28937 8.28505 6.06316 8.575 6.06316ZM7 1.01053C6.1664 1.01053 5.48405 1.63379 5.42863 2.42254L5.425 2.52632H8.575L8.57137 2.42254C8.51595 1.63379 7.8336 1.01053 7 1.01053Z" fill="#A3A3A3"/>
+                                                    </svg>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td>
+                                                <input type="text" onkeypress="show_new_name_input(this, event)" value="{{ support_document.file_name }}" class="user-checkbox-collection-filename">
+                                                <div style="position: absolute; top: 0; right: 0;"> 
+                                                    <a href="javascript:void(0)" onclick="download_support_document('{{support_document.file_access_management_key}}')" style="display: inline-block; vertical-align: middle;">
+                                                        <svg class="svg-hide-on-desktop" data-toggle="tooltip" data-placement="bottom" title="Download" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M21.6732 16.5962L21.6732 11.5962C21.6732 9.38705 19.8824 7.59619 17.6732 7.59619L15.6732 7.59619L7.67322 7.59619L5.67322 7.59619C3.46408 7.59619 1.67322 9.38705 1.67322 11.5962L1.67322 16.5962C1.67322 18.8053 3.46408 20.5962 5.67322 20.5962L17.6732 20.5962C19.8824 20.5962 21.6732 18.8053 21.6732 16.5962Z" fill="#66BB6A"/>
+                                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M17.6732 6.84619C20.2966 6.84619 22.4232 8.97284 22.4232 11.5962L22.4232 16.5962C22.4232 19.2195 20.2966 21.3462 17.6732 21.3462L5.67322 21.3462C3.04986 21.3462 0.923215 19.2195 0.923215 16.5962L0.923216 11.5962C0.923216 8.97284 3.04986 6.84619 5.67322 6.84619L17.6732 6.84619ZM20.9232 11.5962C20.9232 9.80127 19.4681 8.34619 17.6732 8.34619L5.67322 8.34619C3.87829 8.34619 2.42322 9.80127 2.42322 11.5962L2.42322 16.5962C2.42322 18.3911 3.87829 19.8462 5.67322 19.8462L17.6732 19.8462C19.4681 19.8462 20.9232 18.3911 20.9232 16.5962L20.9232 11.5962Z" fill="#66BB6A"/>
+                                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M15.2033 12.0658C15.4962 12.3587 15.4962 12.8336 15.2033 13.1265L12.9104 15.4194C12.227 16.1028 11.119 16.1028 10.4355 15.4194L8.14264 13.1265C7.84975 12.8336 7.84975 12.3587 8.14264 12.0658C8.43554 11.7729 8.91041 11.7729 9.2033 12.0658L10.923 13.7855L10.923 2.59613C10.923 2.18192 11.2588 1.84613 11.673 1.84613C12.0872 1.84613 12.423 2.18192 12.423 2.59613L12.423 13.7855L14.1426 12.0658C14.4355 11.7729 14.9104 11.7729 15.2033 12.0658Z" fill="#66BB6A"/>
+                                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M15.2033 12.0657C15.4962 12.3586 15.4962 12.8335 15.2033 13.1264L12.9104 15.4193C12.227 16.1027 11.119 16.1027 10.4355 15.4193L8.14264 13.1264C7.84975 12.8335 7.84975 12.3586 8.14264 12.0657C8.43554 11.7728 8.91041 11.7728 9.2033 12.0657L10.923 13.7854L10.923 6.59605L12.423 6.59605L12.423 13.7854L14.1426 12.0657C14.4355 11.7728 14.9104 11.7728 15.2033 12.0657Z" fill="white"/>
+                                                        </svg>
+                                                    </a>
+                                                    <button class="btn" type="button" data-toggle="modal" data-target="#delete-support-document-modal-{{ support_document.pk }}" style="margin: 5px 4px!important;padding: 0.375rem 0.2em;">
+                                                        <svg class="svg-hide-on-desktop" data-toggle="tooltip" data-placement="bottom" title="Delete" width="14" height="16" viewBox="0 0 14 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M7 0C8.40298 0 9.54889 1.05927 9.62136 2.39215L9.625 2.52632H13.475C13.7649 2.52632 14 2.75253 14 3.03158C14 3.28737 13.8025 3.49877 13.5462 3.53223L13.475 3.53684H12.7337L11.8798 13.6779C11.7693 14.9896 10.6309 16 9.26338 16H4.73662C3.36913 16 2.23072 14.9896 2.12021 13.6779L1.2656 3.53684H0.525C0.259213 3.53684 0.0395562 3.34676 0.0047925 3.10014L0 3.03158C0 2.77578 0.197508 2.56438 0.453761 2.53093L0.525 2.52632H4.375C4.375 1.13107 5.55025 0 7 0ZM11.6807 3.53684H2.31929L3.16677 13.5962C3.23308 14.3832 3.91613 14.9895 4.73662 14.9895H9.26338C10.0839 14.9895 10.7669 14.3832 10.8332 13.5962L11.6807 3.53684ZM5.425 6.06316C5.69079 6.06316 5.91044 6.25324 5.94521 6.49986L5.95 6.56842V11.9579C5.95 12.2369 5.71495 12.4632 5.425 12.4632C5.15921 12.4632 4.93956 12.2731 4.90479 12.0265L4.9 11.9579V6.56842C4.9 6.28937 5.13505 6.06316 5.425 6.06316ZM8.575 6.06316C8.84079 6.06316 9.06044 6.25324 9.09521 6.49986L9.1 6.56842V11.9579C9.1 12.2369 8.86495 12.4632 8.575 12.4632C8.30921 12.4632 8.08956 12.2731 8.05479 12.0265L8.05 11.9579V6.56842C8.05 6.28937 8.28505 6.06316 8.575 6.06316ZM7 1.01053C6.1664 1.01053 5.48405 1.63379 5.42863 2.42254L5.425 2.52632H8.575L8.57137 2.42254C8.51595 1.63379 7.8336 1.01053 7 1.01053Z" fill="#EE2525"/>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td> 
+                                                <span style="text-transform: capitalize;">{{ support_document.file_type }}</span>
+                                            </td>
+                                            {% if support_document.is_usable %}
+                                            <td>
+                                                <label class="easyassist-switch-checkbox-label">
+                                                    <input type="checkbox" id="{{support_document.pk}}" class="user-checkbox-collection-usable" checked>
+                                                    <span class="easyassist-switch-checkbox"></span>
+                                                </label>
+                                            </td>
+                                            {% else %}
+                                            <td>
+                                                <label class="easyassist-switch-checkbox-label">
+                                                    <input type="checkbox" id="{{support_document.pk}}" class="user-checkbox-collection-usable">
+                                                    <span class="easyassist-switch-checkbox"></span>
+                                                </label>
+                                            </td>
+                                            {% endif %}
+                                            <td class="td-hide-on-small-device">
+                                                <a href="javascript:void(0)" onclick="download_support_document('{{support_document.file_access_management_key}}')" class="edit-delete-btn-class">
+                                                    <svg data-toggle="tooltip" data-placement="bottom" title="Download" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M21.6732 16.5962L21.6732 11.5962C21.6732 9.38705 19.8824 7.59619 17.6732 7.59619L15.6732 7.59619L7.67322 7.59619L5.67322 7.59619C3.46408 7.59619 1.67322 9.38705 1.67322 11.5962L1.67322 16.5962C1.67322 18.8053 3.46408 20.5962 5.67322 20.5962L17.6732 20.5962C19.8824 20.5962 21.6732 18.8053 21.6732 16.5962Z" fill="#66BB6A"/>
+                                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M17.6732 6.84619C20.2966 6.84619 22.4232 8.97284 22.4232 11.5962L22.4232 16.5962C22.4232 19.2195 20.2966 21.3462 17.6732 21.3462L5.67322 21.3462C3.04986 21.3462 0.923215 19.2195 0.923215 16.5962L0.923216 11.5962C0.923216 8.97284 3.04986 6.84619 5.67322 6.84619L17.6732 6.84619ZM20.9232 11.5962C20.9232 9.80127 19.4681 8.34619 17.6732 8.34619L5.67322 8.34619C3.87829 8.34619 2.42322 9.80127 2.42322 11.5962L2.42322 16.5962C2.42322 18.3911 3.87829 19.8462 5.67322 19.8462L17.6732 19.8462C19.4681 19.8462 20.9232 18.3911 20.9232 16.5962L20.9232 11.5962Z" fill="#66BB6A"/>
+                                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M15.2033 12.0658C15.4962 12.3587 15.4962 12.8336 15.2033 13.1265L12.9104 15.4194C12.227 16.1028 11.119 16.1028 10.4355 15.4194L8.14264 13.1265C7.84975 12.8336 7.84975 12.3587 8.14264 12.0658C8.43554 11.7729 8.91041 11.7729 9.2033 12.0658L10.923 13.7855L10.923 2.59613C10.923 2.18192 11.2588 1.84613 11.673 1.84613C12.0872 1.84613 12.423 2.18192 12.423 2.59613L12.423 13.7855L14.1426 12.0658C14.4355 11.7729 14.9104 11.7729 15.2033 12.0658Z" fill="#66BB6A"/>
+                                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M15.2033 12.0657C15.4962 12.3586 15.4962 12.8335 15.2033 13.1264L12.9104 15.4193C12.227 16.1027 11.119 16.1027 10.4355 15.4193L8.14264 13.1264C7.84975 12.8335 7.84975 12.3586 8.14264 12.0657C8.43554 11.7728 8.91041 11.7728 9.2033 12.0657L10.923 13.7854L10.923 6.59605L12.423 6.59605L12.423 13.7854L14.1426 12.0657C14.4355 11.7728 14.9104 11.7728 15.2033 12.0657Z" fill="white"/>
+                                                    </svg>
+                                                </a>
+                                                <button class="btn edit-delete-btn-class" type="button" data-toggle="modal" data-target="#delete-support-document-modal-{{ support_document.pk }}">
+                                                    <svg data-toggle="tooltip" data-placement="bottom" title="Delete" width="14" height="16" viewBox="0 0 14 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M7 0C8.40298 0 9.54889 1.05927 9.62136 2.39215L9.625 2.52632H13.475C13.7649 2.52632 14 2.75253 14 3.03158C14 3.28737 13.8025 3.49877 13.5462 3.53223L13.475 3.53684H12.7337L11.8798 13.6779C11.7693 14.9896 10.6309 16 9.26338 16H4.73662C3.36913 16 2.23072 14.9896 2.12021 13.6779L1.2656 3.53684H0.525C0.259213 3.53684 0.0395562 3.34676 0.0047925 3.10014L0 3.03158C0 2.77578 0.197508 2.56438 0.453761 2.53093L0.525 2.52632H4.375C4.375 1.13107 5.55025 0 7 0ZM11.6807 3.53684H2.31929L3.16677 13.5962C3.23308 14.3832 3.91613 14.9895 4.73662 14.9895H9.26338C10.0839 14.9895 10.7669 14.3832 10.8332 13.5962L11.6807 3.53684ZM5.425 6.06316C5.69079 6.06316 5.91044 6.25324 5.94521 6.49986L5.95 6.56842V11.9579C5.95 12.2369 5.71495 12.4632 5.425 12.4632C5.15921 12.4632 4.93956 12.2731 4.90479 12.0265L4.9 11.9579V6.56842C4.9 6.28937 5.13505 6.06316 5.425 6.06316ZM8.575 6.06316C8.84079 6.06316 9.06044 6.25324 9.09521 6.49986L9.1 6.56842V11.9579C9.1 12.2369 8.86495 12.4632 8.575 12.4632C8.30921 12.4632 8.08956 12.2731 8.05479 12.0265L8.05 11.9579V6.56842C8.05 6.28937 8.28505 6.06316 8.575 6.06316ZM7 1.01053C6.1664 1.01053 5.48405 1.63379 5.42863 2.42254L5.425 2.52632H8.575L8.57137 2.42254C8.51595 1.63379 7.8336 1.01053 7 1.01053Z" fill="#EE2525"/>
+                                                    </svg>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade upload_file_modal" id="customer_support_document_modal" tabindex="-1" role="dialog" aria-labelledby="document_upload_modal_modal_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="document_upload_modal_modal_label">Upload Files</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <label for="customer-support-file-upload" class="custom-file-upload">
+                        Choose File
+                        </label>
+                        <input type="file" id="customer-support-file-upload" class="form-control" name="" style="display: none !important;" multiple>
+                    </div>
+                    <div class="col-sm-11 " id="modal-upload-file-container" style="overflow: auto; max-height: 235px;">
+                    </div>
+                    <div class="col-sm-12">
+                        <p style="padding-top: 1em;" id="customer-support-file-upload-error"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-text-only" type="button" data-dismiss="modal" onclick="remove_selected_file(this);">Cancel</button>
+                <button class="btn btn-primary" onclick="upload_selected_customer_support_document()">Upload</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% for support_document in support_document_objs %}
+<div class="modal fade" id="delete-support-document-modal-{{ support_document.pk }}" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="remove_agent_modal_modal_label">Delete Support Document</h5>
+            </div>
+            <div class="modal-body">
+                Do you really want to delete this document?
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-danger" onclick="delete_customer_support_document_details(this, '{{ support_document.pk }}')">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<script type="text/javascript">
+$(document).ready(function() {
+    $("#customer_support_document_table").DataTable({
+        "ordering": false,
+        "searching": false,
+        "bPaginate": true,
+        "bLengthChange": false
+    });
+});
+
+function change_file_name(element) {
+    element.style.display = "none";
+    element.nextElementSibling.style.display = "inline";
+}
+
+function show_new_name_input(element, event) {
+    if (!event.shiftKey) {
+        if (event.keyCode == 13 || event.which == 13) {
+            element.previousElementSibling.style.display = "inline";
+            element.style.display = "none";
+            element.previousElementSibling.innerHTML = element.value;
+        }
+    }
+}
+
+var customer_support_input_file_global = undefined;
+document.getElementById("customer-support-file-upload").addEventListener('change', function(event) {
+    var files = document.getElementById("customer-support-file-upload").files;
+    if (files.length > 0) {
+        var html = "";
+        var all_files_valid = true;
+        var files_validation_error = "";
+        var customer_support_file_upload_error = document.getElementById("customer-support-file-upload-error");
+
+        if (files.length > 5) {
+            customer_support_file_upload_error.style.color = "red";
+            customer_support_file_upload_error.innerHTML = "Maximum 5 files can be uploaded at a time"
+            return;
+        }
+
+        for(var idx = 0; idx < files.length; idx ++) {
+            var file = files[idx];
+            if(file.size / 1000000 > 5){
+                all_files_valid = false;
+                files_validation_error = "file_size";
+            } else if (check_file_extension(file.name) == false) {
+                all_files_valid = false;
+                files_validation_error = "file_extension";
+            } else if(check_malicious_file(file.name).status) {
+                all_files_valid = false;
+                files_validation_error = "malicious_file";
+            } else {
+                var file_name = sanitize_filename(file.name);
+                file_name = file_name.substring(0, file_name.lastIndexOf("."));
+                if (!file_name.length) {
+                    all_files_valid = false;
+                    files_validation_error = "malicious_filename";
+                }
+            }
+        }
+
+        if(all_files_valid == false) {
+            if(files_validation_error == "file_size") {
+                customer_support_file_upload_error.innerHTML = "File size cannot exceed 5 MB";
+            } else if(files_validation_error == "malicious_file") {
+                customer_support_file_upload_error.innerHTML = "Please do not use .(dot) except for extension";
+            } else if (files_validation_error == "file_extension") {
+                customer_support_file_upload_error.innerHTML = "You can only upload Images, Docs, and PDFs. Please choose the files again.";
+            } else if (files_validation_error == "malicious_filename") {
+                customer_support_file_upload_error.innerHTML = "File name can only consist of alphabets, numbers and underscores";
+            }
+            customer_support_file_upload_error.style.color = "red";
+            return;
+        }
+
+        for(var index = 0; index < files.length; index ++) {
+
+            var filename = files[index].name;
+            filename = sanitize_filename(filename);
+            if(filename.length > 30) {
+                filename = get_shorter_file_name(filename, 20);
+            }
+
+            html += [
+                '<div class="col-md-12 col-sm-12 modal-upload-file mt-4">',
+                    '<div class="col-md-1 col-sm-1 width-auto-sm pd-mg">',
+                        '<svg width="24" height="32" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">',
+                            '<path fill-rule="evenodd" clip-rule="evenodd" d="M14 0V8.50667C14 9.33333 14.6667 10 15.4933 10H24V30.5067C24 31.3333 23.3333 32 22.5067 32H1.49333C0.666665 32 0 31.3333 0 30.5067V1.49333C0 0.666667 0.666665 0 1.49333 0H14ZM17.4404 0.426667L23.5471 6.56C23.8404 6.85333 24.0004 7.22667 24.0004 7.62667V8H16.0004V0H16.3737C16.7737 0 17.147 0.16 17.4404 0.426667Z" fill="#ef827f"/>',
+                            '<defs>',
+                                '<linearGradient id="paint0_linear" x1="2.39111" y1="3" x2="23.3908" y2="32.0002" gradientUnits="userSpaceOnUse">',
+                                    '<stop stop-color="#E08F8D"/>',
+                                    '<stop offset="1" stop-color="#FE736F"/>',
+                                '</linearGradient>',
+                            '</defs>',
+                        '</svg>',
+                    '</div>',
+                    '<div class="col-md-10 col-sm-10 file-name-container">',
+                        '<div class="file-name-div">' + filename + '</div>',
+                        '<div class="progress">',
+                            '<div class="indeterminate">','</div>',
+                        '</div>',
+                    '</div>',
+                    '<div class="col-md-1 col-sm-1 pr-sm-0 width-auto-sm">',
+                        '<button class="upload-file-cross-btn" type="button" onclick="remove_uploaded_file(this);">',
+                            '<svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">',
+                                '<path d="M6.48438 4.98438L9.85938 1.64062C10.0469 1.45312 10.0469 1.10938 9.85938 0.921875L9.07812 0.140625C8.89062 -0.046875 8.54688 -0.046875 8.35938 0.140625L5.01562 3.51562L1.64062 0.140625C1.45312 -0.046875 1.10938 -0.046875 0.921875 0.140625L0.140625 0.921875C-0.046875 1.10938 -0.046875 1.45312 0.140625 1.64062L3.51562 4.98438L0.140625 8.35938C-0.046875 8.54688 -0.046875 8.89062 0.140625 9.07812L0.921875 9.85938C1.10938 10.0469 1.45312 10.0469 1.64062 9.85938L5.01562 6.48438L8.35938 9.85938C8.54688 10.0469 8.89062 10.0469 9.07812 9.85938L9.85938 9.07812C10.0469 8.89062 10.0469 8.54688 9.85938 8.35938L6.48438 4.98438Z" fill="#E08F8D"/>',
+                            '</svg>',
+                        '</button>',
+                    '</div>',
+                '</div>',
+            ].join('');
+        }
+
+        customer_support_input_file_global = Array.from(files);
+
+        document.getElementById("modal-upload-file-container").innerHTML = html;
+        var customer_support_document_modal = document.getElementById("customer_support_document_modal");
+
+        var progress_divs = customer_support_document_modal.getElementsByClassName('progress');
+        for(var idx = 0; idx < progress_divs.length; idx ++) {
+            var progress_div = progress_divs[idx].children[0];
+            progress_div.classList.remove('determinate');
+            progress_div.classList.add('indeterminate');
+            complete_progress_bar(progress_div);
+        }
+
+        var customer_support_file_upload_error = document.getElementById("customer-support-file-upload-error");
+        customer_support_file_upload_error.innerHTML = ""
+        
+    } else {
+        if (customer_support_input_file_global == undefined || customer_support_input_file_global.length == 0) {
+            $('#customer_support_document_modal .file-name-div').html("No file selected");
+            $('#customer_support_document_modal .progress').hide();
+        }
+    }
+});
+
+function complete_progress_bar(progress_div) {
+    setTimeout(function() {
+        progress_div.classList.remove('indeterminate');
+        progress_div.classList.add('determinate');
+    }, 300);    
+}
+
+function remove_uploaded_file(element, index) {
+
+    var parent_element = element.parentNode.parentNode;
+    var removed_file_name = parent_element.getElementsByClassName('file-name-div')[0].innerHTML;
+    
+    var new_file_list = [];
+    for(var idx = 0; idx < customer_support_input_file_global.length; idx ++) {
+        if(customer_support_input_file_global[idx].name == removed_file_name) {
+            continue;
+        }
+        new_file_list.push(customer_support_input_file_global[idx]);
+    }
+    
+    customer_support_input_file_global = new_file_list;
+    parent_element.remove();
+
+    document.getElementById("customer-support-file-upload").value = "";
+    var customer_support_file_upload_error = document.getElementById("customer-support-file-upload-error");
+    customer_support_file_upload_error.innerHTML = ""
+}
+
+$("#customer_support_document_modal").on("hidden.bs.modal", function() {
+    var customer_support_file_upload_error = document.getElementById("customer-support-file-upload-error");
+    customer_support_file_upload_error.innerHTML = ""
+});
+
+$('.user-checkbox-collection-usable').on('change', function(){
+    document.getElementById("save_customer_support_document").disabled = false;
+})
+
+$('.user-checkbox-collection-filename').on('keyup', function(){
+    document.getElementById("save_customer_support_document").disabled = false;
+})
+
+function remove_selected_file() {
+    document.getElementById("modal-upload-file-container").innerHTML = "";
+    document.getElementById("customer-support-file-upload").value = "";
+    customer_support_input_file_global = undefined;
+}
+
+function download_support_document(document_id) {
+    var url = window.location.protocol + '/easy-assist/download-file/' + document_id;
+    window.open(url, "_self");
+}
+
+function show_invalid_access_toast(event) {
+    const toast_message = "You don't have permission to perform this operation <br> as this document has been uploaded by the admin";
+    show_easyassist_toast(toast_message);
+    event.preventDefault()
+}
+
+</script>
+
+{% endblock %}

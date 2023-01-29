@@ -1,0 +1,85 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+   <head>
+       <title>EasyChat</title>
+       
+       <link href="{% static 'EasyChatApp/img/ipal_left.png' %}" rel="icon">
+       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+      {% if request.user.enable_s3_bucket %}
+        <script src="https://static.allincall.in/static/EasyChatApp/js/jquery.js"></script>
+       <link href="https://static.allincall.in/static/EasyChatApp/css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+       <link href="https://static.allincall.in/static/EasyChatApp/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+      {% else %}
+        <script src="{% static 'EasyChatApp/js/jquery.js' %}"></script>
+         <link href="{% static 'EasyChatApp/css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+         <link href="{% static 'EasyChatApp/css/materialize.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+      {% endif %}
+
+       <link href="{% static 'EasyChatApp/css/style1.css' %}?v={% random_int 1 100 %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+       <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+   </head>
+   <body>
+      {% csrf_token %}
+      <div class="main-div">
+      <div id="header" class="row">
+         <div class="col s2 m2 l2" >
+            <span class="helper"></span>
+         </div>
+         <div class="col s8 m8 l8" >
+            <p  class="chatbot_name">Ask iPal for Help</p>
+         </div>
+         <div class="col s2 m2 l2" style="text-align: center;margin-top:10px">
+            <span class="helper ">
+              <!-- <i id="settings-chatbot" class="inline-icon material-icons" style="color: white; cursor:pointer;">settings_applications</i> -->
+              <i id="close-chatbot" class="inline-icon material-icons responsive-img" style="color: white; cursor:pointer;">close</i>
+<!--              <img id="close-chatbot" src="{% static 'EasyChatApp/img/cancel5.png' %}" width="18" style="cursor:pointer;" class="responsive-img"> --> 
+            </span>
+         </div>
+      </div>
+      <div  class="scrollbar row" id="style-2" style="position: absolute;">
+         <br>
+         <div  class="row">
+            <div class="new-chat-form-launcher disabled" data-radium="true">
+
+               <div id="submit" class="send-button">
+                  <!--<img id="submit-img" src="{% static 'EasyChatApp/img/send1.png' %}" width=28 class="responsive-img">-->
+                  <i class="material-icons responsive-img orange-text darken-2" id="submit-img" title="Send">send</i>
+               </div>
+
+               <form class="input-container" data-radium="true" autocomplete="off">
+                  <div class="autocomplete" style="width: calc(100%);" style="display: block;">
+                     <input class="chat-input" id="query" type="text" contenteditable="true" placeholder="Ask me about career related queries">
+                  </div>
+               </form>
+            </div>
+            <div id="restart-button" class="menu-button" title="Restart" style="color: rgb(102, 56, 205); background:#f57c00;"><img src="{% static 'EasyChatApp/img/restart.png' %}" width="24" height="22" style="padding:auto" class="responsive-img">
+            </div>
+            <div id="sound" style="display: none;"></div>
+         </div>
+      </div>
+   </div>
+    {% if request.user.enable_s3_bucket %}
+     <script src="https://static.allincall.in/static/EasyChatApp/js/record_rtc.js"></script>
+  <script src="https://static.allincall.in/static/EasyChatApp/js/adapter-latest.js"></script>
+
+    {% else %}
+     <script src="{% static 'EasyChatApp/js/record_rtc.js' %}?v={% random_int 1 100 %}"></script>
+  <script src="{% static 'EasyChatApp/js/adapter-latest.js' %}?v={% random_int 1 100 %}"></script>
+
+    {% endif %}
+
+ 
+   <script src="{% static 'EasyChatApp/js/materialize.js' %}"></script>
+   <script src="{% static 'EasyChatApp/js/init_quiz.js' %}?v={% random_int 1 100 %}"></script>
+    {% if request.user.enable_s3_bucket %}
+      <script src="https://static.allincall.in/static/EasyChatApp/js/artyom.window.min.js"></script>
+
+    {% else %}
+    <script src="{% static 'EasyChatApp/js/artyom.window.min.js' %}"></script>
+    {% endif %}
+   
+   </body>
+</html>

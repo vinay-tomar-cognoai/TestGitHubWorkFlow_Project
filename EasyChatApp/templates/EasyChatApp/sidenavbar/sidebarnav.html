@@ -1,0 +1,338 @@
+{% load static %}
+{% load custom_filters %}
+
+{% bot_related_access_perm request.user selected_bot_obj.pk as get_bot_related_access_perm %}
+{% bot_related_type_access request.user selected_bot_obj.pk as get_bot_related_type_access %}
+{% overall_access_perm request.user selected_bot_obj.pk as get_overall_access_perm %}
+
+<div class="collapsed" id="easychat-sidenav-wrapper">
+            <div style="cursor: pointer;" class="easychat-botname-wrapper tooltipped" onclick="window.location='/chat/bots/'" data-position="right" data-tooltip="{{ selected_bot_obj.name }}">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M11.4303 0.585336C11.051 0.705273 10.7801 0.874697 10.5331 1.14657C9.82557 1.92496 9.83378 3.0595 10.5522 3.81098C10.8197 4.09079 11.0778 4.25794 11.3803 4.34722L11.5786 4.4058L11.5912 5.4075L11.6038 6.40916H12.0024H12.4009L12.4135 5.4075L12.4261 4.4058L12.6245 4.34722C12.9269 4.25794 13.185 4.09079 13.4525 3.81098C14.1709 3.0595 14.1791 1.92496 13.4717 1.14657C12.9644 0.58849 12.1384 0.361369 11.4303 0.585336ZM4.40712 7.25146C4.17659 7.28852 3.72326 7.468 3.49259 7.61359C2.99398 7.92827 2.58613 8.5211 2.45851 9.1167C2.36095 9.57224 2.36128 18.3211 2.45894 18.7769C2.55421 19.2214 2.7378 19.5709 3.04799 19.8978C3.50399 20.3785 4.11156 20.6612 4.70375 20.6682C4.88937 20.6704 4.95468 20.6952 5.06711 20.8064L5.20415 20.942L5.20565 22.0935C5.20673 22.9254 5.223 23.2653 5.26425 23.3185C5.34063 23.4169 5.5043 23.5 5.62184 23.5C5.67449 23.5 6.64059 22.8917 7.76881 22.1482C8.89698 21.4048 9.88844 20.7682 9.97199 20.7337C10.0963 20.6823 10.9748 20.6707 14.8022 20.6702C19.9489 20.6694 19.8012 20.677 20.3561 20.3845C20.7028 20.2016 21.1853 19.7012 21.3531 19.3504C21.6143 18.8041 21.612 18.8525 21.612 13.9458C21.612 9.00613 21.6154 9.07422 21.3403 8.5351C21.0694 8.0042 20.6041 7.59573 19.9961 7.35526L19.7148 7.24399L12.1196 7.23829C7.94219 7.23518 4.47158 7.24112 4.40712 7.25146ZM7.77851 10.8799C9.07838 11.2801 9.60526 12.7972 8.82708 13.899C8.05935 14.9861 6.39501 15.0056 5.59966 13.9368C5.31939 13.5602 5.22806 13.2717 5.22806 12.7632C5.22806 12.2554 5.31939 11.9661 5.59769 11.5921C6.09237 10.9274 6.98542 10.6357 7.77851 10.8799ZM17.4037 10.8839C17.9777 11.0593 18.4977 11.5526 18.6926 12.1066C18.8099 12.4404 18.8077 13.1009 18.6881 13.4125C18.2979 14.4286 17.2365 14.9567 16.2151 14.6427C15.654 14.4701 15.2286 14.0966 14.9691 13.5484C14.8515 13.2999 14.8389 13.224 14.8389 12.7632C14.8389 12.3023 14.8515 12.2264 14.9691 11.9779C15.4127 11.0408 16.4264 10.5854 17.4037 10.8839ZM0.820474 11.6369C0.614605 11.7088 0.332175 11.9239 0.213042 12.0996C0.0130807 12.3945 0 12.5078 0 13.9445C0 15.0573 0.0136902 15.3605 0.0716391 15.5287C0.241969 16.0232 0.676258 16.3112 1.25162 16.3112H1.59406V13.9458V11.5805L1.27759 11.5841C1.10356 11.5861 0.897833 11.6099 0.820474 11.6369ZM6.82165 11.6369C6.48587 11.7541 6.17367 12.0695 6.05571 12.4106C5.85659 12.9864 6.22702 13.6858 6.84036 13.8922C7.34966 14.0636 7.95536 13.83 8.23887 13.3529C8.35163 13.1631 8.36883 13.0851 8.36883 12.7632C8.36883 12.4412 8.35163 12.3632 8.23887 12.1734C8.0871 11.918 7.88044 11.7496 7.59787 11.651C7.36804 11.5707 7.02874 11.5646 6.82165 11.6369ZM16.3903 11.6534C16.1233 11.7502 15.9135 11.9248 15.7658 12.1734C15.6531 12.3632 15.6359 12.4412 15.6359 12.7632C15.6359 13.0851 15.6531 13.1631 15.7658 13.3529C16.2526 14.1719 17.4202 14.1328 17.8736 13.2823C18.0347 12.9802 18.0217 12.514 17.8433 12.1948C17.5546 11.6782 16.9468 11.4518 16.3903 11.6534ZM22.4107 13.9458V16.3112H22.7531C23.3339 16.3112 23.7674 16.0201 23.9365 15.5163C23.9979 15.3335 24.0075 15.0675 23.9955 13.8684L23.9813 12.4385L23.8448 12.1948C23.6108 11.7771 23.2475 11.5805 22.7095 11.5805H22.4107V13.9458ZM10.4083 15.7761C10.7992 16.1482 11.2846 16.3112 12.0024 16.3112C12.7289 16.3112 13.2071 16.1481 13.6075 15.7638C13.7889 15.5897 13.861 15.5506 14.0004 15.5506C14.2103 15.5506 14.3935 15.7346 14.3935 15.9455C14.3935 16.2981 13.5521 16.8791 12.8228 17.0301C12.402 17.1172 11.6028 17.1172 11.1819 17.0301C10.6932 16.929 10.146 16.6441 9.85445 16.3392C9.5904 16.063 9.5491 15.9095 9.68661 15.7153C9.86308 15.466 10.104 15.4863 10.4083 15.7761Z" fill="#2F80ED"/>
+            </svg>
+
+                <span class="easychat-botname-div">{{ selected_bot_obj.name }}</span>
+            </div>
+            <div class="collection with-header" id="buildchatbot-sidenav">
+
+                {% if "build_bot" in get_bot_related_type_access|get_dict_item:selected_bot_obj.pk %}
+                <div class="collabsible-sidebar-menu-wrapper">
+                    <div class="collabsible-sidebar-menu sidebar-menu-item">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g clip-path="url(#clip0_636_395)">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M17.3182 5.22727C18.6738 5.22727 19.7727 6.32621 19.7727 7.68182V14.2273C19.7727 15.5829 18.6738 16.6818 17.3182 16.6818H9.85227L7.09091 19.1364V16.6818H6.68182C5.32621 16.6818 4.22727 15.5829 4.22727 14.2273V7.68182C4.22727 6.32621 5.32621 5.22727 6.68182 5.22727H17.3182ZM17.3182 4H6.68182C4.64841 4 3 5.64841 3 7.68182V14.2273C2.99904 15.9462 4.18766 17.4371 5.86364 17.8191V19.1364C5.863 19.6206 6.1472 20.06 6.58914 20.258C7.03109 20.456 7.54814 20.3756 7.90909 20.0527L10.3227 17.9091H17.3182C19.3516 17.9091 21 16.2607 21 14.2273V7.68182C21 5.64841 19.3516 4 17.3182 4Z" fill="#334155"/>
+                        <circle cx="12.0001" cy="10.9545" r="0.613636" fill="#334155"/>
+                        <circle cx="16.0909" cy="10.9545" r="0.613636" fill="#334155"/>
+                        <circle cx="7.95812" cy="10.9545" r="0.613636" fill="#334155"/>
+                        </g>
+                        <defs>
+                        <clipPath id="clip0_636_395">
+                        <rect width="18" height="16.3653" fill="white" transform="translate(3 4)"/>
+                        </clipPath>
+                        </defs>
+                        </svg>
+
+
+                        <span>Build Bot</span>
+                        <svg class="down-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2.21967 4.46967C2.51256 4.17678 2.98744 4.17678 3.28033 4.46967L6 7.18934L8.71967 4.46967C9.01256 4.17678 9.48744 4.17678 9.78033 4.46967C10.0732 4.76256 10.0732 5.23744 9.78033 5.53033L6.53033 8.78033C6.23744 9.07322 5.76256 9.07322 5.46967 8.78033L2.21967 5.53033C1.92678 5.23744 1.92678 4.76256 2.21967 4.46967Z" fill="#1E293B"/>
+            </svg>
+                    </div>
+
+                    <div class="collapsed-section-content">
+                        {% if "Intent Related" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk or "Full Access" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk %}
+                            <a class="collapsed-section-href" href="/chat/intent/?bot_pk={{ selected_bot_obj.pk }}&selected_language=en" id="modify-existing-intent">
+                                <div class="collapsed-section-item sidebar-menu-item">
+
+                                    <span>Manage Intents </span>
+                                </div>
+                            </a>
+                        {% endif %}
+
+                        {% if "Categories" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk or "Full Access" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk %} 
+                            <a class="collapsed-section-href" href="/chat/categories/?bot_pk={{ selected_bot_obj.pk }}" id="categories">
+                                <div class="collapsed-section-item sidebar-menu-item">
+
+                                    <span>Manage Categories</span>
+                                </div>
+                            </a>
+                        {% endif %}
+                        {% if "Extract FAQ Related" in get_overall_access_perm or "Full Access" in get_overall_access_perm %}
+                            <a class="collapsed-section-href" href="/chat/extract-faqs/?bot_pk={{ selected_bot_obj.pk }}">
+                                <div class="collapsed-section-item sidebar-menu-item">
+
+                                    <span>Extract Website FAQs</span>
+                                </div>
+                            </a>
+                        {% endif %}
+
+                        {% if "Create Bot With Excel Related" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk or "Full Access" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk %}   
+                            <a class="collapsed-section-href" href="/chat/create-quick-bot/?bot_pk={{ selected_bot_obj.pk }}" id="create-quick-chatbot">
+                                <div class="collapsed-section-item sidebar-menu-item">
+
+                                    <span>Create Bot With Excel</span>
+                                </div>
+                            </a>
+                        {% endif %}
+
+                        {% if "Word Mapper Related" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk or "Full Access" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk %}
+                            <a class="collapsed-section-href" href="/chat/word-mappers/?bot_pk={{ selected_bot_obj.pk }}" id="word-mappers">
+                                <div class="collapsed-section-item sidebar-menu-item">
+
+                                    <span>Word Mappers</span>
+                                </div>
+                            </a>
+                        {% endif %}
+
+                        {% if "Bot Setting Related" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk or "Full Access" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk %}
+                            {% if selected_bot_obj.is_easy_search_allowed == True %}
+                                <a class="collapsed-section-href" href="/chat/easysearch/edit/{{ selected_bot_obj.pk }}/">
+                                    <div class="collapsed-section-item sidebar-menu-item">
+
+                                        <span>Add Website Content</span>
+                                    </div>
+                                </a>
+                            {% endif %}
+                        {% endif %}
+
+                        {% if "PDF Searcher" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk or "Full Access" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk %}
+
+                            {% if selected_bot_obj.is_pdf_search_allowed == True %}
+                                <a class="collapsed-section-href" href="/chat/bot/pdf-searcher/?bot_pk={{ selected_bot_obj.pk }}">
+                                    <div class="collapsed-section-item sidebar-menu-item">
+
+                                        <span>Add PDF Content </span>
+                                    </div>
+                                </a>
+                            {% endif %}
+
+                        {% endif%}
+
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if "configure_bot" in get_bot_related_type_access|get_dict_item:selected_bot_obj.pk %}
+                <div class="collabsible-sidebar-menu-wrapper">
+                    <div class="collabsible-sidebar-menu sidebar-menu-item">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M3.64286 7.00162H4.80429C5.08966 8.01639 6.01515 8.71752 7.06929 8.71752C8.12342 8.71752 9.04891 8.01639 9.33429 7.00162H20.3571C20.7122 7.00162 21 6.7138 21 6.35876C21 6.00372 20.7122 5.7159 20.3571 5.7159H9.33857C9.0532 4.70113 8.12771 4 7.07357 4C6.01943 4 5.09394 4.70113 4.80857 5.7159H3.64286C3.28782 5.7159 3 6.00372 3 6.35876C3 6.7138 3.28782 7.00162 3.64286 7.00162ZM7.07142 5.28737C7.66315 5.28737 8.14285 5.76706 8.14285 6.35879C8.14285 6.95053 7.66315 7.43022 7.07142 7.43022C6.47969 7.43022 5.99999 6.95053 5.99999 6.35879C5.99999 5.76706 6.47969 5.28737 7.07142 5.28737Z" fill="#334155"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M20.3571 11.7156H14.1943C13.8436 10.8093 12.9718 10.2119 12 10.2119C11.0282 10.2119 10.1564 10.8093 9.80571 11.7156H3.64286C3.28782 11.7156 3 12.0034 3 12.3585C3 12.7135 3.28782 13.0013 3.64286 13.0013H9.68571C9.8955 14.1154 10.8685 14.9223 12.0021 14.9223C13.1357 14.9223 14.1088 14.1154 14.3186 13.0013H20.3571C20.7122 13.0013 21 12.7135 21 12.3585C21 12.0034 20.7122 11.7156 20.3571 11.7156ZM11.9999 13.6443C11.4082 13.6443 10.9285 13.1646 10.9285 12.5729C10.9285 11.9812 11.4082 11.5015 11.9999 11.5015C12.5916 11.5015 13.0713 11.9812 13.0713 12.5729C13.0713 13.1646 12.5916 13.6443 11.9999 13.6443Z" fill="#334155"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M20.3571 17.7157H19.1957C18.9103 16.7009 17.9849 15.9998 16.9307 15.9998C15.8766 15.9998 14.9511 16.7009 14.6657 17.7157H3.64286C3.28782 17.7157 3 18.0035 3 18.3585C3 18.7136 3.28782 19.0014 3.64286 19.0014H14.6614C14.9468 20.0161 15.8723 20.7173 16.9264 20.7173C17.9806 20.7173 18.9061 20.0161 19.1914 19.0014H20.3571C20.7122 19.0014 21 18.7136 21 18.3585C21 18.0035 20.7122 17.7157 20.3571 17.7157ZM16.9286 19.43C16.3369 19.43 15.8572 18.9503 15.8572 18.3585C15.8572 17.7668 16.3369 17.2871 16.9286 17.2871C17.5203 17.2871 18 17.7668 18 18.3585C18 18.9503 17.5203 19.43 16.9286 19.43Z" fill="#334155"/>
+                        </svg>
+
+
+                        <span>Configure Bot</span>
+                        <svg class="down-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2.21967 4.46967C2.51256 4.17678 2.98744 4.17678 3.28033 4.46967L6 7.18934L8.71967 4.46967C9.01256 4.17678 9.48744 4.17678 9.78033 4.46967C10.0732 4.76256 10.0732 5.23744 9.78033 5.53033L6.53033 8.78033C6.23744 9.07322 5.76256 9.07322 5.46967 8.78033L2.21967 5.53033C1.92678 5.23744 1.92678 4.76256 2.21967 4.46967Z" fill="#1E293B"/>
+            </svg>
+                    </div>
+
+                    <div class="collapsed-section-content">
+                        {% if "Bot Setting Related" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk or "Full Access" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk %}
+                            <a class="collapsed-section-href" href="/chat/bot/edit/{{ selected_bot_obj.pk }}/?selected_language=en" id="create-quick-chatbot">
+                                <div class="collapsed-section-item sidebar-menu-item">
+
+                                    <span>Settings </span>
+                                </div>
+                            </a>
+
+                        <a class="collapsed-section-href" href="/chat/channels/edit/{{ selected_bot_obj.pk }}/">
+                            <div class="collapsed-section-item sidebar-menu-item">
+
+                                <span>Integrate Channels </span>
+                            </div>
+                        </a>
+ 
+                        <a class="collapsed-section-href" href="/chat/export-import/{{ selected_bot_obj.pk }}/">
+                            <div class="collapsed-section-item sidebar-menu-item">
+
+                                <span>Export & Import Intents</span>
+                            </div>
+                        </a>
+                        {% endif %}
+
+
+
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if "test_and_deploy" in get_bot_related_type_access|get_dict_item:selected_bot_obj.pk %}
+                <div class="collabsible-sidebar-menu-wrapper">
+                    <div class="collabsible-sidebar-menu sidebar-menu-item">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M13.4469 8.38648C12.4704 8.38713 11.6247 9.06466 11.4111 10.0176C11.1975 10.9705 11.673 11.9442 12.5558 12.3616C13.4387 12.7791 14.493 12.5288 15.0939 11.7591C15.6949 10.9893 15.682 9.90581 15.0629 9.1506C14.666 8.66652 14.0729 8.38606 13.4469 8.38648ZM13.9772 11.1214C13.716 11.3359 13.3513 11.3719 13.0532 11.2124C12.7552 11.053 12.5826 10.7296 12.6162 10.3933C12.6497 10.0569 12.8826 9.77394 13.2063 9.67645C13.5299 9.57896 13.8804 9.68618 14.0942 9.94805C14.3841 10.3057 14.33 10.8305 13.9731 11.1214H13.9772Z" fill="#334155"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M20.9963 4.21091C20.9755 3.56054 20.4602 3.03437 19.8104 3C19.8104 3 19.6309 3 19.3135 3C17.5014 3 12.9959 3.29646 10.261 6.03145C9.78715 6.50814 9.34893 7.01893 8.94983 7.5597L8.84127 7.58893L3.85983 9.28838C3.44399 9.42573 3.13006 9.77027 3.0319 10.1971C2.93374 10.6239 3.06559 11.0709 3.37964 11.3762L6.04365 14.0443C5.67452 14.16 5.33527 14.3553 5.04986 14.6164C4.43167 15.343 4.14821 16.2965 4.26904 17.2428C4.21865 17.4192 4.14418 17.5878 4.04773 17.7439C3.82264 18.0921 3.78447 18.5292 3.9458 18.9112C4.10712 19.2932 4.44703 19.5706 4.85361 19.6521C4.98011 19.6773 5.10879 19.6899 5.23776 19.6897C5.61139 19.6856 5.97783 19.5864 6.30253 19.4016C6.41759 19.4853 6.54609 19.5489 6.68251 19.5895C6.91624 19.6549 7.15799 19.6872 7.4007 19.6855C8.12257 19.6888 8.81575 19.4032 9.32563 18.8922C9.59688 18.6181 9.80122 18.2852 9.92273 17.9192L12.5659 20.5624C12.8723 20.8762 13.3205 21.0069 13.7475 20.9069C14.1746 20.807 14.5183 20.491 14.6536 20.0738L16.2905 15.1634C16.8588 14.7701 17.3912 14.3271 17.8813 13.8397C21.1717 10.5243 21.0046 4.47815 20.9963 4.21091ZM7.86836 9.22153C7.26476 10.3151 6.80712 11.4831 6.50713 12.6956L4.26068 10.4742L7.86836 9.22153ZM8.43624 17.9902C8.16021 18.264 7.78524 18.4146 7.39653 18.4078C7.27552 18.4095 7.1548 18.3955 7.03743 18.366C7.03743 18.366 6.99985 17.3806 6.76602 17.1467C6.76602 17.1467 6.01442 18.3994 5.23359 18.3994C5.18777 18.404 5.14161 18.404 5.0958 18.3994C5.35389 18.0111 5.49849 17.5585 5.51335 17.0925C5.43494 16.5199 5.58493 15.9394 5.93091 15.4765C6.32906 15.1936 6.80805 15.0472 7.29631 15.059C7.71691 15.0397 8.12762 15.1901 8.43624 15.4765C8.43624 15.4765 9.30893 17.1175 8.43624 17.9902ZM13.4469 19.6605L11.0334 17.2471C12.2815 17.051 13.4932 16.6696 14.6286 16.1155L13.4469 19.6605ZM16.9752 12.9378C15.1696 14.7124 12.8131 15.8185 10.2944 16.0737L9.83922 15.6186C9.75797 15.3689 9.65746 15.126 9.53858 14.892C9.48117 14.783 9.40801 14.6832 9.32145 14.5955C8.99492 14.2709 8.58889 14.0376 8.14395 13.9191L7.63871 13.4139C8.15481 10.9545 9.37319 8.69757 11.1462 6.9167C12.156 5.96885 13.3812 5.28097 14.7163 4.91244C14.6774 6.09273 15.0946 7.24267 15.8812 8.12344C16.7331 8.89984 17.8572 9.30808 19.0087 9.25918H19.0421C18.6657 10.632 17.9639 11.8939 16.9961 12.9378H16.9752ZM19.3678 7.99392C18.2697 8.07325 17.326 7.80602 16.7665 7.24232C16.2069 6.67862 15.9314 5.70989 15.9689 4.59502C17.0686 4.37257 18.1874 4.25789 19.3094 4.25262C19.4501 4.26 19.5911 4.24449 19.7269 4.20669C19.754 5.47735 19.6335 6.74687 19.3678 7.98974V7.99392Z" fill="#334155"/>
+                        </svg>
+
+
+                        <span>Test & Deploy</span>
+                        <svg class="down-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2.21967 4.46967C2.51256 4.17678 2.98744 4.17678 3.28033 4.46967L6 7.18934L8.71967 4.46967C9.01256 4.17678 9.48744 4.17678 9.78033 4.46967C10.0732 4.76256 10.0732 5.23744 9.78033 5.53033L6.53033 8.78033C6.23744 9.07322 5.76256 9.07322 5.46967 8.78033L2.21967 5.53033C1.92678 5.23744 1.92678 4.76256 2.21967 4.46967Z" fill="#1E293B"/>
+            </svg>
+                    </div>
+
+                    <div class="collapsed-section-content">
+                        {% if "Automated Testing" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk or "Full Access" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk %} 
+                            <a class="collapsed-section-href" href="/chat/test-chatbot/?bot_pk={{ selected_bot_obj.pk }}" id="test-chatbot">
+                                <div class="collapsed-section-item sidebar-menu-item">
+
+                                    <span>Bot Automated Testing</span>
+                                </div>
+                            </a>
+                        {% endif %}
+
+                        {% if "Bot Setting Related" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk or "Full Access" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk %}
+                            <a class="collapsed-section-href" href="/chat/channels/edit/{{ selected_bot_obj.pk }}/">
+                                <div class="collapsed-section-item sidebar-menu-item">
+
+                                    <span>Deploy Bot</span>
+                                </div>
+                            </a>
+                        {% endif %}
+
+
+
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if "analyze_and_improve" in get_bot_related_type_access|get_dict_item:selected_bot_obj.pk %}
+                <div class="collabsible-sidebar-menu-wrapper">
+                    <div class="collabsible-sidebar-menu sidebar-menu-item">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M18.5485 10.0269H18.7615C19.9375 10.0857 20.9385 9.17999 20.9973 8.00398C21.0561 6.82797 20.1504 5.82696 18.9744 5.76816H18.7615C17.9549 5.76816 17.2176 6.22385 16.8569 6.94524C16.4962 7.66663 16.5741 8.52989 17.058 9.17512L14.2856 13.1017C14.1472 13.0559 14.0045 13.0245 13.8597 13.008H13.6468C13.186 13.008 12.7377 13.1574 12.3692 13.4338L9.75005 11.5643C9.87387 10.9739 9.74153 10.3588 9.3859 9.87164C9.03027 9.38447 8.48471 9.07098 7.88474 9.00903H7.6718C6.92384 9.01023 6.23135 9.40378 5.84755 10.0458C5.46375 10.6878 5.44493 11.484 5.79797 12.1434L4.27761 13.9704V3.63881C4.27761 3.286 3.99161 3 3.63881 3C3.286 3 3 3.286 3 3.63881V20.0348C3 20.205 3.06788 20.3681 3.18861 20.488C3.30933 20.608 3.47291 20.6748 3.64306 20.6736H20.0391C20.3919 20.6736 20.6779 20.3876 20.6779 20.0348C20.6779 19.682 20.3919 19.396 20.0391 19.396H4.28187V15.9635L6.72211 13.0335C6.95484 13.1524 7.20747 13.2275 7.46738 13.255H7.68032C8.21916 13.2553 8.73811 13.0514 9.13254 12.6843L11.6281 14.4687C11.581 14.6069 11.5481 14.7496 11.5302 14.8946C11.4622 15.4633 11.6262 16.0355 11.9852 16.4819C12.3442 16.9283 12.868 17.2111 13.4381 17.2667H13.651C14.4576 17.2667 15.1949 16.811 15.5556 16.0896C15.9163 15.3682 15.8384 14.5049 15.3545 13.8597L18.1269 9.93317C18.2639 9.97861 18.4052 10.01 18.5485 10.0269ZM7.68031 11.9987H7.59513C7.29083 11.9835 7.01777 11.8071 6.8788 11.536C6.73982 11.2649 6.75606 10.9402 6.92138 10.6842C7.08671 10.4283 7.37601 10.28 7.68031 10.2953H7.76548C8.23588 10.3188 8.59815 10.7192 8.57463 11.1896C8.55111 11.66 8.15071 12.0223 7.68031 11.9987ZM18.7528 7.05431H18.838C19.3084 7.07783 19.6707 7.47823 19.6472 7.94863C19.6236 8.41904 19.2232 8.78131 18.7528 8.75779H18.6677C18.1973 8.73427 17.835 8.33386 17.8585 7.86346C17.882 7.39306 18.2824 7.03079 18.7528 7.05431ZM13.6425 15.9976H13.5573C13.0869 15.9741 12.7247 15.5737 12.7482 15.1033C12.7717 14.6329 13.1721 14.2706 13.6425 14.2941H13.7277C14.1981 14.3177 14.5604 14.7181 14.5368 15.1885C14.5133 15.6589 14.1129 16.0211 13.6425 15.9976Z" fill="#334155"/>
+                        </svg>
+
+
+                        <span>Analyze & Improve</span>
+                        <svg class="down-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2.21967 4.46967C2.51256 4.17678 2.98744 4.17678 3.28033 4.46967L6 7.18934L8.71967 4.46967C9.01256 4.17678 9.48744 4.17678 9.78033 4.46967C10.0732 4.76256 10.0732 5.23744 9.78033 5.53033L6.53033 8.78033C6.23744 9.07322 5.76256 9.07322 5.46967 8.78033L2.21967 5.53033C1.92678 5.23744 1.92678 4.76256 2.21967 4.46967Z" fill="#1E293B"/>
+            </svg>
+                    </div>
+
+                    <div class="collapsed-section-content">
+                        {% if "Analytics Related" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk or "Full Access" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk %}
+                            <a class="collapsed-section-href" href="/chat/revised-analytics/?bot_id={{ selected_bot_obj.pk }}&selected_language=en" id="combined-analytics-sidenav">
+                                <div class="collapsed-section-item sidebar-menu-item">
+
+                                    <span>Analytics</span>
+                                </div>
+                            </a>
+                        {% endif %}
+
+                        {% if "API Analytics Related" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk or "Full Access" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk %}
+
+                            <a class="collapsed-section-href" href="/chat/easychat-api-analytics/?bot_pk={{ selected_bot_obj.pk }}">
+                                <div class="collapsed-section-item sidebar-menu-item">
+
+                                    <span>API Analytics</span>
+                                </div>
+                            </a>
+                        {% endif %}
+
+                        {% if "Message History Related" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk or "Full Access" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk %}
+                            <a class="collapsed-section-href" href="/chat/user-filtered/?bot_id={{ selected_bot_obj.pk }}" id="message-history-sidenav">
+                                <div class="collapsed-section-item sidebar-menu-item">
+
+                                    <span>Message History</span>
+                                </div>
+                            </a>
+                        {% endif %}
+                        {% if "Self Learning Related" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk or "Full Access" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk %}
+                            <a  class="collapsed-section-href" href="/chat/bot-learning/?bot_pk={{ selected_bot_obj.pk }}" id="bot-learning">
+                                <div class="collapsed-section-item sidebar-menu-item">
+
+                                    <span>Self Learning</span>
+                                </div>
+                            </a>
+                        {% endif %}
+
+                        {% if "Message History Related" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk or "Full Access" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk %}
+                            <a class="collapsed-section-href" href="/chat/form-widget-reports/?bot_id={{ selected_bot_obj.pk }}" id="form-widget-reports-sidenav">
+                                <div class="collapsed-section-item sidebar-menu-item">
+
+                                    <span>Download Reports</span>
+                                </div>
+                            </a>
+                        {% endif %}
+
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if request.user in selected_bot_obj.users.all or "additional_tools" in get_bot_related_type_access|get_dict_item:selected_bot_obj.pk %}
+                <div class="collabsible-sidebar-menu-wrapper">
+                    <div class="collabsible-sidebar-menu sidebar-menu-item">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M9.46154 3H4.38462C3.61991 3 3 3.61991 3 4.38462V9.46154C3 10.2262 3.61991 10.8462 4.38462 10.8462H9.46154C10.2262 10.8462 10.8462 10.2262 10.8462 9.46154V4.38462C10.8462 3.61991 10.2262 3 9.46154 3ZM9.46154 9.46154H4.38462V4.38462H9.46154V9.46154Z" fill="#334155"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M19.6153 3H14.5384C13.7737 3 13.1538 3.61991 13.1538 4.38462V9.46154C13.1538 10.2262 13.7737 10.8462 14.5384 10.8462H19.6153C20.38 10.8462 21 10.2262 21 9.46154V4.38462C21 3.61991 20.38 3 19.6153 3ZM19.6153 9.46144H14.5383V4.38452H19.6153V9.46144Z" fill="#334155"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M9.46154 13.1538H4.38462C3.61991 13.1538 3 13.7737 3 14.5384V19.6153C3 20.38 3.61991 21 4.38462 21H9.46154C10.2262 21 10.8462 20.38 10.8462 19.6153V14.5384C10.8462 13.7737 10.2262 13.1538 9.46154 13.1538ZM9.46144 19.6155H4.38452V14.5386H9.46144V19.6155Z" fill="#334155"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M19.6153 13.1538H14.5384C13.7737 13.1538 13.1538 13.7737 13.1538 14.5384V19.6153C13.1538 20.38 13.7737 21 14.5384 21H19.6153C20.38 21 21 20.38 21 19.6153V14.5384C21 13.7737 20.38 13.1538 19.6153 13.1538ZM19.6153 19.6155H14.5383V14.5386H19.6153V19.6155Z" fill="#334155"/>
+                        </svg>
+
+
+                        <span>Additional Tools</span>
+                        <svg class="down-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2.21967 4.46967C2.51256 4.17678 2.98744 4.17678 3.28033 4.46967L6 7.18934L8.71967 4.46967C9.01256 4.17678 9.48744 4.17678 9.78033 4.46967C10.0732 4.76256 10.0732 5.23744 9.78033 5.53033L6.53033 8.78033C6.23744 9.07322 5.76256 9.07322 5.46967 8.78033L2.21967 5.53033C1.92678 5.23744 1.92678 4.76256 2.21967 4.46967Z" fill="#1E293B"/>
+            </svg>
+                    </div>
+
+                    <div class="collapsed-section-content">
+                        {% if request.user in selected_bot_obj.users.all %}
+                        <a class="collapsed-section-href" href="/campaign/dashboard/?bot_pk={{ selected_bot_obj.pk }}" target="_blank">
+                            <div class="collapsed-section-item sidebar-menu-item" >
+
+                                <span>Campaigns</span>
+                            </div>
+                        </a>
+                        <a class="collapsed-section-href" href="/chat/easychat-api-documentation/?bot_id={{ selected_bot_obj.pk }}" target="_blank">
+                            <div class="collapsed-section-item sidebar-menu-item" >
+
+                                <span>API Documentation</span>
+                            </div>
+                        </a>
+                        {% endif %}
+
+                        {% if "Form Assist Related" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk or "Full Access" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk %}     
+                            {% if selected_bot_obj.is_form_assist_enabled %}
+
+                                <a class="collapsed-section-href" href="/chat/form-assist/?bot_pk={{ selected_bot_obj.pk }}" id="form-assist">
+                                    <div class="collapsed-section-item sidebar-menu-item">
+
+                                        <span>Form Assist</span>
+                                    </div>
+                                </a>
+                            {% endif %}
+                        {% endif %}
+
+                        {% if "Lead Gen Related" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk or "Full Access" in get_bot_related_access_perm|get_dict_item:selected_bot_obj.pk %}     
+                            {% if selected_bot_obj.is_lead_generation_enabled %}
+                                <a class="collapsed-section-href" href="/chat/lead-generation/?bot_pk={{ selected_bot_obj.pk }}" id="lead-generation">
+                                    <div class="collapsed-section-item sidebar-menu-item">
+
+                                        <span>Lead Generation</span>
+                                    </div>
+                                </a>
+                            {% endif %}
+                        {% endif %}
+
+
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="collapse-expand-sidebar-div">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="16" cy="16" r="16" fill="#EBEBEB"/>
+            <path d="M12.7979 15.7866C12.7975 15.5041 12.9188 15.2351 13.1309 15.0484L17.892 10.8598C18.2202 10.5845 18.7081 10.6214 18.991 10.9431C19.2739 11.2647 19.2483 11.7534 18.9333 12.0437L14.7699 15.7063C14.7467 15.7266 14.7335 15.7559 14.7335 15.7866C14.7335 15.8173 14.7467 15.8466 14.7699 15.8669L18.9333 19.5295C19.1525 19.7134 19.2548 20.0016 19.2008 20.2825C19.1467 20.5635 18.9448 20.7931 18.673 20.8826C18.4013 20.9721 18.1024 20.9073 17.892 20.7134L13.1326 16.5261C12.92 16.339 12.7981 16.0697 12.7979 15.7866Z" fill="black"/>
+            <mask id="mask0" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="12" y="10" width="8" height="11">
+            <path d="M12.7979 15.7866C12.7975 15.5041 12.9188 15.2351 13.1309 15.0484L17.892 10.8598C18.2202 10.5845 18.7081 10.6214 18.991 10.9431C19.2739 11.2647 19.2483 11.7534 18.9333 12.0437L14.7699 15.7063C14.7467 15.7266 14.7335 15.7559 14.7335 15.7866C14.7335 15.8173 14.7467 15.8466 14.7699 15.8669L18.9333 19.5295C19.1525 19.7134 19.2548 20.0016 19.2008 20.2825C19.1467 20.5635 18.9448 20.7931 18.673 20.8826C18.4013 20.9721 18.1024 20.9073 17.892 20.7134L13.1326 16.5261C12.92 16.339 12.7981 16.0697 12.7979 15.7866Z" fill="white"/>
+            </mask>
+            <g mask="url(#mask0)">
+            </g>
+          </svg>
+                </div>
+            </div>
+        </div>

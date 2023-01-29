@@ -1,0 +1,1833 @@
+{% load static %}
+{% load easyassist_custom_filters %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  
+  {% if cobrowse_config_obj.cobrowsing_favicon %}
+    <link rel="shortcut icon" type="image/x-icon" href="{{ cobrowse_config_obj.cobrowsing_favicon }}">
+  {% else %}
+    {% if request.user.enable_s3_bucket %}
+    <link rel="shortcut icon" type="image/x-icon" href="https://static.allincall.in/static/EasyAssistApp/img/cobrowseLogoShort.svg">
+    {% else %}
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'EasyAssistApp/img/cobrowseLogoShort.svg' %}">
+    {% endif %}
+  {% endif %}
+  
+
+  <title>{{ cobrowse_config_obj.cobrowsing_title_text }}</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+  
+  {% if request.user.enable_s3_bucket %}
+  <!-- Custom fonts for this template-->
+  <link href="https://static.allincall.in/static/EasyAssistApp/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+
+  <link rel="stylesheet" href="https://static.allincall.in/static/EasyAssistApp/css/bootstrap-select.css" />
+  <!-- Custom styles for this template-->
+
+  <link href="https://static.allincall.in/static/EasyAssistApp/css/sb-admin-2.min.css" rel="stylesheet">
+
+  <link href="https://static.allincall.in/static/EasyAssistApp/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+
+  <script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/vendor/jquery/jquery.min.js"></script>
+
+  <script src="https://static.allincall.in/static/EasyAssistApp/vendor/chart.js/Chart.min.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="https://static.allincall.in/static/EasyAssistApp/css/bootstrap-datepicker.min.css">
+  
+  <link rel="stylesheet" type="text/css" href="https://static.allincall.in/static/EasyAssistApp/css/bootstrap-multiselect.css">
+
+  {% else %}
+  <!-- Custom fonts for this template-->
+  <link href="{% static 'EasyAssistApp/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+
+  <link rel="stylesheet" href="{% static 'EasyAssistApp/css/bootstrap-select.css' %}" />
+  <!-- Custom styles for this template-->
+
+  <link href="{% static 'EasyAssistApp/css/sb-admin-2.min.css' %}" rel="stylesheet">
+
+  <link href="{% static 'EasyAssistApp/vendor/datatables/dataTables.bootstrap4.min.css' %}" rel="stylesheet">
+
+  <script type="text/javascript" src="{% static 'EasyAssistApp/vendor/jquery/jquery.min.js' %}"></script>
+
+  <script src="{% static 'EasyAssistApp/vendor/chart.js/Chart.min.js' %}"></script>
+
+  <link rel="stylesheet" type="text/css" href="{% static 'EasyAssistApp/css/bootstrap-datepicker.min.css' %}">
+  
+  <link rel="stylesheet" type="text/css" href="{% static 'EasyAssistApp/css/bootstrap-multiselect.css' %}">
+
+  {% endif %}
+
+  <link rel="stylesheet" type="text/css" href="{% static 'EasyAssistApp/css/console.css' %}">
+
+  <link rel="stylesheet" type="text/css" href="{% static 'EasyAssistApp/css/cobrowse_changes.css' %}">
+
+  <link rel="stylesheet" type="text/css" href="{% static 'EasyAssistApp/css/cobrowse_responsive.css' %}">
+
+  <link rel="stylesheet" type="text/css" href="{% static 'EasyAssistApp/css/easyassist-custom-select.css' %}">
+
+  <style>
+
+  .sidebar::-webkit-scrollbar {
+    display: none;
+  }
+
+  #accordionSidebar{
+    overflow-y: auto!important;
+    min-height: unset!important;
+    overflow-x: hidden;
+    top: 0;
+    bottom: 0;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;
+  }
+  .request_in_queue_count_bubble_wrapper {
+    border-radius: 50%;
+    background: #FF281A;
+    color: white;
+    font-size: 12px!important;
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+    vertical-align: middle;
+  }
+
+  .datepicker table tr td.active.active{
+    display: revert;
+  }
+
+  @media (max-width:768px) {
+    .request_in_queue_count_bubble_wrapper{
+        position: absolute;
+        right: 30px;
+        top: 8px;
+    }  
+  }
+
+  @media (min-width: 768px){
+    .request_in_queue_count_bubble_wrapper {
+        margin-left: 0.6em;
+    }
+  }
+  
+  @media only screen and (min-width: 760px) {
+    #accordionSidebar{
+      overflow-y: auto;
+      overflow-x: hidden;
+      z-index: 99999;
+      top: 0;
+      bottom: 0;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    #content-wrapper{
+      height:100vh;
+    }
+  }
+  @media only screen and (min-width: 769px) {
+    #accordionSidebar{
+      max-height: 100vh;
+    }
+  }
+
+  @media (min-width: 768px) {
+    #accordionSidebar {
+      width: 16rem !important;
+    }
+
+    #accordionSidebar.toggled {
+      width: 7rem!important;
+    }
+  }
+
+  .sidebar.toggled #submenu1, .sidebar.toggled #submenu2 {
+    position: relative!important;
+    left: 0!important;
+    top: 0!important;
+  }
+
+  .sidebar.toggled .nav-link-sub-menu svg {
+      margin: 0 1em;
+  }
+
+  @media only screen and (max-width: 600px) {
+    .sidebar.toggled {
+      position: fixed;
+      width: 6.5rem!important;
+    }
+  }
+  </style>
+  <style>
+    {% if access_token_obj.cobrowsing_console_theme_color != None %}
+
+    :root {
+      --color_rgba_3: rgba({{ access_token_obj.get_cobrowsing_console_theme_color.red }}, {{ access_token_obj.get_cobrowsing_console_theme_color.green }}, {{ access_token_obj.get_cobrowsing_console_theme_color.blue }}, 0.03);
+
+      --color_rgba_5: rgba({{ access_token_obj.get_cobrowsing_console_theme_color.red }}, {{ access_token_obj.get_cobrowsing_console_theme_color.green }}, {{ access_token_obj.get_cobrowsing_console_theme_color.blue }}, 0.05);
+
+      --color_rgba_8: rgba({{ access_token_obj.get_cobrowsing_console_theme_color.red }}, {{ access_token_obj.get_cobrowsing_console_theme_color.green }}, {{ access_token_obj.get_cobrowsing_console_theme_color.blue }}, 0.08);
+
+      --color_rgba_10: rgba({{ access_token_obj.get_cobrowsing_console_theme_color.red }}, {{ access_token_obj.get_cobrowsing_console_theme_color.green }}, {{ access_token_obj.get_cobrowsing_console_theme_color.blue }}, 0.1);
+
+      --color_rgba_80: rgba({{ access_token_obj.get_cobrowsing_console_theme_color.red }}, {{ access_token_obj.get_cobrowsing_console_theme_color.green }}, {{ access_token_obj.get_cobrowsing_console_theme_color.blue }}, 0.8);
+
+      --color_rgba_90: rgba({{ access_token_obj.get_cobrowsing_console_theme_color.red }}, {{ access_token_obj.get_cobrowsing_console_theme_color.green }}, {{ access_token_obj.get_cobrowsing_console_theme_color.blue }}, 0.9);
+
+      --color_rgba_60: rgba({{ access_token_obj.get_cobrowsing_console_theme_color.red }}, {{ access_token_obj.get_cobrowsing_console_theme_color.green }}, {{ access_token_obj.get_cobrowsing_console_theme_color.blue }}, 0.6);
+
+      --color_rgb: {{ access_token_obj.get_cobrowsing_console_theme_color.rgb }};
+
+      --dark_color: {{ access_token_obj.get_dark_theme_color }};
+
+      --color_text: #4A4A4A;
+    }
+
+    .agent-status-toggle input:checked+.easyassist-custom-toggle-slider:before {
+      content: url("data:image/svg+xml,%3Csvg width='3' height='9' viewBox='0 0 3 9' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='0.987305' y='0.892334' width='1' height='7' rx='0.5' stroke='%23{{ access_token_obj.get_cobrowsing_console_theme_color.hex|slice:'1:' }}'/%3E%3C/svg%3E%0A") !important;
+    }
+
+    .chat-agent-message-bubble{
+      background-color: var(--color_rgb) !important;
+    }
+
+    .nj-timepick__box--active {
+      background: var(--color_rgb) !important;
+      border: 2px var(--color_rgb) !important;
+    }
+
+    .chat-client-image, .chat-agent-image{
+      background-color: var(--color_rgb) !important;
+    }
+
+    .fa-file-download{
+      color: var(--color_rgb) !important;
+    }
+
+    .easyassist-chat-bubble{
+      background: var(--color_rgb) !important;
+    }
+    
+    .file-upload-img-div-client path{
+      fill: var(--color_rgb) !important;
+    }
+
+    #archive_lead_modal .btn-secondary {
+      color: var(--color_rgb)!important;
+    }
+
+    #content {
+      background: var(--color_rgba_3) !important;
+    }
+
+    .sticky-footer {
+      background: var(--color_rgba_3) !important;
+    }
+
+    .card-header {
+      background: var(--color_rgba_3) !important;
+    }
+
+    .tooltip.show {
+        opacity: 1;
+    }
+
+    .bs-tooltip-auto[x-placement^=bottom] .arrow::before, .bs-tooltip-bottom .arrow::before {
+        border-bottom-color: var(--color_rgba_90) !important;
+    }
+
+    .bs-tooltip-auto[x-placement^=top] .arrow::before, .bs-tooltip-top .arrow::before {
+        border-top-color: var(--color_rgba_90) !important;
+    }
+
+    .bs-tooltip-auto[x-placement^=left] .arrow::before, .bs-tooltip-left .arrow::before {
+        border-left-color: var(--color_rgba_90) !important;
+    }
+
+    .bs-tooltip-auto[x-placement^=right] .arrow::before, .bs-tooltip-right .arrow::before {
+        border-right-color: var(--color_rgba_90) !important;
+    }
+
+    .tooltip-inner {
+          background: var(--color_rgba_90) !important;
+    }
+
+    .btn-primary, .btn-info {
+      background: var(--color_rgb) !important;
+    }
+
+    .btn-primary:hover,
+    .btn-info:hover {
+      color: #FFFFFF!important;
+      background: var(--color_rgb) !important;
+    }
+
+    .modal .btn-primary {
+      background: var(--color_rgb) !important;
+      border: none!important;
+    }
+
+    .modal .btn-primary:hover {
+      background: var(--color_rgb) !important;
+    }
+
+    th {
+      color: var(--color_text) !important;
+      background: var(--color_rgba_8) !important;
+    }
+
+    .admin-agent-management-table-area  table thead th{
+      border-right: 1px solid #FFFFFF !important;
+      background: var(--color_rgba_8) !important;
+    }
+
+    .filter-header-row {
+      background: var(--color_rgba_8) !important;
+    }
+
+    .filter-chip {
+      background: var(--color_rgba_8) !important;
+      border: 1px solid var(--color_rgb)!important;
+      color: var(--color_rgb)!important;
+    }
+
+    .filter-chip path {
+      fill: var(--color_rgb)!important;
+    }
+
+    .filter-remove-icon {
+      background: var(--color_rgba_8) !important;
+    }
+
+    .filter-remove-icon path {
+      fill: var(--color_rgb)!important;
+    }
+
+    .filter-remove-icon path {
+      stroke: var(--color_rgb)!important;
+    }
+
+    .clear-all-filter-btn {
+      color: var(--color_rgb)!important;
+    }
+
+    .sidebar-dark .nav-item.active .nav-link {
+      background-color: var(--color_rgba_10) !important;
+    }
+
+    .sidebar-dark .nav-item .nav-link:hover {
+      background: var(--color_rgba_10) !important;
+    }
+
+    input:checked + .easyassist-switch-slider {
+      background: var(--color_rgb) !important;
+    }
+
+    .text-primary {
+      color: var(--color_text) !important;
+    }
+
+    .page-item.active .page-link {
+      background: var(--color_rgb) !important;
+      border-color: var(--color_rgb) !important;
+      color: #fff!important;
+    }
+
+    .btn-tab {
+      color: var(--color_rgb) !important;
+      border: 1px solid var(--color_rgb) !important;
+    }
+
+    .btn-tab-active {
+      background: var(--color_rgba_3) !important;
+      border: 1px solid var(--color_rgb) !important;
+    }
+
+    .btn-link {
+      color: var(--color_rgb) !important;
+    }
+
+    .nav-pills .nav-link.active {
+      color: var(--color_rgb) !important;
+      border: 1px solid var(--color_rgb) !important;
+      background: var(--color_rgba_10) !important;
+    }
+
+    a {
+      color: var(--color_text);
+    }
+
+    a:hover {
+      color: var(--color_rgb) !important;
+    }
+    /*{% if access_token_obj.get_cobrowsing_console_theme_color != None %}
+    .active1 {
+      color: var(--color_rgb) !important;
+    }
+    {% else %}
+    
+    .active1 {
+      color: #0254D7 !important;
+    }
+    {% endif %}*/
+    
+    /*.card-title{
+      color: var(--color_rgb) !important;
+    }*/
+
+    .modal-title {
+      color: var(--color_text)!important;
+    }
+
+    .form-control:disabled, .form-control[readonly] {
+      background-color: var(--color_rgba_3) !important;
+    }
+
+    .card-cobrowse {
+      background: linear-gradient(180deg, var(--color_rgb) 0%, var(--dark_color) 100%)!important;
+    }
+
+    .icon-cobrowse {
+      background: var(--color_rgb) !important;
+    }
+
+    .icon-download {
+      background: var(--color_rgb) !important;
+    }
+
+    .sidebar-dark #sidebarToggle {
+      color: #FFFFFF!important;
+      background: var(--color_rgba_10) !important;
+    }
+
+    .btn-danger:hover {
+      color: #FFFFFF!important;
+    }
+
+    .bg-primary {
+       background: var(--color_rgb)!important;
+    }
+
+    .sessiondetail-icon {
+       background: var(--color_rgb)!important;
+       background-color: rgba(0,0,0,.15)!important;
+    }
+
+    @media only screen and (min-width: 768px) {
+      .input-group-text {
+        background: var(--color_rgba_5) !important;
+      }
+    }
+
+    .btn-outline-primary {
+      color: var(--color_rgb)!important;
+      border: 1px solid var(--color_rgb)!important;
+    }
+
+    .btn-outline-primary:hover {
+      color: var(--color_rgb)!important;
+    }
+
+    #refresh-btn svg path {
+      fill: var(--color_rgb)!important;
+    }
+
+    .easychat-bot-message{
+      background: var(--color_rgba_10) !important;
+    }
+
+    .left-side-chat{
+      background: var(--color_rgba_10) !important;
+    }
+
+    .active-page {
+      color: var(--color_rgb) !important;
+      background: var(--color_rgba_10) !important;
+      border-bottom: 3px solid var(--color_rgb) !important;
+    }
+
+    .btn-white-border {
+      border: 1px solid var(--color_rgb)!important;
+      color: var(--color_rgb)!important;
+    }
+
+    .btn-text-only {
+      color: var(--color_rgb)!important;
+    }
+
+    .btn.btn-text-only:hover {
+      color: var(--color_rgb)!important;
+    }
+
+    .agent-username-link {
+      color: var(--color_rgb)!important;
+    }
+
+    #apply_filter_modal .btn-secondary {
+      color: var(--color_rgb)!important;
+    }
+
+    .upload_file_modal svg path {
+      fill: var(--color_rgba_60)!important;
+    }
+
+    .btn-success {
+      background: var(--color_rgb)!important;
+      border: none!important;
+      color: #fff!important;
+    }
+
+    .easyassist-switch-checkbox-label input:checked ~ .easyassist-switch-checkbox {
+      background-color: var(--color_rgb)!important;
+    }
+
+    .easyassist-switch-checkbox {
+      border-color: var(--color_rgb)!important;
+    }
+    
+    /*#save-btn{
+      background: var(--color_rgb)!important;
+    }*/
+    
+    #password-change-cancel-btn {
+      background: var(--color_rgb)!important;
+    }
+
+    .datepicker table.table-condensed tr td.active {
+        background: var(--color_rgb)!important;
+        display: revert;
+    }
+
+    .datepicker table.table-condensed tr td span.active{
+      background: var(--color_rgb)!important;
+    }
+
+    .sidebar-dark .nav-item.active .nav-link span {
+        color: var(--color_rgb)!important;
+    }
+
+    .sidebar-dark .nav-item.active .nav-link svg path {
+        fill:  var(--color_rgb)!important;
+    }
+
+    .suggestion-id-div a:hover {
+      background: var(--color_rgba_80)!important;
+      color: white!important;
+    }
+
+    .checkbox-include-screenshot .cam input:checked~.checkmark {
+      color: var(--color_rgb) !important;
+      background-color: var(--color_rgb) !important;
+      border-color: var(--color_rgb) !important;
+    }
+
+    .agent-management-status-tile > div.active{
+      background-color: var(--color_rgba_8) !important;
+    }
+
+    .download-doc-svg path {
+      fill: var(--color_rgb) !important;
+    }
+
+    .dropdown-item:focus, .dropdown-item:hover{
+      background-color: var(--color_rgba_8) !important;
+    }
+
+    .dropdown-item.active, .dropdown-item:active{
+      background-color: var(--color_rgba_90) !important;
+      color: white !important;
+    }
+
+    .easyassist-custom-dropdown-container li:hover{
+      background-color: var(--color_rgba_90) !important;
+      color: white !important;
+    }
+
+    #custom-accordion .accordion-button:not(.collapsed) {
+      color: var(--color_rgb) !important;
+    }
+
+    .checkbox-btn-container-item input[type="checkbox"]:checked~label::before {
+      color: var(--color_rgb) !important;
+      background-color: var(--color_rgb) !important;
+      border-color: var(--color_rgb) !important;
+    }
+
+    .agent-status-toggle input:checked+.easyassist-custom-toggle-slider {
+      background: var(--color_rgb) !important;
+    }
+    
+    #custom-accordion .card-title{
+      color: var(--color_rgb) !important;
+    }
+
+    .easyassist-beta-tag {
+      fill: var(--color_rgb) !important;
+    }
+
+    .individual:checked ~ .label-for-check,
+    .selectall:checked ~ .label-for-check{
+      color: var(--color_rgb) !important;
+    }
+
+    {% else %}
+
+    #archive_lead_modal .btn-secondary {
+      color: #0254D7!important;
+    }
+    
+    #apply_filter_modal .btn-secondary {
+      color: #0254D7!important;
+    }
+
+    #custom-accordion .accordion-button:not(.collapsed) {
+      color: #2755cb !important;
+    }
+
+    #custom-accordion .card-title{
+      color: #2755cb !important;
+    }
+
+    .easyassist-beta-tag {
+      fill: #2755cb !important;
+    }
+    {% endif %}
+    
+    #change-password-button {
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  padding-right: 0px !important;
+  width: 165px !important;
+
+  {% if access_token_obj.get_cobrowsing_console_theme_color != None %}
+    color: {{access_token_obj.get_cobrowsing_console_theme_color.hex}} !important;
+  {% else %}
+    color: #0254D7 !important;
+  {% endif %}
+
+  text-align: right !important;
+}
+    
+    .download-generated-document-btn-setting:focus {
+      outline: none;
+    }
+    
+    
+    {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+  #pills-options-tab .nav-item .nav-link.active {
+    border-bottom: easyassist-option-switch-slider3px solid   {{ access_token_obj.get_cobrowsing_console_theme_color.hex }} !important;
+    color: {{ access_token_obj.get_cobrowsing_console_theme_color.hex }} !important;
+    background-color: inherit;
+    border: none;
+  }
+  input:checked + .easyassist-option-switch-slider {
+    background-color: {{ access_token_obj.get_cobrowsing_console_theme_color.hex }} !important;
+    border: 2px solid {{ access_token_obj.get_cobrowsing_console_theme_color.hex }} !important;
+  }
+
+  #cobrowse_logo_upload_button {
+    background: {{ access_token_obj.get_cobrowsing_console_theme_color.hex }} !important;
+  }
+  
+  .active1 {
+    color: var(--color_rgb) !important;
+    }
+
+  .card-subheader-heading-text {
+    color: #2D2D2D!important;
+  }
+  
+  .add-fields-btn{
+    background-color: var(--color_rgb) !important;
+    padding: 6px 32px 5px;
+    font-weight: 500;
+    font-size: 16px;
+    color: #ffffff;
+  }
+   
+  #reset-button, #save-button, #download-button {
+    padding: 10px 16px;
+    width: 148px;
+    height: 41px;
+    background: var(--color_rgb) !important;
+    color: white;
+    margin-right: 10px !important;
+  }
+  
+  .btn_blue {
+    background: #0254D7!important;
+    padding: 8px 16px;
+  }
+  
+  .text-primary {
+    color: var(--color_text) !important;
+ }
+ #display_chat_icon #chat_icon_upload_button,
+#display_icon #connect_with_agent_icon_upload_button{
+    background: var(--color_rgb) !important;
+    border-radius: 9px !important;
+    padding: 10px 16px !important;
+    width: 123px;
+    height: 42px;
+}
+  /*#save-button{
+    background: {{ access_token_obj.get_cobrowsing_console_theme_color.hex }} !important;
+  }*/
+  .edit-icon svg {
+    fill: {{ access_token_obj.get_cobrowsing_console_theme_color.hex }} !important;
+  }
+{% else %}
+  #pills-options-tab .nav-item .nav-link.active {
+    border-bottom: 3px solid  #435ac6 !important;
+    color: #435ac6 !important;
+    background-color: inherit;
+    border: none;
+  }
+
+  
+  #display_chat_icon #chat_icon_upload_button,
+#display_icon #connect_with_agent_icon_upload_button{
+    background: #0254D7 !important;
+    border-radius: 9px !important;
+    padding: 10px 16px !important;
+    width: 123px;
+    height: 42px;
+}
+
+  .edit-icon svg {
+    fill: #0254D7 !important;
+  }
+  
+  .active1 {
+    color: #0254D7 !important;;
+    }
+  
+    .btn_blue {
+    background: #0254D7!important;
+    padding: 8px 16px;
+  }
+    
+  .btn-info {
+  background-color: #0254D7!important;
+  border: 0px !important;
+  }
+ 
+.text-primary {
+    color: #2755cb !important;
+ }
+  
+ .add-fields-btn{
+    background-color: #0254D7 !important;
+    padding: 6px 32px 5px;
+    font-weight: 500;
+    font-size: 16px;
+    color: #ffffff;
+  }
+
+  #reset-button, #save-button, #download-button {
+    padding: 10px 16px;
+    width: 148px;
+    height: 41px;
+    background:  #0254D7 !important;
+    color: white;
+    margin-right: 10px !important;
+  }
+{% endif %}
+
+{% if access_token_obj.cobrowsing_console_theme_color != None %}
+  .page-link {
+    color: var(--color_rgb)
+  }
+
+  .page-link:hover {
+    color: var(--color_rgb)
+  }
+{% endif %}
+
+/* below css for custom checkbox for theme color matching */
+{% if access_token_obj.cobrowsing_console_theme_color != None %}
+.cam {
+    display: inline-block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    font-size: 22px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  .cam input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+  .cam input:checked ~ .checkmark {
+    background-color: var(--color_rgb) !important;
+  }
+  .cam .checkmark:after {
+    left: 5px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+  }
+  .cam input:checked ~ .checkmark:after {
+    display: block;
+  }
+  .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 18px;
+    width: 18px;
+    border: 1px solid var(--color_rgb) !important;
+    background-color: #ffffff;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+  .filter-modal-custom-checkbox input:checked ~ .filter-custom-checkmark {
+    background-color: var(--color_rgb) !important;
+  }
+  .filter-custom-checkmark {
+    border: 1px solid var(--color_rgb) !important;
+  }
+
+  {% else %}
+  .cam {
+    display: inline-block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    font-size: 22px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  .cam input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+  .cam input:checked ~ .checkmark {
+    background-color: #2755cb !important;
+  }
+  .cam .checkmark:after {
+    left: 5px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+  }
+  .cam input:checked ~ .checkmark:after {
+    display: block;
+  }
+  .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 18px;
+    width: 18px;
+    border: 1px solid #2755cb !important;
+    background-color: #ffffff;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+  {% endif %}
+  
+  </style>
+</head>
+
+<body id="page-top">
+  {% csrf_token %}
+  <!-- Page Wrapper -->
+  <div id="wrapper">
+
+    <!-- Sidebar -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion toggled" id="accordionSidebar" style="z-index: 0;">
+
+      <!-- Sidebar - Brand -->
+      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/" style="height:3.75rem !important;">
+          <div class="sidebar-brand-icon rotate-n-15"></div>
+          {% if cobrowse_config_obj.cobrowsing_logo and cobrowse_config_obj.cobrowsing_favicon %}
+            <img id="cobrowseLogoImage" src="{{ cobrowse_config_obj.cobrowsing_logo }}" max-width = "90px" height = "50px" />
+            <img id="cobrowseLogoSmall" src="{{ cobrowse_config_obj.cobrowsing_favicon }}" max-width = "90px" height = "50px" />
+          {% else %}
+            {% if access_token_obj.source_easyassist_cobrowse_logo %}
+            <img id="cobrowseLogoImage" src="/{{ access_token_obj.source_easyassist_cobrowse_logo }}" alt="Cogno CoBrowse" max-width = "90px" height = "50px" />
+            <img id="cobrowseLogoSmall" src="/{{ access_token_obj.source_easyassist_cobrowse_logo }}" alt="Cogno CoBrowse" max-width = "90px" height = "50px" />
+            {% else %}
+            {% if access_token_obj and access_token_obj.agent.user.enable_s3_bucket %}
+            <img id="cobrowseLogoImage" src="https://static.allincall.in/static/EasyAssistApp/img/cobrowseLogo.svg" id="sales-ai-logo" alt="Cogno CoBrowse" max-width = "90px" height = "50px"/>
+            <img id="cobrowseLogoSmall" src="https://static.allincall.in/static/EasyAssistApp/img/cobrowseLogoShort.svg" id="sales-ai-logo" alt="Cogno CoBrowse" />
+            {% else %}
+            <img id="cobrowseLogoImage" src="{% static 'EasyAssistApp/img/cobrowseLogo.svg' %}" id="sales-ai-logo" alt="Cogno CoBrowse" max-width = "90px" height = "50px"/>
+            <img id="cobrowseLogoSmall" src="{% static 'EasyAssistApp/img/cobrowseLogoShort.svg' %}" id="sales-ai-logo" alt="Cogno CoBrowse" />
+            {% endif %}
+            {% endif %}
+          {% endif %}
+      </a>
+      <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3"
+        amino-styles="margin: 5px 0 10px 0 !important;" style="min-height: 42px!important;">
+        <i class="fa fa-bars"></i>
+      </button>
+
+      <div class="topbar-divider-left-nav"></div>
+      
+      
+      {% if cobrowse_agent.is_switch_allowed %}
+
+        {% if cobrowse_agent.role == "agent" %}
+          <li class="admin-agent-toggle-li">
+              {% if access_token_obj.agent == cobrowse_agent %}  
+              Admin&nbsp;
+              <label class="easyassist-switch" data-toggle="tooltip" title="Switch to Admin role">
+                <input type="checkbox" id="checkbox-mark-as-agent-admin" onclick="check_and_mark_agent_as_admin(this)" checked>
+                <span class="easyassist-switch-slider round"></span>
+              </label>
+              &nbsp;Agent
+              {% else %}
+                Supervisor&nbsp;
+                <label class="easyassist-switch" data-toggle="tooltip" title="Switch to Supervisor role">
+                  <input type="checkbox" id="checkbox-mark-as-agent-admin" onclick="check_and_mark_agent_as_admin(this)" checked>
+                  <span class="easyassist-switch-slider round"></span>
+                </label>
+                &nbsp;Agent
+              {% endif %}
+          </li>
+        {% else %}
+          <li class="admin-agent-toggle-li">
+            {% if access_token_obj.agent == cobrowse_agent %}
+            Admin&nbsp;
+            <label class="easyassist-switch" data-toggle="tooltip" title="Switch to Agent role">
+              <input type="checkbox" id="checkbox-mark-as-agent-admin" onclick="check_and_mark_agent_as_admin(this)">
+              <span class="easyassist-switch-slider round"></span>
+            </label>
+            &nbsp;Agent
+            {% else %}
+              Supervisor&nbsp;
+              <label class="easyassist-switch" data-toggle="tooltip" title="Switch to Agent role">
+                <input type="checkbox" id="checkbox-mark-as-agent-admin" onclick="check_and_mark_agent_as_admin(this)">
+                <span class="easyassist-switch-slider round"></span>
+              </label>
+              &nbsp;Agent
+            {% endif %}
+          </li>
+        {% endif %}
+
+      {% endif %}
+
+      {% if cobrowse_agent.role == "agent" %}
+
+        {% if cobrowse_agent.is_active %}
+          <li class="agent-online-li">Offline&nbsp;
+            <label class="easyassist-switch" data-toggle="tooltip" title="Mark as Offline">
+              <input type="checkbox" id="checkbox-mark-as-active" onclick="check_and_mark_agent_active_status(this)" checked>
+              <span class="easyassist-switch-slider round"></span>
+            </label>
+            &nbsp;Online
+          </li>
+        {% else %}
+          <li class="agent-online-li">Offline&nbsp;
+            <label class="easyassist-switch" data-toggle="tooltip" title="Mark as Online">
+              <input type="checkbox" id="checkbox-mark-as-active" onclick="check_and_mark_agent_active_status(this)">
+              <span class="easyassist-switch-slider round"></span>
+            </label>
+            &nbsp;Online
+          </li>
+        {% endif %}
+
+      {% endif %}
+
+      <div class="topbar-divider-left-nav d-sm-block"></div>
+
+      <!-- Divider -->
+      <hr class="sidebar-divider my-0">
+
+      <!-- Nav Item - Dashboard -->
+      <li class="nav-item active nav-item-menu">
+          <a class="nav-link tooltip-navbar" href="/easy-assist/sales-ai/dashboard/" data-tooltip="tooltip" data-original-title="Active Customers">
+            <svg width="20" height="19" viewBox="0 0 20 19" fill="none" xmlns="http://www.w3.org/2000/svg" >
+              <path d="M2 10.999L11 11C12.0538 11 12.9181 11.8155 12.9945 12.8507L13 13V14.5C12.999 18 9.284 19 6.5 19C3.77787 19 0.164695 18.044 0.00545406 14.7296L0 14.5V12.999C0 11.9452 0.816397 11.0809 1.85081 11.0045L2 10.999ZM13.22 11H18C19.0538 11 19.9181 11.8164 19.9945 12.8508L20 13V14C19.999 17.062 17.142 18 15 18C14.32 18 13.569 17.904 12.86 17.678C13.196 17.292 13.467 16.851 13.662 16.351C14.205 16.476 14.715 16.5 15 16.5L15.2665 16.494C16.2518 16.4509 18.3529 16.1306 18.4927 14.205L18.5 14V13C18.5 12.7547 18.3222 12.5504 18.0896 12.5081L18 12.5H13.949C13.865 11.9986 13.6554 11.5432 13.3545 11.1598L13.22 11H18H13.22ZM2 12.499L1.89934 12.509C1.77496 12.5343 1.69 12.6018 1.646 12.645C1.6028 12.689 1.53528 12.7733 1.51 12.898L1.5 12.999V14.5C1.5 15.509 1.95 16.222 2.917 16.742C3.74315 17.1869 4.91951 17.4563 6.18258 17.4951L6.5 17.5L6.8174 17.4951C8.08035 17.4563 9.25592 17.1869 10.083 16.742C10.9886 16.2545 11.4416 15.5974 11.4947 14.6849L11.5 14.499V13C11.5 12.7547 11.3222 12.5504 11.0896 12.5081L11 12.5L2 12.499ZM6.5 0C8.985 0 11 2.015 11 4.5C11 6.985 8.985 9 6.5 9C4.015 9 2 6.985 2 4.5C2 2.015 4.015 0 6.5 0ZM15.5 2C17.433 2 19 3.567 19 5.5C19 7.433 17.433 9 15.5 9C13.567 9 12 7.433 12 5.5C12 3.567 13.567 2 15.5 2ZM6.5 1.5C4.846 1.5 3.5 2.846 3.5 4.5C3.5 6.154 4.846 7.5 6.5 7.5C8.154 7.5 9.5 6.154 9.5 4.5C9.5 2.846 8.154 1.5 6.5 1.5ZM15.5 3.5C14.397 3.5 13.5 4.397 13.5 5.5C13.5 6.603 14.397 7.5 15.5 7.5C16.603 7.5 17.5 6.603 17.5 5.5C17.5 4.397 16.603 3.5 15.5 3.5Z" fill="#212121"/>
+            </svg>
+
+            <span>Active Customers</span>
+            <div class="cobrowsing_count_bubble_wrapper" style="display: none;">
+              <div id="total_cobrowsing_count" class="cobrowsing_count_bubble"></div>
+            </div>
+          </a>
+      </li>
+
+      {% if access_token_obj.enable_request_in_queue %}
+      <li class="nav-item active nav-item-menu">
+        <a class="nav-link tooltip-navbar" href="/easy-assist/sales-ai/request-queue-dashboard/" data-tooltip="tooltip"
+          data-original-title="Requests in Queue">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M6.56809 0.592108C5.55421 0.831028 4.42057 1.59771 3.84541 2.43363C2.39785 4.53771 2.90269 7.47627 4.96225 8.93427L5.30461 9.17655L4.50037 9.57243C3.52765 10.0513 2.25493 11.2209 1.69477 12.1509C1.14373 13.0655 0.744014 14.2125 0.647294 15.1563L0.566895 15.9415H1.05613H1.54525L1.62301 15.3715C1.84453 13.7478 2.45893 12.496 3.54565 11.4547C5.32525 9.74955 8.16001 9.33255 10.38 10.4495C10.644 10.5823 10.8777 10.7067 10.8994 10.7256C10.921 10.7446 10.7451 11.0417 10.5084 11.3857C9.08365 13.4568 9.76105 16.0821 11.9897 17.1271C12.9064 17.5571 14.3135 17.5671 15.12 17.1493C16.0225 16.6818 16.5015 16.2283 16.9282 15.4371C17.2993 14.7485 17.3357 14.5911 17.3374 13.6615C17.3391 12.7155 17.3081 12.585 16.9102 11.8615C16.008 10.2215 14.1127 9.43311 12.4386 10.0014C11.911 10.1806 11.9057 10.1795 11.2143 9.76311C10.8323 9.53319 10.4159 9.31203 10.2889 9.27171C10.0906 9.20871 10.152 9.11463 10.7241 8.60487C13.4813 6.14739 12.3793 1.57371 8.80561 0.642868C8.04433 0.444508 7.26901 0.426988 6.56809 0.592108ZM9.15241 1.81011C9.91345 2.13327 10.8364 3.14775 11.1049 3.95619C11.5549 5.31099 11.1102 6.91683 10.0191 7.87731C9.33265 8.48151 8.59213 8.74155 7.55785 8.74155C6.48685 8.74155 5.46409 8.24727 4.80229 7.41003C4.20289 6.65187 4.02433 6.11331 4.03033 5.08155C4.04557 2.42559 6.66397 0.753148 9.15241 1.81011ZM14.3893 10.9695C15.7549 11.3751 16.6339 12.8458 16.3279 14.2133C15.868 16.2682 13.5029 17.1591 11.8515 15.8994C10.0545 14.5288 10.5639 11.6355 12.72 10.966C13.4303 10.7454 13.6361 10.7458 14.3893 10.9695ZM13.08 13.0353V14.2091L13.7973 14.9188L14.5145 15.6286L14.8173 15.3442C14.9838 15.1877 15.12 14.9994 15.12 14.9256C15.12 14.8518 14.877 14.553 14.58 14.2615L14.04 13.7316V12.7966V11.8615H13.56H13.08V13.0353Z" fill="#212121"/>
+            </svg>
+
+          <span>Requests in Queue</span>
+          <div id="request_in_queue_count_bubble_wrapper" class="request_in_queue_count_bubble_wrapper easyassist_hidden_div">
+            <div  id="total_request_in_queue" class="request_in_queue_count_bubble"></div>
+          </div>
+        </a>
+      </li>
+      {% endif %}
+
+      <!-- Nav Item - Dashboard -->
+      {% if access_token_obj.allow_generate_meeting == False and access_token_obj.allow_video_meeting_only == False and access_token_obj.enable_voip_calling == False %}
+      <li class="nav-item active nav-item-menu" id="menu-support-history">
+          <a class="nav-link tooltip-navbar" href="/easy-assist/sales-ai/support-history/" data-tooltip="tooltip" data-original-title="Support History">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" >
+              <path d="M9 0C13.9706 0 18 4.02944 18 9C18 13.9706 13.9706 18 9 18C7.29039 18 5.64945 17.5218 4.23081 16.6338C3.65294 16.2721 3.1177 15.8457 2.63566 15.3636C2.1529 14.8808 1.72601 14.3446 1.36401 13.7657C0.477401 12.3478 0 10.7082 0 9C0 8.72585 0.0122797 8.45308 0.0366964 8.18227C0.0738916 7.76973 0.438474 7.46545 0.851014 7.50265C1.26355 7.53984 1.56783 7.90443 1.53064 8.31697C1.51026 8.54301 1.5 8.77083 1.5 9C1.5 10.4249 1.89727 11.7893 2.63583 12.9704C2.93764 13.453 3.29368 13.9002 3.69639 14.303C4.09848 14.7051 4.5449 15.0608 5.02668 15.3623C6.20844 16.1021 7.57394 16.5 9 16.5C13.1421 16.5 16.5 13.1421 16.5 9C16.5 4.85786 13.1421 1.5 9 1.5C6.60271 1.5 4.39953 2.63281 2.99775 4.50196L5.75419 4.50209C6.1684 4.50209 6.50419 4.83788 6.50419 5.25209C6.50419 5.63179 6.22203 5.94558 5.85596 5.99525L5.75419 6.00209H1.25C0.870304 6.00209 0.556509 5.71994 0.506847 5.35386L0.5 5.25209V0.752093C0.5 0.33788 0.835786 0.00209332 1.25 0.00209332C1.6297 0.00209332 1.94349 0.284247 1.99315 0.650323L2 0.752093L1.999 3.34348C3.68587 1.25603 6.23628 0 9 0ZM8.25 4C8.6295 4 8.94346 4.28233 8.99315 4.64827L9 4.75V9H11.25C11.664 9 12 9.336 12 9.75C12 10.1295 11.7177 10.4435 11.3517 10.4931L11.25 10.5H8.25C7.8705 10.5 7.55654 10.2177 7.50685 9.85173L7.5 9.75V4.75C7.5 4.336 7.836 4 8.25 4Z" fill="#212121"/>
+            </svg>
+
+            <span>Support History</span>
+          </a>
+      </li>
+      {% else %}
+      <li class="nav-item nav-item-submenu " style="flex-direction: column;" >
+        <a class="nav-link collapsed text-truncate tooltip-navbar" href="#submenu2" data-toggle="collapse" data-target="#submenu2"data-tooltip="tooltip" data-original-title="Support History">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" >
+            <path d="M9 0C13.9706 0 18 4.02944 18 9C18 13.9706 13.9706 18 9 18C7.29039 18 5.64945 17.5218 4.23081 16.6338C3.65294 16.2721 3.1177 15.8457 2.63566 15.3636C2.1529 14.8808 1.72601 14.3446 1.36401 13.7657C0.477401 12.3478 0 10.7082 0 9C0 8.72585 0.0122797 8.45308 0.0366964 8.18227C0.0738916 7.76973 0.438474 7.46545 0.851014 7.50265C1.26355 7.53984 1.56783 7.90443 1.53064 8.31697C1.51026 8.54301 1.5 8.77083 1.5 9C1.5 10.4249 1.89727 11.7893 2.63583 12.9704C2.93764 13.453 3.29368 13.9002 3.69639 14.303C4.09848 14.7051 4.5449 15.0608 5.02668 15.3623C6.20844 16.1021 7.57394 16.5 9 16.5C13.1421 16.5 16.5 13.1421 16.5 9C16.5 4.85786 13.1421 1.5 9 1.5C6.60271 1.5 4.39953 2.63281 2.99775 4.50196L5.75419 4.50209C6.1684 4.50209 6.50419 4.83788 6.50419 5.25209C6.50419 5.63179 6.22203 5.94558 5.85596 5.99525L5.75419 6.00209H1.25C0.870304 6.00209 0.556509 5.71994 0.506847 5.35386L0.5 5.25209V0.752093C0.5 0.33788 0.835786 0.00209332 1.25 0.00209332C1.6297 0.00209332 1.94349 0.284247 1.99315 0.650323L2 0.752093L1.999 3.34348C3.68587 1.25603 6.23628 0 9 0ZM8.25 4C8.6295 4 8.94346 4.28233 8.99315 4.64827L9 4.75V9H11.25C11.664 9 12 9.336 12 9.75C12 10.1295 11.7177 10.4435 11.3517 10.4931L11.25 10.5H8.25C7.8705 10.5 7.55654 10.2177 7.50685 9.85173L7.5 9.75V4.75C7.5 4.336 7.836 4 8.25 4Z" fill="#212121"/>
+          </svg>
+          <span>Support History</span>
+        </a>
+
+        <div class="collapse" id="submenu2" aria-expanded="false">
+            <ul class="flex-column" style="padding: 0;">
+                {% if access_token_obj.allow_video_meeting_only == False %}
+                <li class="nav-item nav-item-menu " id="submenu2-cobrowse-history">
+                  <a class="nav-link nav-link-sub-menu tooltip-navbar" href="/easy-assist/sales-ai/support-history/" data-tooltip="tooltip" data-original-title="Cobrowsing">
+                    <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M15.8541 14.0368L12.9818 11.1644L14.3905 9.75576C14.5126 9.63371 14.5627 9.45717 14.523 9.28916C14.4834 9.12115 14.3596 8.98568 14.1958 8.9311L5.74371 6.11371C5.56478 6.05405 5.36742 6.10063 5.23404 6.23404C5.10063 6.36745 5.05405 6.56474 5.11371 6.74371L7.9311 15.1959C7.98571 15.3596 8.12118 15.4834 8.28916 15.5231C8.45713 15.5628 8.63371 15.5126 8.75576 15.3905L10.1645 13.9819L13.0368 16.8542C13.1341 16.9514 13.2615 17.0001 13.389 17.0001C13.5164 17.0001 13.6439 16.9514 13.7411 16.8542L15.8542 14.7411C16.0487 14.5466 16.0487 14.2313 15.8541 14.0368ZM13.3889 15.7976L10.5166 12.9253C10.3221 12.7308 10.0067 12.7308 9.81225 12.9253L8.62122 14.1164L6.37367 7.3737L13.1163 9.62126L11.9253 10.8123C11.731 11.0066 11.7308 11.3222 11.9253 11.5166L14.7976 14.389L13.3889 15.7976Z" fill="#4D4D4D"/>
+                      <path d="M5.47461 3.98438C5.74966 3.98438 5.97266 3.76138 5.97266 3.48633V0.498047C5.97266 0.222992 5.74966 0 5.47461 0C5.19955 0 4.97656 0.222992 4.97656 0.498047V3.48633C4.97656 3.76138 5.19955 3.98438 5.47461 3.98438Z" fill="#4D4D4D"/>
+                      <path d="M1.60083 1.89637C1.40636 1.70186 1.09099 1.70186 0.896488 1.89637C0.701984 2.09087 0.701984 2.4062 0.896488 2.6007L3.00953 4.71375C3.20401 4.90825 3.5194 4.90825 3.71387 4.71375C3.90838 4.51925 3.90838 4.20392 3.71387 4.00941L1.60083 1.89637Z" fill="#4D4D4D"/>
+                      <path d="M3.00953 8.23548L0.896488 10.3485C0.701984 10.543 0.701984 10.8584 0.896488 11.0529C1.09096 11.2474 1.40636 11.2474 1.60083 11.0529L3.71387 8.93981C3.90838 8.74531 3.90838 8.42998 3.71387 8.23548C3.51937 8.04097 3.20401 8.04097 3.00953 8.23548Z" fill="#4D4D4D"/>
+                      <path d="M7.93969 4.71375L10.0527 2.6007C10.2472 2.4062 10.2472 2.09087 10.0527 1.89637C9.85827 1.70186 9.54291 1.70186 9.3484 1.89637L7.23536 4.00941C7.04085 4.20392 7.04085 4.51925 7.23536 4.71375C7.42983 4.90825 7.74522 4.90825 7.93969 4.71375Z" fill="#4D4D4D"/>
+                  </svg>
+                    <span>Cobrowsing</span>
+                  </a>
+                </li>
+                {% if access_token_obj.allow_generate_meeting == True or access_token_obj.enable_voip_calling == True %}
+                <li class="nav-item nav-item-menu" id="submenu2-meeting-history">
+                  <a class="nav-link nav-link-sub-menu tooltip-navbar" href="/easy-assist/sales-ai/meeting-audit-trail/" data-tooltip="tooltip" data-original-title="Meeting">
+                    <svg width="16" height="12" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M2 0.5C0.895431 0.5 0 1.39543 0 2.5V7.5C0 8.60457 0.895431 9.5 2 9.5H7C8.10457 9.5 9 8.60457 9 7.5V7.00002L10.8 8.35002C11.2944 8.72084 12 8.36805 12 7.75002V2.25002C12 1.63199 11.2944 1.2792 10.8 1.65002L9 3.00002V2.5C9 1.39543 8.10457 0.5 7 0.5H2ZM9 4.25002L11 2.75002V7.25002L9 5.75002V4.25002ZM8 2.5V7.5C8 8.05228 7.55228 8.5 7 8.5H2C1.44772 8.5 1 8.05228 1 7.5V2.5C1 1.94772 1.44772 1.5 2 1.5H7C7.55228 1.5 8 1.94772 8 2.5Z" fill="#4D4D4D"/>
+                    </svg>
+                    <span>Meeting</span>
+                    </a>
+                </li>
+                {% endif %}
+                {% else %}
+                <li class="nav-item nav-item-menu" id="submenu2-meeting-history">
+                  <a class="nav-link nav-link-sub-menu tooltip-navbar" href="/easy-assist/sales-ai/meeting-audit-trail/"  data-tooltip="tooltip" data-original-title="Meeting">
+                    <svg width="16" height="12" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M2 0.5C0.895431 0.5 0 1.39543 0 2.5V7.5C0 8.60457 0.895431 9.5 2 9.5H7C8.10457 9.5 9 8.60457 9 7.5V7.00002L10.8 8.35002C11.2944 8.72084 12 8.36805 12 7.75002V2.25002C12 1.63199 11.2944 1.2792 10.8 1.65002L9 3.00002V2.5C9 1.39543 8.10457 0.5 7 0.5H2ZM9 4.25002L11 2.75002V7.25002L9 5.75002V4.25002ZM8 2.5V7.5C8 8.05228 7.55228 8.5 7 8.5H2C1.44772 8.5 1 8.05228 1 7.5V2.5C1 1.94772 1.44772 1.5 2 1.5H7C7.55228 1.5 8 1.94772 8 2.5Z" fill="#4D4D4D"/>
+                    </svg>
+                    <span>Meeting</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+      </li>
+      {% endif %}
+
+      
+      {% if access_token_obj.allow_generate_meeting %}
+      <li class="nav-item nav-item-menu">
+          <a class="nav-link tooltip-navbar" href="/easy-assist/sales-ai/sales-meetings/" data-tooltip="tooltip" data-original-title="Meetings">
+            <svg width="20" height="15" viewBox="0 0 20 15" fill="none" xmlns="http://www.w3.org/2000/svg" >
+              <path d="M11.75 0C13.5449 0 15 1.45507 15 3.25V3.423L18.8639 1.105C19.3638 0.804863 20 1.16493 20 1.748V13.25C20 13.833 19.364 14.1931 18.8641 13.8931L15 11.575V11.75C15 13.5449 13.5449 15 11.75 15H3.25C1.45507 15 0 13.5449 0 11.75V3.25C0 1.45507 1.45507 0 3.25 0H11.75ZM11.75 1.5H3.25C2.2835 1.5 1.5 2.2835 1.5 3.25V11.75C1.5 12.7165 2.2835 13.5 3.25 13.5H11.75C12.7165 13.5 13.5 12.7165 13.5 11.75V3.25C13.5 2.2835 12.7165 1.5 11.75 1.5ZM18.5 3.0731L15 5.1745V9.82536L18.5 11.9254V3.0731Z" fill="#4D4D4D"/>
+            </svg>
+
+            <span>Meetings</span>
+            <div class="cobrowsing_count_bubble_wrapper" style="display: none;">
+              <div id="total_video_meeting_count" class="cobrowsing_count_bubble"></div>
+            </div>
+        </a>
+      </li>
+      {% endif %}
+      
+
+      <!-- Nav Item - Dashboard -->
+      {% if access_token_obj.allow_generate_meeting == False and access_token_obj.allow_video_meeting_only == False %}
+      <li class="nav-item nav-item-menu" style="flex-direction: column;" id="menu-cobrowse-analytics">
+          {% if access_token_obj.allow_agent_to_customer_cobrowsing == True %}
+          <a class="nav-link tooltip-navbar" href="/easy-assist/sales-ai/reverse-analytics/" data-tooltip="tooltip" data-original-title="Analytics">
+            <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7.67073 2.2561C8.04453 2.2561 8.34756 2.55912 8.34756 2.93293V10.1524H15.5671C15.9097 10.1524 16.1929 10.4071 16.2377 10.7374L16.2439 10.8293C16.2439 15.3149 12.6076 18.5 8.12195 18.5C3.63632 18.5 0 14.8637 0 10.378C0 5.89242 3.1851 2.2561 7.67073 2.2561ZM6.9939 3.64315L6.80538 3.66456C3.47601 4.08945 1.35366 6.9332 1.35366 10.378C1.35366 14.1161 4.38393 17.1463 8.12195 17.1463C11.5668 17.1463 14.4106 15.024 14.8354 11.6946L14.856 11.5061H7.67073C7.32808 11.5061 7.0449 11.2515 7.00008 10.9211L6.9939 10.8293V3.64315ZM10.378 0C14.8637 0 18.5 3.63632 18.5 8.12195C18.5 8.49575 18.197 8.79878 17.8232 8.79878H10.378C10.0042 8.79878 9.70122 8.49575 9.70122 8.12195V0.676829C9.70122 0.303027 10.0042 0 10.378 0ZM11.0549 1.38705V7.44512H17.112L17.0915 7.2566C16.7028 4.21058 14.2894 1.79719 11.2434 1.40846L11.0549 1.38705Z" fill="#212121"/>
+            </svg>
+            <span>Analytics</span>
+          </a>
+          {% elif cobrowse_agent.role != "agent" and access_token_obj.enable_inbound == True and access_token_obj.lead_generation == True %}
+          <a class="nav-link tooltip-navbar" href="/easy-assist/sales-ai/general-analytics/" data-tooltip="tooltip" data-original-title="Analytics">
+            <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7.67073 2.2561C8.04453 2.2561 8.34756 2.55912 8.34756 2.93293V10.1524H15.5671C15.9097 10.1524 16.1929 10.4071 16.2377 10.7374L16.2439 10.8293C16.2439 15.3149 12.6076 18.5 8.12195 18.5C3.63632 18.5 0 14.8637 0 10.378C0 5.89242 3.1851 2.2561 7.67073 2.2561ZM6.9939 3.64315L6.80538 3.66456C3.47601 4.08945 1.35366 6.9332 1.35366 10.378C1.35366 14.1161 4.38393 17.1463 8.12195 17.1463C11.5668 17.1463 14.4106 15.024 14.8354 11.6946L14.856 11.5061H7.67073C7.32808 11.5061 7.0449 11.2515 7.00008 10.9211L6.9939 10.8293V3.64315ZM10.378 0C14.8637 0 18.5 3.63632 18.5 8.12195C18.5 8.49575 18.197 8.79878 17.8232 8.79878H10.378C10.0042 8.79878 9.70122 8.49575 9.70122 8.12195V0.676829C9.70122 0.303027 10.0042 0 10.378 0ZM11.0549 1.38705V7.44512H17.112L17.0915 7.2566C16.7028 4.21058 14.2894 1.79719 11.2434 1.40846L11.0549 1.38705Z" fill="#212121"/>
+            </svg>
+            <span>Analytics</span>
+          </a>
+          {% else %}
+              {% if access_token_obj.enable_inbound %}
+                <a class="nav-link tooltip-navbar" href="/easy-assist/sales-ai/analytics/" data-tooltip="tooltip" data-original-title="Analytics">
+                  <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7.67073 2.2561C8.04453 2.2561 8.34756 2.55912 8.34756 2.93293V10.1524H15.5671C15.9097 10.1524 16.1929 10.4071 16.2377 10.7374L16.2439 10.8293C16.2439 15.3149 12.6076 18.5 8.12195 18.5C3.63632 18.5 0 14.8637 0 10.378C0 5.89242 3.1851 2.2561 7.67073 2.2561ZM6.9939 3.64315L6.80538 3.66456C3.47601 4.08945 1.35366 6.9332 1.35366 10.378C1.35366 14.1161 4.38393 17.1463 8.12195 17.1463C11.5668 17.1463 14.4106 15.024 14.8354 11.6946L14.856 11.5061H7.67073C7.32808 11.5061 7.0449 11.2515 7.00008 10.9211L6.9939 10.8293V3.64315ZM10.378 0C14.8637 0 18.5 3.63632 18.5 8.12195C18.5 8.49575 18.197 8.79878 17.8232 8.79878H10.378C10.0042 8.79878 9.70122 8.49575 9.70122 8.12195V0.676829C9.70122 0.303027 10.0042 0 10.378 0ZM11.0549 1.38705V7.44512H17.112L17.0915 7.2566C16.7028 4.21058 14.2894 1.79719 11.2434 1.40846L11.0549 1.38705Z" fill="#212121"/>
+                  </svg>
+                  <span>Analytics</span>
+                </a>
+              {% else %}
+                <a class="nav-link tooltip-navbar" href="/easy-assist/sales-ai/analytics-outbound/" data-tooltip="tooltip" data-original-title="Analytics">
+                  <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7.67073 2.2561C8.04453 2.2561 8.34756 2.55912 8.34756 2.93293V10.1524H15.5671C15.9097 10.1524 16.1929 10.4071 16.2377 10.7374L16.2439 10.8293C16.2439 15.3149 12.6076 18.5 8.12195 18.5C3.63632 18.5 0 14.8637 0 10.378C0 5.89242 3.1851 2.2561 7.67073 2.2561ZM6.9939 3.64315L6.80538 3.66456C3.47601 4.08945 1.35366 6.9332 1.35366 10.378C1.35366 14.1161 4.38393 17.1463 8.12195 17.1463C11.5668 17.1463 14.4106 15.024 14.8354 11.6946L14.856 11.5061H7.67073C7.32808 11.5061 7.0449 11.2515 7.00008 10.9211L6.9939 10.8293V3.64315ZM10.378 0C14.8637 0 18.5 3.63632 18.5 8.12195C18.5 8.49575 18.197 8.79878 17.8232 8.79878H10.378C10.0042 8.79878 9.70122 8.49575 9.70122 8.12195V0.676829C9.70122 0.303027 10.0042 0 10.378 0ZM11.0549 1.38705V7.44512H17.112L17.0915 7.2566C16.7028 4.21058 14.2894 1.79719 11.2434 1.40846L11.0549 1.38705Z" fill="#212121"/>
+                  </svg>
+                  <span>Analytics</span>
+                </a>
+              {% endif %}
+          {% endif %}
+      </li>
+      {% else %}
+      <li class="nav-item nav-item-submenu" style="flex-direction: column;">
+          <a class="nav-link collapsed text-truncate tooltip-navbar" href="#submenu1" data-toggle="collapse" data-target="#submenu1" data-tooltip="tooltip" data-original-title="Analytics">
+            <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7.67073 2.2561C8.04453 2.2561 8.34756 2.55912 8.34756 2.93293V10.1524H15.5671C15.9097 10.1524 16.1929 10.4071 16.2377 10.7374L16.2439 10.8293C16.2439 15.3149 12.6076 18.5 8.12195 18.5C3.63632 18.5 0 14.8637 0 10.378C0 5.89242 3.1851 2.2561 7.67073 2.2561ZM6.9939 3.64315L6.80538 3.66456C3.47601 4.08945 1.35366 6.9332 1.35366 10.378C1.35366 14.1161 4.38393 17.1463 8.12195 17.1463C11.5668 17.1463 14.4106 15.024 14.8354 11.6946L14.856 11.5061H7.67073C7.32808 11.5061 7.0449 11.2515 7.00008 10.9211L6.9939 10.8293V3.64315ZM10.378 0C14.8637 0 18.5 3.63632 18.5 8.12195C18.5 8.49575 18.197 8.79878 17.8232 8.79878H10.378C10.0042 8.79878 9.70122 8.49575 9.70122 8.12195V0.676829C9.70122 0.303027 10.0042 0 10.378 0ZM11.0549 1.38705V7.44512H17.112L17.0915 7.2566C16.7028 4.21058 14.2894 1.79719 11.2434 1.40846L11.0549 1.38705Z" fill="#212121"/>
+            </svg>
+            <span>Analytics</span>
+          </a>
+
+          <div class="collapse" id="submenu1" aria-expanded="false">
+            <ul class="flex-column" style="padding: 0;">
+              {% if access_token_obj.allow_video_meeting_only == False %}
+              <li class="nav-item nav-item-menu" id="submenu1-cobrowse-analytics">
+                {% if access_token_obj.allow_agent_to_customer_cobrowsing == True %}
+                <a class="nav-link nav-link-sub-menu tooltip-navbar" href="/easy-assist/sales-ai/reverse-analytics/" data-tooltip="tooltip" data-original-title="Cobrowsing">
+                  <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M15.8541 14.0368L12.9818 11.1644L14.3905 9.75576C14.5126 9.63371 14.5627 9.45717 14.523 9.28916C14.4834 9.12115 14.3596 8.98568 14.1958 8.9311L5.74371 6.11371C5.56478 6.05405 5.36742 6.10063 5.23404 6.23404C5.10063 6.36745 5.05405 6.56474 5.11371 6.74371L7.9311 15.1959C7.98571 15.3596 8.12118 15.4834 8.28916 15.5231C8.45713 15.5628 8.63371 15.5126 8.75576 15.3905L10.1645 13.9819L13.0368 16.8542C13.1341 16.9514 13.2615 17.0001 13.389 17.0001C13.5164 17.0001 13.6439 16.9514 13.7411 16.8542L15.8542 14.7411C16.0487 14.5466 16.0487 14.2313 15.8541 14.0368ZM13.3889 15.7976L10.5166 12.9253C10.3221 12.7308 10.0067 12.7308 9.81225 12.9253L8.62122 14.1164L6.37367 7.3737L13.1163 9.62126L11.9253 10.8123C11.731 11.0066 11.7308 11.3222 11.9253 11.5166L14.7976 14.389L13.3889 15.7976Z" fill="#4D4D4D"/>
+                      <path d="M5.47461 3.98438C5.74966 3.98438 5.97266 3.76138 5.97266 3.48633V0.498047C5.97266 0.222992 5.74966 0 5.47461 0C5.19955 0 4.97656 0.222992 4.97656 0.498047V3.48633C4.97656 3.76138 5.19955 3.98438 5.47461 3.98438Z" fill="#4D4D4D"/>
+                      <path d="M1.60083 1.89637C1.40636 1.70186 1.09099 1.70186 0.896488 1.89637C0.701984 2.09087 0.701984 2.4062 0.896488 2.6007L3.00953 4.71375C3.20401 4.90825 3.5194 4.90825 3.71387 4.71375C3.90838 4.51925 3.90838 4.20392 3.71387 4.00941L1.60083 1.89637Z" fill="#4D4D4D"/>
+                      <path d="M3.00953 8.23548L0.896488 10.3485C0.701984 10.543 0.701984 10.8584 0.896488 11.0529C1.09096 11.2474 1.40636 11.2474 1.60083 11.0529L3.71387 8.93981C3.90838 8.74531 3.90838 8.42998 3.71387 8.23548C3.51937 8.04097 3.20401 8.04097 3.00953 8.23548Z" fill="#4D4D4D"/>
+                      <path d="M7.93969 4.71375L10.0527 2.6007C10.2472 2.4062 10.2472 2.09087 10.0527 1.89637C9.85827 1.70186 9.54291 1.70186 9.3484 1.89637L7.23536 4.00941C7.04085 4.20392 7.04085 4.51925 7.23536 4.71375C7.42983 4.90825 7.74522 4.90825 7.93969 4.71375Z" fill="#4D4D4D"/>
+                  </svg>
+                  <span>Cobrowsing</span>
+                </a>
+                {% elif cobrowse_agent.role != "agent" and access_token_obj.enable_inbound == True and access_token_obj.lead_generation == True %}
+                <a class="nav-link nav-link-sub-menu tooltip-navbar" href="/easy-assist/sales-ai/general-analytics/" data-tooltip="tooltip" data-original-title="Cobrowsing">
+                  <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M15.8541 14.0368L12.9818 11.1644L14.3905 9.75576C14.5126 9.63371 14.5627 9.45717 14.523 9.28916C14.4834 9.12115 14.3596 8.98568 14.1958 8.9311L5.74371 6.11371C5.56478 6.05405 5.36742 6.10063 5.23404 6.23404C5.10063 6.36745 5.05405 6.56474 5.11371 6.74371L7.9311 15.1959C7.98571 15.3596 8.12118 15.4834 8.28916 15.5231C8.45713 15.5628 8.63371 15.5126 8.75576 15.3905L10.1645 13.9819L13.0368 16.8542C13.1341 16.9514 13.2615 17.0001 13.389 17.0001C13.5164 17.0001 13.6439 16.9514 13.7411 16.8542L15.8542 14.7411C16.0487 14.5466 16.0487 14.2313 15.8541 14.0368ZM13.3889 15.7976L10.5166 12.9253C10.3221 12.7308 10.0067 12.7308 9.81225 12.9253L8.62122 14.1164L6.37367 7.3737L13.1163 9.62126L11.9253 10.8123C11.731 11.0066 11.7308 11.3222 11.9253 11.5166L14.7976 14.389L13.3889 15.7976Z" fill="#4D4D4D"/>
+                      <path d="M5.47461 3.98438C5.74966 3.98438 5.97266 3.76138 5.97266 3.48633V0.498047C5.97266 0.222992 5.74966 0 5.47461 0C5.19955 0 4.97656 0.222992 4.97656 0.498047V3.48633C4.97656 3.76138 5.19955 3.98438 5.47461 3.98438Z" fill="#4D4D4D"/>
+                      <path d="M1.60083 1.89637C1.40636 1.70186 1.09099 1.70186 0.896488 1.89637C0.701984 2.09087 0.701984 2.4062 0.896488 2.6007L3.00953 4.71375C3.20401 4.90825 3.5194 4.90825 3.71387 4.71375C3.90838 4.51925 3.90838 4.20392 3.71387 4.00941L1.60083 1.89637Z" fill="#4D4D4D"/>
+                      <path d="M3.00953 8.23548L0.896488 10.3485C0.701984 10.543 0.701984 10.8584 0.896488 11.0529C1.09096 11.2474 1.40636 11.2474 1.60083 11.0529L3.71387 8.93981C3.90838 8.74531 3.90838 8.42998 3.71387 8.23548C3.51937 8.04097 3.20401 8.04097 3.00953 8.23548Z" fill="#4D4D4D"/>
+                      <path d="M7.93969 4.71375L10.0527 2.6007C10.2472 2.4062 10.2472 2.09087 10.0527 1.89637C9.85827 1.70186 9.54291 1.70186 9.3484 1.89637L7.23536 4.00941C7.04085 4.20392 7.04085 4.51925 7.23536 4.71375C7.42983 4.90825 7.74522 4.90825 7.93969 4.71375Z" fill="#4D4D4D"/>
+                  </svg>
+                  <span>Cobrowsing</span>
+                </a>
+                {% else %}
+                  {% if access_token_obj.enable_inbound %}
+                  <a class="nav-link nav-link-sub-menu tooltip-navbar" href="/easy-assist/sales-ai/analytics/" data-tooltip="tooltip" data-original-title="Cobrowsing">
+                    <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M15.8541 14.0368L12.9818 11.1644L14.3905 9.75576C14.5126 9.63371 14.5627 9.45717 14.523 9.28916C14.4834 9.12115 14.3596 8.98568 14.1958 8.9311L5.74371 6.11371C5.56478 6.05405 5.36742 6.10063 5.23404 6.23404C5.10063 6.36745 5.05405 6.56474 5.11371 6.74371L7.9311 15.1959C7.98571 15.3596 8.12118 15.4834 8.28916 15.5231C8.45713 15.5628 8.63371 15.5126 8.75576 15.3905L10.1645 13.9819L13.0368 16.8542C13.1341 16.9514 13.2615 17.0001 13.389 17.0001C13.5164 17.0001 13.6439 16.9514 13.7411 16.8542L15.8542 14.7411C16.0487 14.5466 16.0487 14.2313 15.8541 14.0368ZM13.3889 15.7976L10.5166 12.9253C10.3221 12.7308 10.0067 12.7308 9.81225 12.9253L8.62122 14.1164L6.37367 7.3737L13.1163 9.62126L11.9253 10.8123C11.731 11.0066 11.7308 11.3222 11.9253 11.5166L14.7976 14.389L13.3889 15.7976Z" fill="#4D4D4D"/>
+                      <path d="M5.47461 3.98438C5.74966 3.98438 5.97266 3.76138 5.97266 3.48633V0.498047C5.97266 0.222992 5.74966 0 5.47461 0C5.19955 0 4.97656 0.222992 4.97656 0.498047V3.48633C4.97656 3.76138 5.19955 3.98438 5.47461 3.98438Z" fill="#4D4D4D"/>
+                      <path d="M1.60083 1.89637C1.40636 1.70186 1.09099 1.70186 0.896488 1.89637C0.701984 2.09087 0.701984 2.4062 0.896488 2.6007L3.00953 4.71375C3.20401 4.90825 3.5194 4.90825 3.71387 4.71375C3.90838 4.51925 3.90838 4.20392 3.71387 4.00941L1.60083 1.89637Z" fill="#4D4D4D"/>
+                      <path d="M3.00953 8.23548L0.896488 10.3485C0.701984 10.543 0.701984 10.8584 0.896488 11.0529C1.09096 11.2474 1.40636 11.2474 1.60083 11.0529L3.71387 8.93981C3.90838 8.74531 3.90838 8.42998 3.71387 8.23548C3.51937 8.04097 3.20401 8.04097 3.00953 8.23548Z" fill="#4D4D4D"/>
+                      <path d="M7.93969 4.71375L10.0527 2.6007C10.2472 2.4062 10.2472 2.09087 10.0527 1.89637C9.85827 1.70186 9.54291 1.70186 9.3484 1.89637L7.23536 4.00941C7.04085 4.20392 7.04085 4.51925 7.23536 4.71375C7.42983 4.90825 7.74522 4.90825 7.93969 4.71375Z" fill="#4D4D4D"/>
+                    </svg>
+                    <span>Cobrowsing</span>
+                  </a>
+                  {% else %}
+                  <a class="nav-link nav-link-sub-menu tooltip-navbar" href="/easy-assist/sales-ai/analytics-outbound/" data-tooltip="tooltip" data-original-title="Cobrowsing">
+                    <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15.8541 14.0368L12.9818 11.1644L14.3905 9.75576C14.5126 9.63371 14.5627 9.45717 14.523 9.28916C14.4834 9.12115 14.3596 8.98568 14.1958 8.9311L5.74371 6.11371C5.56478 6.05405 5.36742 6.10063 5.23404 6.23404C5.10063 6.36745 5.05405 6.56474 5.11371 6.74371L7.9311 15.1959C7.98571 15.3596 8.12118 15.4834 8.28916 15.5231C8.45713 15.5628 8.63371 15.5126 8.75576 15.3905L10.1645 13.9819L13.0368 16.8542C13.1341 16.9514 13.2615 17.0001 13.389 17.0001C13.5164 17.0001 13.6439 16.9514 13.7411 16.8542L15.8542 14.7411C16.0487 14.5466 16.0487 14.2313 15.8541 14.0368ZM13.3889 15.7976L10.5166 12.9253C10.3221 12.7308 10.0067 12.7308 9.81225 12.9253L8.62122 14.1164L6.37367 7.3737L13.1163 9.62126L11.9253 10.8123C11.731 11.0066 11.7308 11.3222 11.9253 11.5166L14.7976 14.389L13.3889 15.7976Z" fill="#4D4D4D"/>
+                        <path d="M5.47461 3.98438C5.74966 3.98438 5.97266 3.76138 5.97266 3.48633V0.498047C5.97266 0.222992 5.74966 0 5.47461 0C5.19955 0 4.97656 0.222992 4.97656 0.498047V3.48633C4.97656 3.76138 5.19955 3.98438 5.47461 3.98438Z" fill="#4D4D4D"/>
+                        <path d="M1.60083 1.89637C1.40636 1.70186 1.09099 1.70186 0.896488 1.89637C0.701984 2.09087 0.701984 2.4062 0.896488 2.6007L3.00953 4.71375C3.20401 4.90825 3.5194 4.90825 3.71387 4.71375C3.90838 4.51925 3.90838 4.20392 3.71387 4.00941L1.60083 1.89637Z" fill="#4D4D4D"/>
+                        <path d="M3.00953 8.23548L0.896488 10.3485C0.701984 10.543 0.701984 10.8584 0.896488 11.0529C1.09096 11.2474 1.40636 11.2474 1.60083 11.0529L3.71387 8.93981C3.90838 8.74531 3.90838 8.42998 3.71387 8.23548C3.51937 8.04097 3.20401 8.04097 3.00953 8.23548Z" fill="#4D4D4D"/>
+                        <path d="M7.93969 4.71375L10.0527 2.6007C10.2472 2.4062 10.2472 2.09087 10.0527 1.89637C9.85827 1.70186 9.54291 1.70186 9.3484 1.89637L7.23536 4.00941C7.04085 4.20392 7.04085 4.51925 7.23536 4.71375C7.42983 4.90825 7.74522 4.90825 7.93969 4.71375Z" fill="#4D4D4D"/>
+                      </svg>
+                    <span>Cobrowsing</span>
+                  </a>
+                  {% endif %}
+                {% endif %}
+              </li>
+              {% if access_token_obj.allow_generate_meeting == True %}
+              <li class="nav-item nav-item-menu" id="submenu1-meeting-analytics">
+                <a class="nav-link nav-link-sub-menu tooltip-navbar" href="/easy-assist/sales-ai/cogno-meet-analytics/" data-tooltip="tooltip" data-original-title="Meeting">
+                  <svg width="16" height="12" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 0.5C0.895431 0.5 0 1.39543 0 2.5V7.5C0 8.60457 0.895431 9.5 2 9.5H7C8.10457 9.5 9 8.60457 9 7.5V7.00002L10.8 8.35002C11.2944 8.72084 12 8.36805 12 7.75002V2.25002C12 1.63199 11.2944 1.2792 10.8 1.65002L9 3.00002V2.5C9 1.39543 8.10457 0.5 7 0.5H2ZM9 4.25002L11 2.75002V7.25002L9 5.75002V4.25002ZM8 2.5V7.5C8 8.05228 7.55228 8.5 7 8.5H2C1.44772 8.5 1 8.05228 1 7.5V2.5C1 1.94772 1.44772 1.5 2 1.5H7C7.55228 1.5 8 1.94772 8 2.5Z" fill="#4D4D4D"/>
+                  </svg>
+                  <span>Meeting</span>
+                  </a>
+              </li>
+              {% endif %}
+              {% else %}
+              <li class="nav-item nav-item-menu" id="submenu1-meeting-analytics">
+                <a class="nav-link nav-link-sub-menu tooltip-navbar" href="/easy-assist/sales-ai/cogno-meet-analytics/" data-tooltip="tooltip" data-original-title="Meeting">
+                  <svg width="16" height="12" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 0.5C0.895431 0.5 0 1.39543 0 2.5V7.5C0 8.60457 0.895431 9.5 2 9.5H7C8.10457 9.5 9 8.60457 9 7.5V7.00002L10.8 8.35002C11.2944 8.72084 12 8.36805 12 7.75002V2.25002C12 1.63199 11.2944 1.2792 10.8 1.65002L9 3.00002V2.5C9 1.39543 8.10457 0.5 7 0.5H2ZM9 4.25002L11 2.75002V7.25002L9 5.75002V4.25002ZM8 2.5V7.5C8 8.05228 7.55228 8.5 7 8.5H2C1.44772 8.5 1 8.05228 1 7.5V2.5C1 1.94772 1.44772 1.5 2 1.5H7C7.55228 1.5 8 1.94772 8 2.5Z" fill="#4D4D4D"/>
+                  </svg>
+                  <span>Meeting</span>
+                  </a>
+              </li>
+              {% endif %}
+          </ul>
+        </div>
+      </li>
+      {% endif %}
+
+      {% if cobrowse_agent.role != "agent" %}
+      <li class="nav-item nav-item-menu">
+        <a class="nav-link tooltip-navbar" href="/easy-assist/sales-ai/access-management/" data-tooltip="tooltip" data-original-title="Agent Management">
+
+          <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14.023 9.04496C16.7717 9.04496 19 11.2733 19 14.022C19 16.7707 16.7717 18.999 14.023 18.999C11.2742 18.999 9.04594 16.7707 9.04594 14.022C9.04594 11.2733 11.2742 9.04496 14.023 9.04496ZM9.06608 10.8542C8.7976 11.2734 8.58084 11.729 8.42482 12.2118L2.03504 12.2121C1.66077 12.2121 1.35737 12.5155 1.35737 12.8898V13.4125C1.35737 13.8972 1.53031 14.3661 1.84509 14.7347C2.97923 16.0628 4.75818 16.7377 7.23611 16.7377C7.77584 16.7377 8.28247 16.7057 8.75658 16.6419C8.97846 17.0897 9.25676 17.5047 9.58142 17.8783C8.86156 18.0233 8.07891 18.0951 7.23611 18.0951C4.38937 18.0951 2.23024 17.276 0.812867 15.6161C0.288232 15.0018 0 14.2204 0 13.4125V12.8898C0 11.7658 0.911119 10.8547 2.03504 10.8547L9.06608 10.8542ZM14.023 10.8548L13.9416 10.8621C13.757 10.8956 13.6113 11.0412 13.5778 11.2259L13.5705 11.3072L13.5696 13.5695H11.3118L11.2304 13.5768C11.0457 13.6103 10.9001 13.756 10.8666 13.9407L10.8593 14.022L10.8666 14.1033C10.9001 14.288 11.0457 14.4336 11.2304 14.4672L11.3118 14.4744H13.5696L13.5705 16.7367L13.5778 16.8181C13.6113 17.0027 13.757 17.1484 13.9416 17.1819L14.023 17.1892L14.1043 17.1819C14.289 17.1484 14.4346 17.0027 14.4681 16.8181L14.4754 16.7367L14.4745 14.4744H16.7413L16.8226 14.4672C17.0073 14.4336 17.1529 14.288 17.1864 14.1033L17.1937 14.022L17.1864 13.9407C17.1529 13.756 17.0073 13.6103 16.8226 13.5768L16.7413 13.5695H14.4745L14.4754 11.3072L14.4681 11.2259C14.4346 11.0412 14.289 10.8956 14.1043 10.8621L14.023 10.8548ZM7.23611 0C9.73496 0 11.7607 2.02572 11.7607 4.52457C11.7607 7.02343 9.73496 9.04915 7.23611 9.04915C4.73726 9.04915 2.71154 7.02343 2.71154 4.52457C2.71154 2.02572 4.73726 0 7.23611 0ZM7.23611 1.35737C5.48692 1.35737 4.06891 2.77538 4.06891 4.52457C4.06891 6.27377 5.48692 7.69177 7.23611 7.69177C8.98531 7.69177 10.4033 6.27377 10.4033 4.52457C10.4033 2.77538 8.98531 1.35737 7.23611 1.35737Z" fill="#212121"/>
+          </svg>
+
+          <span>Agent Management</span>
+        </a>
+      </li>
+      {% endif %}
+
+      {% if cobrowse_agent.role != "agent" %}
+      <li class="nav-item nav-item-menu" id="menu-audit-trail">
+        <a class="nav-link tooltip-navbar" href="/easy-assist/sales-ai/audit-trail/" data-tooltip="tooltip" data-original-title="Audit Trail">
+
+         <svg width="17" height="20" viewBox="0 0 17 20" fill="none" xmlns="http://www.w3.org/2000/svg" >
+            <path d="M7.94305 8.45063C9.57003 10.0776 9.74024 12.6097 8.45367 14.4261L8.32016 14.6053L12.3039 18.59L12.3746 18.6719C12.5868 18.9578 12.5632 19.3636 12.3039 19.6229C12.0446 19.8822 11.6388 19.9058 11.3529 19.6936L11.271 19.6229L7.25032 15.6023C5.4409 16.8222 2.9637 16.6318 1.36281 15.0309C-0.45427 13.2138 -0.45427 10.2677 1.36281 8.45063C3.17989 6.63355 6.12596 6.63355 7.94305 8.45063ZM9.56789 0C10.1314 0 10.6718 0.22377 11.0704 0.622115L13.7265 3.27685L16.3786 5.93298C16.7765 6.33147 17 6.87159 17 7.43472V16.7669C17 17.9407 16.0484 18.8922 14.8746 18.8922L13.4489 18.8928C13.4135 18.6161 13.3088 18.3456 13.1332 18.109L13.0189 17.9727L12.5214 17.4744L14.8746 17.4753C15.2659 17.4753 15.5831 17.1581 15.5831 16.7669L15.5823 7.55973L11.5715 7.56057C10.4466 7.56057 9.5258 6.68665 9.45102 5.58071L9.44612 5.43519V1.41692H4.0146C3.62333 1.41692 3.30614 1.73411 3.30614 2.12538L3.30583 6.30167C2.81569 6.41795 2.33819 6.60112 1.88786 6.85116L1.88922 2.12538C1.88922 0.951563 2.84079 0 4.0146 0H9.56789ZM2.39575 9.48356C1.14914 10.7302 1.14914 12.7513 2.39575 13.9979C3.64235 15.2445 5.6635 15.2445 6.91011 13.9979C8.15672 12.7513 8.15672 10.7302 6.91011 9.48356C5.6635 8.23696 3.64235 8.23696 2.39575 9.48356ZM10.863 2.41821V5.43519C10.863 5.79386 11.1296 6.09027 11.4754 6.13718L11.5715 6.14365L14.5857 6.14281L10.863 2.41821Z" fill="#212121"/>
+          </svg>
+          <span>Audit Trail</span></a>
+      </li>
+      {% endif %}
+
+      {% if cobrowse_agent.role == "admin" or cobrowse_agent.role == "supervisor" %}
+      <li class="nav-item nav-item-menu">
+        <a class="nav-link tooltip-navbar" href="/easy-assist/sales-ai/customer-support-documents/" data-tooltip="tooltip" data-original-title="Documents">
+
+          <svg width="15" height="19" viewBox="0 0 15 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1.40916 2.46334L1.40653 4.45401V14.3037C1.40653 15.9867 2.77093 17.3512 4.45401 17.3512L12.5334 17.3514C12.2437 18.1707 11.4623 18.7577 10.5437 18.7577H4.45401C1.99413 18.7577 0 16.7636 0 14.3037V4.45401C0 3.53441 0.588347 2.75223 1.40916 2.46334ZM8.5596 0C9.11937 0 9.65619 0.222449 10.0519 0.618377L14.3825 4.95149C14.7779 5.34712 15 5.88357 15 6.44291V14.3037C15 15.4689 14.0554 16.4135 12.8902 16.4135H4.45627C3.29106 16.4135 2.34647 15.4689 2.34647 14.3037V2.1098C2.34647 0.944588 3.29106 0 4.45627 0H8.5596ZM8.43863 1.40653H4.45627C4.06787 1.40653 3.753 1.72139 3.753 2.1098V14.3037C3.753 14.6921 4.06787 15.0069 4.45627 15.0069H12.8902C13.2786 15.0069 13.5935 14.6921 13.5935 14.3037L13.5931 6.56662L10.549 6.56746C9.43232 6.56746 8.51828 5.69994 8.44405 4.60211L8.43918 4.45766L8.43863 1.40653ZM9.84516 2.40142L9.84571 4.45766C9.84571 4.8137 10.1103 5.10794 10.4535 5.15451L10.549 5.16093L12.6029 5.16009L9.84516 2.40142Z" fill="#212121"/>
+          </svg>
+          <span>Documents</span>
+        </a>
+      </li>
+
+      {% endif %}
+
+      {% if access_token_obj.enable_video_conferencing_form == True %}
+      {% if cobrowse_agent.role != "agent" %}
+      {% if access_token_obj.allow_generate_meeting or access_token_obj.allow_cobrowsing_meeting %}
+      <li class="nav-item nav-item-menu">
+        <a class="nav-link tooltip-navbar" href="/easy-assist/sales-ai/cobrowse-video-conferencing-form/" data-tooltip="tooltip" data-original-title="Forms">
+
+          <svg width="19" height="20" viewBox="0 0 19 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6.79546 19.6954H16.0682C17.2158 19.6954 18.15 18.762 18.15 17.6135V6.02264C18.15 4.87417 17.2158 3.94082 16.0682 3.94082H6.79546C5.64784 3.94082 4.71365 4.87417 4.71365 6.02264V17.6135C4.71365 18.762 5.64784 19.6954 6.79546 19.6954ZM5.78637 6.02264C5.78637 5.46644 6.23926 5.01355 6.79546 5.01355H16.0682C16.6244 5.01355 17.0773 5.46644 17.0773 6.02264V17.6135C17.0773 18.1697 16.6244 18.6226 16.0682 18.6226H6.79546C6.23926 18.6226 5.78637 18.1697 5.78637 17.6135V6.02264Z" fill="black"/>
+            <path d="M2.93182 17.3773H3.70454C4.00066 17.3773 4.24091 17.137 4.24091 16.8409C4.24091 16.5448 4.00066 16.3045 3.70454 16.3045H2.93182C2.37562 16.3045 1.92273 15.8516 1.92273 15.2954V2.93182C1.92273 2.37561 2.37562 1.92273 2.93182 1.92273H12.2045C12.7607 1.92273 13.2136 2.37561 13.2136 2.93182C13.2136 3.22793 13.4539 3.46818 13.75 3.46818C14.0461 3.46818 14.2864 3.22793 14.2864 2.93182C14.2864 1.78334 13.3522 0.85 12.2045 0.85H2.93182C1.7842 0.85 0.85 1.78334 0.85 2.93182V15.2954C0.85 16.4439 1.7842 17.3773 2.93182 17.3773Z" fill="black"/>
+            <path d="M8.34089 14.2865H14.5227C14.8188 14.2865 15.0591 14.0462 15.0591 13.7501C15.0591 13.454 14.8188 13.2138 14.5227 13.2138H8.34089C8.04478 13.2138 7.80453 13.454 7.80453 13.7501C7.80453 14.0462 8.04478 14.2865 8.34089 14.2865Z" fill="black"/>
+            <path d="M8.34089 17.3773H14.5227C14.8188 17.3773 15.0591 17.1371 15.0591 16.841C15.0591 16.5448 14.8188 16.3046 14.5227 16.3046H8.34089C8.04478 16.3046 7.80453 16.5448 7.80453 16.841C7.80453 17.1371 8.04478 17.3773 8.34089 17.3773Z" fill="black"/>
+            <path d="M8.34089 11.1954H14.5227C14.8188 11.1954 15.0591 10.9552 15.0591 10.6591C15.0591 10.363 14.8188 10.1227 14.5227 10.1227H8.34089C8.04478 10.1227 7.80453 10.363 7.80453 10.6591C7.80453 10.9552 8.04478 11.1954 8.34089 11.1954Z" fill="black"/>
+            <path d="M8.34089 8.10461H14.5227C14.8188 8.10461 15.0591 7.86436 15.0591 7.56825C15.0591 7.27213 14.8188 7.03188 14.5227 7.03188H8.34089C8.04478 7.03188 7.80453 7.27213 7.80453 7.56825C7.80453 7.86436 8.04478 8.10461 8.34089 8.10461Z" fill="black"/>
+          </svg>
+          <span>Forms</span>
+        </a>
+      </li>
+
+      {% endif %}
+      {% endif %}
+      {% endif %}
+
+      <!-- Nav Item - Dashboard -->
+      <li class="nav-item nav-item-menu" id="nav-settings-menu">
+        <a class="nav-link tooltip-navbar" href="/easy-assist/sales-ai/settings/" data-tooltip="tooltip" data-original-title="Settings">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15.25 4C16.7866 4 18.0741 5.06632 18.4129 6.49934L21.25 6.5C21.6642 6.5 22 6.83579 22 7.25C22 7.6297 21.7178 7.94349 21.3518 7.99315L21.25 8L18.4129 8.00066C18.0741 9.43368 16.7866 10.5 15.25 10.5C13.7134 10.5 12.4259 9.43368 12.0871 8.00066L2.75 8C2.33579 8 2 7.66421 2 7.25C2 6.8703 2.28215 6.55651 2.64823 6.50685L2.75 6.5L12.0874 6.49833C12.4265 5.06582 13.7138 4 15.25 4ZM15.25 5.5C14.4859 5.5 13.8361 5.98976 13.5975 6.6725L13.577 6.73515L13.5385 6.88337C13.5133 7.0016 13.5 7.12425 13.5 7.25C13.5 7.40483 13.5201 7.55497 13.5579 7.69794L13.5977 7.82787L13.6234 7.89664C13.8805 8.54307 14.5119 9 15.25 9C16.0138 9 16.6632 8.51073 16.9021 7.82852L16.9422 7.69781L16.9251 7.75808C16.9738 7.59729 17 7.4267 17 7.25C17 7.14518 16.9908 7.04251 16.9731 6.94275L16.9431 6.80565L16.9231 6.73529L16.8763 6.60236C16.6188 5.95647 15.9877 5.5 15.25 5.5Z" fill="#212121"/>
+              <path d="M8.25 13.5C6.7134 13.5 5.4259 14.5663 5.0871 15.9993L2.25 16C1.8358 16 1.5 16.3358 1.5 16.75C1.5 17.1297 1.7822 17.4435 2.1482 17.4931L2.25 17.5L5.0871 17.5007C5.4259 18.9337 6.7134 20 8.25 20C9.7866 20 11.0741 18.9337 11.4129 17.5007L20.75 17.5C21.1642 17.5 21.5 17.1642 21.5 16.75C21.5 16.3703 21.2178 16.0565 20.8518 16.0069L20.75 16L11.4126 15.9983C11.0735 14.5658 9.7862 13.5 8.25 13.5ZM8.25 15C9.0141 15 9.6639 15.4898 9.9025 16.1725L9.923 16.2352L9.9615 16.3834C9.9867 16.5016 10 16.6242 10 16.75C10 16.9048 9.9799 17.055 9.9421 17.1979L9.9023 17.3279L9.8766 17.3966C9.6195 18.0431 8.9881 18.5 8.25 18.5C7.4862 18.5 6.8368 18.0107 6.5979 17.3285L6.5578 17.1978L6.5749 17.2581C6.5262 17.0973 6.5 16.9267 6.5 16.75C6.5 16.6452 6.5092 16.5425 6.5269 16.4427L6.5569 16.3056L6.5769 16.2353L6.6237 16.1024C6.8812 15.4565 7.5123 15 8.25 15Z" fill="#212121"/>
+              </svg>
+            <span>Settings</span>
+          </a>
+      </li>
+
+      {% if cobrowse_agent.user.is_staff %}
+      {% if cobrowse_agent.role == "admin" %}
+      <li class="nav-item nav-item-menu" id="sales-developer-settings-container">
+        <a class="nav-link tooltip-navbar" href="/easy-assist/sales-ai/advanced-settings/static/" data-tooltip="tooltip" data-original-title="Developer Settings">
+            <svg width="20" height="19" viewBox="0 0 20 19" xmlns="http://www.w3.org/2000/svg" fill="#4D4D4D" >
+              <path d="M1.52941 4.04369H4.84652C5.18811 4.04369 5.46493 3.76668 5.46493 3.42528C5.46493 3.08388 5.18811 2.80687 4.84652 2.80687H1.52941C1.18782 2.80687 0.911 3.08388 0.911 3.42528C0.911 3.76668 1.18782 4.04369 1.52941 4.04369Z" fill="black"/>
+              <path d="M4.22808 3.42511C4.22808 4.81131 5.35572 5.93894 6.74203 5.93894C8.12834 5.93894 9.25598 4.81135 9.25598 3.42511C9.25598 2.03864 8.12835 0.911 6.74203 0.911C5.35571 0.911 4.22808 2.03864 4.22808 3.42511ZM5.46489 3.42511C5.46489 2.72095 6.03789 2.14785 6.74203 2.14785C7.44617 2.14785 8.01917 2.72095 8.01917 3.42511C8.01917 4.12925 7.4462 4.70209 6.74203 4.70209C6.03786 4.70209 5.46489 4.12925 5.46489 3.42511Z" fill="black"/>
+              <path d="M10.5581 4.04369H18.4706C18.8122 4.04369 19.089 3.76667 19.089 3.42528C19.089 3.08388 18.8122 2.80687 18.4706 2.80687H10.5581C10.2165 2.80687 9.93969 3.08388 9.93969 3.42528C9.93969 3.76668 10.2165 4.04369 10.5581 4.04369Z" fill="black"/>
+              <path d="M11.3363 9.82242C11.3363 11.2086 12.4639 12.3363 13.8502 12.3363C15.2366 12.3363 16.3642 11.2086 16.3642 9.82242C16.3642 8.43622 15.2366 7.30858 13.8502 7.30858C12.4639 7.30858 11.3363 8.43622 11.3363 9.82242ZM12.5731 9.82242C12.5731 9.11828 13.1461 8.54544 13.8502 8.54544C14.5544 8.54544 15.1274 9.11828 15.1274 9.82242C15.1274 10.5266 14.5544 11.0994 13.8502 11.0994C13.1461 11.0994 12.5731 10.5266 12.5731 9.82242Z" fill="black"/>
+              <path d="M1.52941 10.4409H10.0343C10.3759 10.4409 10.6527 10.1639 10.6527 9.8225C10.6527 9.4811 10.3759 9.20409 10.0343 9.20409H1.52941C1.18782 9.20409 0.911 9.4811 0.911 9.8225C0.911 10.1639 1.18782 10.4409 1.52941 10.4409Z" fill="black"/>
+              <path d="M15.7458 10.4409H18.4706C18.8122 10.4409 19.089 10.1639 19.089 9.8225C19.089 9.4811 18.8122 9.20409 18.4706 9.20409H15.7458C15.4042 9.20409 15.1274 9.4811 15.1274 9.8225C15.1274 10.1639 15.4042 10.4409 15.7458 10.4409Z" fill="black"/>
+              <path d="M3.63585 16.2198C3.63585 17.6062 4.76349 18.7339 6.1498 18.7339C7.53612 18.7339 8.66376 17.6062 8.66376 16.2198C8.66376 14.8336 7.53611 13.7059 6.1498 13.7059C4.76349 13.7059 3.63585 14.8336 3.63585 16.2198ZM4.87267 16.2198C4.87267 15.5156 5.44564 14.9428 6.1498 14.9428C6.85397 14.9428 7.42694 15.5156 7.42694 16.2198C7.42694 16.9239 6.85395 17.497 6.1498 17.497C5.44566 17.497 4.87267 16.9239 4.87267 16.2198Z" fill="black"/>
+              <path d="M9.96569 16.8381H18.4706C18.8122 16.8381 19.089 16.5611 19.089 16.2197C19.089 15.8783 18.8122 15.6013 18.4706 15.6013H9.96569C9.6241 15.6013 9.34728 15.8783 9.34728 16.2197C9.34728 16.5611 9.6241 16.8381 9.96569 16.8381Z" fill="black"/>
+              <path d="M1.52941 16.8382H4.25423C4.59582 16.8382 4.87264 16.5611 4.87264 16.2197C4.87264 15.8783 4.59582 15.6013 4.25423 15.6013H1.52941C1.18782 15.6013 0.911 15.8783 0.911 16.2197C0.911 16.5611 1.18781 16.8382 1.52941 16.8382Z" fill="black"/>
+            </svg>
+            <span>Developer Settings</span>
+          </a>
+      </li>
+      {% endif %}
+      {% endif %}
+
+      <!-- Divider -->
+      <hr class="sidebar-divider">
+
+      <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle" onclick="change_sales_logo_property()"></button>
+      </div>
+
+    </ul>
+    <!-- End of Sidebar -->
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+      <!-- Main Content -->
+      <div id="content">
+
+        <!-- Topbar -->
+        <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+
+          <!-- Sidebar Toggle (Topbar) -->
+          <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+            <i class="fa fa-bars"></i>
+          </button>
+
+        {% if cobrowse_agent.role == "agent" %}
+        {% if access_token_obj.allow_connect_with_virtual_agent_code or access_token_obj.allow_agent_to_customer_cobrowsing %}
+          {% if cobrowse_agent.virtual_agent_code %}
+              <div class="virtual-agent-code">Your virtual agent code: {{ cobrowse_agent.virtual_agent_code }}</div>
+          {% endif %}
+        {% endif %}
+        {% endif %}
+
+          <ul class="navbar-nav navbar-left virtual-agent-code-ul">
+            {% if cobrowse_agent.role == "agent" %}
+            {% if access_token_obj.allow_connect_with_virtual_agent_code or access_token_obj.allow_agent_to_customer_cobrowsing %}
+              {% if cobrowse_agent.virtual_agent_code %}
+                  <li class="d-none d-md-block">Your virtual agent code: {{ cobrowse_agent.virtual_agent_code }}</li>
+              {% endif %}
+            {% endif %}
+            {% endif %}
+          </ul>
+          <!-- Topbar Navbar -->
+          <ul class="navbar-nav ml-auto navbar-right">
+
+            <!-- Nav Item - Search Dropdown (Visible Only XS) -->
+            <li class="nav-item dropdown no-arrow d-sm-none">
+              <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-search fa-fw"></i>
+              </a>
+              <!-- Dropdown - Messages -->
+              <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in" aria-labelledby="searchDropdown">
+                <form class="form-inline mr-auto w-100 navbar-search">
+                  <div class="input-group">
+                    <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+                    <div class="input-group-append">
+                      <button class="btn btn-primary" type="button">
+                        <i class="fas fa-search fa-sm"></i>
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </li>
+
+            {% if cobrowse_agent.is_switch_allowed %}
+
+              {% if cobrowse_agent.role == "agent" %}
+                <li class="admin-agent-toggle">
+                  {% if access_token_obj.agent == cobrowse_agent %}
+                    Admin&nbsp;&nbsp;<label class="easyassist-switch" data-toggle="tooltip" title="Switch to Admin role"><input type="checkbox" id="checkbox-mark-as-agent-admin" onclick="check_and_mark_agent_as_admin(this)" checked><span class="easyassist-switch-slider round"></span></label>&nbsp;&nbsp;Agent
+                  {% else %}
+                    Supervisor&nbsp;&nbsp;<label class="easyassist-switch" data-toggle="tooltip" title="Switch to Supervisor role"><input type="checkbox" id="checkbox-mark-as-agent-admin" onclick="check_and_mark_agent_as_admin(this)" checked><span class="easyassist-switch-slider round"></span></label>&nbsp;&nbsp;Agent
+                  {% endif %}
+                </li>
+              {% else %}
+                <li class="admin-agent-toggle">
+                  {% if access_token_obj.agent == cobrowse_agent %}
+                    Admin&nbsp;&nbsp;<label class="easyassist-switch" data-toggle="tooltip" title="Switch to Agent role"><input type="checkbox" id="checkbox-mark-as-agent-admin" onclick="check_and_mark_agent_as_admin(this)"><span class="easyassist-switch-slider round"></span></label>&nbsp;&nbsp;Agent
+                  {% else %}
+                    Supervisor&nbsp;&nbsp;<label class="easyassist-switch" data-toggle="tooltip" title="Switch to Agent role"><input type="checkbox" id="checkbox-mark-as-agent-admin" onclick="check_and_mark_agent_as_admin(this)"><span class="easyassist-switch-slider round"></span></label>&nbsp;&nbsp;Agent
+                  {% endif %}
+                </li>
+              {% endif %}
+
+              <div class="topbar-divider console-topbar-divider"></div>
+
+            {% endif %}
+
+            {% if cobrowse_agent.role == "agent" %}
+
+              {% if cobrowse_agent.is_active %}
+                <li class="agent-online-toggle">You are online now&nbsp;&nbsp;<label class="easyassist-switch" data-toggle="tooltip" title="Mark as Offline"><input type="checkbox" id="checkbox-mark-as-active" onclick="check_and_mark_agent_active_status(this)" checked><span class="easyassist-switch-slider round"></span></label>
+                </li>
+              {% else %}
+                <li class="agent-online-toggle">You are offline now&nbsp;&nbsp;<label class="easyassist-switch" data-toggle="tooltip" title="Mark as Online"><input type="checkbox" id="checkbox-mark-as-active" onclick="check_and_mark_agent_active_status(this)"><span class="easyassist-switch-slider round"></span></label>
+                </li>
+              {% endif %}
+
+              <div class="topbar-divider console-topbar-divider"></div>
+
+            {% endif %}
+
+            <!-- Nav Item - User Information -->
+            <li class="nav-item dropdown no-arrow">
+              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ request.user.username }}</span>
+                {% if access_token_obj.cobrowsing_console_theme_color == None %}
+                {% if request.user.enable_s3_bucket %}
+                <img alt="Person icon" class="img-profile rounded-circle" src="https://static.allincall.in/static/EasyAssistApp/img/personImg.svg">
+                {% else %}
+                <img alt="Person icon" class="img-profile rounded-circle" src="/static/EasyAssistApp/img/personImg.svg">
+                {% endif %}
+                {% else %}
+                <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M18 36C27.9412 36 36 27.9412 36 18C36 8.05884 27.9412 0 18 0C8.05884 0 0 8.05884 0 18C0 27.9412 8.05884 36 18 36ZM26 22.2468C26 21.0044 24.9932 19.9973 23.7511 19.9973H12.2489C11.0068 19.9973 10 21.0044 10 22.2468V23.1667C10 23.739 10.1785 24.2969 10.5104 24.7629C12.0526 26.9277 14.5757 28 17.9967 28C21.4171 28 23.9414 26.9282 25.4874 24.7644C25.8208 24.2979 26 23.7388 26 23.1653V22.2468ZM22.9968 13.001C22.9968 10.239 20.7582 8 17.9967 8C15.2352 8 12.9966 10.239 12.9966 13.001C12.9966 15.7627 15.2352 18.0017 17.9967 18.0017C20.7582 18.0017 22.9968 15.7627 22.9968 13.001Z" fill="url(#paint0_linear)"/>
+                  <defs>
+                    <linearGradient id="paint0_linear" x1="18" y1="0" x2="18" y2="36" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}"/>
+                    <stop offset="1" stop-color="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+                {% endif %}
+              </a>
+              <!-- Dropdown - User Information -->
+              <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" data-target="#logoutModal">
+                  <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                  Logout
+                </a>
+              </div>
+            </li>
+
+          </ul>
+
+        </nav>
+        <!-- End of Topbar -->
+
+        {% block content %}
+
+        {% endblock %}
+
+
+      </div>
+      <!-- End of Main Content -->
+
+      <!-- Footer -->
+      {% if developer_config_obj.enable_footer_over_entire_console %}
+      <footer id="cobrowse-footer" class="sticky-footer bg-white">
+        <div class="container my-auto" style="display: inline-table;">
+          <div class="copyright text-center my-auto">
+              <span style="float: left;">Version: {{ cobrowse_agent.get_easychat_version }}</span>
+              <span>Copyright &copy; {{ developer_config_obj.legal_name }} &nbsp;&nbsp;
+              </span>
+          </div>
+        </div>
+        <button id="report_problem_icon" data-toggle="modal" data-target="#report_problem_modal" onmousedown="easyassist_capture_screenshot()">
+            <svg data-toggle="tooltip" title="" data-placement="left" data-original-title="Report a problem" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        </button>
+      </footer>
+      {% endif %}
+      <!-- End of Footer -->
+
+    </div>
+    <!-- End of Content Wrapper -->
+
+  </div>
+  <!-- End of Page Wrapper -->
+
+  <!-- Scroll to Top Button-->
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
+
+  <!-- Logout Modal-->
+  <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+        </div>
+        <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+          <a class="btn btn-primary" href="/easy-assist/logout/">Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Logout Modal-->
+  <div class="modal fade" id="cobrowsing_feedback_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Cobrowsing Feedback</h5>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-md-12">
+                  <h6>Leave product feedback or share your ideas!</h6>
+                  <textarea class="form-control" id="cobrowsing-feedback-textarea" style="resize:none;height:6em;width:-webkit-fill-available;overflow-y:auto;max-width: 100%!important;"></textarea>
+                </div>
+                <div class="col-md-6">
+                    <br>Category*:
+                    <select class="form-control" id="cobrowsing-feedback-category" style="margin-top:0.5em;">
+                        <option value="None" selected="">---select---</option>
+                        <option value="Issue">Issue</option>
+                        <option value="Suggestion">Suggestion</option>
+                        <option value="Feature Proposal">Feature Proposal</option>
+                    </select>                  
+                </div>
+                <div class="col-md-6">
+                    <br>Priority*:
+                    <select class="form-control" id="cobrowsing-feedback-priority" style="margin-top:0.5em;">
+                        <option value="None" selected="">---select---</option>
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                        <option value="Critical">Critical</option>
+                    </select>                  
+                </div>
+
+                <div class="col-md-12">
+                  <br>
+                  <input type="file" id="cobrowsing-feedback-file" accept=".png, .jpg, .jpeg, .svg, .bmp, .gif, .tiff, .exif, .jfif, .PNG" style="box-shadow:none !important;">
+                  <p style="padding-top: 1em;" id="cobrowsing-feedback-error"></p>
+                </div>
+
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+          <button class="btn btn-primary" onclick="capture_cobrowsing_general_feedback(this)">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="report_problem_modal" tabindex="-1" role="dialog" aria-labelledby="report_problem_modal_label" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title">Report an Issue</h5>
+              </div>
+              <div class="modal-body">
+                  <div class="row">
+                      <div class="col-sm-12 mb-2">
+                          <textarea id="bug-description" aria-label="Describe your issue in detail. We will get back to you as soon as possible. Also, mention what are the steps we need to take to reproduce this issue?." autofocus="" placeholder="Describe your issue in detail. We will get back to you as soon as possible. Also, mention what are the steps we need to take to reproduce this issue?"
+                              required="" rows="1"></textarea>
+                      </div>
+                      <div class="col-sm-12">
+                          <div class="checkbox-include-screenshot">
+                              <label class="cam">
+                                <input type="checkbox" id="checkbox-include-screenshot-text" name="" value="" checked>
+                                <span class="checkmark"></span>
+                                <span class="easyassist-noselect">Include screenshot</span>
+                              </label>
+                          </div>
+                      </div>
+                      <div class="col-sm-12 mb-4 " id="screen-capture-img-div">
+                          <div class="screen-capture-img-div">
+                              <img alt="Loading" class="easyassist-noselect" src="data:image/gif;base64,R0lGODlhLAEsAQAAACH5BAEAAAAALAAAAAAsASwBgwAAAL3I3Ft2p/T2+cjR4rK/1p2tymZ/rai20N7k7X+UunGIs9Pa55KkxFBtoent8wT/QE5a7cVZb979B0NxJEvzRFN1ZVv3hWN5pmv7xnN953v/BwaFQ2LReEQmlUtm0/mERqVTatV6xWa1W27X+wWHxWNy2XxGp9Vrdtv9hsflc3rdfsfn9Xt+3/8HDBQcJCw0PERMVFxkbHR8hIyUnKSstLzEzNTc5Oz0/AQNFR0lLTU9RU1VXWVtdX2FjZWdpa21vcXN1d3l7fX9BQ4WHiYuNj5GTlZeZm52foaOlp6mrra+xs7W3ubu9v4GDxcfJy83P0dPV19nb3d/h4+Xn6evt7/Hz9ff5+/3/wcYUOBAggUNHkSYUOFChg0dPoT4kIACigrQBahoMUsDBx01TmDQ/7Ejgm4KRC7QskCkgQoFRDog0O1lgywDXsakYFLkA24hRQbIQuDlgAoHRB7ohuAlTywGTlpAEBUBUG46HSDNorIjy3MCRNIU8aBAg4oIcG5gEABBRgUIEnxIsLbs25dUJzxgkJeBBbx53wIgYKAsUw4E5FJ0CyCBXqKsErwsEOKB1ZdX/15wWbnygcsYCBjVfHVpBY4dUVaw2iAA6Mp2MawOLVpk51SZO9LeYDs2TAyUd+OWMMD3bqwUWHOlsFvz2QrClb8U4Mpq9A+lnwsgnPy5xwsDtG53AHaCTZHMAfgEf7r59+0fV3nl7kG3g8QDAsDfauGxgwUGCDB9QKmXLv+g7IAAmEqgANYccA2woSoQ8KUDEMjLqQHXk/BACRhQ8CWSWHkAMg/260gA2hLAr7i7EMiOAgs7guolBRqjAD0HaHtRRQkKbNA6B1p8MTwaJyDRgb1YCeClIzmYDjgfh+RAtwoewE+9lkSijoLvxJsAPy4niNCBCmz8cgIpW/HRAxs/tCBJkZbEYIC8CljrKQqsw643kdwDgLyOGiwSuDBROwrKCazjMxXWEsUAT0M3VPKCuIZ7Cbk+8bO0Avwio0Cona4ssVE7JQjxpwxYY1OVUkfywMsMbIQTANi2Y87Njlok8iXaItQRAKsYBeA7S3V7FIBVjWzF045ixaBI8yj/GHQ8SmMb0rpezbwwpz0twC/V8W7SNr4LbHWg2FKC9IBcXA/FUkvNDmjLLKusBIC1MtkVdwIRKTiWWQdFGrLbDKyjN5XvCsYgWgwWBRM6FgnNTztWFxbJWxtpIzfhUSXwMANhW/HTgUwzUFi/urrEEriTJaYPg34hbJe0bQn8qoKOuwOXFWV566BkmUtszMYGIf2UZW8nyBhiBxJFFYOV9a3YswdZCdNcmGe7gMyGAb4gRwsq1TNfCQTmN1ILbGzxJYQT+O5ataTyV1apzHpt7qH/mPcDrStAEUsaw2xxspm+LnRKyjItMtadH+XVggW5nKiye1vDAL+WL1hw5D8k/5y7c7hRjjq4AixnTrcF/mLAxz8tYE+BvwhQnWdsRbLgRYR9rbmCIB0QgCLLTR2zMuCKRJavyp71w0bw7AqTd4o085b453Cd7zkof2V9pcpF4pSCAX5XDtcws6yAXDEv2LlcQprfLjv2Yus+3O2uDRY8/rgN/dvyJNVVUvBPOgrNZmYBHwErSLfrw7RiQ74+KfAAcfNObASTO/287yvHmZLZJrCzddmGgfzyjQAaILiO3Mty8TPOzbKnPULQyXMvjMrdUseaBTQAed5DwHcUUACevI1CGRhAAeZlAJ7MLVYBkgqUGDA3DCwxhhzQC4ByBqG5rQsAnbNi5+JWEK9FhP8G5LqbF0XQgAMY4IhhQqAYQbAgeClgQbyzoho/cKzdmEiOJzBfaBpgtTt2YACGUQB74MXDPhbSkIdEZCIVuUhGNtKRj4RkJCU5yStMBlhXkBMD+AgN87kOaUv7gk+YssQtNoMjvdNKngDAkaNlASMfMckNnWGUD+2HU0Yp5RY6sslklGpJJiFJqTr1K8JMBD6960wBdHiWBDQAPgvYIkbsQpYjCUcBPJnMophDkbcEQCsVmYabUgiUJH3klAZAgFGKc8rnXWUCJpmQAYwCFjc1oE4/0tiHfPIhl2jETb67FalgBAB5XoUimmMGRz7iEgEQhZUSUMoeg+OVIyWARp7/kkA5oQWUkCyAMMDMpwRAwxWjUOUBhCHPkTS6I9lNY54MgN3q6oWsEB1gSCaBE0wRwBGsKIVRRumMUlp5npYlySsWEYqOFhOVgK7ycgDYZTXoyDuTDrR6n0rAcMDiqQM0gJCK2U0YQ4KA793ofiahygCcuZkJ4BJSaWSGm6RCABqt1CT29BxRwxOAvaB1g+whST9faMWQoFNkUP2ROy+1tAJoMqICPd8VD1sNhYrqQzjFgEri19Qa6USyQ22iaBpaP5ASFJTvZFBGT4s7WTaDlhQ70l2nRJSBSsAlWMmL93gHgNs2J44k4pRORou7Je2HKQ/lWPGm4csLCFO14SHA/xJVwhOPcEgrYHFKA94iOJaUSgF8FWJqM9CR4giITSZZAAEwQt62KreEHIpjMsQ5rtWalq32LZFXqBI75NynMnYcr3IFdNHNhAey8lNfNPACHGMxIHAuDEBnnEjXxdBILDFskX2i0lgowklOtEHigfDClA97722tpWSKVbxiFrfYxS+GcYxlPGMa19jGN8ZxjnW8Yx732Mc/BnKQhTxkIhfZyEdGcpKVvGQmN9nJT4ZylKU8ZSpX2cpXxnKWtbxlLnfZy18Gc5jFPGYyl9nMZ0ZzmtW8Zja32c1vhnOc5TxnOtfZznfGc571vGc+99nPfwZ0oAU9aEIX2tCHRnSiFRa9aEY32tGPhnSkJT1pSlfa0pe2RAQAADs=">
+                          </div>
+                      </div>
+                  </div>
+                  <p id="easyassist-report-bug-error"></p>
+              </div>
+              <div class="modal-footer">
+                  <button class="btn btn-text-only" type="button" data-dismiss="modal">Cancel</button>
+                  <button class="btn btn-primary" onclick="easyassist_report_bug(this);">Submit</button>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <div id="easyassist-snackbar"></div>
+  <script type="text/javascript">
+    function show_easyassist_toast(message){
+        var element = document.getElementById("easyassist-snackbar");
+        element.innerHTML = message;
+        element.className = "show";
+        setTimeout(function(){ element.className = element.className.replace("show", ""); }, 5000);
+    }
+  </script>
+  <script type="text/javascript">
+    window.WEBSOCKET_TOKEN = '{{ request.user.username }}';
+    window.ACTIVE_AGENT_USERNAME = '{{ request.user.username }}';
+    window.EASYASSIST_AGENT_ROLE = '{{cobrowse_agent.role}}';
+  </script>
+
+{% if request.user.enable_s3_bucket %}
+  <script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/bootstrap-datepicker.min.js"></script>
+  <script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/bootstrap-multiselect.js"></script>
+{% else %}
+  <script type="text/javascript" src="{% static 'EasyAssistApp/js/bootstrap-datepicker.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'EasyAssistApp/js/bootstrap-multiselect.js' %}"></script>
+{% endif %}
+
+
+  {% if request.user.enable_s3_bucket %}
+
+  <script src="https://static.allincall.in/static/EasyAssistApp/js/bootstrap.bundle.min.js"></script>
+  <script src="https://static.allincall.in/static/EasyAssistApp/js/bootstrap-select.min.js"></script>
+  <script src="https://static.allincall.in/static/EasyAssistApp/vendor/jquery-easing/jquery.easing.min.js"></script>
+  <!-- Custom scripts for all pages-->
+  <script src="https://static.allincall.in/static/EasyAssistApp/js/sb-admin-2.min.js"></script>
+  <script src="https://static.allincall.in/static/EasyAssistApp/js/crypto-js.min.js"></script>
+  <script src="https://static.allincall.in/static/EasyAssistApp/vendor/datatables/jquery.dataTables.min.js"></script>
+  <script src="https://static.allincall.in/static/EasyAssistApp/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+  <script src="https://static.allincall.in/static/EasyAssistApp/js/html2canvas.min.js"></script>
+
+  {% else %}
+
+  <script src="{% static 'EasyAssistApp/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'EasyAssistApp/js/bootstrap-select.min.js' %}"></script>
+  <script src="{% static 'EasyAssistApp/vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+  <!-- Custom scripts for all pages-->
+  <script src="{% static 'EasyAssistApp/js/sb-admin-2.min.js' %}"></script>
+  <script src="{% static 'EasyAssistApp/js/crypto-js.min.js' %}"></script>
+  <script src="/static/EasyAssistApp/vendor/datatables/jquery.dataTables.min.js"></script>
+  <script src="/static/EasyAssistApp/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+  <script type="text/javascript" src="{% static 'EasyAssistApp/js/html2canvas.min.js' %}"></script>
+
+  {% endif %}
+  
+  <script src="{% static 'EasyAssistApp/js/validations.js' %}"></script>
+  <script src="{% static 'EasyAssistApp/js/encrypt.js' %}"></script>
+  <script type="text/javascript" src="{% static 'EasyAssistApp/js/easyassist-custom-select.js' %}"></script>
+  <!-- Core plugin JavaScript-->
+  <script src="{% static 'EasyAssistApp/js/admin-app.js' %}"></script>
+  <script src="{% static 'EasyAssistApp/js/settings.js' %}"></script>
+  <script src="{% static 'EasyAssistApp/js/calendar.js' %}"></script>
+
+  <script>
+    $(function () {
+        $("#datepicker").datepicker({ 
+              autoclose: true, 
+              todayHighlight: true,
+              startDate: '+0d'
+        })
+      });
+    </script>
+
+  <script type="text/javascript">
+
+        nav_items = document.getElementsByClassName("nav-item-menu");
+
+        for(var index=0; index< nav_items.length; index++){
+            nav_items[index].classList.remove("active");
+        }
+
+        for(var index=0; index< nav_items.length; index++){
+            if(nav_items[index].children[0].pathname==window.location.pathname){
+                nav_items[index].classList.add("active");
+
+                if($(nav_items[index]).closest('.nav-item-submenu')) {
+                  $(nav_items[index]).closest('.collapse').collapse();
+                }
+            }
+        }
+
+        function change_sales_logo_property(){
+            var sales_logo = document.getElementById("sales-ai-logo");
+            var is_sidebar_toggled = false;
+            if(document.getElementById("accordionSidebar").getAttribute("class").indexOf("toggled")!=-1){
+              set_cookie("sidebar-easy-assist", "", path="/");
+              if (window.matchMedia("(min-width: 720px)")){ 
+                  $('#accordianSidebar').css({"position": "fixed"});
+              }
+              is_sidebar_toggled = false;
+            }else{
+              set_cookie("sidebar-easy-assist", "toggled",path="/");
+              if ((window.matchMedia("(min-width: 720px)"))){
+                  $('#accordianSidebar').css({"position": "relative"});
+              }
+              is_sidebar_toggled = true;
+            }
+
+            if(is_sidebar_toggled) {
+                $(".tooltip-navbar").tooltip({
+
+                    boundary: 'window',
+                    placement: "right",
+                    container: 'body',
+                    trigger : 'hover'
+                });
+                $('.tooltip-navbar').tooltip('enable');
+                $('.tooltip-navbar').css('width', '100%');
+            } else {
+                $('.tooltip-navbar').tooltip('dispose');
+                $('.tooltip-navbar').css('width', '');
+            }
+      }
+
+      function show_cobrowsing_feedback_module(element){
+            $("#cobrowsing_feedback_modal").modal("show");
+      }
+
+      $(document).ready(function() {
+        if(get_cookie("sidebar-easy-assist")==""){
+            document.getElementById("accordionSidebar").classList.remove("toggled");
+        } else if(get_cookie("sidebar-easy-assist")=="toggled") {
+            document.getElementById("accordionSidebar").classList.add("toggled");
+            $(".tooltip-navbar").tooltip({
+                boundary: 'window',
+                placement: "right",
+                container: 'body',
+                trigger : 'hover'
+            }); 
+            $('.tooltip-navbar').tooltip('enable');
+            $('.tooltip-navbar').css('width', '100%');
+        }
+
+        if(window.innerWidth <= 767) {
+          $('.tooltip-navbar').tooltip('dispose');
+          $('.tooltip-navbar').css('width', '');
+
+          // in the below listener if the nav bar is open and a click is performed anywhere on the page then the nav bar is closed
+          document.addEventListener("click", function(event) {
+            var parent = $(event.target).closest("#accordionSidebar, #sidebarToggleTop");
+            if(parent.length === 0) {
+              if(document.getElementById("accordionSidebar").classList.contains('toggled')) {
+                document.getElementById("sidebarToggleTop").click();
+              }
+            }
+          });
+        }
+      });
+
+      window.addEventListener("resize", function(event) {
+        if(window.innerWidth <= 767) {
+          $('.tooltip-navbar').tooltip('dispose');
+          $('.tooltip-navbar').css('width', '');
+        } else {
+          if(get_cookie("sidebar-easy-assist")=="toggled"){
+              document.getElementById("accordionSidebar").classList.add("toggled");
+              $(".tooltip-navbar").tooltip({
+                  boundary: 'window',
+                  placement: "right",
+                  container: 'body',
+                  trigger : 'hover'
+              }); 
+              $('.tooltip-navbar').tooltip('enable');
+              $('.tooltip-navbar').css('width', '100%');
+          }
+        }
+      });
+
+      window.ENABLE_REQUEST_IN_QUEUE = "{{ access_token_obj.enable_request_in_queue }}";
+      window.COGNOMEET_ACCESS_TOKEN = "{{ access_token_obj.cogno_meet_access_token }}";
+  </script>
+
+  <!-- sprint 5.4---- -->
+  <script>
+    $(document).ready(function() {
+        
+        $('#description-text, #response-text, #selectDate').keyup(function() {
+           if($('#description-text').val() != '' && $('#response-text').val() != '' &&  $("#selectDate").val() != '') {
+              $('#save-holiday-info').prop('disabled', false);
+           }else{
+            $('#save-holiday-info').prop('disabled', true);
+           }
+        });
+
+        $('#selectDate').on('change', function() {
+           if($('#description-text').val() != '' && $('#response-text').val() != '' &&  $("#selectDate").val() != '') {
+              $('#save-holiday-info').prop('disabled', false);
+           }else{
+            $('#save-holiday-info').prop('disabled', true);
+           }
+        });
+
+        $('#select-add-work-timing').on('change', function(){
+          if(this.value == 1){
+            $('.individual, .selectall').prop('disabled',false)
+          }else if (this.value == 2){
+            $('.individual, .selectall').prop('disabled',false)
+          }else{
+            $('.individual, .selectall').prop('disabled',true)
+          }
+        })
+
+        $('.individual, .selectall').on('change', function(){
+          if($('.individual, .selectall').is(':checked')){
+            $('#save-work-time').prop('disabled',false)
+          }else{
+            $('#save-work-time').prop('disabled',true)
+          }
+        })
+
+
+        $("#apply_filter_modal .multiselect-container>li>a>label").addClass("filter-modal-custom-checkbox");
+        $("#apply_filter_modal .multiselect-container>li").find(".filter-modal-custom-checkbox").append("<span class='filter-custom-checkmark'></span>");
+
+        $("#apply_filter_modal .dropdown-menu>li .dropdown-item-checkbox").addClass("filter-modal-custom-checkbox");
+        $("#apply_filter_modal .dropdown-menu>li").find(".filter-modal-custom-checkbox").append("<span class='filter-custom-checkmark'></span>");
+
+    });
+    var table = $('#table-calendar-details').DataTable({
+      dom: 'lrt', 
+      "bPaginate": false,
+      "bLengthChange": false,
+      "bFilter": true,
+      "bInfo": false,
+      "bAutoWidth": false,
+      "ordering": false,
+    });
+
+  $('#table-calendar-details-search').keyup(function() {
+      let value = this.value;
+      table.search(value).draw();
+  })
+
+  $(document).ready(function(){
+    var selected_font = "{{ access_token_obj.font_family }}";
+    easyassist_font_family_list(selected_font);
+  });
+
+  $('[data-toggle="tooltip"]').tooltip({ boundary: 'window' })
+
+  </script>
+  
+  {% if access_token_obj.deploy_chatbot_flag and access_token_obj.deploy_chatbot_url %}
+    <script id="deploy_chatbot_script" src="{{access_token_obj.deploy_chatbot_url}}"></script>
+  {% endif %}
+
+</body>
+</html>

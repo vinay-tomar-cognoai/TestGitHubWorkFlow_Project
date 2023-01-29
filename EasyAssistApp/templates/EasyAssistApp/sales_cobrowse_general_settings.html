@@ -1,0 +1,825 @@
+{% extends 'EasyAssistApp/console.html' %}
+{% block content %}
+{% load static %}
+
+{% if request.user.enable_s3_bucket %}
+<script src="https://static.allincall.in/static/EasyAssistApp/js/ace.js" type="text/javascript"
+    charset="utf-8"></script>
+<script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/jscolor.min.js"></script>
+{% else %}
+<script src="{% static 'EasyAssistApp/js/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/jscolor.min.js' %}"></script>
+{% endif %}
+
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<link href="{% static 'EasyAssistApp/css/settings.css' %}" rel="stylesheet" type="text/css">
+
+<div class="container-fluid">
+    <div>
+        <div id="pills-cobrowse-admin-setting-options">
+            <div class="page-header">
+                <div class="row justify-content-between">
+                    <div class="col-sm-8 d-flex align-items-center">
+                        <div class="nav nav-pills navbar-right">
+                            <a class="anchor-reset back-btn" href="/easy-assist/sales-ai/settings/options/cobrowse">
+                                <span class="mr-3 mb-auto" style="cursor: pointer;">
+                                    <svg class="back-arrow-svg" width="44" height="44" viewBox="0 0 44 44" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <rect width="44" height="44" rx="22" transform="matrix(1 0 0 -1 0 44)"
+                                            fill="white" />
+                                            {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                                            <path
+                                            d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                                            fill="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" />
+                                            {% else %}
+                                            <path
+                                            d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                                            fill="#0254D7" />
+                                            {% endif %} 
+                                        
+                                    </svg>
+                                </span>
+                            </a>
+                            <h5 class="nav_btn mr-2 mt-2"><a class="anchor-reset"
+                                    href="/easy-assist/sales-ai/settings">Settings</a></h5>
+                            <div class=" mr-2 pt-2">
+                                <svg class="mini-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                                        fill="#475569" />
+                                </svg>
+                            </div>
+                            <h5 class="nav_btn mr-2 mt-2"><a class="anchor-reset"
+                                    href="/easy-assist/sales-ai/settings/options">Options </a></h5>
+                            <div class=" mr-2 pt-2">
+                                <svg class="mini-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                                        fill="#475569" />
+                                </svg>
+                            </div>
+                            <h5 class="nav_btn mr-2 mt-2"><a class="anchor-reset"
+                                    href="/easy-assist/sales-ai/settings/options/cobrowse">Cobrowse</a></h5>
+                            <div class=" mr-2 pt-2">
+                                <svg class="mini-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                                        fill="#475569" />
+                                </svg>
+                            </div>
+                            <h5 class="nav_btn active1 mt-2">General Settings</h5>
+                        </div>
+                    </div>
+                    
+                        <div class="col-sm-4 d-flex justify-content-end">
+                            <button class="btn btn-width-100" data-toggle="modal" data-target="#modal-confirm-reset-all" id="reset-button">Reset All</button>
+                            <button class="btn btn-width-100" id="save-button" onclick="chip_predefined_remarks_with_buttons(); save_cobrowse_general_settings(this)"
+                            style="background: #10B981!important;">Save</button>
+                          </div>
+                    
+                </div>
+            </div>
+            <div class="card shadow mb-4 mt-20">
+                <div class="card-body p-0">
+                    <div class="card">
+                        <div class="card-body table-responsive p-0">
+                            <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                                <tr class="tr-flex-sm">
+                                    <th scope="row" class="heading-toggle-text">Text to be shown on agent feedback modal
+                                    </th>
+                                    <td style="vertical-align: inherit;">
+                                        <textarea class="form-control" style="height:auto;" maxlength="1024"
+                                            id="lead_conversion_checkbox_text">{{ access_token_obj.lead_conversion_checkbox_text }}</textarea>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow mb-4 mt-20">
+                <div class="card-body p-0">
+                    <div class="card">
+                        <div class="card-body table-responsive p-0">
+                            <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                                <tr>
+                                    <th scope="row" class="heading-toggle-text">Enable pre-defined remarks with dropdown
+                                    </th>
+                                    <td style="vertical-align: inherit;">
+                                        {% if access_token_obj.enable_predefined_remarks %}
+                                        <label class="easyassist-option-switch">
+                                          <input type="checkbox" id="enable_predefined_remarks" checked>
+                                          <span class="easyassist-option-switch-slider round"></span>
+                                        </label>
+                                      {% else %}
+                                        <label class="easyassist-option-switch">
+                                          <input type="checkbox" id="enable_predefined_remarks">
+                                          <span class="easyassist-option-switch-slider round"></span>
+                                        </label>
+                                      {% endif %}
+                                    </td>
+                                </tr>
+                                <tr id="row-enable_predefined_sub_remarks_with_dropdown">
+                                    <th scope="row" class="sub-heading-toggle-text">Enable pre-defined sub-remarks with dropdown</th>
+                                    <td style="vertical-align: inherit;">
+                                      {% if access_token_obj.enable_predefined_subremarks %}
+                                      <label class="easyassist-option-switch">
+                                          <input type="checkbox" id="enable_predefined_subremarks" checked>
+                                          <span class="easyassist-option-switch-slider round" onclick="change_predefined_remarks_list_with_dropdown_div_text(this)"></span>
+                                      </label>
+                                      {% else %}
+                                      <label class="easyassist-option-switch">
+                                          <input type="checkbox" id="enable_predefined_subremarks">
+                                          <span class="easyassist-option-switch-slider round" onclick="change_predefined_remarks_list_with_dropdown_div_text(this)"></span>
+                                      </label>
+                                      {% endif %}
+                                    </td>
+                                  </tr>
+                                <tr id="predefined_remarks_list_div" class="tr-flex-sm">
+                                    <th scope="row" class="sub-heading-toggle-text">
+                                        Add remarks to be selected by agent from dropdown <br>
+                                        (Eg. Lead Closed, Internet Issue, Others).
+                                        <span id="map-sub-remarks-text-for-dropdown" style="display: inline-block;">
+                                            Map Sub-Remarks by clicking on Remarks added
+                                        </span>
+                                        <span data-toggle="tooltip" data-placement="bottom"
+                                            id="predefined_remarks_list_with_dropdown_div_tooltip"
+                                            data-original-title='Please hit "Enter" to add the remark. You can add multiple sub-remarks by clicking on the remarks added.(Eg: Remarks- Lead Drop, Sub remarks - No Payment, Out of Coverage Area).'>
+                                            <i class="fas fa-info-circle"></i>
+                                        </span>
+                                    </th>
+                                    <td style="vertical-align: inherit;">
+                                        <div>
+                                            <p id="predefined-remarks-list" style="display: none!important;"></p>
+                                            <ul id="predefined-remarks-tag-list"
+                                                style="padding: 0;position: relative;display: flex;flex-wrap: wrap;gap: 0.5em;">
+                                            </ul>
+                                            <input type="text" maxLength="25" id="input-predefined-remark"
+                                                placeholder="Type remark and press enter">
+                                            <div style="margin-top: 10px;">
+                                                <label>
+                                                    <span style="margin-right: 15px;">Optional</span>
+                                                    {% if access_token_obj.predefined_remarks_optional %}
+                                                      <input type="checkbox" name="optional"
+                                                          id="input-predefined-remark-optional-checkbox" checked>
+                                                    {% else %}
+                                                      <input type="checkbox" name="optional"
+                                                      id="input-predefined-remark-optional-checkbox">
+                                                    {% endif %}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow mb-4 mt-20">
+                <div class="card-body p-0">
+                    <div class="card">
+                        <div class="card-body table-responsive p-0">
+                            <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                                <tr>
+                                    <th scope="row" class="heading-toggle-text">Enable pre-defined remarks with buttons
+                                    </th>
+                                    <td style="vertical-align: inherit;">
+                                        {% if access_token_obj.enable_predefined_remarks_with_buttons %}
+                                        <label class="easyassist-option-switch">
+                                            <input type="checkbox" id="enable_predefined_remarks_with_buttons" checked>
+                                            <span class="easyassist-option-switch-slider round"></span>
+                                        </label>
+                                        {% else %}
+                                        <label class="easyassist-option-switch">
+                                            <input type="checkbox" id="enable_predefined_remarks_with_buttons">
+                                            <span class="easyassist-option-switch-slider round"></span>
+                                        </label>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr id="predefined_remarks_list_with_buttons_div" class="tr-flex-sm">
+                                    <th scope="row" class="sub-heading-toggle-text">
+                                        Add remarks to be selected by agent from buttons shown <br>
+                                        (Eg. Lead Closed, Internet Issue, Others).
+                                        <span data-toggle="tooltip" data-placement="bottom"
+                                            title="Press enter to save the remark. You can add multiple remarks."><i
+                                                class="fas fa-info-circle"></i></span>
+                                    </th>
+                                    <td style="vertical-align: inherit;">
+                                        <div>
+                                            <p id="predefined_remarks_with_buttons" style="display: none!important;">
+                                            </p>
+                                            <ul id="predefined-remarks-tag-with-buttons-list"
+                                                style="padding: 0; max-height: max-content; display: flex; flex-wrap: wrap;">
+                                            </ul>
+                                            <input type="text" maxLength="25" id="input-predefined-remark-with-buttons"
+                                                placeholder="Type remark and press enter">
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow mb-4 mt-20">
+                <div class="card-body p-0">
+                    <div class="card">
+                        <div class="card-body table-responsive p-0">
+                            <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                                <tr>
+                                    <th scope="row" class="heading-toggle-text">
+                                        Enable agent connect message
+                                        <span data-toggle="tooltip" data-placement="bottom"
+                                            title="This message will be shown in the customer's Livechat as soon as the session starts."><i
+                                                class="fas fa-info-circle"></i></span>
+                                    </th>
+                                    <td style="vertical-align: inherit;">
+                                        {% if access_token_obj.enable_agent_connect_message %}
+                                            <label class="easyassist-option-switch">
+                                            <input type="checkbox" id="enable_agent_connect_message" checked>
+                                            <span class="easyassist-option-switch-slider round"></span>
+                                            </label>
+                                        {% else %}
+                                            <label class="easyassist-option-switch">
+                                            <input type="checkbox" id="enable_agent_connect_message">
+                                            <span class="easyassist-option-switch-slider round"></span>
+                                            </label>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr id="agent_connect_message_div" class="tr-flex-sm">
+                                    <th scope="row" class="sub-heading-toggle-text"> Agent connect message
+                                        <span data-toggle="tooltip" data-placement="bottom"
+                                            title="This message will pop up on customer's chat as soon as agent joins the session."><i
+                                                class="fas fa-info-circle"></i></span>
+                                    </th>
+                                    <td style="vertical-align: inherit;">
+                                        <textarea class="form-control" style="height:10em;" maxlength="1024"
+                                            id="agent_connect_message">{{ access_token_obj.agent_connect_message }}</textarea>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow mb-4 mt-20">
+                <div class="card-body p-0">
+                    <div class="card">
+                        <div class="card-body table-responsive p-0">
+                            <table class="table table-borderless gy-settings-table" style="margin-bottom: 0;">
+                              {% if access_token_obj.allow_agent_to_customer_cobrowsing %}
+                                <tr>
+                                    <th scope="row" class="heading-toggle-text disable-menu-tab" style="color: #CBCACA !important;">
+                                        Enable smart agent assignment
+                                        <span data-toggle="tooltip" data-placement="bottom"
+                                            title="If end user disconnects, they will be connected back to the same agent within the reconnecting window, based on their availability."><i
+                                                class="fas fa-info-circle"></i></span>
+                                    </th>
+                                    <td style="vertical-align: inherit;">
+                                      <label class="easyassist-option-switch" data-toggle="tooltip" data-placement="bottom" data-original-title="Not applicable to Reverse Co-browsing">
+                                        <input type="checkbox" disabled id="enable_smart_agent_assignment">
+                                        <span class="disable-menu-tab easyassist-option-switch-slider round" style="color: #CBCACA !important;"></span>
+                                      </label>
+                                    </td>
+                                </tr>
+                                <tr id="reconnecting_window_timer_section" class="tr-flex-sm">
+                                  <th scope="row" class="sub-heading-toggle-text">Reconnecting window timer (In mins)
+                                      <span data-toggle="tooltip" data-placement="bottom" title=""
+                                          data-original-title="The time window within which user will be connected back to the last connected agent."><i
+                                              class="fas fa-info-circle"></i></span>
+                                  </th>
+                                  <td style="vertical-align: inherit;">
+                                      <input type="number" aria-label="Checkbox for following text input"
+                                          id="reconnecting_window_timer_input_field" value={{ access_token_obj.smart_agent_assignment_reconnecting_window }} min="0" class="positive_numeric">
+                                  </td>
+                              </tr>
+                              {% else %}
+                                <tr>
+                                  <th scope="row" class="heading-toggle-text">
+                                      Enable smart agent assignment
+                                      <span data-toggle="tooltip" data-placement="bottom"
+                                          title="If end user disconnects, they will be connected back to the same agent within the reconnecting window, based on their availability."><i
+                                              class="fas fa-info-circle"></i></span>
+                                  </th>
+                                  <td style="vertical-align: inherit;">
+                                      {% if access_token_obj.enable_smart_agent_assignment %}
+                                          <label class="easyassist-option-switch">
+                                          <input type="checkbox" id="enable_smart_agent_assignment" checked>
+                                          <span class="easyassist-option-switch-slider round"></span>
+                                          </label>
+                                      {% else %}
+                                          <label class="easyassist-option-switch">
+                                          <input type="checkbox" id="enable_smart_agent_assignment">
+                                          <span class="easyassist-option-switch-slider round"></span>
+                                          </label>
+                                      {% endif %}
+                                  </td>
+                                </tr>
+                                <tr id="reconnecting_window_timer_section" class="tr-flex-sm">
+                                  <th scope="row" class="sub-heading-toggle-text">Reconnecting window timer (In mins)
+                                      <span data-toggle="tooltip" data-placement="bottom" title=""
+                                          data-original-title="The time window within which user will be connected back to the last connected agent."><i
+                                              class="fas fa-info-circle"></i></span>
+                                  </th>
+                                  <td style="vertical-align: inherit;">
+                                      <input type="number" aria-label="Checkbox for following text input"
+                                          id="reconnecting_window_timer_input_field" value={{ access_token_obj.smart_agent_assignment_reconnecting_window }} min="0" class="positive_numeric">
+                                  </td>
+                              </tr>
+                              {% endif %}
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="subRemarkModal" tabindex="-1" role="dialog" aria-labelledby="subRemarkModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="subRemarkModalLabel">Map Sub-Remarks to Call Back Request</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <p hidden id="subremark-remark-field"></p>  
+            <div class="modal-input-field">
+                <input id="subremark-input-field" maxlength='40' type="text" placeholder="Hit 'Enter' after adding Sub-remarks">
+            </div>
+            <div class="modal-list">
+                <div class="subremarks-list-dragable-output-div" id="sortable-subremarks-div">
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <p id="save-subremarks-error"></p>
+          <button type="button" class="btn btn-primary" onclick="save_subremarks(this, 'Dropdown')">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade upload_file_modal" id="modal-confirm-reset-all" tabindex="-1" role="dialog"aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Reset All Settings</h5>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-12">
+                  <p>This will reset all settings across the console. Are you sure you want to continue?<p>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-text-only" type="button" data-dismiss="modal">Cancel</button>
+          <button class="btn btn-primary" onclick="reset_cobrowsing_meta_details(this)">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+    function get_predefined_remarks() {
+  var predefined_remarks_list = [];
+  var remarks_element_list = $('#predefined-remarks-tag-list').find('.remark-value');
+  for(var i=0; i<remarks_element_list.length; i++){
+    predefined_remarks_list.push(remarks_element_list[i].innerHTML);
+  }
+  return predefined_remarks_list;
+}
+
+
+function render_predefined_remarks_with_buttons() {
+  predefined_remarks_tag_with_buttons_list.innerHTML = '';
+  predefined_remarks_array_with_buttons.map((item, index) => {
+    predefined_remarks_tag_with_buttons_list.innerHTML += `<li class="bg-primary" id="predefined-remark-li-with-buttons"><span style="font-weight: bold;">${item}</span><span style="color:white;cursor: pointer;font-weight: bold;vertical-align: text-bottom;"onclick="javascript: remove_predefined_remark_tag_with_buttons(${index})"> x</span></li>`;
+  });
+}
+
+function remove_predefined_remark_tag_with_buttons(index) {
+  predefined_remarks_array_with_buttons = predefined_remarks_array_with_buttons.filter(item => predefined_remarks_array_with_buttons.indexOf(item) != index);
+  render_predefined_remarks_with_buttons();
+}
+
+$(function() {
+  $('#sortable-subremarks-div').sortable({
+      containment: "parent",
+  });
+});
+
+function add_subremarks_in_modal(remark) {
+  var subremark_array = [];
+  for(var i=0; i<predefined_remarks_array.length; i++){
+    if(remark == predefined_remarks_array[i].remark){
+      subremark_array = predefined_remarks_array[i].subremark;
+      break;
+    }
+  }
+  $('#subRemarkModalLabel').html(`Map Sub-Remarks to ${remark}`)
+  $('#sortable-subremarks-div').empty();
+  $('#subremark-remark-field').empty();
+  $('#subremark-remark-field').append(remark);
+
+  for(var i=0; i<subremark_array.length; i++) {
+    $('#sortable-subremarks-div').append(`
+      <div class="modal-dragable-output-item" onmouseover="handle_mouse_over_drag_icon_subremarks_modal(this)" onmouseout="handle_mouse_out_drag_icon_subremarks_modal(this)">
+        <div class="dragable-item-icon"  style="cursor: grabbing;display: none">
+          <svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M16.9998 6.5C16.9998 7.6 16.0998 8.5 14.9998 8.5C13.8998 8.5 12.9998 7.6 12.9998 6.5C12.9998 5.4 13.8998 4.5 14.9998 4.5C16.0998 4.5 16.9998 5.4 16.9998 6.5ZM8.9998 4.5C7.8998 4.5 6.9998 5.4 6.9998 6.5C6.9998 7.6 7.8998 8.5 8.9998 8.5C10.0998 8.5 10.9998 7.6 10.9998 6.5C10.9998 5.4 10.0998 4.5 8.9998 4.5ZM6.99976 12.5C6.99976 11.4 7.89976 10.5 8.99976 10.5C10.0998 10.5 10.9998 11.4 10.9998 12.5C10.9998 13.6 10.0998 14.5 8.99976 14.5C7.89976 14.5 6.99976 13.6 6.99976 12.5ZM8.99976 20.5C10.0998 20.5 10.9998 19.6 10.9998 18.5C10.9998 17.4 10.0998 16.5 8.99976 16.5C7.89976 16.5 6.99976 17.4 6.99976 18.5C6.99976 19.6 7.89976 20.5 8.99976 20.5ZM14.9998 10.5C13.8998 10.5 12.9998 11.4 12.9998 12.5C12.9998 13.6 13.8998 14.5 14.9998 14.5C16.0998 14.5 16.9998 13.6 16.9998 12.5C16.9998 11.4 16.0998 10.5 14.9998 10.5ZM12.9998 18.5C12.9998 17.4 13.8998 16.5 14.9998 16.5C16.0998 16.5 16.9998 17.4 16.9998 18.5C16.9998 19.6 16.0998 20.5 14.9998 20.5C13.8998 20.5 12.9998 19.6 12.9998 18.5Z" fill="#DADADA"/>
+          </svg>
+        </div>  
+        <input type="text" class="subremark-value" value="${subremark_array[i].remark}">
+        <div class="sub-remark-delete-icon" onclick="$(this).parent().remove()">
+            <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22 6C22 6.51284 21.614 6.93551 21.1166 6.99327L21 7H20.1553L18.9239 19.5192C18.7854 20.9269 17.6016 22 16.1871 22H8.81293C7.3984 22 6.2146 20.9269 6.07614 19.5192L4.84474 7H4C3.44772 7 3 6.55228 3 6C3 5.44772 3.44772 5 4 5H9C9 3.067 10.567 1.5 12.5 1.5C14.433 1.5 16 3.067 16 5H21C21.5523 5 22 5.44772 22 6ZM14.75 9.25C14.3703 9.25 14.0565 9.53215 14.0068 9.89823L14 10V17L14.0068 17.1018C14.0565 17.4678 14.3703 17.75 14.75 17.75C15.1297 17.75 15.4435 17.4678 15.4932 17.1018L15.5 17V10L15.4932 9.89823C15.4435 9.53215 15.1297 9.25 14.75 9.25ZM10.25 9.25C9.8703 9.25 9.55651 9.53215 9.50685 9.89823L9.5 10V17L9.50685 17.1018C9.55651 17.4678 9.8703 17.75 10.25 17.75C10.6297 17.75 10.9435 17.4678 10.9932 17.1018L11 17V10L10.9932 9.89823C10.9435 9.53215 10.6297 9.25 10.25 9.25ZM12.5 3.5C11.6716 3.5 11 4.17157 11 5H14C14 4.17157 13.3284 3.5 12.5 3.5Z" fill="#E53E3E"/>
+            </svg>                                    
+        </div>
+      </div>`);
+  }
+}
+
+function render_predefined_remarks() {
+
+    var html = "";
+    predefined_remarks_array.forEach(function(remark_obj, index) {
+        var remark = remark_obj.remark;
+        html += 
+            `<li class="predefined-remark-li bg-primary" ondblclick="start_rename_remark('${remark}')" onmouseover="handleDragIconMouseOver('Dropdown',this)" onmouseout="handleDragIconMouseOut('Dropdown',this)" id="predefined-remark-li">
+                <svg width="15" height="16" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="7.08333" cy="4.66667" r="1.66667" fill="#F8F8F8"/>
+                    <circle cx="7.08333" cy="10.5002" r="1.66667" fill="#F8F8F8"/>
+                    <circle cx="7.08333" cy="16.3332" r="1.66667" fill="#F8F8F8"/>
+                    <circle cx="12.9167" cy="4.66667" r="1.66667" fill="#F8F8F8"/>
+                    <circle cx="12.9167" cy="10.5002" r="1.66667" fill="#F8F8F8"/>
+                    <circle cx="12.9167" cy="16.3332" r="1.66667" fill="#F8F8F8"/>
+                </svg>
+                <span class="remark-value" style="font-weight: bold;">${remark}</span>
+                <span style="color:white;cursor: pointer;font-weight: bold;vertical-align: text-bottom;"onclick="remove_predefined_remark_tag(${index});"> x</span>
+                <div class="add-sub-remark-btn" onclick="add_subremarks_in_modal('${remark}')" data-toggle="modal" data-target="#subRemarkModal" style="display:none;text-align: center;font-size: 10px;cursor: pointer;border-top: 1px solid rgba(255, 255, 255, 0.3);">
+                    Add Sub-Remark
+                </div>
+            </li>`;
+    });
+
+    predefined_remarks_tag_list.innerHTML = html;
+
+    var remark_tag_container = document.getElementById("predefined-remarks-tag-list");
+    remark_tag_container.drag_obj = new CognoAiDragableTagInput(
+        remark_tag_container, 
+        function(event) {
+            remark_tag_container.drag_finish_callback(event)
+        }
+    );
+}
+
+function start_rename_remark(remark) {
+  var remarks_list = document.getElementsByClassName("predefined-remark-li");
+  var input = document.createElement("input");
+  input.value = remark;
+  input.type = "text";
+  input.maxLength = 25;
+  input.className = "remark-input";
+  input.setAttribute('id', `${remark}`);
+  end_rename_remark(input);
+
+  for(var i=0; i<remarks_list.length; i++) {
+    var element = remarks_list[i].querySelector('.remark-value'); 
+    if(element.innerHTML == remark) {
+      element.parentNode.setAttribute('style','display:none');
+      element.parentNode.parentNode.insertBefore(input,element.parentNode.nextSibling);
+      break;
+    }
+  }
+  input.focus();
+}
+
+function end_rename_remark(element) {
+  element.addEventListener("keypress", function(event){
+    var val = element.value;
+    var remark = element.id;
+
+    
+    var keycode = (event.keyCode ? event.keyCode : event.which);
+    if(keycode == 13){
+      //remove special characters
+      val = remove_special_characters_from_str(val);
+      
+      //length and duplicate check
+      if(val.length < 2) {
+          show_easyassist_toast( "Pre-defined remark should be atleast 2 characters long");
+          return;
+      }           
+  
+      var cnt = 0;
+      for(var i=0; i<predefined_remarks_array.length; i++) {
+          if(val == predefined_remarks_array[i]['remark'])
+            cnt++;
+      }
+      if(remark != val && cnt > 0) {
+          show_easyassist_toast("Duplicate Remarks are not allowed");
+          return;
+      }
+
+      for(i=0; i<predefined_remarks_array.length; i++){
+        ele = predefined_remarks_array[i];
+        if(ele.remark == remark) {
+          ele.remark = val;
+          break;
+        }
+      }
+      var prev = element.previousElementSibling; 
+      prev.getElementsByClassName('remark-value')[0].innerHTML = val;
+      prev.getElementsByClassName('add-sub-remark-btn')[0].setAttribute('onclick',`add_subremarks_in_modal("${val}")`)
+      prev.setAttribute('style','display:inline-block');
+      prev.setAttribute('ondblclick',`start_rename_remark("${val}")`);
+      element.remove();
+    }
+  });
+}
+
+function remove_predefined_remark_tag(index) {
+  predefined_remarks_array = predefined_remarks_array.filter((item, idx) => idx != index);
+  render_predefined_remarks();
+  
+}
+
+function chip_predefined_remarks(){
+  var predefined_remarks_string = predefined_remarks_array.join(',');
+  document.getElementById("predefined-remarks-list").value = predefined_remarks_string;
+}
+
+function chip_predefined_remarks_with_buttons(){
+  var predefined_remarks_with_buttons_string = predefined_remarks_array_with_buttons.join(',');
+  document.getElementById("predefined_remarks_with_buttons").value = predefined_remarks_with_buttons_string;
+}
+
+window.addEventListener("load", function() {
+    render_predefined_remarks();
+    render_predefined_remarks_with_buttons();
+});
+
+function handleDragIconMouseOver(type,element){
+    element.querySelector("svg").style.display="";
+    if(type==="Button" && document.getElementById("enable_predefined_subremarks_with_buttons").checked==true)
+    element.querySelector(".add-sub-remark-btn").style.display="";
+    if(type==="Dropdown" && document.getElementById("enable_predefined_subremarks").checked==true)
+    element.querySelector(".add-sub-remark-btn").style.display="";
+}
+
+function handleDragIconMouseOut(type,element){
+    if(type==="Button" && document.getElementById("enable_predefined_subremarks_with_buttons").checked==true)
+    element.querySelector(".add-sub-remark-btn").style.display="none";
+    if(type==="Dropdown" && document.getElementById("enable_predefined_subremarks").checked==true)
+    element.querySelector(".add-sub-remark-btn").style.display="none";
+}
+
+var input_predefined_remark = document.getElementById("input-predefined-remark");
+var predefined_remarks_tag_list = document.getElementById("predefined-remarks-tag-list");
+var predefined_remarks_array = {{access_token_obj.predefined_remarks|safe}};
+
+var input_predefined_remark_with_buttons = document.getElementById("input-predefined-remark-with-buttons");
+var predefined_remarks_tag_with_buttons_list = document.getElementById("predefined-remarks-tag-with-buttons-list");
+var predefined_remarks_array_with_buttons = "{{access_token_obj.predefined_remarks_with_buttons|safe}}";
+if(predefined_remarks_array_with_buttons === "")
+  predefined_remarks_array_with_buttons = []
+else
+  predefined_remarks_array_with_buttons = predefined_remarks_array_with_buttons.split(",")
+
+input_predefined_remark.addEventListener('keypress', function(e) {
+  if (e.key === 'Enter' || e.keyCode==13) {
+    let val = input_predefined_remark.value.trim();
+    if(!is_input_text_valid(val)) {
+      show_easyassist_toast("Please enter a valid pre-defined remark (Only a-z A-z 0-9 .,@ are allowed)");
+      return;
+    }
+    val = sanitize_input_string(val);
+    let predefined_remarks_list = get_predefined_remarks();
+
+    if (predefined_remarks_list.some(value => value == val)) {
+      show_easyassist_toast('Pre-defined remark already exist');
+      $('#input-predefined-remark').val('');
+    } else if(val.length < 2) {
+      show_easyassist_toast( "Pre-defined remark should be atleast 2 characters long");
+    } else if(val.length > 25) {
+      show_easyassist_toast( "Pre-defined remark should not be more than 25 characters");
+    } else if (val.toLowerCase() == "others" || val.toLowerCase() == "other") {
+      show_easyassist_toast(val + ' option can not be added');
+      input_predefined_remark.value = '';
+    } else {
+      predefined_remarks_array.push({"remark":val,"subremark":[]});
+      input_predefined_remark.value = '';
+      input_predefined_remark.focus();
+      render_predefined_remarks();
+    }
+  }
+});
+
+input_predefined_remark_with_buttons.addEventListener('keypress', function(e) {
+  if (e.key === 'Enter' || e.keyCode==13) {
+    let val = input_predefined_remark_with_buttons.value.trim();
+
+    if(!is_input_text_valid(val)) {
+      show_easyassist_toast("Please enter a valid pre-defined remark (Only a-z A-z 0-9 .,@ are allowed)");
+      return;
+    }
+
+    val = val.replace( /(<([^>]+)>)/ig, '');
+    if(val.length < 2) {
+      show_easyassist_toast( "Pre-defined remark should be atleast 2 characters long");
+    }  else if(val.length > 25) {
+      show_easyassist_toast( "Pre-defined remark should not be more than 25 characters");
+    } else {
+        if (predefined_remarks_array_with_buttons.some(value => value === val)) {
+        show_easyassist_toast('Pre-defined remark already exist');
+        input_predefined_remark_with_buttons.value = '';
+      } else {
+        predefined_remarks_array_with_buttons.push(val);
+        render_predefined_remarks_with_buttons();
+        input_predefined_remark_with_buttons.value = '';
+        input_predefined_remark_with_buttons.focus();
+      }
+    }
+  }
+});
+
+function get_tr_tag_from_parent_recursive(element){
+    var current_element = element;
+    var selected_element = null;
+
+    while(current_element){
+        if(current_element.tagName.toLowerCase() == "tr"){
+            selected_element = current_element;
+        }
+        current_element = current_element.parentElement;
+    }
+
+    return selected_element;
+}
+
+function enable_predefined_remarks_change_actions(){
+    var predefined_remarks_button = document.getElementById('enable_predefined_remarks_with_buttons');
+    var check_element = document.getElementById("enable_predefined_remarks");
+    var tr_check_element = get_tr_tag_from_parent_recursive(check_element);
+    if(check_element.checked == true && tr_check_element.classList.contains("easyassist_hidden_div") == false){
+      document.getElementById("predefined_remarks_list_div").classList.remove("easyassist_hidden_div");
+      document.getElementById("row-enable_predefined_sub_remarks_with_dropdown").classList.remove("easyassist_hidden_div");
+      if(predefined_remarks_button.checked){
+        predefined_remarks_button.click();
+      }
+      if(!document.getElementById("enable_predefined_subremarks").checked) {
+        document.getElementById("map-sub-remarks-text-for-dropdown").style.display = "none";
+      }
+    }else{
+      document.getElementById("predefined_remarks_list_div").classList.add("easyassist_hidden_div");
+      document.getElementById("row-enable_predefined_sub_remarks_with_dropdown").classList.add("easyassist_hidden_div");
+    }
+  }
+
+  function enable_predefined_remarks_with_buttons_change_actions(){
+    var predefined_remarks_dropdown = document.getElementById('enable_predefined_remarks');
+    var check_element = document.getElementById("enable_predefined_remarks_with_buttons");
+    var tr_check_element = get_tr_tag_from_parent_recursive(check_element);
+    if(check_element.checked == true && tr_check_element.classList.contains("easyassist_hidden_div") == false){
+      document.getElementById("predefined_remarks_list_with_buttons_div").classList.remove("easyassist_hidden_div");
+      if(predefined_remarks_dropdown.checked){
+        predefined_remarks_dropdown.click();
+      }
+    } else {
+      document.getElementById("predefined_remarks_list_with_buttons_div").classList.add("easyassist_hidden_div");
+    }
+  }
+
+  function change_predefined_remarks_list_with_dropdown_div_text(element){
+    if(!element.previousElementSibling.checked)
+    {
+        document.getElementById("map-sub-remarks-text-for-dropdown").style.display="inline-block";
+        document.getElementById("predefined_remarks_list_with_dropdown_div_tooltip").setAttribute("data-original-title",`Please hit "Enter" to add the remark. You can add multiple sub-remarks by clicking on the remarks added.
+(Eg: Remarks- Lead Drop, Sub remarks - No Payment, Out of Coverage Area).`)
+    } 
+    else
+    {
+        document.getElementById("map-sub-remarks-text-for-dropdown").style.display="none";
+        document.getElementById("predefined_remarks_list_with_dropdown_div_tooltip").setAttribute("data-original-title",`Press enter to save the remark. You can add multiple remarks.`)
+    }
+    
+}
+
+$('#subremark-input-field').keypress(function(event) {
+  let keycode = (event.keyCode ? event.keyCode : event.which);
+  let value = $('#subremark-input-field').val();
+  if(keycode == 13){
+
+    if(!is_input_text_valid(value)) {
+      show_easyassist_toast("Please enter a valid pre-defined sub-remark (Only a-z A-z 0-9 .,@ are allowed)");
+      return;
+    }
+
+    value = remove_special_characters_from_str(value);
+    value = value.trim().replace( /(<([^>]+)>)/ig, '');
+
+    if(value.length < 2){
+      show_easyassist_toast('Pre-defined sub-remark should be atleast 2 characters long')
+      return;
+    }
+    var predefined_subremarks_list = []; 
+    var remark = $('#subRemarkModal').find('#subremark-remark-field').html();
+    var subremarks_element_list = $('#subRemarkModal').find('.subremark-value');
+    for(var i=0; i<subremarks_element_list.length; i++){
+        predefined_subremarks_list.push(subremarks_element_list[i].value);
+    }
+    
+    if (predefined_subremarks_list.some(val => val === value)) {
+      show_easyassist_toast('Pre-defined sub-remark already exist');
+      $('#subremark-input-field').val('');
+      return;
+    }
+    $('#subremark-input-field').val('');
+      $('#sortable-subremarks-div').append(`
+      <div class="modal-dragable-output-item" onmouseover="handle_mouse_over_drag_icon_subremarks_modal(this)" onmouseout="handle_mouse_out_drag_icon_subremarks_modal(this)">
+        <div class="dragable-item-icon"  style="cursor: grabbing;display: none">
+          <svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M16.9998 6.5C16.9998 7.6 16.0998 8.5 14.9998 8.5C13.8998 8.5 12.9998 7.6 12.9998 6.5C12.9998 5.4 13.8998 4.5 14.9998 4.5C16.0998 4.5 16.9998 5.4 16.9998 6.5ZM8.9998 4.5C7.8998 4.5 6.9998 5.4 6.9998 6.5C6.9998 7.6 7.8998 8.5 8.9998 8.5C10.0998 8.5 10.9998 7.6 10.9998 6.5C10.9998 5.4 10.0998 4.5 8.9998 4.5ZM6.99976 12.5C6.99976 11.4 7.89976 10.5 8.99976 10.5C10.0998 10.5 10.9998 11.4 10.9998 12.5C10.9998 13.6 10.0998 14.5 8.99976 14.5C7.89976 14.5 6.99976 13.6 6.99976 12.5ZM8.99976 20.5C10.0998 20.5 10.9998 19.6 10.9998 18.5C10.9998 17.4 10.0998 16.5 8.99976 16.5C7.89976 16.5 6.99976 17.4 6.99976 18.5C6.99976 19.6 7.89976 20.5 8.99976 20.5ZM14.9998 10.5C13.8998 10.5 12.9998 11.4 12.9998 12.5C12.9998 13.6 13.8998 14.5 14.9998 14.5C16.0998 14.5 16.9998 13.6 16.9998 12.5C16.9998 11.4 16.0998 10.5 14.9998 10.5ZM12.9998 18.5C12.9998 17.4 13.8998 16.5 14.9998 16.5C16.0998 16.5 16.9998 17.4 16.9998 18.5C16.9998 19.6 16.0998 20.5 14.9998 20.5C13.8998 20.5 12.9998 19.6 12.9998 18.5Z" fill="#DADADA"/>
+          </svg>
+        </div>  
+        <input type="text" class="subremark-value" value="${value}">
+        <div class="sub-remark-delete-icon" onclick="$(this).parent().remove()">
+            <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22 6C22 6.51284 21.614 6.93551 21.1166 6.99327L21 7H20.1553L18.9239 19.5192C18.7854 20.9269 17.6016 22 16.1871 22H8.81293C7.3984 22 6.2146 20.9269 6.07614 19.5192L4.84474 7H4C3.44772 7 3 6.55228 3 6C3 5.44772 3.44772 5 4 5H9C9 3.067 10.567 1.5 12.5 1.5C14.433 1.5 16 3.067 16 5H21C21.5523 5 22 5.44772 22 6ZM14.75 9.25C14.3703 9.25 14.0565 9.53215 14.0068 9.89823L14 10V17L14.0068 17.1018C14.0565 17.4678 14.3703 17.75 14.75 17.75C15.1297 17.75 15.4435 17.4678 15.4932 17.1018L15.5 17V10L15.4932 9.89823C15.4435 9.53215 15.1297 9.25 14.75 9.25ZM10.25 9.25C9.8703 9.25 9.55651 9.53215 9.50685 9.89823L9.5 10V17L9.50685 17.1018C9.55651 17.4678 9.8703 17.75 10.25 17.75C10.6297 17.75 10.9435 17.4678 10.9932 17.1018L11 17V10L10.9932 9.89823C10.9435 9.53215 10.6297 9.25 10.25 9.25ZM12.5 3.5C11.6716 3.5 11 4.17157 11 5H14C14 4.17157 13.3284 3.5 12.5 3.5Z" fill="#E53E3E"/>
+            </svg>                                    
+        </div>
+      </div>`);
+  }
+});
+
+function handle_mouse_out_drag_icon_subremarks_modal(element){
+  element.querySelector(".dragable-item-icon").style.display="none";
+}
+function handle_mouse_over_drag_icon_subremarks_modal(element){
+  element.querySelector(".dragable-item-icon").style.display="block";
+}
+
+
+function enable_agent_connect_message_change_actions(){
+    var check_element = document.getElementById("enable_agent_connect_message");
+    var tr_check_element = get_tr_tag_from_parent_recursive(check_element);
+    if(check_element.checked == true && tr_check_element.classList.contains("easyassist_hidden_div") == false){
+      document.getElementById("agent_connect_message_div").classList.remove("easyassist_hidden_div");
+    } else {
+      document.getElementById("agent_connect_message_div").classList.add("easyassist_hidden_div");
+    }
+  }
+
+  function enable_smart_agent_assignment_change_actions(){
+    var check_element = document.getElementById("enable_smart_agent_assignment");
+    var tr_check_element = get_tr_tag_from_parent_recursive(check_element);
+    if(check_element.checked == true && tr_check_element.classList.contains("easyassist_hidden_div") == false){
+      document.getElementById("reconnecting_window_timer_section").classList.remove("easyassist_hidden_div");
+    } else {
+      document.getElementById("reconnecting_window_timer_section").classList.add("easyassist_hidden_div");
+    }
+  }
+
+  function default_function_calls() {
+    enable_predefined_remarks_change_actions();
+    change_predefined_remarks_list_with_dropdown_div_text;
+    enable_predefined_remarks_with_buttons_change_actions();
+    enable_smart_agent_assignment_change_actions();
+    enable_agent_connect_message_change_actions();
+  }
+
+  default_function_calls();
+
+  document.getElementById("enable_predefined_remarks").addEventListener(
+    "click", enable_predefined_remarks_change_actions);
+  document.getElementById("enable_predefined_remarks_with_buttons").addEventListener(
+    "click", enable_predefined_remarks_with_buttons_change_actions);
+  document.getElementById("enable_agent_connect_message").addEventListener(
+    "click", enable_agent_connect_message_change_actions)
+  document.getElementById("enable_smart_agent_assignment").addEventListener(
+    "click", enable_smart_agent_assignment_change_actions)
+
+  $(document).ready(function() {
+    try {
+        document.getElementById("nav-settings-menu").classList.add("active")
+    } catch(err) {}
+  });
+  
+</script>
+{% endblock %}

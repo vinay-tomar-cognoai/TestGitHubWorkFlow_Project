@@ -1,0 +1,419 @@
+{% extends 'EasyAssistApp/console.html' %} {% block content %} {% load static %}
+<script src="{% static 'EasyAssistApp/vendor/chart.js/chartjs-plugin-datalabels.js' %}"></script>
+<style type="text/css">
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #f3f6ff !important;
+}
+
+.shadow {
+    /* box-shadow: 0 1px 0 rgba(0, 6, 85, 0.05), 0 10px 7px rgba(0, 30, 65, 0.06), 0 7px 70px rgba(68, 93, 184, 0.205) !important; */
+    box-shadow: 0px 0px 25px 0px rgba(0,0,0,0.15);
+}
+
+.icon-cobrowse {
+    background-color: rgba(116, 170, 252, 0.5);
+    height: 39px;
+    width: 39px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    position: absolute;
+    left: 15px;
+    top: 10px;
+    transition: all 0.2s ease;
+}
+
+.icon-download {
+    background-color: rgba(116, 170, 252, 0.5);
+    height: 30px;
+    width: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    transition: all 0.2s ease;
+}
+
+.stats-cobrowse {
+    color: white;
+    text-align: center;
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 95%;
+}
+
+.card-cobrowse:hover .icon-cobrowse {
+    top: 5px;
+    transition: all 0.2s ease;
+}
+
+.text-cobrowse {
+    text-align: center;
+    margin-top: 6px;
+    color: white !important;
+    font-weight: 400 !important;
+    letter-spacing: -0.04em;
+    font-size: 13px;
+    margin-bottom: 16px !important;
+
+}
+
+.card-cobrowse {
+    border-radius: 8px !important;
+    background: linear-gradient(180deg, #0254D7 0%, #013E9F 100%);
+    width: 93%;
+    height: 78% !important;
+    margin: auto;
+
+}
+
+@media only screen and (max-width: 600px) {
+  .chart-area {
+    height: 20rem;
+    width: 35rem;
+  }
+
+  .card-body-sm {
+    overflow: auto;
+  }
+}
+
+.card-collection {
+    margin-left: 3.5em !important;
+    margin-right: 3.5em !important;
+}
+
+@media only screen and (max-width: 769px) {
+    .card-collection {
+        margin-left: 1em !important;
+        margin-right: 1em !important;
+    }
+}
+
+#cobrowse-page-count-trend {
+    font-size: 14px;
+}
+
+.get-analytics {
+    padding: 15px 26px;
+    vertical-align: middle;
+    width: 100%;
+}
+
+.get-analytics-btn {
+    /*width: 100%;*/
+    height: 35px;
+    border-radius: 30px;
+    font-family: Silka;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 15px;
+    text-align: center;
+    color: #FFFFFF;
+}
+
+.button-dropdown {
+    width: 210px;
+    background-color: #fff;
+    font-family: Silka;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 13px;
+    color: #7a7a7a;
+    display: flex;
+    justify-content: space-between;
+}
+
+.button-dropdown:hover {
+    transform: none;
+}
+
+.button-dropdown::after {
+    border: none!important;
+    content: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.41 0L6 4.58L10.59 0L12 1.41L6 7.41L0 1.41L1.41 0Z' fill='black'/%3E%3C/svg%3E");
+}
+
+.dropdown-item {
+    color: #7a7a7a;
+}
+
+.dropdown-item:hover {
+    background-color: var(--color_rgba_10) !important;
+    color:  #7a7a7a !important;
+}
+
+.no-data-present {
+    display: none;
+    justify-content: center;
+    height: 100%;
+    align-items: center;
+}
+
+#visited-title-select-option {
+    height: 35px;
+    border: 1px solid #E6E6E6;
+    box-sizing: border-box;
+    border-radius: 30px;
+    outline: none!important;
+    box-shadow: none!important;
+
+    font-family: Silka;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 14px;
+    text-align: center;
+
+    color: #4D4D4D;
+}
+
+.tooltip { 
+  top: 0; 
+}
+
+@media only screen and (max-width: 769px) {
+    .card-body {
+        padding: 1.25rem!important;
+    }
+
+    .flex-column-sm {
+        flex-direction: column!important;
+        margin: 23px!important;
+        gap: 10px;
+    }
+
+    .h1-order-sm {
+        order: 2;
+        font-size: 1.55rem!important;
+        text-align: center;
+    }
+
+    .get-analytics {
+        padding: 15px 0 15px 22px!important
+    }
+
+    .get-analytics-btn {
+        margin-left: 0!important;
+    }
+
+    .card-cobrowse .no-gutters {
+        padding-left: 25px!important;
+    }
+
+   .button-dropdown {
+        margin-top: 0!important;
+    }
+}
+
+.analytics-btn-wrapper .btn-block:first-child {
+    margin: 0 1em 0 0!important;
+}
+
+.analytics-btn-wrapper .btn-block:nth-child(2) {
+    margin: 0!important;
+}
+
+.analytics-btn-wrapper {
+    display: flex;
+    padding: 0!important;
+}
+
+@media only screen and (max-width: 1340px) {
+    .analytics-btn-wrapper {
+        flex-direction: column;
+        padding: 0 0.75rem!important;
+    }
+
+    .analytics-btn-wrapper .btn-block:nth-child(2) {
+        margin: 1em 0 0 0em!important;
+    }
+}
+</style>
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <div class="row rectangle-btn-parent" style="margin: 0px 0px 10px 0px;">
+        {% if cobrowse_agent.role != "agent" and access_token_obj.enable_inbound == True and access_token_obj.lead_generation == True %}
+        <div class="col-md pd-l ">
+            <a class="rectangle-btn" href="/easy-assist/sales-ai/general-analytics/"> General Analytics
+                <span data-toggle="tooltip" data-placement="top" title="" data-original-title="A comparison between the two approaches (Inbound and Outbound) is done to get a generalized idea about the approach used more."><i class="fas fa-info-circle"></i></span>
+            </a>
+        </div>
+        {% endif %}
+
+        {% if access_token_obj.allow_video_meeting_only == False and access_token_obj.enable_inbound == True %}
+        <div class="col-md pd-l">
+            <a class="rectangle-btn " href="/easy-assist/sales-ai/analytics/"> Inbound Analytics
+                <span data-toggle="tooltip" data-placement="top" title="" data-original-title="Analytics for incoming requests."><i class="fas fa-info-circle"></i></span>
+            </a>
+        </div>
+        {% endif %}
+
+        {% if access_token_obj.lead_generation %}
+        <div class="col-md pd-l">
+            <a class="rectangle-btn " href="/easy-assist/sales-ai/analytics-outbound/"> Outbound Analytics
+                <span data-toggle="tooltip" data-placement="top" title="" data-original-title="Analytics for outgoing requests."><i class="fas fa-info-circle"></i></span>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow get-analytics">
+                <div class="d-sm-flex align-items-center justify-content-between">
+                    <div class="row" style="width: 100%;">
+                        <div class="col-md-3 col-sm-12 mt-1 mb-1" style="display: flex; align-items: center;">
+                            <select id="visited-title-select-option" class="form-control">
+                                <option value="none">No visited pages</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 col-sm-12  analytic-calendar-div" style="align-items: center;">
+                            <div class="col-md-5 mt-1 mb-1">
+                                <input class="form-control datepicker easyassist-date-picker" data-date-format="dd/mm/yyyy" placeholder="Start Date" id="start-date" autocomplete="off" value="{{ datetime_start|date:'d/m/Y' }}">
+                            </div>
+                            <div class="col-md-1 mt-1 mb-1 between-to-text" style="display: flex; align-items: center;justify-content: center;">
+                                To
+                            </div>
+                            <div class="col-md-5 mt-1 mb-1">
+                                <input class="form-control datepicker easyassist-date-picker" data-date-format="dd/mm/yyyy" placeholder="End Date" id="end-date" autocomplete="off" value="{{ datetime_end|date:'d/m/Y' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-12 mt-1 mb-1 analytics-btn-wrapper">
+                            <button class="btn btn-primary btn-block" onclick="show_general_analysis()">Get Analytics</button>
+                            {% if cobrowse_agent.role == "admin" or cobrowse_agent.role == "supervisor" or cobrowse_agent.role == "admin_ally" %}
+                            <button class="btn btn-primary btn-block" data-toggle="modal" data-target="#modal-mis-filter">  Export
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-5 mb-4">
+            <br>
+            <div class="card shadow" style="height: 100%;">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Cobrowsing Sessions Attended</h6>
+                </div>
+                <div class="card-body card-body-sm">
+                    <div class="chart-area">
+                        <canvas id="general-analytics-pie-chart" style="height: 100%; width: 100%;"></canvas>
+                        <div class="no-data-present" id="no-data-img-pie">
+                            <img src="{% static 'EasyAssistApp/img/no-data.svg' %}" alt="No data present" style="margin: auto;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+         <div class="col-md-7 mb-4">
+             <br>
+            <div class="card shadow" style="height: 100%;">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Requests initiated vs Requests attended vs Customers converted</h6>
+                </div>
+                <div class="card-body card-body-sm">
+                    <div class="chart-area">
+                        <canvas id="general-analytics-bar-graph" style="height: 100%; width: 100%;"></canvas>
+                        <div class="no-data-present" id="no-data-img-bar" style="display: none;">
+                            <img src="{% static 'EasyAssistApp/img/no-data.svg' %}"  alt="No data present" style="margin: auto;">
+                        </div>                    
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <br>
+            <!-- Project Card Example -->
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">NPS</h6>
+                </div>
+                <div class="card-body" id="general-analytics-nps-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ************************ Export data ***********************-->
+    <div class="modal fade client-location-details" id="modal-mis-filter" tabindex="-1" role="dialog" aria-labelledby="client_location_details_label" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="export_mis_lable">Export General Analytics</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h6 style="color: #3e95cd">Select date range</h6>
+                            <select id="select-date-range" class="form-control" onchange="check_select_date_range(this)">
+                                <option value="0" selected="selected">Choose date range</option>
+                                <option value="1">Last day</option>
+                                <option value="2">Last 7 days</option>
+                                <option value="3">Last 1 month</option>
+                                <option value="4">Custom Range</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-6 mt-4" id="from-date-div" style="display: none;">
+                            <h6 style="color: #3e95cd">From Date</h6>
+                            <input id="startdate" placeholder="From Date" class="filter-parameter form-control datepicker" autocomplete="off" data-date-format="dd-mm-yyyy">
+                        </div>
+                        <div class="col-sm-6 mt-4" id="to-date-div" style="display: none;">
+                            <h6 style="color: #3e95cd">To Date</h6>
+                            <input id="enddate" placeholder="To Date" class="filter-parameter form-control datepicker" autocomplete="off" data-date-format="dd-mm-yyyy">
+                        </div>
+                        <div class="col-sm-12" id="email-id-div" style="display:none; padding-top: 25px;">
+                            <h6 style="color: #3e95cd">Email ID*</h6>
+                            <textarea class="form-control" id="filter-data-email" style="height:10em;">{{ request.user.email }}</textarea>
+                            <span><br><b>Note: You will receive the general analytics data dump on the above email ID within 24 hours.</b></span>
+                        </div>
+                        <div class="col-sm-12 mt-3" id="general-error-message">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn btn-info" type="button" onclick="export_general_analytics(this)">Export</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/general_analytics.js' %}"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    initialize_custom_tabs();
+});
+
+function check_select_date_range(element){
+    general_error_message = document.getElementById("general-error-message");
+    general_error_message.innerHTML = "";
+
+    if(element.value == "0") {
+        general_error_message.innerHTML = "Please select valid date range filter";
+    } else {
+        general_error_message.innerHTML = "";
+    }
+
+    if(element.value=="4"){
+        document.getElementById("from-date-div").style.display="block";
+        document.getElementById("to-date-div").style.display="block";
+        document.getElementById("email-id-div").style.display="block";
+    }else{
+        document.getElementById("from-date-div").style.display="none";
+        document.getElementById("to-date-div").style.display="none";
+        document.getElementById("email-id-div").style.display="none";
+    }
+}
+</script>
+{% endblock %}

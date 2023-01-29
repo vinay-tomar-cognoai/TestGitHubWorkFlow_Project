@@ -1,0 +1,186 @@
+{% extends 'EasyChatApp/base.html' %}
+{% block content %}
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="/static/EasyChatApp/css/easychat_drive.css?v={% random_int 1 100 %}">
+<div class="add-scrolling">
+<div class="row" style="padding:1em;">
+
+    <div class="col s12">
+        <div class="row">
+            <div class="col s6">
+                <a class="btn easychat-button modal-trigger tooltipped" 
+                href="#modal-upload-files" data-tooltip="Upload Files"> Upload New Files
+                <i class="material-icons inline-icon">insert_drive_file</i></a>
+                &nbsp; &nbsp;
+                <a class="btn red darken-3 modal-trigger" href="#modal-delete-file" 
+                id="btn-delete-file-from-drive" style="display:none;">Delete Selected Files <i class="material-icons inline-icon">delete</i></a>
+            </div>
+            <div class="col s6 right">
+                <a class="btn easychat-button modal-trigger" href="#modal-add-to-bot" id="btn-add-files-to-bot" 
+                style="display:none;"><i class="material-icons inline-icon">add</i> Add Into Bot</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col s12">
+        {% if easychat_drive_objs %}
+            <table id="easychat-drive-file-table" class="display">
+                <thead>
+                    <tr>
+                        <th scope="col"></th>
+                        <th scope="col">File</th>
+                        <th scope="col">Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for easychat_drive_obj in easychat_drive_objs %}
+                        <tr>
+                            <td>
+                                <div class="row">
+                                    <div class="col s12">
+                                      <label>                        
+                                          <input type="checkbox" 
+                                          class="checkbox-easychat-drive-file filled-in purple darken-4" id="checkbox-easychat-drive-file-{{ easychat_drive_obj.pk }}" 
+                                          onchange="show_intent_upload_button()"/>
+                                            <span>
+                                                {% if easychat_drive_obj.media_type == "1" %}
+                                                    <img src="{% static 'EasyChatApp/img/image-icon.png' %}" style="height:2em;">
+                                                {% elif easychat_drive_obj.media_type == "2" %}
+                                                    <img src="{% static 'EasyChatApp/img/ppt-icon.png' %}" style="height:2em;">
+                                                {% elif easychat_drive_obj.media_type == "3" %}
+                                                    <img src="{% static 'EasyChatApp/img/docx-icon.png' %}" style="height:2em;">
+                                                {% elif easychat_drive_obj.media_type == "5" %}
+                                                    <img src="{% static 'EasyChatApp/img/pdf-icon.png' %}" style="height:2em;">
+                                                {% elif easychat_drive_obj.media_type == "4" %}
+                                                    <img src="{% static 'EasyChatApp/img/excel-icon.png' %}" style="height:2em;">
+                                                {% elif easychat_drive_obj.media_type == "7" %}
+                                                    <img src="{% static 'EasyChatApp/img/video-icon.png' %}" style="height:2em;">
+                                                {% else %}
+                                                    <i class="material-icons black-text">insert_drive_file
+                                                    </i>
+                                                {% endif %}
+                                            </span>
+                                      </label>
+                                    </div>                                
+                                </div>                                    
+                            </td>
+                            <td><a href="{{ easychat_drive_obj.media_url }}" target="_blank" 
+                                id="easychat-drive-media-name-{{ easychat_drive_obj.pk }}">
+                            {{ easychat_drive_obj.media_name }}</td>
+                            <td>{{ easychat_drive_obj.get_media_type }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+            <p style="padding:1em; text-align: center;" class="green lighten-1">No media files found.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+
+<!-- Modal Structure -->
+<div id="modal-upload-files" class="modal">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <div class="row">
+                    <ol>
+                        <li>Upload Images, PPTs, Docs, PDFs into EasyChat Drive.</li>
+                        <li>At max 10 files can be uploaded at a time.</li>
+                    </ol>
+                  <p></p>
+                  <div class="file-field input-field">
+                    <div class="col s3 waves-effect waves-light btn easychat-button">
+                      <span>Select Files<sup>*</sup></span>
+                      <input id="input-upload-files" type = "file" accept=".gif,.jpeg,.jpg,.png,.doc,.docx,.pdf,.ppt,.pptx" multiple />
+                    </div>
+
+                    <div class="col s9 file-path-wrapper">
+                      <input style="box-shadow: none;color: rgba(0,0,0,0.87);" class="file-path validate" type="text" 
+                      disabled placeholder="Upload file" />
+                    </div>
+
+                    <div class="col s12" id="easychat-drive-files-preloader" style="display:none;">
+                      <div class="progress">
+                          <div class="indeterminate"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <a class="col s2 btn waves-effect waves-light right easychat-button" id="upload-resume" onclick="upload_selected_files_at_drive()">Upload</a>
+                </div>
+            </div>            
+        </div>
+    </div>
+</div>
+
+
+<!-- Model Structure For Bot-->
+<div id="modal-add-to-bot" class="modal">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <div class="row">
+                    <p>Please select Bot into which you want to add files.</p>
+                    <select id="selected-Bot-for-insert-file" 
+                    onchange="show_intent_selection_button()">
+                        <option value="None" selected>Choose Bot from following list</option>
+                        {% for bot in bot_objs %}
+                            <option value="{{ bot.pk }}">{{ bot.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row" id = "intent-select" style="display: none;">
+            <div class="col s12">
+                <div class="row">
+                    <p>Please select intent into which you want to add files.</p>
+                    <select id="selected-intent-for-insert-file" 
+                    onchange="show_intent_tree_structure()">
+                    </select>
+                    <p>Kindly select valid intent or child intent for media file insertion!</p>
+                </div>
+            </div>
+            <div class="col s12">
+                <div class="row" id="easychat-drive-modal-render-tree-structure-container">
+                    <div id="jstree-drive-data"></div>                    
+                </div>                
+            </div>
+            <div class="col s12">
+                <div class="row">
+                  <a class="col s2 btn waves-effect waves-light right green darken-4" 
+                  onclick="insert_selected_files_into_intent()">Add</a>
+                </div>                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal Structure -->
+<div id="modal-delete-file" class="modal">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <div class="row">
+                    <p>Are you sure, you want to delete selected files?</p>
+                </div>
+            </div>
+            <div class="col s12">
+                <a class="col s2 btn waves-effect waves-light red darken-3 modal-close right" 
+                onclick="delete_selected_files_from_drive()">Delete</a>
+                <a class="col s2 btn waves-effect waves-light transparent-btn white black-text modal-close right" style="margin-right: 5%">Cancel</a>    
+                &nbsp;&nbsp;&nbsp;            
+            </div>            
+        </div>
+    </div>
+</div>
+</div
+
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'EasyChatApp/base.html' %}
+{% block content %}
+{% load static %}
+
+<!--css containing editor_common_utils and editor_custom_js and editor_code-->
+<link rel="stylesheet" type="text/css" href="/static/EasyChatApp/css/chatbot_custom_js.css?v={% random_int 1 100 %}" media="screen">
+<script type="text/javascript" src="{% static 'EasyChatApp/js/google_home_console.js' %}?v={% random_int 1 100 %}"></script>
+<div class="add-scrolling">
+<div class="row" style="padding:1em;" id="easychat-processor-container">
+  <div class="col s8">
+    <div class="col s12">
+      <a class="btn green lighten-2" style="opacity:1; float: right; margin-bottom: 10px;" id="save-auth-page-btn" onclick="save_auth_page_content('{{detail_obj_id}}', '{{channel}}')">Save Processor</a>
+    </div>
+    <div class="col s12">
+      <div class="col s12" style="background-color: #dddddd69;">
+        <a href="javascript:void(0)" class="right tooltipped" data-position="top" data-tooltip="Full-screen mode" onclick="go_full_screen_mode()"><i class="material-icons inline-icon black-text" style="font-size: 28px !important;">fullscreen</i></a>
+      </div>
+    </div>
+    <div class="col s12">
+      <div id="editor-code">{{code}}</div><br><br>
+      <div class="col s6">
+          <input type="text" id="easychat-processor-input" placeholder="write your input here as string. Ex. 'This is easychat console'">
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+{% if request.user.enable_s3_bucket %}
+
+<script src="https://static.allincall.in/static/EasyChatApp/js/ace.js" type="text/javascript" charset="utf-8"></script>
+
+{% else %}
+
+<script src="{% static 'EasyChatApp/js/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+
+{% endif %}
+
+<script src="{% static 'EasyChatApp/js/ext-searchbox.js' %}" type="text/javascript" charset="utf-8"></script>
+
+<script>
+    var autosave_session_timer = null;
+    var editor = ace.edit("editor-code");
+    editor.setTheme("ace/theme/monokai");
+    editor.session.setMode("ace/mode/javascript");
+</script>
+
+{% endblock %}

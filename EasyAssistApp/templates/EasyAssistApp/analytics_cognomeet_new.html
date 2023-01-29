@@ -1,0 +1,668 @@
+{% extends 'EasyAssistApp/console.html' %} {% block content %} {% load static %}
+<style type="text/css">
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #f3f6ff !important;
+}
+
+.shadow {
+    /* box-shadow: 0 1px 0 rgba(0, 6, 85, 0.05), 0 10px 7px rgba(0, 30, 65, 0.06), 0 7px 70px rgba(68, 93, 184, 0.205) !important; */
+    box-shadow: 0px 0px 25px 0px rgba(0,0,0,0.15);
+}
+
+.icon-cobrowse {
+    background-color: rgba(116, 170, 252, 0.5);
+    height: 45px;
+    width: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    position: absolute;
+    left: 18px;
+    top: 10px;
+    transition: all 0.2s ease;
+}
+
+.icon-download {
+    background-color: rgba(116, 170, 252, 0.5);
+    height: 30px;
+    width: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    position: absolute;
+    right: 18px;
+    top: 18px;
+    transition: all 0.2s ease;
+}
+
+.stats-cobrowse {
+    color: white;
+    text-align: center;
+    font-size: 30px;
+    font-weight: 600;
+    line-height: 95%;
+    margin-top: 10px;
+}
+
+.card-cobrowse:hover .icon-cobrowse {
+    top: 5px;
+    transition: all 0.2s ease;
+}
+
+.text-cobrowse {
+    text-align: center;
+    margin-top: 10px;
+    color: white !important;
+    font-weight: 400 !important;
+    letter-spacing: -0.04em;
+    font-size: 13px;
+    font-family: Silka;
+}
+
+.card-cobrowse {
+    height: 90% !important;
+    border-radius: 20px !important;
+    background: linear-gradient(0deg, #282DA5 0%, #445DB8 94.37%);
+    width: 90%;
+
+}
+
+@media only screen and (max-width: 600px) {
+  .chart-area {
+    height: 20rem;
+    width: 35rem;
+  }
+
+  .card-body-sm {
+    overflow: auto;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+    .pull-left-md {
+    float: left;
+  }
+
+  .pull-right-md {
+    float: right;
+  }
+
+  .col-filter {
+    padding-right: 3.5em;
+  }
+}
+
+.datepicker {
+    padding: 8px;
+}
+
+.select-agent-dropdown {
+    min-width: 100px!important;
+    margin-right: 10px;
+    height: 35px!important;
+}
+
+.get-analytics {
+    margin-bottom: 10px;
+    padding: 15px 26px;
+    vertical-align: middle;
+    width: 100%;
+}
+
+.get-analytics-btn {
+    width: 100%;
+    height: 35px;
+    border-radius: 30px;
+    font-family: Silka;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 15px;
+    text-align: center;
+    color: #FFFFFF;
+}
+
+.card-collection {
+    width: 100%;
+    margin-right: 17px;
+    margin-left: 15px;
+    margin-top: 20px;
+    padding: 10px;
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+}
+
+@media only screen and (max-width: 769px) {
+    .card-collection {
+        margin-left: 0em !important;
+        margin-right: 0em !important;
+    }
+}
+
+@media (max-width: 768px) {
+.card-cobrowse {
+    width: 100% !important;
+}
+
+@media only screen and (max-width: 769px) {
+    .card-body {
+        padding: 1.25rem!important;
+    }
+
+    .h1-order-sm {
+        order: 2;
+        font-size: 1.55rem!important;
+        text-align: center;
+    }
+
+    .get-analytics {
+        padding: 15px 0 15px 22px!important
+    }
+
+    .get-analytics-btn {
+        margin-left: 0!important;
+    }
+
+    .card-cobrowse .no-gutters {
+        padding-left: 25px!important;
+    }
+}
+
+.cobrowse-pie-chart {
+    height: 100%!important;
+}
+</style>
+<!-- Begin Page Content -->
+<div class="d-flex flex-row" style="justify-content:space-between; margin: 23px;">
+    <h1 class="h3 mb-0 text-gray-800 h1-order-sm">Meeting Analytics</h1>
+</div>
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <div class="card shadow get-analytics">
+                <div class="d-sm-flex align-items-center justify-content-between">
+                    <div class="row" style="width: 100%;">
+                        <div class="col-md-6 col-sm-12  analytic-calendar-div">
+                            <div class="col-md-5 mt-1 mb-1">
+                                <input class="form-control datepicker easyassist-date-picker" data-date-format="dd/mm/yyyy" placeholder="Start Date" id="start-date" autocomplete="off" value="{{ datetime_start|date:'d/m/Y' }}">
+                            </div>
+                            <div class="col-md-1 mt-1 mb-1 between-to-text" style="display: flex; align-items: center;">
+                                To
+                            </div>
+                            <div class="col-md-5 mt-1 mb-1">
+                                <input class="form-control datepicker easyassist-date-picker" data-date-format="dd/mm/yyyy" placeholder="End Date" id="end-date" autocomplete="off" value="{{ datetime_end|date:'d/m/Y' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-sm-12 mt-1 mb-1" style="display : flex;">
+                            <button class="btn btn-primary get-analytics-btn" onclick="get_cognomeet_analytics()">Get Analytics</button>
+                            {% if cobrowse_agent.role != "agent" %}
+                                <button class="btn btn-primary ml-2" data-toggle="modal" data-target="#modal-mis-filter">Export</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Content Row -->
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="card shadow mb-4" style="width: 100%;">
+                <div class="row card-collection">
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-info shadow h-100 py-2 card-cobrowse">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="col-auto">
+                                            <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="cogno-meet-total-meeting-scheduled">
+                                                ...
+                                            </div>
+                                        </div>
+                                        <div class="mb-1 text-cobrowse" style="color: #806ef3;">
+                                            Meeting Scheduled
+                                        </div>
+                                    </div>
+                                    <div class="icon-cobrowse">
+                                        <svg width="24" height="19" viewBox="0 0 24 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M18 15.25C18 17.0449 16.5449 18.5 14.75 18.5H7.25C5.45507 18.5 4 17.0449 4 15.25V6.75C4 4.95507 5.45507 3.5 7.25 3.5H14.75C16.5449 3.5 18 4.95507 18 6.75V15.25ZM23.762 4.89334C23.9156 5.07414 24 5.30368 24 5.54096V16.4588C24 17.0111 23.5523 17.4588 23 17.4588C22.7627 17.4588 22.5332 17.3744 22.3524 17.2208L19 14.3709V7.62794L22.3524 4.77899C22.7732 4.42132 23.4043 4.47252 23.762 4.89334Z" fill="white"/>
+                                            {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                                            <circle cx="6" cy="6" r="6" fill="{{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.hex }}"/>
+                                            {% else %}
+                                            <circle cx="6" cy="6" r="6" fill="blue"/>
+                                            {% endif %}
+                                            <path d="M8.11364 3C8.60316 3 9 3.39684 9 3.88636V8.11364C9 8.60316 8.60316 9 8.11364 9H3.88636C3.39684 9 3 8.60316 3 8.11364V3.88636C3 3.39684 3.39684 3 3.88636 3H8.11364ZM4.5 6.40909C4.27407 6.40909 4.09091 6.59225 4.09091 6.81818C4.09091 7.04412 4.27407 7.22727 4.5 7.22727C4.72593 7.22727 4.90909 7.04412 4.90909 6.81818C4.90909 6.59225 4.72593 6.40909 4.5 6.40909ZM6 6.40909C5.77407 6.40909 5.59091 6.59225 5.59091 6.81818C5.59091 7.04412 5.77407 7.22727 6 7.22727C6.22593 7.22727 6.40909 7.04412 6.40909 6.81818C6.40909 6.59225 6.22593 6.40909 6 6.40909ZM4.5 4.77273C4.27407 4.77273 4.09091 4.95588 4.09091 5.18182C4.09091 5.40775 4.27407 5.59091 4.5 5.59091C4.72593 5.59091 4.90909 5.40775 4.90909 5.18182C4.90909 4.95588 4.72593 4.77273 4.5 4.77273ZM6 4.77273C5.77407 4.77273 5.59091 4.95588 5.59091 5.18182C5.59091 5.40775 5.77407 5.59091 6 5.59091C6.22593 5.59091 6.40909 5.40775 6.40909 5.18182C6.40909 4.95588 6.22593 4.77273 6 4.77273ZM7.5 4.77273C7.27407 4.77273 7.09091 4.95588 7.09091 5.18182C7.09091 5.40775 7.27407 5.59091 7.5 5.59091C7.72593 5.59091 7.90909 5.40775 7.90909 5.18182C7.90909 4.95588 7.72593 4.77273 7.5 4.77273Z" fill="white"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-info shadow h-100 py-2 card-cobrowse">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="col-auto">
+                                            <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="cogno-meet-total-meeting-scheduled-by-floating-button">
+                                                ...
+                                            </div>
+                                        </div>
+                                        <div class="mb-1 text-cobrowse" style="color: #806ef3;">
+                                            Meeting Initiated by customer (Floating button/ Icon)
+                                        </div>
+                                    </div>
+                                    <div class="icon-cobrowse">
+                                        <svg width="24" height="19" viewBox="0 0 24 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M18 15.75C18 17.5449 16.5449 19 14.75 19H7.25C5.45507 19 4 17.5449 4 15.75V7.25C4 5.45507 5.45507 4 7.25 4H14.75C16.5449 4 18 5.45507 18 7.25V15.75ZM23.762 5.39334C23.9156 5.57414 24 5.80368 24 6.04096V16.9588C24 17.5111 23.5523 17.9588 23 17.9588C22.7627 17.9588 22.5332 17.8744 22.3524 17.7208L19 14.8709V8.12794L22.3524 5.27899C22.7732 4.92132 23.4043 4.97252 23.762 5.39334Z" fill="white"/>
+                                            {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                                            <circle cx="6" cy="6" r="6" fill="{{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.hex }}"/>
+                                            {% else %}
+                                            <circle cx="6" cy="6" r="6" fill="blue"/>
+                                            {% endif %}
+                                            <path d="M4.2 7.88575L2.68284 6.13518C2.52663 5.95494 2.27337 5.95494 2.11716 6.13518C1.96095 6.31542 1.96095 6.60765 2.11716 6.7879L3.91716 8.86482C4.07337 9.04506 4.32663 9.04506 4.48284 8.86482L8.88284 3.7879C9.03905 3.60765 9.03905 3.31542 8.88284 3.13518C8.72663 2.95494 8.47337 2.95494 8.31716 3.13518L4.2 7.88575Z" fill="white"/>
+                                        </svg>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-info shadow h-100 py-2 card-cobrowse">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="col-auto">
+                                            <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="cogno-meet-total-meeting-scheduled-by-greeting-bubble">
+                                                ...
+                                            </div>
+                                        </div>
+                                        <div class="mb-1 text-cobrowse" style="color: #806ef3;">
+                                            Meeting Initiated by customer (Greeting bubble)
+                                        </div>
+                                    </div>
+                                    <div class="icon-cobrowse">
+                                        <svg width="24" height="19" viewBox="0 0 24 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M18 15.75C18 17.5449 16.5449 19 14.75 19H7.25C5.45507 19 4 17.5449 4 15.75V7.25C4 5.45507 5.45507 4 7.25 4H14.75C16.5449 4 18 5.45507 18 7.25V15.75ZM23.762 5.39334C23.9156 5.57414 24 5.80368 24 6.04096V16.9588C24 17.5111 23.5523 17.9588 23 17.9588C22.7627 17.9588 22.5332 17.8744 22.3524 17.7208L19 14.8709V8.12794L22.3524 5.27899C22.7732 4.92132 23.4043 4.97252 23.762 5.39334Z" fill="white"/>
+                                            {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                                            <circle cx="6" cy="6" r="6" fill="{{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.hex }}"/>
+                                            {% else %}
+                                            <circle cx="6" cy="6" r="6" fill="blue"/>
+                                            {% endif %}
+                                            <path d="M4.2 7.88575L2.68284 6.13518C2.52663 5.95494 2.27337 5.95494 2.11716 6.13518C1.96095 6.31542 1.96095 6.60765 2.11716 6.7879L3.91716 8.86482C4.07337 9.04506 4.32663 9.04506 4.48284 8.86482L8.88284 3.7879C9.03905 3.60765 9.03905 3.31542 8.88284 3.13518C8.72663 2.95494 8.47337 2.95494 8.31716 3.13518L4.2 7.88575Z" fill="white"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-info shadow h-100 py-2 card-cobrowse">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="col-auto">
+                                            <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="cogno-meet-total-meeting-scheduled-by-inactivty-popup">
+                                                ...
+                                            </div>
+                                        </div>
+                                        <div class="mb-1 text-cobrowse" style="color: #806ef3;">
+                                            Meeting Initiated by customer (Inactivity Pop-up)
+                                        </div>
+                                    </div>
+                                    <div class="icon-cobrowse">
+                                        <svg width="24" height="19" viewBox="0 0 24 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M18 15.75C18 17.5449 16.5449 19 14.75 19H7.25C5.45507 19 4 17.5449 4 15.75V7.25C4 5.45507 5.45507 4 7.25 4H14.75C16.5449 4 18 5.45507 18 7.25V15.75ZM23.762 5.39334C23.9156 5.57414 24 5.80368 24 6.04096V16.9588C24 17.5111 23.5523 17.9588 23 17.9588C22.7627 17.9588 22.5332 17.8744 22.3524 17.7208L19 14.8709V8.12794L22.3524 5.27899C22.7732 4.92132 23.4043 4.97252 23.762 5.39334Z" fill="white"/>
+                                            {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                                            <circle cx="6" cy="6" r="6" fill="{{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.hex }}"/>
+                                            {% else %}
+                                            <circle cx="6" cy="6" r="6" fill="blue"/>
+                                            {% endif %}
+                                            <path d="M4.2 7.88575L2.68284 6.13518C2.52663 5.95494 2.27337 5.95494 2.11716 6.13518C1.96095 6.31542 1.96095 6.60765 2.11716 6.7879L3.91716 8.86482C4.07337 9.04506 4.32663 9.04506 4.48284 8.86482L8.88284 3.7879C9.03905 3.60765 9.03905 3.31542 8.88284 3.13518C8.72663 2.95494 8.47337 2.95494 8.31716 3.13518L4.2 7.88575Z" fill="white"/>
+                                        </svg>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-info shadow h-100 py-2 card-cobrowse">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="col-auto">
+                                            <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="cogno-meet-total-meeting-scheduled-by-exit-intent">
+                                                ...
+                                            </div>
+                                        </div>
+                                        <div class="mb-1 text-cobrowse" style="color: #806ef3;">
+                                            Meeting Initiated by customer (Exit Intent)
+                                        </div>
+                                    </div>
+                                    <div class="icon-cobrowse">
+                                        <svg width="24" height="19" viewBox="0 0 24 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M18 15.75C18 17.5449 16.5449 19 14.75 19H7.25C5.45507 19 4 17.5449 4 15.75V7.25C4 5.45507 5.45507 4 7.25 4H14.75C16.5449 4 18 5.45507 18 7.25V15.75ZM23.762 5.39334C23.9156 5.57414 24 5.80368 24 6.04096V16.9588C24 17.5111 23.5523 17.9588 23 17.9588C22.7627 17.9588 22.5332 17.8744 22.3524 17.7208L19 14.8709V8.12794L22.3524 5.27899C22.7732 4.92132 23.4043 4.97252 23.762 5.39334Z" fill="white"/>
+                                            {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                                            <circle cx="6" cy="6" r="6" fill="{{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.hex }}"/>
+                                            {% else %}
+                                            <circle cx="6" cy="6" r="6" fill="blue"/>
+                                            {% endif %}
+                                            <path d="M4.2 7.88575L2.68284 6.13518C2.52663 5.95494 2.27337 5.95494 2.11716 6.13518C1.96095 6.31542 1.96095 6.60765 2.11716 6.7879L3.91716 8.86482C4.07337 9.04506 4.32663 9.04506 4.48284 8.86482L8.88284 3.7879C9.03905 3.60765 9.03905 3.31542 8.88284 3.13518C8.72663 2.95494 8.47337 2.95494 8.31716 3.13518L4.2 7.88575Z" fill="white"/>
+                                        </svg>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-md-6 mb-4 ">
+                        <div class="card border-left-warning shadow h-100 py-2 card-cobrowse">
+                            <div class="card-body">
+                                <div class="col mr-2">
+                                    <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="cogno-meet-total-meeting-completed">
+                                        ...
+                                    </div>
+                                    <div class=" mb-1 text-cobrowse" style="color: #16A1AA;">
+                                        Meeting Completed
+                                    </div>
+                                </div>
+                                <div class="icon-cobrowse">
+                                    <svg width="24" height="19" viewBox="0 0 24 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M18 15.75C18 17.5449 16.5449 19 14.75 19H7.25C5.45507 19 4 17.5449 4 15.75V7.25C4 5.45507 5.45507 4 7.25 4H14.75C16.5449 4 18 5.45507 18 7.25V15.75ZM23.762 5.39334C23.9156 5.57414 24 5.80368 24 6.04096V16.9588C24 17.5111 23.5523 17.9588 23 17.9588C22.7627 17.9588 22.5332 17.8744 22.3524 17.7208L19 14.8709V8.12794L22.3524 5.27899C22.7732 4.92132 23.4043 4.97252 23.762 5.39334Z" fill="white"/>
+                                        {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                                        <circle cx="6" cy="6" r="6" fill="{{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.hex }}"/>
+                                        {% else %}
+                                        <circle cx="6" cy="6" r="6" fill="blue"/>
+                                        {% endif %}
+                                        <path d="M4.2 7.88575L2.68284 6.13518C2.52663 5.95494 2.27337 5.95494 2.11716 6.13518C1.96095 6.31542 1.96095 6.60765 2.11716 6.7879L3.91716 8.86482C4.07337 9.04506 4.32663 9.04506 4.48284 8.86482L8.88284 3.7879C9.03905 3.60765 9.03905 3.31542 8.88284 3.13518C8.72663 2.95494 8.47337 2.95494 8.31716 3.13518L4.2 7.88575Z" fill="white"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-md-6 mb-4 ">
+                        <div class="card border-left-warning shadow h-100 py-2 card-cobrowse">
+                            <div class="card-body">
+                                <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="cogno-meet-total-ongoing-meeting">
+                                    ...
+                                </div>
+                                <div class="col mr-2">
+                                    <div class=" mb-1 text-cobrowse" style="color: #1caf3d">
+                                        Ongoing Meeting
+                                    </div>
+                                </div>
+                                <div class="icon-cobrowse">
+                                    <svg width="23" height="19" viewBox="0 0 23 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M17 15.75C17 17.5449 15.5449 19 13.75 19H6.25C4.45507 19 3 17.5449 3 15.75V7.25C3 5.45507 4.45507 4 6.25 4H13.75C15.5449 4 17 5.45507 17 7.25V15.75ZM22.762 5.39334C22.9156 5.57414 23 5.80368 23 6.04096V16.9588C23 17.5111 22.5523 17.9588 22 17.9588C21.7627 17.9588 21.5332 17.8744 21.3524 17.7208L18 14.8709V8.12794L21.3524 5.27899C21.7732 4.92132 22.4043 4.97252 22.762 5.39334Z" fill="white"/>
+                                        {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                                        <circle cx="6" cy="6" r="6" fill="{{ cobrowse_agent.get_access_token_obj.get_cobrowsing_console_theme_color.hex }}"/>
+                                        {% else %}
+                                        <circle cx="6" cy="6" r="6" fill="blue"/>
+                                        {% endif %}
+                                        <path d="M6 2C8.20914 2 10 3.79086 10 6C10 8.20914 8.20914 10 6 10C3.79086 10 2 8.20914 2 6C2 3.79086 3.79086 2 6 2ZM5.73684 3.47368C5.5915 3.47368 5.47368 3.5915 5.47368 3.73684V6.26316C5.47368 6.4085 5.5915 6.52632 5.73684 6.52632H7.42105C7.56639 6.52632 7.68421 6.4085 7.68421 6.26316C7.68421 6.11782 7.56639 6 7.42105 6H6V3.73684C6 3.5915 5.88218 3.47368 5.73684 3.47368Z" fill="white"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-md-6 mb-4 ">
+                        <div class="card border-left-warning shadow h-100 py-2 card-cobrowse">
+                            <div class="card-body">
+                                <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="cogno-meet-avg-call-duration">
+                                    ...
+                                </div>
+                                <div class="col mr-2">
+                                    <div class=" mb-1 text-cobrowse" style="color: #1caf3d">
+                                        Average Call Duration (Min)
+                                    </div>
+                                </div>
+                                <div class="icon-cobrowse">
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M10.0002 1.11108C8.24217 1.11108 6.52359 1.63241 5.06182 2.60913C3.60005 3.58586 2.46074 4.97411 1.78796 6.59834C1.11518 8.22257 0.93915 10.0098 1.28213 11.7341C1.62511 13.4584 2.47169 15.0422 3.71483 16.2854C4.95796 17.5285 6.54181 18.3751 8.26609 18.7181C9.99036 19.061 11.7776 18.885 13.4019 18.2122C15.0261 17.5395 16.4143 16.4001 17.3911 14.9384C18.3678 13.4766 18.8891 11.758 18.8891 9.99997C18.8891 7.64249 17.9526 5.38157 16.2856 3.71458C14.6186 2.04759 12.3577 1.11108 10.0002 1.11108ZM10.0002 17.7778C8.46192 17.7778 6.95817 17.3216 5.67912 16.467C4.40007 15.6123 3.40317 14.3976 2.81449 12.9764C2.22581 11.5552 2.07178 9.99135 2.37189 8.4826C2.672 6.97386 3.41276 5.588 4.5005 4.50025C5.58824 3.41251 6.97411 2.67175 8.48285 2.37164C9.99159 2.07154 11.5554 2.22556 12.9766 2.81424C14.3979 3.40293 15.6126 4.39982 16.4672 5.67887C17.3218 6.95792 17.778 8.46167 17.778 9.99997C17.778 12.0628 16.9586 14.0411 15.4999 15.4997C14.0413 16.9583 12.063 17.7778 10.0002 17.7778Z" fill="white"/>
+                                        <path d="M10.511 10.2222V5.97218C10.511 5.82484 10.4525 5.68353 10.3483 5.57934C10.2441 5.47516 10.1028 5.41663 9.95546 5.41663C9.80812 5.41663 9.66681 5.47516 9.56262 5.57934C9.45843 5.68353 9.3999 5.82484 9.3999 5.97218V10.8166L12.6777 13.0388C12.7381 13.0843 12.8071 13.1169 12.8805 13.1347C12.9539 13.1526 13.0302 13.1552 13.1047 13.1426C13.1791 13.1299 13.2503 13.1022 13.3137 13.0611C13.3771 13.0201 13.4314 12.9665 13.4734 12.9037C13.5154 12.8409 13.5442 12.7702 13.5579 12.6959C13.5717 12.6216 13.5701 12.5453 13.5533 12.4716C13.5366 12.3979 13.505 12.3284 13.4604 12.2674C13.4159 12.2064 13.3594 12.1551 13.2943 12.1166L10.511 10.2222Z" fill="white"/>
+                                        <path d="M4.44429 9.96671C4.43921 8.96728 4.70545 7.98521 5.21464 7.12521C5.72382 6.26521 6.45686 5.55952 7.33559 5.08337C8.21431 4.60723 9.20579 4.37849 10.2043 4.42154C11.2028 4.46459 12.1709 4.77781 13.0054 5.32782L13.4776 4.57226C12.685 4.05304 11.7872 3.71581 10.8487 3.58481C9.91023 3.45381 8.9544 3.53228 8.04986 3.81459C7.14533 4.0969 6.31454 4.57604 5.61719 5.21759C4.91984 5.85914 4.37324 6.64717 4.01664 7.52508C3.66004 8.40299 3.50231 9.34897 3.55476 10.2951C3.60722 11.2412 3.86857 12.164 4.32003 12.9971C4.7715 13.8302 5.40187 14.5529 6.16587 15.1135C6.92987 15.674 7.80853 16.0583 8.73873 16.2389L8.88873 15.3889C7.63761 15.1336 6.51265 14.455 5.70318 13.4674C4.89371 12.4799 4.44914 11.2436 4.44429 9.96671Z" fill="white"/>
+                                    </svg> 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% if cobrowse_agent.get_access_token_obj and cobrowse_agent.get_access_token_obj.allow_video_meeting_only %}
+                    <div class="col-xl-4 col-md-6 mb-4 ">
+                        <div class="card border-left-warning shadow h-100 py-2 card-cobrowse">
+                            <div class="card-body">
+                                <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="cogno-meet-total-sr">
+                                    ...
+                                </div>
+                                <div class="col mr-2">
+                                    <div class=" mb-1 text-cobrowse" style="color: #1caf3d">
+                                        Leads Searched
+                                    </div>
+                                </div>
+                                <div class="icon-cobrowse">
+                                    <svg width="39" height="39" viewBox="0 0 39 39" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="19.5" cy="19.5" r="19.5" fill-opacity="0.15"/>
+                                    <path d="M18.9092 21.995L26.7531 21.9953C27.9957 21.9953 29.0031 23.0027 29.0031 24.2453V25.1504C29.0031 26.2441 28.5256 27.2832 27.6958 27.9956C26.1303 29.3396 23.89 29.9964 21 29.9964L20.821 29.9953C21.1231 29.3868 21.0492 28.6391 20.5995 28.0989L20.489 27.978L18.2591 25.7541C18.7394 24.927 19 23.9805 19 22.9954C19 22.6537 18.9689 22.3194 18.9092 21.995ZM13.5 18.4954C15.9853 18.4954 18 20.5101 18 22.9954C18 24.0892 17.6097 25.0918 16.9609 25.8717L19.7827 28.686C20.076 28.9785 20.0766 29.4534 19.784 29.7466C19.5181 30.0132 19.1014 30.0379 18.8076 29.8204L18.7234 29.7479L15.8203 26.8519C15.1427 27.2604 14.3488 27.4954 13.5 27.4954C11.0147 27.4954 9 25.4807 9 22.9954C9 20.5101 11.0147 18.4954 13.5 18.4954ZM13.5 19.9954C11.8431 19.9954 10.5 21.3385 10.5 22.9954C10.5 24.6522 11.8431 25.9954 13.5 25.9954C15.1569 25.9954 16.5 24.6522 16.5 22.9954C16.5 21.3385 15.1569 19.9954 13.5 19.9954ZM21 10C23.7614 10 26 12.2386 26 15C26 17.7614 23.7614 20 21 20C18.2386 20 16 17.7614 16 15C16 12.2386 18.2386 10 21 10Z" fill="white"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if access_token_obj.enable_request_in_queue %}
+                    <div class="col-xl-4 col-md-6 mb-4 ">
+                        <div class="card border-left-warning shadow h-100 py-2 card-cobrowse" data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" Total number of sessions self-assigned by agents.">
+                            <div class="card-body">
+                                <div class="col mr-2">
+                                    <div class="h5 mb-0 font-weight-bold stats-cobrowse" id="self-assign-sessions-div">...</div>
+                                    <div class=" mb-1 text-cobrowse" style="color: #16A1AA;">
+                                        Self Assigned Sessions
+                                </div>
+                                </div>
+                                <div class="icon-cobrowse">
+                                    <svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 2.5C9.38 2.5 7.25 4.63 7.25 7.25C7.25 9.82 9.26 11.9 11.88 11.99C11.96 11.98 12.04 11.98 12.1 11.99C12.12 11.99 12.13 11.99 12.15 11.99C12.16 11.99 12.16 11.99 12.17 11.99C14.73 11.9 16.74 9.82 16.75 7.25C16.75 4.63 14.62 2.5 12 2.5Z" fill="white"/>
+                                        <path d="M17.08 14.66C14.29 12.8 9.73996 12.8 6.92996 14.66C5.65996 15.5 4.95996 16.65 4.95996 17.88C4.95996 19.11 5.65996 20.25 6.91996 21.09C8.31996 22.03 10.16 22.5 12 22.5C13.84 22.5 15.68 22.03 17.08 21.09C18.34 20.24 19.04 19.1 19.04 17.86C19.03 16.64 18.34 15.49 17.08 14.66ZM14.33 17.06L11.81 19.58C11.69 19.7 11.53 19.76 11.37 19.76C11.21 19.76 11.05 19.69 10.93 19.58L9.66996 18.32C9.42996 18.08 9.42996 17.68 9.66996 17.44C9.90996 17.2 10.31 17.2 10.55 17.44L11.37 18.26L13.45 16.18C13.69 15.94 14.09 15.94 14.33 16.18C14.58 16.42 14.58 16.82 14.33 17.06Z" fill="white"/>
+                                    </svg> 
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-md-6 mb-4 ">
+                        <div class="card border-left-warning shadow h-100 py-2 card-cobrowse" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Average time for a self-assigned session.">
+                            <div class="card-body">
+                                <div class="col mr-2">
+                                    <div class="h5 mb-0 font-weight-bold stats-cobrowse average-session-time-value" id="average-self-assign-time-div">...</div>
+                                    <div class=" mb-1 text-cobrowse" style="color: #16A1AA;">
+                                        Average Self Assign Time
+                                </div>
+                                </div>
+                                <div class="icon-cobrowse">
+                                    <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M7.18536 0.814625C6.20455 0.969327 5.197 1.53197 4.60535 2.25537C3.95669 3.0484 3.63905 3.9102 3.63021 4.90077C3.62161 5.86426 3.8933 6.69856 4.46113 7.45236C5.02298 8.19822 5.7994 8.72194 6.72546 8.97975C7.06985 9.07562 7.16526 9.08509 7.78815 9.08533C8.38046 9.08552 8.51717 9.07343 8.80486 8.99555C10.0181 8.66698 10.9856 7.8804 11.5206 6.78767C12.3163 5.16218 11.9958 3.25231 10.7142 1.98235C10.1902 1.46301 9.53302 1.09094 8.81291 0.905803C8.385 0.795771 7.5879 0.751101 7.18536 0.814625ZM14.0057 10.0214C11.6322 10.4436 9.84053 12.2883 9.50568 14.6545C9.44672 15.0713 9.4789 16.0667 9.56407 16.4595C9.78884 17.4962 10.2636 18.3835 10.9972 19.1377C11.7852 19.9479 12.6847 20.4465 13.8018 20.6926C14.3679 20.8173 15.3925 20.8163 15.9563 20.6905C17.0723 20.4415 17.9189 19.9815 18.7005 19.1998C19.482 18.4181 19.9418 17.5711 20.1907 16.4548C20.3164 15.8909 20.3174 14.866 20.1928 14.2997C20.0228 13.5277 19.7055 12.8109 19.2591 12.1906C18.9803 11.8034 18.3036 11.1452 17.9239 10.8921C17.3448 10.5061 16.6686 10.2175 15.9805 10.0626C15.6013 9.97728 14.3953 9.95213 14.0057 10.0214ZM3.55474 10.8496C2.73993 10.9969 2.05177 11.3604 1.45227 11.9601C0.838215 12.5743 0.484714 13.2549 0.338034 14.1048C0.288646 14.3913 0.279769 14.7649 0.288724 16.1777C0.29936 17.8484 0.302176 17.9044 0.380345 18.0091C0.424689 18.0684 0.509545 18.1533 0.568944 18.1977C0.676168 18.2778 0.704988 18.2784 4.77616 18.2887L8.8754 18.2989L8.7008 17.869C8.33409 16.966 8.19397 16.1382 8.23065 15.0913C8.26468 14.1203 8.44221 13.3985 8.86379 12.5176C9.10432 12.0151 9.40268 11.5411 9.70875 11.1754C9.82458 11.037 9.94349 10.8932 9.97298 10.8557C10.0239 10.7912 9.86806 10.7879 6.94241 10.7912C4.47791 10.794 3.79722 10.8057 3.55474 10.8496ZM15.2089 12.5302C15.3942 12.6077 15.5169 12.7231 15.6225 12.9195C15.7012 13.0657 15.7075 13.14 15.7188 14.0538L15.7308 15.0317L16.2711 15.5793C16.5683 15.8805 16.8377 16.1798 16.8698 16.2443C17.0379 16.5827 16.9782 16.932 16.7058 17.2045C16.4163 17.4941 16.0592 17.5419 15.7067 17.3382C15.4594 17.1953 14.2204 15.9237 14.1263 15.7162C14.0515 15.5512 14.0465 15.4646 14.0465 14.3276C14.0465 13.2298 14.0534 13.1003 14.119 12.9586C14.1983 12.7872 14.3517 12.6303 14.5336 12.5345C14.6848 12.455 15.0237 12.4528 15.2089 12.5302Z" fill="white"/>
+                                        </svg>  
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Video Conference Analytics</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="javascript:void(0)" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Timeline:</div>
+                            {% comment %} #TODO work on this {% endcomment %}
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="show_daily_cogno_meeting_analytics()">Daily</a>
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="show_weekly_cogno_meeting_analytics()">Weekly</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="show_monthly_cogno_meeting_analytics()">Monthly</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body card-body-sm">
+                    <div class="chart-area">
+                        <canvas id="cogno-meet-analytics"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Daily Call Time Trend</h6>
+                </div>
+                <div class="card-body card-body-sm">
+                    <div class="chart-area">
+                        <canvas id="cogno-meet-daily-time-trend"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+         <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Session Initiated In</h6>
+                </div>
+                <div class="card-body card-body-sm">
+                    <div class="chart-area cobrowse-pie-chart">
+                        <canvas id="session-initiated-in-pie-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if cobrowse_agent.role != 'agent' %}
+        <div class="col-md-12 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Agent wise Video Meeting Analytics</h6>
+                    <div style="display: flex; align-items: center">
+                        <select class="form-control select-agent-dropdown" onchange="show_agent_wise_cogno_meet_analytics();" id="cogno-meet-select-agent">
+                            {% for agent_obj in agent_objs %}
+                                <option value="{{ agent_obj.user.pk }}">{{ agent_obj.user.username }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="dropdown no-arrow">
+                            <a class="dropdown-toggle" href="javascript:void(0)" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                                <div class="dropdown-header">Timeline:</div>
+                                <a class="dropdown-item" href="javascript:void(0)" onclick="get_agentwise_daily_analytics()">Daily</a>
+                                <a class="dropdown-item" href="javascript:void(0)" onclick="get_agentwise_weekly_analytics()">Weekly</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="javascript:void(0)" onclick="get_agentwise_monthly_analytics()">Monthly</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body card-body-sm">
+                    <div class="chart-area">
+                        <canvas id="cogno-meet-agent-wise-analytics"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ************************ Export data ***********************-->
+<div class="modal fade client-location-details" id="modal-mis-filter" tabindex="-1" role="dialog" aria-labelledby="client_location_details_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="export_mis_lable">Export Meeting Analytics</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h6 style="color: #3e95cd">Select date range</h6>
+                        <select id="select-date-range" class="form-control" onchange="check_select_date_range(this)">
+                            <option value="0" selected="selected">Choose date range</option>
+                            <option value="1">Last day</option>
+                            <option value="2">Last 7 days</option>
+                            <option value="3">Last 1 month</option>
+                            <option value="4">Custom Range</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-6 mt-4" id="from-date-div" style="display: none;">
+                        <h6 style="color: #3e95cd">From Date</h6>
+                        <input id="startdate" placeholder="From Date" class="filter-parameter form-control datepicker" autocomplete="off" data-date-format="dd-mm-yyyy">
+                    </div>
+                    <div class="col-sm-6 mt-4" id="to-date-div" style="display: none;">
+                        <h6 style="color: #3e95cd">To Date</h6>
+                        <input id="enddate" placeholder="To Date" class="filter-parameter form-control datepicker" autocomplete="off" data-date-format="dd-mm-yyyy">
+                    </div>
+                    <div class="col-sm-12" id="email-id-div" style="display:none; padding-top: 25px;">
+                        <h6 style="color: #3e95cd">Email ID*</h6>
+                        <textarea class="form-control" id="filter-data-email" style="height:10em;">{{ request.user.email }}</textarea>
+                        <span><br><b>Note: You will receive the meeting analytics data dump on the above email ID within 1 hours.</b></span>
+                    </div>
+                    <div class="col-sm-12 mt-3" id="general-error-message">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-info" type="button" onclick="export_meeting_analytics(this)">Export</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% comment %} <script type="text/javascript" src="{% static 'EasyAssistApp/js/analytics_cogno_meet.js' %}"></script> {% endcomment %}
+<script type="text/javascript" src="{% static 'EasyAssistApp/js/analytics_cognomeet_new.js' %}"></script>
+<script type="text/javascript">
+    window.AGENTS_USERNAMES_LIST = {{agent_usernames_list | safe}};
+    window.COGNOMEET_ACCESS_TOKEN = "{{ access_token_obj.cogno_meet_access_token }}";
+    window.agent_role = '{{agent_role}}';
+    
+    function check_select_date_range(element){
+        let general_error_message_element = document.getElementById("general-error-message");
+        general_error_message_element.innerHTML = "";
+    
+        if(element.value == "0") {
+            general_error_message_element.innerHTML = "Please select valid date range filter";
+        } else {
+            general_error_message_element.innerHTML = "";
+        }
+    
+        if(element.value=="4") {
+            document.getElementById("from-date-div").style.display="block";
+            document.getElementById("to-date-div").style.display="block";
+            document.getElementById("email-id-div").style.display="block";
+        } else {
+            document.getElementById("from-date-div").style.display="none";
+            document.getElementById("to-date-div").style.display="none";
+            document.getElementById("email-id-div").style.display="none";
+        }
+    }
+</script>
+{% endblock %}

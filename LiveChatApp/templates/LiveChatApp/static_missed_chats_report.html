@@ -1,0 +1,353 @@
+{% extends 'LiveChatApp/report_console.html' %}
+{% block consolecontent %}
+{% load static %}
+<style type="text/css">
+.dataTables_filter {
+  display: none;
+}
+
+#offline-message-report-table_info {
+    font-size: 13px;
+    margin-top: 60px;
+    color: #4D4D4D;
+    width: 50%;
+    padding-left: 10px;
+    display: inline-block;
+  position: absolute;
+  bottom: 2px;
+}
+.ui-state-default{
+  background: #f6f6f6 !important;
+  color: #454545 !important;
+  border: 1px solid #c5c5c5 !important;
+}
+.ui-state-highlight{
+    background: #ffffff !important;
+    color: {{admin_config.get_livechat_theme_lighten_one}} !important;
+}
+.ui-state-active{
+  background: {{admin_config.get_livechat_theme_lighten_one}} !important;
+  color: #ffffff !important;
+  border: 1px solid {{admin_config.get_livechat_theme_lighten_one}} !important;
+}
+</style>
+  <div class="col-xl-10 col-lg-10 col-md-12 col-sm-12 col-12 py-2 overflow-hidden-desktop" id="live-chat-reports-content-offline-message"
+  style="height: calc(100vh - 4.375rem); background: #FAFAFA; overflow-y: auto; overflow-x: hidden; max-width: 83%;">
+
+  <div class="live-chat-report-d-interaction-heading ">
+    <div class="row">
+      <!-- <img src="./img/mobile-back.svg" class="back-arrow-div" id="live-chat-active-customers-opener-setting" onclick="myFunctionArrow()"> -->
+      <svg width="15" height="15" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="14" height="14" fill="#E5E5E5"/>
+        <g clip-path="url(#clip0)">
+        <rect width="1440" height="760" transform="translate(-98 -337)" fill="white"/>
+        <rect x="-21" y="-281" width="1363" height="704" fill="#FAFAFA"/>
+        <rect x="-21" y="-281" width="180" height="704" fill="white"/>
+        <path d="M0.896235 0.153759C0.691212 -0.0512502 0.3588 -0.0512536 0.153773 0.153752C-0.0512546 0.358757 -0.051258 0.69114 0.153765 0.89615L1.69287 2.43515C0.637795 3.66061 0 5.25553 0 6.9994C0 8.13349 0.270456 9.22939 0.780228 10.2137L0.0328636 12.8894C-0.0101542 13.0433 -0.010175 13.2062 0.032834 13.3602C0.162807 13.8256 0.645486 14.0975 1.11093 13.9675L3.789 13.2205C4.77248 13.729 5.8672 13.9988 7 13.9988C8.74397 13.9988 10.339 13.3611 11.5645 12.3062L13.1036 13.8451C13.3086 14.0501 13.641 14.0502 13.8461 13.8451C14.0511 13.6401 14.0511 13.3078 13.8461 13.1027L0.896235 0.153759ZM10.8196 11.5613C9.78613 12.4274 8.45397 12.9489 7 12.9489C5.97253 12.9489 4.98404 12.6886 4.10696 12.1996L3.91829 12.0944L1.12767 12.8729L1.90657 10.0842L1.80112 9.89537C1.31094 9.0176 1.05 8.02804 1.05 6.9994C1.05 5.54552 1.57155 4.21343 2.43778 3.18001L4.54071 5.28281C4.34167 5.35743 4.2 5.54943 4.2 5.77451C4.2 6.06443 4.43505 6.29946 4.725 6.29946H5.55744L6.95741 7.69934H4.725L4.65376 7.70413C4.39751 7.7389 4.2 7.95853 4.2 8.2243C4.2 8.51422 4.43505 8.74925 4.725 8.74925H7.87378L7.94502 8.74446C7.96148 8.74223 7.9777 8.73923 7.99364 8.73551L10.8196 11.5613Z" fill="#4D4D4D"/>
+        <path d="M9.27814 5.24955H7.47729L8.52727 6.29946H9.27814L9.34938 6.29467C9.60563 6.25991 9.80314 6.04027 9.80314 5.77451C9.80314 5.48458 9.56809 5.24955 9.27814 5.24955Z" fill="#4D4D4D"/>
+        <path d="M12.95 6.9994C12.95 8.07045 12.667 9.0754 12.1716 9.94354L12.9371 10.709C13.6106 9.63353 14 8.36193 14 6.9994C14 3.13374 10.866 6.1531e-06 7 6.1531e-06C5.6374 6.1531e-06 4.36574 0.389298 3.29018 1.06272L4.05571 1.82821C4.9239 1.33291 5.9289 1.04992 7 1.04992C10.2861 1.04992 12.95 3.71359 12.95 6.9994Z" fill="#4D4D4D"/>
+        </g>
+        <defs>
+        <clipPath id="clip0">
+        <rect width="1440" height="760" fill="white" transform="translate(-98 -337)"/>
+        </clipPath>
+        </defs>
+      </svg>
+      <span>Offline Message</span>
+    </div>
+    <div class="row">
+      
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-report-button-section">
+    
+        <button class="filter-button" id="filterBtn-offlinemessage" data-toggle="modal" data-target="#apply-filter-report">Filters
+            <svg width="16" height="9" viewBox="0 0 16 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="16" height="9" fill="#E5E5E5"/>
+                <g clip-path="url(#clip0)">
+                <rect width="1440" height="660" transform="translate(-174 -97)" fill="white"/>
+                <rect x="-97" y="-41" width="1363" height="604" fill="#FAFAFA"/>
+                <rect x="-88" y="-30" width="1345" height="68" fill="white"/>
+                <rect x="-72.5" y="-13.5" width="103" height="34" rx="4.5" fill="white" stroke="#E6E6E6"/>
+                <path d="M5.33333 8.35714C5.33333 8.18665 5.40357 8.02313 5.5286 7.90257C5.65362 7.78201 5.82319 7.71429 6 7.71429H10C10.1768 7.71429 10.3464 7.78201 10.4714 7.90257C10.5964 8.02313 10.6667 8.18665 10.6667 8.35714C10.6667 8.52764 10.5964 8.69115 10.4714 8.81171C10.3464 8.93227 10.1768 9 10 9H6C5.82319 9 5.65362 8.93227 5.5286 8.81171C5.40357 8.69115 5.33333 8.52764 5.33333 8.35714ZM2.66667 4.5C2.66667 4.3295 2.7369 4.16599 2.86193 4.04543C2.98695 3.92487 3.15652 3.85714 3.33333 3.85714H12.6667C12.8435 3.85714 13.013 3.92487 13.1381 4.04543C13.2631 4.16599 13.3333 4.3295 13.3333 4.5C13.3333 4.6705 13.2631 4.83401 13.1381 4.95457C13.013 5.07513 12.8435 5.14286 12.6667 5.14286H3.33333C3.15652 5.14286 2.98695 5.07513 2.86193 4.95457C2.7369 4.83401 2.66667 4.6705 2.66667 4.5ZM0 0.642857C0 0.472361 0.070238 0.308848 0.195262 0.188289C0.320287 0.0677295 0.489856 0 0.666667 0H15.3333C15.5101 0 15.6797 0.0677295 15.8047 0.188289C15.9298 0.308848 16 0.472361 16 0.642857C16 0.813353 15.9298 0.976867 15.8047 1.09743C15.6797 1.21798 15.5101 1.28571 15.3333 1.28571H0.666667C0.489856 1.28571 0.320287 1.21798 0.195262 1.09743C0.070238 0.976867 0 0.813353 0 0.642857Z" fill="#868686"/>
+                </g>
+                <defs>
+                <clipPath id="clip0">
+                <rect width="1440" height="660" fill="white" transform="translate(-174 -97)"/>
+                </clipPath>
+                </defs>
+            </svg>
+        </button>
+        <button class="export-button" id="exportBtn-offlinemessage" data-toggle="modal" data-target="#modal-report-filter">Export
+          <svg width="15" height="11" viewBox="0 0 15 11" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-left: 12px; margin-top: -3px;">
+            <rect width="15" height="11" fill="#E5E5E5"/>
+            <g clip-path="url(#clip0)">
+            <rect width="1440" height="660" transform="translate(-290 -95)" fill="white"/>
+            <rect x="-213" y="-39" width="1363" height="604" fill="#FAFAFA"/>
+            <rect x="-204" y="-28" width="1345" height="68" fill="white"/>
+            <rect x="-65" y="-12" width="95" height="35" rx="5" fill="{{ admin_config.get_livechat_theme_lighten_one }}"/>
+            <path d="M11.25 9.58965H1.5V3.24309H3.44625C3.44625 3.24309 3.963 2.61126 5.07375 1.83275H0.75C0.551088 1.83275 0.360322 1.90704 0.21967 2.03929C0.0790176 2.17153 0 2.3509 0 2.53792L0 10.2948C0 10.4819 0.0790176 10.6612 0.21967 10.7935C0.360322 10.9257 0.551088 11 0.75 11H12C12.1989 11 12.3897 10.9257 12.5303 10.7935C12.671 10.6612 12.75 10.4819 12.75 10.2948V7.65325L11.25 8.81326V9.58965ZM10.0208 4.6887V7.19277L15 3.52516L10.0208 0V2.2079C3.975 2.2079 3.975 7.82672 3.975 7.82672C5.6865 5.18373 6.7395 4.6887 10.0208 4.6887Z" fill="white"/>
+            </g>
+            <defs>
+            <clipPath id="clip0">
+            <rect width="1440" height="660" fill="white" transform="translate(-290 -95)"/>
+            </clipPath>
+            </defs>
+        </svg>
+        </button>
+
+        <div class="search-container">
+          
+            <button type="submit">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect width="13" height="13" fill="#E5E5E5"/>
+                      <g clip-path="url(#clip0)">
+                      <rect width="1440" height="660" transform="translate(-1209 -141)" fill="white"/>
+                      <rect x="-962" y="-85" width="1193" height="604" fill="#FAFAFA"/>
+                      <rect x="-952" y="-74" width="1174" height="114" fill="white"/>
+                      <g filter="url(#filter0_d)">
+                      <rect x="-14" y="-10" width="219" height="33" rx="5" fill="white"/>
+                      </g>
+                      <path d="M5.55942 11.1182C6.79289 11.118 7.99083 10.7051 8.96247 9.94526L12.0174 13L13 12.0174L9.9451 8.96269C10.7054 7.991 11.1185 6.79285 11.1188 5.55912C11.1188 2.49396 8.62474 0 5.55942 0C2.49409 0 0 2.49396 0 5.55912C0 8.62428 2.49409 11.1182 5.55942 11.1182ZM5.55942 1.38978C7.85893 1.38978 9.72898 3.25973 9.72898 5.55912C9.72898 7.85851 7.85893 9.72846 5.55942 9.72846C3.2599 9.72846 1.38985 7.85851 1.38985 5.55912C1.38985 3.25973 3.2599 1.38978 5.55942 1.38978Z" fill="#757575"/>
+                      </g>
+                      <defs>
+                      <filter id="filter0_d" x="-22" y="-18" width="235" height="49" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
+                      <feOffset/>
+                      <feGaussianBlur stdDeviation="4"/>
+                      <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.08 0"/>
+                      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+                      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+                      </filter>
+                      <clipPath id="clip0">
+                      <rect width="1440" height="660" fill="white" transform="translate(-1209 -141)"/>
+                      </clipPath>
+                      </defs>
+                </svg>  
+            </button>
+            <input type="text" placeholder="Search" name="search" id="offline-message-report-table-search">
+
+          
+        </div>
+
+
+      </div>
+    </div>
+
+  </div>
+    {% if offline_messages %}
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 live-chat-report-d-interaction-table-area live-chat-table-parent-div">
+    <table role="table" id="offline-message-report-table" class="display">
+      <thead role="rowgroup">
+        <tr role="row">
+          <th role="columnheader">Customer Name </th>
+          <th role="columnheader">Email</th>
+          <th role="columnheader">Phone Number</th>
+          <th role="columnheader">Message </th>
+          <th role="columnheader">Channel</th>
+          <th role="columnheader">Category</th>
+          <th role="columnheader">Created</th>
+        </tr>
+      </thead>
+      <tbody role="rowgroup">
+      {% for message in offline_messages %}
+      <tr role="row">
+          <td role="cell">{{ message.name }}</td>
+          <td role="cell">
+            {{ message.email }}
+          </td>
+          <td role="cell">
+            {{ message.phone }}
+          </td>
+          <td role="cell">
+            {{ message.message }}
+          </td>
+          <td role="cell">
+            {{ message.channel }}
+          </td>
+          <td role="cell">
+            {{ message.category }}
+          </td>
+          <td role="cell">
+            {{ message.date|date:"d-M-Y, h:i a"}}
+          </td>
+        </tr>
+      {% endfor %}    
+      </tbody>
+    </table>
+        <div class="col s12 right-align">
+          <div class="pagination-div">
+          {% if offline_messages.has_other_pages %}
+            <ul class="pagination-content">
+
+                {% if offline_messages.number|add:'-4' > 1 %}
+                    <li><a href="?selected_category_pk={{selected_category_pk}}&channel_name={{channel_name}}&start_date={{start_date|date:"Y-m-d"}}&end_date={{end_date|date:"Y-m-d"}}&page={{ offline_messages.number|add:'-5' }}">&hellip;</a></li>
+                {% endif %}
+
+                {% for i in offline_messages.paginator.page_range %}
+                    {% if offline_messages.number == i %}
+                        <li class="active-page purple darken-3"><a href="?selected_category_pk={{selected_category_pk}}&channel_name={{channel_name}}&start_date={{start_date|date:"Y-m-d"}}&end_date={{end_date|date:"Y-m-d"}}&page={{ i }}">{{ i }}</a></li>
+                    {% elif i > offline_messages.number|add:'-5' and i < offline_messages.number|add:'5' %}
+                        <li><a href="?selected_category_pk={{selected_category_pk}}&channel_name={{channel_name}}&start_date={{start_date|date:"Y-m-d"}}&end_date={{end_date|date:"Y-m-d"}}&page={{ i }}">{{ i }}</a></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if offline_messages.paginator.num_pages > offline_messages.number|add:'4' %}
+                    <li><a href="?selected_category_pk={{selected_category_pk}}&channel_name={{channel_name}}&start_date={{start_date|date:"Y-m-d"}}&end_date={{end_date|date:"Y-m-d"}}&page={{ offline_messages.number|add:'5' }}">&hellip;</a></li>
+                {% endif %}
+
+            </ul>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% else %}
+      <div class="col s12" style="height: 80vh;">
+          <p class="green lighten-1 black-text center" style="padding:1em;">No offline message till now.</p>
+      </div>
+    {% endif %}
+    </div>
+    <!-- Modal content -->
+      <div class="modal fade" id="apply-filter-report" tabindex="-1" role="dialog" aria-labelledby="Admin_report_performance_filter_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h6>Filter</h6>
+              <svg width="16" height="9" viewBox="0 0 16 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M5.33333 8.35714C5.33333 8.18665 5.40357 8.02313 5.5286 7.90257C5.65362 7.78201 5.82319 7.71429 6 7.71429H10C10.1768 7.71429 10.3464 7.78201 10.4714 7.90257C10.5964 8.02313 10.6667 8.18665 10.6667 8.35714C10.6667 8.52764 10.5964 8.69115 10.4714 8.81171C10.3464 8.93227 10.1768 9 10 9H6C5.82319 9 5.65362 8.93227 5.5286 8.81171C5.40357 8.69115 5.33333 8.52764 5.33333 8.35714ZM2.66667 4.5C2.66667 4.3295 2.7369 4.16599 2.86193 4.04543C2.98695 3.92487 3.15652 3.85714 3.33333 3.85714H12.6667C12.8435 3.85714 13.013 3.92487 13.1381 4.04543C13.2631 4.16599 13.3333 4.3295 13.3333 4.5C13.3333 4.6705 13.2631 4.83401 13.1381 4.95457C13.013 5.07513 12.8435 5.14286 12.6667 5.14286H3.33333C3.15652 5.14286 2.98695 5.07513 2.86193 4.95457C2.7369 4.83401 2.66667 4.6705 2.66667 4.5ZM0 0.642857C0 0.472361 0.070238 0.308848 0.195262 0.188289C0.320287 0.0677295 0.489856 0 0.666667 0H15.3333C15.5101 0 15.6797 0.0677295 15.8047 0.188289C15.9298 0.308848 16 0.472361 16 0.642857C16 0.813353 15.9298 0.976867 15.8047 1.09743C15.6797 1.21798 15.5101 1.28571 15.3333 1.28571H0.666667C0.489856 1.28571 0.320287 1.21798 0.195262 1.09743C0.070238 0.976867 0 0.813353 0 0.642857Z" fill="#2D2D2D"></path>
+              </svg>
+          </div>
+          <div class="modal-body">
+              <div class="row">
+                  <div class="col-12 mb-2">
+                      <label>Channel</label>
+                      <select name="day" class="form-control select-dropdown-icon" id="select-channel">
+                        <option value="All">All</option>
+                        {% for channel_obj in channel_obj_list %}
+                            {% if channel_obj.name == channel_name %}
+                                <option value="{{ channel_obj.name }}" selected>{{ channel_obj.name }}</option>
+                            {% else %}
+                                <option value="{{ channel_obj.name }}">{{ channel_obj.name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                      </select>
+                  </div>
+                  <div class="col-12 mb-2">
+                      <label>Category</label>
+                      <select name="day" class="form-control select-dropdown-icon" id="select-category">
+                        <option value="0">All</option>
+                        {% for category in category_list %}
+                            {% if category.pk == selected_category_pk %}
+                                <option value="{{ category.pk }}" selected>{{ category.title }}</option>
+                            {% else %}
+                                <option value="{{ category.pk }}">{{ category.title }}</option>
+                            {% endif %}
+                        {% endfor %}
+                      </select>
+                  </div>
+                  <div class="col-6 mb-2">
+                      <label>Start date</label>
+                      <input type="text" class="form-control" id="start-date" value="{{ start_date|date:" d-m-Y " }}" placeholder="Select">
+                  </div>
+                  <div class="col-6 mb-2">
+                      <label>End date</label>
+                      <input type="text" class="form-control" id="end-date" value="{{ end_date|date:" d-m-Y " }}" placeholder="Select">
+                  </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+              <div style="float: right;">
+                  <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                  <button class="btn-primary" type="button" id="submit-filter" onclick="submit_offline_or_abandoned_or_declined_message_report_filter()">Apply</button>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+    <!-- Export Modal -->
+
+    <div class="modal fade" id="modal-report-filter" tabindex="-1" role="dialog" aria-labelledby="Admin_report_export_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h6>Select Date Range</h6>
+          </div>
+          <div class="modal-body">
+              <div class="row">
+                  <div class="col-12 mb-2">
+                      <label>Range</label>
+                      <select name="day" class="form-control select-dropdown-icon" id="select-date-range-export" onchange="check_select_date_range(this)">
+                        <option value="0" selected="selected">Choose date range</option>
+                        <option value="1">Last day</option>
+                        <option value="2">Last 7 days</option>
+                        <option value="3">Last 1 month</option>
+                        <option value="4">Custom Range</option>
+                      </select>
+                  </div>
+              </div>
+              <div class="row" id="custom-range-filter-export" style="display: none;">
+                <div class="col-12">
+                    <label>Filter by date range</label><br>
+                    <input type="text" class="form-control" id="export-default-start-date" placeholder="Start Date" value="{{ start_date|date:" d-m-Y " }}">
+                    <input type="text" class="form-control" id="export-default-end-date" placeholder="End Date" value="{{ end_date|date:" d-m-Y " }}">
+                </div>
+                <div class="col-12" style="margin-top: 18px;">
+                    <label>Email ID*</label>
+                    <input class="form-control" type="text" placeholder="Enter your email id" id="filter-data-email-export" value="{{ request.user.email }}">
+                </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+              <div style="float: right;">
+                  <button class="btn-close" type="button" data-dismiss="modal">Cancel</button>
+                  <button class="btn-primary" type="button"  id="offline-message-report-filter">Export</button>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+        $('#offline-message-report-table').DataTable({
+            "language": {
+              "info": "Showing _START_ to _END_ entries out of {{ total_offline_messages }}",
+              "infoEmpty": "No records available",
+              "infoFiltered": "(filtered from _MAX_ total records)",
+            },
+            "bPaginate": false,
+            "ordering": false,
+            "infoCallback": function( settings, start, end, max, total, pre ) {
+                if (settings.oPreviousSearch["sSearch"] != ""){
+                    return pre;
+                }
+                end = ({{ start_point }} - 1) + end;
+                start = ({{ start_point }} - 1) + start;
+                return "Showing " + start + " to " + end + " entries out of {{ total_offline_messages }}" ;
+              }
+        });
+        var table = $('#offline-message-report-table').DataTable();
+
+        $('#offline-message-report-table-search').keyup(function() {
+          let value = this.value;
+          table.search(value).draw();
+        })
+
+        try {
+          document.getElementsByClassName('dataTables_empty')[0].innerHTML = 'No record found';
+        } catch (err) {}
+        var start_date = "{{start_date|date:" d-m-Y "}}";
+        var end_date = "{{end_date|date:" d-m-Y "}}";
+        $('#start-date').datepicker({ dateFormat: 'dd-mm-yy', prevText: "Previous" }).val(start_date.trim());
+        $('#end-date').datepicker({ dateFormat: 'dd-mm-yy', prevText: "Previous" }).val(end_date.trim());
+        $('#export-default-start-date').datepicker({ dateFormat: 'dd-mm-yy', prevText: "Previous" }).val(start_date.trim());
+        $('#export-default-end-date').datepicker({ dateFormat: 'dd-mm-yy', prevText: "Previous" }).val(end_date.trim());
+    });
+    function check_select_date_range(element){
+        if(element.value=="4"){
+            document.getElementById("custom-range-filter-export").style.display="block";
+        }else{
+            document.getElementById("custom-range-filter-export").style.display="none";
+        }
+    }
+  </script>
+{% endblock %}

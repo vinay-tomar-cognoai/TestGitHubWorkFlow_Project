@@ -1,0 +1,180 @@
+{% extends 'EasyChatApp/console.html' %}
+{% block consolecontent %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'EasyChatApp/css/create_quick_bot.css' %}?v={% random_int 1 100 %}">
+<div><div class="col s9 offset-s3" id="create-excel-bot-main-console-container" style="margin-top: 1%; margin-left: 0% !important; ">
+    <div class="main-content" id="excel-page-main-content">
+        <h6 class="heading">Create flows or intents by importing excel</h6>
+        <h3 class="sub-heading">File Upload</h3>
+        <label for="excel" class="choose-text">Choose type of excel file:</label>
+        <select onchange="handleSelected(this)" name="excel" id="excel">
+            <option value="none" selected disabled hidden>
+              Select File Type
+          </option>
+            <option value="1">FAQs using excel</option>
+            <option  value="2">Flow using excel</option>
+        </select>
+        <br><br>  
+        <div class="open-container-excel">
+          <label for="attach" class="choose-text">Attach File</label>
+          <div class="drag-drop-container" style="
+          text-align: center;
+          width: 55%;
+          background: #fff;
+          border: 0.7px dashed #CFD6DF;
+          border-radius: 3px;
+          padding: 30px 50px;
+          height: 248px;
+          position: relative;
+          margin-bottom: 30px;">        
+            <span class="drag-drop-message" style="color:#0F52A1;flex-direction: column;">
+              <svg width="79" height="78" viewBox="0 0 79 78" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <rect x="0.66626" width="78" height="78" fill="url(#pattern0)"/>
+                <defs>
+                <pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">
+                <use xlink:href="#image0" transform="scale(0.00195312)"/>
+                </pattern>
+                <image id="image0" width="512" height="512" xlink:href="data:image/png;base64,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"/>
+                </defs>
+                </svg>              
+                    
+                <p style="width:90%;margin-bottom: 0;">
+                    Drop your file here<br>
+                    or<br>
+                    <a>Click here</a> to upload your file
+                </p>
+            </span>
+            <div id="bot-excel-selected-filename">
+            </div>
+            <div class="drag-drop-input-field-wrapper">
+              <input onchange="handleFileInputChange()" id="drag-drop-input-box" style="border-bottom: none !important;border: 1px solid black;height: 100% !important;opacity: 0;cursor: pointer;" type="file" accept=".xls, .xlsx">
+          </div>  
+        </div>
+          <div class="error-message" style="display: none;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M2 12C2 6.48 6.47 2 11.99 2C17.52 2 22 6.48 22 12C22 17.52 17.52 22 11.99 22C6.47 22 2 17.52 2 12ZM13 8C13 7.45 12.55 7 12 7C11.45 7 11 7.45 11 8V12C11 12.55 11.45 13 12 13C12.55 13 13 12.55 13 12V8ZM12 20C7.58 20 4 16.42 4 12C4 7.58 7.58 4 12 4C16.42 4 20 7.58 20 12C20 16.42 16.42 20 12 20ZM11 15V17H13V15H11Z" fill="#F55448"/>
+            </svg>
+            <span style="color: #F55448;margin-left: 3px;">Some fields were missing. Please revaluate your sheet.</span>
+          </div>
+          <div class="loading-message" style="display: none;">
+            <svg class="rotate-loader" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5.09791 3.99314V7.43709C5.09791 7.97507 5.53402 8.41119 6.072 8.41119H9.51595C10.0539 8.41119 10.4901 7.97507 10.4901 7.43709C10.4901 6.89911 10.0539 6.46299 9.51595 6.46299L8.71532 6.46199C11.3342 4.8955 14.7776 5.24023 17.0336 7.49618C19.6964 10.159 19.6964 14.4764 17.0336 17.1392C14.3707 19.8021 10.0534 19.8021 7.39049 17.1392C5.76978 15.5185 5.09135 13.2303 5.51706 11.0206C5.61883 10.4924 5.2731 9.98164 4.74483 9.87986C4.21657 9.77808 3.70582 10.1238 3.60404 10.6521C3.05729 13.49 3.93016 16.4341 6.01291 18.5168C9.43659 21.9405 14.9875 21.9405 18.4111 18.5168C21.8348 15.0932 21.8348 9.54228 18.4111 6.1186C15.3138 3.02123 10.4754 2.72602 7.04613 5.23297L7.0461 3.99314C7.0461 3.45516 6.60998 3.01904 6.072 3.01904C5.53402 3.01904 5.09791 3.45516 5.09791 3.99314Z" fill="#35A0F4"/>
+            </svg>
+            <span style="margin-left: 3px;color:#35A0F4;">Creating your FAQ bot. It may take some time.</span>
+          </div>
+          <div class="btn-section">
+            <button id="submit_faqs" type="submit">Upload Excel</button>
+            <a id="sample-excel" href="#">Download Template</a>
+          </div>
+        </div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- Modal Container-->
+
+<div id="success-modal" class="modal">
+  <div class="modal-content">
+    <div>
+      <svg width="27" height="22" viewBox="0 0 27 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20.8917 11C20.8917 16.5228 16.4388 21 10.9458 21C5.4529 21 1 16.5228 1 11C1 5.47715 5.4529 1 10.9458 1C13.3195 1 15.4989 1.83604 17.2088 3.23122" stroke="#5CB660" stroke-width="2" stroke-linecap="round"/>
+        <path d="M9.3877 10.7328L13.0726 14.4378L24.9998 2.4458" stroke="#5CB660" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>        
+      <span>FAQs using excel has been uploaded successfully</span>
+    </div>
+    <div class="modal-btns" style="margin-top: 30px;">
+      <a href="/chat/intent/?bot_pk={{bot_pk}}&selected_language={{selected_language}}" class="modal-manage-btn btn">Manage intent</a>
+      <a href="/chat/create-quick-bot/?bot_pk={{bot_pk}}" class="modal-upload-btn btn">Upload Another Excel</a>
+    </div>
+   
+  </div>
+</div>
+
+
+    </div>
+
+  </div>
+<div data-html2canvas-ignore class="easychat-footer">
+
+    <span class="left">Version: 4.4</span>
+    <span class="left">Date of Release: 31-Aug-2021</span>
+    <!-- <a href="https://docs.google.com/spreadsheets/d/1wcKi4E38DW99npqyCVwSWOUEEvJqpJLeGDcT-UrMRUc/edit?usp=sharing" target="_blank"> <i class="material-icons tiny" id="home-button">feedback</i></a> -->
+
+    <span> © 2017 - 2021, Cogno AI or its affiliates. All rights reserved.</span>
+</div>
+
+<!-- Build bot modal -->
+
+<div id="easychat-build-bot-modal" class="modal modal-fixed-footer">
+  <div class="modal-header">
+      <h5>Build Bot</h5>
+  </div>
+
+  <div class="modal-content">
+      <ol id="build-bot-points" style="margin: 0px; padding: 0;">
+          <li class="build-bot-processes">
+              <div class="build-bot-process">1. Updating Version Of Files</div>
+              <div class="build-bot-process-loader" id="build-bot-process-loader-one"></div>
+          </li>
+          <li class="build-bot-processes">
+              <div class="build-bot-process">2. Adding translation-based training questions in available languages</div>
+              <div class="build-bot-process-loader" id="build-bot-process-loader-two"></div>
+          </li>
+          <li class="build-bot-processes">
+              <div class="build-bot-process">3. Syncing Word Mappers With Intents</div>
+              <div class="build-bot-process-loader" id="build-bot-process-loader-three"></div>
+          </li>
+          <li class="build-bot-processes">
+            <div class="build-bot-process">4. Training Spell Checker And Word Splitter</div>
+            <div class="build-bot-process-loader" id="build-bot-process-loader-four"></div>
+          </li>
+          <li class="build-bot-processes">
+              <div class="build-bot-process">5. Loading Suggestions And Word Mappers</div>
+              <div class="build-bot-process-loader" id="build-bot-process-loader-five"></div>
+          </li>
+      </ol>
+      <div 
+      style="font-size: 25px; color: #4d4d4d; display: none;"
+      id="bot-built-success"
+      ><p>Bot Built Successfully!</p></div>
+      <div 
+      style="font-size: 25px; color: #4d4d4d; display: none;"
+      id="bot-built-failed"
+      ><p>Bot Built Failed!</p></div>
+  </div>
+  <div class="modal-footer">
+      <a id="build-bot-modal-close-btn" href="javascript:void(0)" class=" modal-close btn transparent-btn white black-text" style="pointer-events: none; opacity: 0.7;">Close</a>
+  </div>
+</div>
+
+<!-- Lnaguage change loader modal -->
+<div id="modal-language-change-loader" class="modal" >
+    <div class="modal-content">
+        <img id="language-change-loader-gif" style="width: 220px;height: 135px;" src="/static/EasyChatApp/img/language_change_loader.gif">
+        <div id="language-loader-inner-text" style="color: #2755CB;font-weight:500;"> Loading Languages</div>
+    </div>
+</div>
+
+<!-- Build bot modal -->
+
+<script type="text/javascript">
+    window.API_FAIL_EMAIL_CONFIGURED = '{{api_fail_email_configured}}'
+    bot_id = window.location.href.split("/")[5].split("=")[1]
+    SERVER_URL= window.location.origin;
+    BOT_ID=bot_id
+    BOT_NAME='uat';
+    BOT_THEME='null';
+    BOT_POSITION='bottom-right';
+    bot_click_image = 'true';
+    is_form_assist='false';
+    is_easyassist_enabled='false';
+    is_lead_generation='false';
+    lead_generation_intent_id='';
+    window.NEED_TO_BUILD = "{{ selected_bot_obj.need_to_build }}";
+</script>
+<script src="{% static 'EasyChatApp/js/theme2_embed.js' %}?v={% random_int 1 100 %}"></script>
+<script src="{% static 'EasyChatApp/js/create_bot_using_excel.js' %}?v={% random_int 1 100 %}"></script>
+
+{% endblock %}

@@ -1,0 +1,107 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    
+    {% if cobrowse_config_obj.cobrowsing_favicon %}
+        <link rel="shortcut icon" type="image/x-icon" href="{{ cobrowse_config_obj.cobrowsing_favicon }}">
+    {% else %}        
+      {% if cobrowse_agent.get_access_token_obj and cobrowse_agent.get_access_token_obj.agent.user.enable_s3_bucket %}
+      <link rel="shortcut icon" type="image/x-icon" href="https://static.allincall.in/static/EasyAssistApp/img/cobrowseLogoShort.svg">
+      {% else %}
+      <link rel="shortcut icon" type="image/x-icon" href="{% static 'EasyAssistApp/img/cobrowseLogoShort.svg' %}">
+      {% endif %}
+    {% endif %}
+
+    <title>Agent | Cobrowsing</title>
+    <!-- Custom fonts for this template-->
+    {% if cobrowse_agent.get_access_token_obj and cobrowse_agent.get_access_token_obj.agent.user.enable_s3_bucket %}
+    <link href="https://static.allincall.in/static/EasyAssistApp/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    {% else %}
+    <link href="{% static 'EasyAssistApp/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+    {% endif %}
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <!-- Custom styles for this template-->
+    {% if cobrowse_agent.get_access_token_obj and cobrowse_agent.get_access_token_obj.agent.user.enable_s3_bucket %}
+    <link rel="stylesheet" href="https://static.allincall.in/static/EasyAssistApp/css/bootstrap.min.css">
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/vendor/jquery/jquery.min.js"></script>
+    <script src="https://static.allincall.in/static/EasyAssistApp/js/popper.min.js"></script>
+    <script src="https://static.allincall.in/static/EasyAssistApp/js/bootstrap.min.js"></script>
+    {% else %}
+    <link rel="stylesheet" href="{% static 'EasyAssistApp/css/bootstrap.min.css' %}">
+    <script type="text/javascript" src="/static/EasyAssistApp/vendor/jquery/jquery.min.js"></script>
+    <script src="{% static 'EasyAssistApp/js/popper.min.js' %}"></script>
+    <script src="{% static 'EasyAssistApp/js/bootstrap.min.js' %}"></script>
+    {% endif %}
+
+    {% if easyassist_font_family != 'Silka' %}
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family={{easyassist_font_family}}">
+    {% endif %}
+
+    <style>
+        #logo {
+            display: flex;
+            justify-content: center;
+            padding-top: 3em;
+        }
+
+        .meeting-ended-text {
+            font-style: normal;
+        }
+
+        .container-fluid {
+            text-align: center;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 72vh;
+        }
+
+        {% if easyassist_font_family == 'Silka' %}
+          *{
+            font-family: Silka, sans-serif !important;
+          }
+        {% else %}
+          *{
+            font-family: {{easyassist_font_family}} !important;
+          }
+        {% endif %}
+    
+    </style>
+</head>
+
+
+<body>
+    <div id="logo">
+        {% if cobrowse_config_obj.cobrowsing_logo %}
+          <img id="cobrowseLogoImage" src="{{ cobrowse_config_obj.cobrowsing_logo }}" alt="Logo" max-width="90px" height="50px"/>
+        {% else %}    
+          {% if logo %}
+          <img id="cobrowseLogoImage" src="/{{ logo }}" alt="Cogno CoBrowse" max-width="90px" height="50px" />
+          {% else %}
+          {% if cobrowse_agent.get_access_token_obj and cobrowse_agent.get_access_token_obj.agent.user.enable_s3_bucket %}
+          <img id="cobrowseLogoImage" src="https://static.allincall.in/static/EasyAssistApp/img/cobrowseLogo.svg" id="sales-ai-logo" alt="Cogno CoBrowse" style="height: 100%; width: 13em;"/>
+          {% else %}
+          <img id="cobrowseLogoImage" src="{% static 'EasyAssistApp/img/cobrowseLogo.svg' %}" id="sales-ai-logo" alt="Cogno CoBrowse" style="height: 100%; width: 13em;"/>
+          {% endif %}
+          {% endif %}
+        {% endif %}
+
+    </div>
+    <div class="container-fluid">
+        {% if message %}
+            <h2 class="meeting-ended-text">{{ message|safe }}</h2>
+        {% else %}
+            <h2 class="meeting-ended-text">CoBrowsing session has ended</h2><br>
+        {% endif %}
+    </div>
+</body>
+
+</html>

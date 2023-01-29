@@ -1,0 +1,502 @@
+{% extends 'EasyAssistApp/console.html' %}
+{% block content %}
+{% load static %}
+
+{% if request.user.enable_s3_bucket %}
+    <script src="https://static.allincall.in/static/EasyAssistApp/js/ace.js" type="text/javascript"
+        charset="utf-8"></script>
+    <script type="text/javascript" src="https://static.allincall.in/static/EasyAssistApp/js/jscolor.min.js"></script>
+{% else %}
+    <script src="{% static 'EasyAssistApp/js/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" src="{% static 'EasyAssistApp/js/jscolor.min.js' %}"></script>
+{% endif %}
+
+<link href="{% static 'EasyAssistApp/css/settings.css' %}" rel="stylesheet" type="text/css">
+
+<div class="container-fluid">
+    <div>
+      <div id="pills-options-settings">
+        <div>
+          <div class="page-header ">
+            <div class="nav nav-pills navbar-right">
+              <a class="anchor-reset back-btn"  href="/easy-assist/sales-ai/settings">
+                <span class="mr-3 mb-auto " style="cursor: pointer;">
+                    <svg class="back-arrow-svg" width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect width="44" height="44" rx="22" transform="matrix(1 0 0 -1 0 44)" fill="white" />
+                      {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                      <path
+                      d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                      fill="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" />
+                          {% else %}
+                          <path
+                          d="M20.2954 29.7162C20.6888 30.1038 21.322 30.0991 21.7096 29.7057C22.0972 29.3123 22.0925 28.6792 21.6991 28.2915L16.3288 23.0001H29.9999C30.5522 23.0001 30.9999 22.5524 30.9999 22.0001C30.9999 21.4479 30.5522 21.0001 29.9999 21.0001H16.3354L21.6991 15.7153C22.0925 15.3276 22.0972 14.6945 21.7096 14.3011C21.322 13.9077 20.6888 13.903 20.2954 14.2906L13.3712 21.113C12.8743 21.6026 12.8743 22.4042 13.3712 22.8938L20.2954 29.7162Z"
+                          fill="#0254D7" />
+                          {% endif %} 
+                      
+                    </svg>
+                  </span>
+            </a>
+          <h5 class="nav_btn mr-2 mt-2" > <a class="anchor-reset"  href="/easy-assist/sales-ai/settings">Settings</a></h5>
+              <div class=" mr-2 pt-2">
+                <svg class="mini-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2426 12L10.5858 6.34317Z"
+                    fill="#475569" />
+                </svg>
+              </div>
+              <h5  class="nav_btn active1 mt-2">Options</h5>
+            </div>
+          </div>
+          <ul class="nav d-flex flex-column w-100 mb-3 mt-30 custom-list">
+            <li class="nav-item custom-nav-item  col-lg-6 col-md-12 col-sm-12 mb px-0">
+              <div class="col-md-12 px-0">
+                <div class="card bg-white border rounded" id="main_card">
+                  <a href="/easy-assist/sales-ai/settings/options/general" 
+                    class="d-flex w-100 custom-link">
+                    <div class="row no-gutters">
+                      <div class="col-auto d-flex-flex p-2 ml-3 mr-2 mt-4">
+                        <svg width="32" height="33" viewBox="0 0 32 33" fill="none"
+                          xmlns="http://www.w3.org/2000/svg">
+                          {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                          <path d="M29.3333 9.16699H21.3333" stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2"
+                            stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                          <path d="M7.99999 9.16699H2.66666" stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2"
+                            stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                          <path
+                            d="M13.3333 13.8333C15.9107 13.8333 18 11.744 18 9.16667C18 6.58934 15.9107 4.5 13.3333 4.5C10.756 4.5 8.66666 6.58934 8.66666 9.16667C8.66666 11.744 10.756 13.8333 13.3333 13.8333Z"
+                            stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                          <path d="M29.3333 23.833H24" stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2" stroke-miterlimit="10"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                          <path d="M10.6667 23.833H2.66666" stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2"
+                            stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                          <path
+                            d="M18.6667 28.5003C21.244 28.5003 23.3333 26.411 23.3333 23.8337C23.3333 21.2563 21.244 19.167 18.6667 19.167C16.0893 19.167 14 21.2563 14 23.8337C14 26.411 16.0893 28.5003 18.6667 28.5003Z"
+                            stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                          {% else %}
+                          <path d="M29.3333 9.16699H21.3333" stroke="#0254D7" stroke-width="2"
+                          stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M7.99999 9.16699H2.66666" stroke="#0254D7" stroke-width="2"
+                          stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                        <path
+                          d="M13.3333 13.8333C15.9107 13.8333 18 11.744 18 9.16667C18 6.58934 15.9107 4.5 13.3333 4.5C10.756 4.5 8.66666 6.58934 8.66666 9.16667C8.66666 11.744 10.756 13.8333 13.3333 13.8333Z"
+                          stroke="#0254D7" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round"
+                          stroke-linejoin="round" />
+                        <path d="M29.3333 23.833H24" stroke="#0254D7" stroke-width="2" stroke-miterlimit="10"
+                          stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M10.6667 23.833H2.66666" stroke="#0254D7" stroke-width="2"
+                          stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                        <path
+                          d="M18.6667 28.5003C21.244 28.5003 23.3333 26.411 23.3333 23.8337C23.3333 21.2563 21.244 19.167 18.6667 19.167C16.0893 19.167 14 21.2563 14 23.8337C14 26.411 16.0893 28.5003 18.6667 28.5003Z"
+                          stroke="#0254D7" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round"
+                          stroke-linejoin="round" />
+                          {% endif %} 
+                          
+                        </svg>
+  
+                      </div>
+                      <div class="col px-0">
+                        <div class="card-block px-2 mt-4 pb-0">
+                          <h5 class="card-title text-dark font-weight-bold fs-18 mb-0">
+                            General
+                          </h5>
+                          <p class="card-text mt-2 mb-4 tab-sub-heading-text">
+                            Configure different settings of Agent, Admin, Customer and Console 
+                          </p>
+                        </div>
+                      </div>
+                      <div class="col-auto  pt-3 pr-3 mt-4">
+                        <svg width="16" height="17" viewBox="0 0 16 17" fill="none"
+                          xmlns="http://www.w3.org/2000/svg">
+                          <path
+                            d="M11.3354 8.49994C11.3358 8.20566 11.2094 7.92549 10.9885 7.73101L6.02899 3.36784C5.68718 3.08103 5.17892 3.11954 4.88423 3.45459C4.58954 3.78963 4.61622 4.29865 4.94432 4.60106L9.28125 8.41633C9.30533 8.43744 9.31914 8.46791 9.31914 8.49994C9.31914 8.53196 9.30533 8.56243 9.28125 8.58355L4.94432 12.3988C4.61622 12.7012 4.58954 13.2102 4.88423 13.5453C5.17892 13.8803 5.68718 13.9188 6.02899 13.632L10.9868 9.2702C11.2081 9.07539 11.3351 8.79483 11.3354 8.49994Z"
+                            fill="#CBCACA" />
+                          <mask id="mask0_155_622" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="4" y="3"
+                            width="8" height="11">
+                            <path
+                              d="M11.3354 8.49994C11.3358 8.20566 11.2094 7.92549 10.9885 7.73101L6.02899 3.36784C5.68718 3.08103 5.17892 3.11954 4.88423 3.45459C4.58954 3.78963 4.61622 4.29865 4.94432 4.60106L9.28125 8.41633C9.30533 8.43744 9.31914 8.46791 9.31914 8.49994C9.31914 8.53196 9.30533 8.56243 9.28125 8.58355L4.94432 12.3988C4.61622 12.7012 4.58954 13.2102 4.88423 13.5453C5.17892 13.8803 5.68718 13.9188 6.02899 13.632L10.9868 9.2702C11.2081 9.07539 11.3351 8.79483 11.3354 8.49994Z"
+                              fill="white" />
+                          </mask>
+                          <g mask="url(#mask0_155_622)">
+                          </g>
+                        </svg>
+                      </div>
+                  </a>
+                </div>
+              </div>
+            </li>
+            {% if access_token_obj.allow_video_meeting_only %}
+              <li class="nav-item custom-nav-item col-lg-6 col-md-12 col-sm-12 mt-20 px-0 " data-toggle="tooltip" data-placement="top" title="Not applicable if “Allow only video call” is enabled.">
+                <div class="col-md-12 px-0">
+                  <div class="disable-menu-tab card bg-white border rounded" id="main_card" style="color: #CBCACA !important;">
+                    <a href="#"  class="d-flex w-100 custom-link">
+                      <div class="row no-gutters">
+                        <div class="col-auto disable-option-tab d-flex-flex p-2 ml-3 mr-2 mt-4" style="color: #CBCACA !important;">
+                          <svg width="32" height="33" viewBox="0 0 32 33" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <g clip-path="url(#clip0_219_1298)">
+                              <path
+                              d="M31 16.5C31 24.7843 24.2843 31.5 16 31.5C7.71573 31.5 1 24.7843 1 16.5C1 8.21573 7.71573 1.5 16 1.5C24.2843 1.5 31 8.21573 31 16.5Z"
+                              stroke="#CBCACA" stroke-width="2" />
+                            <path
+                              d="M10.3693 19.1611H17.2587C18.8565 19.1611 20.1521 20.4567 20.1521 22.0546C20.1521 23.6528 18.8565 24.9481 17.2587 24.9481H10.3693C8.77142 24.9481 7.4758 23.6528 7.4758 22.0546C7.4758 20.4567 8.77142 19.1611 10.3693 19.1611Z"
+                              fill="#CBCACA" />
+                            <path
+                              d="M8.67845 17.1799C8.95289 17.0892 8.96141 16.7095 8.69132 16.6069L6.33348 15.7104C6.1012 15.6221 5.86384 15.827 5.92193 16.0657L6.4797 18.3573C6.54332 18.6189 6.89424 18.6767 7.04068 18.4498L7.42103 17.8603L8.10318 18.557C8.24148 18.6983 8.46955 18.7021 8.61278 18.5658C8.75591 18.4295 8.75991 18.2045 8.62162 18.0633L7.9821 17.4101L8.67845 17.1799Z"
+                              fill="#CBCACA" />
+                            <path
+                              d="M15.9909 10.2324H22.8803C24.4781 10.2324 25.7737 11.528 25.7737 13.1259C25.7737 14.724 24.4781 16.0193 22.8803 16.0193H15.9909C14.393 16.0193 13.0974 14.724 13.0974 13.1259C13.0974 11.528 14.393 10.2324 15.9909 10.2324Z"
+                              fill="#CBCACA" />
+                            <path
+                              d="M14.3 8.25118C14.5744 8.1605 14.583 7.78085 14.3129 7.67817L11.955 6.78165C11.7227 6.69341 11.4854 6.89831 11.5434 7.13696L12.1012 9.42857C12.1649 9.69017 12.5158 9.74795 12.6622 9.5211L13.0426 8.93163L13.7247 9.62833C13.863 9.76958 14.0911 9.77344 14.2343 9.63716C14.3774 9.50078 14.3815 9.27577 14.2432 9.13463L13.6036 8.48137L14.3 8.25118Z"
+                              fill="#CBCACA" />                              
+                            </g>
+                            <defs>
+                              <clipPath id="clip0_219_1298">
+                                <rect width="32" height="32" fill="white" transform="translate(0 0.5)" />
+                              </clipPath>
+                            </defs>
+                          </svg>
+    
+                        </div>
+                        <div class="col px-0">
+                          <div class="card-block px-2 mt-4 pb-0">
+                            <h5 class="disable-menu-tab card-title text-dark font-weight-bold fs-18 mb-0" style="color: #CBCACA !important;">
+                              Co-Browse
+                            </h5>
+                            <p class=" disable-menu-tab card-text mt-2 mb-4 tab-sub-heading-text" style="color: #CBCACA !important;">
+                              Configure different settings of Agent, Customer and Admin 
+                            </p>
+                          </div>
+                        </div>
+                        <div class="col-auto disable-option-tab pt-3 pr-3 mt-4" style="color: #CBCACA !important;">
+                          <svg width="16" height="17" viewBox="0 0 16 17" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                              d="M11.3354 8.49994C11.3358 8.20566 11.2094 7.92549 10.9885 7.73101L6.02899 3.36784C5.68718 3.08103 5.17892 3.11954 4.88423 3.45459C4.58954 3.78963 4.61622 4.29865 4.94432 4.60106L9.28125 8.41633C9.30533 8.43744 9.31914 8.46791 9.31914 8.49994C9.31914 8.53196 9.30533 8.56243 9.28125 8.58355L4.94432 12.3988C4.61622 12.7012 4.58954 13.2102 4.88423 13.5453C5.17892 13.8803 5.68718 13.9188 6.02899 13.632L10.9868 9.2702C11.2081 9.07539 11.3351 8.79483 11.3354 8.49994Z"
+                              fill="#CBCACA" />
+                            <mask id="mask0_155_622" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="4" y="3"
+                              width="8" height="11">
+                              <path
+                                d="M11.3354 8.49994C11.3358 8.20566 11.2094 7.92549 10.9885 7.73101L6.02899 3.36784C5.68718 3.08103 5.17892 3.11954 4.88423 3.45459C4.58954 3.78963 4.61622 4.29865 4.94432 4.60106L9.28125 8.41633C9.30533 8.43744 9.31914 8.46791 9.31914 8.49994C9.31914 8.53196 9.30533 8.56243 9.28125 8.58355L4.94432 12.3988C4.61622 12.7012 4.58954 13.2102 4.88423 13.5453C5.17892 13.8803 5.68718 13.9188 6.02899 13.632L10.9868 9.2702C11.2081 9.07539 11.3351 8.79483 11.3354 8.49994Z"
+                                fill="white" />
+                            </mask>
+                            <g mask="url(#mask0_155_622)">
+                            </g>
+                          </svg>
+                        </div>
+                    </a>
+                  </div>
+                </div>
+              </li>
+            {% else %} 
+              <li class="nav-item custom-nav-item col-lg-6 col-md-12 col-sm-12 mt-20 px-0 ">
+                <div class="col-md-12 px-0">
+                  <div class="card bg-white border rounded" id="main_card">
+                    <a href="/easy-assist/sales-ai/settings/options/cobrowse/"  class="d-flex w-100 custom-link">
+                      <div class="row no-gutters">
+                        <div class="col-auto d-flex-flex p-2 ml-3 mr-2 mt-4">
+                          <svg width="32" height="33" viewBox="0 0 32 33" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <g clip-path="url(#clip0_219_1298)">
+                              {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                              <path
+                                d="M31 16.5C31 24.7843 24.2843 31.5 16 31.5C7.71573 31.5 1 24.7843 1 16.5C1 8.21573 7.71573 1.5 16 1.5C24.2843 1.5 31 8.21573 31 16.5Z"
+                                stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2" />
+                              <path
+                                d="M10.3693 19.1611H17.2587C18.8565 19.1611 20.1521 20.4567 20.1521 22.0546C20.1521 23.6528 18.8565 24.9481 17.2587 24.9481H10.3693C8.77142 24.9481 7.4758 23.6528 7.4758 22.0546C7.4758 20.4567 8.77142 19.1611 10.3693 19.1611Z"
+                                fill="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" />
+                              <path
+                                d="M8.67845 17.1799C8.95289 17.0892 8.96141 16.7095 8.69132 16.6069L6.33348 15.7104C6.1012 15.6221 5.86384 15.827 5.92193 16.0657L6.4797 18.3573C6.54332 18.6189 6.89424 18.6767 7.04068 18.4498L7.42103 17.8603L8.10318 18.557C8.24148 18.6983 8.46955 18.7021 8.61278 18.5658C8.75591 18.4295 8.75991 18.2045 8.62162 18.0633L7.9821 17.4101L8.67845 17.1799Z"
+                                fill="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" />
+                              <path
+                                d="M15.9909 10.2324H22.8803C24.4781 10.2324 25.7737 11.528 25.7737 13.1259C25.7737 14.724 24.4781 16.0193 22.8803 16.0193H15.9909C14.393 16.0193 13.0974 14.724 13.0974 13.1259C13.0974 11.528 14.393 10.2324 15.9909 10.2324Z"
+                                fill="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" />
+                              <path
+                                d="M14.3 8.25118C14.5744 8.1605 14.583 7.78085 14.3129 7.67817L11.955 6.78165C11.7227 6.69341 11.4854 6.89831 11.5434 7.13696L12.1012 9.42857C12.1649 9.69017 12.5158 9.74795 12.6622 9.5211L13.0426 8.93163L13.7247 9.62833C13.863 9.76958 14.0911 9.77344 14.2343 9.63716C14.3774 9.50078 14.3815 9.27577 14.2432 9.13463L13.6036 8.48137L14.3 8.25118Z"
+                                fill="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" />
+                              {% else %}
+                              <path
+                              d="M31 16.5C31 24.7843 24.2843 31.5 16 31.5C7.71573 31.5 1 24.7843 1 16.5C1 8.21573 7.71573 1.5 16 1.5C24.2843 1.5 31 8.21573 31 16.5Z"
+                              stroke="#0254D7" stroke-width="2" />
+                            <path
+                              d="M10.3693 19.1611H17.2587C18.8565 19.1611 20.1521 20.4567 20.1521 22.0546C20.1521 23.6528 18.8565 24.9481 17.2587 24.9481H10.3693C8.77142 24.9481 7.4758 23.6528 7.4758 22.0546C7.4758 20.4567 8.77142 19.1611 10.3693 19.1611Z"
+                              fill="#0254D7" />
+                            <path
+                              d="M8.67845 17.1799C8.95289 17.0892 8.96141 16.7095 8.69132 16.6069L6.33348 15.7104C6.1012 15.6221 5.86384 15.827 5.92193 16.0657L6.4797 18.3573C6.54332 18.6189 6.89424 18.6767 7.04068 18.4498L7.42103 17.8603L8.10318 18.557C8.24148 18.6983 8.46955 18.7021 8.61278 18.5658C8.75591 18.4295 8.75991 18.2045 8.62162 18.0633L7.9821 17.4101L8.67845 17.1799Z"
+                              fill="#0254D7" />
+                            <path
+                              d="M15.9909 10.2324H22.8803C24.4781 10.2324 25.7737 11.528 25.7737 13.1259C25.7737 14.724 24.4781 16.0193 22.8803 16.0193H15.9909C14.393 16.0193 13.0974 14.724 13.0974 13.1259C13.0974 11.528 14.393 10.2324 15.9909 10.2324Z"
+                              fill="#0254D7" />
+                            <path
+                              d="M14.3 8.25118C14.5744 8.1605 14.583 7.78085 14.3129 7.67817L11.955 6.78165C11.7227 6.69341 11.4854 6.89831 11.5434 7.13696L12.1012 9.42857C12.1649 9.69017 12.5158 9.74795 12.6622 9.5211L13.0426 8.93163L13.7247 9.62833C13.863 9.76958 14.0911 9.77344 14.2343 9.63716C14.3774 9.50078 14.3815 9.27577 14.2432 9.13463L13.6036 8.48137L14.3 8.25118Z"
+                              fill="#0254D7" />
+                              {% endif %} 
+                              
+                            </g>
+                            <defs>
+                              <clipPath id="clip0_219_1298">
+                                <rect width="32" height="32" fill="white" transform="translate(0 0.5)" />
+                              </clipPath>
+                            </defs>
+                          </svg>
+    
+                        </div>
+                        <div class="col px-0">
+                          <div class="card-block px-2 mt-4 pb-0">
+                            <h5 class="card-title text-dark font-weight-bold fs-18 mb-0">
+                              Cobrowse
+                            </h5>
+                            <p class="card-text mt-2 mb-4 tab-sub-heading-text">
+                              Configure different settings of Agent, Customer and Admin 
+                            </p>
+                          </div>
+                        </div>
+                        <div class="col-auto  pt-3 pr-3 mt-4">
+                          <svg width="16" height="17" viewBox="0 0 16 17" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                              d="M11.3354 8.49994C11.3358 8.20566 11.2094 7.92549 10.9885 7.73101L6.02899 3.36784C5.68718 3.08103 5.17892 3.11954 4.88423 3.45459C4.58954 3.78963 4.61622 4.29865 4.94432 4.60106L9.28125 8.41633C9.30533 8.43744 9.31914 8.46791 9.31914 8.49994C9.31914 8.53196 9.30533 8.56243 9.28125 8.58355L4.94432 12.3988C4.61622 12.7012 4.58954 13.2102 4.88423 13.5453C5.17892 13.8803 5.68718 13.9188 6.02899 13.632L10.9868 9.2702C11.2081 9.07539 11.3351 8.79483 11.3354 8.49994Z"
+                              fill="#CBCACA" />
+                            <mask id="mask0_155_622" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="4" y="3"
+                              width="8" height="11">
+                              <path
+                                d="M11.3354 8.49994C11.3358 8.20566 11.2094 7.92549 10.9885 7.73101L6.02899 3.36784C5.68718 3.08103 5.17892 3.11954 4.88423 3.45459C4.58954 3.78963 4.61622 4.29865 4.94432 4.60106L9.28125 8.41633C9.30533 8.43744 9.31914 8.46791 9.31914 8.49994C9.31914 8.53196 9.30533 8.56243 9.28125 8.58355L4.94432 12.3988C4.61622 12.7012 4.58954 13.2102 4.88423 13.5453C5.17892 13.8803 5.68718 13.9188 6.02899 13.632L10.9868 9.2702C11.2081 9.07539 11.3351 8.79483 11.3354 8.49994Z"
+                                fill="white" />
+                            </mask>
+                            <g mask="url(#mask0_155_622)">
+                            </g>
+                          </svg>
+                        </div>
+                    </a>
+                  </div>
+                </div>
+              </li>
+            {% endif %}
+            <li class="nav-item custom-nav-item  col-lg-6 col-md-12 col-sm-12 mt-20  px-0 ">
+              <div class="col-md-12 px-0">
+                <div class="card bg-white border rounded" id="main_card">
+                  <a href="/easy-assist/sales-ai/settings/options/video-call"  class="d-flex w-100 custom-link">
+                    <div class="row no-gutters">
+                      <div class="col-auto d-flex-flex p-2 ml-3 mr-2 mt-4">
+                        <svg width="32" height="33" viewBox="0 0 32 33" fill="none"
+                          xmlns="http://www.w3.org/2000/svg">
+                          {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                          <path fill-rule="evenodd" clip-rule="evenodd"
+                            d="M21.7291 21.2171C21.837 23.6599 19.8655 25.7255 17.3261 25.8293C17.139 25.8372 8.02033 25.8188 8.02033 25.8188C5.4932 26.0106 3.28145 24.1947 3.08212 21.7611C3.0671 21.5798 3.0712 11.7956 3.0712 11.7956C2.95925 9.35022 4.92798 7.27933 7.46876 7.17158C7.65853 7.16239 16.7649 7.17947 16.7649 7.17947C19.3044 6.99025 21.5229 8.81936 21.7195 11.2647C21.7332 11.4408 21.7291 21.2171 21.7291 21.2171Z"
+                            stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                          <path
+                            d="M21.7333 13.8061L26.124 10.2128C27.212 9.32212 28.844 10.0981 28.8426 11.5021L28.8266 21.3008C28.8253 22.7048 27.192 23.4741 26.1066 22.5835L21.7333 18.9901"
+                            stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                          {% else %}
+                          <path fill-rule="evenodd" clip-rule="evenodd"
+                          d="M21.7291 21.2171C21.837 23.6599 19.8655 25.7255 17.3261 25.8293C17.139 25.8372 8.02033 25.8188 8.02033 25.8188C5.4932 26.0106 3.28145 24.1947 3.08212 21.7611C3.0671 21.5798 3.0712 11.7956 3.0712 11.7956C2.95925 9.35022 4.92798 7.27933 7.46876 7.17158C7.65853 7.16239 16.7649 7.17947 16.7649 7.17947C19.3044 6.99025 21.5229 8.81936 21.7195 11.2647C21.7332 11.4408 21.7291 21.2171 21.7291 21.2171Z"
+                          stroke="#0254D7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        <path
+                          d="M21.7333 13.8061L26.124 10.2128C27.212 9.32212 28.844 10.0981 28.8426 11.5021L28.8266 21.3008C28.8253 22.7048 27.192 23.4741 26.1066 22.5835L21.7333 18.9901"
+                          stroke="#0254D7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                          {% endif %} 
+                          
+                        </svg>
+  
+                      </div>
+                      <div class="col px-0">
+                        <div class="card-block px-2 mt-4 pb-0">
+                          <h5 class="card-title text-dark font-weight-bold fs-18 mb-0">
+                            Video call
+                          </h5>
+                          <p class="card-text mt-2 mb-4 tab-sub-heading-text">
+                            Configure different settings of Agent and Admin
+                          </p>
+                        </div>
+                      </div>
+                      <div class="col-auto  pt-3 pr-3 mt-4">
+                        <svg width="16" height="17" viewBox="0 0 16 17" fill="none"
+                          xmlns="http://www.w3.org/2000/svg">
+                          <path
+                            d="M11.3354 8.49994C11.3358 8.20566 11.2094 7.92549 10.9885 7.73101L6.02899 3.36784C5.68718 3.08103 5.17892 3.11954 4.88423 3.45459C4.58954 3.78963 4.61622 4.29865 4.94432 4.60106L9.28125 8.41633C9.30533 8.43744 9.31914 8.46791 9.31914 8.49994C9.31914 8.53196 9.30533 8.56243 9.28125 8.58355L4.94432 12.3988C4.61622 12.7012 4.58954 13.2102 4.88423 13.5453C5.17892 13.8803 5.68718 13.9188 6.02899 13.632L10.9868 9.2702C11.2081 9.07539 11.3351 8.79483 11.3354 8.49994Z"
+                            fill="#CBCACA" />
+                          <mask id="mask0_155_622" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="4" y="3"
+                            width="8" height="11">
+                            <path
+                              d="M11.3354 8.49994C11.3358 8.20566 11.2094 7.92549 10.9885 7.73101L6.02899 3.36784C5.68718 3.08103 5.17892 3.11954 4.88423 3.45459C4.58954 3.78963 4.61622 4.29865 4.94432 4.60106L9.28125 8.41633C9.30533 8.43744 9.31914 8.46791 9.31914 8.49994C9.31914 8.53196 9.30533 8.56243 9.28125 8.58355L4.94432 12.3988C4.61622 12.7012 4.58954 13.2102 4.88423 13.5453C5.17892 13.8803 5.68718 13.9188 6.02899 13.632L10.9868 9.2702C11.2081 9.07539 11.3351 8.79483 11.3354 8.49994Z"
+                              fill="white" />
+                          </mask>
+                          <g mask="url(#mask0_155_622)">
+                          </g>
+                        </svg>
+                      </div>
+                  </a>
+                </div>
+              </div>
+            </li>
+            {% if access_token_obj.enable_inbound == True %}
+              <li class="nav-item custom-nav-item col-lg-6 col-md-12 col-sm-12 mt-20 px-0 ">
+                <div class="col-md-12 px-0">
+                  <div class="card bg-white border rounded" id="main_card">
+                    <a href="/easy-assist/sales-ai/settings/options/calendar"  class="d-flex w-100 custom-link">
+                      <div class="row no-gutters">
+                        <div class=" col-auto d-flex-flex p-2 ml-3 mr-2 mt-4">
+                          <svg width="32" height="33" viewBox="0 0 32 33" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            {% if cobrowse_agent.get_access_token_obj.cobrowsing_console_theme_color != None %}
+                            <path d="M10.6667 3.16699V7.16699" stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2"
+                              stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M21.3333 3.16699V7.16699" stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2"
+                              stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M4.66666 12.6201H27.3333" stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2"
+                              stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                            <path
+                              d="M28 11.8337V23.167C28 27.167 26 29.8337 21.3333 29.8337H10.6667C6 29.8337 4 27.167 4 23.167V11.8337C4 7.83366 6 5.16699 10.6667 5.16699H21.3333C26 5.16699 28 7.83366 28 11.8337Z"
+                              stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round"
+                              stroke-linejoin="round" />
+                            <path d="M20.9263 18.7673H20.9383" stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2.66667"
+                              stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M20.9263 22.7673H20.9383" stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2.66667"
+                              stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M15.994 18.7673H16.0059" stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2.66667"
+                              stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M15.994 22.7673H16.0059" stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2.66667"
+                              stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M11.0591 18.7673H11.0711" stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2.66667"
+                              stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M11.0591 22.7673H11.0711" stroke="{{ access_token_obj.get_cobrowsing_console_theme_color.hex }}" stroke-width="2.66667"
+                              stroke-linecap="round" stroke-linejoin="round" />
+                            {% else %}
+                            <path d="M10.6667 3.16699V7.16699" stroke="#0254D7" stroke-width="2"
+                            stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                          <path d="M21.3333 3.16699V7.16699" stroke="#0254D7" stroke-width="2"
+                            stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                          <path d="M4.66666 12.6201H27.3333" stroke="#0254D7" stroke-width="2"
+                            stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                          <path
+                            d="M28 11.8337V23.167C28 27.167 26 29.8337 21.3333 29.8337H10.6667C6 29.8337 4 27.167 4 23.167V11.8337C4 7.83366 6 5.16699 10.6667 5.16699H21.3333C26 5.16699 28 7.83366 28 11.8337Z"
+                            stroke="#0254D7" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                          <path d="M20.9263 18.7673H20.9383" stroke="#0254D7" stroke-width="2.66667"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                          <path d="M20.9263 22.7673H20.9383" stroke="#0254D7" stroke-width="2.66667"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                          <path d="M15.994 18.7673H16.0059" stroke="#0254D7" stroke-width="2.66667"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                          <path d="M15.994 22.7673H16.0059" stroke="#0254D7" stroke-width="2.66667"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                          <path d="M11.0591 18.7673H11.0711" stroke="#0254D7" stroke-width="2.66667"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                          <path d="M11.0591 22.7673H11.0711" stroke="#0254D7" stroke-width="2.66667"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                            {% endif %} 
+                          </svg>
+    
+                        </div>
+                          <div class="col px-0">
+                            <div class="card-block px-2 mt-4 pb-0">
+                              <h5 class="card-title text-dark font-weight-bold fs-18 mb-0">
+                                Calendar
+                              </h5>
+                              <p class="card-text mt-2 mb-4 tab-sub-heading-text">
+                                Configure Working Days, Holidays
+                              </p>
+                            </div>
+                          </div>
+                        <div class="col-auto  pt-3 pr-3 mt-4">
+                          <svg width="16" height="17" viewBox="0 0 16 17" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                              d="M11.3354 8.49994C11.3358 8.20566 11.2094 7.92549 10.9885 7.73101L6.02899 3.36784C5.68718 3.08103 5.17892 3.11954 4.88423 3.45459C4.58954 3.78963 4.61622 4.29865 4.94432 4.60106L9.28125 8.41633C9.30533 8.43744 9.31914 8.46791 9.31914 8.49994C9.31914 8.53196 9.30533 8.56243 9.28125 8.58355L4.94432 12.3988C4.61622 12.7012 4.58954 13.2102 4.88423 13.5453C5.17892 13.8803 5.68718 13.9188 6.02899 13.632L10.9868 9.2702C11.2081 9.07539 11.3351 8.79483 11.3354 8.49994Z"
+                              fill="#CBCACA" />
+                            <mask id="mask0_155_622" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="4" y="3"
+                              width="8" height="11">
+                              <path
+                                d="M11.3354 8.49994C11.3358 8.20566 11.2094 7.92549 10.9885 7.73101L6.02899 3.36784C5.68718 3.08103 5.17892 3.11954 4.88423 3.45459C4.58954 3.78963 4.61622 4.29865 4.94432 4.60106L9.28125 8.41633C9.30533 8.43744 9.31914 8.46791 9.31914 8.49994C9.31914 8.53196 9.30533 8.56243 9.28125 8.58355L4.94432 12.3988C4.61622 12.7012 4.58954 13.2102 4.88423 13.5453C5.17892 13.8803 5.68718 13.9188 6.02899 13.632L10.9868 9.2702C11.2081 9.07539 11.3351 8.79483 11.3354 8.49994Z"
+                                fill="white" />
+                            </mask>
+                            <g mask="url(#mask0_155_622)">
+                            </g>
+                          </svg>
+                        </div>
+                    </a>
+                  </div>
+                </div>
+              </li>
+            {% else %} 
+              <li class="nav-item custom-nav-item col-lg-6 col-md-12 col-sm-12 mt-20 px-0 " data-toggle="tooltip" data-placement="bottom" data-original-title="Not applicable to Reverse Co-browsing">
+                <div class="disable-option-tab col-md-12 px-0" style="color: #CBCACA !important;">
+                  <div class="card bg-white border rounded" id="main_card">
+                    <a href="#"  class="d-flex w-100 custom-link">
+                      <div class="row no-gutters">
+                        <div class="col-auto disable-option-tab d-flex-flex p-2 ml-3 mr-2 mt-4" style="color: #CBCACA !important;">
+                          <svg width="32" height="33" viewBox="0 0 32 33" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10.6667 3.16699V7.16699" stroke="#CBCACA" stroke-width="2"
+                            stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M21.3333 3.16699V7.16699" stroke="#CBCACA" stroke-width="2"
+                              stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M4.66666 12.6201H27.3333" stroke="#CBCACA" stroke-width="2"
+                              stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                            <path
+                              d="M28 11.8337V23.167C28 27.167 26 29.8337 21.3333 29.8337H10.6667C6 29.8337 4 27.167 4 23.167V11.8337C4 7.83366 6 5.16699 10.6667 5.16699H21.3333C26 5.16699 28 7.83366 28 11.8337Z"
+                              stroke="#CBCACA" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round"
+                              stroke-linejoin="round" />
+                            <path d="M20.9263 18.7673H20.9383" stroke="#CBCACA" stroke-width="2.66667"
+                              stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M20.9263 22.7673H20.9383" stroke="#CBCACA" stroke-width="2.66667"
+                              stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M15.994 18.7673H16.0059" stroke="#CBCACA" stroke-width="2.66667"
+                              stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M15.994 22.7673H16.0059" stroke="#CBCACA" stroke-width="2.66667"
+                              stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M11.0591 18.7673H11.0711" stroke="#CBCACA" stroke-width="2.66667"
+                              stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M11.0591 22.7673H11.0711" stroke="#CBCACA" stroke-width="2.66667"
+                              stroke-linecap="round" stroke-linejoin="round" />
+                          </svg>
+    
+                        </div>
+                          <div class="col px-0">
+                            <div class="card-block px-2 mt-4 pb-0">
+                              <h5 class="disable-menu-tab card-title text-dark font-weight-bold fs-18 mb-0" style="color: #CBCACA !important;">
+                                Calendar
+                              </h5>
+                              <p class="disable-menu-tab card-text mt-2 mb-4 tab-sub-heading-text" style="color: #CBCACA !important;">
+                                Configure Working Days, Holidays
+                              </p>
+                            </div>
+                          </div>
+                        <div class="col-auto  pt-3 pr-3 mt-4 disable-option-tab" style="color: #CBCACA !important;">
+                          <svg width="16" height="17" viewBox="0 0 16 17" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                              d="M11.3354 8.49994C11.3358 8.20566 11.2094 7.92549 10.9885 7.73101L6.02899 3.36784C5.68718 3.08103 5.17892 3.11954 4.88423 3.45459C4.58954 3.78963 4.61622 4.29865 4.94432 4.60106L9.28125 8.41633C9.30533 8.43744 9.31914 8.46791 9.31914 8.49994C9.31914 8.53196 9.30533 8.56243 9.28125 8.58355L4.94432 12.3988C4.61622 12.7012 4.58954 13.2102 4.88423 13.5453C5.17892 13.8803 5.68718 13.9188 6.02899 13.632L10.9868 9.2702C11.2081 9.07539 11.3351 8.79483 11.3354 8.49994Z"
+                              fill="#CBCACA" />
+                            <mask id="mask0_155_622" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="4" y="3"
+                              width="8" height="11">
+                              <path
+                                d="M11.3354 8.49994C11.3358 8.20566 11.2094 7.92549 10.9885 7.73101L6.02899 3.36784C5.68718 3.08103 5.17892 3.11954 4.88423 3.45459C4.58954 3.78963 4.61622 4.29865 4.94432 4.60106L9.28125 8.41633C9.30533 8.43744 9.31914 8.46791 9.31914 8.49994C9.31914 8.53196 9.30533 8.56243 9.28125 8.58355L4.94432 12.3988C4.61622 12.7012 4.58954 13.2102 4.88423 13.5453C5.17892 13.8803 5.68718 13.9188 6.02899 13.632L10.9868 9.2702C11.2081 9.07539 11.3351 8.79483 11.3354 8.49994Z"
+                                fill="white" />
+                            </mask>
+                            <g mask="url(#mask0_155_622)">
+                            </g>
+                          </svg>
+                        </div>
+                    </a>
+                  </div>
+                </div>
+              </li>
+            {% endif %}
+          </ul>
+        </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function() {
+    try {
+        document.getElementById("nav-settings-menu").classList.add("active")
+    } catch(err) {}
+  });
+</script>
+{% endblock %}

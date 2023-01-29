@@ -1,0 +1,153 @@
+{% extends 'LiveChatApp/manager_console.html' %}
+{% block consolecontent %}
+{% load static %}
+
+<link href="{% static 'LiveChatApp/css/livechat_integrations.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+
+<style>
+	.modal-backdrop {
+		display: none !important;
+	}
+	.backdrop {
+		background-color: rgba(0, 0, 0, 0.5);
+	}
+	.dataTables_filter {
+	display: none;
+	}
+	#canned-response-table_info {
+		font-size: 13px;
+		margin-top: 60px;
+		color: #4D4D4D;
+		width: 50%;
+		padding-left: 10px;
+		display: inline-block;
+		position: absolute;
+		bottom: 2px;
+	}
+	.live-chat-canned-response-area table .cam input:checked~.checkmark {background-color: {{admin_config.get_livechat_theme_lighten_one }} !important;
+		
+	}
+	.upload-excel-button{
+	  border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }} !important;
+	  color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+   }
+   .upload-excel-button {
+    font-style: normal;
+    font-weight: 500;
+    border: 1px solid #0254D7;
+    text-align: center;
+    outline: none;
+    font-size: 12px;
+    width: 106px;
+    height: 35px;
+    background: #FFFFFF;
+    border-radius: 5px;
+    font-weight: 500;
+    font-size: 12px;
+    color: #0254D7;
+}
+.upload-excel-button:focus{
+  outline: none;
+}
+#custom-button{
+	border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }} !important;
+	color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+}
+#download_create_canned_response_template{
+	color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+}
+.custom-control-input:checked~.custom-control-label::before {
+            border-color: {{ admin_config.get_livechat_theme_lighten_one }};
+            background-color: {{ admin_config.get_livechat_theme_lighten_one }};
+        }
+.active-page {
+		background: {{ admin_config.get_livechat_theme_lighten_three }} !important;
+		border: 1px solid {{ admin_config.get_livechat_theme_lighten_one }} !important;
+}
+.active-page a {
+	color: {{ admin_config.get_livechat_theme_lighten_one }} !important;
+}
+</style>
+
+<div class="col-xl-10 col-lg-10 col-md-12 col-sm-12 col-12 p-0">
+
+<!-- ms dynamics integration code goes here ----------- -->
+<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 overflow-hidden-desktop p-0" style="height: 85%; background: #fafafa;">
+
+	<div class="live-chat-integration-section d-flex justify-content-between align-items-center" style="height: 52px; width: 98%;">
+		<div class="row">
+			<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 d-flex justify-content-between align-items-center">
+				<div class="d-flex align-items-center">
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M10.9979 6H6.49942C6.22328 6 5.99942 6.22386 5.99942 6.5V10.6653" stroke="#4D4D4D"></path>
+						<path d="M5.99941 12.9979L7.73095 10.3737H4.26787L5.99941 12.9979Z" fill="#4D4D4D"></path>
+						<path d="M13 19.9979H17.4985C17.7746 19.9979 17.9985 19.7741 17.9985 19.4979V15.3326" stroke="#4D4D4D"></path>
+						<path d="M17.9985 13L16.267 15.6242H19.7301L17.9985 13Z" fill="#4D4D4D"></path>
+						<path fill-rule="evenodd" clip-rule="evenodd" d="M17.1382 4.43594C17.0611 4.14128 16.8301 3.90534 16.528 3.86713C16.3551 3.84526 16.1788 3.83399 16 3.83399C15.8211 3.83399 15.6449 3.84526 15.472 3.86713C15.1698 3.90534 14.9388 4.14129 14.8618 4.43595L14.7884 4.71656C14.6709 5.1656 14.2093 5.43215 13.7617 5.30934L13.4825 5.23274C13.1891 5.15223 12.8696 5.23406 12.685 5.47599C12.4718 5.75552 12.2931 6.06283 12.1554 6.39154C12.0378 6.67211 12.1268 6.98966 12.3432 7.20347L12.5501 7.40789C12.8802 7.73412 12.8802 8.26722 12.5501 8.59344L12.3432 8.79786C12.1268 9.01167 12.0378 9.32923 12.1554 9.60979C12.2932 9.9385 12.4718 10.2458 12.685 10.5253C12.8696 10.7673 13.1891 10.8491 13.4825 10.7686L13.7617 10.692C14.2093 10.5692 14.6709 10.8357 14.7884 11.2848L14.8618 11.5654C14.9388 11.86 15.1698 12.096 15.472 12.1342C15.6449 12.1561 15.8211 12.1673 16 12.1673C16.1788 12.1673 16.3551 12.1561 16.528 12.1342C16.8301 12.096 17.0611 11.86 17.1382 11.5654L17.2116 11.2848C17.329 10.8357 17.7907 10.5692 18.2383 10.692L18.5175 10.7686C18.8109 10.8491 19.1304 10.7673 19.3149 10.5254C19.5282 10.2458 19.7068 9.93851 19.8446 9.60981C19.9621 9.32924 19.8732 9.01168 19.6568 8.79787L19.4499 8.59344C19.1198 8.26722 19.1198 7.73412 19.4499 7.40789L19.6568 7.20346C19.8732 6.98965 19.9622 6.67209 19.8446 6.39153C19.7068 6.06282 19.5282 5.75551 19.315 5.47598C19.1304 5.23405 18.8109 5.15223 18.5175 5.23274L18.2383 5.30934C17.7907 5.43215 17.329 5.1656 17.2116 4.71656L17.1382 4.43594ZM17.4583 8.00001C17.4583 8.80542 16.8054 9.45834 16 9.45834C15.1946 9.45834 14.5417 8.80542 14.5417 8.00001C14.5417 7.19459 15.1946 6.54167 16 6.54167C16.8054 6.54167 17.4583 7.19459 17.4583 8.00001Z" fill="#4D4D4D"></path>
+						<path fill-rule="evenodd" clip-rule="evenodd" d="M10.1382 13.4359C10.0611 13.1413 9.83012 12.9053 9.52796 12.8671C9.35505 12.8453 9.17883 12.834 8.99999 12.834C8.82113 12.834 8.6449 12.8453 8.47198 12.8671C8.16982 12.9053 7.93883 13.1413 7.86176 13.4359L7.78837 13.7166C7.67093 14.1656 7.20925 14.4321 6.76166 14.3093L6.4825 14.2327C6.18906 14.1522 5.86956 14.2341 5.68502 14.476C5.4718 14.7555 5.29313 15.0628 5.15539 15.3915C5.03783 15.6721 5.12679 15.9897 5.34317 16.2035L5.55006 16.4079C5.88021 16.7341 5.88021 17.2672 5.55006 17.5934L5.34318 17.7979C5.12679 18.0117 5.03783 18.3292 5.1554 18.6098C5.29314 18.9385 5.47181 19.2458 5.68503 19.5253C5.86957 19.7673 6.18907 19.8491 6.4825 19.7686L6.76166 19.692C7.20925 19.5692 7.67093 19.8357 7.78837 20.2848L7.86176 20.5654C7.93883 20.86 8.16982 21.096 8.47198 21.1342C8.6449 21.1561 8.82113 21.1673 8.99999 21.1673C9.17883 21.1673 9.35505 21.1561 9.52796 21.1342C9.83013 21.096 10.0611 20.86 10.1382 20.5654L10.2116 20.2848C10.329 19.8357 10.7907 19.5692 11.2383 19.692L11.5175 19.7686C11.8109 19.8491 12.1304 19.7673 12.3149 19.5254C12.5282 19.2458 12.7068 18.9385 12.8446 18.6098C12.9621 18.3292 12.8732 18.0117 12.6568 17.7979L12.4499 17.5934C12.1197 17.2672 12.1197 16.7341 12.4499 16.4079L12.6568 16.2035C12.8732 15.9896 12.9621 15.6721 12.8446 15.3915C12.7068 15.0628 12.5282 14.7555 12.3149 14.476C12.1304 14.2341 11.8109 14.1522 11.5175 14.2327L11.2383 14.3093C10.7907 14.4321 10.329 14.1656 10.2116 13.7166L10.1382 13.4359ZM10.4583 17C10.4583 17.8054 9.8054 18.4583 8.99999 18.4583C8.19457 18.4583 7.54165 17.8054 7.54165 17C7.54165 16.1946 8.19457 15.5417 8.99999 15.5417C9.8054 15.5417 10.4583 16.1946 10.4583 17Z" fill="#4D4D4D"></path>
+					</svg>
+					<span style="color: #858796;" id="sidebarlink">Integrations</span>
+				</div>                        
+			</div>
+		</div>
+	</div>
+		
+	  <div class="live-chat-integration-section d-flex justify-content-between align-items-center" style="height: 78px; width: 98%;">
+		<div class="row">
+			<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 d-flex justify-content-between align-items-center">
+				<div class="d-flex align-items-center">
+					<svg width="51" height="51" viewBox="0 0 51 51" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+						<rect width="51" height="51" fill="url(#pattern0)"></rect>
+						<defs>
+						<pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">
+						<use xlink:href="#image0_4_1219" transform="scale(0.00444444)"></use>
+						</pattern>
+						<image id="image0_4_1219" width="225" height="225" xlink:href="data:image/png;base64,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"></image>
+						</defs>
+					</svg>
+					<span style="color: #757575;" id="sidebarlink">Microsoft Dynamics 365</span>
+				</div>                        
+			</div>
+		</div>
+		<a href="/livechat/integrations/ms-dynamics/"><button class="configure-button" >Configure</button></a>
+	</div>
+</div>
+<!-- ms dynamics code end --------------- -->
+
+<script type="text/javascript">
+	window.LIVECHAT_THEME_COLOR = 'rgb(39,85,203,1)'
+	window.SHOW_VERSION_FOOTER = 'True'
+	if ('True' == 'True' && '1' == '3') {
+
+		window.STATUS_CHANGED_BY_ADMIN_SUPERVISOR = false
+	} else if ('False' == 'True') {
+
+		window.STATUS_CHANGED_BY_ADMIN_SUPERVISOR = true
+		try {
+
+		} catch {}
+	} else {
+
+		window.STATUS_CHANGED_BY_ADMIN_SUPERVISOR = false
+	}
+
+
+	$("#home-button").click(function() {
+		if ($("#panel").is(":visible") == true) {
+			$("#panel").hide(100);
+		} else {
+			$("#panel").show(100);
+		}
+	});
+
+	$("[data-toggle='tooltip']").tooltip();
+</script>
+
+</div>
+
+<script type="text/javascript">
+	window.CURRENT_STATUS = '{{user_obj.current_status}}'
+</script>
+
+{% endblock %}
+ 
